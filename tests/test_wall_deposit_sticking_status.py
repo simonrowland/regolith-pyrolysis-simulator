@@ -455,7 +455,8 @@ def test_uncertified_deposited_alpha_status_reaches_all_coating_surfaces() -> No
     readout = surfaces["readout"]
     leaderboard_row = surfaces["leaderboard_row"]
 
-    assert coating.feasible
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
     assert coating.status == "warning"
     assert coating.authoritative is False
     assert coating.output_status == "status_bearing"
@@ -1193,7 +1194,7 @@ def test_zero_deposit_out_of_domain_alpha_remains_non_authoritative() -> None:
     assert authority["deposited_species"] == []
 
 
-def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
+def test_out_of_domain_wall_psat_extrapolation_is_status_bearing() -> None:
     magnesium_vapor = condensation_module._species_vapor_data(
         "Mg",
         vapor_pressure_data=condensation_module.VAPOR_PRESSURE_DATA,
@@ -1219,15 +1220,21 @@ def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
         ),
     )
 
+    # b24e17095 predicts and flags this finite out-of-range wall Antoine
+    # value. The same temperature is an extrapolation, not a refusal, in
+    # test_wall_deposit_query_reports_out_of_domain_antoine_prediction.
     assert route.wall_deposit_by_species.get("Mg", 0.0) == pytest.approx(0.0)
-    refusal = route.sticking_alpha_provenance_notice[
+    assert (
         "wall_saturation_pressure_refusals_by_species"
+        not in route.sticking_alpha_provenance_notice
+    )
+    extrapolation = route.sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
     ]["Mg"]["stage_0_to_stage_1"]
-    assert refusal["status"] == "refused"
-    assert refusal["output_status"] == "status_bearing"
-    assert refusal["reason"] == "wall_saturation_pressure_out_of_domain"
-    assert refusal["wall_temperature_K"] == pytest.approx(wall_temperature_K)
-    assert refusal["wall_saturation_pressure_pa"] is None
+    assert extrapolation["status"] == "extrapolated"
+    assert extrapolation["authority_level"] == "extrapolated"
+    assert extrapolation["temperature_K"] == pytest.approx(wall_temperature_K)
+    assert extrapolation["valid_range_K"] == list(certified_range_K)
     assert any(
         "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
         in warning
@@ -1236,11 +1243,8 @@ def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
 
     assert authority["authoritative_for_deposit_mass"] is False
     assert authority["output_status"] == "status_bearing"
-    assert authority["code"] == "wall_deposit_saturation_pressure_refused"
-    assert authority["status_bearing_alpha_count"] == 1
+    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
     assert authority["out_of_domain_alpha_species"] == ["Mg"]
-    assert authority["status_bearing_refusal_count"] == 1
-    assert authority["wall_saturation_pressure_refused_species"] == ["Mg"]
     fouling = _wall_fouling_report(
         route.wall_deposit_by_species,
         alpha_notice=route.sticking_alpha_provenance_notice,
@@ -1250,7 +1254,7 @@ def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
     assert fouling["verdict"] == "non-authoritative"
 
 
-def test_wall_psat_refusal_survives_a_later_non_refusing_route() -> None:
+def test_wall_psat_extrapolation_survives_a_later_non_refusing_route() -> None:
     magnesium_vapor = condensation_module._species_vapor_data(
         "Mg",
         vapor_pressure_data=condensation_module.VAPOR_PRESSURE_DATA,
@@ -1293,7 +1297,7 @@ def test_wall_psat_refusal_survives_a_later_non_refusing_route() -> None:
     )
 
     assert "Mg" in first.sticking_alpha_provenance_notice[
-        "wall_saturation_pressure_refusals_by_species"
+        "wall_saturation_pressure_extrapolations_by_species"
     ]
     assert not any(
         bool(rate_diagnostic.get("wall_saturation_pressure_refused", False))
@@ -1302,10 +1306,10 @@ def test_wall_psat_refusal_survives_a_later_non_refusing_route() -> None:
     )
     final_notice = model.last_sticking_alpha_provenance_notice
     assert "Mg" in final_notice[
-        "wall_saturation_pressure_refusals_by_species"
+        "wall_saturation_pressure_extrapolations_by_species"
     ]
     assert "Mg" in second.sticking_alpha_provenance_notice[
-        "wall_saturation_pressure_refusals_by_species"
+        "wall_saturation_pressure_extrapolations_by_species"
     ]
 
     final_wall = {
@@ -1374,7 +1378,7 @@ def test_zero_deposit_refusal_reaches_product_web_and_leaderboard_surfaces() -> 
     trace_authority = surfaces["trace"].wall_deposit_sticking_authority
     assert trace_authority["authoritative_for_coating"] is False
     assert surfaces["product_summary"]["coating_authoritative"] is False
-    assert surfaces["product_summary"]["coating_status"] == "warning"
+    assert surfaces["product_summary"]["coating_status"] == "unavailable"
     assert surfaces["readout"]["authoritative"] is False
     assert surfaces["readout"]["output_status"] == "status_bearing"
     assert surfaces["leaderboard_row"]["coating_authoritative"] is False
@@ -1417,7 +1421,8 @@ def test_missing_or_wrong_species_alpha_status_reaches_all_coating_surfaces(
     readout = surfaces["readout"]
     leaderboard_row = surfaces["leaderboard_row"]
 
-    assert coating.feasible
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
     assert coating.status == "warning"
     assert coating.authoritative is False
     assert coating.output_status == "status_bearing"

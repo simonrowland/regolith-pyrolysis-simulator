@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import math
 from pathlib import Path
 
 import pytest
@@ -24,12 +23,12 @@ from simulator.state import (
 MULTI_TICK_COUNT = 4
 C0_ENDPOINT_SETPOINTS = {
     "temp_range_C": [20, 950],
-    "dT_dt_C_per_hr": 50,
+    "dT_dt_C_per_hr": 200,
     "max_hold_hr": 25,
-    "soft_endpoint": {
-        "min_hold_hr": 10,
-        "temperature_min_C": 940,
-    },
+    "carrier_gas": "Ar",
+    "p_total_mbar_default": 1.0,
+    "pO2_mbar_default": 0.0,
+    "alkali_retention_budget_fraction": 1.0e-3,
 }
 _ROOT = Path(__file__).resolve().parents[1]
 
@@ -140,57 +139,42 @@ def _has_runtime_wall_keys(mapping: dict) -> bool:
     return False
 
 
-def test_cold_wall_segment_attribution_matches_configured_geometry_values():
-    session = _start_session()
+@pytest.mark.parametrize(
+    ("p_total_mbar", "expect_vacuum_area_split"),
+    [(1.0, False), (0.0, True)],
+    ids=["owner-cover", "vacuum"],
+)
+def test_cold_wall_segment_attribution_matches_configured_geometry_values(
+    p_total_mbar, expect_vacuum_area_split, monkeypatch
+):
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C0"]["p_total_mbar_default"] = p_total_mbar
+    session = _start_session(setpoints=setpoints)
+    model = session.simulator.condensation_model
+    route_owner = model.route
+    route_results = []
 
+    def _record_route_owner(*args, **kwargs):
+        result = route_owner(*args, **kwargs)
+        route_results.append(result)
+        return result
+
+    monkeypatch.setattr(model, "route", _record_route_owner)
     attribution = _route_cold_wall_sio_tick(session)
 
-    # Premise: each local wall consumes J*A*M*3600 from its entering parcel;
-    # a later collector cannot rescale an earlier wall. Units are kg/h.
-    # These equal-temperature, equal-pressure walls below the supply limit
-    # preserve the configured area ratio A2/A1 = 4.5/4.0.
-    model = session.simulator.condensation_model
-    segment_areas_m2 = {
-        "process.wall_deposit_segment_stage_0_to_stage_1": (
-            math.pi * 0.06**2 * 4.0
-        ),
-        "process.wall_deposit_segment_stage_1_to_stage_2": (
-            math.pi * 0.06**2 * 4.5
-        ),
-    }
+    assert len(route_results) == 1
+    route_result = route_results[0]
+    sio_wall_kg = float(route_result.wall_deposit_by_species["SiO"])
+    sio_fractions_by_account = (
+        route_result.wall_deposit_account_fractions_by_species["SiO"]
+    )
     expected_sio_kg = {
-        account: (
-            _series_resistance_deposition_flux_mol_m2_s(
-                "SiO", model.wall_species_partial_pressures_pa_by_segment[segment.name]["SiO"],
-                segment.wall_temperature_C + 273.15,
-                _required_record_alpha_s(
-                    _wall_alpha_record("SiO", model.materials, segment=segment),
-                    species="SiO", site="wall_segment_alpha",
-                ),
-                pipe_diameter_m=segment.inner_diameter_m,
-                stir_factor=model.stir_factor,
-                radial_stir_factor=model.radial_stir_factor,
-                regime_factor=model.regime_factor,
-                T_gas_K=model.gas_temperature_C + 273.15,
-                overhead_pressure_pa=model.overhead_pressure_mbar * 100.0,
-                carrier_gas=model.carrier_gas,
-                vapor_pressure_data=model.vapor_pressure_data,
-            )
-            * area_m2
-            * (MOLAR_MASS["SiO"] / 1000.0)
-            * 3600.0
-        )
-        for segment in model.pipe_segments
-        for account, area_m2 in segment_areas_m2.items()
-        if account == "process.wall_deposit_segment_" + segment.name
+        account: sio_wall_kg * float(fraction)
+        for account, fraction in sio_fractions_by_account.items()
     }
+    expected_accounts = set(expected_sio_kg)
 
-    stage_capture_kg = sum(session.simulator.atom_ledger.kg_by_account(
-        "process.condensation_train"
-    ).values())
-    assert stage_capture_kg > 0.0
-
-    assert set(attribution) == set(expected_sio_kg)
+    assert set(attribution) == expected_accounts
     for account, sio_kg in expected_sio_kg.items():
         species_kg = attribution[account]
         assert species_kg == {
@@ -203,17 +187,26 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
         }
     assert sum(
         sum(species_kg.values()) for species_kg in attribution.values()
-    ) == pytest.approx(sum(expected_sio_kg.values()))
-    assert sum(attribution[
-        "process.wall_deposit_segment_stage_1_to_stage_2"
-    ].values()) > sum(attribution[
-        "process.wall_deposit_segment_stage_0_to_stage_1"
-    ].values())
+    ) == pytest.approx(sio_wall_kg)
+    if expect_vacuum_area_split:
+        downstream = sum(attribution[
+            "process.wall_deposit_segment_stage_1_to_stage_2"
+        ].values())
+        upstream = sum(attribution[
+            "process.wall_deposit_segment_stage_0_to_stage_1"
+        ].values())
+        assert downstream / upstream == pytest.approx(4.5 / 4.0)
+        assert downstream > upstream
+
+    stage_capture_kg = sum(session.simulator.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).values())
+    assert stage_capture_kg > 0.0
     assert session.simulator.atom_ledger.kg_by_account(
         "process.wall_deposit"
     ) == {}
     overhead_kg = session.simulator.atom_ledger.kg_by_account("process.overhead_gas").get("SiO", 0.0)
-    assert stage_capture_kg + sum(expected_sio_kg.values()) + overhead_kg == pytest.approx(1.0)
+    assert stage_capture_kg + sio_wall_kg + overhead_kg == pytest.approx(1.0)
 
 
 def test_repeated_in_process_runs_keep_wall_attribution_deterministic():

@@ -10,6 +10,9 @@ from types import MethodType, SimpleNamespace
 import pytest
 
 from simulator.condensation import _coerce_alpha_s
+from simulator.campaigns import CampaignManager, CampaignSetpointMissingRefusal
+from simulator.config import load_config_bundle
+from simulator.state import CampaignPhase
 from simulator.silent_zero import (
     CATEGORY_PROVEN_ZERO,
     CATEGORY_REFUSE,
@@ -135,7 +138,7 @@ def test_kernel_ok_empty_note_on_diagnostic_surface() -> None:
         _record_degraded_path_engagement=lambda *a, **k: None,
         _vapor_pressure_dispatch_pO2_bar=lambda: 1e-12,
         _vapor_pressure_dispatch_intrinsic_fO2_log=lambda: None,
-        _vacuum_floor_bar=lambda: 1e-12,
+        _oxygen_numerical_floor_bar=lambda: 1e-12,
     )
     if not hasattr(PyrolysisSimulator, "_refresh_vapor_pressures_from_kernel"):
         pytest.skip("kernel refresh helper unavailable")
@@ -388,7 +391,7 @@ def test_internal_analytical_feo_below_threshold_vs_missing_activity() -> None:
             melt_fO2_log=-9.0,
         ),
         _headspace_transport_pO2_bar=lambda: 1e-12,
-        _vacuum_floor_bar=lambda: 1e-12,
+        _oxygen_numerical_floor_bar=lambda: 1e-12,
         atom_ledger=None,
         _ELLINGHAM_THERMO=EquilibriumMixin._ELLINGHAM_THERMO,
         vapor_pressures={
@@ -466,15 +469,24 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
 
     from simulator.extraction import ExtractionMixin
 
+    source_row = load_config_bundle().setpoints["campaigns"]["C7"]
+    setpoints = {
+        "campaigns": {
+            "C7": {"default_hold_T_C": source_row["default_hold_T_C"]}
+        }
+    }
     sim = SimpleNamespace(
         melt=SimpleNamespace(
+            campaign=CampaignPhase.C7_CA_ALUMINOTHERMIC,
+            campaign_hour=0,
             melt_surface_area_m2=0.2,
             p_total_mbar=0.05,
             stir_state=SimpleNamespace(axial=1.0),
             stir_factor=1.0,
         ),
         vapor_pressures={"metals": {"Ca": ca_entry}},
-        setpoints={},
+        setpoints=setpoints,
+        campaign_mgr=CampaignManager(setpoints),
         _resolve_condensation_carrier_gas=lambda: "N2",
         overhead=SimpleNamespace(headspace_temperature_K=1000.0),
         overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
@@ -485,8 +497,26 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
     sim._c7_float = ExtractionMixin._c7_float
     sim._c7_clamp = ExtractionMixin._c7_clamp
     sim._c7_bool = ExtractionMixin._c7_bool
+    sim._c7_hold_temperature_C = MethodType(
+        ExtractionMixin._c7_hold_temperature_C,
+        sim,
+    )
     sim._c7_knob_diag = MethodType(ExtractionMixin._c7_knob_diag, sim)
     return sim
+
+
+def test_c7_transport_requires_campaign_hold_setpoint() -> None:
+    from simulator.extraction import ExtractionMixin
+
+    sim = _c7_sim({})
+    sim.campaign_mgr.setpoints["campaigns"]["C7"].pop("default_hold_T_C")
+
+    with pytest.raises(CampaignSetpointMissingRefusal):
+        ExtractionMixin._c7_transport_extent_mol(
+            sim,
+            {"hold_time_h": 1.0, "p_total_mbar": 0.05},
+            ca_per_extent=1.0,
+        )
 
 
 def test_c7_ca_missing_coefficient_and_thermo_notes_bounded() -> None:

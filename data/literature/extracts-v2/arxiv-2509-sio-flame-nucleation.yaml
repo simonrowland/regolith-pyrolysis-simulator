@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -68,6 +69,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -107,6 +109,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -146,6 +149,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -230,6 +234,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -270,6 +275,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -310,6 +316,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -359,9 +366,8 @@ observations:
       tag: not_applicable
       reason: profile density does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped density field selected; source fields: method_class, generator, quantity, density_g_cm3,
-      density_kg_m3_also_printed'
+    kind: point
+    point: '2196'
     approximate: false
   uncertainty:
     kind: none
@@ -372,15 +378,67 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density
   source_id: arxiv-2509-sio-flame-nucleation
   locator:
     page: 20
     section: B.2 Validation of expression for Brownian motion
     equation: '52'
   read_from: pdf:arxiv-2509-sio-flame-nucleation
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:arxiv-2509-sio-flame-nucleation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.196'
+        locator:
+          page: 20
+          section: B.2 Validation of expression for Brownian motion
+          equation: '52'
+        inference:
+          relation: g_per_cm3_to_kg_per_m3
+          inputs:
+          - rho_kg_per_m3 = rho_g_per_cm3 × 1000
+          - original_unit=g_per_cm3
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.196'
+              locator:
+                page: 20
+                section: B.2 Validation of expression for Brownian motion
+                equation: '52'
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 20
+                section: B.2 Validation of expression for Brownian motion
+                equation: '52'
+          output_unit: kg_per_m3
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 20
+          section: B.2 Validation of expression for Brownian motion
+          equation: '52'
+    output_unit: kg_per_m3
+    references: []
 - observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_reaction_mechanism
   experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
   identity:
@@ -395,6 +453,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -408,9 +467,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Panjwani, B.; Olsen, J. E. (2013), "Combustion and mechanism for NOx formation in ferrosilicon electric arc
+      furnaces," Proceedings of the European Combustion Meeting (ref. 14), as cited by Haugen et al. (2025); NOx elements
+      omitted
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -521,6 +582,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -560,6 +622,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

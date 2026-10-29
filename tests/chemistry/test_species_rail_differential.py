@@ -19,6 +19,8 @@ from simulator.diagnostic_helpers.gibbs_battery import (
     LN10,
     RT_LN10_298_15_KJ,
     TYPED_REFUSAL_PREFIX,
+    engine_delta_fG_kJ_mol,
+    resolve_pilot_channel,
 )
 from simulator.chemistry.ellingham_thermo import ellingham_fit_range_K
 from simulator.diagnostic_helpers.species_rail import (
@@ -59,6 +61,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     ScoredRailPoint,
     build_report,
     classify_phase_token,
+    cea_delta_fG_kJ_mol,
     elemental_reference_mismatch_applies,
     elemental_reference_shift_kJ_per_mol_O2,
     ellingham_line_product_oxide,
@@ -297,6 +300,21 @@ def test_o2_identity_point_is_a_match() -> None:
     assert score.provenance_class == "independent_tabulation"
     self_check = table_self_check_residual(point)
     assert self_check == pytest.approx(0.0, abs=1e-12)
+
+
+def test_formation_gibbs_current_numeric_outputs_before_consolidation() -> None:
+    """Pin both current CEA formation paths before moving their subtraction owner."""
+
+    pilot_po2 = resolve_pilot_channel("PO2")
+    assert engine_delta_fG_kJ_mol(pilot_po2, 1000.0).hex() == "-0x1.197cb595c8f2fp+8"
+    assert engine_delta_fG_kJ_mol(pilot_po2, 1500.0).hex() == "-0x1.14e027064b6d7p+8"
+
+    assert cea_delta_fG_kJ_mol("H2O", 298.15).hex() == "-0x1.c92865388f3b2p+7"
+    assert cea_delta_fG_kJ_mol("H2O", 1000.0).hex() == "-0x1.81293c3ccb96fp+7"
+
+    # FeO stays gaseous while its elemental Fe reference crosses α → γ → δ.
+    assert cea_delta_fG_kJ_mol("FeO", 1000.0).hex() == "0x1.217ffb9d22418p+7"
+    assert cea_delta_fG_kJ_mol("FeO", 1500.0).hex() == "0x1.91b407cf81134p+6"
 
 
 def test_inconsistent_table_logk_does_not_admit_cea_comparison(monkeypatch) -> None:

@@ -55,21 +55,10 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Sequence
 
-#: Molar masses (g/mol) for the CMAS parent-oxide formula units this checker
-#: supports. IUPAC 2021 atomic weights; formula-unit basis matches the
-#: benchmark's EngineResult.activities convention.
-_MOLAR_MASS_G_MOL: dict[str, float] = {
-    "SiO2": 60.084,
-    "CaO": 56.077,
-    "MgO": 40.304,
-    "Al2O3": 101.961,
-    # Alkalis: review 2026-08-19 caught that the module was motivated by the
-    # alkali-shape defect class and then refused Na2O as unsupported. The hole
-    # was this table, not thermodynamics — closed-system GD applies to
-    # alkali-bearing melts exactly as to CMAS.
-    "Na2O": 61.979,
-    "K2O": 94.196,
-}
+from simulator.accounting import resolve_species_formula
+
+# Supported formula units; masses come from accounting.formulas.
+_SUPPORTED_OXIDES = ("SiO2", "CaO", "MgO", "Al2O3", "Na2O", "K2O")
 
 #: Species this checker refuses because of an OPERATIONAL mismatch, restated
 #: after review (2026-08-19): for an equilibrium phase the GD identity itself
@@ -208,12 +197,13 @@ def mole_fractions_from_wt(
                 "the Fe couple, so its residual would conflate speciation "
                 "with model inconsistency. Use an Fe-free path."
             )
-        if name not in _MOLAR_MASS_G_MOL:
+        if name not in _SUPPORTED_OXIDES:
             raise GibbsDuhemInapplicable(
                 f"unsupported component {name!r}; supported: "
-                + ", ".join(sorted(_MOLAR_MASS_G_MOL))
+                + ", ".join(sorted(_SUPPORTED_OXIDES))
             )
-        moles[name] = wt / _MOLAR_MASS_G_MOL[name]
+        molar_mass = resolve_species_formula(name).molar_mass_g_per_mol()
+        moles[name] = wt / molar_mass
     total = sum(moles.values())
     if total <= 0.0:
         raise GibbsDuhemInapplicable("empty composition")

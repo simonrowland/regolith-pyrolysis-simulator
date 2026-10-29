@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import warnings
 
 import pytest
 
@@ -61,34 +62,57 @@ def test_dissociation_pO2_threshold_matches_formation_equilibrium(
     ) == pytest.approx(expected, rel=0.0, abs=1e-12)
 
 
-def test_negative_pO2_refuses_before_division_floor(vapor_pressure_data) -> None:
-    """SC-170 C2: a negative fugacity must refuse, not floor to 1e-30.
+@pytest.mark.parametrize("oxygen", [-1.0, 0.0, float("nan"), float("inf"), -float("inf")])
+def test_invalid_pO2_is_a_typed_refusal(vapor_pressure_data, oxygen):
+    for call in (
+        lambda: ellingham_graph.metal_activity_factor("Na", 1700.0, oxygen),
+        lambda: ellingham_graph.effective_equilibrium_pressure_Pa(
+            "Na", 1700.0, oxygen, vapor_pressure_data=vapor_pressure_data,
+        ),
+        lambda: ellingham_graph.evolves(
+            "Na", 1700.0, oxygen, vapor_pressure_data=vapor_pressure_data,
+        ),
+    ):
+        with pytest.raises(ellingham_graph.EllinghamPressureRefusal, match="finite and positive"):
+            call()
 
-    ``max(-1.0, 1e-30)`` is 1e-30, which kills the ``numerator <= 0``
-    guard and returns a physical-looking P_sat. The 1e-30 floor stays
-    as a division guard for zero / tiny-positive pO2; only a negative
-    input is invalid.
-    """
-    with pytest.raises(ellingham_graph.EllinghamPressureRefusal, match="non-negative"):
-        ellingham_graph.metal_activity_factor("Na", 1700.0, -1.0)
-    with pytest.raises(ellingham_graph.EllinghamPressureRefusal, match="non-negative"):
-        ellingham_graph.effective_equilibrium_pressure_Pa(
-            "Na",
-            1700.0,
-            -1.0,
-            vapor_pressure_data=vapor_pressure_data,
-        )
-    with pytest.raises(ellingham_graph.EllinghamPressureRefusal, match="non-negative"):
-        ellingham_graph.evolves(
-            "Na",
-            1700.0,
-            -1.0,
-            vapor_pressure_data=vapor_pressure_data,
-        )
-    # Zero still takes the vacuum floor; that is not this class.
-    assert ellingham_graph.metal_activity_factor("Na", 1700.0, 0.0) == pytest.approx(
-        ellingham_graph.metal_activity_factor("Na", 1700.0, 1e-30)
-    )
+
+@pytest.mark.parametrize("route", ["helper", "fallback"])
+@pytest.mark.parametrize("species,exponent", [("SiO", -0.5), ("Si", -1.0)])
+def test_b984_actual_oxygen_reaction_law_and_notice(vapor_pressure_data, route, species, exponent):
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    backend = AlphaMELTSBackend()
+    answers = {}
+    receipts = {}
+    for oxygen in (1e-31, 1e-30, 1e-29, 1e-12, 1e-9, 1e-8, 100.0, 1000.0):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            if route == "helper":
+                pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
+                    species, 1873.15, oxygen, vapor_pressure_data=vapor_pressure_data,
+                )
+            else:
+                pressure = backend._activities_times_antoine(
+                    1600.0, {"SiO2": 1.0}, {"SiO2": 100.0}, pO2_bar=oxygen,
+                )[species]
+                receipts[oxygen] = backend._antoine_floor_inversion_notices.get(species)
+        answers[oxygen] = pressure
+        if oxygen in (1e-31, 1000.0):
+            assert any("pO2_outside_evaluator_band" in str(w.message)
+                       and repr(oxygen) in str(w.message) for w in caught)
+    # SiO2 -> SiO + 1/2 O2 gives exponent -1/2; SiO2 -> Si + O2 gives -1.
+    # Fixed T/activity cancels the equilibrium constant in P/P_ref, leaving
+    # (pO2/p_ref)**exponent (bar/bar dimensionless), continuous through p_ref.
+    for oxygen, pressure in answers.items():
+        assert pressure / answers[1e-9] == pytest.approx((oxygen / 1e-9) ** exponent)
+    if route == "fallback":
+        for oxygen in (1e-31, 1000.0):
+            notice = receipts[oxygen]
+            assert notice["reason"] == "pO2_outside_evaluator_band"
+            assert notice["pO2_bar_used"] == oxygen
+            assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
+            assert notice["was_clamped"] is False
 
 
 def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:

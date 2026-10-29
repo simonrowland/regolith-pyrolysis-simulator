@@ -10,9 +10,13 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from functools import lru_cache
+from importlib import metadata
 from importlib import resources
+import json
 import math
 import numbers
+from pathlib import Path
+import subprocess
 from types import MappingProxyType
 from typing import Any
 
@@ -49,6 +53,12 @@ except (ImportError, OSError, RuntimeError) as exc:  # pragma: no cover
 else:
     _OPENIMCC_IMPORT_ERROR = None
 
+_IMCC_REFUSAL_ERROR_TYPE: type[BaseException] | None = (
+    getattr(_openimcc, "ImccRefusal", None)
+    if _openimcc is not None
+    else None
+)
+
 
 OPENIMCC_INSTALL_HINT = (
     "python -m pip install --no-deps "
@@ -56,9 +66,103 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@af0f2a241b4a76bd3d0867bdce2029497bc11403"
+    "@66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
 )
+
+
+def imported_openimcc_commit() -> str | None:
+    """Return the commit for the imported package, if it can be verified."""
+
+    module = _openimcc
+    module_file = getattr(module, "__file__", None) if module is not None else None
+    if not isinstance(module_file, str):
+        return None
+    try:
+        imported_path = Path(module_file).resolve()
+    except (OSError, RuntimeError):
+        return None
+
+    try:
+        distribution = metadata.distribution("openimcc")
+    except metadata.PackageNotFoundError:
+        distribution = None
+
+    if distribution is not None:
+        distribution_files = distribution.files
+        belongs_to_distribution = bool(
+            distribution_files
+            and any(
+                Path(distribution.locate_file(entry)).resolve() == imported_path
+                for entry in distribution_files
+            )
+        )
+        if not belongs_to_distribution:
+            # Some editable installs omit RECORD entries. Compare the imported
+            # package file at the distribution's location rather than trusting
+            # an unrelated openimcc dist-info elsewhere on sys.path.
+            belongs_to_distribution = (
+                Path(distribution.locate_file("openimcc/__init__.py")).resolve()
+                == imported_path
+            )
+        if belongs_to_distribution:
+            direct_url = distribution.read_text("direct_url.json")
+            if direct_url:
+                try:
+                    direct_url_data = json.loads(direct_url)
+                except (TypeError, json.JSONDecodeError):
+                    direct_url_data = None
+                vcs_info = (
+                    direct_url_data.get("vcs_info")
+                    if isinstance(direct_url_data, dict)
+                    else None
+                )
+                commit_id = (
+                    vcs_info.get("commit_id") if isinstance(vcs_info, dict) else None
+                )
+                if isinstance(commit_id, str) and commit_id:
+                    return commit_id
+
+    # A PYTHONPATH source checkout may shadow a stale distribution. In that
+    # case report the checkout's HEAD, never the unrelated dist-info commit.
+    if "site-packages" in imported_path.parts or any(
+        part in {".venv", "venv", "env"} for part in imported_path.parts
+    ):
+        return None
+    for checkout in imported_path.parents:
+        if not (checkout / ".git").exists():
+            continue
+        try:
+            relative_path = imported_path.relative_to(checkout)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(checkout),
+                    "ls-files",
+                    "--error-unmatch",
+                    str(relative_path),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            result = subprocess.run(
+                ["git", "-C", str(checkout), "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+        except (OSError, subprocess.SubprocessError):
+            continue
+        commit_id = result.stdout.strip()
+        return commit_id or None
+    return None
 DEFAULT_BACKEND_PACK_NAME = "default"
+
+# Retained domain metadata for typed fallback when the optional package is absent.
+_UNAVAILABLE_TEMPERATURE_DOMAIN_K = (1700.0, 3000.0)
 
 _PACK_RESOURCE_NAMES = {
     "default": None,
@@ -176,6 +280,59 @@ class OpenImccBridgeResult:
     coverage: Mapping[str, str]
     activity_coefficients: Mapping[str, Mapping[str, Any]] | None = None
     parent_oxide_x_star_ratios: Mapping[str, float] = field(default_factory=dict)
+
+    def to_transport(self) -> dict[str, Any]:
+        """Return every result field in a plain, multiprocessing-safe shape."""
+        return {
+            "parent_oxide_activities": dict(self.parent_oxide_activities),
+            "parent_oxides": self.parent_oxides,
+            "flags": self.flags,
+            "notices": self.notices,
+            "acid_sink_ratio": self.acid_sink_ratio,
+            "pack_model_id": self.pack_model_id,
+            "pack_version": self.pack_version,
+            "pack_digest": self.pack_digest,
+            "openimcc_version": self.openimcc_version,
+            "envelope_status": self.envelope_status,
+            "extrapolated": self.extrapolated,
+            "labels": {
+                "identity": dict(self.labels.identity),
+                "coverage": dict(self.labels.coverage),
+                "trust": self.labels.trust,
+                "envelope_status": self.labels.envelope_status,
+                "flags": self.labels.flags,
+                "notices": self.labels.notices,
+                "acid_sink_ratio": self.labels.acid_sink_ratio,
+            },
+            "coverage": dict(self.coverage),
+            "activity_coefficients": {
+                key: dict(value)
+                for key, value in (self.activity_coefficients or {}).items()
+            },
+            "parent_oxide_x_star_ratios": dict(self.parent_oxide_x_star_ratios),
+        }
+
+    @classmethod
+    def from_transport(cls, payload: Mapping[str, Any]) -> OpenImccBridgeResult:
+        """Rebuild the immutable bridge DTO after crossing a process boundary."""
+        labels = payload["labels"]
+        return cls(
+            parent_oxide_activities=payload["parent_oxide_activities"],
+            parent_oxides=payload["parent_oxides"],
+            flags=payload["flags"],
+            notices=payload["notices"],
+            acid_sink_ratio=payload["acid_sink_ratio"],
+            pack_model_id=payload["pack_model_id"],
+            pack_version=payload["pack_version"],
+            pack_digest=payload["pack_digest"],
+            openimcc_version=payload["openimcc_version"],
+            envelope_status=payload["envelope_status"],
+            extrapolated=payload["extrapolated"],
+            labels=ImccAdapterLabels(**labels),
+            coverage=payload["coverage"],
+            activity_coefficients=payload["activity_coefficients"],
+            parent_oxide_x_star_ratios=payload["parent_oxide_x_star_ratios"],
+        )
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -415,6 +572,94 @@ def _composition_wt_pct_from_moles(
     }
 
 
+def ferric_folded_to_feot_notices(
+    *,
+    fe2o3_wt_pct: float,
+    feo_total_wt_pct: float,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """The one notice pair for an Fe-atom fold of Fe2O3 onto FeOt."""
+
+    return (
+        {
+            "code": "openimcc_fe2o3_fold",
+            "fe2o3_wt_pct": fe2o3_wt_pct,
+            "feo_total_wt_pct": feo_total_wt_pct,
+            "factor": FE2O3_TO_FEO_TOTAL_WT_FACTOR,
+            "basis": "Fe_atoms",
+        },
+        {
+            "code": "openimcc_ferric_component_collapsed",
+            "message": "ferric component collapsed until d-072",
+        },
+    )
+
+
+def positive_fe2o3(composition: Mapping[str, Any]) -> bool:
+    """True when the composition carries a positive finite Fe2O3 amount."""
+
+    if not isinstance(composition, Mapping):
+        return False
+    raw = composition.get("Fe2O3")
+    if isinstance(raw, bool) or not isinstance(raw, numbers.Real):
+        return False
+    value = float(raw)
+    return math.isfinite(value) and value > 0.0
+
+
+def _oxide_wt_pct_known(composition_mol: Mapping[str, Any]) -> dict[str, float]:
+    """Wt% over oxides with a molar mass. Unknown names stay out of the notice."""
+
+    masses: dict[str, float] = {}
+    for name, amount in composition_mol.items():
+        if str(name) not in MOLAR_MASS or isinstance(amount, bool):
+            continue
+        if not isinstance(amount, numbers.Real):
+            continue
+        value = float(amount)
+        if math.isfinite(value) and value > 0.0:
+            masses[str(name)] = value
+    if not masses:
+        return {}
+    return _composition_wt_pct_from_moles(masses)
+
+
+def fold_ferric_to_feot(
+    composition_mol: Mapping[str, Any],
+) -> tuple[Mapping[str, Any], tuple[dict[str, Any], ...]]:
+    """Fold positive Fe2O3 onto FeOt before OpenIMCC evaluate.
+
+    OpenIMCC refuses raw Fe2O3. Iron atoms stay on the FeO mole basis
+    owned by feot_equivalent_moles: n(FeOt) = n(FeO) + 2 * n(Fe2O3).
+    No positive Fe2O3 returns the same mapping and no notices, so a
+    ferrous row is unchanged. Fe2O3 of zero is not ferric iron.
+    """
+
+    if not isinstance(composition_mol, Mapping) or not positive_fe2o3(
+        composition_mol
+    ):
+        return composition_mol, ()
+    canonical = _canonical_composition(dict(composition_mol))
+    coerced = dict(canonical)
+    for name in ("FeO", "Fe2O3"):
+        raw = coerced.get(name)
+        if isinstance(raw, bool) or not isinstance(raw, numbers.Real):
+            continue
+        coerced[name] = float(raw)
+    # n(FeOt) = n(FeO) + 2 * n(Fe2O3). Do not retype that sum here.
+    feot_moles = feot_equivalent_moles(coerced)
+    folded = {
+        key: value for key, value in canonical.items() if key != "Fe2O3"
+    }
+    folded["FeO"] = feot_moles
+    source_wt = _oxide_wt_pct_known(canonical)
+    folded_wt = _oxide_wt_pct_known(folded)
+    fold_notice, redox_notice = ferric_folded_to_feot_notices(
+        fe2o3_wt_pct=source_wt.get("Fe2O3", 0.0),
+        feo_total_wt_pct=folded_wt.get("FeO", 0.0),
+    )
+    return folded, (fold_notice, redox_notice)
+
+
 def _cleaned_melt_policy(
     composition_mol: Mapping[str, float],
 ) -> tuple[dict[str, float], dict[str, Any]]:
@@ -534,19 +779,14 @@ def _cleaned_melt_policy(
         policy["openimcc_projection_crmn_relaxed"] = relaxed_notice
     _feo_wt_pct, fe2o3_wt_pct = iron_oxide_values(source_wt_pct)
     if fe2o3_wt_pct > 0.0:
-        policy["fe2o3_fold"] = {
-            "code": "openimcc_fe2o3_fold",
-            "fe2o3_wt_pct": fe2o3_wt_pct,
-            "feo_total_wt_pct": _composition_wt_pct_from_moles(
+        fold_notice, redox_notice = ferric_folded_to_feot_notices(
+            fe2o3_wt_pct=fe2o3_wt_pct,
+            feo_total_wt_pct=_composition_wt_pct_from_moles(
                 cleaned_composition_mol
             ).get("FeO", 0.0),
-            "factor": FE2O3_TO_FEO_TOTAL_WT_FACTOR,
-            "basis": "Fe_atoms",
-        }
-        policy["fe_redox_notice"] = {
-            "code": "openimcc_ferric_component_collapsed",
-            "message": "ferric component collapsed until d-072",
-        }
+        )
+        policy["fe2o3_fold"] = fold_notice
+        policy["fe_redox_notice"] = redox_notice
     return cleaned_composition_mol, policy
 
 
@@ -639,6 +879,15 @@ def _load_pack(pack_name: str) -> Any:
         return package.load_datapack(path)
 
 
+def _temperature_domain_K() -> tuple[float, float]:
+    try:
+        _require_openimcc()
+        domains = _load_pack(DEFAULT_BACKEND_PACK_NAME).kernel_datapack.domains
+    except OpenImccUnavailableError:
+        return _UNAVAILABLE_TEMPERATURE_DOMAIN_K
+    return max(low for low, _ in domains), min(high for _, high in domains)
+
+
 def _pack_digest(pack: Any) -> str:
     value = getattr(pack, "binding_digest", None)
     if not isinstance(value, str) or not value:
@@ -694,6 +943,8 @@ def evaluate(
     are explicit and default to refusal. Positive ``Fe2O3`` remains an openimcc typed refusal
     because the IMCC adapter requires the caller's
     redox model to convert it to the FeO-equivalent convention first.
+    The battery scorer folds first via ``fold_ferric_to_feot``; this
+    function still refuses a raw ferric composition.
     """
 
     package = _require_openimcc()

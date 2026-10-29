@@ -33,11 +33,9 @@ cao_reducing_cell_kems:
   source: S. I. Shornikov, Thermodynamic Study of Calcium Oxide Evaporation under Various Redox Conditions (2025)
   doi: 10.1007/978-3-031-80664-3_20
   pressure_uncertainty_relative_max: 0.10
-  raw_pCa:
-    - {temperature_K: 1812.0, pressure_atm: 6.59e-8}
-    - {temperature_K: 1913.0, pressure_atm: 4.09e-7}
-    - {temperature_K: 2000.0, pressure_atm: 1.76e-6}
-    - {temperature_K: 2100.0, pressure_atm: 7.85e-6}
+  # Table 1 raw values are held only by the full source extract; cross-extract
+  # supersedes do not resolve in migration, so the former mirror rows retire here.
+  raw_pCa: []
   fitted_log10_pCa_atm:
     intercept: 7.76965
     inverse_temperature_coefficient_K: -27058.1

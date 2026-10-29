@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -68,7 +69,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '190'
+    point: '0.006783291681542306803519577404'
     approximate: false
   uncertainty:
     kind: none
@@ -93,6 +94,75 @@ observations:
     note: row=AV; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '190'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=AV; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '190'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=AV; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=AV; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=AV; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=AV; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=AV; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_bd
   experiment_id: 10.1029/2024je008587::experiment::bd
   identity:
@@ -107,6 +177,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -159,7 +230,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '80'
+    point: '0.002856122813280971285692453644'
     approximate: false
   uncertainty:
     kind: none
@@ -184,6 +255,75 @@ observations:
     note: row=BD; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '80'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=BD; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '80'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=BD; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=BD; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=BD; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=BD; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=BD; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_ca1
   experiment_id: 10.1029/2024je008587::experiment::ca1
   identity:
@@ -198,6 +338,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -250,7 +391,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '30'
+    point: '0.001071046054980364232134670116'
     approximate: false
   uncertainty:
     kind: none
@@ -275,6 +416,75 @@ observations:
     note: row=CA1; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '30'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=CA1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '30'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=CA1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=CA1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=CA1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=CA1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=CA1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_ca2
   experiment_id: 10.1029/2024je008587::experiment::ca2
   identity:
@@ -289,6 +499,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -341,7 +552,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '50'
+    point: '0.001785076758300607053557783528'
     approximate: false
   uncertainty:
     kind: none
@@ -366,6 +577,75 @@ observations:
     note: row=CA2; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '50'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=CA2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '50'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=CA2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=CA2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=CA2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=CA2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=CA2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_mg1
   experiment_id: 10.1029/2024je008587::experiment::mg1
   identity:
@@ -380,6 +660,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -432,7 +713,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '180'
+    point: '0.006426276329882185392808020699'
     approximate: false
   uncertainty:
     kind: none
@@ -457,6 +738,75 @@ observations:
     note: row=MG1; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '180'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=MG1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '180'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=MG1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=MG1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=MG1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=MG1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=MG1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_mg2
   experiment_id: 10.1029/2024je008587::experiment::mg2
   identity:
@@ -471,6 +821,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -523,7 +874,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '675'
+    point: '0.02409853623705819522303007762'
     approximate: false
   uncertainty:
     kind: none
@@ -548,6 +899,75 @@ observations:
     note: row=MG2; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '675'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=MG2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '675'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=MG2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=MG2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=MG2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=MG2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=MG2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_nt1
   experiment_id: 10.1029/2024je008587::experiment::nt1
   identity:
@@ -562,6 +982,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -614,7 +1035,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '90'
+    point: '0.00321313816494109269640401035'
     approximate: false
   uncertainty:
     kind: none
@@ -639,6 +1060,75 @@ observations:
     note: row=NT1; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '90'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=NT1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '90'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=NT1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=NT1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=NT1; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=NT1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=NT1; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_nt2
   experiment_id: 10.1029/2024je008587::experiment::nt2
   identity:
@@ -653,6 +1143,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -705,7 +1196,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '180'
+    point: '0.006426276329882185392808020699'
     approximate: false
   uncertainty:
     kind: none
@@ -730,6 +1221,75 @@ observations:
     note: row=NT2; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '180'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=NT2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '180'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=NT2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=NT2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=NT2; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=NT2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=NT2; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_pt
   experiment_id: 10.1029/2024je008587::experiment::pt
   identity:
@@ -744,6 +1304,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -796,7 +1357,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '30'
+    point: '0.001071046054980364232134670116'
     approximate: false
   uncertainty:
     kind: none
@@ -821,6 +1382,75 @@ observations:
     note: row=PT; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '30'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=PT; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '30'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=PT; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=PT; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=PT; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=PT; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=PT; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_ze
   experiment_id: 10.1029/2024je008587::experiment::ze
   identity:
@@ -835,6 +1465,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -887,7 +1518,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '130'
+    point: '0.004641199571581578339250237172'
     approximate: false
   uncertainty:
     kind: none
@@ -912,6 +1543,75 @@ observations:
     note: row=ZE; column=C from CO (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '130'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=ZE; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '130'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=ZE; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '28.009999999999998'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=ZE; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00003570153516601214107115567055'
+              locator:
+                pdf_page_index: 18
+                figure: '10'
+                note: row=ZE; column=C from CO (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '28.009999999999998'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=ZE; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00003570153516601214107115567055'
+        locator:
+          pdf_page_index: 18
+          figure: '10'
+          note: row=ZE; column=C from CO (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_av
   experiment_id: 10.1029/2024je008587::experiment::av
   identity:
@@ -926,6 +1626,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -978,7 +1679,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '2.9'
+    point: '1.609769636414099361643075215'
     approximate: false
   uncertainty:
     kind: none
@@ -1003,6 +1704,75 @@ observations:
     note: row=AV; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.9'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=AV; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.9'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=AV; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=AV; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=AV; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=AV; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=AV; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_bd
   experiment_id: 10.1029/2024je008587::experiment::bd
   identity:
@@ -1017,6 +1787,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1069,7 +1840,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '1.6'
+    point: '0.8881487649181237857341104635'
     approximate: false
   uncertainty:
     kind: none
@@ -1094,6 +1865,75 @@ observations:
     note: row=BD; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.6'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=BD; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.6'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=BD; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=BD; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=BD; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=BD; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=BD; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_ca1
   experiment_id: 10.1029/2024je008587::experiment::ca1
   identity:
@@ -1108,6 +1948,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1160,7 +2001,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '3.3'
+    point: '1.831806827643630308076602831'
     approximate: false
   uncertainty:
     kind: none
@@ -1185,6 +2026,75 @@ observations:
     note: row=CA1; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.3'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=CA1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '3.3'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=CA1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=CA1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=CA1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=CA1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=CA1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_ca2
   experiment_id: 10.1029/2024je008587::experiment::ca2
   identity:
@@ -1199,6 +2109,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1251,7 +2162,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '2.3'
+    point: '1.276713849569802941992783791'
     approximate: false
   uncertainty:
     kind: none
@@ -1276,6 +2187,75 @@ observations:
     note: row=CA2; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.3'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=CA2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.3'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=CA2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=CA2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=CA2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=CA2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=CA2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_mg1
   experiment_id: 10.1029/2024je008587::experiment::mg1
   identity:
@@ -1290,6 +2270,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1342,7 +2323,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '7.2'
+    point: '3.996669442131557035803497086'
     approximate: false
   uncertainty:
     kind: none
@@ -1367,6 +2348,75 @@ observations:
     note: row=MG1; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.2'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=MG1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '7.2'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=MG1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=MG1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=MG1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=MG1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=MG1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_mg2
   experiment_id: 10.1029/2024je008587::experiment::mg2
   identity:
@@ -1381,6 +2431,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1433,7 +2484,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '7.7'
+    point: '4.274215931168470718845406606'
     approximate: false
   uncertainty:
     kind: none
@@ -1458,6 +2509,75 @@ observations:
     note: row=MG2; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.7'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=MG2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '7.7'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=MG2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=MG2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=MG2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=MG2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=MG2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_nt1
   experiment_id: 10.1029/2024je008587::experiment::nt1
   identity:
@@ -1472,6 +2592,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1524,7 +2645,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '2.2'
+    point: '1.221204551762420205384401887'
     approximate: false
   uncertainty:
     kind: none
@@ -1549,6 +2670,75 @@ observations:
     note: row=NT1; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.2'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=NT1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.2'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=NT1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=NT1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=NT1; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=NT1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=NT1; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_nt2
   experiment_id: 10.1029/2024je008587::experiment::nt2
   identity:
@@ -1563,6 +2753,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1615,7 +2806,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '1.8'
+    point: '0.9991673605328892589508742715'
     approximate: false
   uncertainty:
     kind: none
@@ -1640,6 +2831,75 @@ observations:
     note: row=NT2; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.8'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=NT2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.8'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=NT2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=NT2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=NT2; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=NT2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=NT2; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_pt
   experiment_id: 10.1029/2024je008587::experiment::pt
   identity:
@@ -1654,6 +2914,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1706,7 +2967,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.8'
+    point: '0.4440743824590618928670552318'
     approximate: false
   uncertainty:
     kind: none
@@ -1731,6 +2992,75 @@ observations:
     note: row=PT; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.8'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=PT; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.8'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=PT; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=PT; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=PT; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=PT; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=PT; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_ze
   experiment_id: 10.1029/2024je008587::experiment::ze
   identity:
@@ -1745,6 +3075,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1797,7 +3128,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '5.3'
+    point: '2.94199278379128504024424091'
     approximate: false
   uncertainty:
     kind: none
@@ -1822,6 +3153,75 @@ observations:
     note: row=ZE; column=SAM H2O abundance (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '5.3'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=ZE; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_H2O_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5.3'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=ZE; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '18.015'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=ZE; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.5550929780738273660838190397'
+              locator:
+                pdf_page_index: 11
+                figure: '5'
+                note: row=ZE; column=SAM H2O abundance (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '18.015'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=ZE; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.5550929780738273660838190397'
+        locator:
+          pdf_page_index: 11
+          figure: '5'
+          note: row=ZE; column=SAM H2O abundance (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_av
   experiment_id: 10.1029/2024je008587::experiment::av
   identity:
@@ -1836,6 +3236,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1888,7 +3289,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.8'
+    point: '0.09992880072948024532520579088'
     approximate: false
   uncertainty:
     kind: none
@@ -1913,6 +3314,75 @@ observations:
     note: row=AV; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.8'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=AV; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.8'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=AV; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=AV; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=AV; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=AV; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=AV; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_bd
   experiment_id: 10.1029/2024je008587::experiment::bd
   identity:
@@ -1927,6 +3397,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1979,7 +3450,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.4'
+    point: '0.04996440036474012266260289544'
     approximate: false
   uncertainty:
     kind: none
@@ -2004,6 +3475,75 @@ observations:
     note: row=BD; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.4'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=BD; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.4'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=BD; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=BD; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=BD; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=BD; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=BD; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_ca1
   experiment_id: 10.1029/2024je008587::experiment::ca1
   identity:
@@ -2018,6 +3558,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2070,7 +3611,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.22'
+    point: '0.02748042020060706746443159249'
     approximate: false
   uncertainty:
     kind: none
@@ -2095,6 +3636,75 @@ observations:
     note: row=CA1; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.22'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=CA1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.22'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=CA1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=CA1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=CA1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=CA1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=CA1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_ca2
   experiment_id: 10.1029/2024je008587::experiment::ca2
   identity:
@@ -2109,6 +3719,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2161,7 +3772,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.22'
+    point: '0.02748042020060706746443159249'
     approximate: false
   uncertainty:
     kind: none
@@ -2186,6 +3797,75 @@ observations:
     note: row=CA2; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.22'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=CA2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.22'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=CA2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=CA2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=CA2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=CA2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=CA2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_mg1
   experiment_id: 10.1029/2024je008587::experiment::mg1
   identity:
@@ -2200,6 +3880,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2252,7 +3933,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '1.8'
+    point: '0.2248398016413305519817130295'
     approximate: false
   uncertainty:
     kind: none
@@ -2277,6 +3958,75 @@ observations:
     note: row=MG1; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.8'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=MG1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.8'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=MG1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=MG1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=MG1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=MG1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=MG1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_mg2
   experiment_id: 10.1029/2024je008587::experiment::mg2
   identity:
@@ -2291,6 +4041,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2343,7 +4094,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '2.1'
+    point: '0.2623131019148856439786652011'
     approximate: false
   uncertainty:
     kind: none
@@ -2368,6 +4119,75 @@ observations:
     note: row=MG2; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.1'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=MG2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.1'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=MG2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=MG2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=MG2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=MG2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=MG2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_nt1
   experiment_id: 10.1029/2024je008587::experiment::nt1
   identity:
@@ -2382,6 +4202,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2434,7 +4255,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.5'
+    point: '0.0624555004559251533282536193'
     approximate: false
   uncertainty:
     kind: none
@@ -2459,6 +4280,75 @@ observations:
     note: row=NT1; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.5'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=NT1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.5'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=NT1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=NT1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=NT1; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=NT1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=NT1; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_nt2
   experiment_id: 10.1029/2024je008587::experiment::nt2
   identity:
@@ -2473,6 +4363,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2525,7 +4416,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.6'
+    point: '0.07494660054711018399390434316'
     approximate: false
   uncertainty:
     kind: none
@@ -2550,6 +4441,75 @@ observations:
     note: row=NT2; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.6'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=NT2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.6'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=NT2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=NT2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=NT2; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=NT2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=NT2; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_pt
   experiment_id: 10.1029/2024je008587::experiment::pt
   identity:
@@ -2564,6 +4524,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2616,7 +4577,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.4'
+    point: '0.04996440036474012266260289544'
     approximate: false
   uncertainty:
     kind: none
@@ -2641,6 +4602,75 @@ observations:
     note: row=PT; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.4'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=PT; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.4'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=PT; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=PT; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=PT; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=PT; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=PT; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_ze
   experiment_id: 10.1029/2024je008587::experiment::ze
   identity:
@@ -2655,6 +4685,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2707,7 +4738,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.8'
+    point: '0.09992880072948024532520579088'
     approximate: false
   uncertainty:
     kind: none
@@ -2732,6 +4763,75 @@ observations:
     note: row=ZE; column=SAM SO3 / APXS SO3 (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.8'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=ZE; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_SO3_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.8'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=ZE; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '80.057'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=ZE; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.1249110009118503066565072386'
+              locator:
+                pdf_page_index: 12
+                figure: '6'
+                note: row=ZE; column=SAM SO3 / APXS SO3 (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '80.057'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=ZE; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.1249110009118503066565072386'
+        locator:
+          pdf_page_index: 12
+          figure: '6'
+          note: row=ZE; column=SAM SO3 / APXS SO3 (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_av
   experiment_id: 10.1029/2024je008587::experiment::av
   identity:
@@ -2746,6 +4846,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2798,7 +4899,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.17'
+    point: '0.04795486600846262341325811001'
     approximate: false
   uncertainty:
     kind: none
@@ -2823,6 +4924,75 @@ observations:
     note: row=AV; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.17'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=AV; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.17'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=AV; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=AV; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=AV; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=AV; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=AV; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_bd
   experiment_id: 10.1029/2024je008587::experiment::bd
   identity:
@@ -2837,6 +5007,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2889,7 +5060,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.17'
+    point: '0.04795486600846262341325811001'
     approximate: false
   uncertainty:
     kind: none
@@ -2914,6 +5085,75 @@ observations:
     note: row=BD; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.17'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=BD; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.17'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=BD; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=BD; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=BD; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=BD; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=BD; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_ca1
   experiment_id: 10.1029/2024je008587::experiment::ca1
   identity:
@@ -2928,6 +5168,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2980,7 +5221,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.14'
+    point: '0.03949224259520451339915373765'
     approximate: false
   uncertainty:
     kind: none
@@ -3005,6 +5246,75 @@ observations:
     note: row=CA1; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.14'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=CA1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.14'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=CA1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=CA1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=CA1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=CA1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=CA1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_ca2
   experiment_id: 10.1029/2024je008587::experiment::ca2
   identity:
@@ -3019,6 +5329,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3071,7 +5382,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.11'
+    point: '0.0310296191819464033850493653'
     approximate: false
   uncertainty:
     kind: none
@@ -3096,6 +5407,75 @@ observations:
     note: row=CA2; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.11'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=CA2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.11'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=CA2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=CA2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=CA2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=CA2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=CA2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_mg1
   experiment_id: 10.1029/2024je008587::experiment::mg1
   identity:
@@ -3110,6 +5490,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3162,7 +5543,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.35'
+    point: '0.09873060648801128349788434413'
     approximate: false
   uncertainty:
     kind: none
@@ -3187,6 +5568,75 @@ observations:
     note: row=MG1; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.35'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=MG1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.35'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=MG1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=MG1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=MG1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=MG1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=MG1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_mg2
   experiment_id: 10.1029/2024je008587::experiment::mg2
   identity:
@@ -3201,6 +5651,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3253,7 +5704,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.63'
+    point: '0.1777150916784203102961918194'
     approximate: false
   uncertainty:
     kind: none
@@ -3278,6 +5729,75 @@ observations:
     note: row=MG2; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.63'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=MG2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.63'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=MG2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=MG2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=MG2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=MG2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=MG2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_nt1
   experiment_id: 10.1029/2024je008587::experiment::nt1
   identity:
@@ -3292,6 +5812,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3344,7 +5865,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.12'
+    point: '0.03385049365303244005641748942'
     approximate: false
   uncertainty:
     kind: none
@@ -3369,6 +5890,75 @@ observations:
     note: row=NT1; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.12'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=NT1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.12'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=NT1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=NT1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=NT1; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=NT1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=NT1; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_nt2
   experiment_id: 10.1029/2024je008587::experiment::nt2
   identity:
@@ -3383,6 +5973,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3435,7 +6026,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.12'
+    point: '0.03385049365303244005641748942'
     approximate: false
   uncertainty:
     kind: none
@@ -3460,6 +6051,75 @@ observations:
     note: row=NT2; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.12'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=NT2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.12'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=NT2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=NT2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=NT2; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=NT2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=NT2; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_pt
   experiment_id: 10.1029/2024je008587::experiment::pt
   identity:
@@ -3474,6 +6134,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3526,7 +6187,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.11'
+    point: '0.0310296191819464033850493653'
     approximate: false
   uncertainty:
     kind: none
@@ -3551,6 +6212,75 @@ observations:
     note: row=PT; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.11'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=PT; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.11'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=PT; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=PT; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=PT; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=PT; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=PT; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_ze
   experiment_id: 10.1029/2024je008587::experiment::ze
   identity:
@@ -3565,6 +6295,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3617,7 +6348,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '0.37'
+    point: '0.1043723554301833568406205924'
     approximate: false
   uncertainty:
     kind: none
@@ -3642,6 +6373,75 @@ observations:
     note: row=ZE; column=SAM Cl / APXS Cl (wt.%)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.37'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=ZE; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: evolved_gas_yield_Cl_wt_percent_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[wt%] * 10 / M[g/mol]
+          - original_unit=wt%
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.37'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=ZE; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '35.45'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=ZE; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.2820874471086036671368124118'
+              locator:
+                pdf_page_index: 15
+                figure: '8'
+                note: row=ZE; column=SAM Cl / APXS Cl (wt.%)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '35.45'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=ZE; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.2820874471086036671368124118'
+        locator:
+          pdf_page_index: 15
+          figure: '8'
+          note: row=ZE; column=SAM Cl / APXS Cl (wt.%)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_av
   experiment_id: 10.1029/2024je008587::experiment::av
   identity:
@@ -3656,6 +6456,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3708,7 +6509,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '530'
+    point: '0.01204299120634415687700243132'
     approximate: false
   uncertainty:
     kind: none
@@ -3733,6 +6534,75 @@ observations:
     note: row=AV; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '530'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=AV; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '530'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=AV; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=AV; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=AV; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=AV; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=AV; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_bd
   experiment_id: 10.1029/2024je008587::experiment::bd
   identity:
@@ -3747,6 +6617,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3799,7 +6670,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '630'
+    point: '0.01431525369810720534436138063'
     approximate: false
   uncertainty:
     kind: none
@@ -3824,6 +6695,75 @@ observations:
     note: row=BD; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '630'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=BD; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '630'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=BD; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=BD; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=BD; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=BD; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=BD; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_ca1
   experiment_id: 10.1029/2024je008587::experiment::ca1
   identity:
@@ -3838,6 +6778,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3890,7 +6831,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '170'
+    point: '0.00386284623599718239451021382'
     approximate: false
   uncertainty:
     kind: none
@@ -3915,6 +6856,75 @@ observations:
     note: row=CA1; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '170'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=CA1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '170'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=CA1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=CA1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=CA1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=CA1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=CA1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_ca2
   experiment_id: 10.1029/2024je008587::experiment::ca2
   identity:
@@ -3929,6 +6939,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3981,7 +6992,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '225'
+    point: '0.005112590606466859051557635938'
     approximate: false
   uncertainty:
     kind: none
@@ -4006,6 +7017,75 @@ observations:
     note: row=CA2; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '225'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=CA2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '225'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=CA2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=CA2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=CA2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=CA2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=CA2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_mg1
   experiment_id: 10.1029/2024je008587::experiment::mg1
   identity:
@@ -4020,6 +7100,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4072,7 +7153,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '900'
+    point: '0.02045036242586743620623054375'
     approximate: false
   uncertainty:
     kind: none
@@ -4097,6 +7178,75 @@ observations:
     note: row=MG1; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '900'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=MG1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '900'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=MG1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=MG1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=MG1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=MG1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=MG1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_mg2
   experiment_id: 10.1029/2024je008587::experiment::mg2
   identity:
@@ -4111,6 +7261,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4163,7 +7314,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '1640'
+    point: '0.03726510486491399486468676862'
     approximate: false
   uncertainty:
     kind: none
@@ -4188,6 +7339,75 @@ observations:
     note: row=MG2; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1640'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=MG2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1640'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=MG2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=MG2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=MG2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=MG2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=MG2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_nt1
   experiment_id: 10.1029/2024je008587::experiment::nt1
   identity:
@@ -4202,6 +7422,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4254,7 +7475,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '320'
+    point: '0.007271239973641755095548637779'
     approximate: false
   uncertainty:
     kind: none
@@ -4279,6 +7500,75 @@ observations:
     note: row=NT1; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '320'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=NT1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '320'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=NT1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=NT1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=NT1; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=NT1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=NT1; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_nt2
   experiment_id: 10.1029/2024je008587::experiment::nt2
   identity:
@@ -4293,6 +7583,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4345,7 +7636,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '610'
+    point: '0.01386080119975459565088959077'
     approximate: false
   uncertainty:
     kind: none
@@ -4370,6 +7661,75 @@ observations:
     note: row=NT2; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '610'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=NT2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '610'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=NT2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=NT2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=NT2; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=NT2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=NT2; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_pt
   experiment_id: 10.1029/2024je008587::experiment::pt
   identity:
@@ -4384,6 +7744,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4436,7 +7797,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '100'
+    point: '0.002272262491763048467358949306'
     approximate: false
   uncertainty:
     kind: none
@@ -4461,6 +7822,75 @@ observations:
     note: row=PT; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=PT; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=PT; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=PT; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=PT; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=PT; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=PT; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []
 - observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_ze
   experiment_id: 10.1029/2024je008587::experiment::ze
   identity:
@@ -4475,6 +7905,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4527,7 +7958,7 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: point
-    point: '530'
+    point: '0.01204299120634415687700243132'
     approximate: false
   uncertainty:
     kind: none
@@ -4552,3 +7983,72 @@ observations:
     note: row=ZE; column=C from CO2 (µg/g)
     source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
   read_from: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+  derivation:
+    relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+    inputs:
+    - pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '530'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=ZE; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+        inference:
+          relation: specific_gas_yield_CO2_ug_g_to_mol_per_initial_kg
+          inputs:
+          - Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]
+          - original_unit=ug/g
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '530'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=ZE; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - molar_mass_g_mol
+            - state:
+                tag: value
+                value: '44.009'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=ZE; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '0.00002272262491763048467358949306'
+              locator:
+                pdf_page_index: 16
+                figure: '9'
+                note: row=ZE; column=C from CO2 (µg/g)
+                source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+          output_unit: mol_species_per_initial_kg
+          references: []
+    - - molar_mass_g_mol
+      - state:
+          tag: value
+          value: '44.009'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=ZE; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '0.00002272262491763048467358949306'
+        locator:
+          pdf_page_index: 16
+          figure: '9'
+          note: row=ZE; column=C from CO2 (µg/g)
+          source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    output_unit: mol_species_per_initial_kg
+    references: []

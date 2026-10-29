@@ -34,9 +34,11 @@ from simulator.chemistry.kernel import (
     ProposalRejected,
     ProviderRegistry,
 )
+from simulator.chemistry.kernel.validation import _build_lots
 
 
 Action = Callable[[], None]
+_RETAINED_FE_AMOUNT_MOL = 1.1987204510704742e-9
 
 
 class _AdmissibilityProvider(ChemistryProvider):
@@ -139,6 +141,202 @@ def _assert_valid_kernel_control() -> None:
             reason="valid_control",
         ),
     )
+
+
+@pytest.mark.parametrize("oxygen_kg", [1e-12, 1.8697581195613093e-13])
+def test_positive_sub_tolerance_lot_retains_consistent_kg_and_mol(oxygen_kg) -> None:
+    molar_mass = resolve_species_formula("O2").molar_mass_kg_per_mol()
+    oxygen_mol = oxygen_kg / molar_mass
+    lot = MaterialLot(
+        "process.overhead_gas", {"O2": oxygen_kg},
+        meta={"amount_basis": "mol", "species_mol": {"O2": oxygen_mol}},
+    )
+    for retained in (lot, lot.without_empty()):
+        assert retained.meta["amount_basis"] == "mol"
+        assert retained.species_kg == {"O2": oxygen_kg}
+        assert retained.species_moles_for()["O2"] == oxygen_mol
+        assert retained.meta["species_mol"]["O2"] == oxygen_mol
+
+
+def test_kg_basis_lot_preserves_nonzero_sub_tolerance_si_mass() -> None:
+    si_kg = 3.226e-13
+    lot = MaterialLot("process.cleaned_melt", {"Si": si_kg})
+
+    assert lot.species_kg == {"Si": si_kg}
+    assert lot.without_empty().species_kg == {"Si": si_kg}
+
+
+def test_sub_tolerance_kg_species_survives_move_and_conserves_mass() -> None:
+    si_kg = 3.226e-13
+    transition = LedgerTransition.move(
+        "tiny_si_transfer",
+        "process.cleaned_melt",
+        "process.overhead_gas",
+        {"Si": si_kg},
+    )
+
+    assert transition.debits[0].species_kg == {"Si": si_kg}
+    assert transition.credits[0].species_kg == {"Si": si_kg}
+    assert transition.debit_mass_kg() == si_kg
+    assert transition.credit_mass_kg() == si_kg
+
+
+def test_sub_tolerance_kg_species_survives_ledger_debit() -> None:
+    si_kg = 3.226e-13
+    debit = AtomLedger().debit("process.cleaned_melt", {"Si": si_kg})
+
+    assert debit.species_kg == {"Si": si_kg}
+    assert debit.total_mass_kg() == si_kg
+
+
+def test_sub_tolerance_kg_species_survives_ledger_credit() -> None:
+    si_kg = 3.226e-13
+    credit = AtomLedger().credit("process.overhead_gas", {"Si": si_kg})
+
+    assert credit.species_kg == {"Si": si_kg}
+    assert credit.total_mass_kg() == si_kg
+
+
+def test_sub_tolerance_negative_mol_basis_lot_still_refuses() -> None:
+    with pytest.raises(AccountingError, match="mol-basis lot mass.*non-negative"):
+        MaterialLot(
+            "process.cleaned_melt",
+            {"Si": -3.226e-13},
+            meta={"amount_basis": "mol", "species_mol": {"Si": -1e-20}},
+        )
+
+
+def test_negative_kg_basis_lot_keeps_base_tolerance_behavior() -> None:
+    clipped = MaterialLot("process.cleaned_melt", {"Si": -5e-13})
+
+    assert clipped.species_kg == {"Si": 0.0}
+    assert clipped.without_empty().species_kg == {}
+    with pytest.raises(AccountingError, match="lot mass.*non-negative"):
+        MaterialLot("process.cleaned_melt", {"Si": -2e-12})
+
+
+def test_h190_fe_reduction_retains_tiny_oxygen_credit_and_closes() -> None:
+    ledger = AtomLedger()
+    # Hero h190: Fe2O3 -> 2 FeO + 1/2 O2. The measured O2 parcel
+    # is 1.8697581195613093e-13 kg; n_Fe2O3 = 2*n_O2 (mol).
+    oxygen_mol = 5.843359333587441e-12
+    ferric_mol = 2.0 * oxygen_mol
+    ledger.load_external_mol(
+        "process.cleaned_melt", {"Fe2O3": ferric_mol}, material_origin="feedstock",
+    )
+    before_mass = math.fsum(ledger.total_kg_by_account().values())
+    before_atoms = ledger.atom_moles_by_account("process.cleaned_melt")
+    _commit(ledger, LedgerTransitionProposal(
+        debits={"process.cleaned_melt": {"Fe2O3": ferric_mol}},
+        credits={
+            "process.cleaned_melt": {"FeO": 2.0 * ferric_mol},
+            "process.overhead_gas": {"O2": oxygen_mol},
+        },
+        reason="fe_redox_respeciation",
+    ))
+    transition = ledger.transitions[-1]
+    oxygen_lot = next(lot for lot in transition.credits if lot.account == "process.overhead_gas")
+    assert oxygen_lot.meta["amount_basis"] == "mol"
+    assert oxygen_lot.meta["species_mol"] == {"O2": oxygen_mol}
+    assert oxygen_lot.species_kg["O2"] == (
+        oxygen_mol * resolve_species_formula("O2").molar_mass_kg_per_mol()
+    )
+    assert oxygen_lot.species_moles_for()["O2"] == oxygen_mol
+    assert oxygen_lot.species_moles_for() == dict(oxygen_lot.meta["species_mol"])
+    after_mass = math.fsum(ledger.total_kg_by_account().values())
+    assert after_mass == pytest.approx(before_mass, rel=0.0, abs=2 * math.ulp(before_mass))
+    after_atoms = {
+        element: math.fsum(ledger.atom_moles_by_account(account).get(element, 0.0)
+                           for account in ledger.mol_by_account())
+        for element in before_atoms
+    }
+    assert after_atoms == pytest.approx(before_atoms, rel=2e-16, abs=0.0)
+    assert "Fe2O3" not in ledger.mol_by_account("process.cleaned_melt")
+
+
+def test_exact_zero_lots_and_fully_debited_balances_are_empty() -> None:
+    lot = MaterialLot("process.cleaned_melt", {"FeO": 0.0})
+    assert not lot.without_empty().species_kg
+    assert not LedgerTransition("zero", (lot,), (lot,)).debits
+    ledger = AtomLedger()
+    ledger.load_external_mol("process.cleaned_melt", {"FeO": 1.0}, material_origin="feedstock")
+    _commit(ledger, LedgerTransitionProposal(
+        debits={"process.cleaned_melt": {"FeO": 1.0}},
+        credits={"process.overhead_gas": {"FeO": 1.0}},
+        reason="exact_depletion",
+    ))
+    assert ledger.mol_by_account("process.cleaned_melt") == {}
+
+
+def test_mol_native_debit_applies_the_retained_fe_amount() -> None:
+    amount_mol = _RETAINED_FE_AMOUNT_MOL
+    ledger = AtomLedger()
+    account = "process.overhead_gas"
+    ledger._balances[account] = {"Fe": amount_mol}
+
+    debit = ledger.debit_mol(account, {"Fe": amount_mol})
+    projected = ledger.project(
+        LedgerTransition("exact_fe_depletion", debits=(debit,), credits=())
+    )
+
+    assert projected[account] == {}
+
+
+def test_mol_credit_round_trips_the_retained_species_amount() -> None:
+    ledger = AtomLedger()
+    lot = ledger.credit_mol(
+        "process.overhead_gas",
+        {"Fe": _RETAINED_FE_AMOUNT_MOL},
+    )
+
+    assert lot.species_moles_for(ledger.registry) == {
+        "Fe": _RETAINED_FE_AMOUNT_MOL
+    }
+
+
+def test_kernel_proposal_lot_round_trips_the_retained_species_amount() -> None:
+    ledger = AtomLedger()
+    (lot,) = _build_lots(
+        {"process.overhead_gas": {"Fe": _RETAINED_FE_AMOUNT_MOL}},
+        ledger.registry,
+        kind="credit",
+    )
+
+    assert lot.species_moles_for(ledger.registry) == {
+        "Fe": _RETAINED_FE_AMOUNT_MOL
+    }
+
+
+def test_gross_flow_records_the_retained_species_amount() -> None:
+    ledger = AtomLedger()
+    account = "process.overhead_gas"
+    ledger.load_external_mol(
+        account,
+        {"Fe": _RETAINED_FE_AMOUNT_MOL},
+        material_origin="feedstock",
+    )
+
+    flows = ledger.gross_account_flows()
+    assert flows["inputs"]["species_mol_by_account"][account] == {
+        "Fe": _RETAINED_FE_AMOUNT_MOL
+    }
+
+
+def test_atom_projection_uses_the_retained_species_amount() -> None:
+    ledger = AtomLedger()
+    debit = ledger.debit_mol(
+        "process.overhead_gas",
+        {"Fe": _RETAINED_FE_AMOUNT_MOL},
+    )
+    transition = LedgerTransition(
+        "exact_fe_depletion",
+        debits=(debit,),
+        credits=(),
+    )
+
+    assert transition.debit_atom_moles(ledger.registry) == {
+        "Fe": _RETAINED_FE_AMOUNT_MOL
+    }
 
 
 def _direct_overdraft_normal() -> tuple[Action, Action, type[BaseException]]:

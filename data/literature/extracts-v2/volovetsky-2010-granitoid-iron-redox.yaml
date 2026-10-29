@@ -1,0 +1,3568 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/volovetsky-2010-granitoid-iron-redox.yaml
+observations:
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_al2o3::T=1693.15:row=p9-37:h=e8a580902b14
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '20.77'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Al2O3.; row=P9-37; column=Al2O3
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column Al2O3.; row=P9-37; column=Al2O3
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Al2O3.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Al2O3.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Al2O3.; row=P9-37; column=Al2O3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column Al2O3.; row=P9-37; column=Al2O3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column Al2O3.; row=P9-37; column=Al2O3
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_cao::T=1693.15:row=p9-37:h=1a1f62bea57d
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.35'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column CaO.; row=P9-37; column=CaO
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column CaO.; row=P9-37; column=CaO
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column CaO.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column CaO.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column CaO.; row=P9-37; column=CaO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column CaO.; row=P9-37; column=CaO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column CaO.; row=P9-37; column=CaO
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_cl::T=1693.15:row=p9-37:h=709a3186e51d
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cl
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Cl.; row=P9-37; column=Cl
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column Cl.; row=P9-37; column=Cl
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Cl.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Cl.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Cl.; row=P9-37; column=Cl
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column Cl.; row=P9-37; column=Cl
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column Cl.; row=P9-37; column=Cl
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_feo::T=1693.15:row=p9-37:h=91a5a8c9db5a
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '4.05'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column FeO.; row=P9-37; column=FeO
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column FeO.; row=P9-37; column=FeO
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column FeO.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column FeO.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column FeO.; row=P9-37; column=FeO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column FeO.; row=P9-37; column=FeO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column FeO.; row=P9-37; column=FeO
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_k2o::T=1693.15:row=p9-37:h=f59fa43bf298
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '3.85'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column K2O.; row=P9-37; column=K2O
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column K2O.; row=P9-37; column=K2O
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column K2O.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column K2O.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column K2O.; row=P9-37; column=K2O
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column K2O.; row=P9-37; column=K2O
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column K2O.; row=P9-37; column=K2O
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_mgo::T=1693.15:row=p9-37:h=85265623fca5
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.22'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column MgO.; row=P9-37; column=MgO
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column MgO.; row=P9-37; column=MgO
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column MgO.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column MgO.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column MgO.; row=P9-37; column=MgO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column MgO.; row=P9-37; column=MgO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column MgO.; row=P9-37; column=MgO
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_mno::T=1693.15:row=p9-37:h=efcb23fadcfe
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.36'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column MnO.; row=P9-37; column=MnO
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column MnO.; row=P9-37; column=MnO
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column MnO.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column MnO.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column MnO.; row=P9-37; column=MnO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column MnO.; row=P9-37; column=MnO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column MnO.; row=P9-37; column=MnO
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_na2o::T=1693.15:row=p9-37:h=e7a51f4d9ac2
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '3.52'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Na2O.; row=P9-37; column=Na2O
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column Na2O.; row=P9-37; column=Na2O
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Na2O.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Na2O.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column Na2O.; row=P9-37; column=Na2O
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column Na2O.; row=P9-37; column=Na2O
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column Na2O.; row=P9-37; column=Na2O
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_sio2::T=1693.15:row=p9-37:h=b1ff96d5e63a
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '63.69'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column SiO2.; row=P9-37; column=SiO2
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column SiO2.; row=P9-37; column=SiO2
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column SiO2.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column SiO2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column SiO2.; row=P9-37; column=SiO2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column SiO2.; row=P9-37; column=SiO2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column SiO2.; row=P9-37; column=SiO2
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_tio2::T=1693.15:row=p9-37:h=4d9c0d40a85f
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.35'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column TiO2.; row=P9-37; column=TiO2
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column TiO2.; row=P9-37; column=TiO2
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column TiO2.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column TiO2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column TiO2.; row=P9-37; column=TiO2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column TiO2.; row=P9-37; column=TiO2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column TiO2.; row=P9-37; column=TiO2
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_37_zro2::T=1693.15:row=p9-37:h=133cfbcb70a4
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_37
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: ZrO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.31'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column ZrO2.; row=P9-37; column=ZrO2
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-37, column ZrO2.; row=P9-37; column=ZrO2
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column ZrO2.
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column ZrO2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-37, column ZrO2.; row=P9-37; column=ZrO2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column ZrO2.; row=P9-37; column=ZrO2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-37, column ZrO2.; row=P9-37; column=ZrO2
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_al2o3::T=1375.15:row=p9-n2:h=18fe44f31039
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '7.71'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Al2O3.; row=P9-N2; column=Al2O3
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column Al2O3.; row=P9-N2; column=Al2O3
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Al2O3.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Al2O3.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Al2O3.; row=P9-N2; column=Al2O3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column Al2O3.; row=P9-N2; column=Al2O3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column Al2O3.; row=P9-N2; column=Al2O3
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_cao::T=1375.15:row=p9-n2:h=4093ced034d2
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.37'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column CaO.; row=P9-N2; column=CaO
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column CaO.; row=P9-N2; column=CaO
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column CaO.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column CaO.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column CaO.; row=P9-N2; column=CaO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column CaO.; row=P9-N2; column=CaO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column CaO.; row=P9-N2; column=CaO
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_cl::T=1375.15:row=p9-n2:h=229e533ff7d3
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cl
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Cl.; row=P9-N2; column=Cl
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column Cl.; row=P9-N2; column=Cl
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Cl.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Cl.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Cl.; row=P9-N2; column=Cl
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column Cl.; row=P9-N2; column=Cl
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column Cl.; row=P9-N2; column=Cl
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_feo::T=1375.15:row=p9-n2:h=b6120e300f83
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '7.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column FeO.; row=P9-N2; column=FeO
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column FeO.; row=P9-N2; column=FeO
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column FeO.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column FeO.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column FeO.; row=P9-N2; column=FeO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column FeO.; row=P9-N2; column=FeO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column FeO.; row=P9-N2; column=FeO
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_k2o::T=1375.15:row=p9-n2:h=71c95ea3f85a
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '4.13'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column K2O.; row=P9-N2; column=K2O
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column K2O.; row=P9-N2; column=K2O
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column K2O.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column K2O.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column K2O.; row=P9-N2; column=K2O
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column K2O.; row=P9-N2; column=K2O
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column K2O.; row=P9-N2; column=K2O
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_mgo::T=1375.15:row=p9-n2:h=acfe4e4e84ed
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.09'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column MgO.; row=P9-N2; column=MgO
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column MgO.; row=P9-N2; column=MgO
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column MgO.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column MgO.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column MgO.; row=P9-N2; column=MgO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column MgO.; row=P9-N2; column=MgO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column MgO.; row=P9-N2; column=MgO
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_mno::T=1375.15:row=p9-n2:h=caa5505c1719
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.28'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column MnO.; row=P9-N2; column=MnO
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column MnO.; row=P9-N2; column=MnO
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column MnO.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column MnO.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column MnO.; row=P9-N2; column=MnO
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column MnO.; row=P9-N2; column=MnO
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column MnO.; row=P9-N2; column=MnO
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_na2o::T=1375.15:row=p9-n2:h=324cea403bd1
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '6.05'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Na2O.; row=P9-N2; column=Na2O
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column Na2O.; row=P9-N2; column=Na2O
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Na2O.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Na2O.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column Na2O.; row=P9-N2; column=Na2O
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column Na2O.; row=P9-N2; column=Na2O
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column Na2O.; row=P9-N2; column=Na2O
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_sio2::T=1375.15:row=p9-n2:h=5bfc3f4c0a14
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '70'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column SiO2.; row=P9-N2; column=SiO2
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column SiO2.; row=P9-N2; column=SiO2
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column SiO2.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column SiO2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column SiO2.; row=P9-N2; column=SiO2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column SiO2.; row=P9-N2; column=SiO2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column SiO2.; row=P9-N2; column=SiO2
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_tio2::T=1375.15:row=p9-n2:h=1efce0207e81
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.36'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column TiO2.; row=P9-N2; column=TiO2
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column TiO2.; row=P9-N2; column=TiO2
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column TiO2.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column TiO2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column TiO2.; row=P9-N2; column=TiO2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column TiO2.; row=P9-N2; column=TiO2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column TiO2.; row=P9-N2; column=TiO2
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []
+- observation_id: volovetsky-2010-granitoid-iron-redox::volovetsky_2010_table1_p9_n2_zro2::T=1375.15:row=p9-n2:h=fb2073517233
+  experiment_id: 10.1088/1742-6596/217/1/012050::experiment::volo2010_table1_p9_n2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: ZrO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Chemical composition, percent; the table does not state mass or mole basis.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1375.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.36'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No component uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column ZrO2.; row=P9-N2; column=ZrO2
+  notices: []
+  source_id: volovetsky-2010-granitoid-iron-redox
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row P9-N2, column ZrO2.; row=P9-N2; column=ZrO2
+  read_from: pdf:volovetsky-2010-granitoid-iron-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1102'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column ZrO2.
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column ZrO2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375.15'
+      locator:
+        page: 3
+        published_page: 2
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row P9-N2, column ZrO2.; row=P9-N2; column=ZrO2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1102'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column ZrO2.; row=P9-N2; column=ZrO2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 2
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row P9-N2, column ZrO2.; row=P9-N2; column=ZrO2
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:volovetsky-2010-granitoid-iron-redox
+    parameters: []
+    output_unit: '%'
+    references: []

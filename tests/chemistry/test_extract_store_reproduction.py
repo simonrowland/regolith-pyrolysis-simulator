@@ -35,6 +35,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     DEFAULT_PSAT_UNCERTAINTY,
     DEFAULT_TRANSITION_POINT_UNCERTAINTY,
     MODEL_LIMITATIONS_PATH,
+    ObservationEvaluation,
     ORDERING_VERDICT_STATUSES,
     RAIL_COMPARABLE_SYSTEM_CLASSES,
     RAIL_INCOMPARABLE_SYSTEM_CLASSES,
@@ -86,6 +87,31 @@ BASELINES_PATH = (
 REGEN_ENV = "RPS_T512_REGEN_ROLLUP"
 
 
+def test_melt_observation_oxygen_admission_and_exact_cache(vapor_pressure_data, monkeypatch):
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    receipts = []
+    dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def capture(provider, request):
+        result = dispatch(provider, request)
+        receipts.append((request.control_inputs['pO2_bar'], result.diagnostic['pO2_bar']))
+        return result
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, 'dispatch', capture)
+    monkeypatch.setattr(extract_reproduction, '_MELT_PSAT_CACHE', {})
+    oxygen = (1.3e-12, 1.0001e-9, 1.0004e-9)
+    results = [extract_reproduction._engine_melt_psat_pa('Mg', 1873.15, p, vapor_pressure_data)
+               for p in oxygen]
+    assert all(reason is None for _, reason, _ in results)
+    assert receipts == [(p, p) for p in oxygen]
+    assert [runtime['pO2_bar'] for _, _, runtime in results] == list(oxygen)
+    assert results[1][0] != results[2][0]
+    cached = extract_reproduction._engine_melt_psat_pa('Mg', 1873.15, oxygen[2], vapor_pressure_data)
+    assert cached == results[2]
+    assert len(receipts) == 3
+
+
 def _record_pin_key(record) -> tuple[str, str]:
     return (str(record.case_id), str(record.observable_id))
 
@@ -102,6 +128,17 @@ def vapor_pressure_data() -> dict:
 @pytest.fixture(scope="module")
 def adopted_observations() -> list[AdoptedObservation]:
     return load_adopted_observations()
+
+
+def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeypatch) -> None:
+    import extract_merge
+
+    monkeypatch.setattr(
+        extract_merge,
+        "load_extracts",
+        lambda _directory: [{"source_id": "legacy-table", "species": "K"}],
+    )
+    assert load_adopted_observations() == []
 
 
 @pytest.fixture(scope="module")
@@ -137,11 +174,22 @@ def test_store_yields_adopted_target_type_observations(
             if obs.source_id.startswith("kems-") and obs.adoption_basis != "superseded"]
     # B1 harvest + class-tagged fence rows expanded the KEMS surface; keep the
     # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
-    # 2026-09-06 b-481 attributed regen: deepening folds + supersession
-    # (parents excluded) + closed evidence-marker admission.
-    assert len(kems) == 1133
-    # b-480: 15 added KEMS sources; coverage includes typed-skipped evidence.
-    assert len({obs.source_id for obs in kems}) == 45
+    # Offer19 store growth: 37 new KEMS extract files add 732 observations;
+    # edits across existing KEMS extracts add a net 35 more (1133 -> 1900).
+    # Offer 20 adds 51 Richter 2007 Table 1 residue rate_series rows
+    # (kems-010-richter-2007, richter_2007_residue_table1_*). The aluminum
+    # quoted non-loss bound stays on species Al (1900 -> 1951).
+    # famBAND04 (e72d720b9) corrects the Figure 2 marker centres, admitting
+    # one series observation: schneider_1980_k_psat_figure2_high_temperature_digitized.
+    # Car source edits vs green: 1952 -> 1973. Kambayashi 1983 adds 50 rows;
+    # Yakovlev 1984 and Yakovlev-Shornikov 2011 add 8 and 12, Schneider adds 1;
+    # edits to other KEMS sources net -50 after the reviewed context moves.
+    assert len(kems) == 1973
+    # Active KEMS source IDs grew from 45 to 81 (+36); source IDs and added
+    # extract files are distinct counts (37 files were added).
+    # famBAND04: the Schneider 1980 Figure 2 series adds a new KEMS source
+    # (kems-212-schneider-1980-nbsir-80-2059): 81 -> 82.
+    assert len({obs.source_id for obs in kems}) == 82
     for obs in adopted_observations:
         assert obs.is_priority_winner or obs.adoption_basis in {"mass_spec_extract", "superseded"}
         assert obs.source_id
@@ -276,6 +324,7 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
         values={
             "alpha": 0.02,
             "system_class": "silicate_melt",
+            "admission_status": "admitted",
             "transformation_class": "redox_reduction_required",
             "material": "FCMAS_silicate_melt",
         },
@@ -293,6 +342,23 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     pin_ok, pin_skip, _ = rail_alpha_comparability(obs)
     assert pin_ok is True
     assert pin_skip is None
+    evaluation = evaluate_observation(obs, vapor_pressure_data={"metals": {}})
+    assert evaluation.skip_reason is None
+    assert any(record.status in SCORING_STATUSES for record in evaluation.records)
+
+
+def test_untyped_system_class_is_not_alpha_pin_bearing() -> None:
+    obs = _alpha_fixture(
+        species_id="Fe",
+        observation_id="fixture_untyped_fe_alpha",
+        phase=None,
+        values={"alpha": 0.02, "material": "unclassified_sample"},
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+    pin_ok, pin_skip, axes = rail_alpha_comparability(obs)
+    assert pin_ok is False
+    assert pin_skip == "missing_system_classification"
+    assert axes["rail_system_class_verdict"] == "undeterminable"
 
 
 @pytest.mark.parametrize("markers", [
@@ -735,6 +801,24 @@ def test_dual_axis_skip_records_both_reasons() -> None:
     assert "glass_amorphous" in evaluation.skip_reason
 
 
+def test_coverage_primary_prefers_typed_refusal_over_point_drop() -> None:
+    obs = _form_gate_fixture(
+        observation_id="fixture_typed_refusal_with_point_drop",
+        values={"alpha": 0.14},
+        condensed_form=None,
+    )
+    evaluation = ObservationEvaluation(
+        observation=obs,
+        skip_reason="typed-refusal:rate_series_without_alpha_and_no_motzfeldt_geometry",
+        skip_reasons=["point_drop:missing_alpha_or_temperature"],
+    )
+
+    coverage = coverage_summary([evaluation])
+
+    assert coverage["entries"][0]["primary_skip_reason"] == evaluation.skip_reason
+    assert coverage["skip_reasons"] == {evaluation.skip_reason: 1}
+
+
 def test_wetzel_stale_duplicate_hits_system_class_and_form_gate() -> None:
     observation = next(
         row
@@ -939,6 +1023,111 @@ def test_antoine_fallback_mbar_is_not_scaled_as_bar() -> None:
     assert pressure_pa("log10(P_bar) = A - B/(T+C)").hex() == (
         "0x1.2a05f20000000p+33"
     )
+
+
+def test_literature_antoine_refuses_missing_C_for_three_parameter_form() -> None:
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _literature_pressure_points,
+    )
+
+    obs = AdoptedObservation(
+        species_id="X",
+        source_id="fixture",
+        observation_id="missing_C_antoine",
+        obs_type="psat_series",
+        review_status=None,
+        phase=None,
+        regime=None,
+        standard_state=None,
+        T_range_K=(1000.0, 1000.0),
+        units="Pa",
+        uncertainty=None,
+        locator={},
+        values={
+            "runtime_form": "log10(P_Pa) = A - B/(T_K + C)",
+            "runtime_coefficients": {"A": 5.0, "B": 1000.0},
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+    )
+
+    points, skip, _drops = _literature_pressure_points(obs)
+
+    assert points is None
+    assert skip == "missing_antoine_C"
+
+
+def test_literature_antoine_accepts_missing_C_for_two_parameter_form() -> None:
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _literature_pressure_points,
+    )
+
+    obs = AdoptedObservation(
+        species_id="X",
+        source_id="fixture",
+        observation_id="two_parameter_antoine",
+        obs_type="psat_series",
+        review_status=None,
+        phase=None,
+        regime=None,
+        standard_state=None,
+        T_range_K=(1000.0, 1000.0),
+        units="Pa",
+        uncertainty=None,
+        locator={},
+        values={
+            "runtime_form": "log10(P_Pa) = A - B/T_K",
+            "runtime_coefficients": {"A": 5.0, "B": 1000.0},
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+    )
+
+    points, skip, _drops = _literature_pressure_points(obs)
+
+    assert skip is None
+    assert points is not None and len(points) == 1
+    assert points[0]["P_Pa"] == pytest.approx(10_000.0)
+
+
+def test_antoine_inversion_refuses_missing_C_for_three_parameter_form() -> None:
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _invert_antoine_temperature_K,
+    )
+
+    temperature_K, reason = _invert_antoine_temperature_K(
+        {
+            "runtime_form": "log10(P_Pa) = A - B/(T_K + C)",
+            "A": 5.0,
+            "B": 1000.0,
+        },
+        10_000.0,
+    )
+
+    assert temperature_K is None
+    assert reason == "missing_antoine_C"
+
+
+def test_antoine_inversion_accepts_missing_C_for_two_parameter_form() -> None:
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _invert_antoine_temperature_K,
+    )
+
+    temperature_K, reason = _invert_antoine_temperature_K(
+        {
+            "runtime_form": "log10(P_Pa) = A - B/T_K",
+            "A": 5.0,
+            "B": 1000.0,
+        },
+        10_000.0,
+    )
+
+    assert reason is None
+    assert temperature_K == pytest.approx(1000.0)
 
 
 def test_point_level_drops_emit_gap_records_not_silent() -> None:
@@ -1314,54 +1503,57 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     # extract_reproduction imports grounded_alpha by name — patch both.
     monkeypatch.setattr(er, "grounded_alpha", _ten_x)
 
+    # The Fedkin Fe Table 3 values are now context (model-fit outputs), so use
+    # the live Richter Mg alpha series, which still has three measured pins.
     observations = [
         o
         for o in load_adopted_observations()
-        if o.species_id == "Fe" and o.obs_type == "rate_series"
+        if o.source_id == "richter-et-al-2007"
+        and o.observation_id == "richter_2007_mg_cai_arrhenius_langmuir"
+        and o.obs_type == "alpha"
     ]
-    assert observations, "Fe rate_series observation missing from store"
-    obs = observations[0]
-    evaluation = evaluate_observation(
-        obs, vapor_pressure_data=load_vapor_pressure_data()
-    )
-    mismatches = [r for r in evaluation.records if r.status == "mismatch"]
-    # Under 10×, Fe actual≈0.2 vs lit≈0.23 — may still mismatch on σ=0.02, or match.
-    comparable = [
-        r for r in evaluation.records if r.status in {"match", "mismatch"}
-    ]
-    assert comparable, "mutation must still produce comparable records"
-    # Residual pin must fail for at least one Fe point.
+    assert observations, "pinned Richter Mg alpha observation missing from store"
     by_key = residual_baselines["by_key"]
+    vapor_pressure_data = load_vapor_pressure_data()
+    pinned_records = []
+    for obs in observations:
+        evaluation = evaluate_observation(
+            obs, vapor_pressure_data=vapor_pressure_data
+        )
+        for record in evaluation.records:
+            if record.status not in {"match", "mismatch"}:
+                continue
+            pin = by_key.get(_record_pin_key(record))
+            if pin is not None:
+                pinned_records.append((record, pin))
+    assert pinned_records, "Mg mutation must produce pinned comparable records"
+    red_record = None
     reds: list[str] = []
-    for record in comparable:
-        pin = by_key.get(_record_pin_key(record))
-        if pin is None:
-            continue
+    for record, pin in pinned_records:
         measured = residual_dex(record)
         if measured is None:
-            reds.append(f"{record.observable_id}: residual_dex=None under mutation")
             continue
         if abs(measured - float(pin["residual_dex"])) > float(pin["band_dex"]):
             reds.append(
                 f"{record.observable_id}: measured_dex={measured:.4g} "
                 f"pin={pin['residual_dex']:.4g} band=±{pin['band_dex']}"
             )
+            red_record = red_record or (record, pin, measured)
     assert reds, (
         "mutation proof FAILED: 10× grounded_alpha did not move residual_dex "
         "outside the pin band — the battery still has no red path. "
-        f"records={[(r.observable_id, r.actual_value, residual_dex(r)) for r in comparable]}"
+        f"records={[(r.observable_id, r.actual_value, residual_dex(r)) for r, _ in pinned_records]}"
     )
     # Also assert the public param-style check would raise.
     with pytest.raises(AssertionError, match="RESIDUAL REGRESSION"):
-        for record in comparable:
-            pin = by_key[_record_pin_key(record)]
-            measured = residual_dex(record)
-            assert measured is not None
-            assert abs(measured - float(pin["residual_dex"])) <= float(pin["band_dex"]), (
-                f"RESIDUAL REGRESSION {record.observable_id}: residual_dex moved "
-                f"measured={measured:.6g} pin={float(pin['residual_dex']):.6g} "
-                f"band=±{float(pin['band_dex']):g}"
-            )
+        assert red_record is not None
+        record, pin, measured = red_record
+        assert measured is not None
+        assert abs(measured - float(pin["residual_dex"])) <= float(pin["band_dex"]), (
+            f"RESIDUAL REGRESSION {record.observable_id}: residual_dex moved "
+            f"measured={measured:.6g} pin={float(pin['residual_dex']):.6g} "
+            f"band=±{float(pin['band_dex']):g}"
+        )
 
 
 def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
@@ -1392,10 +1584,6 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
 @pytest.mark.parametrize(
     ("observation_id", "skip_reason"),
     (
-        (
-            "stolyarova_1992_binary_wilson_model_parameters_table2",
-            "typed-refusal:model_output_not_measurement",
-        ),
         (
             "halwax_2024_cao_third_law_formation_enthalpy",
             "typed-refusal:superseded",
@@ -1467,8 +1655,11 @@ def test_transition_point_is_an_adopted_target_type(
     assert "transition_point" in TARGET_TYPES
     rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"
             and obs.adoption_basis != "superseded"]
-    # Three superseded transition parents remain provenance only: 74 - 3.
-    assert len(rows) == 71
+    # Offer19 adds 40 points from 11 sources: Ueshima 1983 (+18), Ichise and
+    # Ueshima 1989 (+5), Ichise 1986 (+5), Nunoue 1987 (+4), Ichise 1989
+    # (+2), and six other KEMS extracts (+1 each); prior total was 71. The car
+    # adds one Schneider 1980 KEMS transition point (kems-213).
+    assert len(rows) == 112
     # NIST NBP/melting rows are priority winners; kems-020 Hastie Na2SO4
     # second-law prose is extract-adopted (mass_spec_extract).
     assert all(
@@ -1572,6 +1763,15 @@ def test_battery_rollup_matches_committed_model_limitations(
     assert battery_evaluations
     rows = rollup_species_error_bars(battery_evaluations)
     assert rows, "rollup produced no species rows"
+    # Findings species move 14 -> 12: SiO's secondary Fedkin fit rows are
+    # typed model-output refusals under the KEMS owner (ced900aa2 / d-084),
+    # and Si's JANAF boiling point now matches after the Antoine refit
+    # (3e54afda8).
+    finding_species = {
+        row["species"] for row in rows
+        if row["classification"] == "FINDING-mismatch"
+    }
+    assert len(finding_species) == 12
     species = {row["species"] for row in rows}
     assert species == {obs.species_id for obs in adopted_observations}
 
@@ -1587,6 +1787,11 @@ def test_battery_rollup_matches_committed_model_limitations(
     assert "Coverage by source" in generated_section
     assert "Combined propagated uncertainty" in generated_section
     assert "not computable (engine uncertainty unavailable)" in generated_section
+    # The old count of 16 included eight secondary Fedkin SiO alpha/rate
+    # findings plus eight transition-point findings. The duplicate/model-fit
+    # rows are now refused; the Si JANAF mismatch is corrected, leaving seven
+    # NIST/JANAF transition-point extrapolation findings.
+    assert "Extrapolated-alpha FINDINGs: **7**." in generated_section
     for row in rows:
         assert row["species"] in generated_section
 
@@ -1681,17 +1886,37 @@ def test_coverage_ledger_is_observation_first_and_exact(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
     coverage = coverage_summary(battery_evaluations)
-    # 2026-09-06 b-481 attributed regen: deepening folds after ca6b0748 plus
-    # supersession and closed evidence-marker admission. Counts are live
-    # battery, not hand-estimated.
+    # o19fix4 attribution (old pin -> current): KEMS is 1133 -> 1900 (+767;
+    # 37 new extracts +732, existing KEMS edits +35 per o19fix3). Non-KEMS is
+    # 106 -> 96: Fedkin 8 -> 0 and Sossi 1 -> 0 after the source-priority
+    # repoint to kems-005/kems-012 (5c169ea9f; secondary extracts removed in
+    # 94a6dfd6f), then Costa 2 -> 1 when its duplicate Fe summary row was
+    # removed (8119c031e). Replaying the old extracts with current priority
+    # gives 1230: exactly those eight Fedkin rows plus one Sossi row are no
+    # longer separate priority-winner observations.
+    # Comparable observations/points move 30/60 -> 23/34: the six duplicate
+    # Fedkin comparisons account for -24 points; Zhang K's two stale points
+    # are now typed-refused as
+    # rate_series_without_alpha_and_no_motzfeldt_geometry (the row has no
+    # per-point alpha or geometry). Other old comparable sources keep their
+    # point counts. The rollup's “Extrapolated-alpha” label counts all
+    # extrapolated findings: eight Fedkin SiO alpha/rate findings disappear
+    # as model-fit duplicates, and one Si NBP finding resolves after 3e54afda8.
+    # Offer 20's 51 Richter Table 1 residue rows are skipped rate_hkl gaps.
+    # famBAND04 (e72d720b9) adds one adopted Schneider Figure 2 series record
+    # (schneider_1980_k_psat_figure2_high_temperature_digitized): 2047 -> 2048;
+    # it is typed-refused and moves the skipped count from 2024 to 2025.
+    # Car source updates bring the adopted total to 2069, including Kambayashi
+    # 1983 (+50), Yakovlev 1984 (+8), Yakovlev-Shornikov 2011 (+12), and
+    # Schneider 1980 (+1), offset by reviewed source reclassifications.
     assert coverage["observations"] == sum(
         obs.adoption_basis != "superseded" for obs in adopted_observations
-    ) == 1239
-    assert coverage["comparable"] == 30
-    assert coverage["skipped"] == 1209
+    ) == 2069
+    assert coverage["comparable"] == 21
+    assert coverage["skipped"] == 2048
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 60
-    assert coverage["gap_points"] == 1235
+    assert coverage["comparable_points"] == 26
+    assert coverage["gap_points"] == 2027
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1713,29 +1938,28 @@ def test_coverage_ledger_is_observation_first_and_exact(
         )
         for key, row in by_type.items()
     } == {
-        "activity_coefficient": (285, 1, 284, 1),
-        "alpha": (99, 8, 91, 28),
-        "gibbs_table": (241, 0, 241, 0),
-        "psat_series": (334, 1, 333, 2),
-        "rate_series": (209, 5, 204, 14),
-        "transition_point": (71, 15, 56, 15),
+        "activity_coefficient": (504, 1, 503, 1),
+        "alpha": (71, 2, 69, 6),
+        "gibbs_table": (301, 0, 301, 0),
+        "psat_series": (260, 1, 259, 2),
+        "rate_series": (821, 2, 819, 2),
+        "transition_point": (112, 15, 97, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
         key: (row["observations"], row["comparable"], row["comparable_points"])
         for key, row in by_family.items()
     } == {
-        "activity_coefficient": (152, 1, 1),
+        "activity_coefficient": (374, 1, 1),
         "activity_self_agreement": (10, 0, 0),
-        "alpha": (99, 8, 28),
-        "alpha_in_legacy_rate_series": (3, 3, 12),
-        "gibbs_table": (241, 0, 0),
-        "ordering_activity": (123, 0, 0),
-        "ordering_bound": (98, 2, 2),
-        "psat_series": (334, 1, 2),
-        "rate_hkl": (107, 0, 0),
+        "alpha": (71, 2, 6),
+        "gibbs_table": (301, 0, 0),
+        "ordering_activity": (120, 0, 0),
+        "ordering_bound": (161, 2, 2),
+        "psat_series": (260, 1, 2),
+        "rate_hkl": (659, 0, 0),
         "relative_volatility": (1, 0, 0),
-        "transition_point": (71, 15, 15),
+        "transition_point": (112, 15, 15),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations
@@ -1934,12 +2158,35 @@ def test_alkali_first_observed_stays_unparsed_ordering() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "quantity",
+    (
+        "vapour_partial_pressure_ordering_no_numeric_P",
+        "vapour_partial_pressure_ratio_ordering_no_numeric_P",
+    ),
+)
+def test_explicit_ordering_quantity_stays_unparsed_ordering(quantity: str) -> None:
+    obs = _ordering_fixture(quantity=quantity)
+    _assert_qualitative_skip(
+        obs, "typed-refusal:unsupported_observable:ordering_claim_unparsed"
+    )
+
+
+def test_unclassified_qualitative_payload_is_not_reported_as_ordering_gap() -> None:
+    obs = _ordering_fixture(
+        observation_id="unclassified_qualitative_payload",
+        quantity="unclassified_qualitative_trend",
+        note="Qualitative trend only; no ordering relation is stated.",
+    )
+    _assert_qualitative_skip(
+        obs,
+        "typed-refusal:unsupported_observable:qualitative_payload_unclassified",
+    )
+
+
 # Live-battery qualitative rows that used to share ordering_claim_unparsed.
 # Tokens are the payload class; none of these become comparable.
 _LIVE_QUALITATIVE_SKIP_BY_ID = {
-    "stolyarova_1992_al_cas_vapor_ions_and_gibbs": (
-        "unsupported_observable:species_detected_absolute_P_not_tabulated"
-    ),
     "demaria_1971_al_monatomic_figure7": (
         "unsupported_observable:figure_only_not_digitized"
     ),
@@ -1967,6 +2214,9 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
     "drowart_2005_kems_reporting_requirements": (
         "unsupported_observable:methodology_guidance_not_observable"
     ),
+    "ichise_1986_few_activity_runs_no_arrest": (
+        "unsupported_observable:qualitative_activity_not_tabulated"
+    ),
     "hastie_1981_table3_solgasmix_model_not_measurement": (
         "model_output_not_measurement"
     ),
@@ -1975,6 +2225,9 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
     ),
     "sauerborn_2005_qms_traces_figure_only_blocked": (
         "unsupported_observable:figure_only_not_digitized"
+    ),
+    "sossi_fegley_2018_table5_Ag_speciation": (
+        "unsupported_observable:species_speciation_without_numeric_pressures"
     ),
     "sesko_2024_crucible_deposit_edx": (
         "unsupported_observable:deposit_composition_not_species_rate"

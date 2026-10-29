@@ -8,7 +8,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:lpi-compendium-14240
       role: pdf
@@ -22,12 +22,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:lpi-compendium-14240
-      role: table_csv
-      path: tables/lpi-compendium-14240
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:lpi-compendium-14240
       role: pdftotext
       path: unknown

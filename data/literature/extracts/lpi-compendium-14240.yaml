@@ -13,6 +13,10 @@ extraction:
   scope: "secondary compilation of Apollo 14 lunar-soil provenance and composition; no primary vaporization experiment"
   apparatus_status: "no vaporization apparatus, run conditions, pressure, temperature, pumping, crucible, or calibration record stated"
 review_status: draft
+fidelity_samples:
+- path: species.lunar_sample_14240.observations[lpi_14240_chemical_composition_table1].values.composition.wt_percent.SiO2.Rose72
+  value: 47.77
+  locator: {published_page: 3, table: '1', note: 'SiO2 row, Rose72 column.'}
 species:
   lunar_sample_14240:
     observations:

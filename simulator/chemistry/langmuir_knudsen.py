@@ -28,13 +28,18 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from engines.builtin.evaporation_flux import (
     SeriesEvaporationFlux,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from engines.builtin.vapor_pressure import (
     FIT_TARGET_STANDARD_REACTION,
+    VaporPressureComputationError,
     vapor_pressure_antoine_coefficients,
 )
 from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
@@ -323,11 +328,37 @@ def pseudo_antoine_p_eq_pa(species: str, T_K: float) -> float:
             "builtin vapor-pressure provider for an effective P_eq."
         )
     antoine, _ = vapor_pressure_antoine_coefficients(row, temperature_K=T_K)
-    A = float(antoine.get("A", 0.0))
-    B = float(antoine.get("B", 0.0))
-    C = float(antoine.get("C", 0.0))
-    if A <= 0.0 or T_K <= 0.0:
-        return 0.0
+    try:
+        A, B, C = _read_antoine_coefficients(antoine)
+    except _AntoineCoefficientRefusal as exc:
+        if exc.input_category == "missing_input":
+            detail = (
+                "missing_antoine_coefficient: "
+                f"species={species} coefficient={exc.coefficient}"
+            )
+        else:
+            prefix = (
+                "nonfinite_antoine_coefficient"
+                if exc.invalid_kind == "nonfinite"
+                else "invalid_antoine_coefficient"
+            )
+            detail = (
+                f"{prefix}: species={species} coefficient={exc.coefficient} "
+                f"value={exc.value!r}"
+            )
+        raise VaporPressureComputationError(detail) from exc
+
+    try:
+        valid_temperature = math.isfinite(T_K) and T_K > 0.0
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise VaporPressureComputationError(
+            f"invalid_antoine_temperature: species={species} T_K={T_K!r}"
+        ) from exc
+    if not valid_temperature:
+        raise VaporPressureComputationError(
+            f"invalid_antoine_temperature: species={species} T_K={T_K!r}"
+        )
+
     log10_p = _antoine_log10_pressure(A, B, C, T_K)
     return 10.0 ** log10_p
 

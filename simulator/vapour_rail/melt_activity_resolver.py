@@ -26,6 +26,7 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
 )
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
+from simulator.melt_backend import openimcc_bridge
 from simulator.vapour_rail.activity import (
     ActivityAttempt,
     ActivityRefusalCode,
@@ -47,7 +48,6 @@ SHADOW_EQUALITY_ABS_TOL_LN: Final[float] = 1.0e-10
 MELT_ACTIVITY_SHADOW_RECORD_LIMIT: Final[int] = 64
 
 IMCC_ACTIVITY_SHADOW_SCHEMA: Final[str] = "imcc_activity_shadow.v1"
-IMCC_ACTIVITY_SHADOW_DOMAIN_K: Final[tuple[float, float]] = (1700.0, 3000.0)
 IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K: Final[float] = VAPOROCK_T_MAX_K
 IMCC_ACTIVITY_SHADOW_FLUX_OXIDES: Final[tuple[str, ...]] = (
     "Na2O",
@@ -2637,7 +2637,7 @@ def _imcc_shadow_payload_base(temperature_K: float | None) -> dict[str, Any]:
         "temperature_K": (
             None if temperature_K is None else float(temperature_K)
         ),
-        "imcc_domain_K": list(IMCC_ACTIVITY_SHADOW_DOMAIN_K),
+        "imcc_domain_K": list(openimcc_bridge._UNAVAILABLE_TEMPERATURE_DOMAIN_K),
         "vaporock_cap_K": IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K,
         "above_vaporock_cap": (
             None
@@ -2690,31 +2690,32 @@ def build_imcc_activity_shadow(
         )
         return payload
 
-    low, high = IMCC_ACTIVITY_SHADOW_DOMAIN_K
-    if not low <= temperature <= high:
-        payload.update(
-            {
-                "status": "out_of_imcc_domain",
-                "reason": "out of IMCC domain",
-                "reason_code": "imcc_shadow_out_of_domain",
-                "refusal": {
-                    "code": "imcc_shadow_out_of_domain",
-                    "type": "ImccTOutsideDomain",
-                    "detail": (
-                        f"temperature_K={temperature:g} is outside "
-                        f"[{low:g}, {high:g}] K; no extrapolation attempted"
-                    ),
-                },
-            }
-        )
-        payload["activities_by_oxide"] = _imcc_shadow_rows(
-            composition_mol,
-            imcc_activities=None,
-        )
-        return payload
-
     try:
         from simulator.melt_backend.openimcc_bridge import evaluate
+
+        low, high = openimcc_bridge._temperature_domain_K()
+        payload["imcc_domain_K"] = [low, high]
+        if not low <= temperature <= high:
+            payload.update(
+                {
+                    "status": "out_of_imcc_domain",
+                    "reason": "out of IMCC domain",
+                    "reason_code": "imcc_shadow_out_of_domain",
+                    "refusal": {
+                        "code": "imcc_shadow_out_of_domain",
+                        "type": "ImccTOutsideDomain",
+                        "detail": (
+                            f"temperature_K={temperature:g} is outside "
+                            f"[{low:g}, {high:g}] K; no extrapolation attempted"
+                        ),
+                    },
+                }
+            )
+            payload["activities_by_oxide"] = _imcc_shadow_rows(
+                composition_mol,
+                imcc_activities=None,
+            )
+            return payload
 
         result = evaluate(
             composition_mol=composition_mol,

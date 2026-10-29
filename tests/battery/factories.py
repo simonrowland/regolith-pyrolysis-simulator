@@ -1,9 +1,11 @@
-"""Minimal valid records for schema v2.1 tests. Not production fixtures."""
+"""Test factories and migration helpers shared by battery tests."""
 
 from __future__ import annotations
 
 from decimal import Decimal
 from fractions import Fraction
+from pathlib import Path
+from typing import Any, Mapping
 
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -72,6 +74,20 @@ from simulator.battery.records import (
     Value,
     Work,
 )
+
+
+def migrate_one_extract(
+    root: Path,
+    path: Path,
+    index: Mapping[str, Mapping[str, Any]] | None = None,
+    aliases: Mapping[str, str] | None = None,
+):
+    """Migrate one extract and leave finalization to the caller."""
+    from simulator.battery.migrate import Migrator
+
+    migrator = Migrator(root=root, index=index, aliases=aliases)
+    migrator._migrate_extract(path)
+    return migrator
 
 
 def loc(**kwargs: object) -> Locator:

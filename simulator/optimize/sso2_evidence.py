@@ -225,7 +225,7 @@ def sso2_owner_recipe_evidence(
     active_constraints = constraints or PhysicsConstraintSet()
     trace = getattr(run_execution, "trace", None)
     purity_margin = active_constraints.delivered_stream_purity(trace)
-    coating_margin = active_constraints.coating(trace)
+    coating_margin = active_constraints.coating(run_execution)
     stage_species_kg, trace_status, trace_reason = _stage_species_kg_from_trace(trace)
     stage3_kg = {
         species: kg
@@ -458,12 +458,38 @@ def sso2_owner_recipe_evidence(
 
 def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
     permitted = set(SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES)
-    engaged_species = {
-        str(species)
-        for species in (
-            getattr(sim, "_unmeasured_alpha_fallback_species_engaged", ()) or ()
-        )
+    setpoints = getattr(sim, "setpoints", {}) or {}
+    kernel_config = (
+        setpoints.get("chemistry_kernel", {}) or {}
+        if isinstance(setpoints, Mapping)
+        else {}
+    )
+    configured_scope = (
+        kernel_config.get("unmeasured_alpha_fallback_species")
+        if isinstance(kernel_config, Mapping)
+        else None
+    )
+    configured_scope_species = {
+        str(species) for species in (configured_scope or ())
     }
+    is_sso_scoped = (
+        configured_scope is not None
+        and configured_scope_species == permitted
+    )
+    # The simulator's engagement list is run-global. SSO-2 evidence may use it
+    # only when the run explicitly opted into the SSO trace-species scope;
+    # generic alpha-fallback runs do not become SSO-2 engagements.
+    engaged_species = (
+        {
+            str(species)
+            for species in (
+                getattr(sim, "_unmeasured_alpha_fallback_species_engaged", ())
+                or ()
+            )
+        }
+        if is_sso_scoped
+        else set()
+    )
     unexpected = engaged_species - permitted
     if unexpected:
         raise RuntimeError(
@@ -476,7 +502,11 @@ def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
     engagement = dict(
         degraded.get("unmeasured_alpha_evaporation_fallback", {}) or {}
     )
-    total_count = int(engagement.get("total_count", 0) or 0)
+    total_count = (
+        int(engagement.get("total_count", 0) or 0)
+        if is_sso_scoped and engaged_species
+        else 0
+    )
     return {
         "severity": "warning",
         "status": "engaged" if total_count > 0 else "not_engaged",
@@ -1058,7 +1088,7 @@ def _kg_to_mol(run_execution: Any, species: str, kg: float) -> float:
 
 
 def _gate_margin_payload(margin: GateMargin) -> dict[str, Any]:
-    return {
+    payload = {
         "gate": margin.gate,
         "feasible": margin.feasible,
         "margin": _json_number(margin.margin),
@@ -1068,9 +1098,27 @@ def _gate_margin_payload(margin: GateMargin) -> dict[str, Any]:
         ),
         "detail": margin.detail,
         "status": margin.status,
+        "authoritative": margin.authoritative,
+        "output_status": margin.output_status,
         "status_reason": margin.status_reason,
         "threshold": _threshold_payload(margin.threshold),
     }
+    if margin.gate == "coating":
+        if "coating_verdict" in margin.status_payload:
+            payload["coating_verdict"] = margin.status_payload["coating_verdict"]
+        if "coating_unavailable_reason" in margin.status_payload:
+            payload["coating_unavailable_reason"] = margin.status_payload[
+                "coating_unavailable_reason"
+            ]
+        payload["coating_violation_reasons"] = list(
+            margin.status_payload.get("coating_violation_reasons", ())
+        )
+        payload["coating_positive_deposit_tolerance_kg_per_campaign"] = (
+            margin.status_payload.get(
+                "coating_positive_deposit_tolerance_kg_per_campaign"
+            )
+        )
+    return payload
 
 
 def _threshold_payload(threshold: Any) -> dict[str, Any]:

@@ -15,6 +15,132 @@ const socket = io({
 });
 window.socket = socket;
 
+const SIMULATION_TICK_PAYLOAD_VERSION = 4;
+window.simulationTickPayloadVersion = SIMULATION_TICK_PAYLOAD_VERSION;
+window.requireSimulationTickPayloadVersion = function (data) {
+    if (data && data.payload_version === SIMULATION_TICK_PAYLOAD_VERSION) {
+        return true;
+    }
+    const message = 'Unsupported simulation_tick payload version: '
+        + String(data && data.payload_version)
+        + ' (expected ' + SIMULATION_TICK_PAYLOAD_VERSION + ')';
+    console.error(message);
+    const status = document.getElementById('status-text');
+    if (status) status.textContent = message;
+    return false;
+};
+
+let simulationHistoryRunId = null;
+let simulationHistoryFetch = null;
+window.simulationPerHourSummaryHistory = [];
+window.latestPerHourSummary = null;
+
+function mergeSimulationHistory(snapshot, deltas) {
+    const rowsByHour = new Map();
+    for (const row of snapshot) rowsByHour.set(row.hour, row);
+    for (const row of deltas) rowsByHour.set(row.hour, row);
+    return [...rowsByHour.values()].sort((left, right) => left.hour - right.hour);
+}
+
+function rejectSimulationTickShape(message) {
+    const detail = 'Invalid simulation_tick payload: ' + message;
+    console.error(detail);
+    const status = document.getElementById('status-text');
+    if (status) status.textContent = detail;
+}
+
+window.fetchSimulationHistory = async function () {
+    const request = {
+        runId: simulationHistoryRunId,
+        deltas: [],
+    };
+    simulationHistoryFetch = request;
+    try {
+        const response = await fetch('/api/simulation-history', {
+            credentials: 'same-origin',
+        });
+        if (!response.ok) {
+            throw new Error('Simulation history request failed (' + response.status + ')');
+        }
+        const payload = await response.json();
+        if (
+            !payload
+            || payload.payload_version !== SIMULATION_TICK_PAYLOAD_VERSION
+            || !Array.isArray(payload.per_hour_summary)
+        ) {
+            const message = 'Unsupported simulation history payload version: '
+                + String(payload && payload.payload_version)
+                + ' (expected ' + SIMULATION_TICK_PAYLOAD_VERSION + ')';
+            console.error(message);
+            const status = document.getElementById('status-text');
+            if (status) status.textContent = message;
+            return null;
+        }
+        if (
+            simulationHistoryFetch !== request
+            || simulationHistoryRunId !== request.runId
+            || payload.run_id !== request.runId
+        ) return null;
+        simulationHistoryRunId = payload.run_id;
+        window.simulationPerHourSummaryHistory = mergeSimulationHistory(
+            payload.per_hour_summary,
+            request.deltas,
+        );
+        window.latestPerHourSummary = (
+            window.simulationPerHourSummaryHistory.at(-1) || null
+        );
+        return payload;
+    } finally {
+        if (simulationHistoryFetch === request) simulationHistoryFetch = null;
+    }
+};
+
+socket.on('simulation_status', (data) => {
+    if (data && data.status === 'started') {
+        simulationHistoryRunId = data.run_id || null;
+        simulationHistoryFetch = null;
+        window.simulationPerHourSummaryHistory = [];
+        window.latestPerHourSummary = null;
+    }
+});
+
+socket.on('simulation_tick', (data) => {
+    if (!window.requireSimulationTickPayloadVersion(data)) return;
+    const delta = data && data.per_hour_summary_delta;
+    if (
+        !delta || typeof delta !== 'object' || Array.isArray(delta)
+        || typeof delta.hour !== 'number'
+        || !Number.isFinite(delta.hour)
+    ) {
+        rejectSimulationTickShape('per_hour_summary_delta has an invalid shape');
+        return;
+    }
+    if (
+        simulationHistoryRunId
+        && data.run_id
+        && data.run_id !== simulationHistoryRunId
+    ) {
+        simulationHistoryRunId = data.run_id;
+        window.simulationPerHourSummaryHistory = [];
+    }
+    simulationHistoryRunId = data.run_id || simulationHistoryRunId;
+    window.simulationPerHourSummaryHistory.push(delta);
+    window.latestPerHourSummary = delta;
+    if (simulationHistoryFetch?.runId === simulationHistoryRunId) {
+        simulationHistoryFetch.deltas.push(delta);
+    }
+});
+
+socket.on('simulation_complete', () => {
+    window.fetchSimulationHistory().catch((error) => {
+        const message = 'Simulation history request failed: '
+            + String(error && error.message || error);
+        console.error(message);
+        const status = document.getElementById('status-text');
+        if (status) status.textContent = message;
+    });
+});
+
 function resetDecisionModal() {
     const modal = document.getElementById('decision-modal');
     if (modal) modal.remove();

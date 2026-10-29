@@ -71,6 +71,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_301_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -118,6 +119,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -228,6 +230,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_301_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_301_cu_assay
@@ -239,6 +242,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_301_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_301_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -309,18 +313,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 301, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '49'
-          Al2O3: '40'
-          SiO2: '11'
       locator:
         page: 2
         published_page: 806
@@ -405,12 +397,26 @@ observations:
               table: '2'
               note: Sample 301, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '49'
+          Al2O3: '40'
+          SiO2: '11'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 301, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_302_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -480,6 +486,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_302_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -527,6 +534,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -637,6 +645,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_302_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_302_cu_assay
@@ -648,6 +657,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_302_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_302_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -718,18 +728,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 302, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '55'
-          Al2O3: '36'
-          SiO2: '9'
       locator:
         page: 2
         published_page: 806
@@ -814,12 +812,26 @@ observations:
               table: '2'
               note: Sample 302, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '55'
+          Al2O3: '36'
+          SiO2: '9'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 302, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_303_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -889,6 +901,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_303_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -936,6 +949,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -1046,6 +1060,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_303_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_303_cu_assay
@@ -1057,6 +1072,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_303_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_303_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -1127,18 +1143,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 303, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '47'
-          Al2O3: '44'
-          SiO2: '9'
       locator:
         page: 2
         published_page: 806
@@ -1223,12 +1227,26 @@ observations:
               table: '2'
               note: Sample 303, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '47'
+          Al2O3: '44'
+          SiO2: '9'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 303, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_304_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -1298,6 +1316,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_304_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -1345,6 +1364,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -1455,6 +1475,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_304_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_304_cu_assay
@@ -1466,6 +1487,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_304_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_304_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -1536,18 +1558,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 304, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '39'
-          Al2O3: '52'
-          SiO2: '9'
       locator:
         page: 2
         published_page: 806
@@ -1632,12 +1642,26 @@ observations:
               table: '2'
               note: Sample 304, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '39'
+          Al2O3: '52'
+          SiO2: '9'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 304, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_305_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -1707,6 +1731,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_305_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -1754,6 +1779,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -1864,6 +1890,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_305_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_305_cu_assay
@@ -1875,6 +1902,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_305_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_305_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -1945,18 +1973,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 305, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '48'
-          Al2O3: '46'
-          SiO2: '6'
       locator:
         page: 2
         published_page: 806
@@ -2041,12 +2057,26 @@ observations:
               table: '2'
               note: Sample 305, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '48'
+          Al2O3: '46'
+          SiO2: '6'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 305, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_306_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -2116,6 +2146,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_306_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -2163,6 +2194,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -2273,6 +2305,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_306_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_306_cu_assay
@@ -2284,6 +2317,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_306_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_306_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -2354,18 +2388,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 306, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '54'
-          Al2O3: '40'
-          SiO2: '6'
       locator:
         page: 2
         published_page: 806
@@ -2450,12 +2472,26 @@ observations:
               table: '2'
               note: Sample 306, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '54'
+          Al2O3: '40'
+          SiO2: '6'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 306, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_307_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -2525,6 +2561,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_307_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -2572,6 +2609,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -2682,6 +2720,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_307_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_307_cu_assay
@@ -2693,6 +2732,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_307_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_307_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -2763,18 +2803,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 307, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '40'
-          Al2O3: '54'
-          SiO2: '6'
       locator:
         page: 2
         published_page: 806
@@ -2859,12 +2887,26 @@ observations:
               table: '2'
               note: Sample 307, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '40'
+          Al2O3: '54'
+          SiO2: '6'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 307, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_308_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -2934,6 +2976,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_308_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -2981,6 +3024,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -3091,6 +3135,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_308_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_308_cu_assay
@@ -3102,6 +3147,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_308_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_308_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -3172,18 +3218,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 308, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '46'
-          Al2O3: '50'
-          SiO2: '4'
       locator:
         page: 2
         published_page: 806
@@ -3268,12 +3302,26 @@ observations:
               table: '2'
               note: Sample 308, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '46'
+          Al2O3: '50'
+          SiO2: '4'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 308, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_309_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -3343,6 +3391,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_309_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -3390,6 +3439,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -3500,6 +3550,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_309_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_309_cu_assay
@@ -3511,6 +3562,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_309_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_309_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -3581,18 +3633,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 309, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '40'
-          Al2O3: '56'
-          SiO2: '4'
       locator:
         page: 2
         published_page: 806
@@ -3677,12 +3717,26 @@ observations:
               table: '2'
               note: Sample 309, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '40'
+          Al2O3: '56'
+          SiO2: '4'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 309, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_310_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -3752,6 +3806,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_310_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -3799,6 +3854,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -3909,6 +3965,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_310_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_310_cu_assay
@@ -3920,6 +3977,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_310_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_310_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -3990,18 +4048,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 2
-        published_page: 806
-        table: '2'
-        note: Sample 310, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '54'
-          Al2O3: '42'
-          SiO2: '4'
       locator:
         page: 2
         published_page: 806
@@ -4086,12 +4132,26 @@ observations:
               table: '2'
               note: Sample 310, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '54'
+          Al2O3: '42'
+          SiO2: '4'
+      locator:
+        page: 2
+        published_page: 806
+        table: '2'
+        note: Sample 310, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_401_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -4161,6 +4221,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_401_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -4208,6 +4269,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -4318,6 +4380,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_401_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_401_cu_assay
@@ -4329,6 +4392,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_401_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_401_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -4401,19 +4465,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 401, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '42'
-          Al2O3: '41'
-          SiO2: '8'
-          MgO: '9'
       locator:
         page: 4
         published_page: 808
@@ -4518,12 +4569,27 @@ observations:
               table: '3'
               note: Sample 401, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '42'
+          Al2O3: '41'
+          SiO2: '8'
+          MgO: '9'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 401, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_402_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -4593,6 +4659,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_402_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -4640,6 +4707,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -4750,6 +4818,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_402_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_402_cu_assay
@@ -4761,6 +4830,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_402_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_402_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -4833,19 +4903,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 402, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '46'
-          Al2O3: '35'
-          SiO2: '9'
-          MgO: '10'
       locator:
         page: 4
         published_page: 808
@@ -4950,12 +5007,27 @@ observations:
               table: '3'
               note: Sample 402, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '46'
+          Al2O3: '35'
+          SiO2: '9'
+          MgO: '10'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 402, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_403_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -5025,6 +5097,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_403_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -5072,6 +5145,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -5182,6 +5256,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_403_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_403_cu_assay
@@ -5193,6 +5268,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_403_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_403_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -5265,19 +5341,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 403, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '38'
-          Al2O3: '46'
-          SiO2: '8'
-          MgO: '8'
       locator:
         page: 4
         published_page: 808
@@ -5382,12 +5445,27 @@ observations:
               table: '3'
               note: Sample 403, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '38'
+          Al2O3: '46'
+          SiO2: '8'
+          MgO: '8'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 403, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_404_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -5457,6 +5535,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_404_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -5504,6 +5583,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -5614,6 +5694,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_404_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_404_cu_assay
@@ -5625,6 +5706,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_404_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_404_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -5697,19 +5779,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 404, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '43'
-          Al2O3: '42'
-          SiO2: '6'
-          MgO: '9'
       locator:
         page: 4
         published_page: 808
@@ -5814,12 +5883,27 @@ observations:
               table: '3'
               note: Sample 404, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '43'
+          Al2O3: '42'
+          SiO2: '6'
+          MgO: '9'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 404, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_405_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -5889,6 +5973,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_405_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -5936,6 +6021,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -6046,6 +6132,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_405_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_405_cu_assay
@@ -6057,6 +6144,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_405_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_405_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -6129,19 +6217,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 405, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '46'
-          Al2O3: '38'
-          SiO2: '6'
-          MgO: '10'
       locator:
         page: 4
         published_page: 808
@@ -6246,12 +6321,27 @@ observations:
               table: '3'
               note: Sample 405, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '46'
+          Al2O3: '38'
+          SiO2: '6'
+          MgO: '10'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 405, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_406_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -6321,6 +6411,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_406_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -6368,6 +6459,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -6478,6 +6570,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_406_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_406_cu_assay
@@ -6489,6 +6582,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_406_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_406_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -6561,19 +6655,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 406, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '36'
-          Al2O3: '49'
-          SiO2: '5'
-          MgO: '10'
       locator:
         page: 4
         published_page: 808
@@ -6678,12 +6759,27 @@ observations:
               table: '3'
               note: Sample 406, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '36'
+          Al2O3: '49'
+          SiO2: '5'
+          MgO: '10'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 406, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_407_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -6753,6 +6849,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_407_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -6800,6 +6897,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -6910,6 +7008,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_407_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_407_cu_assay
@@ -6921,6 +7020,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_407_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_407_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -6993,19 +7093,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 407, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '41'
-          Al2O3: '46'
-          SiO2: '3'
-          MgO: '10'
       locator:
         page: 4
         published_page: 808
@@ -7110,12 +7197,27 @@ observations:
               table: '3'
               note: Sample 407, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '41'
+          Al2O3: '46'
+          SiO2: '3'
+          MgO: '10'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 407, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_408_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -7185,6 +7287,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_408_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -7232,6 +7335,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -7342,6 +7446,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_408_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_408_cu_assay
@@ -7353,6 +7458,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_408_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_408_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -7425,19 +7531,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 408, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '36'
-          Al2O3: '52'
-          SiO2: '3'
-          MgO: '9'
       locator:
         page: 4
         published_page: 808
@@ -7542,12 +7635,27 @@ observations:
               table: '3'
               note: Sample 408, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '36'
+          Al2O3: '52'
+          SiO2: '3'
+          MgO: '9'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 408, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_409_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -7617,6 +7725,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_409_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -7664,6 +7773,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -7774,6 +7884,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_409_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_409_cu_assay
@@ -7785,6 +7896,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_409_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_409_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -7857,19 +7969,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 409, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '45'
-          Al2O3: '42'
-          SiO2: '4'
-          MgO: '9'
       locator:
         page: 4
         published_page: 808
@@ -7974,12 +8073,27 @@ observations:
               table: '3'
               note: Sample 409, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '45'
+          Al2O3: '42'
+          SiO2: '4'
+          MgO: '9'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 409, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_410_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -8049,6 +8163,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_410_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -8096,6 +8211,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -8206,6 +8322,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_410_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_410_cu_assay
@@ -8217,6 +8334,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_410_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_410_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -8289,19 +8407,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 410, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '40'
-          Al2O3: '42'
-          SiO2: '8'
-          MgO: '10'
       locator:
         page: 4
         published_page: 808
@@ -8406,12 +8511,27 @@ observations:
               table: '3'
               note: Sample 410, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '40'
+          Al2O3: '42'
+          SiO2: '8'
+          MgO: '10'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 410, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_411_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -8481,6 +8601,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_411_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -8528,6 +8649,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -8638,6 +8760,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_411_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_411_cu_assay
@@ -8649,6 +8772,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_411_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_411_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -8721,19 +8845,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 411, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '47'
-          Al2O3: '36'
-          SiO2: '11'
-          MgO: '6'
       locator:
         page: 4
         published_page: 808
@@ -8838,12 +8949,27 @@ observations:
               table: '3'
               note: Sample 411, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '47'
+          Al2O3: '36'
+          SiO2: '11'
+          MgO: '6'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 411, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_412_cu_assay
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -8913,6 +9039,7 @@ observations:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_412_sio2_activity
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -8960,6 +9087,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -9070,6 +9198,7 @@ observations:
               equation: 1-2
               note: Printed pO2 = 4.4 × 10^-16 atm.
         output_unit: Pa
+        references: []
   derived_from:
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_412_slag_composition
   - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_412_cu_assay
@@ -9081,6 +9210,7 @@ observations:
     - kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_412_cu_assay
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: kang-2007-sio2-activity-cas-low-silica::kang_2007_t3_sample_412_slag_composition
   experiment_id: 27f52927e5811e270214d6cfc8d94e3437891725d3ec56721372e292fb3d147c::experiment::copper-slag-equilibration-1873k
   identity:
@@ -9153,19 +9283,6 @@ observations:
       state:
         tag: value
         value: '1873'
-      locator:
-        page: 4
-        published_page: 808
-        table: '3'
-        note: Sample 412, analyzed slag composition.
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '48'
-          Al2O3: '31'
-          SiO2: '15'
-          MgO: '6'
       locator:
         page: 4
         published_page: 808
@@ -9270,9 +9387,24 @@ observations:
               table: '3'
               note: Sample 412, analyzed slag composition.
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '48'
+          Al2O3: '31'
+          SiO2: '15'
+          MgO: '6'
+      locator:
+        page: 4
+        published_page: 808
+        table: '3'
+        note: Sample 412, analyzed slag composition.
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:kang-2007-sio2-activity-cas-low-silica
     parameters: []
     output_unit: Pa
+    references: []

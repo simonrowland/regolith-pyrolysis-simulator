@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import inspect
+import json
+import math
 import types
 from dataclasses import replace
 from decimal import Decimal
@@ -182,8 +184,10 @@ def test_predict_with_engine_does_not_select_the_engine_default() -> None:
     assert "engine_default" not in source
 
 
-def test_missing_fo2_on_a_vapour_row_is_a_typed_refusal(monkeypatch) -> None:
-    opened = _no_engine(monkeypatch)
+def test_vapour_row_without_printed_fo2_commands_borrowed_ladder_fo2(
+    monkeypatch,
+) -> None:
+    seen = _capture_cell(monkeypatch)
     composition = Composition(
         basis="ordered_complete_mole_inventory",
         components=(("K2O", Decimal("0.2")), ("SiO2", Decimal("0.8"))),
@@ -197,22 +201,32 @@ def test_missing_fo2_on_a_vapour_row_is_a_typed_refusal(monkeypatch) -> None:
     )
     obs = F.observation("k-partial", "exp", ident, Decimal("1"))
     prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
-    assert opened == []
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail["reason"] == "missing_fO2"
-    assert prediction.refusal_detail["reason"] != "engine_default"
-    assert "engine_default" not in str(prediction.refusal_detail)
+    assert seen["mode"] == PO2_COMMANDED
+    assert seen["po2_bar"] is not None
+    assert seen["mode"] != PO2_ENGINE_DEFAULT
+    assert prediction.refusal_detail.get("reason") != "missing_fO2"
+    assert prediction.refusal_detail.get("reason") != "engine_default"
+    assert any(
+        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        for notice in prediction.notices
+    )
 
 
-def test_multivalent_melt_without_oxygen_is_a_typed_refusal(monkeypatch) -> None:
-    opened = _no_engine(monkeypatch)
+def test_multivalent_melt_without_printed_fo2_commands_borrowed_ladder_fo2(
+    monkeypatch,
+) -> None:
+    seen = _capture_cell(monkeypatch)
     ident = _melt((("FeO", "0.2"), ("SiO2", "0.8")), "SiO2", fO2_Pa=None, total_P=Decimal("1e5"))
     obs = F.observation("feo", "exp", ident, Decimal("0.4"))
     prediction = predict_with_engine(Engine.ALPHAMELTS, obs, isolated=False)
-    assert opened == []
-    assert prediction.refusal_detail["reason"] == "missing_fO2"
-    assert "FeO" in prediction.refusal_detail["multivalent"]
+    assert seen["mode"] == PO2_COMMANDED
+    assert seen["po2_bar"] is not None
+    assert seen["mode"] != PO2_ENGINE_DEFAULT
+    assert prediction.refusal_detail.get("reason") != "missing_fO2"
+    assert any(
+        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        for notice in prediction.notices
+    )
 
 
 @pytest.mark.parametrize("alias", ["FeOT", "FeO*", "FeO_tot", "FeO_total"])
@@ -227,7 +241,7 @@ def test_iron_alias_without_oxygen_is_a_typed_refusal(alias, monkeypatch) -> Non
 
 
 def test_zero_iron_does_not_hide_another_multivalent_oxide(monkeypatch) -> None:
-    _no_engine(monkeypatch)
+    seen = _capture_cell(monkeypatch)
     ident = _melt(
         (("FeO", "0"), ("TiO2", "0.2"), ("SiO2", "0.8")),
         "SiO2",
@@ -236,13 +250,16 @@ def test_zero_iron_does_not_hide_another_multivalent_oxide(monkeypatch) -> None:
     )
     obs = F.observation("ti", "exp", ident, Decimal("0.4"))
     prediction = predict_with_engine(Engine.OPENIMCC, obs, isolated=False)
-    assert prediction.refusal_detail["reason"] == "missing_fO2"
-    assert "TiO2" in prediction.refusal_detail["multivalent"]
-    assert "FeO" not in prediction.refusal_detail["multivalent"]
+    assert seen["mode"] == PO2_COMMANDED
+    assert prediction.refusal_detail.get("reason") != "missing_fO2"
+    assert any(
+        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        for notice in prediction.notices
+    )
 
 
 def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas(monkeypatch) -> None:
-    _no_engine(monkeypatch)
+    seen = _capture_cell(monkeypatch)
     ident = _melt(
         (("CaO", "0.2"), ("MgO", "0.1"), ("Al2O3", "0.1"), ("SiO2", "0.6")),
         "Ga",
@@ -251,8 +268,12 @@ def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas(monkeypatch) -> 
     )
     obs = F.observation("ga", "exp", ident, Decimal("0.01"))
     prediction = predict_with_engine(Engine.THERMOENGINE, obs, isolated=False)
-    assert prediction.refusal_detail["reason"] == "missing_fO2"
-    assert "Ga" in prediction.refusal_detail["multivalent"]
+    assert seen["mode"] == PO2_COMMANDED
+    assert prediction.refusal_detail.get("reason") != "missing_fO2"
+    assert any(
+        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        for notice in prediction.notices
+    )
 
 
 def test_melt_without_a_multivalent_element_omits_oxygen(monkeypatch) -> None:
@@ -285,7 +306,7 @@ def test_printed_oxygen_is_commanded(monkeypatch) -> None:
     obs = F.observation("feo-printed", "exp", ident, Decimal("0.4"))
     predict_with_engine(Engine.MAGEMIN, obs, isolated=False)
     assert seen["mode"] == PO2_COMMANDED
-    assert seen["po2_bar"] == pytest.approx(1e-3 / 1.0e5)
+    assert seen["po2_bar"] == float(Decimal("1e-3")) / 1.0e5
     assert seen["mode"] != PO2_ENGINE_DEFAULT
 
 
@@ -356,7 +377,7 @@ def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
     seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(cell_material=None)
 
-    predict_with_engine(
+    prediction = predict_with_engine(
         Engine.OPENIMCC,
         observation,
         experiment=experiment,
@@ -367,6 +388,10 @@ def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
     assert seen["po2_bar"] is None
     assert seen["cell_material"] is None
+    assert any(
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        for notice in prediction.notices
+    )
 
 
 @pytest.mark.parametrize(
@@ -385,7 +410,7 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
     seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(cell_material=None)
 
-    predict_with_engine(
+    prediction = predict_with_engine(
         Engine.OPENIMCC,
         observation,
         experiment=experiment,
@@ -396,17 +421,22 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
     assert seen["po2_bar"] is None
     assert seen["cell_material"] == cell_material
+    assert any(
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        for notice in prediction.notices
+    )
 
 
 @pytest.mark.parametrize(
-    ("materials", "reason"),
+    ("engine", "materials", "reason"),
     (
-        ((CellMaterial.AL2O3,), "cell_material_not_inert"),
-        ((CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
-        ((CellMaterial.OTHER,), "cell_material_not_inert"),
+        (Engine.OPENIMCC, (CellMaterial.AL2O3,), "cell_material_not_inert"),
+        (Engine.VAPOROCK, (CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
+        (Engine.ALPHAMELTS, (CellMaterial.OTHER,), "cell_material_not_inert"),
     ),
 )
 def test_noninert_knudsen_cell_refuses_oxygen_balance(
+    engine: Engine,
     materials: tuple[CellMaterial, ...],
     reason: str,
     monkeypatch,
@@ -415,7 +445,7 @@ def test_noninert_knudsen_cell_refuses_oxygen_balance(
     observation, experiment = _kems_partial(cell_material=None)
 
     prediction = predict_with_engine(
-        Engine.OPENIMCC,
+        engine,
         observation,
         experiment=experiment,
         bench=_cell_material_bench(materials),
@@ -499,8 +529,7 @@ def test_printed_fo2_leaves_knudsen_request_unchanged_even_for_reactive_cell(mon
         isolated=False,
     )
 
-    assert seen["mode"] == PO2_COMMANDED
-    assert seen["po2_bar"] == pytest.approx(1e-3 / 1.0e5)
+    assert seen["po2_bar"] == float(Decimal("1e-3")) / 1.0e5
 
 
 def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> None:
@@ -519,7 +548,7 @@ def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> No
     )
     observation = replace(observation, point_conditions={"fO2_Pa": derived})
 
-    predict_with_engine(
+    prediction = predict_with_engine(
         Engine.OPENIMCC,
         observation,
         experiment=experiment,
@@ -529,6 +558,10 @@ def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> No
 
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
     assert seen["po2_bar"] is None
+    assert any(
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        for notice in prediction.notices
+    )
 
 
 def test_solved_effusion_notice_keeps_pO2_diagnostics() -> None:
@@ -643,6 +676,91 @@ def test_printed_total_pressure_is_passed_without_an_assumption(monkeypatch) -> 
     assert seen["pressure_bar"] == pytest.approx(2500 / 1.0e5)
     assert not any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN for notice in prediction.notices
+    )
+
+
+@pytest.mark.parametrize("engine", [Engine.VAPOROCK, Engine.ALPHAMELTS])
+def test_oxygen_balance_vapour_rows_use_engine_pressures_at_commanded_po2(
+    engine, monkeypatch
+) -> None:
+    observation, experiment = _kems_partial(cell_material=None)
+    bench = _cell_material_bench((CellMaterial.PT,))
+    calls: list[tuple[float, dict[str, float]]] = []
+    handle = types.SimpleNamespace(
+        name=engine.value,
+        available=True,
+        unavailable_reason=None,
+        supports_intrinsic_fo2=False,
+        backend=types.SimpleNamespace(get_vapor_species=lambda: ["K", "O2"]),
+    )
+
+    def _open(_name):
+        return handle
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        assert po2.mode == PO2_COMMANDED
+        assert po2.po2_bar is not None and po2.po2_bar > 0.0
+        pressures = {
+            "K": 1e-6 * po2.po2_bar ** -0.25 * 1e5,
+            "O2": 0.02264 * po2.po2_bar * 1e5,
+        }
+        calls.append((po2.po2_bar, pressures))
+        return types.SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            engine_reason=None,
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[],
+            authority=None,
+            certified_band=None,
+            melt_activities={},
+            melt_activity_coefficients={},
+            gas_partial_pressures_Pa=pressures,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+
+    prediction = predict_with_engine(
+        engine,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
+    )
+
+    assert prediction.value is not None
+    assert any(
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+        for notice in prediction.notices
+    )
+    solved_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
+    )
+    solved = json.loads(solved_notice.reason.split(":", 1)[1])
+    score_pO2_bar, score_pressures = calls[-1]
+    direct_pressures = _cell(
+        handle,
+        None,
+        po2=Po2Request(PO2_COMMANDED, solved["pO2_bar"]),
+    ).gas_partial_pressures_Pa
+    assert score_pO2_bar == pytest.approx(solved["pO2_bar"], rel=1e-12)
+    assert math.isclose(
+        float(prediction.value), direct_pressures["K"], rel_tol=1e-9
+    )
+    assert math.isclose(
+        score_pressures["K"], direct_pressures["K"], rel_tol=1e-9
     )
 
 

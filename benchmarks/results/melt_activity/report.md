@@ -393,6 +393,8 @@ AlphaMELTS did not complete a usable melt-activity evaluation on all literal SF0
 
 IMCC-versus-AlphaMELTS empirical verdict: **none**. No point has both a convention-valid measurement and successful canonical activities from both engine families.
 
+ThermoEngine isolated-mode ceiling narrative condition: not met (adapter latch and measured isolated results)
+
 ThermoEngine produced 114/402 usable benchmark predictions; converged results without the requested canonical observable remain typed `observable_unavailable`.
 
 ## Stripping-trajectory coverage

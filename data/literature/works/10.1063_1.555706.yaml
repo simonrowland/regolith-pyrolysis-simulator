@@ -11,74 +11,32 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:lamoreaux-hildenbrand-1984
       role: pdf
-      path: raw/lamoreaux-hildenbrand-1984/lamoreaux-hildenbrand-1984.pdf
+      path: raw/lamoreaux-hildenbrand-1984-t383/lamoreaux-hildenbrand-1984-t383.pdf
       sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
+        tag: value
+        value: 7a4570a34c2c336170c81d3bf1df0d078ae1c46713df80301d4fbfe3ef537a12
     - asset_id: pdftotext:lamoreaux-hildenbrand-1984
       role: pdftotext
       path: text/lamoreaux-hildenbrand-1984
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:lamoreaux-hildenbrand-1984
-      role: table_csv
-      path: tables/lamoreaux-hildenbrand-1984
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:lamoreaux-hildenbrand-1984
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
-    - asset_id: pdf:ref-052-k-o-gas
-      role: pdf
-      path: raw/ref-052-k-o-gas/ref-052-k-o-gas.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:ref-052-k-o-gas
-      role: pdftotext
-      path: text/ref-052-k-o-gas
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:ref-052-k-o-gas
-      role: table_csv
-      path: tables/ref-052-k-o-gas
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:ref-052-k-o-gas
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
-    - asset_id: pdf:ref-052-na-o-gas
-      role: pdf
-      path: raw/ref-052-na-o-gas/ref-052-na-o-gas.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:ref-052-na-o-gas
-      role: pdftotext
-      path: text/ref-052-na-o-gas
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:ref-052-na-o-gas
-      role: table_csv
-      path: tables/ref-052-na-o-gas
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:ref-052-na-o-gas
       role: pdftotext
       path: unknown

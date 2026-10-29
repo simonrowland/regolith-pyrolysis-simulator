@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.config import _load_setpoints_file  # noqa: E402
 from simulator.evaporation import _pre_rg_effective_pressure_source  # noqa: E402
 from simulator.state import CampaignPhase  # noqa: E402
 from simulator.vapour_rail.batch import PressureValue  # noqa: E402
@@ -30,7 +31,7 @@ def _active_pressure_rows(temperature_C: float) -> list[dict[str, object]]:
         "lunar_mare_low_ti",
         _load_yaml("vapor_pressures.yaml"),
         _load_yaml("feedstocks.yaml"),
-        _load_yaml("setpoints.yaml"),
+        _load_setpoints_file(ROOT / "data" / "setpoints.yaml"),
     )
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = temperature_C

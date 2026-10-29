@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import ast
+import inspect
+
 import pytest
 
 from simulator.state import CampaignPhase
@@ -39,21 +42,49 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     )
 
     assert max(abs(s.mass_balance_error_pct) for s in snapshots) <= 1.0e-12
-    # With t-1217 causal capture and b-850 parent-oxide alkali-dimer activity
-    # active, the merged run leaves only Fe subtraction dust at
-    # 2.9782141520250497e-15 kg; it is below the 1e-12 kg bleed floor but above
-    # per-species projection tolerance, so both ledger views retain it.
-    expected_overhead: dict[str, float] = {
-        "Fe": 2.9782141520250497e-15,
-    }
-    assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
-        expected_overhead,
-        rel=1.0e-12,
-        abs=0.0,
+    # 2026-08-05 carrier batch 1a1ab47: the added carrier route leaves
+    # +3.988089247730642e-20 kg Na roundoff in overhead. The exact audit and
+    # outward projection agree, while HI-2 above remains well inside contract.
+    # 2026-08-05 MC-4 wave 1B (a34318c): the composed Na carrier set routes
+    # the tick flux exactly; the residual Na roundoff dust is gone and the
+    # audited overhead is now empty. HI-2 above remains <= 1e-12 %.
+    # The computed C0 exit shortens this run, so the old hour-18 SiO2 roundoff
+    # parcel is no longer produced. Missing account keys mean zero material.
+    assert set(sim.atom_ledger.kg_by_account("process.overhead_gas")) == set()
+    assert set(sim.atom_ledger.project_account_kg("process.overhead_gas")) == set()
+    assert sim.atom_ledger.kg_by_account("terminal.offgas").get(
+        "SiO2_gas", 0.0
+    ) == pytest.approx(0.0, abs=0.0)
+
+
+def test_empty_overhead_expectations_do_not_use_numeric_approx():
+    function = ast.parse(
+        inspect.getsource(test_toggle_off_existing_path_keeps_mass_balance_closed)
     )
-    assert sim.atom_ledger.project_account_kg(
-        "process.overhead_gas"
-    ) == pytest.approx(expected_overhead, rel=1.0e-12, abs=0.0)
+    empty_mapping_names = {
+        node.target.id
+        for node in ast.walk(function)
+        if isinstance(node, ast.AnnAssign)
+        and isinstance(node.target, ast.Name)
+        and isinstance(node.value, ast.Dict)
+        and not node.value.keys
+    }
+    approx_calls_with_empty_mapping = [
+        node
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "approx"
+        and node.args
+        and (
+            isinstance(node.args[0], ast.Dict)
+            and not node.args[0].keys
+            or isinstance(node.args[0], ast.Name)
+            and node.args[0].id in empty_mapping_names
+        )
+    ]
+
+    assert not approx_calls_with_empty_mapping
 
 
 def test_finite_headspace_keeps_oxygen_bins_distinct():

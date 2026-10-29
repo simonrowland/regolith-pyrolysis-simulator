@@ -28,9 +28,7 @@ Train topology (metals train, active C2A onward):
              Sherwood multiplier. The shared wall-pressure owner supplies
              the reactive Si/SiO2 product limit at or below the declared
              SiO routing temperature; unavailable inputs remain refusals.
-             Sub-laminar ``stir_state.axial`` or pO₂ hold suppresses
-             Stage 3 capture and passes SiO downstream (silica fume)
-             or holds it in the melt.
+             Stage-3 capture has no axial stirring suppression gate.
     Stage 4  Alkali/Mg cyclone (350-700°C) — Na/K/Mg condensation
     Stage 5  Vortex dust filter (200-350°C) — entrained particle capture
     Stage 6  Turbine-compressor      — pressure regulation, pO₂ control
@@ -79,7 +77,11 @@ from typing import Any, Dict
 
 import yaml
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
@@ -98,7 +100,12 @@ from simulator.transport_constants import (
     N2_COLLISION_DIAMETER_M,
     VISCOUS_KNUDSEN_MAX,
 )
-from simulator.transport_regime import KnudsenRegime, classify_knudsen_regime
+from simulator.transport_regime import (
+    KnudsenRegime,
+    _minimum_pressure_pa_for_knudsen,
+    _single_species_mean_free_path_m_unchecked,
+    classify_knudsen_regime,
+)
 from simulator.physical_constants import (
     AVOGADRO,
     BOLTZMANN,
@@ -1474,9 +1481,9 @@ STICKING_COEFF = {
 # ``MAX_STIR_FACTOR`` + ``clamp_stir_factor`` are canonical in
 # ``simulator/state.py`` (where ``MeltState.stir_factor`` lives). They
 # are imported here so the condensation Sherwood-enhancement honours the
-# same ceiling as the evaporation linear-multiplier consumer at
-# ``engines/builtin/evaporation_flux.py``. See ``MeltState.stir_factor``
-# doc for the two-consumer rationale and the codex/gstack reviewer
+# same ceiling as the evaporation diagnostic clamp at
+# ``engines/builtin/evaporation_flux.py``. See ``StirState``
+# doc for the consumer mapping and the codex/gstack reviewer
 # trail that surfaced the clamp-asymmetry P1.
 
 
@@ -1502,12 +1509,10 @@ def _stirring_enhanced_sherwood(
     0.5.3 Phase B (2-axis stirring) — which axis drives Sh:
 
     The Sherwood enhancement reads the RADIAL stirring axis as the
-    configured gas-side transport proxy. The axial axis drives a different
-    consumer (the H-K-L linear
-    multiplier in ``engines/builtin/evaporation_flux.py``) — it
-    represents vertical melt-side surface renewal, not gas-side
-    boundary-layer transport. Mixing them up would double-count the
-    same physical knob.
+    configured gas-side transport proxy. The axial axis is diagnostic-only
+    in ``engines/builtin/evaporation_flux.py`` and drives the assumed
+    metal cross-pool relaxation in ``simulator/metal_stratification.py``.
+    Mixing the axes would apply the wrong consumer input.
 
     Signature contract (post-0.5.3):
 
@@ -1530,10 +1535,9 @@ def _stirring_enhanced_sherwood(
 
     Constrained: the driving factor is clamped to ``[0.0,
     MAX_STIR_FACTOR]`` at the operator boundary, with a Sh physics
-    floor at 1.0 (laminar baseline never collapses to zero). Anything
-    beyond ``MAX_STIR_FACTOR`` breaks the gas-side boundary-layer
-    assumption AND the recipe setpoints; the clamp keeps physics
-    defensible even under a bad campaign override.
+    floor at 1.0 (laminar baseline never collapses to zero). The 10×
+    input ceiling is an unsourced engineering placeholder (b-1015), not
+    a measured gas-side boundary-layer limit.
 
     Returns: Sh in the range [``sherwood_laminar``, ~11.6] for the
     driving radial factor in [0, MAX_STIR_FACTOR].
@@ -1541,9 +1545,8 @@ def _stirring_enhanced_sherwood(
     Two-tier clamp (codex /code-review max-effort, Phase B):
 
     - ``clamp_stir_factor`` is the OPERATOR-facing clamp ``[0, 10]``.
-      It preserves the "halt evap" signal at the source for the
-      evaporation consumer at ``axial=0`` AND maps non-finite/bool/
-      etc to 0.
+      It maps non-finite/bool/etc. inputs to 0; axial=0 remains an
+      evaporation diagnostic value, not an evaporation stop command.
     - This helper applies its OWN physics floor at ``1.0`` so that
       Sherwood never drops below the BSL laminar-pipe asymptote
       ``Sh = 3.66`` regardless of operator value. Without stirring
@@ -1552,7 +1555,7 @@ def _stirring_enhanced_sherwood(
 
     Net mapping for the Sherwood path:
 
-    - factor = 0 (halt-evap signal): Sh = 3.66 (laminar baseline)
+    - factor = 0 (radial input floor): Sh = 3.66 (laminar baseline)
     - factor = 1 (no radial stir): Sh = 3.66 (matches)
     - factor = 6 (legacy C2A scalar default): Sh ≈ 9.0
     - factor = 10 (operator ceiling): Sh ≈ 11.6
@@ -1572,7 +1575,7 @@ def _stirring_enhanced_sherwood(
     else:
         operator_value = 1.0
     # Physics floor: Sherwood must not drop below the laminar
-    # asymptote. ``operator_value=0`` (halt-evap signal) maps here
+    # asymptote. ``operator_value=0`` (minimum radial input) maps here
     # to Sh = sherwood_laminar, not Sh = 0.
     sh_input = max(1.0, operator_value)
     return float(sherwood_laminar) * math.sqrt(sh_input)
@@ -1891,6 +1894,18 @@ def _knudsen_input_refusal(
         'value': diagnostic_value,
         'detail': detail,
     })
+
+
+def _require_knudsen_pipe_diameter(value: Any, field: str) -> float:
+    try:
+        return require_lab_pipe_diameter(value, field)
+    except LabGeometryError as exc:
+        raise _knudsen_input_refusal(
+            reason=INVALID_PIPE_DIAMETER_REASON,
+            field=field,
+            value=value,
+            detail=str(exc),
+        ) from exc
 
 
 # Condensation temperatures at ~1 mbar partial pressure (°C).
@@ -2249,10 +2264,10 @@ class CondensationModel:
         ``1.0`` (no-stir laminar baseline, ``Sh = 3.66``) when unset; recipes wire
         ``melt.stir_state.radial`` through
         ``core._configure_condensation_operating_conditions``. The
-        AXIAL axis lives on ``melt.stir_state.axial`` and drives a
-        DIFFERENT consumer (the H-K-L linear multiplier in
-        ``engines/builtin/evaporation_flux.py``); it is not consumed
-        here.
+        AXIAL axis lives on ``melt.stir_state.axial`` and is
+        diagnostic-only in ``engines/builtin/evaporation_flux.py``; its
+        live numerical effect is metal cross-pool relaxation. It is not
+        consumed here.
         """
 
         # Validate the complete candidate first. A late invalid pressure,
@@ -5296,7 +5311,10 @@ def _record_antoine_extrapolation(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
     antoine_extrapolation_warnings: list[str] | None,
 ) -> None:
-    from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
+    from engines.builtin.vapor_pressure import (
+        _coefficient_mapping,
+        vapor_pressure_valid_range_K,
+    )
 
     valid_range = vapor_pressure_valid_range_K(
         data,
@@ -5326,6 +5344,36 @@ def _record_antoine_extrapolation(
         'reason': 'wall_saturation_pressure_out_of_validated_range',
         'status': 'extrapolated',
     }
+    # The selector already chose the flank and attached the gap flag.
+    # Copy that flag onto the extrapolation record. Do not re-decide
+    # which phase the temperature belongs to.
+    selected = _coefficient_mapping(
+        data,
+        coefficient_block,
+        temperature_K=T_K,
+    )
+    if isinstance(selected, Mapping) and selected.get("gap_band_K") is not None:
+        record["reason"] = str(
+            selected.get("selection_refusal") or record["reason"]
+        )
+        record["segment_used"] = selected.get("segment_used")
+        record["segment_choice"] = selected.get("segment_choice")
+        record["certified_band_K"] = tuple(
+            float(value) for value in selected["certified_band_K"]
+        )
+        record["gap_band_K"] = tuple(
+            float(value) for value in selected["gap_band_K"]
+        )
+        record["left_segment_band_K"] = tuple(
+            float(value) for value in selected["left_segment_band_K"]
+        )
+        record["right_segment_band_K"] = tuple(
+            float(value) for value in selected["right_segment_band_K"]
+        )
+        if selected.get("transition_temperature_K") is not None:
+            record["transition_temperature_K"] = float(
+                selected["transition_temperature_K"]
+            )
     if antoine_extrapolations is not None:
         existing_records = [
             existing
@@ -5408,6 +5456,7 @@ def _antoine_psat_pa(
                 antoine_extrapolation_warnings.append(str(evaluation.status))
         return evaluation.pressure_pa
     from engines.builtin.vapor_pressure import (
+        VaporPressureComputationError,
         VaporPressureRangeError,
         _coefficient_mapping,
         reconstructed_vapor_pressure_authority_limit,
@@ -5432,13 +5481,47 @@ def _antoine_psat_pa(
             authority_limits[species] = dict(reconstructed_limit)
         return float(reconstructed_limit["pressure_Pa"])
 
-    antoine, coefficient_block = wall_condensation_antoine_coefficients(
-        data,
-        temperature_K=T_K,
-    )
+    try:
+        antoine, coefficient_block = wall_condensation_antoine_coefficients(
+            data,
+            temperature_K=T_K,
+        )
+    except VaporPressureComputationError as exc:
+        raise DepositionInputRefusal(
+            "antoine_coefficients", species, str(exc)
+        ) from exc
     source_band = vapor_pressure_source_equation_range_K(
         data, coefficient_block, T_K,
     ) or vapor_pressure_valid_range_K(data, coefficient_block, T_K)
+    # A coefficient-free phase-gap marker has no flank to evaluate.
+    # That is a typed wall refusal. When the selector has already
+    # attached a finite flank, those coefficients are the prediction;
+    # the extrapolation record carries the selector's flag. Choosing
+    # the flank stays in the selector.
+    selection_refusal = (
+        antoine.get("selection_refusal") if isinstance(antoine, Mapping) else None
+    )
+    coefficients_finite = False
+    if isinstance(antoine, Mapping):
+        try:
+            coefficients_finite = all(
+                math.isfinite(float(antoine.get(key))) for key in ("A", "B", "C")
+            )
+        except (TypeError, ValueError):
+            coefficients_finite = False
+    if selection_refusal and not coefficients_finite:
+        refusal = WallSaturationPressureRefusal(
+            species,
+            T_K,
+            "no extrapolation available: "
+            f"{selection_refusal}; "
+            f"left_segment={antoine.get('left_segment')}({antoine.get('left_phase')}) "
+            f"right_segment={antoine.get('right_segment')}({antoine.get('right_phase')}); "
+            f"valid_range_K={source_band}",
+        )
+        refusal.valid_range_K = source_band
+        refusal.band_scope = str(selection_refusal)
+        raise refusal
     if not antoine:
         declared = _coefficient_mapping(data, coefficient_block, temperature_K=T_K)
         if declared:
@@ -5449,13 +5532,22 @@ def _antoine_psat_pa(
             f"valid_range_K={source_band}")
         refusal.valid_range_K = source_band
         raise refusal
-    A, B, C = (
-        _deposition_finite_scalar(f"{coefficient_block}.{key}", antoine.get(key))
-        for key in ("A", "B", "C")
-    )
+    try:
+        A, B, C = _read_antoine_coefficients(antoine)
+    except _AntoineCoefficientRefusal as exc:
+        raise DepositionInputRefusal(
+            f"{coefficient_block}.{exc.coefficient}",
+            exc.value,
+            exc.input_category,
+        ) from exc
     T_K = _deposition_finite_scalar("T_wall_K", T_K)
+    # Pinned by test_coating_rate::test_unavailable_wall_saturation_does_not_hide_invalid_input.
     if T_K <= 0.0 or A <= 0.0:
-        raise DepositionInputRefusal(coefficient_block, (A, T_K), "requires A > 0 and T > 0")
+        raise DepositionInputRefusal(
+            coefficient_block,
+            (A, T_K),
+            "requires A > 0 and T > 0",
+        )
     if T_K + C <= 0.0:
         refusal = WallSaturationPressureRefusal(species, T_K,
             f"no extrapolation available: Antoine denominator T+C <= 0; valid_range_K={source_band}")
@@ -6591,15 +6683,16 @@ def _mean_free_path_m(
         return math.inf
     if T_K <= 0.0 or molecular_diameter_m <= 0.0:
         return 0.0
-    denominator = (
-        math.sqrt(2.0)
-        * math.pi
-        * molecular_diameter_m ** 2
-        * pressure_pa
-    )
-    if denominator <= 0.0:
+    try:
+        return _single_species_mean_free_path_m_unchecked(
+            pressure_pa,
+            T_K,
+            molecular_diameter_m,
+        )
+    except ZeroDivisionError:
+        # Preserve the prior limit when positive finite inputs underflow to a
+        # zero denominator.
         return math.inf
-    return BOLTZMANN_CONSTANT_J_K * T_K / denominator
 
 
 def _knudsen_number(
@@ -6657,7 +6750,7 @@ def minimum_pressure_mbar_for_knudsen(
     ceiling = float(knudsen_ceiling)
     if not math.isfinite(ceiling) or ceiling <= 0.0:
         raise ValueError('knudsen_ceiling must be finite and positive')
-    fallback_diameter_m = require_lab_pipe_diameter(
+    fallback_diameter_m = _require_knudsen_pipe_diameter(
         pipe_diameter_m,
         'pipe_diameter_m',
     )
@@ -6666,7 +6759,7 @@ def minimum_pressure_mbar_for_knudsen(
         name = str(getattr(segment, 'name', 'default_pipe'))
         lengths.append((
             name,
-            require_lab_pipe_diameter(
+            _require_knudsen_pipe_diameter(
                 getattr(segment, 'inner_diameter_m', fallback_diameter_m),
                 f'{name}.inner_diameter_m',
             ),
@@ -6687,16 +6780,11 @@ def minimum_pressure_mbar_for_knudsen(
     # P_min=k_B*T/(sqrt(2)*pi*d^2*L*Kn_ceiling). Unit check: (J/K*K)/m^3
     # = N/m^2 = Pa; /100 gives mbar. Sanity: hotter gas or a smaller pipe
     # raises P_min, while a larger pipe lowers it.
-    minimum_pressure_pa = (
-        BOLTZMANN_CONSTANT_J_K
-        * temperature_K
-        / (
-            math.sqrt(2.0)
-            * math.pi
-            * collision_diameter_m ** 2
-            * controlling_length_m
-            * ceiling
-        )
+    minimum_pressure_pa = _minimum_pressure_pa_for_knudsen(
+        temperature_K,
+        collision_diameter_m,
+        controlling_length_m,
+        ceiling,
     )
     return {
         'minimum_pressure_pa': minimum_pressure_pa,
@@ -6721,7 +6809,7 @@ def _knudsen_regime_factor(knudsen_number: float) -> float:
 
 
 def _invalid_pipe_diameter_diagnostic(
-    exc: LabGeometryError,
+    exc: KnudsenRegimeRefusal,
     *,
     field: str,
     raw_value: Any,
@@ -6751,7 +6839,7 @@ def _invalid_pipe_diameter_diagnostic(
         'status': 'refused',
         'reason': INVALID_PIPE_DIAMETER_REASON,
         'reason_refused': INVALID_PIPE_DIAMETER_REASON,
-        'detail': str(exc),
+        'detail': str(exc.diagnostic.get('detail') or exc),
         'field': field,
         'regime': 'invalid',
         'knudsen_number': None,
@@ -6833,9 +6921,9 @@ def knudsen_regime_diagnostic(
         carrier_diagnostic['carrier_collision_diameter_m']
     )
     try:
-        fallback_diameter_m = require_lab_pipe_diameter(
+        fallback_diameter_m = _require_knudsen_pipe_diameter(
             pipe_diameter_m, 'pipe_diameter_m')
-    except LabGeometryError as exc:
+    except KnudsenRegimeRefusal as exc:
         return _invalid_pipe_diameter_diagnostic(
             exc,
             field='pipe_diameter_m',
@@ -6876,9 +6964,9 @@ def knudsen_regime_diagnostic(
             segment, 'inner_diameter_m', fallback_diameter_m)
         segment_name = str(getattr(segment, 'name', 'default_pipe'))
         try:
-            diameter_m = require_lab_pipe_diameter(
+            diameter_m = _require_knudsen_pipe_diameter(
                 raw_diameter_m, f'{segment_name}.inner_diameter_m')
-        except LabGeometryError as exc:
+        except KnudsenRegimeRefusal as exc:
             return _invalid_pipe_diameter_diagnostic(
                 exc,
                 field=f'{segment_name}.inner_diameter_m',

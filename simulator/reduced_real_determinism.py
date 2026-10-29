@@ -21,6 +21,7 @@ from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
 from decimal import InvalidOperation
+from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, ClassVar
@@ -40,6 +41,8 @@ from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
 )
 from simulator.fe_redox import (
+    RedoxState,
+    _non_absolute_redox_state_kwargs,
     _kress91_gate_key_referenced_log_fO2,
 )
 from simulator.fidelity_vocabulary import EvidenceClass
@@ -104,6 +107,7 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
+GATE_CURVE_NOTICE_KEYS = ('composition_projected_notice', 'gate_provider_refusal')
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -380,11 +384,18 @@ class PT0DeterminismStore:
     def write_through_enabled(self) -> bool:
         return self.capture_enabled and self.persistent_store is not None
 
-    def clone_for_replay(self) -> "PT0DeterminismStore":
+    def _clone_for_context(
+        self,
+        mode: str,
+        *,
+        persistent_cache: bool,
+    ) -> "PT0DeterminismStore":
         clone = PT0DeterminismStore(
-            "replay",
-            db_path=self.persistent_path,
-            read_only_base_db_path=self.read_only_base_db_path,
+            mode,
+            db_path=(self.persistent_path if persistent_cache else None),
+            read_only_base_db_path=(
+                self.read_only_base_db_path if persistent_cache else None
+            ),
             strict_vapor_gate=self.strict_vapor_gate,
             control_quantization=self._control_quantization,
         )
@@ -395,6 +406,22 @@ class PT0DeterminismStore:
         clone.cache_tier_ceiling = self.cache_tier_ceiling
         clone.cached_real_miss_policy = self.cached_real_miss_policy
         return clone
+
+    def clone_for_replay(self) -> "PT0DeterminismStore":
+        return self._clone_for_context("replay", persistent_cache=True)
+
+    def clone_for_forecast(self) -> "PT0DeterminismStore":
+        """Capture omits PT1; replay reopens its path.
+
+        Replay initialization may write schema metadata.
+        """
+        # Capture forecasts compute cache misses against their detached backend
+        # and retain fills only in the copied in-memory store. Replay forecasts
+        # reopen the live PT1 path, whose initializer may write schema metadata.
+        return self._clone_for_context(
+            self.mode,
+            persistent_cache=self.replay_enabled,
+        )
 
     def quantized_controls(
         self,
@@ -508,6 +535,11 @@ class PT0DeterminismStore:
         *,
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
+        if uncacheable_replay_disposition(sim) or _openimcc_fallback_is_uncacheable(
+            sim
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
         if not self._cached_real_binding_eligible(sim):
             self._mark_uncacheable_capture(sim)
             return
@@ -516,6 +548,14 @@ class PT0DeterminismStore:
             return
         intent = _equilibrium_payload_intent(sim)
         key = self._equilibrium_key(sim)
+        expected_dependency_vector = record_dependency_vector(
+            sim,
+            intent,
+            artifact="equilibrium_post_record",
+        )
+        if dependency_vector_from_replay_key(key) != expected_dependency_vector:
+            self._mark_uncacheable_capture(sim)
+            return
         payload = canonical_replay_output_projection(
             "equilibrium_post_record", sim, result
         )
@@ -607,12 +647,15 @@ class PT0DeterminismStore:
         sim._last_vapor_pressure_diagnostic = vapor_pressure_diagnostic
         sulfur = getattr(result, "sulfur_saturation", None)
         sim._last_sulfur_saturation_result = sulfur
-        if getattr(result, "fO2_log", None) is not None:
+        replay_fO2_log = getattr(result, "requested_fO2_log", None)
+        if replay_fO2_log is None:
+            replay_fO2_log = getattr(result, "fO2_log", None)
+        if replay_fO2_log is not None:
             sync = getattr(sim, "_sync_oxygen_reservoir_mirror", None)
             if callable(sync):
                 sync()
             else:
-                fO2_log = float(result.fO2_log)
+                fO2_log = float(replay_fO2_log)
                 sim.melt.fO2_log = fO2_log
                 if hasattr(sim.melt, "melt_fO2_log"):
                     sim.melt.melt_fO2_log = fO2_log
@@ -643,11 +686,68 @@ class PT0DeterminismStore:
         fO2_log: float,
         curve: Mapping[str, Any],
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
+        redox_state: RedoxState | None = None,
     ) -> None:
-        if not _is_cacheable_gate_curve(curve):
+        active_record = getattr(
+            sim,
+            "_freeze_gate_liquid_fraction_cache",
+            None,
+        )
+        provider_outcome = (
+            active_record.get("provider_outcome")
+            if isinstance(active_record, Mapping)
+            else None
+        )
+        disposition = (
+            active_record.get("disposition", "live")
+            if isinstance(active_record, Mapping)
+            else "live"
+        )
+        if not gate_curve_memo_is_cacheable(
+            sim,
+            curve,
+            provider_outcome,
+            disposition=disposition,
+        ):
             self._mark_uncacheable_capture(sim)
             return
-        if not self.gate_curve_cache_eligible(sim, curve):
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
+        from simulator.engine_binding_admission import (
+            gate_curve_memo_evidence,
+            gate_curve_memo_origin_matches,
+        )
+
+        if not (
+            isinstance(active_record, Mapping)
+            and active_record.get("disposition") in {"live", "memo-hit"}
+            and isinstance(active_record.get("curve"), Mapping)
+            and dict(active_record["curve"]) == dict(curve)
+            and gate_curve_memo_origin_matches(
+                sim,
+                curve,
+                active_record.get("origin"),
+                fresh_evidence=False,
+                **redox_state_kwargs,
+            )
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
+        evidence = gate_curve_memo_evidence(
+            sim,
+            curve,
+            include_selected_bindings=True,
+        )
+        if (
+            not gate_curve_memo_origin_matches(
+                sim,
+                curve,
+                active_record.get("origin"),
+                fresh_evidence=True,
+                evidence=evidence,
+                **redox_state_kwargs,
+            )
+            or not evidence.eligible
+        ):
             self._mark_uncacheable_capture(sim)
             return
         provider_role = _gate_provider_role_for_capture(sim, curve)
@@ -659,7 +759,16 @@ class PT0DeterminismStore:
             fe_redox_policy="intrinsic",
             provider_role=provider_role,
             control_quantization=self._control_quantization,
+            **redox_state_kwargs,
         )
+        if dependency_vector_from_replay_key(key) != record_dependency_vector(
+            sim,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            artifact="freeze_gate_curve",
+            provider_role=provider_role,
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
         self._store(
             "freeze_gate_curve",
             key,
@@ -677,7 +786,13 @@ class PT0DeterminismStore:
         self.last_cache_state = None
         sim._last_reduced_real_cache_state = None
 
-    def replay_gate_curve(self, sim: Any, *, fO2_log: float) -> dict[str, Any]:
+    def replay_gate_curve(
+        self,
+        sim: Any,
+        *,
+        fO2_log: float,
+        redox_state: RedoxState | None = None,
+    ) -> dict[str, Any]:
         roles = _gate_provider_roles_for_replay(sim)
         from simulator.engine_binding_admission import EngineBindingAdmissionError
 
@@ -701,6 +816,7 @@ class PT0DeterminismStore:
             raise PT0CacheMiss(
                 "PT-0 cached replay miss: no admitted gate candidates"
             )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         keys = tuple(
             canonical_replay_key(
                 sim,
@@ -710,6 +826,7 @@ class PT0DeterminismStore:
                 fe_redox_policy="intrinsic",
                 provider_role=provider_role,
                 control_quantization=self._control_quantization,
+                **redox_state_kwargs,
             )
             for provider_role in roles
         )
@@ -957,7 +1074,10 @@ class PT0DeterminismStore:
             key_hash = _sha256(key_bytes)
             checked.append((key, key_bytes, key_hash))
             entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
-            if entry is None:
+            if entry is None or not replay_dependency_vectors_match(
+                key,
+                entry.get("key", {}),
+            ):
                 continue
             self.replay_sequence.append(
                 {
@@ -980,7 +1100,12 @@ class PT0DeterminismStore:
             self.hits += 1
             self.last_cache_state = "cached_exact"
             self._record_cache_event(artifact, "cached_exact")
-            _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
+            replay_notices = _emit_repair_notices(
+                sim,
+                (entry.get("repair_notices_json"),),
+            )
+            if artifact == "freeze_gate_curve" and sim is not None:
+                sim._last_reduced_real_replay_notices = replay_notices
             return copy.deepcopy(entry["payload"])
 
         key, _key_bytes, key_hash = checked[0]
@@ -1072,6 +1197,11 @@ class PT0DeterminismStore:
                             )
                             physics_bucket_rung = rung_tag
                             break
+            if entry is not None and not replay_dependency_vectors_match(
+                candidate_key,
+                entry.get("key", {}),
+            ):
+                entry = None
             if entry is not None:
                 break
             if tier_ceiling == "cached_interpolated":
@@ -2215,6 +2345,8 @@ def _effective_magemin_database(
     sim: Any,
     intent: ChemistryIntent,
     provider_role: str | None,
+    *,
+    resolve_default: bool = True,
 ) -> str | None:
     candidates: list[Any] = []
     registry = getattr(sim, "_chem_registry", None)
@@ -2231,6 +2363,14 @@ def _effective_magemin_database(
         database = getattr(candidate, "_database", None)
         if database is not None and str(database).strip():
             return str(database).strip()
+    if resolve_default and any(
+        getattr(candidate, "real_backend_family", None)
+        is RealBackendFamily.MAGEMIN
+        for candidate in candidates
+    ):
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        return MAGEMinBackend._DEFAULT_DATABASE
     return None
 
 
@@ -2255,6 +2395,8 @@ def _resolved_backend_for_cache_identity(
             is RealBackendFamily.MAGEMIN
         ):
             return provider
+        if provider is not None and intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return None
     backend = getattr(sim, "backend", None)
     return getattr(backend, "_live_backend", None) or backend
 
@@ -2330,7 +2472,10 @@ def record_dependency_vector(
     *,
     artifact: str,
     provider_role: str | None = None,
+    resolve_magemin_database_default: bool = False,
 ) -> dict[str, Any]:
+    # PT0 keys keep an unset MAGEMin database as recorded; memo admission opts
+    # into resolving that default so lazy and initialized producers compare equal.
     provider = _provider_identity(sim, intent, provider_role=provider_role)
     vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
     resolved_backend = _resolved_backend_for_cache_identity(
@@ -2365,7 +2510,10 @@ def record_dependency_vector(
             "model": provider.get("model"),
             "mode": provider.get("mode"),
             "magemin_database": _effective_magemin_database(
-                sim, intent, provider_role
+                sim,
+                intent,
+                provider_role,
+                resolve_default=resolve_magemin_database_default,
             ),
         },
     }
@@ -2398,9 +2546,16 @@ def record_binding_producer_ids(
         )
 
         temperature_C = float(sim.melt.temperature_C)
+        controls = dict(getattr(sim, "setpoints", {}) or {})
+        controls["high_t_melt_activity"] = getattr(
+            sim,
+            "_high_t_melt_activity",
+            controls.get("high_t_melt_activity", "openimcc"),
+        )
         if openimcc_binding_selected_by_inputs(
             temperature_K=temperature_C + 273.15,
-            controls=getattr(sim, "setpoints", {}) or {},
+            controls=controls,
+            quantity_class="activity",
         ):
             selected.append("openimcc")
 
@@ -2422,6 +2577,11 @@ def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
         ),
         "model": _json_ready(key.get("model", {})),
     }
+    redox = key.get("redox", {})
+    if isinstance(redox, Mapping) and redox.get("redox_state_identity") is not None:
+        vector["redox_state_identity"] = _json_ready(
+            redox["redox_state_identity"]
+        )
     sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
     if sulfur_input_ppm and sulfur_input_ppm > 0.0:
         vector["sulfsat"] = {
@@ -2435,6 +2595,333 @@ def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
     return vector
 
 
+def dependency_vector_from_replay_key(
+    key: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Read the complete dependency selection already carried by a replay key."""
+
+    fields = (
+        "namespace_id",
+        "vapor_pressure_provider_selection",
+        "sulfur_side",
+        "model",
+    )
+    if any(field not in key for field in fields):
+        return None
+    if not isinstance(key.get("sulfur_side"), Mapping):
+        return None
+    if not isinstance(key.get("model"), Mapping):
+        return None
+    return _json_ready({field: key[field] for field in fields})
+
+
+def replay_dependency_vectors_match(
+    query_key: Mapping[str, Any],
+    candidate_key: Mapping[str, Any],
+) -> bool:
+    query_vector = dependency_vector_from_replay_key(query_key)
+    return (
+        query_vector is not None
+        and dependency_vector_from_replay_key(candidate_key) == query_vector
+    )
+
+
+def gate_curve_memo_producer_configuration(
+    sim: Any,
+    curve: Mapping[str, Any],
+    *,
+    redox_state: RedoxState | None = None,
+) -> dict[str, Any]:
+    # Match the provider selection used by gate dispatch before a cache read.
+    # Gate providers are otherwise registered lazily by the dispatch path,
+    # after an uninitialized receiver has already refused a shared memo.
+    _register_gate_providers_for_key(sim)
+    provider_role = _gate_curve_provider_role(curve)
+    if provider_role is None:
+        provider_role = _gate_provider_role_for_key(sim)
+    dependency_vector = record_dependency_vector(
+        sim,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        provider_role=provider_role,
+        resolve_magemin_database_default=True,
+    )
+    sulfur_side = dependency_vector["sulfur_side"]
+    model = dependency_vector["model"]
+    redox_identity = (
+        None if redox_state is None else redox_state.cache_identity()
+    )
+    return {
+        "namespace_id": dependency_vector["namespace_id"],
+        "vapor_pressure_provider_selection": dependency_vector[
+            "vapor_pressure_provider_selection"
+        ],
+        "sulfur_side": {
+            "sulfsat_available": sulfur_side["sulfsat_available"],
+            "sulfsat_provider_selection": (
+                sulfur_side["sulfsat_provider_selection"]
+            ),
+        },
+        "model": {
+            name: model[name]
+            for name in ("model", "mode", "magemin_database")
+        },
+        **(
+            {"redox_state_identity": redox_identity}
+            if redox_identity is not None
+            else {}
+        ),
+    }
+
+
+class GateCurveProviderOutcome(str, Enum):
+    NO_PROVIDER = "no_provider"
+    PRODUCED = "produced"
+    STABLE_REFUSAL = "stable_refusal"
+    NUMERICAL_FAILURE = "numerical_failure"
+    FAILED = "failed"
+
+
+_GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
+    "engine_crash",
+    "engine_worker_unavailable",
+    "missing_binary",
+    "nonzero_exit",
+    "parse_empty_output",
+    "subprocess_died",
+    "subprocess_fe_free_absolute_fo2_crash",
+    "system_output_missing",
+    "thermoengine_adapter_unavailable",
+    "worker_pool_error",
+    "engineworkerdied",
+    "engineworkerunavailable",
+    "engineworkerpoollifecycleerror",
+    "mageminprocessexit",
+    "filenotfounderror",
+    "permissionerror",
+    "oserror",
+})
+
+
+def gate_curve_provider_diagnostic_reasons(
+    diagnostic: Mapping[str, Any] | None,
+) -> tuple[str, ...]:
+    """Read reason codes through both provider and projected-solve wrappers."""
+    from engines.domain_reason import reason_value
+
+    if not isinstance(diagnostic, Mapping):
+        return ()
+    reasons = []
+    for field in (
+        "backend_status_reason", "backend_failure_reason_code", "reason", "reason_refused",
+        "backend_failure_exception", "backend_failure_disposition",
+    ):
+        value = reason_value(diagnostic.get(field))
+        if value is not None and value.strip():
+            reasons.append(value.strip().lower())
+    for field in ("backend_diagnostics", "projected_liquidus_diagnostics"):
+        reasons.extend(gate_curve_provider_diagnostic_reasons(diagnostic.get(field)))
+    return tuple(reasons)
+
+
+def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
+    return any(
+        "timeout" in reason
+        or reason in {"aggregate_budget_exceeded", "mageminaggregatebudgetexceeded"}
+        for reason in gate_curve_provider_diagnostic_reasons(diagnostic)
+    )
+
+
+def gate_curve_provider_outcome_for_status(
+    status: str,
+    diagnostic: Mapping[str, Any] | None = None,
+) -> GateCurveProviderOutcome:
+    """Classify provider diagnostics before deciding whether to reuse a curve.
+
+    No-reason domain refusals remain stable for backends that omit diagnostics;
+    an unrecognized reason on a refusal is conservatively treated as failed.
+    """
+
+    from engines.domain_reason import (
+        STABLE_OUT_OF_DOMAIN_REASONS,
+        TRANSIENT_OUT_OF_DOMAIN_REASONS,
+        reason_value,
+    )
+
+    normalized_status = str(status).strip().lower()
+    reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+    if "environment" in reasons:
+        return GateCurveProviderOutcome.FAILED
+    if any(reason in {
+        "missing_input", "invalid_input", "invalid_fo2_log",
+        "invalid_pressure_bar", "non_finite_composition",
+    } for reason in reasons):
+        return GateCurveProviderOutcome.FAILED
+    numerical_reasons = {
+        "not_converged", "engine_not_converged", "negative_convergence_evidence",
+        "no_convergence", "phase_mass_incomplete",
+    }
+    transient_reasons = {
+        reason_value(reason).lower()
+        for reason in TRANSIENT_OUT_OF_DOMAIN_REASONS
+    } | _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS
+    if gate_curve_provider_timed_out(diagnostic) or any(
+        reason in transient_reasons - numerical_reasons for reason in reasons
+    ):
+        return GateCurveProviderOutcome.FAILED
+    nested_outcomes = []
+    if isinstance(diagnostic, Mapping):
+        backend = diagnostic.get("backend_diagnostics")
+        if isinstance(backend, Mapping):
+            nested_outcomes.append(gate_curve_provider_outcome_for_status(
+                backend.get("backend_status") or status, backend,
+            ))
+        # A projected solve ran on a valid bulk. Its unavailable result is
+        # numerical unless the preserved reason identifies an environment failure.
+        projected_status = diagnostic.get("projected_liquidus_status")
+        if projected_status is not None:
+            nested_outcomes.append(
+                GateCurveProviderOutcome.NUMERICAL_FAILURE
+                if projected_status == "unavailable"
+                else gate_curve_provider_outcome_for_status(
+                    projected_status, diagnostic.get("projected_liquidus_diagnostics"),
+                )
+            )
+    stable_reasons = {
+        reason_value(reason).lower()
+        for reason in STABLE_OUT_OF_DOMAIN_REASONS
+    }
+    if GateCurveProviderOutcome.FAILED in nested_outcomes:
+        return GateCurveProviderOutcome.FAILED
+    if (
+        GateCurveProviderOutcome.NUMERICAL_FAILURE in nested_outcomes
+        or normalized_status == "not_converged"
+        or any(reason in numerical_reasons for reason in reasons)
+    ):
+        return GateCurveProviderOutcome.NUMERICAL_FAILURE
+    if normalized_status == "ok":
+        return GateCurveProviderOutcome.PRODUCED
+    if normalized_status in {"out_of_domain", "unsupported", "refused"}:
+        if not reasons or all(
+            reason in stable_reasons
+            for reason in reasons
+        ):
+            return GateCurveProviderOutcome.STABLE_REFUSAL
+    return GateCurveProviderOutcome.FAILED
+
+
+def record_gate_curve_provider_outcome(
+    sim: Any,
+    outcome: GateCurveProviderOutcome | str,
+) -> GateCurveProviderOutcome:
+    """Keep one failed provider from being masked by a later fallback."""
+
+    next_outcome = GateCurveProviderOutcome(outcome)
+    raw_current = getattr(sim, "_freeze_gate_provider_outcome", None)
+    try:
+        current = GateCurveProviderOutcome(raw_current)
+    except (TypeError, ValueError):
+        current = None
+    if (
+        current is not GateCurveProviderOutcome.FAILED
+        or next_outcome is GateCurveProviderOutcome.FAILED
+    ):
+        sim._freeze_gate_provider_outcome = next_outcome
+    return GateCurveProviderOutcome(sim._freeze_gate_provider_outcome)
+
+
+def gate_curve_provider_outcome_is_reusable(
+    outcome: GateCurveProviderOutcome | str | None,
+) -> bool:
+    if outcome is None:
+        return False
+    try:
+        typed_outcome = GateCurveProviderOutcome(outcome)
+    except (TypeError, ValueError):
+        return False
+    return typed_outcome in {
+        GateCurveProviderOutcome.NO_PROVIDER,
+        GateCurveProviderOutcome.PRODUCED,
+        GateCurveProviderOutcome.STABLE_REFUSAL,
+    }
+
+
+def gate_curve_memo_record(
+    curve: Mapping[str, Any],
+    origin: Mapping[str, Any] | None,
+    repair_notices: Sequence[Mapping[str, Any]] | None,
+    disposition: str,
+    *,
+    provider_outcome: GateCurveProviderOutcome | str | None = None,
+) -> dict[str, Any]:
+    """Build the runtime record shared by the producer and core reader."""
+
+    record = {
+        "curve": dict(curve),
+        "origin": dict(origin) if isinstance(origin, Mapping) else None,
+        "repair_notices": [dict(notice) for notice in repair_notices or ()],
+        "disposition": disposition,
+    }
+    if provider_outcome is not None:
+        record["provider_outcome"] = GateCurveProviderOutcome(provider_outcome)
+    return record
+
+
+def gate_curve_memo_record_is_reusable(record: Mapping[str, Any]) -> bool:
+    """Transient provider failures must not become reusable fallback curves."""
+
+    return gate_curve_provider_outcome_is_reusable(
+        record.get("provider_outcome")
+    )
+
+
+def gate_curve_memo_is_cacheable(
+    sim: Any,
+    curve: Mapping[str, Any],
+    provider_outcome: GateCurveProviderOutcome | str | None,
+    *,
+    disposition: str = "live",
+) -> bool:
+    """Apply the shared admission rule before writing any gate-curve memo."""
+
+    if (
+        disposition == "replay"
+        or getattr(sim, "_freeze_gate_held_curve_record", None) is not None
+        or uncacheable_replay_disposition(sim)
+        or not gate_curve_provider_outcome_is_reusable(provider_outcome)
+        or not isinstance(curve, Mapping)
+    ):
+        return False
+    return _is_cacheable_gate_curve(curve)
+
+
+def uncacheable_replay_disposition(sim: Any) -> bool:
+    reasons = getattr(sim, "_reduced_real_uncacheable_reasons", None)
+    return bool(reasons)
+
+
+def mark_uncacheable_replay_disposition(sim: Any, reason: str) -> None:
+    reasons = getattr(sim, "_reduced_real_uncacheable_reasons", None)
+    if not isinstance(reasons, list):
+        reasons = []
+        sim._reduced_real_uncacheable_reasons = reasons
+    text = str(reason)
+    if text and text not in reasons:
+        reasons.append(text)
+
+
+def _openimcc_fallback_is_uncacheable(sim: Any) -> bool:
+    diagnostic = getattr(sim, "_last_vapor_pressure_diagnostic", None)
+    if not isinstance(diagnostic, Mapping):
+        return False
+    high_t = diagnostic.get("high_t_melt_activity")
+    if not isinstance(high_t, Mapping):
+        return False
+    return bool(high_t.get("fallback")) or str(high_t.get("provider")) == (
+        "constant_gamma"
+    )
+
+
 def canonical_replay_key(
     sim: Any,
     *,
@@ -2444,6 +2931,7 @@ def canonical_replay_key(
     fe_redox_policy: str,
     provider_role: str | None = None,
     control_quantization: ControlQuantization | None = None,
+    redox_state: RedoxState | None = None,
 ) -> dict[str, Any]:
     quantization = control_quantization or _PRODUCTION_QUANTIZATION
     if intent == ChemistryIntent.GATE_LIQUID_FRACTION:
@@ -2548,6 +3036,14 @@ def canonical_replay_key(
             "non-finite vapor transport pO2 passed to PT-0 cache key"
         )
     dependency_vector.pop("namespace_id")
+    redox_key: dict[str, Any] = {
+        "fe_redox_policy": str(fe_redox_policy),
+    }
+    redox_identity = (
+        None if redox_state is None else redox_state.cache_identity()
+    )
+    if redox_identity is not None:
+        redox_key["redox_state_identity"] = redox_identity
     key = {
         "namespace_id": namespace_id,
         "composition_mol_fraction": _backend_boundary_composition(
@@ -2564,9 +3060,7 @@ def canonical_replay_key(
             "pO2_bar": quantized_pO2_bar,
             "vapor_transport_pO2_bar": quantized_transport_pO2,
         },
-        "redox": {
-            "fe_redox_policy": str(fe_redox_policy),
-        },
+        "redox": redox_key,
         **dependency_vector,
     }
     if include_amount:
@@ -2605,6 +3099,7 @@ def canonical_physics_bucket_key(
     fe_redox_policy: str,
     provider_role: str | None = None,
     control_quantization: ControlQuantization | None = None,
+    redox_state: RedoxState | None = None,
 ) -> dict[str, Any]:
     return canonical_physics_bucket_key_from_replay_key(
         canonical_replay_key(
@@ -2615,6 +3110,7 @@ def canonical_physics_bucket_key(
             fe_redox_policy=fe_redox_policy,
             provider_role=provider_role,
             control_quantization=control_quantization,
+            redox_state=redox_state,
         )
     )
 
@@ -2977,6 +3473,10 @@ def canonical_replay_output_projection(
             )
             for field in dataclasses.fields(EquilibriumResult)
             if field.name != "ledger_transition"
+            and not (
+                field.name in {"requested_fO2_log", "printed_fO2_echo_log"}
+                and getattr(result, field.name) is None
+            )
         },
         "last_vapor_pressures_source": dict(
             getattr(sim, "_last_vapor_pressures_source", {}) or {}
@@ -3285,9 +3785,9 @@ def _emit_repair_notices(
     groups: Sequence[str | None],
     *,
     approximation_cache_state: str | None = None,
-) -> None:
+) -> list[dict[str, Any]]:
     if sim is None:
-        return
+        return []
     collected: list[dict[str, Any]] = []
     seen: set[bytes] = set()
     legacy_history_unavailable = False
@@ -3312,6 +3812,7 @@ def _emit_repair_notices(
         )
     for notice in collected:
         record_repair_notice(sim, notice)
+    return copy.deepcopy(collected)
 
 
 def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
@@ -3327,9 +3828,10 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
             for point in tuple(curve.get("path") or ())
         ],
     }
-    notice = curve.get("composition_projected_notice")
-    if isinstance(notice, Mapping):
-        payload["composition_projected_notice"] = _json_ready(notice)
+    for notice_key in GATE_CURVE_NOTICE_KEYS:
+        notice = curve.get(notice_key)
+        if isinstance(notice, Mapping):
+            payload[notice_key] = _json_ready(notice)
     return payload
 
 
@@ -3343,9 +3845,10 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             for point in payload.get("path", ())
         ),
     }
-    notice = payload.get("composition_projected_notice")
-    if isinstance(notice, Mapping):
-        curve["composition_projected_notice"] = dict(notice)
+    for notice_key in GATE_CURVE_NOTICE_KEYS:
+        notice = payload.get(notice_key)
+        if isinstance(notice, Mapping):
+            curve[notice_key] = dict(notice)
     return curve
 
 
@@ -3417,6 +3920,8 @@ def _gate_provider_role_for_key(sim: Any) -> str:
         is not None
     ):
         return "authoritative"
+    if getattr(sim, '_liquid_fraction_provider', None) == 'magemin':
+        return "fallback"
     authorized_name = _cached_real_authorized_backend_name(sim)
     if (
         _is_alphamelts_authorized_name(authorized_name)

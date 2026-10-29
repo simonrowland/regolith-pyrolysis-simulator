@@ -1,0 +1,2226 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ferkl-2026-waste-glass-thermal-redox.yaml
+observations:
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_cr3_fraction::points:h=484da01b204e
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0026'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=LAWC100_R; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: LAWC100_R
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '0.0026'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: value
+        value: N2 atmosphere during melting
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+        note: The LAWC100_R sample was melted under nitrogen; it was subsequently air-quenched with the other samples.
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_cr3_fraction::points:h=4c1fe0eee9a6
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '29000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '29000'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=LAWA44; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: LAWA44
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '29000'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_cr3_fraction::points:h=78047c8695b5
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '950'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '950'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=APPS-09; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: APPS-09
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '950'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_cr3_fraction::points:h=9c64889b5024
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '890'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '890'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=LAWC100; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: LAWC100
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '890'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_cr3_fraction::points:h=e30baa9131c0
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '100000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.78'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=Al-19_MF; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: Al-19_MF
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_cr3_fraction::points:h=f22211e98028
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '100000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=APPS-09_MF; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: APPS-09_MF
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_fe2_fraction::points:h=00ab772a8db6
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '29000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '29000'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=LAWA44; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: LAWA44
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '29000'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_fe2_fraction::points:h=444f54973f15
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '950'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.04'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '950'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=APPS-09; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: APPS-09
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '950'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_fe2_fraction::points:h=72889c7aae65
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '890'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '890'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=LAWC100; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: LAWC100
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '890'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_fe2_fraction::points:h=8d83541f26ec
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '100000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=Al-19_MF; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: Al-19_MF
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_fe2_fraction::points:h=9e0e3895ceb7
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '100000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.06'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=APPS-09_MF; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: APPS-09_MF
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: unknown
+        reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []
+- observation_id: ferkl-2026-waste-glass-thermal-redox::ferkl_2026_table3_xanes_fe2_fraction::points:h=d255a380d616
+  experiment_id: 10.1111/jace.70647::ferkl-2026-waste-glass-thermal-redox
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0026'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.49'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the row-specific XANES uncertainties printed in Table 3 are stored; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+          table asset.
+  notices: []
+  source_id: ferkl-2026-waste-glass-thermal-redox
+  locator:
+    page: 7
+    published_page: 6
+    pdf_page_index: 6
+    table: '3'
+    note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator in the original
+      table asset.
+  read_from: pdf:ferkl-2026-waste-glass-thermal-redox
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: row=LAWC100_R; column=Rapidox pO2 (Pa)
+    sample_id:
+      state:
+        tag: value
+        value: LAWC100_R
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper does not state the temperature at which the quenched glass was analyzed by XANES.
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: Measurement temperature is not stated; 1150°C is the high-temperature Rapidox/melt condition, not the XANES
+          analysis temperature.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '0.0026'
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+    atmosphere:
+      state:
+        tag: value
+        value: N2 atmosphere during melting
+      locator:
+        page: 5
+        published_page: 4
+        pdf_page_index: 4
+        section: Sample Preparation
+        note: The LAWC100_R sample was melted under nitrogen; it was subsequently air-quenched with the other samples.
+    composition:
+      state:
+        tag: unknown
+        reason: Table 2 reports a target recipe rather than measured final composition. The full recipe includes elemental
+          Cl and F, which the existing mass-percent identity map cannot represent; no partial composition is substituted.
+      locator:
+        page: 4
+        published_page: 3
+        pdf_page_index: 3
+        table: '2'
+        note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+  derivation:
+    relation: XANES spectra were fit against the printed reference compounds; the authors report the resulting redox fractions
+      in Table 3.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 5
+        pdf_page_index: 5
+        section: XANES measurement
+        note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral fit inputs.
+    references: []

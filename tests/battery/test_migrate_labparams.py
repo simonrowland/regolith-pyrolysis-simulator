@@ -30,6 +30,7 @@ from tests.battery.test_migrate import (
     _migrate_real_extract,
     _write_min_tree,
 )
+from tests.battery.factories import migrate_one_extract
 
 
 def test_wrapped_equipment_sample_and_composition_match_bare_form(
@@ -171,8 +172,7 @@ def test_ntrs_static_capsule_rows_migrate_with_source_validity_flags() -> None:
     assert flags["capsule_reaction"]["status"] == "not_reported"
     assert "tantalum" in flags["impurity_note"]["note"]
 
-    migrator = Migrator(REPO_ROOT)
-    migrator._migrate_extract(extract)
+    migrator = migrate_one_extract(REPO_ROOT, extract)
     rows = [
         observation
         for observation in migrator.result.observations.values()
@@ -550,8 +550,7 @@ def test_richter_declared_sample_survives_fresh_migration() -> None:
     source_experiments = {
         str(item["experiment_id"]): item for item in doc["experiments"]
     }
-    migrator = Migrator()
-    migrator._migrate_extract(_RICHTER_EXTRACT)
+    migrator = migrate_one_extract(REPO_ROOT, _RICHTER_EXTRACT)
 
     for raw_id in _RICHTER_STARTING_EXPERIMENTS:
         source = source_experiments[raw_id]
@@ -630,8 +629,7 @@ def test_mendybaev_runs_use_starting_glass_and_retain_residue_printed() -> None:
         ("SiO2", as_decimal("0.375072728594")),
         ("CaO", as_decimal("0.071193218264")),
     )
-    migrator = Migrator()
-    migrator._migrate_extract(_MENDYBAEV_EXTRACT)
+    migrator = migrate_one_extract(REPO_ROOT, _MENDYBAEV_EXTRACT)
 
     for raw_id in _MENDYBAEV_RUNS:
         experiment_id = next(

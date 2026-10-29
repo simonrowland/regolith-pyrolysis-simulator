@@ -18,6 +18,7 @@ Ambiguity resolutions (simplest-correct; not owner questions):
 
 from __future__ import annotations
 
+from decimal import Decimal
 from enum import StrEnum
 
 from simulator.state_types import StateTag
@@ -38,6 +39,17 @@ class Engine(StrEnum):
     OPENIMCC = "openimcc"
 
 
+class Fo2Mode(StrEnum):
+    ENGINE_INTRINSIC = "engine_intrinsic"
+    SHARED_LADDER = "shared_ladder"
+
+
+class PolymorphRejectionKind(StrEnum):
+    OMITTED = "omitted"
+    UNRECOGNISED = "unrecognised"
+    CONTRADICTS_FORMULA = "contradicts_formula"
+
+
 class Rail(StrEnum):
     """Owner-bound residual reporting rails."""
 
@@ -53,13 +65,14 @@ class Rail(StrEnum):
 
 
 class Quantity(StrEnum):
-    """Complete storage enum (v2.1 quantity_units)."""
+    """Complete v2.1 storage enum; equilibrium composition preserves the printed gas or condensed phase basis."""
 
     P_SAT = "p_sat"
     P_PARTIAL = "p_partial"
     FUGACITY = "fugacity"
     P_REFERENCE = "p_reference"
     LOG10_KF = "log10_Kf"
+    LOG10_K_REACTION = "log10_K_reaction"
     LOG10_K_STAR = "log10_K_star"
     ACTIVITY = "activity"
     ACTIVITY_COEFFICIENT = "activity_coefficient"
@@ -71,10 +84,13 @@ class Quantity(StrEnum):
     YIELD_FRACTION = "yield_fraction"
     O2_YIELD = "o2_yield"
     FE3_FE2_RATIO = "fe3_fe2_ratio"
+    VALENCE_RATIO = "valence_ratio"
     ION_INTENSITY_RATIO = "ion_intensity_ratio"
     DELTA_FH = "delta_fH"
     DELTA_FG = "delta_fG"
     H_MINUS_H298 = "H_minus_H298"
+    ENTHALPY_OF_FUSION = "heat_of_fusion"
+    ENTROPY_OF_FUSION = "entropy_of_fusion"
     PARTIAL_MOLAR_ENTHALPY = "partial_molar_enthalpy"
     ENTHALPY_OF_VAPORIZATION_2ND_LAW = "enthalpy_of_vaporization_2nd_law"
     ENTHALPY_OF_VAPORIZATION_3RD_LAW = "enthalpy_of_vaporization_3rd_law"
@@ -94,6 +110,32 @@ class Quantity(StrEnum):
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
     RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
+    EQUILIBRIUM_PHASE_COMPOSITION = "equilibrium_phase_composition"
+    DISTRIBUTION_RATIO = "distribution_ratio"
+    SULFIDE_CAPACITY = "sulfide_capacity"
+    CHLORIDE_CAPACITY = "chloride_capacity"
+
+
+class ValenceDenominatorKind(StrEnum):
+    TOTAL_ELEMENT = "total_element"
+    OXIDATION_STATE = "oxidation_state"
+
+
+class ValenceValueForm(StrEnum):
+    FRACTION = "fraction"
+    RATIO = "ratio"
+    LOG10_RATIO = "log10_ratio"
+    AVERAGE_OXIDATION_STATE = "average_oxidation_state"
+
+
+class ValencePrintedForm(StrEnum):
+    MASS_FRACTION_PAIR = "mass_fraction_pair"
+
+
+class ScalarPrintedForm(StrEnum):
+    LOG10 = "log10"
+    NEG_LOG10 = "neg_log10"
+    LN = "ln"
 
 
 class EvidenceClass(StrEnum):
@@ -107,6 +149,13 @@ class EvidenceClass(StrEnum):
     FIGURE_ONLY = "figure_only"
     COMPILATION_ASSESSED = "compilation_assessed"
     ENGINE_PREDICTION = "engine_prediction"
+
+
+class RawInputStatus(StrEnum):
+    NOT_PRINTED = "not_printed"
+    # Printed text that does not resolve to a record id or asset. It is kept
+    # on the conditional-field issue and the migration queue, not as lineage.
+    PRINTED_UNRESOLVED = "printed_unresolved"
 
 
 class RefusalReason(StrEnum):
@@ -138,6 +187,14 @@ class RefusalReason(StrEnum):
     OPENIMCC_NOT_IMPORTABLE = "openimcc_not_importable"
     OUTSIDE_SUPPORTED_SPECIES = "outside_supported_species"
     COEFFICIENT_BASIS_MISMATCH = "coefficient_basis_mismatch"
+    ENGINE_DOES_NOT_REPORT_FE_REDOX = "engine_does_not_report_fe_redox"
+    ENGINE_DOES_NOT_REPORT_FUSION = "engine_does_not_report_fusion"
+    ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION = (
+        "engine_does_not_report_phase_composition"
+    )
+    ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
+    ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
+    CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
 
 
 class CellMaterial(StrEnum):
@@ -192,11 +249,17 @@ class NoticeKind(StrEnum):
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     SOURCE_DISAGREEMENT = "source_disagreement"
+    # An engine-reported limitation of its own model at an in-domain prediction.
+    # The engine text is carried verbatim; it is nonblocking, adds no stratum,
+    # and does not change authority.
+    ENGINE_MODEL_CAVEAT = "engine_model_caveat"
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"
     COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
+    PREDICTION_OUTSIDE_PHYSICAL_RANGE = "prediction_outside_physical_range"
+    SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE = "source_value_outside_physical_range"
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
@@ -204,11 +267,19 @@ class NoticeKind(StrEnum):
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
+    VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
+    APPROXIMATE_VALUE = "approximate_value"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
     # t-1123a: printed point sits between printed liquidus positions; scored as
     # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
     LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
+    QUENCH_ALTERED = "quench_altered"
+    QUENCH_OXIDISING = "quench_oxidising"
+    # t-1465: a non-finite gbase token in a phase this read did not request.
+    # Advisory. The reason is the parser sentence (phase, field, raw token).
+    # It is not a flagged stratum and does not void the decision band.
+    UNREQUESTED_PHASE_NONFINITE = "unrequested_phase_nonfinite"
 
 
 class ReferenceStateConvention(StrEnum):
@@ -227,6 +298,30 @@ class Phase(StrEnum):
     AQ = "aq"
     GLASS = "glass"
     SUPERCOOLED_L = "supercooled_l"
+
+
+class QuenchState(StrEnum):
+    ASSERTED_PRESERVED = "asserted_preserved"
+    ASSERTED_ALTERED = "asserted_altered"
+    NOT_STATED = "not_stated"
+
+
+class QuenchDirection(StrEnum):
+    OXIDISING = "oxidising"
+
+
+class PhaseRole(StrEnum):
+    """Printed phase role on a phase-composition row.
+
+    Thermodynamic ``Phase`` cannot separate melt, slag, metal, and matte:
+    those are often all liquid. The role is the identity axis.
+    """
+
+    MELT = "melt"
+    SLAG = "slag"
+    GLASS = "glass"
+    METAL = "metal"
+    MATTE = "matte"
 
 
 class Polymorph(StrEnum):
@@ -249,6 +344,10 @@ class Polymorph(StrEnum):
     TRIDYMITE = "tridymite"
     CRISTOBALITE_HIGH = "cristobalite_high"
     CRISTOBALITE_LOW = "cristobalite_low"
+    CLINOENSTATITE = "clinoenstatite"
+    DIOPSIDE = "diopside"
+    ALBITE_HIGH = "albite_high"
+    SANIDINE_HIGH = "sanidine_high"
     CORUNDUM = "corundum"
     ANDALUSITE = "andalusite"
     KYANITE = "kyanite"
@@ -290,6 +389,9 @@ class Polymorph(StrEnum):
     ZOISITE = "zoisite"
     WOLLASTONITE = "wollastonite"
     CYCLOWOLLASTONITE = "cyclowollastonite"
+    # ThermoEngine pWo. Distinct from cyclowollastonite: that token is the
+    # B1544 printed name and does not select pWo.
+    PSEUDOWOLLASTONITE = "pseudowollastonite"
     LIME = "lime"
     PERICLASE = "periclase"
     DICKITE = "dickite"
@@ -328,6 +430,7 @@ class AmountBasis(StrEnum):
     MOL_INVENTORY = "mol_inventory"
     MOLE_FRACTION = "mole_fraction"
     MASS_PERCENT = "mass_percent"
+    MOLE_PERCENT = "mole_percent"
 
 
 class MethodToken(StrEnum):
@@ -432,6 +535,17 @@ class ValueKind(StrEnum):
     UNAVAILABLE = "unavailable"
 
 
+class BoundDirection(StrEnum):
+    LOWER = "lower"
+    UPPER = "upper"
+
+
+class BoundInclusivity(StrEnum):
+    INCLUDED = "included"
+    EXCLUDED = "excluded"
+    UNKNOWN = "unknown"
+
+
 class UncertaintyKind(StrEnum):
     PRINTED = "printed"
     DERIVED = "derived"
@@ -462,6 +576,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.FUGACITY: "Pa",
     Quantity.P_REFERENCE: "Pa",
     Quantity.LOG10_KF: "dimensionless",
+    Quantity.LOG10_K_REACTION: "dimensionless",
     Quantity.LOG10_K_STAR: "dimensionless",
     Quantity.ACTIVITY: "dimensionless",
     Quantity.ACTIVITY_COEFFICIENT: "dimensionless",
@@ -473,15 +588,19 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.YIELD_FRACTION: "dimensionless",
     Quantity.O2_YIELD: "dimensionless",
     Quantity.FE3_FE2_RATIO: "dimensionless",
+    Quantity.VALENCE_RATIO: "dimensionless",
     Quantity.ION_INTENSITY_RATIO: "dimensionless",
     Quantity.DELTA_FH: "kJ_per_declared_mol_basis",
     Quantity.DELTA_FG: "kJ_per_declared_mol_basis",
     Quantity.H_MINUS_H298: "kJ_per_declared_mol_basis",
+    # Unit check: (kJ/mol) × (1000 J/kJ) / K = J/(mol·K).
+    Quantity.ENTHALPY_OF_FUSION: "kJ_per_declared_mol_basis",
     Quantity.PARTIAL_MOLAR_ENTHALPY: "kJ_per_declared_mol_basis",
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: "kJ_per_declared_mol_basis",
     Quantity.ENTHALPY_OF_VAPORIZATION_3RD_LAW: "kJ_per_declared_mol_basis",
     Quantity.CP: "J_per_declared_mol_basis_per_K",
     Quantity.S: "J_per_declared_mol_basis_per_K",
+    Quantity.ENTROPY_OF_FUSION: "J_per_declared_mol_basis_per_K",
     Quantity.EVAPORATION_RATE: "kg_per_s",
     Quantity.MASS_LOSS_RATE: "kg_per_s",
     Quantity.WALL_DEPOSIT_MASS: "kg",
@@ -496,6 +615,10 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.ION_INTENSITY: "subtype_defined",
     Quantity.INTERACTION_PARAMETER: "subtype_defined",
     Quantity.RESIDUE_COMPONENT_COMPOSITION: "subtype_defined",
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: "subtype_defined",
+    Quantity.DISTRIBUTION_RATIO: "dimensionless",
+    Quantity.SULFIDE_CAPACITY: "dimensionless",
+    Quantity.CHLORIDE_CAPACITY: "dimensionless",
 }
 
 MEASURED_EVIDENCE = frozenset(
@@ -513,6 +636,9 @@ EQUILIBRIUM_FIT_QUANTITIES = frozenset({Quantity.LOG10_K_STAR})
 PURE_STANDARD_THERMO = frozenset(
     {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
 )
+FUSION_QUANTITIES = frozenset(
+    {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}
+)
 VAPORIZATION_ENTHALPIES = frozenset(
     {
         Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW,
@@ -526,6 +652,52 @@ MELT_ACTIVITY_QUANTITIES = frozenset(
         Quantity.INTERACTION_PARAMETER,
     }
 )
+# Phase compositions and printed capacities share the melt_activity rail.
+# They are not members of MELT_ACTIVITY_QUANTITIES: that set is the activity
+# profile and the activity engine branch.
+PHASE_COMPOSITION_QUANTITIES = frozenset(
+    {
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        Quantity.DISTRIBUTION_RATIO,
+    }
+)
+PRINTED_CAPACITY_QUANTITIES = frozenset(
+    {
+        Quantity.SULFIDE_CAPACITY,
+        Quantity.CHLORIDE_CAPACITY,
+    }
+)
+PHASE_ROW_QUANTITIES = PHASE_COMPOSITION_QUANTITIES | PRINTED_CAPACITY_QUANTITIES
+# Closed subtype tokens on a printed phase-composition row. Equilibrium
+# ratios (Darken–Gurry r, pCO2/pCO) reuse EQUILIBRIUM_PHASE_COMPOSITION
+# with a free-text basis and are not in this set. ppm_mass is the printed
+# mass-ppm scale; it is not a weight percent and is not stored converted.
+# element_ppm_by_mass is the residue ppm subtype, a different quantity.
+PHASE_BASIS_TOKENS = frozenset({
+    "wt_percent",
+    "mole_fraction",
+    "element_ppm_by_mass",
+    "ppm_mass",
+})
+
+# 1 wt% = 1 mass part per 100. 1 ppm by mass = 1 mass part per 1_000_000.
+# 1e6 / 1e2 = 1e4, so 1 wt% = 10_000 ppm and wt% = ppm / 1e4.
+# Unit check: ppm_mass / 1e4 = (mass fraction × 1e6) / 1e4
+#   = mass fraction × 1e2 = wt%.
+# Sanity: 2500 ppm = 0.25 wt%; 10000 ppm = 1 wt%.
+_PPM_MASS_PER_WT_PERCENT = Decimal("10000")
+
+
+def ppm_mass_to_wt_percent(ppm: Decimal) -> Decimal:
+    """Scale a mass-ppm amount onto weight percent.
+
+    This is the only conversion for subtype ppm_mass. A stored
+    phase-composition point stays the printed ppm. A scorer that holds an
+    engine wt% map refuses the row; it does not call this on the stored point.
+    """
+
+    return ppm / _PPM_MASS_PER_WT_PERCENT
+
 KINETIC_YIELD_QUANTITIES = frozenset(
     {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,

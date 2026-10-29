@@ -447,7 +447,7 @@ MASS_SPEC_OBSERVATION_TYPES = frozenset({"psat_series", "rate_series", "alpha"})
 RESIDUAL_BASELINES_PATH = (
     ROOT / "tests" / "chemistry" / "extract_store_reproduction_residual_baselines.yaml"
 )
-NA2O_ACTIVITY_PIN_KEY = "ms2000_044_na2o_activity_xsio2_0709_t1673:activity"
+NA2O_ACTIVITY_PIN_KEY = "ms2000_044_na2o_activity_xsio2_0709_t1673_class_quote_r2:activity"
 
 
 @lru_cache(maxsize=1)
@@ -474,14 +474,12 @@ def _mass_spec_expected_species(
     pins: dict[str, Any],
     live_species: set[str],
     residual_pins: tuple[dict[str, Any], ...] | list[dict[str, Any]],
-    covered_species: set[str],
 ) -> set[str]:
     """LIVE T3 mass_spec declarations backed by a mass-spec-type residual pin.
 
     An activity / boiling-point residual pin must not mint a species here.
-    ``covered_species`` is the live mass-spec-type record set: a declared pin
-    whose store record is gone (inadmissible figure, typed skip) does not stay
-    expected. Lost-record detection is ``_assert_mass_spec_pin_record_parity``.
+    Keep this set independent of observed coverage so the parity guard detects
+    a declared mass-spec pin whose store record is gone.
     """
 
     declared = {
@@ -495,7 +493,7 @@ def _mass_spec_expected_species(
         if pin.get("observation_type") in MASS_SPEC_OBSERVATION_TYPES
         and str(pin["species"]) in live_species
     }
-    return declared & typed_pin_species & covered_species
+    return declared & typed_pin_species
 
 
 def _assert_mass_spec_pin_record_parity(
@@ -1183,6 +1181,7 @@ def test_demand_manifest_ratchet_rejects_source_census_shrinkage() -> None:
 
 
 def test_gap_ledger_schema_and_reason_types() -> None:
+    assert GAPS["schema_version"] == 2
     assert set(GAPS["reason_types"]) == REASON_TYPES
     entries = GAPS["entries"]
     keys = [_pair_key(row) for row in entries]
@@ -1190,6 +1189,10 @@ def test_gap_ledger_schema_and_reason_types() -> None:
     for row in entries:
         assert row["reason"] in REASON_TYPES
         assert isinstance(row.get("missing"), str) and row["missing"].strip()
+        if row.get("verdict") == "NEEDS-CHANNEL":
+            assert isinstance(row.get("pathway"), str)
+            assert isinstance(row.get("required_channels"), list)
+            assert isinstance(row.get("refusal_code"), str)
         if row["carrier"] == UNRESOLVED_CARRIER:
             assert row["contract"] == "carrier-discovery"
             assert row["reason"] == "acquisition-pending"
@@ -1815,6 +1818,28 @@ def test_t3_guard_still_fires_when_mass_spec_pin_loses_its_record() -> None:
         _assert_mass_spec_pin_record_parity(expected_species, covered_species)
 
 
+def test_t3_guard_does_not_hide_mass_spec_pin_missing_its_record() -> None:
+    pins = {
+        "species": {
+            "Fe": {"validations": {"mass_spec": {}}},
+            "K": {"validations": {"mass_spec": {}}},
+        }
+    }
+    residual_pins = (
+        {"observation_type": "psat_series", "species": "Fe"},
+        {"observation_type": "alpha", "species": "K"},
+    )
+    covered_species = {"K"}
+    expected_species = _mass_spec_expected_species(
+        pins=pins,
+        live_species={"Fe", "K"},
+        residual_pins=residual_pins,
+    )
+
+    with pytest.raises(AssertionError, match=r"pins_without_records=\['Fe'\]"):
+        _assert_mass_spec_pin_record_parity(expected_species, covered_species)
+
+
 def test_t3_activity_residual_pin_does_not_mint_mass_spec_expected_species() -> None:
     pins = {
         "species": {
@@ -1843,7 +1868,6 @@ def test_t3_activity_residual_pin_does_not_mint_mass_spec_expected_species() -> 
         pins=pins,
         live_species={"Na", "Fe"},
         residual_pins=residual_pins,
-        covered_species={"Na", "Fe"},
     )
     assert "Na" not in expected, (
         "activity residual pin minted Na as a mass-spec expected species"
@@ -1856,8 +1880,10 @@ def test_t3_unfixed_expected_set_names_na_without_mass_spec_record(
 ) -> None:
     """Red-by-revert: every PINS mass_spec key vs mass-spec-type records.
 
-    The assertion must name pins_without_records=['Na'] — Na has a T3
-    mass_spec declaration but no live mass-spec-type store record.
+    Zhang's admitted Table 4 row contains alpha-times-gamma evidence but no
+    per-point alpha, so the evaluator typed-refuses it without Motzfeldt
+    geometry. Plante's 1979 K2O entry is partial pressure, not an activity.
+    K and Na therefore lack live mass-spec-type store records.
     """
 
     unfixed_expected = {
@@ -1866,7 +1892,7 @@ def test_t3_unfixed_expected_set_names_na_without_mass_spec_record(
         if species_id in LIVE_SPECIES and "mass_spec" in row["validations"]
     }
     covered = _mass_spec_covered_species(mass_spec_rollup, set(LIVE_SPECIES))
-    with pytest.raises(AssertionError, match=r"pins_without_records=\['Na'\]"):
+    with pytest.raises(AssertionError, match=r"pins_without_records=\['K', 'Na'\]"):
         _assert_mass_spec_pin_record_parity(unfixed_expected, covered)
 
 
@@ -1878,7 +1904,6 @@ def test_t3_expected_species_come_from_mass_spec_type_pins_only(
         pins=PINS,
         live_species=set(LIVE_SPECIES),
         residual_pins=_residual_baseline_points(),
-        covered_species=covered,
     )
     assert "Na" not in expected, (
         "Na entered expected_species without a mass-spec-type store record; "
@@ -1895,7 +1920,6 @@ def test_t3_mass_spec_residual_pins_are_two_way(
         pins=PINS,
         live_species=set(LIVE_SPECIES),
         residual_pins=_residual_baseline_points(),
-        covered_species=covered,
     )
     _assert_mass_spec_pin_record_parity(expected_species, covered)
     for species_id in sorted(expected_species):
@@ -2281,7 +2305,29 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
 
 
-def test_engine_report_gate_skips_without_private_docs() -> None:
+def test_engine_report_gate_skips_without_private_docs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    request: pytest.FixtureRequest,
+) -> None:
     """Mutation proof: ungated ENGINE_REPORT_PATH.read_text ERROR'd on fresh CI."""
+    missing_report = tmp_path / ENGINE_REPORT_PATH.name
+    monkeypatch.setitem(globals(), "ENGINE_REPORT_PATH", missing_report)
+    monkeypatch.setitem(globals(), "load_rail_provider", lambda: (None, None))
     assert _engine_report_unavailable() is True
     assert ENGINE_REPORT_PATH.is_file() is False
+
+    conformance_simulation = request.getfixturevalue("conformance_sim")
+    with pytest.raises(
+        pytest.skip.Exception,
+        match="machine-local engine crosscheck report absent",
+    ):
+        test_c5_debit_route_alpha_and_source_metadata_are_executable(
+            LIVE_SPECIES[0], conformance_simulation
+        )
+
+    with pytest.raises(
+        pytest.skip.Exception,
+        match="machine-local engine crosscheck report absent",
+    ):
+        engine_residuals.__wrapped__()

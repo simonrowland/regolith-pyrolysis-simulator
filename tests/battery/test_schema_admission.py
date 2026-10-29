@@ -327,7 +327,34 @@ def test_review_author_provenance_matrix(tmp_path, method, shape, case):
         assert _child(result).derivation.inputs == ("fixture-source::parent",)
     else:
         assert evidence.is_unknown
-    assert not result.validation.hard_issues
+    if case == "partial_prose":
+        # Printed derived_from is not a pointer. It is a conditional_field
+        # and a queue entry. Storing it would raise referential_integrity.
+        printed = "not an observation"
+        children = [
+            obs for obs in result.observations.values()
+            if obs.observation_id == "fixture-source::child"
+            or obs.observation_id.startswith("fixture-source::child::")
+        ]
+        assert children
+        assert all(printed not in (obs.derived_from or ()) for obs in children)
+        detail = (
+            f"derived_from {printed!r} is prose, not a resolvable "
+            "observation id; retained here, never minted as a pointer"
+        )
+        assert any(
+            issue.reason is RefusalReason.CONDITIONAL_FIELD
+            and issue.path == "observation[fixture-source::child].derived_from"
+            and issue.detail == detail
+            for issue in result.validation.hard_issues
+        )
+        assert any(entry.why == detail for entry in result.queue)
+        assert not any(
+            issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+            for issue in result.validation.hard_issues
+        )
+    else:
+        assert not result.validation.hard_issues
 
 
 @pytest.mark.parametrize("method", [
@@ -442,6 +469,7 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     raw = {field: _typed(components), "mass_kg": _located({"kind": "point", "point": "0.001"})}
     if field == "printed_composition":
         raw[field]["locator"]["note"] = "Printed starting material composition"
+        raw["composition_role"] = "initial_charge_only"
     if field == "printed_composition" and existing_unknown:
         raw["initial_composition"] = {"state": {"tag": "unknown", "reason": "not printed on a molar basis"}}
     sample = M._sample_from_plain(raw)
@@ -590,6 +618,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
     if boundary == "sample_printed":
         printed["locator"]["note"] = "Printed starting material composition"
         sample["printed_composition"] = conditions.pop("printed_composition")
+        sample["composition_role"] = "initial_charge_only"
     elif boundary == "row_printed_row_initial":
         conditions["composition"] = canonical
     if source_extract:
@@ -597,9 +626,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
     else:
         inputs = _serialized_consumer_inputs(sample, conditions)
         waypoint = inputs.waypoints["normalized_composition"]
-        expected_valid = component == "MgO" or (
-            component == "FeOT" and boundary == "sample_printed"
-        )
+        expected_valid = component == "MgO"
         if not expected_valid:
             assert waypoint.selected is None
             assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
@@ -608,9 +635,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
             )
         requests = engine_point_requests(inputs)
     assert len(requests) == 7
-    expected_valid = component == "MgO" or (
-        component == "FeOT" and boundary == "sample_printed"
-    )
+    expected_valid = component == "MgO"
     for request in requests:
         assert (request.payload is not None) == expected_valid
         if component == "FeOT" and expected_valid:
@@ -777,8 +802,7 @@ def test_areal_unit_routes_agree(unit, factor):
 ])
 def test_real_source_evidence_arms(source, recipes):
     path = M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml"
-    migrator = M.Migrator(M.REPO_ROOT)
-    migrator._migrate_extract(path)
+    migrator = F.migrate_one_extract(M.REPO_ROOT, path)
     migrator.finalize()
     result = migrator.result
     transforms = [e.sample.initial_composition for e in result.experiments.values()
@@ -807,8 +831,10 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
     from simulator.battery.identity import quantity_token
 
     for source in ("kems-120-ueshima-1984", "thomas-2022-chlorine-bonding-silicate-melts"):
-        migrator = M.Migrator(M.REPO_ROOT)
-        migrator._migrate_extract(M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml")
+        migrator = F.migrate_one_extract(
+            M.REPO_ROOT,
+            M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml",
+        )
         migrator.finalize()
         result = migrator.result
         if source.startswith("kems"):
@@ -863,8 +889,7 @@ def test_geometry_context_keeps_original_source_record():
     source_row = next(row for _, row in M.iter_extract_observations(raw)
                       if row["observation_id"] == "yakovlev_shornikov_2011_Po2_table_bar_calculated")
     printed_rows = source_row["values"]["points"]
-    migrator = M.Migrator(M.REPO_ROOT)
-    migrator._migrate_extract(source)
+    migrator = F.migrate_one_extract(M.REPO_ROOT, source)
     migrator.finalize()
     result = migrator.result
     prefix = f"{raw['source_id']}::{source_row['observation_id']}::"
@@ -888,13 +913,123 @@ def test_geometry_context_keeps_original_source_record():
                    for row in result.context_by_work[experiment.work_id])
 
 
+_BOULLIUNG_APPARATUS = "boulliung_2025_ssas_apparatus_and_run_conditions"
+_BOULLIUNG_STARTING = "boulliung_2025_starting_material_hg_and_trace_doping"
+# Context parents are retained as qualified work-context references.
+_BOULLIUNG_CONTEXT_INPUTS = {
+    "boulliung_2025_hg_equilibrium_partial_pressure": (_BOULLIUNG_APPARATUS,),
+    "boulliung_2025_hg_equilibrium_partial_pressure_1400c": (
+        _BOULLIUNG_STARTING, _BOULLIUNG_APPARATUS,
+    ),
+    "boulliung_2025_cd_tl_author_partial_pressures": (_BOULLIUNG_APPARATUS,),
+    "boulliung_2025_hsc_gas_speciation": (
+        _BOULLIUNG_STARTING, _BOULLIUNG_APPARATUS,
+    ),
+}
+_WIMPENNY_TABLE = "wimpenny_2019_table1_experimental_zn_rows"
+
+
+def _printed_lineage_issue(source: str, local_id: str, field: str, text: str):
+    return (
+        f"observation[{source}::{local_id}].{field}",
+        RefusalReason.CONDITIONAL_FIELD,
+        (
+            f"derived_from {text!r} is prose, not a resolvable "
+            "observation id; retained here, never minted as a pointer"
+        ),
+    )
+
+
 @pytest.mark.parametrize("source", [
     "boulliung-2025-mercury-volatile-metals-magmatic", "itoh-hino-banya-1998-spinel",
     "wimpenny-2019-zn-isotope-evaporation-extreme-t",
 ])
 def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
-    migrator = M.Migrator(M.REPO_ROOT)
-    migrator._migrate_extract(M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml")
+    """Printed lineage is a conditional_field, not a stored pointer.
+
+    Storing the text raised referential_integrity and failed the store
+    guard, which allows only conditional_field on lineage fields. The
+    derivation stays. The printed string is in the issue detail and is
+    absent from derived_from and derivation.inputs.
+    """
+
+    migrator = F.migrate_one_extract(
+        M.REPO_ROOT,
+        M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml",
+    )
     migrator.finalize()
-    assert not any(issue.reason.value == "referential_integrity"
-                   for issue in migrator.result.validation.hard_issues)
+    hard = migrator.result.validation.hard_issues
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY for issue in hard
+    )
+    if source == "itoh-hino-banya-1998-spinel":
+        # These records are explicitly extract context, not observations.
+        # Preserve them in the owning work context instead of inventing
+        # Observation derivation pointers from the source's prose.
+        expected = set()
+        context_rows = [
+            row
+            for rows in migrator.result.context_by_work.values()
+            for row in rows
+            if row.get("context_id")
+            in {
+                f"{source}::context::itoh_1998_spinel_equilibrium_constants",
+                f"{source}::context::itoh_1998_spinel_interaction_parameters",
+            }
+        ]
+        assert {row["context_id"] for row in context_rows} == {
+            f"{source}::context::itoh_1998_spinel_equilibrium_constants",
+            f"{source}::context::itoh_1998_spinel_interaction_parameters",
+        }
+        assert all(row.get("type") == "context" for row in context_rows)
+        assert all(
+            "derived_from" not in row and "derivation" not in row
+            for row in context_rows
+        )
+        assert not any(
+            f"{source}::{local_id}" in migrator.result.observations
+            for local_id in (
+                "itoh_1998_spinel_equilibrium_constants",
+                "itoh_1998_spinel_interaction_parameters",
+            )
+        )
+        assert {row["values"]["quantity"] for row in context_rows} == {
+            "printed_equilibrium_constants_and_relations",
+            "cross_interaction_coefficients",
+        }
+    elif source == "boulliung-2025-mercury-volatile-metals-magmatic":
+        expected = set()
+        for local_id, context_inputs in _BOULLIUNG_CONTEXT_INPUTS.items():
+            observation = migrator.result.observations[f"{source}::{local_id}"]
+            expected_context_ids = {
+                f"{source}::context::{context_input}"
+                for context_input in context_inputs
+            }
+            assert expected_context_ids <= set(observation.derived_from or ())
+            assert observation.derivation is not None
+            assert expected_context_ids <= set(observation.derivation.inputs)
+            assert not any(
+                issue.path
+                in {
+                    f"observation[{observation.observation_id}].derived_from",
+                    f"observation[{observation.observation_id}].derivation.inputs",
+                }
+                for issue in hard
+            )
+    else:
+        expected = {
+            _printed_lineage_issue(
+                source, "wimpenny_2019_zn_fractionation_summary", field,
+                _WIMPENNY_TABLE,
+            )
+            for field in ("derived_from", "derivation.inputs")
+        }
+        observation = migrator.result.observations[
+            f"{source}::wimpenny_2019_zn_fractionation_summary"
+        ]
+        assert observation.derivation is not None
+        assert _WIMPENNY_TABLE not in (observation.derived_from or ())
+        assert _WIMPENNY_TABLE not in observation.derivation.inputs
+    assert expected <= {
+        (issue.path, issue.reason, issue.detail) for issue in hard
+    }

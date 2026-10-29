@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -70,6 +71,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -114,6 +116,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -158,6 +161,56 @@ observations:
         published_page: 851
         pdf_page_index: 9
         section: 5. Conclusion
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1e8ba29b1b34
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1ee33138691e
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=4a4e18cae179
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=53ea7b6ff00e
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=6036a9693dd5
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=754814d05e4b
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=8758d9ed7e57
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=b1ae03f9128f
+  - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=cb81bedabbcc
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=03387327ec49
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=29827268987e
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=32a283b44ca3
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=389c4144c554
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=53d2e2290dc0
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=57afa890296a
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=66419c04fab0
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=8546bcbe96b2
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=9041569d4ba2
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=a6a48e08c04c
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=b10fa59f0a57
+  - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=fbab9e204f7b
+  derivation:
+    relation: Infinite-dilution activity coefficients are derived from the Table 4 and Table 6 activity curves; Ta liquid
+      and Nb liquid standards use the printed fusion entropy and melting-point conversions (pp. 847, 850–851).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1e8ba29b1b34
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1ee33138691e
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=4a4e18cae179
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=53ea7b6ff00e
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=6036a9693dd5
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=754814d05e4b
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=8758d9ed7e57
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=b1ae03f9128f
+    - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=cb81bedabbcc
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=03387327ec49
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=29827268987e
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=32a283b44ca3
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=389c4144c554
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=53d2e2290dc0
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=57afa890296a
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=66419c04fab0
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=8546bcbe96b2
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=9041569d4ba2
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=a6a48e08c04c
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=b10fa59f0a57
+    - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=fbab9e204f7b
+    parameters: []
+    output_unit: dimensionless activity coefficient
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_kems_geometry_and_calibration
   experiment_id: 10.2355/isijinternational.29.843::kems-112-ichise-1989
   identity:
@@ -172,6 +225,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -225,6 +279,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -315,7 +370,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -377,6 +431,43 @@ observations:
     note: Table 1 heat 12; X_Ta=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.094'
+          - - Fe
+            - '0.906'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -400,6 +491,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -437,7 +529,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -499,6 +590,43 @@ observations:
     note: Table 1 heat 17; X_Ta=0.319; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.319'
+          - - Fe
+            - '0.681'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -559,7 +687,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -621,6 +748,43 @@ observations:
     note: Table 1 heat 21; X_Ta=0.153; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.153'
+          - - Fe
+            - '0.847'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -644,6 +808,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -681,7 +846,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -743,6 +907,43 @@ observations:
     note: Table 1 heat 22; X_Ta=0.244; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.244'
+          - - Fe
+            - '0.756'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -766,6 +967,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -803,7 +1005,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -865,6 +1066,43 @@ observations:
     note: Table 1 heat 25; X_Ta=0.239; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.239'
+          - - Fe
+            - '0.761'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -888,6 +1126,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -925,7 +1164,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -987,6 +1225,43 @@ observations:
     note: Table 1 heat 27; X_Ta=0.255; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.255'
+          - - Fe
+            - '0.745'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1047,7 +1322,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1109,6 +1383,43 @@ observations:
     note: Table 1 heat 31; X_Ta=0.156; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.156'
+          - - Fe
+            - '0.844'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1169,7 +1480,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1231,6 +1541,43 @@ observations:
     note: Table 1 heat 32; X_Ta=0.152; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.152'
+          - - Fe
+            - '0.848'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1254,6 +1601,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1291,7 +1639,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1353,6 +1700,43 @@ observations:
     note: Table 1 heat 33; X_Ta=0.297; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.297'
+          - - Fe
+            - '0.703'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1413,7 +1797,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1475,6 +1858,43 @@ observations:
     note: Table 1 heat 34; X_Ta=0.054; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.054'
+          - - Fe
+            - '0.946'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1498,6 +1918,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1535,7 +1956,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1597,6 +2017,43 @@ observations:
     note: Table 1 heat 47; X_Ta=0.436; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.436'
+          - - Fe
+            - '0.564'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1620,6 +2077,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1657,7 +2115,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1719,6 +2176,43 @@ observations:
     note: Table 1 heat 48; X_Ta=0.606; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.606'
+          - - Fe
+            - '0.394'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1742,6 +2236,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1779,7 +2274,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1841,6 +2335,43 @@ observations:
     note: Table 1 heat 49; X_Ta=0.406; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.406'
+          - - Fe
+            - '0.594'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1864,6 +2395,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1901,7 +2433,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1963,6 +2494,43 @@ observations:
     note: Table 1 heat 50; X_Ta=0.404; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.404'
+          - - Fe
+            - '0.596'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1986,6 +2554,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2023,7 +2592,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2085,6 +2653,43 @@ observations:
     note: Table 1 heat 51; X_Ta=0.444; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.444'
+          - - Fe
+            - '0.556'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2108,6 +2713,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2145,7 +2751,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2207,6 +2812,43 @@ observations:
     note: Table 1 heat 53; X_Ta=0.727; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.727'
+          - - Fe
+            - '0.273'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2230,6 +2872,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2267,7 +2910,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2329,6 +2971,43 @@ observations:
     note: Table 1 heat 54; X_Ta=0.810; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.81'
+          - - Fe
+            - '0.19'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2352,6 +3031,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2389,7 +3069,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2451,6 +3130,43 @@ observations:
     note: Table 1 heat 55; X_Ta=0.775; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.775'
+          - - Fe
+            - '0.225'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2474,6 +3190,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2511,7 +3228,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2573,6 +3289,43 @@ observations:
     note: Table 1 heat 56; X_Ta=0.828; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.828'
+          - - Fe
+            - '0.172'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2633,7 +3386,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2695,6 +3447,43 @@ observations:
     note: Table 1 heat 9; X_Ta=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.048'
+          - - Fe
+            - '0.952'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Printed X_Ta composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2718,6 +3507,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2770,6 +3560,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2822,6 +3613,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2874,6 +3666,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2926,6 +3719,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2978,6 +3772,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3030,6 +3825,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3082,6 +3878,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3134,6 +3931,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3186,6 +3984,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3238,6 +4037,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3290,6 +4090,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3342,6 +4143,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3395,6 +4197,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3448,6 +4251,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3501,6 +4305,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3554,6 +4359,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3607,6 +4413,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3660,6 +4467,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3713,6 +4521,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3766,6 +4575,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3819,6 +4629,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3861,6 +4672,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1ee33138691e
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3875,6 +4752,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3917,6 +4795,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=4a4e18cae179
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3931,6 +4875,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3973,6 +4918,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=53ea7b6ff00e
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -3987,6 +4998,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4029,6 +5041,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=6036a9693dd5
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4043,6 +5121,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4085,6 +5164,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=754814d05e4b
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4099,6 +5244,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4141,6 +5287,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=8758d9ed7e57
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4155,6 +5367,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4197,6 +5410,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=b1ae03f9128f
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4211,6 +5490,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4253,6 +5533,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=cb81bedabbcc
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -4267,6 +5613,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4309,6 +5656,72 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+  - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+  derivation:
+    relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using
+      the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+    - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+    - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p192
   identity:
@@ -4360,7 +5773,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4422,6 +5834,43 @@ observations:
     note: Table 5 heat 11; X_Nb=0.192; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.192'
+          - - Fe
+            - '0.808'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -4482,7 +5931,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4544,6 +5992,43 @@ observations:
     note: Table 5 heat 12; X_Nb=0.242; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.242'
+          - - Fe
+            - '0.758'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -4604,7 +6089,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4666,6 +6150,43 @@ observations:
     note: Table 5 heat 14; X_Nb=0.234; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.234'
+          - - Fe
+            - '0.766'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -4689,6 +6210,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4726,7 +6248,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4788,6 +6309,43 @@ observations:
     note: Table 5 heat 15; X_Nb=0.320; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.32'
+          - - Fe
+            - '0.68'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -4848,7 +6406,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4910,6 +6467,43 @@ observations:
     note: Table 5 heat 16; X_Nb=0.502; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.502'
+          - - Fe
+            - '0.498'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -4933,6 +6527,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4970,7 +6565,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5032,6 +6626,43 @@ observations:
     note: Table 5 heat 19; X_Nb=0.394; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.394'
+          - - Fe
+            - '0.606'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5055,6 +6686,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5092,7 +6724,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5154,6 +6785,43 @@ observations:
     note: Table 5 heat 20; X_Nb=0.388; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.388'
+          - - Fe
+            - '0.612'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5177,6 +6845,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5214,7 +6883,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5276,6 +6944,43 @@ observations:
     note: Table 5 heat 23; X_Nb=0.596; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.596'
+          - - Fe
+            - '0.404'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5299,6 +7004,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5336,7 +7042,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5398,6 +7103,43 @@ observations:
     note: Table 5 heat 24; X_Nb=0.671; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.671'
+          - - Fe
+            - '0.329'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5421,6 +7163,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5458,7 +7201,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5520,6 +7262,43 @@ observations:
     note: Table 5 heat 25; X_Nb=0.760; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.76'
+          - - Fe
+            - '0.24'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5543,6 +7322,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5580,7 +7360,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5642,6 +7421,43 @@ observations:
     note: Table 5 heat 26; X_Nb=0.548; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.548'
+          - - Fe
+            - '0.452'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5665,6 +7481,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5702,7 +7519,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5764,6 +7580,43 @@ observations:
     note: Table 5 heat 27; X_Nb=0.856; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.856'
+          - - Fe
+            - '0.144'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5787,6 +7640,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5824,7 +7678,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5886,6 +7739,43 @@ observations:
     note: Table 5 heat 29; X_Nb=0.384; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.384'
+          - - Fe
+            - '0.616'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5909,6 +7799,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5946,7 +7837,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6008,6 +7898,43 @@ observations:
     note: Table 5 heat 30; X_Nb=0.370; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.37'
+          - - Fe
+            - '0.63'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6068,7 +7995,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6130,6 +8056,43 @@ observations:
     note: Table 5 heat 31; X_Nb=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.094'
+          - - Fe
+            - '0.906'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6153,6 +8116,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6190,7 +8154,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6252,6 +8215,43 @@ observations:
     note: Table 5 heat 32; X_Nb=0.298; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.298'
+          - - Fe
+            - '0.702'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6312,7 +8312,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6374,6 +8373,43 @@ observations:
     note: Table 5 heat 4; X_Nb=0.091; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.091'
+          - - Fe
+            - '0.909'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6434,7 +8470,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6496,6 +8531,43 @@ observations:
     note: Table 5 heat 58; X_Nb=0.144; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.144'
+          - - Fe
+            - '0.856'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6556,7 +8628,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6618,6 +8689,43 @@ observations:
     note: Table 5 heat 59; X_Nb=0.139; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.139'
+          - - Fe
+            - '0.861'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6678,7 +8786,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6740,6 +8847,43 @@ observations:
     note: Table 5 heat 8; X_Nb=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.048'
+          - - Fe
+            - '0.952'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Printed X_Nb composition axis; observation remains tied to its heat.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6763,6 +8907,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6805,6 +8950,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=29827268987e
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -6819,6 +9012,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6861,6 +9055,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=32a283b44ca3
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -6875,6 +9117,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6917,6 +9160,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=389c4144c554
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -6931,6 +9222,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6973,6 +9265,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=53d2e2290dc0
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -6987,6 +9327,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7029,6 +9370,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=57afa890296a
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -7043,6 +9432,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7085,6 +9475,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=66419c04fab0
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -7099,6 +9537,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7141,6 +9580,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=8546bcbe96b2
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -7155,6 +9642,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7197,6 +9685,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=9041569d4ba2
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -7211,6 +9747,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7253,6 +9790,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=a6a48e08c04c
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -7267,6 +9852,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7309,6 +9895,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=b10fa59f0a57
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -7323,6 +9957,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7365,6 +10000,54 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=fbab9e204f7b
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -7379,6 +10062,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7421,3 +10105,51 @@ observations:
         published_page: 850
         pdf_page_index: 8
         table: '6'
+  derived_from:
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  derivation:
+    relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain
+      Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+    inputs:
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+    - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+    parameters: []
+    output_unit: activity, dimensionless activity coefficient, J mol^-1
+    references: []

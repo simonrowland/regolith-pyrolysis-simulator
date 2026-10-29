@@ -24,7 +24,11 @@ from typing import Any, Iterator, Mapping, Sequence
 
 import yaml
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_FIT_SEGMENTS,
@@ -53,6 +57,7 @@ from simulator.diagnostic_helpers.gibbs_battery import (
     cea_polynomial,
     classify_provenance,
     engine_delta_fG_kJ_mol,
+    formation_subtraction_kJ_mol,
     load_cea_extract,
     residual_log10K_from_kJ,
     resolve_pilot_channel,
@@ -649,6 +654,7 @@ def cea_delta_fG_kJ_mol(cea_key: str, T_K: float) -> float:
         raise GibbsDomainRefusal(
             f"{TYPED_REFUSAL_PREFIX}cea_formula_unmapped:{formula}"
         )
+    elemental_references: list[tuple[float, float]] = []
     for element, count in composition:
         resolved = _elemental_cea_entry(element, T)
         if resolved.cea_key is None:
@@ -661,12 +667,13 @@ def cea_delta_fG_kJ_mol(cea_key: str, T_K: float) -> float:
         n_std = 2.0 if element in _DIATOMIC_STANDARD_FORMULA else 1.0
         el_poly = cea_polynomial(resolved.cea_key)
         try:
-            g -= (count / n_std) * el_poly.evaluate(T).g_J_per_mol
+            el_g = el_poly.evaluate(T).g_J_per_mol
         except NasaCeaDomainError as exc:
             raise GibbsDomainRefusal(
                 f"{TYPED_REFUSAL_PREFIX}engine_channel_out_of_range:{exc}"
             ) from exc
-    return g / 1000.0
+        elemental_references.append((count / n_std, el_g))
+    return formation_subtraction_kJ_mol(g, elemental_references)
 
 
 def _pilot_channel_for_cea_key(cea_key: str) -> PilotChannel | None:
@@ -1089,10 +1096,8 @@ def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | No
     if not isinstance(pca, Mapping):
         return None
     try:
-        A = float(pca["A"])
-        B = float(pca["B"])
-        C = float(pca.get("C") or 0.0)
-    except (KeyError, TypeError, ValueError):
+        A, B, C = _read_antoine_coefficients(pca)
+    except _AntoineCoefficientRefusal:
         return None
     denom = float(T_K) + C
     if denom <= 0.0:

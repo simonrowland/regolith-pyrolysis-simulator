@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-021-plante-1992-feo
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-021-plante-1992-feo
-      role: table_csv
-      path: tables/kems-021-plante-1992-feo
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-021-plante-1992-feo
       role: pdftotext
       path: unknown
@@ -86,6 +80,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 280 to 350 mg; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -99,8 +94,9 @@ experiments:
         tag: value
         value: powdered
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -113,8 +109,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
         note: No chamber or residual-gas background pressure near the cell is reported.
     sweep_gas:
@@ -122,8 +119,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
         note: No sweep gas is reported.
     regime:
@@ -171,6 +169,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -195,14 +194,16 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+          references: []
     calibration:
       ion_current_pressure_standards:
         state:
           tag: value
           value: not printed
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: The paper reports intensity ratios but names no absolute-pressure calibrant.
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
@@ -217,8 +218,9 @@ experiments:
             interval_high: '1980'
             approximate: false
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: Printed 1850 to 1980 K; the highest-FeO charge was 1790 to 1910 K. Per-charge compositions are on feo-mgo-sio2-xfeo-*
             experiments.
@@ -265,6 +267,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p15
   kind: literature
   method:
@@ -314,6 +317,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 280 to 350 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -328,8 +332,9 @@ experiments:
             - '0.425'
           amount_basis: mole_fraction
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1;
           not renormalised
@@ -338,8 +343,9 @@ experiments:
         tag: value
         value: powdered FeO-MgO-SiO2; x(FeO)=0.15, x(MgO)=0.425 on x(MgO)/x(SiO2)=1
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -347,8 +353,9 @@ experiments:
         tag: value
         value: powdered
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -412,6 +419,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -436,6 +444,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+          references: []
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   thermal_schedule:
     setpoints_and_holds:
@@ -448,8 +457,9 @@ experiments:
             interval_high: '1980'
             approximate: false
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
@@ -495,6 +505,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p30
   kind: literature
   method:
@@ -544,6 +555,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 280 to 350 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -558,8 +570,9 @@ experiments:
             - '0.35'
           amount_basis: mole_fraction
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1;
           not renormalised
@@ -568,8 +581,9 @@ experiments:
         tag: value
         value: powdered FeO-MgO-SiO2; x(FeO)=0.30, x(MgO)=0.350 on x(MgO)/x(SiO2)=1
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -577,8 +591,9 @@ experiments:
         tag: value
         value: powdered
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -642,6 +657,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -666,6 +682,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+          references: []
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   thermal_schedule:
     setpoints_and_holds:
@@ -678,8 +695,9 @@ experiments:
             interval_high: '1980'
             approximate: false
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
@@ -725,6 +743,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p40
   kind: literature
   method:
@@ -774,6 +793,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 280 to 350 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -788,8 +808,9 @@ experiments:
             - '0.3'
           amount_basis: mole_fraction
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1;
           not renormalised
@@ -798,8 +819,9 @@ experiments:
         tag: value
         value: powdered FeO-MgO-SiO2; x(FeO)=0.40, x(MgO)=0.300 on x(MgO)/x(SiO2)=1
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -807,8 +829,9 @@ experiments:
         tag: value
         value: powdered
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -872,6 +895,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -896,6 +920,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+          references: []
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   thermal_schedule:
     setpoints_and_holds:
@@ -908,8 +933,9 @@ experiments:
             interval_high: '1980'
             approximate: false
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
@@ -955,6 +981,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p54
   kind: literature
   method:
@@ -1004,6 +1031,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 280 to 350 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1018,8 +1046,9 @@ experiments:
             - '0.23'
           amount_basis: mole_fraction
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1;
           not renormalised
@@ -1028,8 +1057,9 @@ experiments:
         tag: value
         value: powdered FeO-MgO-SiO2; x(FeO)=0.54, x(MgO)=0.230 on x(MgO)/x(SiO2)=1
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1037,8 +1067,9 @@ experiments:
         tag: value
         value: powdered
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -1102,6 +1133,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -1126,6 +1158,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+          references: []
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   thermal_schedule:
     setpoints_and_holds:
@@ -1138,8 +1171,9 @@ experiments:
             interval_high: '1980'
             approximate: false
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
@@ -1185,6 +1219,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p70
   kind: literature
   method:
@@ -1234,6 +1269,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 280 to 350 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1248,8 +1284,9 @@ experiments:
             - '0.15'
           amount_basis: mole_fraction
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1;
           not renormalised
@@ -1258,8 +1295,9 @@ experiments:
         tag: value
         value: powdered FeO-MgO-SiO2; x(FeO)=0.70, x(MgO)=0.150 on x(MgO)/x(SiO2)=1
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1267,8 +1305,9 @@ experiments:
         tag: value
         value: powdered
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -1332,6 +1371,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -1356,6 +1396,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+          references: []
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   thermal_schedule:
     setpoints_and_holds:
@@ -1368,8 +1409,9 @@ experiments:
             interval_high: '1980'
             approximate: false
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
@@ -1415,6 +1457,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p80
   kind: literature
   method:
@@ -1464,6 +1507,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 280 to 350 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1478,8 +1522,9 @@ experiments:
             - '0.1'
           amount_basis: mole_fraction
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1;
           not renormalised
@@ -1488,8 +1533,9 @@ experiments:
         tag: value
         value: powdered FeO-MgO-SiO2; x(FeO)=0.80, x(MgO)=0.100 on x(MgO)/x(SiO2)=1
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1497,8 +1543,9 @@ experiments:
         tag: value
         value: powdered
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -1562,6 +1609,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -1586,6 +1634,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+          references: []
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   thermal_schedule:
     setpoints_and_holds:
@@ -1598,8 +1647,9 @@ experiments:
             interval_high: '1980'
             approximate: false
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
@@ -1645,6 +1695,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p90
   kind: literature
   method:
@@ -1694,6 +1745,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 280 to 350 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1708,8 +1760,9 @@ experiments:
             - '0.05'
           amount_basis: mole_fraction
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1;
           not renormalised
@@ -1718,8 +1771,9 @@ experiments:
         tag: value
         value: powdered FeO-MgO-SiO2; x(FeO)=0.90, x(MgO)=0.050 on x(MgO)/x(SiO2)=1
       locator:
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         table: '1'
         note: Label retained; numeric mole fractions in initial_composition
     form:
@@ -1727,8 +1781,9 @@ experiments:
         tag: value
         value: powdered
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -1792,6 +1847,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -1816,6 +1872,7 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+          references: []
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   thermal_schedule:
     setpoints_and_holds:
@@ -1828,8 +1885,9 @@ experiments:
             interval_high: '1910'
             approximate: false
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: Printed 1790 to 1910 K for the highest-FeO composition x(FeO)=0.90.
     total_duration_s:
@@ -1875,6 +1933,7 @@ experiments:
               section: 3. Experimental Procedure
               note: Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational.32.1276::kems-021-plante-1992-feo
   kind: literature
   method:
@@ -1906,7 +1965,7 @@ experiments:
   locator:
     page: 1278
     figure: '4'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+    source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
 benches:
 - id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   work_id: 10.2355/isijinternational.32.1276
@@ -1917,31 +1976,35 @@ benches:
       tag: value
       value: modulated-beam Knudsen effusion mass spectrometer
     locator:
-      page: 1277
-      pdf_page_index: 2
+      page: 2
+      published_page: 1277
+      pdf_page_index: 1
       section: 3. Experimental Procedure
   cell_material_and_liner:
     state:
       tag: value
       value: tungsten cell with iridium inner cup
     locator:
-      page: 1277
-      pdf_page_index: 2
+      page: 2
+      published_page: 1277
+      pdf_page_index: 1
       section: 3. Experimental Procedure
   cell_materials:
   - state:
       tag: value
       value: W
     locator:
-      page: 1277
-      pdf_page_index: 2
+      page: 2
+      published_page: 1277
+      pdf_page_index: 1
       section: 3. Experimental Procedure
   - state:
       tag: value
       value: Ir
     locator:
-      page: 1277
-      pdf_page_index: 2
+      page: 2
+      published_page: 1277
+      pdf_page_index: 1
       section: 3. Experimental Procedure
   geometry:
     orifice_diameter_m:
@@ -1952,8 +2015,9 @@ benches:
           point: '0.0005'
           approximate: false
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
         note: Printed 0.5 mm; unit conversion only
       inference:
@@ -1967,8 +2031,9 @@ benches:
               tag: value
               value: '0.5'
             locator:
-              page: 1277
-              pdf_page_index: 2
+              page: 2
+              published_page: 1277
+              pdf_page_index: 1
               section: 3. Experimental Procedure
               note: Printed 0.5 mm; unit conversion only
         - - factor
@@ -1976,19 +2041,22 @@ benches:
               tag: value
               value: '1000'
             locator:
-              page: 1277
-              pdf_page_index: 2
+              page: 2
+              published_page: 1277
+              pdf_page_index: 1
               section: 3. Experimental Procedure
               note: Printed 0.5 mm; unit conversion only
         output_unit: m
+        references: []
     cell_internal_dimensions:
       diameter_m:
         state:
           tag: unknown
           reason: not_published
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: No cell body dimensions are stated.
       height_m:
@@ -1996,8 +2064,9 @@ benches:
           tag: unknown
           reason: not_published
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: No cell body dimensions are stated.
   detector:
@@ -2005,8 +2074,9 @@ benches:
       tag: value
       value: modulated-beam mass spectrometer with phase-sensitive detection
     locator:
-      page: 1277
-      pdf_page_index: 2
+      page: 2
+      published_page: 1277
+      pdf_page_index: 1
       section: 3. Experimental Procedure
       note: The instrument is referenced as described earlier in ref. 8; no model number is printed in this paper.
   ionization:
@@ -2015,8 +2085,9 @@ benches:
         tag: value
         value: electron impact
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   temperature_measurement:
     sensor:
@@ -2024,7 +2095,8 @@ benches:
         tag: value
         value: optical pyrometer sighted into the effusion orifice
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
   other_facts: []

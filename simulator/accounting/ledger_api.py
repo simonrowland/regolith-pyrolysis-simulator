@@ -146,8 +146,8 @@ class LedgerAPI:
             "ledger_schema_version": LEDGER_SCHEMA_VERSION,
             "provenance": {
                 "mass_balance_attested": bool(report.get("balanced")),
-                # Schema-2 compatibility: input cleaning still uses this
-                # absolute threshold. Outward projection policy is separate.
+                # Schema-2 compatibility: retain the configured tolerance in
+                # snapshots. Initial kg balances use MaterialLot normalization.
                 "balance_tolerance_kg": float(self.ledger.balance_tolerance_kg),
                 "balance_projection_relative_tolerance": float(
                     self.ledger.balance_relative_tolerance

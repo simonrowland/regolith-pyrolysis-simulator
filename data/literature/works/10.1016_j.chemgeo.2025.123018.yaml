@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:boulliung-2025-mercury-volatile-metals-magmatic
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:boulliung-2025-mercury-volatile-metals-magmatic
-      role: table_csv
-      path: tables/boulliung-2025-mercury-volatile-metals-magmatic
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:boulliung-2025-mercury-volatile-metals-magmatic
       role: pdftotext
       path: unknown
@@ -77,6 +71,7 @@ experiments:
               section: 2.1 Experiments
               note: Printed starting material about 100 mg; SI unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -173,6 +168,7 @@ experiments:
                 section: 2.1 Experiments
                 note: Ampoule inner pressure decreased to about 2.7 mbar before sealing; SI unit conversion only
           output_unit: Pa
+          references: []
   work_id: 10.1016/j.chemgeo.2025.123018
   locator:
     pdf_page_index: 8
@@ -259,6 +255,7 @@ experiments:
               section: 2.1 Experiments
               note: Printed durations 5 min to 24 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value

@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-198-ichise-ueshima-1989
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-198-ichise-ueshima-1989
-      role: table_csv
-      path: tables/kems-198-ichise-ueshima-1989
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-198-ichise-ueshima-1989
       role: pdftotext
       path: unknown
@@ -135,6 +129,7 @@ experiments:
                 section: 2.1 Apparatus
                 note: Combined ion source and Knudsen cell furnace; English experimental section
           output_unit: m
+          references: []
     ionization:
       electron_energy_eV:
         state:
@@ -163,6 +158,7 @@ experiments:
                 section: 2.1 Apparatus
                 note: Combined ion source and Knudsen cell furnace; English experimental section
           output_unit: '1'
+          references: []
     temperature_measurement:
       Tb_thermocouple_location:
         state:

@@ -12,10 +12,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from decimal import Decimal
 from enum import Enum
 import math
 from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence
 
+from engines.domain_reason import OutOfDomainReason
 from simulator.melt_regime import liquid_fraction_invalidity
 
 
@@ -31,6 +33,226 @@ DEFAULT_BACKEND_CAPABILITIES = {
     key: (key == 'silicate_melt')
     for key in BACKEND_CAPABILITY_KEYS
 }
+
+REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
+
+# More than one oxidation state in silicate melts over the fO2 range these
+# engines are asked to run. The melt-backend contract owns this eligibility
+# rule so scorers and backend calls use the same component test.
+MULTIVALENT_MELT_ELEMENTS: dict[str, str] = {
+    'Fe': 'Fe2+/Fe3+',
+    'Ti': 'Ti4+/Ti3+',
+    'Cr': 'Cr3+/Cr2+',
+    'Mn': 'Mn2+/Mn3+',
+    'V': 'V3+/V4+/V5+',
+    'Eu': 'Eu3+/Eu2+',
+    'Ce': 'Ce4+/Ce3+',
+    'S': 'S2-/S6+',
+    'Ga': 'Ga3+/Ga+',
+}
+
+
+def _elements_of_component(
+    name: str,
+    oxide_aliases: Mapping[str, str],
+) -> frozenset[str]:
+    key = str(name).strip()
+    if key.endswith('_Liq'):
+        key = key[:-4]
+    if key.endswith('*'):
+        key = key[:-1]
+    canonical = oxide_aliases.get(key.lower())
+    formula = 'FeO' if canonical == 'FeO_total' else (canonical or key)
+    from simulator.reference_data.janaf import formula_composition
+
+    parsed = formula_composition(formula)
+    if not parsed:
+        return frozenset()
+    return frozenset(element for element, _count in parsed)
+
+
+def _is_multivalent_component(
+    name: str,
+    oxide_aliases: Mapping[str, str],
+) -> bool:
+    return any(
+        element in MULTIVALENT_MELT_ELEMENTS
+        for element in _elements_of_component(name, oxide_aliases)
+    )
+
+
+def multivalent_components(
+    composition: Any,
+    species: str | None = None,
+    *,
+    oxide_aliases: Mapping[str, str],
+) -> tuple[str, ...]:
+    """Return positive multivalent composition components and measured species."""
+    if composition is None:
+        items = ()
+    elif isinstance(composition, Mapping):
+        items = composition.items()
+    else:
+        items = getattr(composition, 'components', ())
+
+    present: list[str] = []
+    for name, amount in items:
+        try:
+            number = Decimal(str(amount))
+        except (ArithmeticError, ValueError):
+            continue
+        if number <= 0:
+            continue
+        if _is_multivalent_component(str(name), oxide_aliases):
+            present.append(str(name))
+    if (
+        species
+        and _is_multivalent_component(species, oxide_aliases)
+        and species not in present
+    ):
+        present.append(species)
+    return tuple(sorted(set(present)))
+
+
+# alphaMELTS writes an oxide into the .melts file only when its wt% is
+# strictly above this floor (simulator/melt_backend/alphamelts.py serializer).
+# Iron the file does not carry cannot be the FeO/Fe2O3 buffer the MELTS
+# family uses to impose fO2, so the couple test and the serializer are one
+# threshold. A sum test of FeO+Fe2O3 <= 0.001 would still call
+# FeO=0.0006 plus Fe2O3=0.0006 Fe-bearing, then impose fO2 into a binary
+# that received neither oxide.
+MELTS_CARRIED_COMPONENT_MIN_WT_PCT = 0.001
+
+# Exact sentence the adapters attach when the external fO2 is applied to
+# the gas only. Battery wiring copies this text; it does not restate it.
+FO2_GAS_ONLY_NOTICE = (
+    'the engine did not resolve intrinsic fO2; '
+    'the external fO2 was imposed on the gas only.'
+)
+
+
+def imposed_absolute_fo2_without_iron_couple(
+    composition_wt_pct: Mapping[str, float],
+    *,
+    oxide_aliases: Mapping[str, str],
+    fO2_log: Optional[float],
+    redox_mode: Optional[str],
+    redox_buffer: Optional[str],
+    fo2_offset: Optional[float],
+) -> Optional[tuple[str, tuple[str, ...]]]:
+    """Classify an absolute fO2 request that the Fe redox couple cannot carry.
+
+    Premise: a MELTS-family engine imposes absolute fO2 only by moving iron
+    between FeO and Fe2O3 (2 FeO + 1/2 O2 = Fe2O3). The ferric fraction is
+    undefined when that inventory is absent, which is why ThermoEngine raises
+    ``FO2_REQUIRES_IRON`` and alphaMELTS aborts after ``log fo2 path: absolute``.
+
+    Without a redox couple the condensed equilibria have no fO2 degree of
+    freedom: the stated bulk fixes the melt. fO2 still enters gas speciation,
+    for example NaO0.5(melt) = Na(g) + 1/4 O2, so the printed absolute fO2 is
+    a gas coordinate, not a melt constraint.
+
+    Units: wt% on the normalized MELTS bulk, the same basis as the .melts
+    file and the ThermoEngine bulk vector. An iron oxide is carried only when
+    its wt% is strictly above ``MELTS_CARRIED_COMPONENT_MIN_WT_PCT`` (0.001).
+    Fe-free means no iron oxide is carried, so the carried FeO+Fe2O3 sum is 0,
+    which is below that floor.
+
+    Sanity: a CMAS melt with both iron oxides at 0 is Fe-free. A basalt with
+    about 18 wt% FeO is not. FeO = 0.001 exactly is not carried (the serializer
+    uses ``>``) and is Fe-free. FeO = 0.0010001 is Fe-bearing and stays on
+    today's imposed-fO2 path. Any other element in ``MULTIVALENT_MELT_ELEMENTS``
+    with a positive amount, including one below the emission floor, refuses:
+    the engine may still have a redox variable, and dropping it would be a
+    silent pass.
+
+    Returns None when today's path must stay in force: Fe is carried, the
+    request is not a finite absolute fO2, a named buffer or an fO2 offset is
+    set, or redox is ``not_an_input``. Otherwise ``('gas_only', ())`` or
+    ``('other_redox', component_names)``.
+    """
+    if redox_mode == REDOX_MODE_NOT_AN_INPUT:
+        return None
+    if redox_buffer is not None or fo2_offset is not None:
+        return None
+    try:
+        requested = float(fO2_log) if fO2_log is not None else None
+    except (TypeError, ValueError):
+        return None
+    if requested is None or not math.isfinite(requested):
+        return None
+
+    fe_carried = False
+    others: list[str] = []
+    items = (
+        composition_wt_pct.items()
+        if isinstance(composition_wt_pct, Mapping)
+        else ()
+    )
+    for name, amount in items:
+        try:
+            wt_pct = float(amount)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(wt_pct) or wt_pct <= 0.0:
+            continue
+        elements = _elements_of_component(str(name), oxide_aliases)
+        if (
+            'Fe' in elements
+            and wt_pct > MELTS_CARRIED_COMPONENT_MIN_WT_PCT
+        ):
+            fe_carried = True
+        if any(
+            element != 'Fe' and element in MULTIVALENT_MELT_ELEMENTS
+            for element in elements
+        ):
+            others.append(str(name))
+    if fe_carried:
+        return None
+    if others:
+        return ('other_redox', tuple(sorted(set(others))))
+    return ('gas_only', ())
+
+
+def fo2_gas_only_diagnostic(printed_fO2_log: float) -> dict[str, Any]:
+    """Diagnostics for an external fO2 applied to the gas only."""
+    printed = float(printed_fO2_log)
+    return {
+        'fo2_gas_only': {
+            'printed_fO2_log': printed,
+            'notice': FO2_GAS_ONLY_NOTICE,
+        },
+        'fO2_transport': 'external_on_gas_only',
+    }
+
+
+def other_redox_without_iron_couple_refusal(
+    *,
+    temperature_C: float,
+    pressure_bar: float,
+    fO2_log: Optional[float],
+    components: tuple[str, ...],
+) -> 'EquilibriumResult':
+    """Typed refusal: imposed fO2, no iron couple, another redox element present."""
+    reason = OutOfDomainReason.UNSUPPORTED_INPUT.value
+    message = (
+        'imposed absolute fO2 has no iron redox couple and other '
+        'redox-active components are present: ' + ', '.join(components)
+    )
+    return EquilibriumResult(
+        temperature_C=float(temperature_C),
+        pressure_bar=float(pressure_bar),
+        fO2_log=None if fO2_log is None else float(fO2_log),
+        status='out_of_domain',
+        warnings=[message],
+        diagnostics={
+            'backend_status': 'out_of_domain',
+            'backend_status_reason': reason,
+            'backend_failure_reason_code': 'redox_active_without_iron_couple',
+            'redox_active_components': list(components),
+            'authoritative_for_requested_conditions': False,
+        },
+    )
 
 
 class RealBackendFamily(str, Enum):
@@ -125,6 +347,34 @@ def normalize_backend_capabilities(value: Any = None) -> Dict[str, bool]:
             raise ValueError(f'unknown backend capability: {key}')
         capabilities[key] = bool(enabled)
     return capabilities
+
+
+def battery_adapter_class(engine_name: str) -> type | None:
+    """Adapter class for one battery engine name, or None.
+
+    This is the class that declares ``models_dissolved_sulfur`` and
+    ``models_dissolved_chloride``. It does not open the engine.
+    """
+
+    if engine_name == "alphamelts":
+        from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+        return AlphaMELTSBackend
+    if engine_name == "thermoengine":
+        from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+        return ThermoEngineBackend
+    if engine_name == "magemin":
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        return MAGEMinBackend
+    if engine_name == "vaporock":
+        from simulator.melt_backend.vaporock import VapoRockBackend
+
+        return VapoRockBackend
+    if engine_name == "internal-analytical":
+        return InternalAnalyticalBackend
+    return None
 
 
 # Cleaned silicate melt is the only ledger account the silicate-oxide
@@ -530,6 +780,12 @@ class EquilibriumResult:
     # the ABI-safe tail so legacy positional constructors retain their shape.
     phase_instances: List[Dict[str, Any]] = field(default_factory=list)
 
+    # AlphaMELTS subprocess distinguishes the absolute fO2 serialized into the
+    # melts file from System_main_tbl.txt's 3-decimal printed confirmation.
+    # Other backends leave these fields unset.
+    requested_fO2_log: Optional[float] = None
+    printed_fO2_echo_log: Optional[float] = None
+
     def __post_init__(self) -> None:
         if self.status != 'ok':
             return
@@ -564,6 +820,65 @@ class MeltBackend(ABC):
 
     backend_name = 'unknown'
     supports_intrinsic_fO2 = False
+    # Dissolved S or Cl in the silicate liquid at an imposed gas fugacity.
+    # equilibrate must accept sulfur_fugacity_bar or chloride_fugacity_bar
+    # (bar, the printed pS2 or pCl2) and return that solute's weight percent
+    # on the phase composition. Sulfide-matte and a bulk sulfur column are
+    # not this capability. False until an adapter does both.
+    models_dissolved_sulfur: ClassVar[bool] = False
+    models_dissolved_chloride: ClassVar[bool] = False
+
+    def _not_an_input_redox_refusal(
+        self,
+        *,
+        redox_mode: Optional[str],
+        composition_kg: Optional[Mapping[str, float]],
+        composition_mol: Optional[Mapping[str, float]],
+        composition_mol_by_account: Optional[
+            Mapping[str, Mapping[str, float]]
+        ],
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: Optional[float],
+        oxide_aliases: Mapping[str, str],
+    ) -> EquilibriumResult | None:
+        if redox_mode != REDOX_MODE_NOT_AN_INPUT:
+            return None
+        if composition_mol_by_account is not None:
+            composition = composition_mol_by_account.get(
+                CLEANED_MELT_ACCOUNT, {}
+            )
+        elif composition_mol is not None:
+            composition = composition_mol
+        else:
+            composition = composition_kg
+        components = multivalent_components(
+            composition,
+            oxide_aliases=oxide_aliases,
+        )
+        if not components:
+            return None
+
+        reason = OutOfDomainReason.INVALID_INPUT.value
+        message = (
+            "redox_mode='not_an_input' requires a composition without "
+            "multivalent elements; found " + ", ".join(components)
+        )
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            status='out_of_domain',
+            warnings=[message],
+            diagnostics={
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': reason,
+                'backend_failure_reason_code': reason,
+                'redox_mode': redox_mode,
+                'multivalent_components': list(components),
+                'authoritative_for_requested_conditions': False,
+            },
+        )
 
     @abstractmethod
     def initialize(self, config: dict) -> bool:
@@ -588,6 +903,7 @@ class MeltBackend(ABC):
                         Mapping[str, Mapping[str, float]]
                     ] = None,
                     species_formula_registry: Optional[Mapping[str, Any]] = None,
+                    redox_mode: Optional[str] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium at given conditions.
@@ -605,6 +921,9 @@ class MeltBackend(ABC):
                               finite default preserves legacy callers; an
                               intrinsic-capable implementation may default to
                               ``None`` explicitly.
+            redox_mode:     ``'not_an_input'`` distinguishes a scorer omission
+                              from an intrinsic closed-system fO2 request. The
+                              default preserves the legacy ``fO2_log`` meaning.
             pressure_bar:    Total pressure (bar)
 
         Returns:

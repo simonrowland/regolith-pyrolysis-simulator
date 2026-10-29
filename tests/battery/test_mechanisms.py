@@ -30,6 +30,7 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Quantity,
+    RawInputStatus,
     Rail,
     ReferenceStateConvention,
     RefusalReason,
@@ -1242,6 +1243,391 @@ def test_r08_consumed_table_via_read_from_refuses_independence() -> None:
         score_eligible=True,
     )
     assert validate_corpus([w], [exp], [ref, disjoint], [control]).ok
+
+
+def _reduced_without_raw_parent(
+    *, declaration: Located | None = None, inputs: tuple[str, ...] = ("pdf-1",)
+) -> Observation:
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "reduced-without-raw-parent",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+    )
+    assert observation.derivation is not None
+    return replace(
+        observation,
+        derived_from=None,
+        derivation=replace(
+            observation.derivation, inputs=inputs, raw_inputs=declaration
+        ),
+    )
+
+
+def _model_derived_without_raw_parent(
+    *,
+    declaration: Located,
+    method: Located | None = None,
+    references: tuple[str, ...] = (),
+    derived_from: tuple[str, ...] | None = None,
+) -> Observation:
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "model-with-raw-input-declaration",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+    )
+    assert observation.derivation is not None
+    return replace(
+        observation,
+        derived_from=derived_from,
+        derivation=replace(
+            observation.derivation,
+            inputs=(),
+            raw_inputs=declaration,
+            method=method,
+            references=references,
+        ),
+    )
+
+
+def test_measured_reduced_raw_inputs_not_printed_satisfies_parent_requirement() -> None:
+    observation = _reduced_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164, section="3.3")
+        ),
+        inputs=(),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert issues == ()
+
+
+def test_measured_reduced_raw_inputs_not_printed_requires_locator() -> None:
+    observation = _reduced_without_raw_parent(
+        declaration=Located(State.of(RawInputStatus.NOT_PRINTED))
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "requires a locator" in issue.detail
+        for issue in issues
+    )
+    assert any(issue.path.endswith(".derived_from") for issue in issues)
+
+
+def test_model_derived_unprinted_inputs_with_located_method_passes() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("calculated with the printed equilibrium equations"),
+            locator=F.loc(page=164, equation="7"),
+        ),
+        references=("Gurvich K°(T)", "Mann cross-sections"),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert issues == ()
+
+
+def test_model_derived_unprinted_inputs_rejects_page_only_placeholder_method() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(State.of("x"), locator=F.loc(page=164)),
+        references=("Gurvich K°(T)",),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.method")
+        and "equation and physical page locator" in issue.detail
+        for issue in issues
+    )
+
+
+def test_model_derived_unprinted_inputs_requires_named_references() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("calculated with the printed equilibrium equation"),
+            locator=F.loc(page=164, equation="7"),
+        ),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.references")
+        and "requires named compiled references" in issue.detail
+        for issue in issues
+    )
+
+
+def test_model_derived_raw_inputs_not_printed_requires_method() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        )
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.method")
+        and issue.detail == (
+            "model_derived raw_inputs not_printed declaration requires a method"
+        )
+        for issue in issues
+    )
+
+
+def test_model_derived_raw_inputs_not_printed_requires_method_locator() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(State.of("equation-based calculation")),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.method")
+        and issue.detail == "model_derived raw_inputs method requires a locator"
+        for issue in issues
+    )
+
+
+def test_model_derived_raw_inputs_not_printed_requires_raw_input_locator() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(State.of(RawInputStatus.NOT_PRINTED)),
+        method=Located(
+            State.of("equation-based calculation"),
+            locator=F.loc(page=164, equation="7"),
+        ),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "requires a locator" in issue.detail
+        for issue in issues
+    )
+
+
+def test_model_derived_raw_inputs_not_printed_contradicts_derived_from() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("equation-based calculation"),
+            locator=F.loc(page=164, equation="7"),
+        ),
+        derived_from=("source-parent",),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "contradicts derived_from" in issue.detail
+        for issue in issues
+    )
+
+
+def test_model_derived_rejects_raw_inputs_not_printed() -> None:
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "model-with-raw-input-declaration",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+    )
+    assert observation.derivation is not None
+    observation = replace(
+        observation,
+        derivation=replace(
+            observation.derivation,
+            inputs=("pdf-1",),
+            raw_inputs=Located(
+                State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+            ),
+        ),
+    )
+    issues = validate_corpus([F.work()], [experiment], [observation]).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "invalid for model_derived" in issue.detail
+        for issue in issues
+    )
+
+
+@pytest.mark.parametrize(
+    "evidence_class",
+    [item for item in EvidenceClass if item is not EvidenceClass.MEASURED_REDUCED],
+)
+def test_raw_inputs_declaration_is_rejected_for_every_non_reduced_class(
+    evidence_class: EvidenceClass,
+) -> None:
+    observation = _reduced_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        inputs=(),
+    )
+    observation = replace(
+        observation,
+        evidence=replace(
+            observation.evidence, class_=State.of(evidence_class)
+        ),
+    )
+
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and (
+            "invalid for model_derived" in issue.detail
+            if evidence_class is EvidenceClass.MODEL_DERIVED
+            else "only for measured_reduced" in issue.detail
+        )
+        for issue in issues
+    )
+
+
+@pytest.mark.parametrize(
+    "evidence_class",
+    [
+        item
+        for item in EvidenceClass
+        if item
+        not in {EvidenceClass.MEASURED_REDUCED, EvidenceClass.MODEL_DERIVED}
+    ],
+)
+def test_raw_inputs_declaration_is_rejected_for_unsupported_classes(
+    evidence_class: EvidenceClass,
+) -> None:
+    observation = _reduced_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        inputs=(),
+    )
+    observation = replace(
+        observation,
+        evidence=replace(
+            observation.evidence, class_=State.of(evidence_class)
+        ),
+    )
+
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "only for measured_reduced or model_derived" in issue.detail
+        for issue in issues
+    )
+
+
+def test_measured_reduced_without_parent_or_raw_input_declaration_is_invalid() -> None:
+    observation = _reduced_without_raw_parent()
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derived_from")
+        and issue.detail == "derived observation requires derived_from"
+        for issue in issues
+    )
+
+
+def test_measured_reduced_raw_inputs_declaration_contradicts_derived_from() -> None:
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "reduced-with-parent-and-raw-input-declaration",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+    )
+    assert observation.derivation is not None
+    observation = replace(
+        observation,
+        derivation=replace(
+            observation.derivation,
+            inputs=("pdf-1",),
+            raw_inputs=Located(
+                State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+            ),
+        ),
+    )
+    issues = validate_corpus([F.work()], [experiment], [observation]).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "contradicts derived_from" in issue.detail
+        for issue in issues
+    )
+
+
+def test_derivation_parser_reads_located_raw_inputs_declaration() -> None:
+    from simulator.battery.migrate import _derivation_from_plain
+
+    derivation = _derivation_from_plain(
+        {
+            "relation": "calculation",
+            "inputs": ["measured_inputs"],
+            "output_unit": "dimensionless",
+            "raw_inputs": {
+                "state": {"tag": "value", "value": "not_printed"},
+                "locator": {"page": 164, "section": "3.3"},
+            },
+        }
+    )
+    assert derivation is not None
+    assert derivation.raw_inputs is not None
+    assert derivation.raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+    assert derivation.raw_inputs.locator == F.loc(page=164, section="3.3")
+
+
+def test_derivation_record_leaves_input_lineage_to_observation_validation() -> None:
+    declaration = Located(
+        State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164, section="3.3")
+    )
+    assert Derivation(
+        relation="calculation",
+        inputs=(),
+        parameters=(),
+        output_unit="dimensionless",
+        raw_inputs=declaration,
+    ).inputs == ()
+    assert Derivation(
+        relation="calculation",
+        inputs=(),
+        parameters=(),
+        output_unit="dimensionless",
+    ).inputs == ()
 
 
 def test_r08_nested_derived_from_parent_is_not_independent() -> None:
@@ -3350,6 +3736,46 @@ def test_mf_f04_in_cell_pressure_sum_passes_with_unstated_background_flagged() -
         "Drowart_standalone_usual_10_Pa_limit; no defensible d printed)"
     )
     assert not any(check.name == "background_pressure_stated" for check in result.checks)
+
+
+def test_mf_f04_calibrated_cell_falls_through_to_printed_pressure_sum() -> None:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment(
+        orifice_area=None,
+        kn=None,
+        total_P=Decimal("1e-6"),
+        calibrated=True,
+    )
+    pressures = tuple(
+        _printed_kems_partial_pressure(
+            f"calibrated-{species.lower()}",
+            experiment.experiment_id,
+            species,
+            pressure,
+            composition,
+        )
+        for species, pressure in (("O2", "0.2"), ("Ca", "0.1"), ("SiO", "0.4"))
+    )
+
+    result = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=pressures[0],
+        point_observations=pressures,
+    )
+
+    # d-274 uses the printed in-cell sum when the calibrated route lacks geometry.
+    assert result.passed
+    assert not any(check.name == "orifice_knudsen" for check in result.checks)
+    pressure_check = next(
+        check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "0.7"
 
 
 def test_mf_f04_in_cell_pressure_sum_above_limit_refuses() -> None:

@@ -7,6 +7,8 @@
     prettySpecies,
     accountLabel,
     speciesColor,
+    exactValue,
+    stageMassQualifier,
     esc,
   } = root.ReportLabels;
 
@@ -187,6 +189,12 @@
         `</article>`;
     }
 
+    const stageMass = stageMassQualifier(stage.total_kg);
+    const stageMassValue = stageMass === null
+      ? hasNumber(stage.total_kg) && stage.total_kg >= 0
+        ? exactValue(stage.total_kg, "kg")
+        : null
+      : esc(stageMass);
     const hasVerdict = typeof stage.verdict === "string" && stage.verdict.trim();
     const verdictToken = hasVerdict ? stage.verdict.trim() : "PENDING";
     const isIndeterminate = verdictToken === "INDETERMINATE";
@@ -196,6 +204,9 @@
       : isIndeterminate
         ? " sec-p15-verdict--indeterminate"
         : " sec-p15-verdict--pending";
+    const stageMassMetric = stageMassValue === null
+      ? ""
+      : `<div class="sec-p15-metric"><span>Total classified product mass</span><strong>${stageMassValue}</strong></div>`;
     const warning = typeof stage.warning === "string" && stage.warning.trim()
       ? `<p class="sec-p15-stage-warning">${esc(stage.warning.trim())}</p>`
       : "";
@@ -226,7 +237,7 @@
     // verdict; inventing "backend's empty-stage classification" for a missing
     // verdict contradicts the PENDING badge and the artifact.
     let emptyStage = "";
-    if (hasNumber(stage.total_kg) && stage.total_kg === 0) {
+    if (stageMass === "empty") {
       emptyStage = hasVerdict
         ? `<p class="sec-p15-stage-empty">${esc("No classified product mass emitted; verdict is the backend's empty-stage classification")}</p>`
         : `<p class="sec-p15-stage-empty">${esc("No classified product mass emitted; verdict pending — not emitted")}</p>`;
@@ -238,6 +249,7 @@
       `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
       `<h4>${esc(label)}</h4>${routeNote}` +
       `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${flaggedCapture}${flaggedProduct}${warning}` +
+      `${stageMassMetric}` +
       metric("Designated + coproduct mass", stage.designated_kg, "kg", { min: 0 }) +
       metric("Impurity mass", stage.impurity_kg, "kg", { min: 0 }) +
       purityMetric +

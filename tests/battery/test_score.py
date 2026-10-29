@@ -71,15 +71,18 @@ from simulator.battery.records import (
     Execution,
     Located,
     Notice,
+    Observation,
     Residual,
     ResidualNumeric,
     DecisionBand,
     Species,
+    SourceMethodUncertainty,
     State,
     Uncertainty,
     Value,
 )
 from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
+import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
     SCORE_ENGINE_SET,
@@ -88,16 +91,20 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _battery_hero_minor_foulant_facets,
+    _battery_hero_sio2_mole_fraction,
+    _battery_hero_sweet_spot_records,
+    _paired_engine_rail_benchmarks,
+    _residual_engine_observable,
     compile_residual,
     compute_metric,
-    derive_kems_partial_pressure_band,
     dumps_residual_line,
     engines_from_names,
     flagged_stratum_payloads,
     headline_payloads,
     load_score_context,
+    measured_engine_rail_records,
     parse_species_formula,
-    pooled_log_pressure_sd,
     predict_with_engine,
     resolve_source_relation,
     residual_to_plain,
@@ -219,6 +226,29 @@ def _with_activity_reference_polymorph(
     )
 
 
+def _without_activity_reference_polymorph(identity: Identity) -> Identity:
+    """Pure solid whose polymorph axis was never set.
+
+    An omitted source polymorph (``State.unknown``) stays on the printed
+    number (d-165, c1ec62344). ``polymorph is None`` is the melt-benchmark
+    solid, and 800194114 still converts it with the stable JANAF crystal.
+    """
+
+    reference_state = identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value is not None
+    endmember = reference_state.value.endmember
+    return replace(
+        identity,
+        reference_state=State.of(
+            replace(
+                reference_state.value,
+                endmember=replace(endmember, polymorph=None),
+            )
+        ),
+    )
+
+
 def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
     quantity = quantity_token(identity)
     assert quantity is not None
@@ -307,6 +337,289 @@ def _partial_identity(*, phase_reason: str | None = None):
             species=Species("Na", State.unknown(phase_reason)),
         )
     return identity
+
+
+def _mathieu_pressure_context() -> tuple[ScoreContext, tuple[Observation, ...]]:
+    from simulator.battery.migrate import Migrator
+
+    root = Path(__file__).parents[2]
+    migrator = Migrator(root=root, index={}, aliases={})
+    migrator._migrate_extract(
+        root / "data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml"
+    )
+    migrator.finalize()
+    rows = tuple(
+        sorted(
+            (
+                observation
+                for observation in migrator.result.observations.values()
+                if isinstance(observation.identity, Identity)
+                and quantity_token(observation.identity) is Quantity.P_PARTIAL
+                and observation.identity.species.formula == "Na"
+            ),
+            key=lambda observation: observation.observation_id,
+        )
+    )
+    assert len(rows) == 212
+    admitted = tuple(
+        observation
+        for observation in rows
+        if observation.admission.status is AdmissionStatus.ADMITTED
+    )
+    # The previous 63 included 23 Tableau III.2 rows whose own reasons reject
+    # them; two Table IV.6 rows also lack run-condition fO2. Removing those 25
+    # leaves the 38 source-admitted rows.
+    assert len(admitted) == 38
+    assert all(
+        observation.identity.fO2_Pa is not None
+        and observation.identity.fO2_Pa.is_value
+        for observation in admitted
+    )
+    context = ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=migrator.result.observations,
+        benches=migrator.result.benches,
+        root=root,
+    )
+    return context, admitted
+
+
+@pytest.mark.parametrize(
+    "engine", (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
+)
+def test_mathieu_unknown_total_pressure_comparison_is_scored_and_flagged(engine) -> None:
+    context, admitted = _mathieu_pressure_context()
+    reference = admitted[0]
+    assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
+        reference.identity, Quantity.P_PARTIAL
+    )
+    assert assumed_bar == 1e-6
+    assert assumption_notice is not None
+    assert invalid is None
+    prediction = replace(
+        _partial_prediction(engine, reference),
+        identity=replace(
+            reference.identity,
+            total_pressure_Pa=State.of(Decimal("0.1")),
+        ),
+        notices=(assumption_notice,),
+    )
+
+    residual, _candidate = compile_residual(
+        reference, engine, context=context, prediction=prediction
+    )
+
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.refusal is None
+    assert assumption_notice in residual.notices
+    assert any(
+        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and "total-pressure-independent" in notice.reason
+        for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
+    "engine", (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
+)
+def test_mathieu_partial_pressure_prediction_is_independent_of_total_pressure(
+    engine,
+) -> None:
+    context, admitted = _mathieu_pressure_context()
+    reference = admitted[0]
+    experiment = context.experiments[reference.experiment_id]
+    predictions = []
+    internal_backend = None
+    if engine is Engine.INTERNAL_ANALYTICAL:
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            PO2_COMMANDED,
+            Po2Request,
+            _InternalAnalyticalBatteryBackend,
+        )
+
+        internal_backend = _InternalAnalyticalBatteryBackend()
+        assert reference.identity.composition is not None
+        assert reference.identity.composition.is_value
+        composition_wt = score_mod.composition_wt_pct(
+            reference.identity.composition.value
+        )
+        assert composition_wt is not None
+        composition_kg = {name: value / 100.0 for name, value in composition_wt.items()}
+        assert reference.identity.temperature_K is not None
+        assert reference.identity.temperature_K.is_value
+        temperature_C = float(reference.identity.temperature_K.value) - 273.15
+        assert reference.identity.fO2_Pa is not None
+        assert reference.identity.fO2_Pa.is_value
+        po2_bar = float(reference.identity.fO2_Pa.value) / 100000.0
+        po2_request = Po2Request(mode=PO2_COMMANDED, po2_bar=po2_bar)
+    for pressure_pa in (Decimal("0.1"), Decimal("100000")):
+        pressure_bar = float(pressure_pa) / 100000.0
+        if engine is Engine.INTERNAL_ANALYTICAL:
+            assert internal_backend is not None
+            result = internal_backend.equilibrate(
+                temperature_C=temperature_C,
+                composition_kg=composition_kg,
+                fO2_log=math.log10(po2_bar),
+                pressure_bar=pressure_bar,
+                po2_request=po2_request,
+            )
+            assert result.status == "ok"
+            predictions.append(Decimal(str(result.vapor_pressures_Pa["Na"])))
+        else:
+            pressured = replace(
+                reference,
+                identity=replace(
+                    reference.identity,
+                    total_pressure_Pa=State.of(pressure_pa),
+                ),
+            )
+            prediction = predict_with_engine(
+                engine,
+                pressured,
+                experiment=experiment,
+                bench=context.benches.get(experiment.bench_id or ""),
+            )
+            assert prediction.execution.state is ExecutionState.PRODUCED
+            assert prediction.value is not None
+            predictions.append(prediction.value)
+
+    assert predictions[0] == predictions[1]
+
+
+def test_known_total_pressure_mismatch_still_refuses() -> None:
+    experiment = F.kems_experiment()
+    identity = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+    reference = F.observation(
+        "known-pressure-mismatch",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="other-source",
+    )
+    prediction = replace(
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        identity=replace(
+            identity, total_pressure_Pa=State.of(Decimal("0.1"))
+        ),
+    )
+
+    residual, _candidate = _compile(reference, experiment, prediction)
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_MISMATCH
+    assert residual.refusal.detail["fields"] == ["total_pressure_Pa"]
+
+
+def test_pressure_dependent_prediction_still_refuses_unknown_total_pressure() -> None:
+    experiment = F.kems_experiment()
+    identity = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.unknown("not printed"),
+    )
+    reference = F.observation(
+        "pressure-dependent-unknown-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="other-source",
+    )
+    reference = replace(reference, point_conditions=None)
+    prediction = replace(
+        _partial_prediction(Engine.VAPOROCK, reference),
+        identity=replace(
+            identity, total_pressure_Pa=State.of(Decimal("0.1"))
+        ),
+    )
+    context = _context(F.work(), experiment, reference)
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=context,
+        prediction=prediction,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["fields"] == ["total_pressure_Pa"]
+
+
+def test_unknown_total_pressure_refusal_is_pinned_on_non_mathieu_row() -> None:
+    identity = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.unknown("not printed"),
+    )
+    reference = F.observation(
+        "other-source-p-partial-unknown-pressure",
+        "other-source-experiment",
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="other-source",
+    )
+    candidate_identity = replace(
+        reference.identity, total_pressure_Pa=State.of(Decimal("0.1"))
+    )
+
+    outcome = identity_equal(reference.identity, candidate_identity)
+
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert outcome.fields == ("total_pressure_Pa",)
+
+
+def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> None:
+    experiment = F.kems_experiment()
+    identity = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.unknown("not printed"),
+    )
+    reference = F.observation(
+        "other-source-score-p-partial-unknown-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="other-source",
+    )
+    reference = replace(reference, point_conditions=None)
+    assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
+        identity, Quantity.P_PARTIAL
+    )
+    assert assumed_bar == 1e-6
+    assert assumption_notice is not None
+    assert invalid is None
+    prediction = replace(
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        identity=replace(
+            identity, total_pressure_Pa=State.of(Decimal("0.1"))
+        ),
+        notices=(assumption_notice,),
+    )
+
+    residual, _candidate = _compile(reference, experiment, prediction)
+
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.refusal is None
+    assert assumption_notice in residual.notices
+    assert any(
+        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and "total-pressure-independent" in notice.reason
+        for notice in residual.notices
+    )
 
 
 def _partial_prediction(engine, observation, **_kwargs):
@@ -608,148 +921,40 @@ def test_p_partial_without_composition_still_refuses_identity() -> None:
     assert "composition" in outcome.fields
 
 
-def test_pooled_log_pressure_sd_known_replicates() -> None:
-    assert pooled_log_pressure_sd(((-1, 0, 1), (9, 10, 11))) == Decimal("1")
 
 
-def test_kems_band_derives_known_replicate_scatter() -> None:
-    experiment = F.kems_experiment()
-    identity = replace(
-        _partial_identity(),
-        total_pressure_Pa=State.of(Decimal("1e-6")),
-    )
-    first = F.observation(
-        "kems-replicate-1",
-        experiment.experiment_id,
-        identity,
-        Decimal("10"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    second = F.observation(
-        "kems-replicate-2",
-        experiment.experiment_id,
-        identity,
-        Decimal("100"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    band = derive_kems_partial_pressure_band(
-        {first.observation_id: first, second.observation_id: second},
-        {experiment.experiment_id: experiment},
-    )
-    assert band is not None
-    assert band.unit == "dimensionless"
-    assert band.value == Decimal("0.5").sqrt()
-    assert "replicate scatter" in band.rule
-    assert "pooled replicate" in band.rule
 
 
-def test_kems_band_uses_source_printed_pressure_uncertainty() -> None:
-    experiment = F.kems_experiment()
-    reference = replace(
-        F.observation(
-            "kems-printed-pressure",
-            experiment.experiment_id,
-            _partial_identity(),
-            Decimal("10"),
-            evidence=EvidenceClass.MEASURED_DIRECT,
-            source_id="kems-042-plante-1979",
-        ),
-        uncertainty=Uncertainty(
-            kind=UncertaintyKind.PRINTED,
-            verbatim={
-                "temperature_quote": (
-                    "At 1500 K, the estimated 20 K error yields an error "
-                    "in K pressure of about 40 percent."
-                )
-            },
-        ),
-    )
-    band = derive_kems_partial_pressure_band(
-        {reference.observation_id: reference},
-        {experiment.experiment_id: experiment},
-    )
-    assert band is not None
-    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
-    assert "source-printed" in band.rule
-    assert "log10(1.40)" in band.rule
-    assert "page-280 1500 K sentence" in band.rule
-    assert "upper multiplicative edge" in band.rule
-    assert "[1/1.40, 1.40] (-28.6%..+40%)" in band.rule
-    assert "+/-40% relative band" in band.rule
-    assert "single 1500 K figure is applied across the tabulated T range" in band.rule
 
 
-def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
-    experiment = F.kems_experiment()
-    identity = _partial_identity()
-    printed = replace(
-        F.observation(
-            "kems-printed-with-replicates",
-            experiment.experiment_id,
-            identity,
-            Decimal("10"),
-            evidence=EvidenceClass.MEASURED_DIRECT,
-            source_id="kems-042-plante-1979",
-        ),
-        uncertainty=Uncertainty(
-            kind=UncertaintyKind.PRINTED,
-            verbatim={
-                "temperature_quote": (
-                    "At 1500 K, the estimated 20 K error yields an error "
-                    "in K pressure of about 40 percent."
-                )
-            },
-        ),
-    )
-    replicate_low = F.observation(
-        "kems-replicate-low",
-        experiment.experiment_id,
-        identity,
-        Decimal("10"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    replicate_high = F.observation(
-        "kems-replicate-high",
-        experiment.experiment_id,
-        identity,
-        Decimal("100"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    band = derive_kems_partial_pressure_band(
-        {
-            item.observation_id: item
-            for item in (printed, replicate_low, replicate_high)
-        },
-        {experiment.experiment_id: experiment},
-    )
-    assert band is not None
-    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
-    assert "source-printed" in band.rule
-    assert "pooled replicate" not in band.rule
 
 
 @pytest.mark.parametrize(
-    ("typed_not_printed", "expected_reason"),
+    ("typed_not_printed", "expected_reason", "expected_record_status"),
     (
         (
             False,
             "calibration_not_grounded: No calibration entry has been recorded yet. "
             "(KEMS pressure requires a recorded calibration)",
+            "not_recorded",
         ),
         (
             True,
             "calibration_not_grounded: The source record says the calibration was "
             "not printed. (KEMS pressure requires a recorded calibration)",
+            "not_printed",
         ),
     ),
 )
 def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     typed_not_printed: bool,
     expected_reason: str,
+    expected_record_status: str,
 ) -> None:
     from simulator.battery.validity import run_validity_gates
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_strata,
         flagged_stratum_rows,
         render_score_report_from_payloads,
@@ -778,14 +983,19 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     pressure_check = next(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
-    assert gates.passed
-    assert pressure_check.passed
-    assert pressure_check.detail["flag"] == "calibration_not_grounded"
+    assert gates.passed is False
+    assert pressure_check.passed is False
     assert pressure_check.detail["reason"] == (
-        "calibration is not grounded for the in-cell fallback"
+        "incomplete printed species coverage; pressure sum is only a lower bound"
     )
-    assert pressure_check.detail["calibration_record_status"] == (
-        "not_printed" if typed_not_printed else "not_recorded"
+    assert pressure_check.detail["pressure_limit_Pa"]
+    calibration_check = next(
+        check for check in gates.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.passed
+    assert (
+        calibration_check.detail["calibration_record_status"]
+        == expected_record_status
     )
     residual, _ = compile_residual(
         reference,
@@ -794,43 +1004,92 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
         prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
     )
 
+    # d-274 keeps uncomputable in-cell sums scoreable with a flagged tier.
     assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
     assert residual.score_eligible is False
     notice = next(
-        item for item in residual.notices
-        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+        item
+        for item in residual.notices
+        if item.reason.startswith("calibration_not_grounded:")
     )
     assert notice.reason == expected_reason
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
     )
 
     diagnostic = flagged_stratum_rows(
         (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
     )
-    assert diagnostic[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    assert diagnostic[0]["n"] == 1
-    assert diagnostic[0]["median_dex"] is not None
-    assert diagnostic[0]["rms_dex"] is not None
+    assert {row["stratum"]: row["n"] for row in diagnostic} == {
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED: 1,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
+    }
+    assert all(row["median_dex"] is not None for row in diagnostic)
+    assert all(row["rms_dex"] is not None for row in diagnostic)
 
     payload = residual_to_plain(residual)
     summary_rows = flagged_stratum_payloads(
         (payload,), (Engine.INTERNAL_ANALYTICAL,)
     )
-    assert summary_rows[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    assert summary_rows[0]["n"] == 1
-    assert summary_rows[0]["median_dex"] is not None
-    assert summary_rows[0]["rms_dex"] is not None
+    assert {row["stratum"]: row["n"] for row in summary_rows} == {
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED: 1,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
+    }
+    assert all(row["median_dex"] is not None for row in summary_rows)
+    assert all(row["rms_dex"] is not None for row in summary_rows)
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
     assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
 
 
+def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_strata,
+    )
+
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    reference = F.observation(
+        "figure-only-kems-pressure",
+        experiment.experiment_id,
+        replace(
+            _partial_identity(),
+            total_pressure_Pa=State.of(Decimal("1e-6")),
+        ),
+        Decimal("10"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+        source_id="kems-figure-only",
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.execution.state is ExecutionState.PRODUCED
+    assert residual.refusal is None
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        FLAGGED_STRATUM_FIGURE_ONLY,
+    )
+
+
 def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> None:
-    from simulator.battery.score import FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-    from simulator.battery.score import flagged_strata
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_strata,
+    )
 
     experiment = F.kems_experiment(kn=None, calibrated=False)
     reference = _uncalibrated_kems_partial_row(
@@ -862,35 +1121,1200 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     assert openimcc.numeric.decision_band is None
     assert internal_analytical.numeric is not None
     assert internal_analytical.numeric.decision_band is None
+    # d-274 preserves both the calibration and in-cell apparatus flags per engine.
     assert flagged_strata(openimcc.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
     )
     assert flagged_strata(internal_analytical.notices) == flagged_strata(
         openimcc.notices
     )
 
 
-def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
-    experiment = F.kems_experiment(kn=None, calibrated=False)
-    first = _uncalibrated_kems_partial_row(
-        experiment, "uncalibrated-kems-replicate-1", Decimal("10")
+def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migration(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import derive_kems_partial_pressure_band, score_store
+    from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
+
+    migrated = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    assert len(migrated.observations) == 383
+    expected = derive_kems_partial_pressure_band(
+        migrated.observations,
+        migrated.experiments,
+        benches=migrated.benches,
     )
-    second = _uncalibrated_kems_partial_row(
-        experiment, "uncalibrated-kems-replicate-2", Decimal("100")
+    assert expected is not None
+    assert expected.value.quantize(Decimal("0.000001")) == Decimal("0.146128")
+
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=migrated.observations,
+        benches=migrated.benches,
+        extract_review={"kems-042-plante-1979": "reviewed"},
     )
-    printed_pressure_error = Uncertainty(
-        kind=UncertaintyKind.PRINTED,
-        verbatim="10% pressure error",
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-042-plante-1979.yaml").read_text()
     )
-    first = replace(first, uncertainty=printed_pressure_error)
-    second = replace(second, uncertainty=printed_pressure_error)
+    engine_row_ids = {
+        "kems-042-plante-1979::" + row["observation_id"]
+        for row in extract["species"]["K"]["observations"]
+        if row.get("supersedes")
+    }
+    references = {
+        observation.observation_id: observation
+        for observation_id in engine_row_ids
+        if (observation := context.observations[observation_id])
+        and observation.source_id == "kems-042-plante-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.identity.species.formula == "K"
+    }
+    assert len(references) == 162
+    work_id = migrated.experiments[next(iter(references.values())).experiment_id].work_id
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        work_id=work_id,
+        rail=Rail.VAPOUR,
+        predict=_partial_prediction,
+    )
+    scored = [row for row in residuals if row.reference in references]
+    assert len(scored) == 162
+    missing_or_changed = [
+        (
+            row.reference,
+            None
+            if row.numeric is None or row.numeric.decision_band is None
+            else row.numeric.decision_band.value,
+        )
+        for row in scored
+        if (
+            row.numeric is None
+            or row.numeric.decision_band is None
+            or row.numeric.decision_band.value.quantize(Decimal("0.000001"))
+            != expected.value.quantize(Decimal("0.000001"))
+        )
+    ]
+    assert not missing_or_changed, missing_or_changed[:5]
+
+
+@pytest.mark.parametrize(
+    ("source_name", "expected_rail"),
+    (
+        ("shornikov-1997-cao-alumina-vapor.yaml", Rail.VAPOUR),
+        (
+            "stolyarova-1996-cao-alumina-silica-kems.yaml",
+            Rail.SIO_EVOLUTION,
+        ),
+        (
+            "stolyarova-1996-cao-alumina-silica-kems.yaml",
+            Rail.VAPOUR,
+        ),
+    ),
+)
+def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
+    tmp_path: Path, source_name: str, expected_rail: Rail
+) -> None:
+    """The source-wide KEMS pressure band survives cell-note parse refusals."""
+    from simulator.battery.enums import Quantity
+    from simulator.battery.score import (
+        _printed_uncertainty_band,
+        derive_kems_partial_pressure_band,
+        rail_for_quantity,
+        point_magnitude,
+        populate_numeric,
+    )
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    plante = _migrate_real_extract(
+        tmp_path / "plante", "kems-042-plante-1979.yaml"
+    )
+    target = _migrate_real_extract(tmp_path / "target", source_name)
+    observations = {**plante.observations, **target.observations}
+    experiments = {**plante.experiments, **target.experiments}
+    benches = {**plante.benches, **target.benches}
+    target_reference = next(
+        observation
+        for observation in target.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and rail_for_quantity(
+            Quantity.P_PARTIAL,
+            species_formula=observation.identity.species.formula,
+        )
+        is expected_rail
+    )
+    band = derive_kems_partial_pressure_band(
+        observations, experiments, benches=benches
+    )
+    assert band is not None
+    assert band.value.quantize(Decimal("0.000001")) == Decimal("0.146128")
+    reference_value = point_magnitude(target_reference.value)
+    assert reference_value is not None
+    printed = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        target_reference.uncertainty,
+        reference_value,
+        source_observation=target_reference,
+        method=experiments[target_reference.experiment_id].method.value,
+    )
+    assert printed.refusal is not None
+    numeric, reason, detail = populate_numeric(
+        quantity=Quantity.P_PARTIAL,
+        candidate=reference_value,
+        reference=reference_value,
+        source_relation=SourceRelation.UNKNOWN,
+        printed_refusal=printed.refusal,
+        derived_band=band,
+    )
+    assert reason is None, detail
+    assert numeric is not None
+    assert numeric.decision_band == band
+
+
+def test_plante_kems_pressure_envelope_reports_unstated_confidence(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.score import (
+        _printed_uncertainty_band,
+        derive_kems_partial_pressure_band,
+        point_magnitude,
+    )
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    plante = _migrate_real_extract(
+        tmp_path / "plante", "kems-042-plante-1979.yaml"
+    )
+    observations = plante.observations
+    experiments = plante.experiments
+    observation = observations[
+        "kems-042-plante-1979::plante1979_table2_s1104_r001_quoted"
+    ]
+    pressure = point_magnitude(observation.value)
+    assert pressure is not None
 
     band = derive_kems_partial_pressure_band(
-        {first.observation_id: first, second.observation_id: second},
+        observations, experiments, benches=plante.benches
+    )
+    assert band is not None
+    assert band.value == Decimal("0.1461280356782380259259551535")
+    assert "source-printed" in band.rule
+    assert "log10(1.40)" in band.rule
+    assert "page-280 1500 K sentence" in band.rule
+    assert "upper multiplicative edge" in band.rule
+    assert "[1/1.40, 1.40] (-28.6%..+40%)" in band.rule
+    assert "+/-40% relative band" in band.rule
+    assert "single 1500 K figure is applied across the tabulated T range" in band.rule
+
+    printed = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        observation.uncertainty,
+        pressure,
+        source_observation=observation,
+        method=experiments[observation.experiment_id].method.value,
+    )
+    assert printed.band is None
+    assert printed.notice is not None
+    assert printed.notice.kind is NoticeKind.INPUT_OMITTED
+    assert printed.notice.reason == "confidence_level_not_stated"
+    assert "original=" in printed.notice.band
+    assert '"published_page": 276' in printed.notice.band
+
+
+def test_cho_suito_log10_activity_standard_deviations_are_one_sigma(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import (
+        NORMAL_95_TICKET_MULTIPLIER,
+        _printed_uncertainty_band,
+        point_magnitude,
+    )
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(
+        tmp_path, "cho-suito-1994-cas-slag-activities.yaml"
+    )
+    expected = {
+        "cho_suito_1994_t5_acs2_sio2_cn": Decimal("0.10"),
+        "cho_suito_1994_t5_acs4_sio2_cn": Decimal("0.23"),
+        "cho_suito_1994_t5_cas5_sio2_cn": Decimal("0.15"),
+        "cho_suito_1994_t5_cas8_sio2_cn": Decimal("0.22"),
+    }
+    rows = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrated.observations.values()
+        if row.observation_id.rsplit("::", 1)[-1] in expected
+    }
+    assert set(rows) == set(expected)
+    for observation_id, sigma_dex in expected.items():
+        row = rows[observation_id]
+        reference = point_magnitude(row.value)
+        assert reference is not None
+        printed = _printed_uncertainty_band(
+            Quantity.ACTIVITY,
+            row.uncertainty,
+            reference,
+            source_observation=row,
+        )
+        assert printed.notice is None
+        assert printed.refusal is None
+        assert printed.standard_uncertainty_dex == sigma_dex
+        assert printed.band is not None
+        assert printed.band.band_basis == "row_printed"
+        assert printed.band.value == sigma_dex * NORMAL_95_TICKET_MULTIPLIER
+
+
+def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    identity = Identity(
+        quantity=Quantity.FE3_FE2_RATIO,
+        species=Species("Fe", Phase.CR),
+    )
+    observation = F.observation(
+        "redox-field-uncertainty",
+        "redox-field-experiment",
+        identity,
+        Decimal("0.72"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derivation=Derivation(
+            relation="Fe3_over_FeT to Fe3+/Fe2+",
+            inputs=("redox-source-row",),
+            parameters=(("original_Fe3_over_FeT", F.located(Decimal("0.72"))),),
+            output_unit="dimensionless",
+        ),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"Fe3_over_FeT": "±0.02", "sigma": "±0.90"},
+    )
+
+    printed = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        uncertainty,
+        Decimal("0.72"),
+        source_observation=observation,
+    )
+
+    assert printed.refusal is None
+    assert printed.band is not None
+    assert printed.band.band_basis == "row_printed"
+    assert printed.band.value == Decimal("0.01223445641701162951905623210")
+
+    unparseable = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        replace(
+            uncertainty,
+            verbatim={"Fe3_over_FeT": "not stated", "sigma": "±0.05"},
+        ),
+        Decimal("0.72"),
+        source_observation=observation,
+    )
+    assert unparseable.band is None
+    assert unparseable.refusal is not None
+    assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
+
+
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_source_method_uncertainty_supplies_a_source_method_band(
+    quantity: Quantity,
+) -> None:
+    from simulator.battery.score import NORMAL_95_TICKET_MULTIPLIER
+
+    experiment = F.kems_experiment()
+    identity = replace(
+        F.activity_identity(endmember_phase=Phase.L), quantity=quantity
+    )
+    reference = F.observation(
+        "source-method-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="source-method-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal("0.10"),
+        meaning="one_sigma",
+        quantity=quantity,
+        basis="log10_dex",
+        quantity_basis=(
+            "log10 activity in dex"
+            if quantity is Quantity.ACTIVITY
+            else "log10 activity coefficient in dex"
+        ),
+        locator=F.loc(
+            page=12,
+            note="The standard deviation of log10(a) is 0.10.",
+        ),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "source-method-fixture"),
+        source_method_uncertainties={"source-method-fixture": method_uncertainty},
+    )
+    context = _context(work, experiment, reference, review="reviewed")
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_predict(Decimal("0.2"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.band_basis == "source_method"
+    assert residual.numeric.decision_band.value == (
+        Decimal("0.10") * NORMAL_95_TICKET_MULTIPLIER
+    )
+
+
+@pytest.mark.parametrize(
+    ("basis", "value", "meaning", "note", "reference_value", "expected_band", "rule"),
+    (
+        (
+            "relative_percent",
+            "10",
+            "one_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.08968303352185472833542869883",
+            "printed_1sigma",
+        ),
+        (
+            "absolute",
+            "0.02",
+            "one_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.08968303352185472833542869883",
+            "printed_1sigma",
+        ),
+        (
+            "log10_dex",
+            "0.20",
+            "two_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.20",
+            "printed_2sigma",
+        ),
+        (
+            "log10_dex",
+            "0.10",
+            "one_sigma",
+            "An explicitly stated dex uncertainty.",
+            "0.2",
+            str(Decimal("0.10") * Decimal("1.959963984540054")),
+            "printed_1sigma",
+        ),
+    ),
+)
+def test_source_method_activity_band_uses_explicit_basis_and_meaning(
+    basis: str,
+    value: str,
+    meaning: str,
+    note: str,
+    reference_value: str,
+    expected_band: str,
+    rule: str,
+) -> None:
+    # Independently, a 10% relative width spans log10(0.9) to log10(1.1);
+    # the larger magnitude is log10(10/9), then the 95% one-sigma multiplier
+    # gives 0.08968303352185472833542869883. This is the metric's conservative
+    # dex width and does not use the production uncertainty converter.
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(endmember_phase=Phase.L)
+    reference = F.observation(
+        "source-method-explicit-band",
+        experiment.experiment_id,
+        identity,
+        Decimal(reference_value),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="source-method-explicit-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal(value),
+        meaning=meaning,
+        quantity=Quantity.ACTIVITY,
+        basis=basis,
+        quantity_basis="activity in the stated basis",
+        locator=F.loc(page=12, note=note),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "source-method-explicit-fixture"),
+        source_method_uncertainties={
+            "source-method-explicit-fixture": method_uncertainty
+        },
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(Decimal(reference_value), identity),
+    )
+
+    assert residual.numeric is not None
+    band = residual.numeric.decision_band
+    assert band is not None
+    assert band.band_basis == "source_method"
+    assert band.value == Decimal(expected_band)
+    assert band.rule.startswith(f"{rule}:")
+
+
+@pytest.mark.parametrize(
+    ("basis", "value", "expected_reason"),
+    (
+        ("not_a_basis", Decimal("0.10"), "source_method_uncertainty_basis_unmapped"),
+        ("log10_dex", Decimal("0"), "source_method_uncertainty_value_nonpositive"),
+    ),
+)
+def test_source_method_invalid_basis_or_zero_value_refuses_band(
+    basis: str, value: Decimal, expected_reason: str
+) -> None:
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(endmember_phase=Phase.L)
+    reference = F.observation(
+        "source-method-invalid-band",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="source-method-invalid-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=value,
+        meaning="one_sigma",
+        quantity=Quantity.ACTIVITY,
+        basis=basis,
+        quantity_basis="activity in the stated basis",
+        locator=F.loc(page=12, note="invalid fixture"),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "source-method-invalid-fixture"),
+        source_method_uncertainties={
+            "source-method-invalid-fixture": method_uncertainty
+        },
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(Decimal("0.2"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residual.refusal.detail["reason"] == expected_reason
+
+
+@pytest.mark.parametrize(
+    ("field_quantity", "quantity"),
+    (
+        (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT),
+        (Quantity.ACTIVITY, Quantity.P_PARTIAL),
+        (Quantity.ACTIVITY, Quantity.FE3_FE2_RATIO),
+        (Quantity.ACTIVITY_COEFFICIENT, Quantity.ACTIVITY),
+    ),
+)
+def test_source_method_uncertainty_does_not_band_other_quantities(
+    field_quantity: Quantity, quantity: Quantity,
+) -> None:
+    experiment = F.kems_experiment()
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        identity = replace(F.activity_identity(), quantity=quantity)
+        value = Decimal("0.2")
+    elif quantity is Quantity.ACTIVITY:
+        identity = F.activity_identity()
+        value = Decimal("0.2")
+    elif quantity is Quantity.P_PARTIAL:
+        na = State.not_applicable("not an activity identity axis for partial pressure")
+        identity = replace(
+            F.activity_identity(),
+            quantity=quantity,
+            per=na,
+            reference_state=na,
+        )
+        value = Decimal("1")
+    else:
+        na = State.not_applicable("not a redox identity axis")
+        identity = replace(
+            F.activity_identity(formula="Fe"),
+            quantity=quantity,
+            species=Species("Fe", Phase.L),
+            per=na,
+            reference_state=na,
+        )
+        value = Decimal("0.72")
+    reference = F.observation(
+        f"activity-method-{quantity.value}",
+        experiment.experiment_id,
+        identity,
+        value,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="activity-method-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal("0.10"),
+        meaning="one_sigma",
+        quantity=field_quantity,
+        basis="log10_dex",
+        quantity_basis=(
+            "log10 activity in dex"
+            if field_quantity is Quantity.ACTIVITY
+            else "log10 activity coefficient in dex"
+        ),
+        locator=F.loc(
+            page=12, note="The standard deviation of log10(a) is 0.10."
+        ),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "activity-method-fixture"),
+        source_method_uncertainties={"activity-method-fixture": method_uncertainty},
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(value, identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert not (
+        residual.refusal is not None
+        and residual.refusal.detail.get("reason")
+        == "printed_uncertainty_unit_unmapped"
+    )
+
+
+def test_fusion_identity_flag_uses_preconversion_source_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.kems_experiment()
+    source_identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1600"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "quartz",
+    )
+    reference = F.observation(
+        "preconversion-source-polymorph",
+        experiment.experiment_id,
+        source_identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-preconversion-source-polymorph",
+    )
+    from simulator.battery.score import fusion_comparison_reference
+    import simulator.battery.score as score_module
+
+    original_unspecified = score_module._source_polymorph_is_unspecified
+    inspected_polymorphs = []
+
+    def record_polymorph(polymorph):
+        inspected_polymorphs.append(polymorph)
+        return original_unspecified(polymorph)
+
+    monkeypatch.setattr(
+        score_module, "_source_polymorph_is_unspecified", record_polymorph
+    )
+
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    candidate_identity = _with_activity_reference_polymorph(
+        converted.identity, None
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(converted.value.point, candidate_identity),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert inspected_polymorphs[-1] == (
+        source_identity.reference_state.value.endmember.polymorph
+    )
+
+
+def test_pooled_log_pressure_sd_known_replicates() -> None:
+    from simulator.battery.score import pooled_log_pressure_sd
+
+    assert pooled_log_pressure_sd(((-1, 0, 1), (9, 10, 11))) == Decimal("1")
+
+
+def test_kems_band_derives_known_replicate_scatter() -> None:
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    experiment = F.kems_experiment()
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    rows = tuple(
+        F.observation(
+            f"kems-replicate-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    band = derive_kems_partial_pressure_band(
+        {row.observation_id: row for row in rows},
         {experiment.experiment_id: experiment},
     )
 
-    assert band is None
+    assert band is not None
+    assert band.unit == "dimensionless"
+    assert band.value == Decimal("0.5").sqrt()
+    assert "replicate scatter" in band.rule
+
+
+def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    experiment = F.kems_experiment()
+    identity = _partial_identity()
+    printed = replace(
+        F.observation(
+            "kems-printed-with-replicates",
+            experiment.experiment_id,
+            identity,
+            Decimal("10"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="kems-042-plante-1979",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "temperature_quote": (
+                    "At 1500 K, the estimated 20 K error yields an error "
+                    "in K pressure of about 40 percent."
+                )
+            },
+        ),
+    )
+    replicates = tuple(
+        F.observation(
+            f"kems-replicate-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    band = derive_kems_partial_pressure_band(
+        {row.observation_id: row for row in (printed, *replicates)},
+        {experiment.experiment_id: experiment},
+    )
+
+    assert band is not None
+    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
+    assert "source-printed pressure envelope" in band.rule
+
+
+def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import _source_band_catalog
+
+    experiment = F.kems_experiment("calibrated-kems")
+    uncalibrated_experiment = F.kems_experiment(
+        "uncalibrated-kems", kn=None, calibrated=False
+    )
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+        reaction=None,
+        reference_state=None,
+        reservoir=None,
+    )
+    rows = tuple(
+        F.observation(
+            f"calibrated-source-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=f"calibrated-source-{index}",
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    work = F.work()
+
+    def context_for(rows, experiments):
+        return ScoreContext(
+            works={work.work_id: work},
+            experiments=experiments,
+            observations={row.observation_id: row for row in rows},
+            extract_review={row.source_id: "reviewed" for row in rows},
+            hostname="test",
+            root=tmp_path,
+        )
+
+    calibrated_context = context_for(
+        rows, {experiment.experiment_id: experiment}
+    )
+    calibrated_bands, _records, _no_band_reasons = _source_band_catalog(
+        calibrated_context, {}
+    )
+
+    assert len(calibrated_bands) == 1
+    calibrated_band = next(iter(calibrated_bands.values()))
+    assert calibrated_band.unit == "dimensionless"
+    assert calibrated_band.value == Decimal("1.452923475835081740375596191")
+
+    uncalibrated_row = replace(
+        _uncalibrated_kems_partial_row(
+            uncalibrated_experiment, "uncalibrated-kems-pressure", Decimal("1")
+        ),
+        identity=identity,
+        source_id="uncalibrated-source",
+    )
+    mixed_rows = (*rows, uncalibrated_row)
+    mixed_context = context_for(
+        mixed_rows,
+        {
+            experiment.experiment_id: experiment,
+            uncalibrated_experiment.experiment_id: uncalibrated_experiment,
+        },
+    )
+    mixed_bands, _records, _no_band_reasons = _source_band_catalog(
+        mixed_context, {}
+    )
+
+    clean_residuals, _ = score_store(
+        calibrated_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.VAPOUR,
+        predict=_partial_prediction,
+    )
+    mixed_residuals, _ = score_store(
+        mixed_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.VAPOUR,
+        predict=_partial_prediction,
+    )
+    clean_by_reference = {row.reference: row for row in clean_residuals}
+    mixed_by_reference = {row.reference: row for row in mixed_residuals}
+    assert clean_by_reference[rows[1].observation_id].status is ResidualStatus.MISMATCH
+    assert mixed_by_reference[rows[1].observation_id].status is ResidualStatus.MISMATCH
+    assert (
+        mixed_by_reference[rows[1].observation_id].numeric.decision_band
+        == calibrated_band
+    )
+    bad_residual = mixed_by_reference[uncalibrated_row.observation_id]
+    assert bad_residual.execution.state is ExecutionState.PRODUCED
+    assert bad_residual.status is ResidualStatus.NO_BAND
+    assert bad_residual.numeric is not None
+    assert bad_residual.numeric.decision_band is None
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and notice.reason.startswith("calibration_not_grounded:")
+        for notice in bad_residual.notices
+    )
+
+    assert mixed_bands == calibrated_bands
+    assert next(iter(mixed_bands.values())).value == Decimal(
+        "1.452923475835081740375596191"
+    )
+
+    uncalibrated_only = tuple(
+        replace(
+            _uncalibrated_kems_partial_row(
+                uncalibrated_experiment,
+                f"uncalibrated-source-{index}",
+                Decimal(value),
+            ),
+            identity=identity,
+            source_id=f"uncalibrated-source-{index}",
+        )
+        for index, value in enumerate(("10", "100", "1000"))
+    )
+    uncalibrated_context = context_for(
+        uncalibrated_only,
+        {uncalibrated_experiment.experiment_id: uncalibrated_experiment},
+    )
+    uncalibrated_bands, _records, _no_band_reasons = _source_band_catalog(
+        uncalibrated_context, {}
+    )
+    assert uncalibrated_bands == {}
+
+
+@pytest.mark.parametrize(
+    "calibration_path",
+    ("low_kn", "high_background", "not_published", "missing_locator"),
+)
+def test_kems_band_populations_exclude_all_ungrounded_calibrations(
+    calibration_path: str,
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import (
+        _source_band_catalog,
+        derive_kems_partial_pressure_band,
+    )
+
+    calibrated = F.kems_experiment("calibrated-kems")
+    uncalibrated = F.kems_experiment(
+        "ungrounded-kems",
+        kn=Decimal("1") if calibration_path == "low_kn" else Decimal("20"),
+        total_P=(
+            Decimal("0.1")
+            if calibration_path == "high_background"
+            else Decimal("1e-6")
+        ),
+        calibrated=False,
+    )
+    if calibration_path == "not_published":
+        uncalibrated = replace(
+            uncalibrated,
+            apparatus=replace(
+                uncalibrated.apparatus,
+                calibration={
+                    "standard": Located(
+                        State.unknown("not published"), locator=F.loc(page=4)
+                    )
+                },
+            ),
+        )
+    elif calibration_path == "missing_locator":
+        uncalibrated = replace(
+            uncalibrated,
+            apparatus=replace(
+                uncalibrated.apparatus,
+                calibration={"standard": Located(State.of("Ag"))},
+            ),
+        )
+
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+        reaction=None,
+        reference_state=None,
+        reservoir=None,
+    )
+    printed_error = Uncertainty(
+        kind=UncertaintyKind.PRINTED, verbatim="10% pressure error"
+    )
+    calibrated_rows = tuple(
+        replace(
+            F.observation(
+                f"calibrated-kems-{index}",
+                calibrated.experiment_id,
+                identity,
+                Decimal(value),
+                evidence=EvidenceClass.MEASURED_DIRECT,
+                source_id=f"calibrated-kems-{index}",
+            ),
+            uncertainty=printed_error,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    uncalibrated_row = replace(
+        F.observation(
+            "ungrounded-kems-row",
+            uncalibrated.experiment_id,
+            identity,
+            Decimal("1000"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="ungrounded-kems-source",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED, verbatim="100% pressure error"
+        ),
+    )
+    experiments = {
+        calibrated.experiment_id: calibrated,
+        uncalibrated.experiment_id: uncalibrated,
+    }
+
+    calibrated_pressure_band = derive_kems_partial_pressure_band(
+        {row.observation_id: row for row in calibrated_rows}, experiments
+    )
+    mixed_pressure_band = derive_kems_partial_pressure_band(
+        {
+            row.observation_id: row
+            for row in (*calibrated_rows, uncalibrated_row)
+        },
+        experiments,
+    )
+    assert calibrated_pressure_band is not None
+
+    work = F.work()
+
+    def context_for(rows):
+        return ScoreContext(
+            works={work.work_id: work},
+            experiments=experiments,
+            observations={row.observation_id: row for row in rows},
+            extract_review={row.source_id: "reviewed" for row in rows},
+            hostname="test",
+            root=tmp_path,
+        )
+
+    calibrated_catalog, _records, _reasons = _source_band_catalog(
+        context_for(calibrated_rows), {}
+    )
+    mixed_catalog, _records, _reasons = _source_band_catalog(
+        context_for((*calibrated_rows, uncalibrated_row)), {}
+    )
+    assert len(calibrated_catalog) == 1
+    assert (
+        mixed_pressure_band == calibrated_pressure_band,
+        mixed_catalog == calibrated_catalog,
+    ) == (True, True), calibration_path
+
+
+def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    uncalibrated = F.kems_experiment(kn=None, calibrated=False)
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim="10% pressure error",
+    )
+    uncalibrated_rows = tuple(
+        replace(
+            _uncalibrated_kems_partial_row(
+                uncalibrated,
+                f"uncalibrated-kems-replicate-{index}",
+                Decimal(value),
+            ),
+            uncertainty=uncertainty,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    calibrated = F.kems_experiment("calibrated-kems")
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    calibrated_rows = tuple(
+        F.observation(
+            f"calibrated-kems-replicate-{index}",
+            calibrated.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    experiments = {
+        uncalibrated.experiment_id: uncalibrated,
+        calibrated.experiment_id: calibrated,
+    }
+    only_uncalibrated = {
+        row.observation_id: row for row in uncalibrated_rows
+    }
+    calibrated_band = derive_kems_partial_pressure_band(
+        {row.observation_id: row for row in calibrated_rows}, experiments
+    )
+    mixed_band = derive_kems_partial_pressure_band(
+        {
+            row.observation_id: row
+            for row in (*calibrated_rows, *uncalibrated_rows)
+        },
+        experiments,
+    )
+
+    assert derive_kems_partial_pressure_band(
+        only_uncalibrated, experiments
+    ) is None
+    assert calibrated_band is not None
+    assert mixed_band == calibrated_band
+    flagged_reference = uncalibrated_rows[0]
+    residual, _ = compile_residual(
+        flagged_reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(
+            F.work(), uncalibrated, flagged_reference, review="reviewed"
+        ),
+        prediction=_partial_prediction(
+            Engine.INTERNAL_ANALYTICAL, flagged_reference
+        ),
+    )
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+
+
+def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    inference = Derivation(
+        relation="inferred from printed Mo oxide ions",
+        inputs=("Mo+;MoO+;MoO2+;MoO3+",),
+        parameters=(),
+        output_unit="cell material",
+    )
+    flagged, flagged_context, flagged_bench, _ = _cell_material_score_case(
+        CellMaterial.MO, inference
+    )
+    flagged_exp = flagged_context.experiments[flagged.experiment_id]
+    flagged_replica = replace(
+        flagged,
+        observation_id="inferred-replica",
+        value=Value.point_of(Decimal("1e-3")),
+    )
+    clean_exp = replace(flagged_exp, experiment_id="clean-kems", bench_id="clean-cell")
+    clean_rows = tuple(
+        replace(
+            flagged,
+            observation_id=observation_id,
+            experiment_id=clean_exp.experiment_id,
+            value=Value.point_of(Decimal(value)),
+        )
+        for observation_id, value in (("clean-row", "1e-6"), ("clean-replica", "2e-6"))
+    )
+    clean_bench = replace(
+        flagged_bench,
+        id="clean-cell",
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    experiments = {
+        flagged_exp.experiment_id: flagged_exp,
+        clean_exp.experiment_id: clean_exp,
+    }
+    baseline = {row.observation_id: row for row in clean_rows}
+    mixed = {
+        row.observation_id: row
+        for row in (*clean_rows, flagged, flagged_replica)
+    }
+
+    clean_band = derive_kems_partial_pressure_band(
+        baseline, experiments, benches={clean_bench.id: clean_bench}
+    )
+    mixed_band = derive_kems_partial_pressure_band(
+        mixed,
+        experiments,
+        benches={clean_bench.id: clean_bench, flagged_bench.id: flagged_bench},
+    )
+    assert clean_band is not None
+    assert mixed_band == clean_band
+
+
+def test_kj_band_dimension_mismatch_is_refused_for_heat_capacity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import score as score_module
+    from simulator.battery.records import DecisionBand
+
+    band = DecisionBand(
+        Decimal("1"), "kJ_per_declared_mol_basis", "source-owned test band"
+    )
+    assert score_module.band_dimension_matches(Quantity.CP, band) is False
+    assert score_module.decision_band_for(
+        Quantity.CP, SourceRelation.INDEPENDENT, derived_band=band
+    ) is None
+    monkeypatch.setattr(
+        score_module, "decision_band_for", lambda *args, **kwargs: band
+    )
+    numeric, reason, detail = score_module.populate_numeric(
+        quantity=Quantity.CP,
+        candidate=Decimal("50"),
+        reference=Decimal("40"),
+        source_relation=SourceRelation.INDEPENDENT,
+    )
+    assert numeric is None
+    assert reason is RefusalReason.DECISION_RULE_MISSING
+    assert detail["reason"] == "band_dimension_mismatch:cp"
+
+
+def test_stolyarova_rows_do_not_move_any_kems_band_path(tmp_path: Path) -> None:
+    from simulator.battery.enums import BenchIdentityBasis, CellMaterial
+    from simulator.battery.records import Bench, BenchIdentity
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    flagged = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    flagged_experiment = context.experiments[flagged.experiment_id]
+    flagged_bench = context.benches[flagged_experiment.bench_id]
+    clean_experiment = F.kems_experiment(
+        "stolyarova-clean-kems", flagged_experiment.work_id or "work-1"
+    )
+    clean_bench = Bench(
+        id="stolyarova-clean-pt",
+        work_id=clean_experiment.work_id or "work-1",
+        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    clean_experiment = replace(clean_experiment, bench_id=clean_bench.id)
+    clean_identity = replace(
+        flagged.identity,
+        species=replace(flagged.identity.species, phase=State.of(Phase.G)),
+        composition=_partial_identity().composition,
+    )
+    clean_rows = tuple(
+        replace(
+            flagged,
+            observation_id=f"stolyarova-clean-{index}",
+            experiment_id=clean_experiment.experiment_id,
+            source_id="stolyarova-clean-test",
+            identity=clean_identity,
+            value=Value.point_of(value),
+            notices=(),
+        )
+        for index, value in enumerate((Decimal("1e-4"), Decimal("2e-4")))
+    )
+    experiments = {
+        flagged_experiment.experiment_id: flagged_experiment,
+        clean_experiment.experiment_id: clean_experiment,
+    }
+    benches = {flagged_bench.id: flagged_bench, clean_bench.id: clean_bench}
+    baseline = {row.observation_id: row for row in clean_rows}
+    baseline_band = derive_kems_partial_pressure_band(
+        baseline, experiments, benches={clean_bench.id: clean_bench}
+    )
+    assert baseline_band is not None
+    assert "replicate scatter" in baseline_band.rule
+
+    flagged_rows = tuple(
+        replace(
+            flagged,
+            observation_id=f"stolyarova-flagged-{index}",
+            identity=clean_identity,
+            value=Value.point_of(value),
+        )
+        for index, value in enumerate((Decimal("1e-5"), Decimal("1e-2")))
+    )
+    mixed = {
+        row.observation_id: row for row in (*clean_rows, *flagged_rows)
+    }
+    mixed_band = derive_kems_partial_pressure_band(
+        mixed, experiments, benches=benches
+    )
+    assert mixed_band == baseline_band
+
+
 
 
 def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
@@ -1217,6 +2641,9 @@ def test_solved_effusion_lifts_only_derived_oxygen_provenance_blocker() -> None:
     assert IMCC_ENGINES == frozenset({Engine.OPENIMCC})
     assert has_own_engine_solved_oxygen_balance(Engine.OPENIMCC, (solved,))
     assert not has_own_engine_solved_oxygen_balance(Engine.ALPHAMELTS, (solved,))
+    for engine in (Engine.ALPHAMELTS, Engine.VAPOROCK):
+        engine_solved = replace(solved, origin=f"engine:{engine.value}")
+        assert has_own_engine_solved_oxygen_balance(engine, (engine_solved,))
     foreign_origin = replace(solved, origin="engine:imcc_sf04")
     assert not has_own_engine_solved_oxygen_balance(
         Engine.OPENIMCC, (foreign_origin,)
@@ -1449,7 +2876,7 @@ def test_green_thermo_residual_is_score_eligible() -> None:
         source_id="work-1",
     )
     residual, candidate = _compile(ref, exp, _predict(Decimal("0"), ident))
-    assert residual.status is ResidualStatus.MATCH
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.score_eligible is True
     assert residual.numeric is not None
     assert residual.numeric.value == Decimal("0")
@@ -1510,6 +2937,38 @@ def test_zero_never_priced_as_value() -> None:
     }
 
 
+def test_one_sided_bound_is_not_scored_as_point() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-bounded-value",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    ref = replace(
+        ref,
+        value=Value(
+            kind=ValueKind.BOUND,
+            bound_operator=">",
+            bound_value=Decimal("0.77"),
+        ),
+    )
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("0.8"), ident))
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert residual.refusal.detail == {
+        "reason": "value_unknown",
+        "value_kind": "bound",
+    }
+
+
 def test_species_formula_unparsed_never_string_matched() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
@@ -1528,6 +2987,221 @@ def test_species_formula_unparsed_never_string_matched() -> None:
     assert parse_species_formula("unknown") is None
     assert parse_species_formula("kems-007") is None
     assert parse_species_formula("O2") == (("O", 2.0),)
+
+
+def test_species_formula_parser_preserves_200_existing_parses() -> None:
+    """Pin established formula results before extending the parser grammar."""
+
+    fixture = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures"
+        / "species_formula_parse_golden_200.json"
+    )
+    rows = json.loads(fixture.read_text(encoding="utf-8"))
+    assert len(rows) == 200
+    for row in rows:
+        expected = tuple(
+            (str(symbol), float(count)) for symbol, count in row["elements"]
+        )
+        assert parse_species_formula(row["formula"]) == expected
+
+
+def test_species_formula_parser_accepts_published_typography() -> None:
+    assert parse_species_formula("$Ta_{2}C$") == (("C", 1.0), ("Ta", 2.0))
+    assert parse_species_formula("V₂S₃") == (("S", 3.0), ("V", 2.0))
+    assert parse_species_formula(
+        r"$\text{HCl}(g)$", species=Species("HCl", Phase.G)
+    ) == (("Cl", 1.0), ("H", 1.0))
+
+
+def test_species_formula_parser_refuses_normalized_ascii_dot_adducts() -> None:
+    for formula in ("Al₂O₃.3H₂O", "$Al_2O_3.3H_2O$", "CoSO₄.7H₂O"):
+        assert parse_species_formula(formula) is None
+
+    for formula in ("Fe0.947O", "Al2O3.3H2O"):
+        assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    assert parse_species_formula(
+        "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
+    ) == score_mod.formula_composition("Fe0.947O")
+
+
+def test_species_formula_parser_accepts_nested_groups() -> None:
+    assert parse_species_formula("[Al(OH)4]") == (
+        ("Al", 1.0),
+        ("H", 4.0),
+        ("O", 4.0),
+    )
+    assert parse_species_formula("(NH4)2SO4") == (
+        ("H", 8.0),
+        ("N", 2.0),
+        ("O", 4.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("Fe(OH)") == (
+        ("Fe", 1.0),
+        ("H", 1.0),
+        ("O", 1.0),
+    )
+
+
+def test_species_formula_parser_accepts_hydrate_segments() -> None:
+    assert parse_species_formula("CoSO4·6H2O") == (
+        ("Co", 1.0),
+        ("H", 12.0),
+        ("O", 10.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("CaSO4·1/2H2O") == (
+        ("Ca", 1.0),
+        ("H", 1.0),
+        ("O", 4.5),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("H2SO4·6.5H2O") == (
+        ("H", 15.0),
+        ("O", 10.5),
+        ("S", 1.0),
+    )
+
+
+def test_species_formula_parser_requires_phase_axis_for_suffix() -> None:
+    assert parse_species_formula("$As(g)$") is None
+    assert parse_species_formula("$As(g)$", species=Species("As", Phase.G)) == (
+        ("As", 1.0),
+    )
+    assert parse_species_formula("$As(g)$", species=Species("As", Phase.CR)) is None
+
+
+@pytest.mark.parametrize(
+    ("label", "phase"),
+    [
+        ("s", Phase.CR),
+        ("solid", Phase.CR),
+        ("gas", Phase.G),
+        ("liq", Phase.L),
+        ("liquid", Phase.L),
+        ("vapor", Phase.G),
+    ],
+)
+def test_species_formula_parser_gates_common_phase_suffixes(
+    label: str, phase: Phase
+) -> None:
+    formula = f"Fe2O3({label})"
+    wrong_phase = Phase.L if phase is not Phase.L else Phase.G
+
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(
+        formula, species=Species("Fe2O3", wrong_phase)
+    ) is None
+    assert parse_species_formula(formula, species=Species("Fe2O3", phase)) == (
+        score_mod.formula_composition("Fe2O3")
+    )
+
+
+def test_match_reported_species_does_not_bind_solid_to_liquid_identity() -> None:
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO(s)": 0.15, "FeO(l)": 0.85},
+        species=Species("FeO", Phase.L),
+    ) == ("FeO(l)", 0.85)
+
+
+@pytest.mark.parametrize(
+    ("label", "phase"),
+    [
+        ("s", Phase.CR),
+        ("S", Phase.CR),
+        ("solid", Phase.CR),
+        ("cr", Phase.CR),
+        ("l", Phase.L),
+        ("liq", Phase.L),
+        ("liquid", Phase.L),
+        ("g", Phase.G),
+        ("gas", Phase.G),
+        ("vapor", Phase.G),
+        ("aq", Phase.AQ),
+    ],
+)
+def test_species_formula_parser_gates_terminal_bracket_phase_labels(
+    label: str, phase: Phase
+) -> None:
+    formula = f"Fe2O3[{label}]"
+    wrong_phase = Phase.CR if phase is not Phase.CR else Phase.L
+
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(
+        formula, species=Species("Fe2O3", wrong_phase)
+    ) is None
+    assert parse_species_formula(formula, species=Species("Fe2O3", phase)) == (
+        score_mod.formula_composition("Fe2O3")
+    )
+
+
+def test_match_reported_species_does_not_bind_bracket_solid_to_liquid_identity() -> None:
+    liquid = Species("FeO", Phase.L)
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO[s]": 0.15, "FeO(l)": 0.85},
+        species=liquid,
+    ) == ("FeO(l)", 0.85)
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO[s]": 0.15},
+        species=liquid,
+    ) is None
+
+
+def test_species_formula_parser_keeps_non_phase_brackets() -> None:
+    assert parse_species_formula("[Al(OH)4]") == (
+        ("Al", 1.0),
+        ("H", 4.0),
+        ("O", 4.0),
+    )
+    assert parse_species_formula("Fe2O3[c]") is None
+    assert parse_species_formula(
+        "Fe2O3[c]", species=Species("Fe2O3", Phase.CR)
+    ) is None
+
+
+def test_species_formula_parser_requires_polymorph_axis_for_suffix() -> None:
+    assert parse_species_formula("Fe(α)") is None
+    assert parse_species_formula(
+        "Fe(α)", species=Species("Fe", Phase.CR, State.of(Polymorph.ALPHA))
+    ) == (("Fe", 1.0),)
+    assert parse_species_formula(
+        "Fe(alpha)", species=Species("Fe", Phase.CR, State.of(Polymorph.ALPHA))
+    ) == (("Fe", 1.0),)
+    assert parse_species_formula(
+        "Fe(α)", species=Species("Fe", Phase.CR, State.of(Polymorph.BETA))
+    ) is None
+    assert parse_species_formula(
+        "SiO2(quartz)",
+        species=Species("SiO2", Phase.CR, State.of(Polymorph.QUARTZ)),
+    ) == (("O", 2.0), ("Si", 1.0))
+
+
+def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> None:
+    assert parse_species_formula("$Ba^{++}(aq)$") is None
+    assert parse_species_formula(
+        "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=2)
+    ) == (("Ba", 1.0),)
+    assert parse_species_formula(
+        "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=0)
+    ) is None
+
+
+def test_species_formula_parser_keeps_deuterium_distinct() -> None:
+    assert parse_species_formula("AsD_3") == (("As", 1.0), ("D", 3.0))
+    assert parse_species_formula(
+        "$AsD_3(g)$", species=Species("AsD3", Phase.G)
+    ) == (("As", 1.0), ("D", 3.0))
+
+
+def test_species_formula_parser_refuses_names_and_variable_compositions() -> None:
+    assert parse_species_formula("quartz") is None
+    assert parse_species_formula("gibbsite") is None
+    assert parse_species_formula("Fe1-xO") is None
+    assert parse_species_formula("NH.C1") is None
 
 
 def test_compile_mutates_each_conjunct_off() -> None:
@@ -1686,6 +3360,84 @@ def test_qualification_notice_carried() -> None:
     assert NoticeKind.OUT_OF_CERTIFIED_BAND in kinds
     assert candidate is not None
     assert candidate.authority is Authority.EXTRAPOLATED
+
+
+def test_thermoengine_numeric_activity_outside_band_is_gamma_extrapolated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    experiment = F.tabulation_experiment(T_K=Decimal("1703"))
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    reference = F.observation(
+        "thermoengine-outside-gamma-band",
+        experiment.experiment_id,
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1703"),
+            component_basis="SiO2",
+            composition=composition,
+        ),
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+
+    def successful_cell(engine_handle, pot, **kwargs):
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=engine_handle.name,
+            temperature_K=kwargs["temperature_K"],
+            po2=kwargs["po2"],
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={"SiO2_Liq": 0.9},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", successful_cell)
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        reference,
+        experiment=experiment,
+        handles={Engine.THERMOENGINE.value: handle},
+        isolated=False,
+    )
+
+    assert prediction.value == Decimal("0.9"), prediction.refusal_detail
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+        and notice.authority is Authority.EXTRAPOLATED
+        for notice in prediction.notices
+    )
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:thermoengine"
+        for notice in prediction.notices
+    )
 
 
 def test_metric_domain_refuses_zero_and_negative_dex() -> None:
@@ -1873,6 +3625,441 @@ def test_static_equilibrium_pressure_uses_pure_sodium_total_surface(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in prediction.notices
     ) is extrapolated
+
+
+# Matching-basis pressures captured from predict_with_engine. The mismatched
+# reservoir and the Si phase-boundary gap are refused below.
+_ANTOINE_MATCHING_CASES = (
+    ("Si", Decimal("2000"), Phase.L, Decimal("4.410122194873473"), ()),
+    ("Si", Decimal("1000"), Phase.CR, Decimal("1.5560633803943994E-11"), ()),
+    ("Si", Decimal("1800"), Phase.L, Decimal("0.320744894252916"), ()),
+    ("Mn", Decimal("1400"), Phase.CR, Decimal("22.630450812668585"), ()),
+    ("Mn", Decimal("1519"), Phase.CR, Decimal("135.85703758590856"), ()),
+    (
+        "Na",
+        Decimal("1056"),
+        Phase.L,
+        Decimal("33991.26166001457"),
+        ("antoine-segment-phase-undeclared",),
+    ),
+    (
+        "Na",
+        Decimal("1200"),
+        Phase.L,
+        Decimal("117402.20851973725"),
+        (
+            "pure_component_antoine_extrapolated",
+            "antoine-segment-phase-undeclared",
+        ),
+    ),
+)
+
+
+def _static_psat(formula: str, temperature: Decimal, reservoir_phase: Phase):
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=temperature
+    )
+    identity = F.psat_identity(
+        formula, T_K=temperature, reservoir_phase=reservoir_phase
+    )
+    observation = F.observation(
+        f"static-{formula}-{temperature}-{reservoir_phase.value}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        source_id="antoine-pin",
+    )
+    return predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation, experiment=experiment
+    )
+
+
+def _assert_antoine_phase_refusal(
+    formula: str,
+    temperature: Decimal,
+    phase: Phase,
+    *,
+    reason: str,
+    observation_basis: str | None = None,
+    segment_basis: str | None = None,
+    left_basis: str | None = None,
+    right_basis: str | None = None,
+):
+    prediction = _static_psat(formula, temperature, phase)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert prediction.refusal_detail["reason"] == reason
+    if observation_basis is not None:
+        assert prediction.refusal_detail["observation_reservoir_basis"] == observation_basis
+        assert prediction.refusal_detail["segment_basis"] == segment_basis
+    if left_basis is not None:
+        assert prediction.refusal_detail["left_segment_basis"] == left_basis
+        assert prediction.refusal_detail["right_segment_basis"] == right_basis
+    return prediction
+
+
+def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_gaps() -> None:
+    for formula, temperature, phase, expected, notice_reasons in _ANTOINE_MATCHING_CASES:
+        prediction = _static_psat(formula, temperature, phase)
+        assert prediction.refusal_reason is None, (formula, temperature, phase)
+        assert prediction.value == expected
+        assert tuple(notice.reason for notice in prediction.notices) == notice_reasons
+
+    _assert_antoine_phase_refusal(
+        "Si",
+        Decimal("2000"),
+        Phase.CR,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Si(cr)",
+        segment_basis="liquid_janaf(l)",
+    )
+    _assert_antoine_phase_refusal(
+        "Mn",
+        Decimal("1600"),
+        Phase.CR,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Mn(cr)",
+        segment_basis="liquid_nist_janaf_chase_1998(l)",
+    )
+    _assert_antoine_phase_refusal(
+        "Mn",
+        Decimal("1519"),
+        Phase.L,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Mn(l)",
+        segment_basis="solid_nist_janaf_chase_1998(cr)",
+    )
+    for phase in (Phase.CR, Phase.L):
+        _assert_antoine_phase_refusal(
+            "Si",
+            Decimal("1690"),
+            phase,
+            reason="antoine-gap-crosses-phase-boundary",
+            left_basis="crystal_janaf(cr)",
+            right_basis="liquid_janaf(l)",
+        )
+
+    from engines.antoine import _antoine_log10_pressure
+    from engines.builtin.vapor_pressure import (
+        _pow10_pressure_or_raise,
+        vapor_pressure_antoine_coefficients,
+        wall_condensation_antoine_coefficients,
+    )
+    from simulator.battery.score import REPO_ROOT, load_yaml
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    silicon = vapor_pressure_legacy_view(
+        load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
+    )["metals"]["Si"]
+    liquid_segment = next(
+        segment
+        for segment in silicon["pure_component_antoine"]["segments"]
+        if segment["name"] == "liquid_janaf"
+    )
+    # Si(cr) is certified through the 1685 K melting join. Si(l) is certified
+    # from 1700 K. 1690 K is above that join, so the extension is the liquid
+    # segment. The comparison pressure is the production Antoine owner
+    # applied to that segment's coefficients.
+    expected_1690 = _pow10_pressure_or_raise(
+        _antoine_log10_pressure(
+            float(liquid_segment["A"]),
+            float(liquid_segment["B"]),
+            float(liquid_segment["C"]),
+            1690.0,
+        ),
+        species="Si",
+        field="liquid_janaf",
+    )
+    expected_1700 = _pow10_pressure_or_raise(
+        _antoine_log10_pressure(
+            float(liquid_segment["A"]),
+            float(liquid_segment["B"]),
+            float(liquid_segment["C"]),
+            1700.0,
+        ),
+        species="Si",
+        field="liquid_janaf",
+    )
+    for selector in (
+        wall_condensation_antoine_coefficients,
+        vapor_pressure_antoine_coefficients,
+    ):
+        selected, block = selector(silicon, 1690.0)
+        assert block == "pure_component_antoine"
+        assert selected["selection_refusal"] == "antoine-gap-crosses-phase-boundary"
+        assert selected["authority_level"] == "extrapolated"
+        assert selected["name"] == "liquid_janaf"
+        assert selected["segment_used"] == "liquid_janaf"
+        assert selected["segment_choice"] == "liquid_above_declared_transition"
+        assert float(selected["transition_temperature_K"]) == 1685.0
+        assert [float(value) for value in selected["certified_band_K"]] == [
+            1700.0,
+            3500.0,
+        ]
+        assert [float(value) for value in selected["gap_band_K"]] == [1685.0, 1700.0]
+        assert [float(value) for value in selected["left_segment_band_K"]] == [
+            100.0,
+            1685.0,
+        ]
+        assert [float(value) for value in selected["right_segment_band_K"]] == [
+            1700.0,
+            3500.0,
+        ]
+        assert float(selected["A"]) == float(liquid_segment["A"])
+        crystal, _ = selector(silicon, 1500.0)
+        liquid, _ = selector(silicon, 1800.0)
+        assert crystal["name"] == "crystal_janaf"
+        assert liquid["name"] == "liquid_janaf"
+        assert "selection_refusal" not in crystal
+        assert "selection_refusal" not in liquid
+
+    # The gap is out of domain, not a missing fit. Wall deposition predicts
+    # the liquid extension, flags it, and keeps a nonzero driving pressure.
+    # The row metadata band [1400, 2273.15] is not either segment's band.
+    from simulator.condensation import (
+        _try_antoine_psat_pa,
+        _wall_deposition_driving_pressure_pa,
+    )
+
+    vapor = load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
+    extrapolations: dict = {}
+    pressure, refused = _try_antoine_psat_pa(
+        "Si",
+        1690.0,
+        vapor_pressure_data=vapor,
+        antoine_extrapolations=extrapolations,
+    )
+    assert refused is False
+    assert pressure is not None and pressure > 0.0
+    assert abs(pressure - expected_1690) / expected_1690 < 1e-12
+    records = [
+        record
+        for record in extrapolations.values()
+        if record.get("authority_level") == "extrapolated"
+        and float(record.get("temperature_K", -1)) == 1690.0
+    ]
+    assert len(records) == 1
+    record = records[0]
+    assert record["reason"] == "antoine-gap-crosses-phase-boundary"
+    assert record["segment_used"] == "liquid_janaf"
+    assert [float(value) for value in record["valid_range_K"]] == [1700.0, 3500.0]
+    assert [float(value) for value in record["certified_band_K"]] == [1700.0, 3500.0]
+    assert [float(value) for value in record["gap_band_K"]] == [1685.0, 1700.0]
+    assert [float(value) for value in record["left_segment_band_K"]] == [100.0, 1685.0]
+    assert [float(value) for value in record["right_segment_band_K"]] == [
+        1700.0,
+        3500.0,
+    ]
+    edge_pressure, edge_refused = _try_antoine_psat_pa(
+        "Si",
+        1700.0,
+        vapor_pressure_data=vapor,
+        antoine_extrapolations={},
+    )
+    assert edge_refused is False
+    assert edge_pressure is not None
+    assert abs(edge_pressure - expected_1700) / expected_1700 < 1e-12
+    diagnostic: dict = {}
+    driving = _wall_deposition_driving_pressure_pa(
+        "Si",
+        expected_1690 * 10.0,
+        1690.0,
+        vapor_pressure_data=vapor,
+        reactive_product_backstop=False,
+        diagnostic_out=diagnostic,
+    )
+    assert driving > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    assert diagnostic["wall_saturation_pressure_pa"] > 0.0
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"] == "antoine-gap-crosses-phase-boundary"
+
+
+def test_phase_gap_underflowing_preferred_flank_uses_the_other_flank() -> None:
+    """A preferred flank that underflows to 0 is not an available extension.
+
+    Si's join still names the liquid segment, but that segment's Antoine
+    triple is replaced in memory with A=1, B=1e6, C=0. At 1690 K the
+    exponentiated liquid pressure is 0. The crystal flank stays the
+    shipped fit and is positive. The selector must use it and say so.
+    """
+
+    import copy
+
+    from engines.antoine import _antoine_log10_pressure
+    from engines.builtin.vapor_pressure import (
+        _pow10_pressure_or_raise,
+        wall_condensation_antoine_coefficients,
+    )
+    from simulator.battery.score import REPO_ROOT, load_yaml
+    from simulator.condensation import (
+        _try_antoine_psat_pa,
+        _wall_deposition_driving_pressure_pa,
+    )
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    silicon = vapor_pressure_legacy_view(
+        load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
+    )["metals"]["Si"]
+    row = copy.deepcopy(silicon)
+    liquid = next(
+        segment
+        for segment in row["pure_component_antoine"]["segments"]
+        if segment["name"] == "liquid_janaf"
+    )
+    liquid["A"] = 1.0
+    liquid["B"] = 1_000_000.0
+    liquid["C"] = 0.0
+    crystal = next(
+        segment
+        for segment in row["pure_component_antoine"]["segments"]
+        if segment["name"] == "crystal_janaf"
+    )
+    selected, block = wall_condensation_antoine_coefficients(row, 1690.0)
+    assert block == "pure_component_antoine"
+    assert selected["selection_refusal"] == "antoine-gap-crosses-phase-boundary"
+    assert selected["name"] == "crystal_janaf"
+    assert selected["segment_used"] == "crystal_janaf"
+    assert selected["segment_choice"] == "only_finite_flank"
+    assert selected["authority_level"] == "extrapolated"
+    assert [float(value) for value in selected["certified_band_K"]] == [100.0, 1685.0]
+    expected = _pow10_pressure_or_raise(
+        _antoine_log10_pressure(
+            float(crystal["A"]),
+            float(crystal["B"]),
+            float(crystal["C"]),
+            1690.0,
+        ),
+        species="Si",
+        field="crystal_janaf",
+    )
+    assert expected > 0.0
+    vapor = {"metals": {"Si": row}}
+    extrapolations: dict = {}
+    pressure, refused = _try_antoine_psat_pa(
+        "Si",
+        1690.0,
+        vapor_pressure_data=vapor,
+        antoine_extrapolations=extrapolations,
+    )
+    assert refused is False
+    assert pressure is not None and pressure > 0.0
+    assert abs(pressure - expected) / expected < 1e-12
+    diagnostic: dict = {}
+    driving = _wall_deposition_driving_pressure_pa(
+        "Si",
+        1.0,
+        1690.0,
+        vapor_pressure_data=vapor,
+        reactive_product_backstop=False,
+        diagnostic_out=diagnostic,
+    )
+    assert driving > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["segment_used"] == "crystal_janaf"
+    assert notice["segment_choice"] == "only_finite_flank"
+
+
+_GAS_MAP_PARTIAL_PA = Decimal("1234.5")
+
+
+def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) -> None:
+    """A condensed P_PARTIAL identity is not a gas-map partial pressure.
+
+    Gas and an undeclared species phase still read gas_partial_pressures_Pa.
+    The condensed identity refuses before equilibrate_cell.
+    """
+
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.55")), ("Na2O", Decimal("0.45"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    base = F.activity_identity(
+        formula="Na2O",
+        component_basis="Na2O",
+        composition=composition,
+    )
+    calls = {"n": 0}
+
+    def fake_equilibrate(_handle, pot, *, temperature_K, po2, **_kwargs):
+        calls["n"] += 1
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.VAPOROCK.value,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={"H2O": 1234.5},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", fake_equilibrate)
+    handle = EngineHandle(
+        name=Engine.VAPOROCK.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+
+    def predict(species: Species):
+        identity = replace(base, quantity=Quantity.P_PARTIAL, species=species)
+        observation = F.observation(
+            f"partial-{species.formula}-{calls['n']}",
+            "exp-1",
+            identity,
+            Decimal("0"),
+            source_id="partial-pin",
+        )
+        return predict_with_engine(
+            Engine.VAPOROCK,
+            observation,
+            handles={Engine.VAPOROCK.value: handle},
+            isolated=False,
+        )
+
+    def assert_condensed_refusal(species: Species, basis: str) -> None:
+        before = calls["n"]
+        refused = predict(species)
+        assert refused.value is None
+        assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+        assert refused.refusal_detail["reason"] == (
+            "partial-pressure-condensed-species-not-on-gas-map"
+        )
+        assert refused.refusal_detail["observation_basis"] == basis
+        assert refused.refusal_detail["map_basis"] == "gas_partial_pressures_Pa(g)"
+        assert calls["n"] == before
+
+    assert_condensed_refusal(
+        Species("H2O", Phase.CR, polymorph=State.of(Polymorph.CRYSTALLINE)),
+        "H2O(cr)",
+    )
+    assert_condensed_refusal(Species("H2O", Phase.GLASS), "H2O(glass)")
+    gas = predict(Species("H2O", Phase.G))
+    assert gas.refusal_reason is None
+    assert gas.value == _GAS_MAP_PARTIAL_PA
+    assert calls["n"] == 1
+    unknown = predict(Species("H2O", State.unknown("phase not printed")))
+    assert unknown.refusal_reason is None
+    assert unknown.value == _GAS_MAP_PARTIAL_PA
+    assert calls["n"] == 2
 
 
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
@@ -2559,6 +4746,7 @@ def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> N
     )
     assert pressure_check.passed is False
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
 
     context = _context(
         F.work(), experiment, activity, sodium, silicon, review="reviewed"
@@ -2578,7 +4766,196 @@ def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> N
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
-def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> None:
+def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses() -> None:
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("Na2O", Decimal("0.25")),
+            ("SiO2", Decimal("0.25")),
+            ("Al2O3", Decimal("0.5")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(composition=composition)
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    activity = F.observation(
+        "d274-incomplete-over-limit-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    activity = replace(
+        activity,
+        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+    )
+    partial_identity = replace(
+        _partial_identity(),
+        temperature_K=identity.temperature_K,
+        fO2_Pa=identity.fO2_Pa,
+        total_pressure_Pa=identity.total_pressure_Pa,
+        composition=State.of(composition),
+    )
+    sodium = F.observation(
+        "d274-incomplete-over-limit-Na",
+        experiment.experiment_id,
+        partial_identity,
+        Decimal("6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    silicon = F.observation(
+        "d274-incomplete-over-limit-Si",
+        experiment.experiment_id,
+        replace(partial_identity, species=Species("Si", Phase.G)),
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    point_observations = (activity, sodium, silicon)
+    gates = run_validity_gates(
+        experiment, activity, point_observations=point_observations
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["reason"] == (
+        "incomplete printed species coverage; pressure sum is only a lower bound"
+    )
+    assert pressure_check.detail["missing_species"] == ["Al"]
+    assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+
+    context = _context(
+        F.work(), experiment, *point_observations, review="reviewed"
+    )
+    residual, _ = compile_residual(
+        activity,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={row.observation_id for row in point_observations},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
+    # d-274 preserves refusal when the printed lower bound alone exceeds the limit.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "in_cell_partial_pressure_sum" in notice.reason
+        for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize("incomplete_coverage", (False, True))
+def test_d274_uncalibrated_partial_pressure_over_limit_refuses(
+    incomplete_coverage: bool,
+) -> None:
+    components = (
+        (("NaO0.5", Decimal("0.5")), ("SiO2", Decimal("0.5")))
+        if incomplete_coverage
+        else (("NaO0.5", Decimal("1")),)
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=components,
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        _partial_identity(), composition=State.of(composition)
+    )
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    reference = F.observation(
+        f"d274-uncalibrated-over-limit-partial-{incomplete_coverage}",
+        experiment.experiment_id,
+        identity,
+        Decimal("11"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    gates = run_validity_gates(
+        experiment, reference, point_observations=(reference,)
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.passed is False
+    assert pressure_check.passed is False
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    assert pressure_check.detail[
+        "printed_partial_pressure_lower_bound_Pa"
+        if incomplete_coverage
+        else "printed_partial_pressure_sum_Pa"
+    ] == "11"
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        comparison_ids={reference.observation_id},
+        predict=_partial_prediction,
+        point_observations=(reference,),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
+def test_d274_uncalibrated_kems_psat_missing_sum_keeps_calibration_refusal() -> None:
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    reference = F.observation(
+        "d274-uncalibrated-psat-without-sum",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-uncalibrated-psat",
+    )
+    reference = replace(
+        reference,
+        evidence=replace(
+            reference.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
+    gates = run_validity_gates(experiment, reference)
+    calibration_check = next(
+        check for check in gates.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.passed is False
+    assert calibration_check.detail["reason"] == (
+        "KEMS pressure requires a recorded calibration"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+    # d-274 does not let an in-cell notice waive the failed P_SAT calibration check.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
+def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures() -> None:
     experiment = F.kems_experiment(calibrated=True, kn=None)
     experiment = replace(
         experiment,
@@ -2597,7 +4974,7 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
         identity,
         Decimal("0.2"),
         evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="kems-053-stolyarova-1991",
+        source_id="ferguson-2004-iron-vapor-pressure",
     )
     reference = replace(
         reference,
@@ -2606,6 +4983,11 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
             original_method_class="measured_direct",
         ),
     )
+    gates = run_validity_gates(experiment, reference)
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
     prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
     context = _context(F.work(), experiment, reference, review="reviewed")
     residual, _ = compile_residual(
@@ -2614,12 +4996,51 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
         context=context,
         prediction=prediction,
     )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
+    # d-274 scores an uncomputable printed sum with an apparatus notice.
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
     assert residual.score_eligible is False
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    assert residual.refusal.detail["primary_check"] == "in_cell_partial_pressure_sum"
+    assert residual.refusal is None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    assert (
+        "original_reason=incomplete printed species coverage; pressure sum is only a lower bound"
+        in notice.reason
+    )
+    assert "authority=extrapolated" in notice.reason
+    pressure_limit = pressure_check.detail["pressure_limit_Pa"]
+    assert f"regime_limit={pressure_limit} Pa" in notice.reason
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == (
+        f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
+    )
+
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    assert headline_rows(
+        (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 0
+    assert [
+        (row["stratum"], row["n"])
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == [(FLAGGED_STRATUM_UNVERIFIED_APPARATUS, 1)]
+    payload = residual_to_plain(residual)
+    for tier in ("measured", "compilation"):
+        assert headline_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+        )[0]["n"] == 0
+    assert flagged_stratum_payloads(
+        (payload,), (Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 1
 
     missing = replace(
         reference,
@@ -2759,6 +5180,61 @@ def test_figure_only_evidence_adds_notice_to_scored_residual() -> None:
 
     assert any(notice.kind is NoticeKind.FIGURE_ONLY for notice in residual.notices)
     assert FLAGGED_STRATUM_FIGURE_ONLY in flagged_strata(residual.notices)
+
+
+@pytest.mark.parametrize("approximate", (False, True))
+def test_approximate_reference_value_is_scored_but_left_out_of_headline(
+    approximate: bool,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        flagged_strata,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        f"approximate-value-{approximate}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    reference = replace(
+        reference,
+        value=replace(reference.value, approximate=approximate),
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_predict(Decimal("0.3"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert ("not_flagged_stratum" in residual.exclusions) is approximate
+    expected_strata = (
+        (FLAGGED_STRATUM_APPROXIMATE_VALUE,) if approximate else ()
+    )
+    assert flagged_strata(residual.notices) == expected_strata
+    headline = next(
+        row
+        for row in headline_rows(
+            (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+        if row["rail"] == residual.rail.value
+    )
+    assert headline["n"] == (0 if approximate else 1)
+    assert [
+        row["stratum"]
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == list(expected_strata)
 
 
 def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> None:
@@ -3043,18 +5519,28 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             Decimal("-7.33"),
             "contested",
         ),
+        # 4e0819f6d types the 26 Table 2 oxygen columns quoted_attributed
+        # (Eq. (4) and Eqns 1–2 with Eqs. (5)–(6), p. 688). The 8 measured
+        # pCa rows are unchanged. resolve_source_oxygen commands that printed
+        # cell pO as fO2, so this residual slope is 2.33 dex per x(CaO).
+        # 1.04 was the engine oxygen-balance slope while those columns were
+        # model_derived. The committed sibling is still that class until
+        # regen; _context_for_sibling_oxygen scores the fresh migration
+        # then, and the store once it is quoted_attributed. b162 does not
+        # edit this extract. The paper prints the pressures, not this slope.
         (
             "stolyarova-1995",
             "stolyarova-1995-cao-alumina-kems",
             "stolyarova_1995_ca_partial_pressure_table2",
             "x(CaO)",
             8,
-            Decimal("1.04"),
+            Decimal("2.33"),
             "liquid",
         ),
     ),
 )
 def test_e15_production_accumulator_pins_stolyarova_pca(
+    tmp_path: Path,
     source_token: str,
     source: str,
     series: str,
@@ -3067,6 +5553,13 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     from simulator.battery.score import _ScorePayloadAccumulator
 
     context = load_score_context(sources=(source_token,))
+    if source == "stolyarova-1995-cao-alumina-kems":
+        context = _context_for_sibling_oxygen(
+            context,
+            tmp_path,
+            extract_name=f"{source}.yaml",
+            oxygen_id_contains="stolyarova_1995_o",
+        )
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     payloads = [residual_to_plain(residual) for residual in residuals]
     aggregate = _ScorePayloadAccumulator.from_rows(
@@ -3086,59 +5579,120 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == expected_slope
 
 
+def _series_stem(observation_id: str) -> str:
+    """Drop a trailing ``:h=<12 hex>`` extract-row hash."""
+    head, separator, tail = observation_id.rpartition(":h=")
+    if (
+        separator
+        and len(tail) == 12
+        and all(character in "0123456789abcdef" for character in tail)
+    ):
+        return head
+    return observation_id
+
+
+def _context_for_sibling_oxygen(
+    context: ScoreContext,
+    tmp_path: Path,
+    *,
+    extract_name: str,
+    oxygen_id_contains: str,
+) -> ScoreContext:
+    """Score the store, or a fresh migration when its oxygen is stale.
+
+    The regenerated sibling is ``quoted_attributed`` and its observation
+    ids match a fresh migration of ``extract_name``. Anything else is
+    stale: ``model_derived``, or a quoted relabel that kept the previous
+    ``:h=`` ids (stable_ids.py hashes the extract row). Series stems,
+    that suffix stripped, must still match.
+    """
+    from simulator.battery.migrate import load_migrated_context
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    oxygen = tuple(
+        observation
+        for observation in context.observations.values()
+        if oxygen_id_contains in observation.observation_id
+        and isinstance(observation.identity, Identity)
+        and observation.identity.species is not None
+        and observation.identity.species.formula in {"O", "O2"}
+        and observation.evidence.class_.is_value
+    )
+    assert oxygen
+    oxygen_class = oxygen[0].evidence.class_.value
+    assert all(
+        observation.evidence.class_.value is oxygen_class for observation in oxygen
+    )
+    assert oxygen_class in {
+        EvidenceClass.QUOTED_ATTRIBUTED,
+        EvidenceClass.MODEL_DERIVED,
+    }
+    fresh = _migrate_real_extract(
+        tmp_path,
+        extract_name,
+        use_repository_index_row=True,
+    )
+    if (
+        oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED
+        and set(fresh.observations) == set(context.observations)
+    ):
+        return context
+    assert {_series_stem(observation_id) for observation_id in fresh.observations} == {
+        _series_stem(observation_id) for observation_id in context.observations
+    }
+    validation = validate_corpus(
+        context.works,
+        context.experiments,
+        fresh.observations,
+        benches=context.benches,
+        context_rows=load_migrated_context(context.root),
+    )
+    return replace(
+        context,
+        observations=dict(fresh.observations),
+        hard_issues_by_observation=validation.hard_issues_by_observation,
+    )
+
+
 def _assert_no_model_derived_e15_points(
     residuals: tuple[Residual, ...],
     context: ScoreContext,
 ) -> None:
     from simulator.battery import score as score_mod
-
-    oxygen_candidates_by_source: dict[str, int] = {}
-    model_derived_oxygen_sources = {
+    nonmeasured_oxygen_sources = {
         observation.source_id
         for observation in context.observations.values()
         if observation.source_id in score_mod._E15_LEVEL_BASIS
         and isinstance(observation.identity, Identity)
         and observation.identity.species.formula in {"O", "O2"}
         and observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and observation.evidence.class_.value
+        in {EvidenceClass.MODEL_DERIVED, EvidenceClass.QUOTED_ATTRIBUTED}
     }
+    # The exclusion is vacuous unless this context still holds non-measured
+    # oxygen. 1995 (4e0819f6d) and 1996 Table 2 (t-1534 / car) are
+    # quoted_attributed. Either class counts.
+    assert nonmeasured_oxygen_sources
     for residual in residuals:
         observation = context.observations.get(residual.reference)
         if observation is None:
             continue
+        evidence = observation.evidence.class_
         is_model_derived = (
-            observation.evidence.class_.is_value
-            and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+            evidence.is_value
+            and evidence.value is EvidenceClass.MODEL_DERIVED
         )
-        if (
-            is_model_derived
+        quoted_oxygen = (
+            evidence.is_value
+            and evidence.value is EvidenceClass.QUOTED_ATTRIBUTED
             and isinstance(observation.identity, Identity)
+            and observation.identity.species is not None
             and observation.identity.species.formula in {"O", "O2"}
-        ):
-            measured_observation = replace(
-                observation,
-                evidence=replace(
-                    observation.evidence,
-                    class_=State.of(EvidenceClass.MEASURED_DIRECT),
-                ),
-            )
-            oxygen_candidates_by_source[observation.source_id] = (
-                oxygen_candidates_by_source.get(observation.source_id, 0)
-                + int(
-                    score_mod._e15_residual_point(
-                        residual, measured_observation
-                    )
-                    is not None
-                )
-            )
+        )
         point = score_mod._e15_residual_point(residual, observation)
         if point is not None:
             assert not is_model_derived
-    assert model_derived_oxygen_sources
-    assert all(
-        oxygen_candidates_by_source.get(source_id, 0) >= 1
-        for source_id in model_derived_oxygen_sources
-    )
+            assert not quoted_oxygen
 
 
 def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
@@ -3186,6 +5740,15 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
             "notices": notices,
         }
 
+    measured_reference = next(
+        observation
+        for observation in context.observations.values()
+        if observation.source_id in score_mod._E15_LEVEL_BASIS
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value in MEASURED_EVIDENCE
+        and score_mod._e15_residual_point(payload(observation), observation)
+        is not None
+    )
     model_derived_oxygen = [
         observation
         for observation in context.observations.values()
@@ -3194,6 +5757,43 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         and observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     ]
+    synthetic_model_derived = None
+    if not model_derived_oxygen:
+        # The reviewed Stolyarova typing now keeps these source rows quoted.
+        # Use one otherwise eligible oxygen row to retain the invariant test.
+        template = None
+        for observation in context.observations.values():
+            if (
+                observation.observation_id == measured_reference.observation_id
+                or observation.source_id not in score_mod._E15_LEVEL_BASIS
+                or observation.identity.species.formula != "O"
+                or not observation.evidence.class_.is_value
+            ):
+                continue
+            measured_observation = replace(
+                observation,
+                evidence=replace(
+                    observation.evidence,
+                    class_=State.of(EvidenceClass.MEASURED_DIRECT),
+                ),
+            )
+            if (
+                score_mod._e15_residual_point(
+                    payload(measured_observation), measured_observation
+                )
+                is not None
+            ):
+                template = observation
+                break
+        assert template is not None
+        synthetic_model_derived = replace(
+            template,
+            evidence=replace(
+                template.evidence,
+                class_=State.of(EvidenceClass.MODEL_DERIVED),
+            ),
+        )
+        model_derived_oxygen = [synthetic_model_derived]
     model_derived_e15 = []
     for observation in model_derived_oxygen:
         measured_observation = replace(
@@ -3211,16 +5811,6 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         ):
             model_derived_e15.append(observation)
     assert model_derived_e15
-
-    measured_reference = next(
-        observation
-        for observation in context.observations.values()
-        if observation.source_id in score_mod._E15_LEVEL_BASIS
-        and observation.evidence.class_.is_value
-        and observation.evidence.class_.value in MEASURED_EVIDENCE
-        and score_mod._e15_residual_point(payload(observation), observation)
-        is not None
-    )
     two_phase_reference = replace(
         measured_reference,
         observation_id=f"{measured_reference.observation_id}::two-phase-fixture",
@@ -3243,6 +5833,11 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         context,
         observations={
             **context.observations,
+            **(
+                {synthetic_model_derived.observation_id: synthetic_model_derived}
+                if synthetic_model_derived is not None
+                else {}
+            ),
             two_phase_reference.observation_id: two_phase_reference,
             outside_single_liquid_reference.observation_id: (
                 outside_single_liquid_reference
@@ -3330,11 +5925,18 @@ def test_measured_no_rail_refusal_stays_in_accumulator_and_legacy_report() -> No
     assert "`unsupported:no_headline_rail:viscosity` | 1" in refusal_census
 
 
-def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
+def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> None:
     from simulator.battery import score as score_mod
 
-    context = load_score_context(
-        sources=("stolyarova-1996-cao-alumina-silica-kems",)
+    source_id = "stolyarova-1996-cao-alumina-silica-kems"
+    context = load_score_context(sources=(source_id,))
+    # t-1534 (742704443) is extract-only. Green's committed sibling
+    # relabels Table 2 oxygen quoted_attributed and keeps the old :h= ids.
+    context = _context_for_sibling_oxygen(
+        context,
+        tmp_path,
+        extract_name=f"{source_id}.yaml",
+        oxygen_id_contains="stolyarova_1996_table2_pO",
     )
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     selected = [
@@ -3347,7 +5949,26 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
         ) is not None
         and point.series == "stolyarova_1996_table2_pCa_1933k"
     ]
-    assert len(selected) == 22
+    assert len(selected) == 29
+    # c2-effusion's d-274 printed-pressure fallback makes these seven
+    # existing Table 2 pCa points scoreable with an apparatus notice.
+    unverified_keys = {
+        residual.reference.rsplit(":", 1)[-1]
+        for residual, _point in selected
+        if any(
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            for notice in residual.notices
+        )
+    }
+    assert unverified_keys == {
+        "h=2b0d96585c1f",
+        "h=70d0b48ae622",
+        "h=77e8a8961618",
+        "h=8e2834e7ce16",
+        "h=8fb519888bcb",
+        "h=9482b6cd970a",
+        "h=b8e8d996ef46",
+    }
     e15_residual = selected[0][0]
     e15_observation = context.observations[e15_residual.reference]
     assert (
@@ -3365,7 +5986,13 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     points = tuple(point for _residual, point in selected)
     shape = score_mod._e15_level_shape_rows(points)[1]
     assert shape["x_axis"] == "x(CaO)"
-    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.38")
+    # t-1534 (742704443) labels Table 2's 55 calculated oxygen columns
+    # quoted_attributed (eqs 7–9; d-110). The 29 measured pCa rows are
+    # unchanged. resolve_source_oxygen then commands that printed cell pO
+    # as fO2, so this residual slope is 5.19 dex per x(CaO). 6.76 was the
+    # engine oxygen-balance slope while those columns were model_derived
+    # (e54df70c40). The paper prints the pressures, not this slope.
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("5.19")
 
     from simulator.battery.score import (
         _ScorePayloadAccumulator,
@@ -3384,12 +6011,12 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
         and row["series"] == "stolyarova_1996_table2_pCa_1933k"
         and row["statistic"] == "shape"
     )
-    assert production_shape["n"] == 22
+    assert production_shape["n"] == 29
     assert production_shape["population"] == "liquid"
     assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("6.38")
+    ) == Decimal("5.19")
     assert (
         score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
         in production_shape["flags"]
@@ -3407,9 +6034,11 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
         for residual, point in selected
     )
     wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
+    # Same residuals on x(SiO2). -4.34 replaces -5.58 for the same
+    # oxygen-condition change.
     assert wrong_axis_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("-4.94")
+    ) == Decimal("-4.34")
 
     contested_payload = next(
         payload
@@ -3438,7 +6067,9 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         _flagged_payload_strata,
@@ -3473,9 +6104,19 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             "reference_converted_via_fusion;probe",
         ),
         (
+            FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            "source_flagged_less_reliable:probe",
+        ),
+        (
             FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
             "liquidus_position_contested:probe",
+        ),
+        (
+            FLAGGED_STRATUM_APPROXIMATE_VALUE,
+            NoticeKind.APPROXIMATE_VALUE,
+            "approximate_printed_value",
         ),
     )
     for stratum, kind, reason in cases:
@@ -3498,10 +6139,12 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         _flagged_payload_strata,
@@ -3519,7 +6162,12 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
         ),
+        (
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            "source_flagged_less_reliable:probe",
+        ),
         (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
+        (NoticeKind.APPROXIMATE_VALUE, "approximate_printed_value"),
         (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
         (
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
@@ -3543,7 +6191,9 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
     )
@@ -3555,6 +6205,26 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
 
     assert flagged_strata(notices) == expected
     assert _flagged_payload_strata(payload) == expected
+
+    evidence_class_notice = Notice(
+        kind=NoticeKind.FIGURE_ONLY,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason="evidence_class:model_derived",
+        origin="evidence-class-pin",
+    )
+    assert FLAGGED_STRATUM_FIGURE_ONLY not in flagged_strata(
+        (evidence_class_notice,)
+    )
+    assert FLAGGED_STRATUM_FIGURE_ONLY not in _flagged_payload_strata(
+        {
+            "notices": [
+                {
+                    "kind": NoticeKind.FIGURE_ONLY.value,
+                    "reason": "evidence_class:model_derived",
+                }
+            ]
+        }
+    )
 
 
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:
@@ -3792,7 +6462,7 @@ def test_report_states_admission_alone_deaths_without_changing_the_rule() -> Non
     residual_pending, _ = _compile(pending, exp, _predict(Decimal("0"), ident))
     assert residual_admitted.score_eligible is True
     assert residual_pending.score_eligible is False
-    assert residual_pending.status is ResidualStatus.MATCH
+    assert residual_pending.status is ResidualStatus.NO_BAND
     assert residual_pending.numeric is not None
     assert residual_pending.exclusions == ("admission_admitted",)
 
@@ -3853,7 +6523,7 @@ def test_non_thermo_quantities_keep_numeric_residual_without_invented_band() -> 
     )
     assert reason is None
     assert thermo is not None
-    assert thermo.decision_band.rule.startswith("LEGACY fallback: gibbs_battery_residual_ledger.yaml")
+    assert thermo.decision_band is None
 
     exp = F.tabulation_experiment()
     ident = F.psat_identity("Na")
@@ -3873,7 +6543,7 @@ def test_non_thermo_quantities_keep_numeric_residual_without_invented_band() -> 
     assert residual.refusal is None
 
 
-def test_no_band_residual_carries_printed_uncertainty() -> None:
+def test_unstated_printed_uncertainty_sets_a_band_and_notice() -> None:
     exp = F.tabulation_experiment()
     ident = F.psat_identity("Na")
     ref = replace(
@@ -3891,10 +6561,17 @@ def test_no_band_residual_carries_printed_uncertainty() -> None:
         ),
     )
     residual, _ = _compile(ref, exp, _predict(Decimal("0.2"), ident))
-    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
     assert residual.numeric.metric_uncertainty == ref.uncertainty
     assert residual.numeric.value == Decimal(str(math.log10(2)))
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.rule.startswith("printed_unstated:")
+    assert any(
+        notice.reason == "confidence_level_not_stated"
+        and "field=sigma" in notice.band
+        and "printed_width=0.02" in notice.band
+        for notice in residual.notices
+    )
 
 
 def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
@@ -3929,7 +6606,7 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     derived_band = DecisionBand(
         Decimal("0.1"),
         "dimensionless",
-        "test residual distribution: 2x median absolute deviation; derived_n=10",
+        "derived_scatter: source-only sigma=1.4826×MAD; n_sources=10; mad=0.01",
     )
     measured = F.residual(
         "headline-measured::p_sat::vapour::internal-analytical",
@@ -3993,11 +6670,11 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     assert by_tier["compilation"]["n_no_band"] == 0
     assert by_tier["compilation"]["rms_dex"] == "0.3"
     stratum = by_tier["compilation"]["decision_strata"][0]
-    assert stratum["band_kind"] == "derived_2xMAD"
+    assert stratum["band_kind"] == "derived_scatter"
     assert stratum["band_derived_n"] == 10
-    assert stratum["tail_out_count"] == 1
-    assert stratum["tail_in_count"] == 0
-    assert "tail membership, not accuracy" in by_tier["compilation"]["match_rate_label"]
+    assert stratum["tail_out_count"] is None
+    assert stratum["tail_in_count"] is None
+    assert by_tier["compilation"]["match_rate_label"] == "band membership"
     payload_record = next(
         row
         for row in headline_payload_records(
@@ -4011,9 +6688,1211 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
         and row["engine"] == Engine.INTERNAL_ANALYTICAL.value
     )
     payload_stratum = payload_record["decision_strata"][0]
-    assert payload_stratum["band_kind"] == "derived_2xMAD"
-    assert payload_stratum["tail_out_count"] == 1
-    assert "tail membership, not accuracy" in payload_record["match_rate_label"]
+    assert payload_stratum["band_kind"] == "derived_scatter"
+    assert payload_stratum["band_derived_n"] == 10
+    assert payload_stratum["tail_out_count"] is None
+    assert payload_record["match_rate_label"] == "band membership"
+
+
+def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None:
+    from simulator.battery.records import ResidualRefusal
+    from simulator.battery.score import dumps_residual_line
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    observations = tuple(
+        F.observation(
+            f"headline-{name}",
+            experiment.experiment_id,
+            F.psat_identity("Na"),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for name in ("a", "b", "flagged", "refused")
+    )
+    context = _context(work, experiment, *observations)
+    engine = Engine.INTERNAL_ANALYTICAL
+    unit = "dimensionless"
+    band = DecisionBand(Decimal("20"), unit, "fixture band")
+
+    def measured(index: int, value: str) -> Residual:
+        return F.residual(
+            f"headline::{observations[index].observation_id}::{engine.value}",
+            observations[index].observation_id,
+            candidate="produced",
+            status=ResidualStatus.MATCH,
+            rail=Rail.VAPOUR,
+            numeric=ResidualNumeric(MetricOperation.DEX, unit, Decimal(value), band),
+        )
+
+    flagged_notice = Notice(
+        NoticeKind.OUT_OF_CERTIFIED_BAND,
+        (Quantity.P_SAT,),
+        "fixture outside certified domain",
+        "engine:fixture",
+    )
+    residuals = (
+        measured(0, "3"),
+        measured(1, "4"),
+        replace(measured(2, "10"), notices=(flagged_notice,)),
+        F.residual(
+            f"headline::{observations[3].observation_id}::{engine.value}",
+            observations[3].observation_id,
+            candidate="produced",
+            status=ResidualStatus.REFUSED,
+            rail=Rail.VAPOUR,
+            refusal=ResidualRefusal(RefusalReason.UNSUPPORTED, {"reason": "unsupported"}),
+        ),
+    )
+    row = next(
+        row for row in measured_engine_rail_records(
+            tuple(json.loads(dumps_residual_line(item)) for item in residuals),
+            context=context,
+            engines=(engine,),
+        )
+        if row["rail"] == Rail.VAPOUR.value
+        and row["source_relation"] == SourceRelation.INDEPENDENT.value
+        and row["candidates"]
+    )
+    assert row["engine"] == engine.value  # key attribution is resolved by _engine_of.
+    assert row["candidates"] == 4
+    assert row["numeric"] == 3
+    assert row["certified_numeric"] == 2
+    assert row["flagged_numeric"] == 1
+    assert row["refused"] == 1
+    assert row["refused_by_reason"] == {RefusalReason.UNSUPPORTED.value: 1}
+    assert row["in_band"] == 3
+    metric = row["metrics"][0]
+    # RMS = sqrt((3² + 4²) / 2) = sqrt(12.5); the refused row is absent.
+    assert Decimal(metric["certified"]["rms"]).quantize(Decimal("0.001")) == Decimal("3.536")
+    assert metric["certified"]["median_abs"] == "3.5"
+    assert metric["flagged"]["rms"] == "10"
+    assert metric["flagged"]["median_abs"] == "10"
+    assert metric["unit"] == "dex"
+    assert metric["certified"]["n"] == 2
+    assert metric["flagged"]["n"] == 1
+    from scripts.battery_score import _measured_report
+
+    report = _measured_report(
+        {
+            "store_revision": "fixture",
+            "observation_store_sha256": "fixture",
+            "wall_seconds": 0,
+            "process_cpu_seconds": 0,
+            "load_average": None,
+            "engine_identities": {engine.value: {}},
+            "records": [row],
+        }
+    )
+    assert "certified RMS" in report and "flagged RMS" in report
+    assert "population / source relation" in report
+    assert "| 10 | 10 | unsupported=1 |" in report
+
+
+def test_measured_engine_rail_records_group_source_relation() -> None:
+    from simulator.battery.score import dumps_residual_line
+    engine = Engine.INTERNAL_ANALYTICAL
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    training = F.observation(
+        "relation-training",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    independent = replace(training, observation_id="relation-independent")
+    context = _context(work, experiment, training, independent)
+    numeric = ResidualNumeric(
+        MetricOperation.DEX,
+        "dimensionless",
+        Decimal("1"),
+        DecisionBand(Decimal("2"), "dimensionless", "fixture band"),
+    )
+    residuals = (
+        replace(
+            F.residual(
+                f"relation::{training.observation_id}::{engine.value}",
+                training.observation_id,
+                candidate="produced",
+                status=ResidualStatus.MATCH,
+                rail=Rail.VAPOUR,
+                numeric=numeric,
+            ),
+            source_relation=SourceRelation.TRAINING,
+        ),
+        replace(
+            F.residual(
+                f"relation::{independent.observation_id}::{engine.value}",
+                independent.observation_id,
+                candidate="produced",
+                status=ResidualStatus.MATCH,
+                rail=Rail.VAPOUR,
+                numeric=replace(numeric, value=Decimal("100")),
+            ),
+            source_relation=SourceRelation.INDEPENDENT,
+        ),
+    )
+
+    rows = [
+        row
+        for row in measured_engine_rail_records(
+            tuple(json.loads(dumps_residual_line(item)) for item in residuals),
+            context=context,
+            engines=(engine,),
+        )
+        if row["rail"] == Rail.VAPOUR.value and row["candidates"]
+    ]
+
+    assert [(row["source_relation"], row["candidates"]) for row in rows] == [
+        (SourceRelation.INDEPENDENT.value, 1),
+        (SourceRelation.TRAINING.value, 1),
+    ]
+
+
+def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> None:
+    rows = [
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "3"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "internal-vaporock",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "4"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "1"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "comparison-only",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "100"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "thermoengine"},
+            "numeric": {"operation": "dex", "value": "2"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "0.5"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "internal-vaporock",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "4"},
+        },
+        {
+            "rail": Rail.REDOX.value,
+            "reference": "redox-primary",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "0.3"},
+        },
+        {
+            "rail": Rail.REDOX.value,
+            "reference": "redox-primary",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "0.2"},
+        },
+    ]
+
+    records = _paired_engine_rail_benchmarks(
+        rows,
+        primary_engines=("openimcc", "internal-analytical"),
+        comparison_engines=("vaporock", "thermoengine", "alphamelts", "magemin"),
+        rails=(Rail.VAPOUR.value, Rail.REDOX.value),
+    )
+    by_key = {
+        (record["rail"], record["primary_engine"]): record for record in records
+    }
+
+    assert by_key[(Rail.VAPOUR.value, "openimcc")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "openimcc",
+        "benchmark_engine": "vaporock",
+        "n": 1,
+        "primary_rms_dex": "1",
+        "benchmark_rms_dex": "0.5",
+    }
+    assert by_key[(Rail.VAPOUR.value, "internal-analytical")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "internal-analytical",
+        "benchmark_engine": "thermoengine",
+        "n": 1,
+        "primary_rms_dex": "3",
+        "benchmark_rms_dex": "2",
+    }
+    for primary in ("openimcc", "internal-analytical"):
+        assert by_key[(Rail.REDOX.value, primary)] == {
+            "rail": Rail.REDOX.value,
+            "primary_engine": primary,
+            "benchmark_engine": None,
+            "n": 0,
+            "primary_rms_dex": None,
+            "benchmark_rms_dex": None,
+        }
+
+
+def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
+    from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+    unsupported_thermo = {
+        "rail": Rail.THERMOCHEMISTRY.value,
+        "candidate_request": {
+            "engine": Engine.ALPHAMELTS.value,
+            "quantity": Quantity.H_MINUS_H298.value,
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {"reason": "quantity_not_predicted"},
+        },
+        "execution": {"state": ExecutionState.UNSUPPORTED.value},
+    }
+    assert Quantity.H_MINUS_H298 not in _engine_thermo_quantities(Engine.ALPHAMELTS)
+    assert not _residual_engine_observable(unsupported_thermo)
+
+    supported_thermo = {
+        "rail": Rail.THERMOCHEMISTRY.value,
+        "candidate_request": {
+            "engine": Engine.THERMOENGINE.value,
+            "quantity": Quantity.CP.value,
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {"reason": "quantity_not_predicted"},
+        },
+        "execution": {"state": ExecutionState.UNSUPPORTED.value},
+    }
+    assert Quantity.CP in _engine_thermo_quantities(Engine.THERMOENGINE)
+    assert _residual_engine_observable(supported_thermo)
+
+    for reason in (
+        RefusalReason.IDENTITY_INCOMPLETE,
+        RefusalReason.METRIC_DOMAIN,
+    ):
+        assert _residual_engine_observable(
+            {
+                "rail": Rail.REDOX.value,
+                "candidate_request": {
+                    "engine": Engine.INTERNAL_ANALYTICAL.value,
+                    "quantity": Quantity.FE3_FE2_RATIO.value,
+                },
+                "execution": {"state": ExecutionState.NOT_PROBED.value},
+                "refusal": {"reason": reason.value},
+            }
+        )
+
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.VAPOUR.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.MELT_ACTIVITY.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.REDOX.value,
+            "candidate_request": {"engine": Engine.ALPHAMELTS.value},
+            "refusal": {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value
+            },
+        }
+    )
+    assert _residual_engine_observable(
+        {
+            "rail": Rail.VAPOUR.value,
+            "candidate_request": {"engine": Engine.VAPOROCK.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    # Line 3,981,466 in the pinned battery archive: this is one of the 92
+    # MAGEMin vapour refusals after equilibrate_cell ran.
+    attempted_magemin_vapour = {
+        "rail": Rail.VAPOUR.value,
+        "candidate_request": {
+            "engine": Engine.MAGEMIN.value,
+            "channel": Engine.MAGEMIN.value,
+            "quantity": Quantity.P_SAT.value,
+        },
+        "execution": {
+            "state": "unsupported",
+            "call_evidence": "equilibrate_cell:magemin:host=Mac-Studio-256-2:exit=None",
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {
+                "engine_reason": "forbidden_species",
+                "refusal_reason": "out_of_basis",
+            },
+        },
+    }
+    assert _residual_engine_observable(attempted_magemin_vapour)
+    assert not _residual_engine_observable(
+        {
+            **attempted_magemin_vapour,
+            "execution": {"state": "not_probed"},
+        }
+    )
+
+
+def test_magemin_melt_activity_call_stays_observable() -> None:
+    """A melt-activity run stays observable. An unasked unsupported refusal does not."""
+
+    called = {
+        "rail": Rail.MELT_ACTIVITY.value,
+        "candidate_request": {"engine": Engine.MAGEMIN.value},
+        "execution": {
+            "state": "unsupported",
+            "call_evidence": "equilibrate_cell:magemin:host=test:exit=None",
+        },
+        "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+    }
+    assert _residual_engine_observable(called)
+    assert _residual_engine_observable(
+        {
+            **called,
+            "refusal": {"reason": "unsupported_species"},
+        }
+    )
+    # The domain gate refuses before a call. That refusal is still an
+    # observation: the reason is metric_domain, not unsupported.
+    assert _residual_engine_observable(
+        {
+            "rail": Rail.MELT_ACTIVITY.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "execution": {"state": ExecutionState.NOT_PROBED.value},
+            "refusal": {"reason": RefusalReason.METRIC_DOMAIN.value},
+        }
+    )
+    for engine in (
+        Engine.MAGEMIN,
+        Engine.OPENIMCC,
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+        Engine.INTERNAL_ANALYTICAL,
+    ):
+        for reason in (RefusalReason.UNSUPPORTED.value, "unsupported_species"):
+            assert not _residual_engine_observable(
+                {
+                    "rail": Rail.MELT_ACTIVITY.value,
+                    "candidate_request": {"engine": engine.value},
+                    "refusal": {"reason": reason},
+                }
+            )
+
+
+def test_alphamelts_invalid_activity_notice_reaches_typed_score_notice() -> None:
+    """Kill mutation: drop_activity_repair_warnings_before_score_notices."""
+    from types import SimpleNamespace
+
+    from engines.alphamelts.domain import (
+        _canonical_oxide_activity_map_with_notices,
+    )
+    from simulator.battery.score import (
+        _match_reported_species_with_notices,
+        cell_notices,
+        match_reported_species,
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+
+    activities = {'SiO2': 0.42, 'Al2O3': float('nan'), 'FeO': 0.0}
+    oxide_activities, repair_warnings = (
+        _canonical_oxide_activity_map_with_notices(activities)
+    )
+    assert oxide_activities == {'SiO2': 0.42}
+    assert match_reported_species(
+        'SiO2', activities, oxide_activity=True
+    ) == ('SiO2', 0.42)
+    matched, score_repair_warnings = _match_reported_species_with_notices(
+        'SiO2', activities, oxide_activity=True
+    )
+    assert matched == ('SiO2', 0.42)
+    assert score_repair_warnings == repair_warnings
+
+    result = SimpleNamespace(warnings=repair_warnings, diagnostics={})
+    raw_notices, _authority, _band = engine_flags_from_result(result)
+    scored_notices = cell_notices(
+        Quantity.ACTIVITY,
+        Engine.ALPHAMELTS,
+        SimpleNamespace(notices=raw_notices),
+    )
+
+    assert [notice.kind for notice in scored_notices] == [NoticeKind.INPUT_OMITTED] * 2
+    assert [notice.reason for notice in scored_notices] == list(repair_warnings)
+    assert all(notice.origin == 'engine:alphamelts' for notice in scored_notices)
+
+
+def _hero_deck_score_row(
+    *,
+    rail: str,
+    formula: str,
+    quantity: str,
+    composition: dict[str, object],
+    residual_dex: Decimal,
+    candidate_value: str,
+    fO2_pa: str | None = None,
+    engine: str = "openimcc",
+) -> dict[str, object]:
+    identity = {
+        "composition": {"tag": "value", "value": composition},
+        "fO2_Pa": (
+            {"tag": "value", "value": fO2_pa}
+            if fO2_pa is not None
+            else {"tag": "unknown", "reason": "not reported"}
+        ),
+        "quantity": {"tag": "value", "value": quantity},
+        "species": {"formula": formula},
+        "temperature_K": {"tag": "value", "value": "1200"},
+    }
+    return {
+        "candidate_request": {"engine": engine, "experiment_id": "deck-test"},
+        "candidate_observation": {
+            "engine": {"name": engine},
+            "experiment_id": "deck-test",
+            "identity": identity,
+            "value": {"kind": "point", "point": candidate_value},
+        },
+        "execution": {"state": "produced"},
+        "notices": [],
+        "numeric": {
+            "operation": "dex",
+            "unit": "dimensionless",
+            "value": str(residual_dex),
+        },
+        "rail": rail,
+        "reference": "measured-row",
+        "status": "no_band",
+    }
+
+
+def test_battery_hero_deck_scores_polymerisation_and_delta_iw() -> None:
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["MgO", "0.5"], ["SiO2", "0.5"]],
+    }
+    row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+        fO2_pa="100000",
+    )
+
+    stored = F.observation(
+        "measured-row",
+        "deck-test-experiment",
+        Identity(
+            quantity=Quantity.P_PARTIAL,
+            species=Species("Fe", Phase.G),
+            temperature_K=State.of(Decimal("1200")),
+            fO2_Pa=State.of(Decimal("100000")),
+        ),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    result = score_mod._battery_hero_deck_records(
+        [row], observations={stored.observation_id: stored}
+    )
+    polymerisation = next(
+        point for point in result["points"]
+        if point["chart"] == "polymerisation"
+    )
+    redox = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+
+    # MgSiO3 has two non-bridging oxygens per tetrahedral Si in the standard
+    # oxide stoichiometry. The output is pinned by exact binary value.
+    assert float(polymerisation["x_value"]).hex() == "0x1.0000000000000p+1"
+    assert float(polymerisation["y_value"]).hex() == "0x1.999999999999ap-3"
+    expected_delta_iw = -feo_iw_log10_fO2_bar(1200.0)
+    assert float(redox["x_value"]).hex() == expected_delta_iw.hex()
+
+
+def test_battery_hero_nbo_t_refuses_free_oxygen_beyond_four() -> None:
+    def composition(cao: str, sio2: str) -> dict[str, object]:
+        return {
+            "amount_basis": AmountBasis.MOLE_FRACTION.value,
+            "components": [["CaO", cao], ["SiO2", sio2]],
+        }
+
+    below_limit = score_mod._battery_hero_nbo_t(composition("0.5", "0.5"))
+    orthosilicate = score_mod._battery_hero_nbo_t(
+        composition(
+            "0.6666666666666666666666666667",
+            "0.3333333333333333333333333333",
+        )
+    )
+    beyond_limit = score_mod._battery_hero_nbo_t(composition("0.75", "0.25"))
+
+    assert below_limit == Decimal("2")
+    assert orthosilicate == Decimal("4")
+    assert beyond_limit.reason == "free_oxygen_beyond_orthosilicate"
+    assert beyond_limit.detail == {"computed_value": Decimal("6")}
+
+    over_orthosilicate_row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity="p_partial",
+        composition=composition("0.75", "0.25"),
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+    )
+    records = score_mod._battery_hero_deck_records([over_orthosilicate_row])
+    assert not any(
+        point["chart"] == "polymerisation" for point in records["points"]
+    )
+    assert records["axis_refusals"][
+        (
+            "polymerisation",
+            "openimcc",
+            "free_oxygen_beyond_orthosilicate",
+        )
+    ] == 1
+
+
+def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
+    from simulator.battery.score import compute_metric
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["CaO", "0.5"]],
+    }
+    pO2_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("0.125"),
+        candidate_value="2.0",
+        fO2_pa="1000",
+    )
+    sio_redox_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("-0.25"),
+        candidate_value="1.5",
+        fO2_pa="100000",
+    )
+    sio_observations = {
+        "sio-pO2-reference": F.observation(
+            "sio-pO2-reference",
+            "deck-sio-experiment",
+            Identity(
+                quantity=Quantity.P_PARTIAL,
+                species=Species("SiO", Phase.G),
+                temperature_K=State.of(Decimal("1200")),
+                fO2_Pa=State.of(Decimal("1000")),
+            ),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="deck-test",
+        ),
+        "sio-redox-high-fo2": F.observation(
+            "sio-redox-high-fo2",
+            "deck-sio-experiment",
+            Identity(
+                quantity=Quantity.P_PARTIAL,
+                species=Species("SiO", Phase.G),
+                temperature_K=State.of(Decimal("1200")),
+                fO2_Pa=State.of(Decimal("100000")),
+            ),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="deck-test",
+        ),
+    }
+    pO2_row["reference"] = "sio-pO2-reference"
+    sio_redox_row["reference"] = "sio-redox-high-fo2"
+    dex = compute_metric(
+        MetricOperation.DEX, Decimal("2.5"), Decimal("1.25")
+    )
+    assert dex is not None
+    redox_row = _hero_deck_score_row(
+        rail=Rail.REDOX.value,
+        formula="Fe",
+        quantity="fe3_fe2_ratio",
+        composition=composition,
+        residual_dex=dex,
+        candidate_value="2.5",
+        fO2_pa="20892.96130854039",
+    )
+
+    result = score_mod._battery_hero_deck_records(
+        [pO2_row, sio_redox_row, redox_row],
+        observations=sio_observations,
+    )
+    sio = next(
+        point for point in result["points"]
+        if point["chart"] == "sio_evolution"
+    )
+    cross = next(
+        point for point in result["points"]
+        if point["chart"] == "fo2_cross_comparison"
+    )
+    sio_redox = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+        and point["reference"] == "sio-redox-high-fo2"
+    )
+
+    assert sio["group_label"] == "10^-2–10^-1 bar"
+    assert float(cross["x_value"]) == pytest.approx(1.25, rel=1e-15)
+    assert float(cross["y_value"]).hex() == "0x1.4000000000000p+1"
+    assert float(sio_redox["x_value"]).hex() == (
+        -feo_iw_log10_fO2_bar(1200.0)
+    ).hex()
+
+
+def test_battery_hero_deck_uses_store_oxygen_request_for_axis() -> None:
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    oxygen_identity = Identity(
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Fe", Phase.G),
+        temperature_K=State.of(Decimal("1200")),
+        fO2_Pa=State.of(Decimal("10")),
+    )
+    stored = F.observation(
+        "store-oxygen-reference",
+        "deck-oxygen-experiment",
+        oxygen_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+        engine=Engine.OPENIMCC.value,
+    )
+    row["reference"] = stored.observation_id
+
+    result = score_mod._battery_hero_deck_records(
+        [row], observations={stored.observation_id: stored}
+    )
+    point = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+
+    # The scorer's Po2Request converts 10 Pa to 1e-4 bar; do not trust the
+    # deliberately absent fO2 on the residual candidate payload.
+    expected = score_mod._battery_hero_delta_iw(Decimal("1200"), Decimal("10"))
+    assert expected is not None
+    assert float(point["x_value"]).hex() == float(expected).hex()
+    assert Decimal(str(point["fO2_Pa"])) == Decimal("10")
+
+
+def test_solved_effusion_po2_bar_keeps_its_binary_value() -> None:
+    notice = Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            score_mod.OXYGEN_BALANCE_NOTICE_PREFIX
+            + ' {"pO2_bar":2.747e-10}'
+        ),
+        origin=f"engine:{Engine.OPENIMCC.value}",
+    )
+    prediction = EnginePrediction(
+        engine=Engine.OPENIMCC,
+        channel="test",
+        execution=Execution(state=ExecutionState.PRODUCED),
+        notices=(notice,),
+    )
+
+    assert score_mod._solved_effusion_po2_bar(prediction).hex() == (
+        "0x1.2e092d150c4aap-32"
+    )
+
+
+def test_battery_hero_deck_uses_solved_oxygen_balance_notice() -> None:
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    oxygen_identity = Identity(
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Fe", Phase.G),
+        temperature_K=State.of(Decimal("1200")),
+    )
+    fe = F.observation(
+        "solved-fe-reference",
+        "deck-solved-oxygen-experiment",
+        oxygen_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    sio = F.observation(
+        "solved-sio-reference",
+        "deck-solved-oxygen-experiment",
+        replace(
+            oxygen_identity,
+            species=Species("SiO", Phase.G),
+        ),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    solved_notice = {
+        "kind": NoticeKind.SOURCE_DISAGREEMENT.value,
+        "origin": f"engine:{Engine.OPENIMCC.value}",
+        "reason": (
+            score_mod.OXYGEN_BALANCE_NOTICE_PREFIX
+            + ' {"kind":"fo2_oxygen_balance_effusion_solved",'
+            + '"oxygen_condition_source":"openimcc_oxygen_balance_condition_only",'
+            + '"pO2_bar":2.747e-10}'
+        ),
+    }
+    fe_row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+    )
+    sio_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("-0.25"),
+        candidate_value="1.5",
+    )
+    fe_row["reference"] = fe.observation_id
+    sio_row["reference"] = sio.observation_id
+    fe_row["notices"] = [solved_notice]
+    sio_row["notices"] = [solved_notice]
+
+    result = score_mod._battery_hero_deck_records(
+        [fe_row, sio_row],
+        observations={fe.observation_id: fe, sio.observation_id: sio},
+    )
+    redox = next(
+        point
+        for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+    evolution = next(
+        point
+        for point in result["points"]
+        if point["chart"] == "sio_evolution"
+    )
+    pO2_bar = Decimal("2.747e-10")
+    expected_delta_iw = pO2_bar.log10() - Decimal(
+        str(feo_iw_log10_fO2_bar(1200.0, a_feo=1.0))
+    )
+
+    assert redox["oxygen_mode"] == "solved"
+    assert redox["oxygen_source"] == "openimcc_oxygen_balance_condition_only"
+    assert redox["oxygen_kind"] == "fo2_oxygen_balance_effusion_solved"
+    assert float(redox["x_value"]).hex() == float(expected_delta_iw).hex()
+    assert Decimal(str(redox["fO2_Pa"])) == pO2_bar * Decimal("1e5")
+    assert evolution["oxygen_mode"] == "solved"
+    assert evolution["oxygen_source"] == redox["oxygen_source"]
+    assert evolution["oxygen_kind"] == redox["oxygen_kind"]
+    assert evolution["group_label"] == "10^-10–10^-9 bar"
+
+
+def test_battery_hero_residue_requires_typed_mass_loss_at_same_time() -> None:
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    temperature = State.of(Decimal("1200"))
+    residue_identity = Identity(
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        species=Species("Fe", Phase.L),
+        temperature_K=temperature,
+    )
+    mass_loss_identity = Identity(
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        species=Species("Fe", Phase.G),
+        temperature_K=temperature,
+    )
+    residue = F.observation(
+        "residue-at-10-min",
+        "deck-residue-experiment",
+        residue_identity,
+        Decimal("2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    other_residue = F.observation(
+        "residue-at-20-min",
+        "deck-residue-experiment",
+        residue_identity,
+        Decimal("3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    mass_loss = F.observation(
+        "typed-mass-loss-at-10-min",
+        "deck-residue-experiment",
+        mass_loss_identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    residue = replace(
+        residue,
+        point_conditions={
+            **(residue.point_conditions or {}),
+            "time_min": Located(State.of(Decimal("10"))),
+        },
+    )
+    other_residue = replace(
+        other_residue,
+        point_conditions={
+            **(other_residue.point_conditions or {}),
+            "time_min": Located(State.of(Decimal("20"))),
+        },
+    )
+    mass_loss = replace(
+        mass_loss,
+        point_conditions={"time_min": Located(State.of(Decimal("10")))},
+    )
+    rows = [
+        _hero_deck_score_row(
+            rail=Rail.RESIDUE_COMPOSITION.value,
+            formula="Fe",
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION.value,
+            composition=composition,
+            residual_dex=Decimal("0.125"),
+            candidate_value="2",
+            engine=Engine.INTERNAL_ANALYTICAL.value,
+        ),
+        _hero_deck_score_row(
+            rail=Rail.RESIDUE_COMPOSITION.value,
+            formula="Fe",
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION.value,
+            composition=composition,
+            residual_dex=Decimal("-0.25"),
+            candidate_value="3",
+            engine=Engine.INTERNAL_ANALYTICAL.value,
+        ),
+    ]
+    rows[0]["reference"] = residue.observation_id
+    rows[1]["reference"] = other_residue.observation_id
+
+    result = score_mod._battery_hero_deck_records(
+        rows,
+        observations={
+            residue.observation_id: residue,
+            other_residue.observation_id: other_residue,
+            mass_loss.observation_id: mass_loss,
+        },
+    )
+    points = [
+        point for point in result["points"]
+        if point["chart"] == "residue_composition"
+    ]
+
+    assert len(points) == 1
+    assert float(points[0]["x_value"]).hex() == "0x1.0000000000000p-2"
+    assert float(points[0]["y_value"]).hex() == "0x1.0000000000000p-3"
+    assert result["axis_refusals"][
+        ("residue_composition", Engine.INTERNAL_ANALYTICAL.value, "no recorded mass loss")
+    ] == 1
+
+
+def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
+    mole_composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.02"]],
+    }
+    assert _battery_hero_sio2_mole_fraction(mole_composition) == Decimal("0.02")
+    assert _battery_hero_sio2_mole_fraction(
+        {
+            "amount_basis": AmountBasis.MASS_PERCENT.value,
+            "components": [["SiO2", "2"]],
+        }
+    ) is None
+    assert _battery_hero_sio2_mole_fraction(
+        {
+            "amount_basis": AmountBasis.MOLE_FRACTION.value,
+            "components": [["SiO2", "1.01"]],
+        }
+    ) is None
+    samples = [
+        (Rail.VAPOUR.value, "openimcc", "100", mole_composition, "-1"),
+        (Rail.VAPOUR.value, "openimcc", "199.9", mole_composition, "3"),
+        (
+            Rail.VAPOUR.value,
+            "openimcc",
+            "200",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["SiO2", "0.05"]],
+            },
+            "6",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "openimcc",
+            "199",
+            {
+                "amount_basis": AmountBasis.MASS_PERCENT.value,
+                "components": [["SiO2", "0.02"]],
+            },
+            "100",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-7",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-1",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-3",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "600",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["SiO2", "1"]],
+            },
+            "-8",
+        ),
+    ]
+
+    records = _battery_hero_sweet_spot_records(samples)
+    openimcc_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "100"
+        and row["sio2_lower"] == "0.00"
+    )
+    assert openimcc_cell["n"] == 2
+    assert Decimal(str(openimcc_cell["median_abs_dex"])) == Decimal("2")
+    assert openimcc_cell["color_eligible"] is False
+
+    boundary_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "200"
+        and row["sio2_lower"] == "0.05"
+    )
+    assert boundary_cell["n"] == 1
+    assert Decimal(str(boundary_cell["median_abs_dex"])) == Decimal("6")
+
+    shared_empty_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "500"
+        and row["sio2_lower"] == "0.95"
+    )
+    assert shared_empty_cell["n"] == 0
+    assert shared_empty_cell["median_abs_dex"] is None
+    zero_sio2_cell = next(
+        row
+        for row in records
+        if row["engine"] == "vaporock"
+        and row["temperature_lower_K"] == "500"
+        and row["sio2_lower"] == "0.00"
+    )
+    assert zero_sio2_cell["n"] == 3
+    assert Decimal(str(zero_sio2_cell["median_abs_dex"])) == Decimal("3")
+    assert zero_sio2_cell["color_eligible"] is True
+    upper_boundary_cell = next(
+        row
+        for row in records
+        if row["engine"] == "vaporock"
+        and row["temperature_lower_K"] == "600"
+        and row["sio2_lower"] == "0.95"
+    )
+    assert upper_boundary_cell["n"] == 1
+    assert Decimal(str(upper_boundary_cell["median_abs_dex"])) == Decimal("8")
+    assert upper_boundary_cell["color_eligible"] is False
+    openimcc_temperature_bins = {
+        (row["temperature_lower_K"], row["temperature_upper_K"])
+        for row in records
+        if row["engine"] == "openimcc"
+    }
+    vaporock_temperature_bins = {
+        (row["temperature_lower_K"], row["temperature_upper_K"])
+        for row in records
+        if row["engine"] == "vaporock"
+    }
+    assert openimcc_temperature_bins == vaporock_temperature_bins
+
+
+@pytest.mark.parametrize(
+    ("formula", "is_alkali_salt"),
+    [("Na", False), ("Na2O", False), ("NaCl", True), ("K2SO4", True)],
+)
+def test_battery_hero_alkali_salt_facets_require_a_salt_anion(
+    formula: str, is_alkali_salt: bool
+) -> None:
+    assert (
+        "minor:alkali_salts" in _battery_hero_minor_foulant_facets(formula)
+    ) is is_alkali_salt
+
+
+def test_measured_headline_mode_serializes_typed_residuals_end_to_end(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from scripts import battery_score
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    reference = F.observation(
+        "measured-headline-mode",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = _context(work, experiment, reference)
+    residual = F.residual(
+        f"headline::{reference.observation_id}::{Engine.INTERNAL_ANALYTICAL.value}",
+        reference.observation_id,
+        candidate="predicted",
+        status=ResidualStatus.MATCH,
+        rail=Rail.VAPOUR,
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            "Pa",
+            Decimal("7"),
+            DecisionBand(Decimal("2"), "Pa", "fixture certified band"),
+        ),
+    )
+    root = tmp_path / "small-store"
+    battery = root / "data" / "battery"
+    (root / "data" / "literature" / "observations-v2").mkdir(parents=True)
+    battery.mkdir(parents=True)
+    (battery / "migration-report.md").write_text(
+        "rows in: 1\nrecords out (observations): 1\nworks: 1\nexperiments: 1\n"
+        "queue size: 0\nhard issues: 0\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "init", "--quiet", str(root)], check=True)
+    subprocess.run(["git", "-C", str(root), "add", "data"], check=True)
+    subprocess.run(
+        [
+            "git", "-C", str(root), "-c", "user.name=Fixture",
+            "-c", "user.email=fixture@example.invalid", "commit", "--quiet",
+            "-m", "fixture store",
+        ],
+        check=True,
+    )
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    def score_fixture(store_context, *, engines, _stream, **_kwargs):
+        _stream.append(residual, reference)
+        _stream.finalize(context=store_context, engines=engines)
+        return (), {}, []
+
+    monkeypatch.setattr(score_mod, "_score_store_with_decisions", score_fixture)
+    monkeypatch.setattr(battery_score, "_observation_store_hash", lambda _root: "fixture")
+
+    result = battery_score.main(
+        [
+            "--measured-headline",
+            "--root", str(root),
+            "--engines", Engine.INTERNAL_ANALYTICAL.value,
+        ]
+    )
+
+    assert result == 0
+    jsonl = (battery / "residuals.jsonl").read_text(encoding="utf-8").splitlines()
+    serialized = [json.loads(line) for line in jsonl]
+    assert len(serialized) == 2  # store stamp plus the real residual serializer row
+    assert serialized[1]["reference"] == reference.observation_id
+    summary = json.loads((battery / "score-summary.json").read_text(encoding="utf-8"))
+    assert summary["kind"] == "measured_engine_accuracy_headline"
+    assert summary["records"]
+    history = [
+        json.loads(line)
+        for line in (battery / "score-history.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert len(history) == 1 and history[0]["kind"] == summary["kind"]
+    report = (battery / "score-report.md").read_text(encoding="utf-8")
+    assert "certified RMS" in report and "flagged RMS" in report
+    assert "7" in report
+
+
+def test_score_history_replaces_same_store_revision(tmp_path: Path) -> None:
+    from scripts.battery_score import _replace_history_revision
+
+    path = tmp_path / "score-history.jsonl"
+    first = {"store_revision": "abc", "observation_store_sha256": "hash", "run": 1}
+    replacement = {**first, "run": 2}
+    other = {"store_revision": "def", "observation_store_sha256": "other", "run": 3}
+    _replace_history_revision(path, first)
+    _replace_history_revision(path, other)
+    _replace_history_revision(path, replacement)
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    assert rows == [other, replacement]
 
 
 def test_compilation_series_does_not_change_empirical_headline() -> None:
@@ -4103,7 +7982,7 @@ def test_compilation_series_does_not_change_empirical_headline() -> None:
         thermochemistry["n_candidates"],
         thermochemistry["n_scored"],
         thermochemistry["n_inside_band"],
-    ) == (1, 1, 1)
+    ) == (1, 1, 0)
 
 
 def test_pyrolysis_yield_keeps_residual_without_robinot_floor() -> None:
@@ -4175,6 +8054,382 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
 
 
+_SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"
+
+
+def _oxide_activity_at_sample_phase(
+    phase: Phase | State,
+    *,
+    quantity: Quantity = Quantity.ACTIVITY,
+    observation_id: str = "sample-phase-activity",
+) -> tuple[object, Observation]:
+    """Al2O3 activity in a CaO–Al2O3 melt, with the sample phase replaced.
+
+    The reference endmember stays liquid, so a phase gate is the only thing
+    that can keep a crystalline sample off the melt engines.
+    """
+
+    experiment = F.tabulation_experiment()
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("CaO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula="Al2O3",
+        component_basis="Al2O3",
+        composition=composition,
+    )
+    polymorph = (
+        State.unknown("source does not state polymorph")
+        if phase is Phase.CR
+        else State.not_applicable("not crystal")
+    )
+    identity = replace(
+        identity,
+        quantity=quantity,
+        species=Species("Al2O3", phase, polymorph=polymorph),
+    )
+    reference = F.observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="sample-phase-activity",
+    )
+    return experiment, reference
+
+
+def _score_sample_phase_activity(reference, experiment):
+    calls: list[str] = []
+
+    def predict(engine, obs, **_kwargs):
+        calls.append(obs.observation_id)
+        return _predict(Decimal("0.4"), obs.identity)
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference),
+        comparison_ids={reference.observation_id},
+        predict=predict,
+    )
+    return residual, calls
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT),
+)
+def test_crystalline_sample_activity_is_refused_not_a_melt_miss(
+    quantity: Quantity,
+) -> None:
+    """A crystalline solid solution is not an observable of a melt engine."""
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        Phase.CR,
+        quantity=quantity,
+        observation_id=f"spinel-ss-{quantity.value}",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == []
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["reason"] == _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    assert residual.refusal.detail["sample_phase"] == Phase.CR.value
+    assert residual.refusal.detail["quantity"] == quantity.value
+    assert _residual_engine_observable(residual_to_plain(residual)) is False
+
+    if quantity is Quantity.ACTIVITY:
+        direct = predict_with_engine(Engine.INTERNAL_ANALYTICAL, reference)
+        assert direct.value is None
+        assert direct.refusal_reason is RefusalReason.UNSUPPORTED
+        assert direct.refusal_detail["reason"] == _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+        assert direct.execution.state is ExecutionState.NOT_PROBED
+        assert direct.execution.call_evidence is None
+
+
+def test_crystalline_malformed_composition_is_invalid_source() -> None:
+    """A malformed activity print stays INVALID_SOURCE on a crystal sample.
+
+    ``run_validity_gates`` does not read that composition. The activity
+    contract does, and its source refusal wins over the phase refusal.
+    The predictor is still not called.
+    """
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        Phase.CR,
+        observation_id="crystal-malformed-composition",
+    )
+    reference = replace(
+        reference,
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "composition": Located(State.unknown("malformed declared amount")),
+        },
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == []
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.INVALID_SOURCE
+    assert residual.refusal.detail["reason"] == RefusalReason.INVALID_SOURCE.value
+    assert residual.refusal.detail.get("reason") != _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    (gap,) = residual.refusal.detail["gaps"]
+    assert gap["waypoint"] == "normalized_composition"
+    assert gap["reason"] == "unsupported_print_form"
+    assert gap["missing"] == [
+        f"observation[{reference.observation_id}].point_conditions.composition"
+    ]
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L),
+)
+def test_melt_like_sample_activity_stays_on_the_melt_activity_rail(
+    phase: Phase,
+) -> None:
+    """Liquid, glass, and supercooled liquid stay comparable melt activities."""
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        phase,
+        observation_id=f"melt-like-{phase.value}",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+
+
+def test_unknown_sample_phase_activity_stays_on_the_melt_activity_rail() -> None:
+    """An untyped phase is not a crystalline-sample statement.
+
+    Identity comparison already refuses an unknown species phase, so the
+    row is not a numeric melt miss. The phase gate must leave that refusal
+    in place rather than reclassifying it.
+    """
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        State.unknown("source does not state phase"),
+        observation_id="unknown-sample-phase-activity",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.numeric is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert "species.phase" in residual.refusal.detail["fields"]
+    assert residual.refusal.detail.get("reason") != _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    assert _residual_engine_observable(residual_to_plain(residual)) is True
+
+
+_SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID = "sample_phase_crystalline_vs_liquid_engine"
+
+
+def _vapour_over_sample_form(form: str):
+    """Mg partial pressure over a sample whose form token is ``form``.
+
+    Tabulation keeps the effusion gate from firing, so a melt sample and
+    a non-liquid engine reach the stub predictor. The gas species stays
+    Phase.G; the sample phase is only the experiment form.
+    """
+
+    base = F.tabulation_experiment()
+    experiment = replace(
+        base, sample=replace(base.sample, form=F.located(form))
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("MgO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        F.psat_identity("Mg", T_K=Decimal("2100")),
+        quantity=Quantity.P_PARTIAL,
+        composition=State.of(composition),
+        fO2_Pa=State.of(Decimal("1e-3")),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+        reservoir=State.unknown("source condensed reservoir not grounded"),
+    )
+    reference = F.observation(
+        "spinel-vapour-mg",
+        experiment.experiment_id,
+        identity,
+        Decimal("1e-5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="spinel-vapour",
+    )
+    return experiment, reference
+
+
+def _score_sample_phase_vapour(reference, experiment, engine):
+    calls: list[str] = []
+
+    def predict(engine_arg, obs, **_kwargs):
+        calls.append(obs.observation_id)
+        produced = _predict(Decimal("2e-5"), obs.identity)
+        return replace(produced, engine=engine_arg)
+
+    residual, _candidate = compile_residual(
+        reference,
+        engine,
+        context=_context(F.work(), experiment, reference),
+        comparison_ids={reference.observation_id},
+        predict=predict,
+    )
+    return residual, calls
+
+
+def test_crystalline_sample_vapour_is_out_of_domain_for_a_liquid_engine() -> None:
+    """Vapour over a typed crystal does not test a liquid-engine score."""
+
+    from simulator.battery.migrate import phase_for_sample_form
+
+    assert phase_for_sample_form("condensed_solid") is Phase.CR
+    assert phase_for_sample_form("Condensed_Solid") is Phase.CR
+    assert (
+        phase_for_sample_form(
+            "Sintered stoichiometric spinel sample and spinel solid-solution compositions"
+        )
+        is None
+    )
+    assert phase_for_sample_form("oxide melt samples") is None
+    assert phase_for_sample_form(None) is None
+
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == []
+    assert residual.rail is Rail.VAPOUR
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["reason"] == _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    assert residual.refusal.detail["sample_phase"] == Phase.CR.value
+    assert residual.refusal.detail["quantity"] == Quantity.P_PARTIAL.value
+    assert _residual_engine_observable(residual_to_plain(residual)) is False
+
+    direct = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment
+    )
+    assert direct.value is None
+    assert direct.refusal_reason is RefusalReason.UNSUPPORTED
+    assert direct.refusal_detail["reason"] == _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    assert direct.execution.state is ExecutionState.NOT_PROBED
+    assert direct.execution.call_evidence is None
+
+
+@pytest.mark.parametrize("engine", sorted(SINGLE_LIQUID_ENGINES, key=lambda e: e.value))
+@pytest.mark.parametrize("compound", ("MgAl2O4", "BaO"))
+def test_crystalline_vapour_missing_fusion_detail_comes_from_reservoir(
+    engine: Engine, compound: str
+) -> None:
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            reservoir=State.of(Species(compound, Phase.CR)),
+        ),
+    )
+    residual, calls = _score_sample_phase_vapour(reference, experiment, engine)
+
+    assert calls == []
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail == {
+        "reason": _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID,
+        "sample_phase": "cr",
+        "quantity": "p_partial",
+        "fusion_data": {
+            "status": "not_available_to_simulator",
+            "compound": compound,
+        },
+    }
+    direct = predict_with_engine(engine, reference, experiment=experiment)
+    assert direct.refusal_detail == residual.refusal.detail
+    assert direct.execution.state is ExecutionState.NOT_PROBED
+
+
+def test_crystalline_vapour_with_existing_fusion_pair_is_unaffected() -> None:
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            reservoir=State.of(Species("MgO", Phase.CR)),
+        ),
+    )
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.OPENIMCC
+    )
+
+    assert calls == []
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail == {
+        "reason": _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID,
+        "sample_phase": "cr",
+        "quantity": "p_partial",
+    }
+
+
+@pytest.mark.parametrize("form", ("condensed_liquid", "oxide melt samples"))
+def test_melt_or_untyped_sample_vapour_stays_scored(form: str) -> None:
+    """A melt token and untyped prose stay on the liquid-engine path."""
+
+    experiment, reference = _vapour_over_sample_form(form)
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.VAPOUR
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.refusal is None or (
+        residual.refusal.detail.get("reason") != _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    )
+
+
+def test_non_liquid_engine_scores_vapour_over_a_crystalline_sample() -> None:
+    """A non-liquid engine is not the liquid-engine domain refusal."""
+
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.MAGEMIN
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.VAPOUR
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.refusal is None or (
+        residual.refusal.detail.get("reason") != _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    )
+
+
 def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
     from simulator.battery.score import (
         ENGINE_CHANNELS,
@@ -4204,6 +8459,33 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
         assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
         assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
+
+
+def test_equilibrium_phase_composition_is_retained_but_not_predicted() -> None:
+    from simulator.battery.score import ENGINE_CHANNELS, predict_with_engine
+
+    identity = replace(
+        F.psat_identity("FeO(l)"),
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        subtype=State.of("O/Fe atom ratio"),
+    )
+    observation = F.observation(
+        "fe-wustite-composition",
+        "darken-gurry-1946-iron-oxygen-ii",
+        identity,
+        Decimal("1.096"),
+        evidence=EvidenceClass.MEASURED_TABULATED,
+        source_id="darken-gurry-1946-iron-oxygen-ii",
+    )
+
+    for engine in ENGINE_CHANNELS:
+        prediction = predict_with_engine(engine, observation)
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail == {
+            "reason": "quantity_not_predicted",
+            "quantity": "equilibrium_phase_composition",
+        }
 
 
 def test_residue_metric_uses_dex_for_element_ppm_and_absolute_for_oxide() -> None:
@@ -4271,6 +8553,23 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
                 "experiment_id": experiment_id,
                 "engine": engine,
                 "oxygen_model": f"own oxygen balance: {engine}",
+                "surface_pO2_balance_floor": (
+                    {
+                        "steps_at_floor": 2,
+                        "first_step": 3,
+                        "fraction_of_time_at_floor": 0.25,
+                        "time_at_floor_s": 12.0,
+                        "pO2_bar": 1.0e-30,
+                    }
+                    if index == 0
+                    else {
+                        "steps_at_floor": 0,
+                        "first_step": None,
+                        "fraction_of_time_at_floor": 0.0,
+                        "time_at_floor_s": 0.0,
+                        "pO2_bar": None,
+                    }
+                ),
                 "integration": {
                     "steps": 256,
                     "refinement_status": "unconverged_at_cap",
@@ -4321,6 +8620,52 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert first_prediction.refusal_detail["production_alpha_arm"]["alpha_arm"] == "alpha_runtime_catalog"
         assert any("feo_melt_redox_stack2_pending" in notice.reason for notice in first_prediction.notices)
         assert any("residue_time_refinement_unconverged" in notice.reason for notice in first_prediction.notices)
+        floor_notice = next(
+            notice
+            for notice in first_prediction.notices
+            if notice.reason == "surface_pO2_at_balance_floor"
+        )
+        assert floor_notice.kind is NoticeKind.FLOOR_INVERSION
+        assert float(floor_notice.original) == 1.0e-30
+        assert first_prediction.refusal_detail["surface_pO2_balance_floor"] == {
+            "steps_at_floor": 2,
+            "first_step": 3,
+            "fraction_of_time_at_floor": 0.25,
+            "time_at_floor_s": 12.0,
+            "pO2_bar": 1.0e-30,
+        }
+        assert not any(
+            notice.reason == "surface_pO2_at_balance_floor"
+            for notice in second_prediction.notices
+        )
+        first_run_references = [
+            observation
+            for observation in context.observations.values()
+            if observation.source_id == "kems-015-hashimoto-1983"
+            and observation.experiment_id == first.experiment_id
+            and "::hashimoto_1983_table3_residue_composition_series::"
+            in observation.observation_id
+            and quantity_token(observation.identity)
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ]
+        assert {row.identity.species.formula for row in first_run_references} == {
+            "FeO",
+            "MgO",
+            "SiO2",
+            "CaO",
+            "Al2O3",
+        }
+        first_run_predictions = [
+            score._hashimoto_residue_prediction(context, row, engine, cache)
+            for row in first_run_references
+        ]
+        assert all(
+            any(
+                notice.reason == "surface_pO2_at_balance_floor"
+                for notice in prediction.notices
+            )
+            for prediction in first_run_predictions
+        )
         candidate = score.candidate_observation(first, first_prediction)
         assert candidate.identity.species.phase == first.identity.species.phase
         assert candidate.identity.exposure.value.area_m2 == first.identity.exposure.value.area_m2
@@ -4347,6 +8692,178 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert refusal.value is None
         assert refusal.refusal_reason is RefusalReason.UNSUPPORTED
         assert "injected_refusal" in refusal.refusal_detail["reason"]
+
+    engine_diagnostic = {
+        "kind": "floor_inversion",
+        "species": "Mg",
+        "reason": "melt_dissociation_pO2_floor_inverted_through_mass_action",
+        "original": 0.125,
+        "band": {"pO2_bar": [1.0e-12, 100.0]},
+    }
+
+    def fail_with_engine_floor_diagnostic(*_args, **_kwargs):
+        raise residue.ResidueInventoryRefusal(
+            "hashimoto_internal_analytical_channels_missing",
+            json.dumps(
+                {
+                    "missing_channels": ["FeO"],
+                    "engine_floor_inversion_diagnostics": [engine_diagnostic],
+                }
+            ),
+        )
+
+    monkeypatch.setattr(
+        residue,
+        "_predict_hashimoto_residue_cohort",
+        fail_with_engine_floor_diagnostic,
+    )
+    diagnostic_refusal = score._hashimoto_residue_prediction(
+        context, first, Engine.INTERNAL_ANALYTICAL, {}
+    )
+    assert diagnostic_refusal.refusal_reason is RefusalReason.UNSUPPORTED
+    assert len(diagnostic_refusal.notices) == 1
+    assert diagnostic_refusal.notices[0].kind is NoticeKind.FLOOR_INVERSION
+    assert diagnostic_refusal.notices[0].origin == "engine:internal-analytical"
+
+
+@pytest.mark.parametrize(
+    "reason",
+    (
+        "engine_timeout:openimcc:hashimoto_residue_cohort",
+        "engine_transport_error:openimcc",
+    ),
+)
+def test_hashimoto_worker_infrastructure_failures_are_not_cohort_cached(
+    monkeypatch: pytest.MonkeyPatch, reason: str
+) -> None:
+    from simulator.battery import residue, score
+
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and "::hashimoto_1983_table3_residue_composition_series::"
+        in row.observation_id
+        and quantity_token(row.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+
+    def fail_cohort(*_args, **_kwargs):
+        raise residue.ResidueEngineNonconvergence(
+            "openimcc", "worker infrastructure failure", reason=reason
+        )
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fail_cohort)
+    cache = {}
+    prediction = score._hashimoto_residue_prediction(
+        context, reference, Engine.OPENIMCC, cache
+    )
+
+    assert cache == {}
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == reason
+
+
+@pytest.mark.parametrize(
+    ("failure_kind", "expected_reason", "expected_state", "expected_refusal"),
+    (
+        (
+            "timeout",
+            "engine_timeout:openimcc:hashimoto_residue_cohort",
+            "attempted_unavailable",
+            "attempted_unavailable",
+        ),
+        (
+            "transport",
+            "engine_transport_error:openimcc",
+            "attempted_unavailable",
+            "attempted_unavailable",
+        ),
+        (
+            "nonconvergence",
+            "engine_nonconvergence",
+            "not_probed",
+            "unsupported",
+        ),
+    ),
+)
+def test_hashimoto_integrator_preserves_failure_reason_for_scorer(
+    monkeypatch: pytest.MonkeyPatch,
+    failure_kind: str,
+    expected_reason: str,
+    expected_state: str,
+    expected_refusal: str,
+) -> None:
+    pytest.importorskip("openimcc")
+    from simulator.battery import residue, score
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.score import load_score_context, quantity_token
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and "::hashimoto_1983_table3_residue_composition_series::"
+        in row.observation_id
+        and quantity_token(row.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+
+    def fail_engine(*_args, **_kwargs):
+        if failure_kind == "timeout":
+            raise TimeoutError("forced Hashimoto call deadline")
+        raise residue.ResidueEngineTransportError("forced worker transport failure")
+
+    integration_calls = 0
+
+    def fail_inventory(
+        inventory,
+        _channels,
+        pressure_model,
+        **_kwargs,
+    ):
+        if failure_kind == "nonconvergence":
+            raise residue.ResidueEngineNonconvergence(
+                "openimcc", "forced solver nonconvergence"
+            )
+        pressure_model(inventory, -9.0)
+        raise AssertionError("injected engine failure unexpectedly returned")
+
+    original_integrate_geometry = residue._hashimoto_integrate_geometry
+
+    def track_integrate_geometry(*args, **kwargs):
+        nonlocal integration_calls
+        integration_calls += 1
+        return original_integrate_geometry(*args, **kwargs)
+
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", fail_engine)
+    monkeypatch.setattr(residue, "integrate_residue_inventory", fail_inventory)
+    monkeypatch.setattr(
+        residue, "_hashimoto_integrate_geometry", track_integrate_geometry
+    )
+    cache = {}
+    prediction = score._hashimoto_residue_prediction(
+        context, reference, Engine.OPENIMCC, cache
+    )
+
+    assert integration_calls > 0
+    assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == expected_reason
+    assert prediction.execution.state.value == expected_state
+    assert prediction.refusal_reason.value == expected_refusal
+    if failure_kind in {"timeout", "transport"}:
+        assert ("kems-015-hashimoto-1983", Engine.OPENIMCC) in cache
+        assert "__cohort_error__" not in cache[
+            ("kems-015-hashimoto-1983", Engine.OPENIMCC)
+        ]
 
 
 def test_residue_area_is_not_identity_but_per_area_rate_still_requires_it() -> None:
@@ -4408,178 +8925,10 @@ def test_non_alkali_alpha_is_refused_with_no_rail() -> None:
     assert "::vapour::" not in residual.key
 
 
-def test_legacy_gibbs_band_is_relation_agnostic_and_derived_band_wins() -> None:
-    """Legacy ΔfG fallback ignores lineage; a supplied quantity band wins."""
-
-    from simulator.battery.score import decision_band_for, populate_numeric
-
-    for quantity in (
-        Quantity.CP,
-        Quantity.S,
-        Quantity.H_MINUS_H298,
-        Quantity.LOG10_KF,
-    ):
-        assert decision_band_for(quantity, SourceRelation.INDEPENDENT) is None
-        numeric, reason, detail = populate_numeric(
-            quantity=quantity,
-            candidate=Decimal("10"),
-            reference=Decimal("9"),
-            source_relation=SourceRelation.INDEPENDENT,
-        )
-        assert numeric is not None
-        assert numeric.decision_band is None
-        assert reason is None
-        assert detail == {}
-    assert decision_band_for(Quantity.DELTA_FH, SourceRelation.INDEPENDENT) is None
-    for relation in SourceRelation:
-        band = decision_band_for(Quantity.DELTA_FG, relation)
-        assert band is not None
-        assert band.value == Decimal("1.0")
-        assert band.unit == "kJ_per_declared_mol_basis"
-        assert band.rule.startswith("LEGACY fallback:")
-    family_band = DecisionBand(
-        Decimal("0.25"), "J_per_declared_mol_basis_per_K", "family residuals"
-    )
-    assert (
-        decision_band_for(
-            Quantity.CP, SourceRelation.UNKNOWN, derived_band=family_band
-        )
-        == family_band
-    )
-    numeric, reason, _detail = populate_numeric(
-        quantity=Quantity.DELTA_FG,
-        candidate=Decimal("1"),
-        reference=Decimal("1"),
-        source_relation=SourceRelation.INDEPENDENT,
-    )
-    assert reason is None
-    assert numeric is not None
-    assert numeric.decision_band.unit == "kJ_per_declared_mol_basis"
 
 
-def test_printed_cell_uncertainty_and_family_mad_are_quantity_scaled() -> None:
-    from types import SimpleNamespace
-
-    from simulator.battery.enums import QUANTITY_UNITS
-    from simulator.battery.score import (
-        _printed_uncertainty_band,
-        _residual_distribution_band,
-    )
-
-    def source(quantity: Quantity, unit: str):
-        return SimpleNamespace(
-            locator=SimpleNamespace(note=f"printed unit='{unit}'"),
-            derivation=SimpleNamespace(output_unit=QUANTITY_UNITS[quantity]),
-        )
-
-    printed = _printed_uncertainty_band(
-        Quantity.CP,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="±0.24"),
-        Decimal("300"),
-        source_observation=source(Quantity.CP, "J/mol·K"),
-    )
-    assert printed == DecisionBand(
-        Decimal("0.24"),
-        "J_per_declared_mol_basis_per_K",
-        "source-printed per-cell uncertainty",
-    )
-    relative_printed = _printed_uncertainty_band(
-        Quantity.O2_YIELD,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="2%"),
-        Decimal("0.5"),
-    )
-    assert relative_printed is not None
-    assert relative_printed.value == Decimal("0.02")
-    assert relative_printed.unit == "dimensionless"
-
-    kcal_printed = _printed_uncertainty_band(
-        Quantity.DELTA_FG,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="0.137"),
-        Decimal("-1"),
-        source_observation=source(Quantity.DELTA_FG, "kcal gfw^-1"),
-    )
-    assert kcal_printed is not None
-    assert kcal_printed.value == Decimal("0.573208")
-
-    joule_printed = _printed_uncertainty_band(
-        Quantity.DELTA_FG,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="100"),
-        Decimal("77.077"),
-        source_observation=source(Quantity.DELTA_FG, "J/mol"),
-    )
-    assert joule_printed is not None
-    assert joule_printed.value == Decimal("0.100")
-
-    parenthetical_printed = _printed_uncertainty_band(
-        Quantity.DELTA_FG,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="(0.389)"),
-        Decimal("-2095.071"),
-        source_observation=source(Quantity.DELTA_FG, "kJ/mol"),
-    )
-    assert parenthetical_printed is not None
-    assert parenthetical_printed.value == Decimal("0.389")
-
-    log_k_printed = _printed_uncertainty_band(
-        Quantity.LOG10_KF,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="(0.068)"),
-        Decimal("109.436"),
-        source_observation=source(Quantity.LOG10_KF, "dimensionless"),
-    )
-    assert log_k_printed is not None
-    assert log_k_printed.value == Decimal("0.068")
-
-    family = _residual_distribution_band(
-        [Decimal(value) for value in ("-10", "-1", "0", "1", "10") * 2],
-        unit="J_per_declared_mol_basis_per_K",
-        family="USGS",
-        quantity=Quantity.CP,
-    )
-    assert family is not None
-    assert family.value == Decimal("2")
-    assert family.unit == "J_per_declared_mol_basis_per_K"
-    assert "2x median absolute deviation" in family.rule
-    assert "derived_n=10" in family.rule
-    assert _residual_distribution_band(
-        [Decimal(value) for value in ("-10", "-1", "0", "1", "10")],
-        unit="J_per_declared_mol_basis_per_K",
-        family="USGS",
-        quantity=Quantity.CP,
-    ) is None
 
 
-def test_applying_kj_band_to_cp_is_refused(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Forcing the Gibbs kJ band onto cp is a dimension refusal, not a match."""
-
-    from simulator.battery import score as score_mod
-
-    band = score_mod.THERMOCHEMISTRY_DECISION_BANDS[SourceRelation.INDEPENDENT]
-    assert score_mod.band_dimension_matches(Quantity.CP, band) is False
-    assert score_mod.band_dimension_matches(Quantity.S, band) is False
-    assert score_mod.band_dimension_matches(Quantity.LOG10_KF, band) is False
-    assert score_mod.band_dimension_matches(Quantity.DELTA_FG, band) is True
-    assert score_mod.band_dimension_matches(Quantity.DELTA_FH, band) is True
-    # H-H298 shares the kJ/mol dimension and is still not a sourced band.
-    assert score_mod.band_dimension_matches(Quantity.H_MINUS_H298, band) is True
-    assert (
-        score_mod.decision_band_for(Quantity.H_MINUS_H298, SourceRelation.INDEPENDENT)
-        is None
-    )
-    monkeypatch.setattr(
-        score_mod,
-        "decision_band_for",
-        lambda quantity, source_relation: band,
-    )
-    numeric, reason, detail = score_mod.populate_numeric(
-        quantity=Quantity.CP,
-        candidate=Decimal("50"),
-        reference=Decimal("40"),
-        source_relation=SourceRelation.INDEPENDENT,
-    )
-    assert numeric is None
-    assert reason is RefusalReason.DECISION_RULE_MISSING
-    assert detail.get("reason") == "band_dimension_mismatch:cp"
-    assert detail.get("quantity_unit") == "J_per_declared_mol_basis_per_K"
-    assert detail.get("band_unit") == "kJ_per_declared_mol_basis"
 
 
 def test_candidate_census_splits_admitted_from_pending() -> None:
@@ -4738,6 +9087,1614 @@ def test_mapped_coefficient_sources_decide_circularity() -> None:
         },
     )
     assert independent is SourceRelation.INDEPENDENT
+
+
+def _printed_unresolved_observation(
+    observation_id: str,
+    experiment_id: str,
+    *,
+    derived_from: tuple[str, ...],
+):
+    from simulator.battery.enums import RawInputStatus
+
+    return F.observation(
+        observation_id,
+        experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="lineage-source",
+        derived_from=derived_from,
+        derivation=Derivation(
+            relation="printed reduction",
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+            raw_inputs=Located(
+                State.of(RawInputStatus.PRINTED_UNRESOLVED),
+                locator=F.loc(),
+            ),
+        ),
+    )
+
+
+def test_printed_unresolved_work_alias_stays_incomplete() -> None:
+    """b-979: a complete sibling or a table asset does not hide printed inputs."""
+
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _asset_ids,
+        _inputs_for_work,
+        _inputs_registered_under_work,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    work = replace(
+        F.work("lineage-work"),
+        source_ids=("lineage-work", "lineage-source"),
+    )
+    pdf, table = work.source_files.files
+    work = replace(
+        work,
+        source_files=replace(
+            work.source_files,
+            files=(
+                replace(pdf, asset_id="lineage-pdf"),
+                replace(table, asset_id="lineage-table"),
+            ),
+        ),
+    )
+    experiment = F.tabulation_experiment(
+        experiment_id="lineage-exp", work_id=work.work_id
+    )
+    sibling = replace(
+        F.observation(
+            "sibling-a",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="lineage-source",
+        ),
+        read_from="lineage-pdf",
+    )
+    printed = replace(
+        _printed_unresolved_observation(
+            "row-b",
+            experiment.experiment_id,
+            derived_from=(sibling.observation_id,),
+        ),
+        read_from="lineage-pdf",
+    )
+    printed_alone = replace(
+        _printed_unresolved_observation(
+            "row-b-alone",
+            experiment.experiment_id,
+            derived_from=(),
+        ),
+        read_from="lineage-pdf",
+    )
+    ref_work = replace(F.work("ref-work"), source_ids=("ref-work",))
+    ref_experiment = F.tabulation_experiment(
+        experiment_id="ref-exp", work_id=ref_work.work_id
+    )
+    reference = F.observation(
+        "ref-r",
+        ref_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="ref-work",
+    )
+    aliases = (
+        printed.observation_id,
+        work.work_id,
+        "lineage-source",
+        "lineage-pdf",
+    )
+    shapes = {
+        "sibling-and-table": (sibling, printed),
+        "table-only": (printed_alone,),
+    }
+    for _name, rows in shapes.items():
+        observations = {row.observation_id: row for row in rows}
+        observations[reference.observation_id] = reference
+        experiments = {
+            experiment.experiment_id: experiment,
+            ref_experiment.experiment_id: ref_experiment,
+        }
+        works = {work.work_id: work, ref_work.work_id: ref_work}
+        table_ids = _table_ids(works)
+
+        def assert_incomplete(alias: str) -> None:
+            resolved = _resolve_coefficient_sources(
+                (alias,), observations, works, experiments
+            )
+            assert resolved.failure is AncestryFailure.PRINTED_UNRESOLVED
+            assert (
+                lineage_complete_for(
+                    (alias,),
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is False
+            )
+            assert (
+                resolve_source_relation(
+                    reference,
+                    (alias,),
+                    True,
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is SourceRelation.UNKNOWN
+            )
+
+        shape_aliases = (
+            aliases
+            if _name == "sibling-and-table"
+            else (
+                printed_alone.observation_id,
+                work.work_id,
+                "lineage-source",
+                "lineage-pdf",
+            )
+        )
+        assert (
+            _inputs_for_work(work, observations, experiments, table_ids).failure
+            is AncestryFailure.PRINTED_UNRESOLVED
+        )
+        assert (
+            _inputs_registered_under_work(
+                work, observations, experiments, table_ids
+            ).failure
+            is AncestryFailure.PRINTED_UNRESOLVED
+        )
+        for alias in shape_aliases:
+            assert_incomplete(alias)
+        with bound_work_inputs(works, observations, experiments):
+            assert (
+                _inputs_registered_under_work(
+                    work, observations, experiments, table_ids
+                ).failure
+                is AncestryFailure.PRINTED_UNRESOLVED
+            )
+            for alias in shape_aliases:
+                assert_incomplete(alias)
+        if _name == "sibling-and-table":
+            assert _observation_lineage(
+                sibling.observation_id,
+                observations,
+                table_ids,
+                asset_ids=_asset_ids(works),
+            ).complete
+            assert (
+                _observation_lineage(
+                    printed.observation_id,
+                    observations,
+                    table_ids,
+                    asset_ids=_asset_ids(works),
+                ).failure
+                is AncestryFailure.PRINTED_UNRESOLVED
+            )
+
+    complete_observations = {
+        sibling.observation_id: sibling,
+        reference.observation_id: reference,
+    }
+    complete_experiments = {
+        experiment.experiment_id: experiment,
+        ref_experiment.experiment_id: ref_experiment,
+    }
+    complete_works = {work.work_id: work, ref_work.work_id: ref_work}
+    assert lineage_complete_for(
+        (work.work_id,),
+        works=complete_works,
+        observations=complete_observations,
+        experiments=complete_experiments,
+    ) is True
+    assert (
+        resolve_source_relation(
+            reference,
+            (work.work_id,),
+            True,
+            works=complete_works,
+            observations=complete_observations,
+            experiments=complete_experiments,
+        )
+        is SourceRelation.INDEPENDENT
+    )
+
+
+def _fe_ratio_identity() -> Identity:
+    na = "fe redox ratio"
+    return replace(
+        F.activity_identity(
+            formula="FeO",
+            T_K=Decimal("1673"),
+            fO2_Pa=Decimal("1e-5"),
+            total_P=Decimal("100000"),
+        ),
+        quantity=Quantity.FE3_FE2_RATIO,
+        per=State.not_applicable(na),
+        reference_state=State.not_applicable(na),
+    )
+
+
+def _compile_redox(reference):
+    experiment = F.tabulation_experiment()
+    prediction = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="internal-analytical",
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:redox"),
+        value=Decimal("0.4"),
+        unit=QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("nasa-cea-thermo",),
+        lineage_complete=True,
+        identity=reference.identity,
+    )
+    return compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference),
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+        derived_band=DecisionBand(Decimal("1"), "dimensionless", "test-dex"),
+    )
+
+
+def test_printed_unresolved_redox_reference_stays_unknown() -> None:
+    """b-979: the Fe redox attribution split does not promote an incomplete walk."""
+
+    from simulator.battery.enums import RawInputStatus
+
+    identity = _fe_ratio_identity()
+    printed = F.observation(
+        "redox-printed",
+        "exp-1",
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derived_from=(),
+        derivation=Derivation(
+            relation="printed redox reduction",
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+            raw_inputs=Located(
+                State.of(RawInputStatus.PRINTED_UNRESOLVED),
+                locator=F.loc(),
+            ),
+        ),
+    )
+    residual, _candidate = _compile_redox(printed)
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.score_eligible is False
+    assert "source_relation_independent_complete_ancestry" in residual.exclusions
+
+    complete = F.observation(
+        "redox-complete",
+        "exp-1",
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    complete_residual, _candidate = _compile_redox(complete)
+    assert complete_residual.source_relation is SourceRelation.INDEPENDENT
+
+    calibration = replace(
+        complete,
+        observation_id="redox-calibration",
+        evidence=replace(complete.evidence, attribution="K&C88+; K&C91"),
+    )
+    calibration_residual, _candidate = _compile_redox(calibration)
+    assert calibration_residual.source_relation is SourceRelation.TRAINING
+
+
+def test_complete_ancestry_outputs_are_pinned() -> None:
+    """b-979: complete walks and their consumer decisions, before the owner change.
+
+    A shared parent stays in both branches. A registered table stays a
+    resolved coefficient. Located not_printed stays a successful walk.
+    The redox split still labels a complete reference against a resolved
+    table.
+    """
+
+    from simulator.battery.enums import RawInputStatus
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        _asset_ids,
+        _inputs_registered_under_work,
+        _observation_lineage,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    work = replace(
+        F.work("pin-work"),
+        source_ids=("pin-work", "pin-source"),
+    )
+    pdf, table = work.source_files.files
+    work = replace(
+        work,
+        source_files=replace(
+            work.source_files,
+            files=(
+                replace(pdf, asset_id="pin-pdf"),
+                replace(table, asset_id="pin-table"),
+            ),
+        ),
+    )
+    experiment = F.tabulation_experiment(
+        experiment_id="pin-exp", work_id=work.work_id
+    )
+    parent = replace(
+        F.observation(
+            "pin-parent",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="pin-source",
+        ),
+        read_from="pin-pdf",
+    )
+    left = F.observation(
+        "pin-left",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="pin-source",
+        derived_from=(parent.observation_id,),
+        derivation=Derivation(
+            relation="shared parent",
+            inputs=(parent.observation_id,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    left = replace(left, read_from="pin-pdf")
+    right = replace(left, observation_id="pin-right")
+    unprinted = F.observation(
+        "pin-unprinted",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="pin-source",
+        derived_from=(),
+        derivation=Derivation(
+            relation="inputs not printed",
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+            raw_inputs=Located(
+                State.of(RawInputStatus.NOT_PRINTED),
+                locator=F.loc(),
+            ),
+        ),
+    )
+    unprinted = replace(unprinted, read_from="pin-pdf")
+    table_reader = replace(parent, observation_id="pin-reader", read_from="pin-table")
+    ref_work = replace(F.work("pin-ref-work"), source_ids=("pin-ref-work",))
+    ref_experiment = F.tabulation_experiment(
+        experiment_id="pin-ref-exp", work_id=ref_work.work_id
+    )
+    reference = F.observation(
+        "pin-ref",
+        ref_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="pin-ref-work",
+    )
+    observations = {
+        row.observation_id: row
+        for row in (parent, left, right, unprinted, table_reader, reference)
+    }
+    experiments = {
+        experiment.experiment_id: experiment,
+        ref_experiment.experiment_id: ref_experiment,
+    }
+    works = {work.work_id: work, ref_work.work_id: ref_work}
+    table_ids = _table_ids(works)
+    corpus_assets = _asset_ids(works)
+
+    def ids_of(row_id: str) -> set[str]:
+        result = _observation_lineage(
+            row_id, observations, table_ids, asset_ids=corpus_assets
+        )
+        assert result.complete and result.ids is not None
+        return set(result.ids)
+
+    assert ids_of(parent.observation_id) == {parent.observation_id}
+    assert ids_of(left.observation_id) == {left.observation_id, parent.observation_id}
+    assert ids_of(right.observation_id) == {right.observation_id, parent.observation_id}
+    assert ids_of(unprinted.observation_id) == {unprinted.observation_id}
+    assert ids_of(table_reader.observation_id) == {
+        table_reader.observation_id,
+        "pin-table",
+    }
+
+    expected_alias = {
+        parent.observation_id,
+        left.observation_id,
+        right.observation_id,
+        unprinted.observation_id,
+        table_reader.observation_id,
+        "pin-table",
+    }
+
+    def assert_alias_complete() -> None:
+        for alias in (work.work_id, "pin-source", "pin-pdf"):
+            expanded = _inputs_registered_under_work(
+                work, observations, experiments, table_ids
+            )
+            assert expanded.complete and expanded.ids is not None
+            assert set(expanded.ids) == expected_alias
+            assert lineage_complete_for(
+                (alias,),
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            ) is True
+            assert (
+                resolve_source_relation(
+                    reference,
+                    (alias,),
+                    True,
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is SourceRelation.INDEPENDENT
+            )
+        assert lineage_complete_for(
+            ("pin-table",),
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        ) is True
+        assert (
+            resolve_source_relation(
+                table_reader,
+                ("pin-table",),
+                True,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            )
+            is SourceRelation.SAME_INPUT
+        )
+
+    assert_alias_complete()
+    with bound_work_inputs(works, observations, experiments):
+        assert_alias_complete()
+
+    identity = _fe_ratio_identity()
+    complete = F.observation(
+        "pin-redox",
+        "exp-1",
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    assert _compile_redox(complete)[0].source_relation is SourceRelation.INDEPENDENT
+    calibration = replace(
+        complete,
+        observation_id="pin-redox-calibration",
+        evidence=replace(complete.evidence, attribution="K&C88+; K&C91"),
+    )
+    assert _compile_redox(calibration)[0].source_relation is SourceRelation.TRAINING
+
+
+def _count_work_input_lookups(
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[list[int], list[tuple[int, bool]]]:
+    """Track work expansions and bound lookups without measuring wall time."""
+
+    import simulator.battery.validate as validate
+
+    original_inputs_for_work = validate._inputs_for_work
+    original_registered_inputs = validate._inputs_registered_under_work
+    work_expansions = [0]
+    registered_lookup_walks: list[tuple[int, bool]] = []
+
+    def count_work_expansions(*args, **kwargs):
+        work_expansions[0] += 1
+        return original_inputs_for_work(*args, **kwargs)
+
+    def count_registered_lookup(*args, **kwargs):
+        before = work_expansions[0]
+        result = original_registered_inputs(*args, **kwargs)
+        registered_lookup_walks.append(
+            (work_expansions[0] - before, result.complete)
+        )
+        return result
+
+    monkeypatch.setattr(validate, "_inputs_for_work", count_work_expansions)
+    monkeypatch.setattr(
+        validate, "_inputs_registered_under_work", count_registered_lookup
+    )
+    return work_expansions, registered_lookup_walks
+
+
+def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A scoring snapshot reuses a shared parent without changing decisions."""
+
+    from simulator.battery.records import Derivation
+    from simulator.battery.validate import (
+        _resolve_coefficient_sources,
+        bound_work_inputs,
+    )
+
+    work = F.work("lineage-cache-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="lineage-cache-exp", work_id=work.work_id
+    )
+    rows = [
+        F.observation(
+            "lineage-cache-0",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="janaf-4th",
+        )
+    ]
+    for index in range(1, 4):
+        parent = rows[-1]
+        rows.append(
+            F.observation(
+                f"lineage-cache-{index}",
+                experiment.experiment_id,
+                F.o2_identity(),
+                Decimal("0"),
+                evidence=EvidenceClass.MEASURED_REDUCED,
+                source_id="janaf-4th",
+                derived_from=(parent.observation_id,),
+                derivation=Derivation(
+                    relation="reduced from the preceding printed row",
+                    inputs=(parent.observation_id,),
+                    parameters=(),
+                    output_unit="kJ/mol",
+                ),
+            )
+        )
+
+    class CountingObservations(dict):
+        def __init__(self, values):
+            super().__init__(values)
+            self.lineage_lookups = 0
+
+        def get(self, key, default=None):
+            self.lineage_lookups += 1
+            return super().get(key, default)
+
+    observations = CountingObservations(
+        {row.observation_id: row for row in rows}
+    )
+    works = {work.work_id: work}
+    experiments = {experiment.experiment_id: experiment}
+    baseline = _resolve_coefficient_sources(
+        (work.work_id,), observations, works, experiments
+    )
+    assert baseline.complete and baseline.ids is not None
+    for _ in range(3):
+        assert (
+            _resolve_coefficient_sources(
+                (work.work_id,), observations, works, experiments
+            )
+            == baseline
+        )
+    uncached_lookups = observations.lineage_lookups
+
+    observations.lineage_lookups = 0
+    context = replace(
+        _context(work, experiment, *rows),
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    )
+    reference = rows[-1]
+    prediction = _predict(
+        Decimal("0"), reference.identity, coefficient_sources=(work.work_id,)
+    )
+    residual_without_cache, candidate_without_cache = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+    residual_line_without_cache = dumps_residual_line(
+        residual_without_cache, candidate_without_cache
+    )
+
+    work_expansions, registered_lookup_walks = _count_work_input_lookups(monkeypatch)
+    observations.lineage_lookups = 0
+    with bound_work_inputs(works, observations, experiments):
+        cached_results = [
+            _resolve_coefficient_sources(
+                (work.work_id,), observations, works, experiments
+            )
+            for _ in range(4)
+        ]
+        index_lookups = observations.lineage_lookups
+        assert work_expansions[0] == 1
+        registered_lookup_walks.clear()
+        residual_with_cache, candidate_with_cache = compile_residual(
+            reference,
+            Engine.INTERNAL_ANALYTICAL,
+            context=context,
+            prediction=prediction,
+            comparison_ids={reference.observation_id},
+        )
+        work_expansions_after_compile = work_expansions[0]
+        cached_lookups = observations.lineage_lookups
+
+    assert cached_results == [baseline] * 4
+    assert uncached_lookups == 40
+    assert index_lookups == 10
+    assert index_lookups < uncached_lookups
+    assert work_expansions_after_compile == 1
+    assert len(registered_lookup_walks) == 2
+    assert all(
+        walks == 0 and complete for walks, complete in registered_lookup_walks
+    )
+    assert cached_lookups >= index_lookups
+    assert dumps_residual_line(
+        residual_with_cache, candidate_with_cache
+    ) == residual_line_without_cache
+
+
+def test_nasa9_comparisons_reuse_one_work_lineage_index(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The production NASA-9 helper binds the same maps passed to residuals."""
+
+    import simulator.battery.compilation_tier as compilation_tier
+    from simulator.battery.compilation_tier import (
+        ThermoAttempt,
+        _nasa9_fit_comparisons,
+    )
+    from simulator.battery.generators import compilation_thermo_fits
+    from simulator.battery.records import Locator
+
+    work = F.work("nasa9-cache-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="nasa9-cache-exp", work_id=work.work_id
+    )
+
+    def cp_identity(temperature: Decimal) -> Identity:
+        identity = F.oxide_identity(
+            "MgO",
+            Phase.CR,
+            T_K=temperature,
+            per=PerBasis.MOL_SPECIES,
+            polymorph=Polymorph.PERICLASE.value,
+            metal_formula="Mg",
+        )
+        return replace(
+            identity,
+            quantity=Quantity.CP,
+            reaction=State.not_applicable("not a formation quantity"),
+            formation_elements=State.not_applicable("not a formation quantity"),
+        )
+
+    rows = tuple(
+        replace(
+            F.observation(
+                f"nasa9-cache-{index}",
+                experiment.experiment_id,
+                cp_identity(temperature),
+                Decimal("1.25"),
+                source_id="janaf-4th",
+            ),
+            locator=Locator(table="fixture-table", record="fixture-table"),
+        )
+        for index, temperature in enumerate((Decimal("1000"), Decimal("1100")))
+    )
+
+    class CountingObservations(dict):
+        def __init__(self, values):
+            super().__init__(values)
+            self.lineage_lookups = 0
+
+        def get(self, key, default=None):
+            self.lineage_lookups += 1
+            return super().get(key, default)
+
+    observations = CountingObservations(
+        {row.observation_id: row for row in rows}
+    )
+    works = {work.work_id: work}
+    experiments = {experiment.experiment_id: experiment}
+    context = replace(
+        _context(work, experiment, *rows),
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    )
+    assert context.works is works
+    assert context.observations is observations
+    assert context.experiments is experiments
+
+    record = {
+        "status": "accepted",
+        "record_id": "nasa9-cache-fit",
+        "source_record_id": "fixture-table",
+        "formula": "MgO",
+        "phase": "cr:periclase",
+        "validity": {"T_min_K": 900.0, "T_max_K": 1200.0},
+        "residual_summary": {
+            Quantity.CP.value: {
+                "n": 2,
+                "max_abs": 0.0,
+                "gate_tolerance": 1.0,
+            }
+        },
+        "formation_capable": False,
+    }
+    monkeypatch.setattr(
+        compilation_thermo_fits,
+        "sidecar_element_reference_curves",
+        lambda _records: {},
+    )
+    monkeypatch.setattr(
+        compilation_thermo_fits,
+        "evaluate_sidecar_fit",
+        lambda *_args, **_kwargs: (1.25, None),
+    )
+    monkeypatch.setattr(
+        compilation_tier,
+        "predict_thermo_attempt",
+        lambda _engine, _observation, **_kwargs: ThermoAttempt(
+            value=Decimal("1.25"),
+            unit=QUANTITY_UNITS[Quantity.CP],
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="nasa9-cache-test",
+            coefficient_sources=(work.work_id,),
+        ),
+    )
+
+    work_expansions, registered_lookup_walks = _count_work_input_lookups(monkeypatch)
+    comparisons = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+        fit_records=(record,),
+    )
+
+    assert len(comparisons) == 2
+    assert all(
+        item.residual.source_relation is SourceRelation.SAME_INPUT
+        for item in comparisons
+    )
+    assert work_expansions[0] == 1
+    assert len(registered_lookup_walks) == 4
+    assert all(
+        walks == 0 and complete for walks, complete in registered_lookup_walks
+    )
+    # Two source-root walks build the index; the two remaining walks are the
+    # per-comparison reference ancestry checks. Work aliases are cache hits.
+    assert observations.lineage_lookups == 4
+
+
+def _alias_fixture(prefix: str):
+    work = replace(
+        F.work(f"{prefix}-work"),
+        source_ids=(f"{prefix}-work", f"{prefix}-source"),
+    )
+    pdf, table = work.source_files.files
+    work = replace(
+        work,
+        source_files=replace(
+            work.source_files,
+            files=(
+                replace(pdf, asset_id=f"{prefix}-pdf"),
+                replace(table, asset_id=f"{prefix}-table"),
+            ),
+        ),
+    )
+    experiment = F.tabulation_experiment(
+        experiment_id=f"{prefix}-exp", work_id=work.work_id
+    )
+    reference_work = replace(
+        F.work(f"{prefix}-ref-work"), source_ids=(f"{prefix}-ref-work",)
+    )
+    reference_experiment = F.tabulation_experiment(
+        experiment_id=f"{prefix}-ref-exp", work_id=reference_work.work_id
+    )
+    reference = F.observation(
+        f"{prefix}-ref",
+        reference_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=f"{prefix}-ref-work",
+    )
+    return work, experiment, reference_work, reference_experiment, reference
+
+
+def _assert_alias_failure(work, experiment, rows, aliases, failure) -> None:
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        _resolve_coefficient_sources,
+        bound_work_inputs,
+    )
+
+    _prefix, _exp, reference_work, reference_experiment, reference = _alias_fixture(
+        "holder"
+    )
+    del _prefix, _exp
+    observations = {row.observation_id: row for row in rows}
+    observations[reference.observation_id] = reference
+    experiments = {
+        experiment.experiment_id: experiment,
+        reference_experiment.experiment_id: reference_experiment,
+    }
+    works = {work.work_id: work, reference_work.work_id: reference_work}
+
+    def check() -> None:
+        for alias in aliases:
+            resolved = _resolve_coefficient_sources(
+                (alias,), observations, works, experiments
+            )
+            assert resolved.failure is failure
+            assert (
+                lineage_complete_for(
+                    (alias,),
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is False
+            )
+            assert (
+                resolve_source_relation(
+                    reference,
+                    (alias,),
+                    True,
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is SourceRelation.UNKNOWN
+            )
+
+    check()
+    with bound_work_inputs(works, observations, experiments):
+        check()
+
+
+def test_unresolvable_derivation_input_is_incomplete() -> None:
+    """b-979: a qualified pointer that is not in the store is not dropped."""
+
+    from simulator.battery.validate import AncestryFailure, _observation_lineage, _table_ids
+
+    work, experiment, reference_work, reference_experiment, reference = _alias_fixture(
+        "missing-input"
+    )
+    parent = replace(
+        F.observation(
+            "missing-input-parent",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="missing-input-source",
+        ),
+        read_from="missing-input-pdf",
+    )
+    child = replace(
+        F.observation(
+            "missing-input-child",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            source_id="missing-input-source",
+            derived_from=(parent.observation_id,),
+            derivation=Derivation(
+                relation="qualified pointer",
+                inputs=(parent.observation_id, "other::missing"),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
+        ),
+        read_from="missing-input-pdf",
+    )
+    observations = {parent.observation_id: parent, child.observation_id: child}
+    table_ids = _table_ids({work.work_id: work})
+    own_assets = {asset.asset_id for asset in work.source_files.files}
+    assert _observation_lineage(
+        parent.observation_id, observations, table_ids, asset_ids=own_assets
+    ).complete
+    assert (
+        _observation_lineage(
+            child.observation_id, observations, table_ids, asset_ids=own_assets
+        ).failure
+        is AncestryFailure.UNRESOLVABLE_INPUT
+    )
+    pdf_id = "missing-input-pdf"
+    registered = replace(
+        F.observation(
+            "missing-input-registered-pdf",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="missing-input-source",
+            derived_from=(),
+            derivation=Derivation(
+                relation="read from the source pdf",
+                inputs=(pdf_id,),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
+        ),
+        read_from=pdf_id,
+    )
+    asset_ids = {asset.asset_id for asset in work.source_files.files}
+    registered_ids = {registered.observation_id: registered}
+    bare = _observation_lineage(
+        registered.observation_id, registered_ids, table_ids
+    )
+    assert bare.failure is AncestryFailure.UNRESOLVABLE_INPUT
+    registered_walk = _observation_lineage(
+        registered.observation_id,
+        registered_ids,
+        table_ids,
+        asset_ids=asset_ids,
+    )
+    assert registered_walk.complete
+    assert registered_walk.ids == frozenset({registered.observation_id})
+    registered_observations = {
+        registered.observation_id: registered,
+        reference.observation_id: reference,
+    }
+    assert (
+        resolve_source_relation(
+            registered,
+            ("missing-input-table",),
+            True,
+            works={work.work_id: work, reference_work.work_id: reference_work},
+            observations=registered_observations,
+            experiments={
+                experiment.experiment_id: experiment,
+                reference_experiment.experiment_id: reference_experiment,
+            },
+        )
+        is SourceRelation.INDEPENDENT
+    )
+    _assert_alias_failure(
+        work,
+        experiment,
+        (parent, child),
+        (
+            child.observation_id,
+            work.work_id,
+            "missing-input-source",
+            "missing-input-pdf",
+        ),
+        AncestryFailure.UNRESOLVABLE_INPUT,
+    )
+
+
+def test_cyclic_ancestry_is_incomplete() -> None:
+    """b-979: an active cycle is incomplete. A shared parent stays complete."""
+
+    from simulator.battery.validate import AncestryFailure, _observation_lineage, _table_ids
+
+    work, experiment, *_rest = _alias_fixture("cycle")
+    own_assets = {asset.asset_id for asset in work.source_files.files}
+    left = replace(
+        F.observation(
+            "cycle-left",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="cycle-source",
+        ),
+        derived_from=("cycle-right",),
+        read_from="cycle-pdf",
+    )
+    right = replace(left, observation_id="cycle-right", derived_from=("cycle-left",))
+    observations = {left.observation_id: left, right.observation_id: right}
+    table_ids = _table_ids({work.work_id: work})
+    assert (
+        _observation_lineage(
+            left.observation_id, observations, table_ids, asset_ids=own_assets
+        ).failure
+        is AncestryFailure.CYCLE
+    )
+    assert (
+        _observation_lineage(
+            right.observation_id, observations, table_ids, asset_ids=own_assets
+        ).failure
+        is AncestryFailure.CYCLE
+    )
+    input_left = replace(
+        F.observation(
+            "input-cycle-left",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            source_id="cycle-source",
+            derived_from=(),
+            derivation=Derivation(
+                relation="input cycle",
+                inputs=("input-cycle-right",),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
+        ),
+        read_from="cycle-pdf",
+    )
+    input_right = replace(
+        input_left,
+        observation_id="input-cycle-right",
+        derivation=replace(input_left.derivation, inputs=("input-cycle-left",)),
+    )
+    input_observations = {
+        input_left.observation_id: input_left,
+        input_right.observation_id: input_right,
+    }
+    assert (
+        _observation_lineage(
+            input_left.observation_id,
+            input_observations,
+            table_ids,
+            asset_ids=own_assets,
+        ).failure
+        is AncestryFailure.CYCLE
+    )
+    _assert_alias_failure(
+        work,
+        experiment,
+        (left, right),
+        (left.observation_id, work.work_id, "cycle-source", "cycle-pdf"),
+        AncestryFailure.CYCLE,
+    )
+    parent = replace(
+        F.observation(
+            "dag-parent",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="cycle-source",
+        ),
+        read_from="cycle-pdf",
+    )
+    dag_left = replace(left, observation_id="dag-left", derived_from=("dag-parent",))
+    dag_right = replace(right, observation_id="dag-right", derived_from=("dag-parent",))
+    dag = {
+        parent.observation_id: parent,
+        dag_left.observation_id: dag_left,
+        dag_right.observation_id: dag_right,
+    }
+    assert _observation_lineage(
+        dag_left.observation_id, dag, table_ids, asset_ids=own_assets
+    ).complete
+    assert _observation_lineage(
+        dag_right.observation_id, dag, table_ids, asset_ids=own_assets
+    ).complete
+
+
+def test_missing_experiment_map_alias_is_incomplete() -> None:
+    """b-979: a missing experiment map does not certify the table assets alone."""
+
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _inputs_for_work,
+        _inputs_registered_under_work,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    work, experiment, *_rest = _alias_fixture("membership")
+    printed = _printed_unresolved_observation(
+        "membership-b",
+        experiment.experiment_id,
+        derived_from=(),
+    )
+    observations = {printed.observation_id: printed}
+    works = {work.work_id: work}
+    table_ids = _table_ids(works)
+    assert (
+        _observation_lineage(printed.observation_id, observations, table_ids).failure
+        is AncestryFailure.PRINTED_UNRESOLVED
+    )
+    maps: tuple[Mapping[str, object] | None, ...] = (
+        None,
+        {},
+        {"other-exp": experiment},
+    )
+    aliases = (work.work_id, "membership-source", "membership-pdf")
+    for experiments in maps:
+        assert (
+            _inputs_for_work(work, observations, experiments, table_ids).failure
+            is AncestryFailure.MISSING_EXPERIMENT_MAP
+        )
+
+        def check() -> None:
+            assert (
+                _inputs_registered_under_work(
+                    work, observations, experiments, table_ids
+                ).failure
+                is AncestryFailure.MISSING_EXPERIMENT_MAP
+            )
+            for alias in aliases:
+                assert (
+                    _resolve_coefficient_sources(
+                        (alias,), observations, works, experiments
+                    ).failure
+                    is AncestryFailure.MISSING_EXPERIMENT_MAP
+                )
+                assert (
+                    lineage_complete_for(
+                        (alias,),
+                        works=works,
+                        observations=observations,
+                        experiments=experiments,
+                    )
+                    is False
+                )
+
+        check()
+        with bound_work_inputs(works, observations, experiments):
+            check()
+
+
+def test_unknown_alias_is_incomplete() -> None:
+    """b-979: an unmatched work, source, or PDF string is an unknown alias."""
+
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _resolve_coefficient_sources,
+        bound_work_inputs,
+    )
+
+    work, experiment, reference_work, reference_experiment, reference = _alias_fixture(
+        "unknown"
+    )
+    row = F.observation(
+        "unknown-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="unknown-source",
+    )
+    observations = {row.observation_id: row, reference.observation_id: reference}
+    experiments = {
+        experiment.experiment_id: experiment,
+        reference_experiment.experiment_id: reference_experiment,
+    }
+    works = {work.work_id: work, reference_work.work_id: reference_work}
+    aliases = ("missing-work", "missing-source", "missing-pdf")
+
+    def check() -> None:
+        for alias in aliases:
+            assert (
+                _resolve_coefficient_sources(
+                    (alias,), observations, works, experiments
+                ).failure
+                is AncestryFailure.UNKNOWN_ALIAS
+            )
+            assert (
+                lineage_complete_for(
+                    (alias,),
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is False
+            )
+            assert (
+                resolve_source_relation(
+                    reference,
+                    (alias,),
+                    True,
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is SourceRelation.UNKNOWN
+            )
+
+    check()
+    with bound_work_inputs(works, observations, experiments):
+        check()
+
+
+def test_unresolved_read_from_is_incomplete() -> None:
+    """b-979: an unresolved read_from is incomplete on the reference and as a coefficient."""
+
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _asset_ids,
+        _observation_lineage,
+        _table_ids,
+    )
+
+    work, experiment, *_rest = _alias_fixture("dangling-read")
+    row = replace(
+        F.observation(
+            "dangling-read-row",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="dangling-read-source",
+        ),
+        read_from="missing::table",
+    )
+    works = {work.work_id: work}
+    direct = _observation_lineage(
+        row.observation_id,
+        {row.observation_id: row},
+        _table_ids(works),
+        asset_ids=_asset_ids(works),
+    )
+    assert direct.failure is AncestryFailure.UNRESOLVABLE_INPUT
+    _assert_alias_failure(
+        work,
+        experiment,
+        (row,),
+        (
+            row.observation_id,
+            work.work_id,
+            "dangling-read-source",
+            "dangling-read-pdf",
+        ),
+        AncestryFailure.UNRESOLVABLE_INPUT,
+    )
+
+    redox = replace(
+        F.observation(
+            "dangling-read-redox",
+            "exp-1",
+            _fe_ratio_identity(),
+            Decimal("0.4"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        read_from="missing::table",
+    )
+    redox_residual, redox_candidate = _compile_redox(redox)
+    assert redox_residual.source_relation is SourceRelation.UNKNOWN
+    assert redox_residual.score_eligible is False
+    assert (
+        "source_relation_independent_complete_ancestry" in redox_residual.exclusions
+    )
+    assert redox_candidate is not None and redox_candidate.engine is not None
+    assert redox_candidate.engine.lineage_complete is True
+
+    plain = replace(
+        F.observation(
+            "dangling-read-o2",
+            "exp-1",
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        read_from="missing::table",
+    )
+    prediction = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="internal-analytical",
+        execution=Execution(
+            state=ExecutionState.PRODUCED, call_evidence="test:read-from"
+        ),
+        value=Decimal("0"),
+        unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("nasa-cea-thermo",),
+        lineage_complete=True,
+        identity=plain.identity,
+    )
+    plain_residual, plain_candidate = compile_residual(
+        plain,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), F.tabulation_experiment(), plain),
+        prediction=prediction,
+        comparison_ids={plain.observation_id},
+        derived_band=DecisionBand(
+            Decimal("1"), QUANTITY_UNITS[Quantity.DELTA_FG], "test"
+        ),
+    )
+    assert plain_residual.source_relation is SourceRelation.UNKNOWN
+    assert plain_residual.score_eligible is False
+    assert plain_candidate is not None and plain_candidate.engine is not None
+    assert plain_candidate.engine.lineage_complete is True
+
+
+def test_registered_read_from_stays_out_of_the_lineage() -> None:
+    """b-979: a registered non-table read_from stays complete and out of the id set."""
+
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        _asset_ids,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    work = F.work("registered-read-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="registered-read-exp", work_id=work.work_id
+    )
+    row = F.observation(
+        "registered-read-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="janaf-4th",
+    )
+    assert row.read_from == "pdf-1"
+    observations = {row.observation_id: row}
+    experiments = {experiment.experiment_id: experiment}
+    works = {work.work_id: work}
+    table_ids = _table_ids(works)
+    corpus = _asset_ids(works)
+    member_ids = frozenset({row.observation_id, "nasa-cea-thermo"})
+
+    def check() -> None:
+        direct = _observation_lineage(
+            row.observation_id, observations, table_ids, asset_ids=corpus
+        )
+        assert direct.complete and direct.ids == frozenset({row.observation_id})
+        for alias in (work.work_id, "janaf-4th", "pdf-1"):
+            expanded = _resolve_coefficient_sources(
+                (alias,), observations, works, experiments
+            )
+            assert expanded.complete and expanded.ids == member_ids
+            assert lineage_complete_for(
+                (alias,),
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            ) is True
+        assert (
+            resolve_source_relation(
+                row,
+                ("nasa-cea-thermo",),
+                True,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            )
+            is SourceRelation.INDEPENDENT
+        )
+
+    check()
+    with bound_work_inputs(works, observations, experiments):
+        check()
+
+
+def test_cross_work_registered_asset_resolves_on_both_paths() -> None:
+    """b-979: direct resolution and alias expansion accept the same cross-work asset."""
+
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _asset_ids,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    wa, wa_experiment, *_rest_a = _alias_fixture("wa")
+    wb, wb_experiment, *_rest_b = _alias_fixture("wb")
+    parent = replace(
+        F.observation(
+            "wb-parent",
+            wb_experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="wb-source",
+            derivation=Derivation(
+                relation="source pdf",
+                inputs=("wb-pdf",),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
+        ),
+        read_from="wb-pdf",
+    )
+    child = replace(
+        F.observation(
+            "wa-child",
+            wa_experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            source_id="wa-source",
+            derived_from=(parent.observation_id,),
+            derivation=Derivation(
+                relation="parent on the other work",
+                inputs=(parent.observation_id,),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
+        ),
+        read_from="wa-pdf",
+    )
+    observations = {
+        parent.observation_id: parent,
+        child.observation_id: child,
+    }
+    experiments = {
+        wa_experiment.experiment_id: wa_experiment,
+        wb_experiment.experiment_id: wb_experiment,
+    }
+    works = {wa.work_id: wa, wb.work_id: wb}
+    table_ids = _table_ids(works)
+    corpus = _asset_ids(works)
+    direct_ids = frozenset({child.observation_id, parent.observation_id})
+    alias_ids = direct_ids | {"wa-table"}
+
+    def check() -> None:
+        direct = _observation_lineage(
+            child.observation_id, observations, table_ids, asset_ids=corpus
+        )
+        assert direct.complete and direct.ids == direct_ids
+        resolved = _resolve_coefficient_sources(
+            (child.observation_id,), observations, works, experiments
+        )
+        assert resolved.complete and resolved.ids == direct_ids
+        for alias in (wa.work_id, "wa-source", "wa-pdf"):
+            expanded = _resolve_coefficient_sources(
+                (alias,), observations, works, experiments
+            )
+            assert expanded.complete and expanded.ids == alias_ids
+            assert "wb-pdf" not in expanded.ids
+
+    check()
+    with bound_work_inputs(works, observations, experiments):
+        check()
+
+    bad = replace(
+        child,
+        observation_id="wa-bad",
+        derivation=replace(child.derivation, inputs=("not-a-real-asset",)),
+    )
+    bad_observations = {
+        bad.observation_id: bad,
+        parent.observation_id: parent,
+    }
+    assert (
+        _observation_lineage(
+            bad.observation_id, bad_observations, table_ids, asset_ids=corpus
+        ).failure
+        is AncestryFailure.UNRESOLVABLE_INPUT
+    )
+    assert (
+        _resolve_coefficient_sources(
+            (wa.work_id,), bad_observations, works, experiments
+        ).failure
+        is AncestryFailure.UNRESOLVABLE_INPUT
+    )
+
+
+def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
+    """b-979: incomplete coefficient ancestry is not relabeled by Fe redox."""
+
+    from simulator.battery.enums import RawInputStatus
+
+    identity = _fe_ratio_identity()
+    experiment = F.tabulation_experiment()
+    work = F.work()
+    printed = F.observation(
+        "redox-coefficient",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derived_from=(),
+        derivation=Derivation(
+            relation="printed redox inputs",
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+            raw_inputs=Located(
+                State.of(RawInputStatus.PRINTED_UNRESOLVED),
+                locator=F.loc(),
+            ),
+        ),
+    )
+    reference = F.observation(
+        "redox-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    calibration = replace(
+        reference,
+        observation_id="redox-reference-calibration",
+        evidence=replace(reference.evidence, attribution="K&C88+; K&C91"),
+    )
+    aliases = (
+        printed.observation_id,
+        work.work_id,
+        "janaf-4th",
+        "pdf-1",
+    )
+    for row in (reference, calibration):
+        for alias in aliases:
+            prediction = EnginePrediction(
+                engine=Engine.INTERNAL_ANALYTICAL,
+                channel="internal-analytical",
+                execution=Execution(
+                    state=ExecutionState.PRODUCED, call_evidence="test:redox"
+                ),
+                value=Decimal("0.4"),
+                unit=QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
+                authority=Authority.CERTIFIED,
+                coefficient_sources=(alias,),
+                lineage_complete=True,
+                identity=row.identity,
+            )
+            residual, candidate = compile_residual(
+                row,
+                Engine.INTERNAL_ANALYTICAL,
+                context=_context(work, experiment, row, printed),
+                prediction=prediction,
+                comparison_ids={row.observation_id},
+                derived_band=DecisionBand(
+                    Decimal("1"), "dimensionless", "test-dex"
+                ),
+            )
+            assert residual.source_relation is SourceRelation.UNKNOWN
+            assert residual.score_eligible is False
+            assert candidate is not None
+            assert candidate.engine is not None
+            assert candidate.engine.lineage_complete is False
+    table_prediction = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="internal-analytical",
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:redox"),
+        value=Decimal("0.4"),
+        unit=QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("nasa-cea-thermo",),
+        lineage_complete=True,
+        identity=reference.identity,
+    )
+    table_residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, printed),
+        prediction=table_prediction,
+        comparison_ids={reference.observation_id},
+        derived_band=DecisionBand(Decimal("1"), "dimensionless", "test-dex"),
+    )
+    assert table_residual.source_relation is SourceRelation.INDEPENDENT
 
 
 def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
@@ -5419,7 +11376,7 @@ def _streaming_score_fixture():
             DecisionBand(
                 Decimal("2"),
                 unit,
-                "source-printed per-cell uncertainty",
+                "printed_1sigma: source-printed uncertainty",
             ),
         ),
     )
@@ -5447,7 +11404,7 @@ def _streaming_score_fixture():
             DecisionBand(
                 Decimal("0.231"),
                 "dimensionless",
-                "source-printed per-cell uncertainty",
+                "printed_1sigma: source-printed uncertainty",
             ),
         ),
     )
@@ -5600,13 +11557,7 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
         isinstance(row.get("numeric"), dict)
         and isinstance(row["numeric"].get("decision_band"), dict)
         and row["numeric"]["decision_band"].get("rule")
-        == "source-printed per-cell uncertainty"
-        for row in rows
-    )
-    assert any(
-        isinstance(row.get("numeric"), dict)
-        and isinstance(row["numeric"].get("decision_band"), dict)
-        and "residual distribution" in row["numeric"]["decision_band"].get("rule", "")
+        .startswith("printed_1sigma:")
         for row in rows
     )
     assert any(row.get("status") == ResidualStatus.NO_BAND.value for row in rows)
@@ -5674,9 +11625,12 @@ def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
     assert streamed_report == legacy_report
     from simulator.battery.score import SCORE_ENGINE_SET
 
+    measured_table = streamed_report.split("## Measured tier", 1)[1].split(
+        "## Flagged strata", 1
+    )[0]
     for rail in Rail:
         for report_engine in SCORE_ENGINE_SET:
-            assert f"| {rail.value} | {report_engine.value} | 0 |" in streamed_report
+            assert f"| {rail.value} | {report_engine.value} | — | 0 |" in measured_table
 
 
 def test_streamed_measured_grid_omits_selected_engine_without_rail_rows(
@@ -5944,6 +11898,42 @@ def test_battery_report_only_streams_residual_jsonl(
         residual_path,
         root=score_mod.REPO_ROOT,
     )
+    import json
+
+    fit_comparison_path = battery / "compilation-comparisons.jsonl"
+    fit_comparison_path.write_text(
+        "\n".join(
+            json.dumps(row)
+            for row in (
+                {
+                    "reference_id": "nasa9-fit::record::cp::T=1200",
+                    "quantity": "cp",
+                    "comparison_channel": f"nasa9_fit:{Engine.INTERNAL_ANALYTICAL.value}",
+                    "comparison_key": "nasa9-fit::record::cp::T=1200::internal-analytical",
+                    "comparison_quantity": "cp",
+                    "status": "match",
+                    "value": "0.12",
+                    "band": "0.5",
+                    "refusal_reason": None,
+                    "refusal_detail": {},
+                },
+                {
+                    "reference_id": "nasa9-fit::record::cp::T=1300",
+                    "quantity": "cp",
+                    "comparison_channel": f"nasa9_fit:{Engine.INTERNAL_ANALYTICAL.value}",
+                    "comparison_key": "nasa9-fit::record::cp::T=1300::internal-analytical",
+                    "comparison_quantity": "cp",
+                    "status": ResidualStatus.REFUSED.value,
+                    "value": None,
+                    "band": None,
+                    "refusal_reason": RefusalReason.UNSUPPORTED.value,
+                    "refusal_detail": {"reason": "fit-unavailable"},
+                },
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
     monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
@@ -5979,16 +11969,100 @@ def test_battery_report_only_streams_residual_jsonl(
     assert "report-only residuals=1" in printed
     assert (battery / "score-report.md").is_file()
     assert (battery / "score-summary.json").is_file()
-    import json
-
+    report = (battery / "score-report.md").read_text(encoding="utf-8")
+    assert "## NASA-9 fit comparison stratum" in report
+    assert "| internal-analytical | cp | 2 | 1 | 1 |" in report
+    assert "`unsupported`" in report and '"reason":"fit-unavailable"' in report
     summary = json.loads((battery / "score-summary.json").read_text(encoding="utf-8"))
     assert all("n_eligible_references" not in row for row in summary["records"])
+    assert all(row["tier"] != "nasa9_fit" for row in summary["records"])
     measured_vapour = next(
         row
         for row in summary["records"]
         if row["tier"] == "measured" and row["rail"] == Rail.VAPOUR.value
     )
+    assert measured_vapour["n"] == 1
     assert measured_vapour["band_width_dex"] is None
+
+
+def test_battery_normal_report_includes_fit_comparison_stratum(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+
+    import simulator.battery.score as score_mod
+    from scripts import battery_score
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    reference = F.observation(
+        "normal-report-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = _context(work, experiment, reference)
+    root = tmp_path / "normal-report-root"
+    (root / "data" / "battery").mkdir(parents=True)
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "emit_store_stamp_mismatch_warning", lambda *_: None)
+    monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
+
+    def write_fit_rows(_context, path, *, engines, invoke_pure_phase):
+        assert engines == (Engine.INTERNAL_ANALYTICAL,)
+        assert invoke_pure_phase is True
+        path.write_text(
+            json.dumps(
+                {
+                    "reference_id": "nasa9-fit::record::cp::T=1200",
+                    "quantity": "cp",
+                    "comparison_channel": f"nasa9_fit:{Engine.INTERNAL_ANALYTICAL.value}",
+                    "comparison_key": "nasa9-fit::record::cp::T=1200::internal-analytical",
+                    "comparison_quantity": "cp",
+                    "status": "match",
+                    "value": "0.12",
+                    "band": "0.5",
+                    "refusal_reason": None,
+                    "refusal_detail": {},
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        return 1
+
+    monkeypatch.setattr(
+        battery_score, "_write_compilation_comparisons_jsonl", write_fit_rows
+    )
+    assert (
+        battery_score.main(
+            [
+                "--root",
+                str(root),
+                "--engines",
+                Engine.INTERNAL_ANALYTICAL.value,
+                "--limit",
+                "1",
+            ]
+        )
+        == 0
+    )
+    report = (root / "data" / "battery" / "score-report.md").read_text(
+        encoding="utf-8"
+    )
+    assert "## NASA-9 fit comparison stratum" in report
+    assert "| internal-analytical | cp | 1 | 1 | 0 |" in report
+    residual_rows = score_mod.load_residuals_jsonl(
+        root / "data" / "battery" / "residuals.jsonl"
+    )
+    assert not any(
+        "nasa9_fit" in str(row.get("source_relation")) for row in residual_rows
+    )
 
 
 def test_write_headline_summary_has_tier_and_null_data_scatter_slot(tmp_path: Path) -> None:
@@ -6341,6 +12415,134 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
     assert converted.source_id == "another-source"
 
 
+def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import score as score_module
+
+    temperature = Decimal("2000")
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.8")), ("Al2O3", Decimal("0.2"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+            composition=composition,
+        ),
+        "lime",
+    )
+    reference = replace(
+        F.observation(
+            "fusion-reference-with-printed-band",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.3"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fusion-band-fixture",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="±0.10 standard deviation of log10(a) as printed",
+            locator=F.loc(page=4, table="2"),
+        ),
+    )
+    resolve_energy = score_module._janaf_fusion_energy_for_reference
+
+    def resolve_with_printed_sigma(row, temperature_K):
+        energy = resolve_energy(row, temperature_K)
+        return replace(
+            energy,
+            sigma_delta_g_fus_kJ_per_mol=Decimal("1"),
+            uncertainty_locator=F.loc(
+                page=4,
+                table="10",
+                note="Printed fusion uncertainty fixture, JANAF Ca-027/Ca-028.",
+            ),
+        )
+
+    monkeypatch.setattr(
+        score_module, "_janaf_fusion_energy_for_reference", resolve_with_printed_sigma
+    )
+    converted = score_module.fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(converted.value.point, converted.identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    band = residual.numeric.decision_band
+    assert band.band_basis == "fusion_combined_row_printed"
+    assert band.value > Decimal("0.10") * score_module.NORMAL_95_TICKET_MULTIPLIER
+    # sigma_conv = 1 kJ/mol * 1000 J/kJ / (8.31441 J/(mol K) * 2000 K * ln(10));
+    # sigma_total = sqrt(0.10^2 + sigma_conv^2) dex; ticket = 1.959963984540054 * sigma_total.
+    assert band.value.quantize(Decimal("0.00001")) == Decimal("0.20257")
+    assert any(
+        item.reason.startswith("reference_converted_via_fusion;")
+        for item in residual.notices
+    )
+
+
+def test_fusion_conversion_without_printed_janaf_sigma_has_typed_no_band() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    temperature = Decimal("2000")
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        "lime",
+    )
+    reference = replace(
+        F.observation(
+            "fusion-reference-without-janaf-sigma",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.3"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fusion-no-sigma-fixture",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="±0.10 standard deviation of log10(a) as printed",
+            locator=F.loc(page=4, table="2"),
+        ),
+    )
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(converted.value.point, converted.identity),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
+    assert any(
+        item.reason.startswith("reference_converted_via_fusion;")
+        for item in residual.notices
+    )
+
+
 @pytest.mark.parametrize(
     ("formula", "polymorph", "expected_offset", "tables"),
     (
@@ -6452,6 +12654,31 @@ def test_periclase_fusion_conversion_uses_restored_janaf_rows() -> None:
     )
 
 
+def test_guo_periclase_measurement_uses_thermoengine_fusion_reference_owner() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    context = _migrated_extract_context("guo-2021-mgo-activity-cmas-slag.yaml")
+    reference = next(
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == "guo-2021-mgo-activity-cmas-slag"
+        and observation.value.point == Decimal("0.6376")
+        and observation.identity.reference_state.is_value
+        and observation.identity.reference_state.value.endmember.polymorph.value
+        == "periclase"
+    )
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.THERMOENGINE
+    )
+    assert converted.value.point != reference.value.point
+    assert abs(converted.value.point - Decimal("0.1024623")) < Decimal("0.00001")
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in converted.notices
+    )
+
+
 def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
     """At 1873 K, Mg-008 and Mg-009 give the expected periclase-to-liquid shift.
 
@@ -6513,32 +12740,17 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
     )
     assert refused.value.point == reference.value.point
     assert refused.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        "Mg-008 represents polymorph periclase" in notice.reason
+    assert not any(
+        notice.reason.startswith("reference_converted_via_fusion;")
         for notice in refused.notices
     )
 
 @pytest.mark.parametrize(
-    ("temperature", "expected_shift_dex"),
-    (
-        (Decimal("1823"), Decimal("-0.96857")),
-        (Decimal("1873"), Decimal("-0.90911")),
-    ),
+    "temperature", (Decimal("1823"), Decimal("1873"))
 )
-def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
+def test_unnamed_cao_reference_phase_is_a_missing_fusion_input(
     temperature: Decimal,
-    expected_shift_dex: Decimal,
 ) -> None:
-    """The sole eligible CaO(cr) JANAF table fixes the unknown solid reference.
-
-    For the same chemical potential, mu = G° + RT ln(a) gives
-    log10(a_l/a_s) = -DeltaG_fus/(RT ln(10)). JANAF's DeltaG_fus is in
-    kJ/mol, so convert by 1000 and use R = 8.314462618 J/(mol K). The
-    interpolated JANAF values are 33.80370 kJ/mol at 1823 K and 32.59870
-    kJ/mol at 1873 K, giving shifts -0.96857 and -0.90911 dex. As a
-    sanity check, DeltaH_fus(1 - T/Tm), with Tm = 3200 K, gives 34.208 and
-    32.966 kJ/mol at those temperatures, close to the JANAF interpolations.
-    """
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -6563,26 +12775,22 @@ def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
 
     converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
-    assert converted.value.point != reference.value.point
-    assert abs(
-        (converted.value.point / reference.value.point).log10() - expected_shift_dex
-    ) < Decimal("0.0005")
-    notice = next(
-        item
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert converted.value.point == reference.value.point
+    assert any(
+        item.reason == "fusion_source_reference_phase_unprinted"
         for item in converted.notices
-        if item.kind is NoticeKind.DERIVATION_USES_COMPILATION
     )
-    assert "reference_converted_via_fusion" in notice.reason
-    assert "source polymorph is unknown" in notice.reason
 
 
 def test_stated_silica_polymorph_is_not_reinferred() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
             formula="SiO2",
-            T_K=Decimal("1823"),
+            T_K=Decimal("1600"),
             endmember_phase=Phase.CR,
             component_basis="SiO2",
         ),
@@ -6597,25 +12805,21 @@ def test_stated_silica_polymorph_is_not_reinferred() -> None:
         source_id="synthetic-stated-silica-polymorph",
     )
 
-    residual, _candidate = compile_residual(
-        reference,
-        Engine.OPENIMCC,
-        context=_context(F.work(), experiment, reference, review="reviewed"),
-    )
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["reason"] == (
-        "solid_liquid_reference_conversion_missing_input"
-    )
-    assert residual.refusal.detail["notice"] == (
-        "fusion conversion missing input: JANAF solid table O-035 represents "
-        "polymorph cristobalite_high, but measured reference polymorph is quartz"
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        and "tables=O-037/O-038" in notice.reason
+        for notice in comparison.notices
     )
 
 
-def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -> None:
+@pytest.mark.parametrize("engine", (Engine.OPENIMCC, Engine.MAGEMIN))
+def test_solid_reference_without_temperature_remains_a_missing_input_refusal(
+    engine: Engine,
+) -> None:
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -6638,13 +12842,16 @@ def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -
 
     residual, _candidate = compile_residual(
         reference,
-        Engine.OPENIMCC,
+        engine,
         context=_context(F.work(), experiment, reference, review="reviewed"),
     )
 
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "solid_liquid_reference_conversion_missing_input"
+    )
     assert residual.refusal.detail["missing_input"] == (
         "activity observation temperature_K"
     )
@@ -6653,7 +12860,7 @@ def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -
     )
 
 
-def test_kume_2000_silica_row_conversion_view_has_stability_inference_flag() -> None:
+def test_kume_2000_silica_unnamed_phase_is_not_converted() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
     context = load_score_context(sources=("kume-2000-cao-activities",))
@@ -6663,14 +12870,15 @@ def test_kume_2000_silica_row_conversion_view_has_stability_inference_flag() -> 
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert comparison.value.point != reference.value.point
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert any(
-        notice.reason.startswith("reference_polymorph_inferred_from_stability: ")
+        notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in comparison.notices
     )
 
 
-def test_inference_notice_reaches_a_numeric_residual() -> None:
+def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -6700,94 +12908,53 @@ def test_inference_notice_reaches_a_numeric_residual() -> None:
     context = _context(F.work(), experiment, reference, review="reviewed")
 
     residual, candidate = compile_residual(
-        reference, Engine.OPENIMCC, context=context
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=_predict(Decimal("0.3"), identity),
     )
 
-    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == (
+        "fusion_source_reference_phase_unprinted"
+    )
     assert candidate is not None
     assert any(
-        notice.reason.startswith("reference_polymorph_inferred_from_stability: ")
+        notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in residual.notices
     )
 
+    quartz_identity = _with_activity_reference_polymorph(identity, "quartz")
+    mismatched, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=_predict(Decimal("0.3"), quartz_identity),
+    )
+    assert mismatched.status is ResidualStatus.REFUSED
+    assert mismatched.refusal is not None
+    assert mismatched.refusal.reason in {
+        RefusalReason.IDENTITY_UNKNOWN,
+        RefusalReason.IDENTITY_MISMATCH,
+    }
+
 
 @pytest.mark.parametrize(
+    ("formula", "temperature_K", "crossing_K"),
     (
-        "formula",
-        "temperature_K",
-        "expected_activity",
-        "expected_residual",
-        "default_solid_table",
-        "selected_solid_table",
-        "liquid_table",
-        "delta_g_kJ_per_mol",
-        "crossing_K",
-        "source_hashes",
-    ),
-    (
-        (
-            "Al2O3",
-            Decimal("2400"),
-            Decimal("0.3583233854709349838426386125"),
-            Decimal("0.021519916602154066"),
-            "Al-096",
-            "Al-096",
-            "Al-100",
-            Decimal("-3.545"),
-            Decimal("2326.528497409326424870466321"),
-            (
-                "2054107c6e2f7c35d0196530f1d9362981612271d82731437cc016d74f147da6",
-                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
-            ),
-        ),
-        (
-            "Al2O3",
-            Decimal("2500"),
-            Decimal("0.4337601535097755115490675312"),
-            Decimal("-0.037220177900394995"),
-            "Al-096",
-            "Al-098",
-            "Al-100",
-            Decimal("-7.664"),
-            Decimal("2289.031679617453676031081889"),
-            (
-                "035d4d22aebf50e27e86e50b938508d792aaa53b8b6ea3eec2dc8908cdabff84",
-                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
-            ),
-        ),
-        (
-            "SiO2",
-            Decimal("2000"),
-            Decimal("0.3004513633937164890006667638"),
-            Decimal("0.2211958252328113"),
-            "O-035",
-            "O-035",
-            "O-038",
-            Decimal("-0.025"),
-            Decimal("1994.469026548672566371681416"),
-            (
-                "b3b964ea6baf5ad47b27a212ef9192762c51fb2acf26f1cec521658fb41fb742",
-                "f1233d320c6c49aa8055a95b7e0f2d6404b47d42079f42966c5f1331f94f3f2c",
-            ),
-        ),
+        ("Al2O3", Decimal("2400"), Decimal("2326.528497409326424870466321")),
+        ("Al2O3", Decimal("2500"), Decimal("2289.031679617453676031081889")),
+        ("SiO2", Decimal("2000"), Decimal("1994.469026548672566371681416")),
     ),
 )
-def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
+def test_unnamed_reference_phase_above_crossing_is_not_selected_from_temperature(
     formula: str,
     temperature_K: Decimal,
-    expected_activity: Decimal,
-    expected_residual: Decimal,
-    default_solid_table: str,
-    selected_solid_table: str,
-    liquid_table: str,
-    delta_g_kJ_per_mol: Decimal,
     crossing_K: Decimal,
-    source_hashes: tuple[str, str],
 ) -> None:
-    import json
-
-    from simulator.battery.generators.janaf import janaf_fusion_energy
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -6815,46 +12982,403 @@ def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    inference = next(
-        notice
+
+    assert temperature_K > crossing_K
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in comparison.notices
-        if notice.reason.startswith("reference_polymorph_inferred_from_stability: ")
     )
-    detail = json.loads(inference.reason.split(": ", 1)[1])
-    conversion = next(
-        notice
-        for notice in comparison.notices
-        if notice.reason.startswith("reference_converted_via_fusion;")
+
+
+def test_unnamed_silica_reference_phase_does_not_select_a_janaf_table() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        None,
     )
-    domain_notice = next(
-        notice
-        for notice in comparison.notices
-        if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    reference = F.observation(
+        "silica-unknown-polymorph-with-multiple-solid-tables",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
     )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        item.reason == "fusion_source_reference_phase_unprinted"
+        for item in comparison.notices
+    )
+
+
+def _quartz_silica_activity_observation():
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "quartz",
+    )
+    reference = F.observation(
+        "silica-unknown-polymorph-activity-golden",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+    return experiment, reference
+
+
+def _corrupt_o037_janaf_source_hash(monkeypatch: pytest.MonkeyPatch) -> None:
+    from copy import deepcopy
+
+    from simulator.battery.generators import janaf
+
+    original_loader = janaf.load_table_document
+
+    def corrupt_o037_hash(path):
+        document = original_loader(path)
+        if path.name != "O-037.yaml":
+            return document
+        corrupted = deepcopy(document)
+        corrupted["extraction"]["source_sha256"] = "0" * 64
+        return corrupted
+
+    monkeypatch.setattr(janaf, "load_table_document", corrupt_o037_hash)
+    janaf._fusion_table_points.cache_clear()
+    janaf._janaf_pure_solid_table_temperature_range.cache_clear()
+
+
+def test_corrupt_o037_activity_candidate_hash_refuses_compile_residual(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _corrupt_o037_janaf_source_hash(monkeypatch)
+    experiment, reference = _quartz_silica_activity_observation()
+
     residual, _candidate = compile_residual(
         reference,
         Engine.OPENIMCC,
         context=_context(F.work(), experiment, reference, review="reviewed"),
     )
 
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    notice = residual.refusal.detail["notice"]
+    assert "O-037" in notice
+    assert "JANAF cache hash does not match source sidecar" in notice
+
+
+def test_corrupt_o037_activity_candidate_is_counted_by_score_store_census(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.score import refusal_census
+
+    _corrupt_o037_janaf_source_hash(monkeypatch)
+    experiment, reference = _quartz_silica_activity_observation()
+    context = _context(F.work(), experiment, reference, review="reviewed")
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        include_diagnostics=True,
+    )
+
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.reference == reference.observation_id
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert "O-037" in residual.refusal.detail["notice"]
+    assert refusal_census(residuals) == {
+        "identity_incomplete:solid_liquid_reference_conversion_missing_input": 1
+    }
+
+
+def test_unnamed_alumina_reference_phase_is_not_inferred() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="Al2O3",
+            T_K=Decimal("1800"),
+            endmember_phase=Phase.CR,
+            component_basis="Al2O3",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "alumina-unknown-polymorph-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        item.reason == "fusion_source_reference_phase_unprinted"
+        for item in comparison.notices
+    )
+
+
+def test_unnamed_silica_reference_with_row_band_keeps_missing_phase_reason() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "silica-inference-bound-exceeds-row-band",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-solid-reference-with-band",
+    )
+    reference = replace(
+        reference,
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="0.01 dex",
+            value=Decimal("0.01"),
+            basis="log10_dex",
+        ),
+    )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        item.reason == "fusion_source_reference_phase_unprinted"
+        for item in comparison.notices
+    )
+
+
+def test_unnamed_cao_reference_phase_is_not_converted() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "single-table-cao-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-cao-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in comparison.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("temperature", "expected_shift_dex"),
+    (
+        (Decimal("1823"), Decimal("-0.96857")),
+        (Decimal("1873"), Decimal("-0.90911")),
+    ),
+)
+def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
+    temperature: Decimal,
+    expected_shift_dex: Decimal,
+) -> None:
+    """The sole eligible CaO(cr) JANAF table fixes the unnamed solid reference.
+
+    For the same chemical potential, mu = G° + RT ln(a) gives
+    log10(a_l/a_s) = -DeltaG_fus/(RT ln(10)). JANAF's DeltaG_fus is in
+    kJ/mol, so convert by 1000 and use R = 8.314462618 J/(mol K). The
+    interpolated JANAF values are 33.80370 kJ/mol at 1823 K and 32.59870
+    kJ/mol at 1873 K, giving shifts -0.96857 and -0.90911 dex. As a
+    sanity check, DeltaH_fus(1 - T/Tm), with Tm = 3200 K, gives 34.208 and
+    32.966 kJ/mol at those temperatures, close to the JANAF interpolations.
+
+    b150r applied this shift to an omitted polymorph. c1ec62344 (d-165)
+    leaves that record on the printed number, and dropped the
+    "source polymorph is unknown" clause from the conversion notice.
+    800194114 keeps the same shift for a polymorph axis that was never set.
+    """
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        )
+    )
+    reference = F.observation(
+        f"cao-unknown-polymorph-at-{temperature}K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-unknown-cao-polymorph",
+    )
+    assert reference.admission.status is AdmissionStatus.ADMITTED
+
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert converted.value.point != reference.value.point
+    assert abs(
+        (converted.value.point / reference.value.point).log10() - expected_shift_dex
+    ) < Decimal("0.0005")
+    notice = next(
+        item
+        for item in converted.notices
+        if item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+    )
+    assert "reference_converted_via_fusion" in notice.reason
+    assert "source polymorph is unknown" not in notice.reason
+
+
+@pytest.mark.parametrize(
+    (
+        "formula",
+        "temperature_K",
+        "crossing_K",
+        "default_solid_table",
+        "selected_solid_table",
+        "liquid_table",
+    ),
+    (
+        (
+            "Al2O3",
+            Decimal("2400"),
+            Decimal("2326.528497409326424870466321"),
+            "Al-096",
+            "Al-096",
+            "Al-100",
+        ),
+        (
+            "Al2O3",
+            Decimal("2500"),
+            Decimal("2289.031679617453676031081889"),
+            "Al-096",
+            "Al-098",
+            "Al-100",
+        ),
+        (
+            "SiO2",
+            Decimal("2000"),
+            Decimal("1994.469026548672566371681416"),
+            "O-035",
+            "O-035",
+            "O-038",
+        ),
+    ),
+)
+def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
+    formula: str,
+    temperature_K: Decimal,
+    crossing_K: Decimal,
+    default_solid_table: str,
+    selected_solid_table: str,
+    liquid_table: str,
+) -> None:
+    """Above the crossing the printed activity stays, on the selected pair.
+
+    b150r converted these unnamed solids numerically (activities
+    0.3583233854709349838426386125, 0.4337601535097755115490675312 and
+    0.3004513633937164890006667638, with engine residuals of those
+    converted values). c1ec62344 stopped that shift: liquid is the natural
+    reference above the JANAF crossing, so the activity pin is the printed
+    0.3. The selected pair is unchanged and is now on the domain notice.
+    """
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula=formula,
+            T_K=temperature_K,
+            endmember_phase=Phase.CR,
+            component_basis=formula,
+        )
+    )
+    reference = F.observation(
+        f"inferred-{formula}-activity-at-{temperature_K}-K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-inferred-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    domain_notice = next(
+        notice
+        for notice in comparison.notices
+        if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    )
+
     assert temperature_K > crossing_K
     assert janaf_fusion_energy(formula, temperature_K).crystal_table == (
         default_solid_table
     )
-    assert detail["chosen_table"] == selected_solid_table
-    assert comparison.value.point == expected_activity
-    assert f"DeltaG_fus={delta_g_kJ_per_mol} kJ/mol" in conversion.reason
-    assert f"JANAF_Tm={crossing_K} K" in conversion.reason
-    assert f"tables={selected_solid_table}/{liquid_table}" in conversion.reason
-    assert f"source_sha256={source_hashes[0]}/{source_hashes[1]}" in conversion.reason
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert domain_notice.reason == (
         f"solid reference recorded at T={temperature_K} K >= "
-        f"JANAF T_fus={crossing_K} K; inferred solid-reference activity "
-        "converted numerically; liquid is natural"
+        f"JANAF T_fus={crossing_K} K; "
+        "no numeric reference-state conversion applied because liquid is natural"
     )
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.numeric is not None
-    assert residual.numeric.value == expected_residual
+    assert domain_notice.band == (
+        f"JANAF fusion crossing {crossing_K} K; "
+        f"tables={selected_solid_table}/{liquid_table}"
+    )
+    assert not any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in comparison.notices
+    )
 
 
 def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() -> None:
@@ -6867,14 +13391,13 @@ def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() 
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
-    identity = _with_activity_reference_polymorph(
+    identity = _without_activity_reference_polymorph(
         F.activity_identity(
             formula="SiO2",
             T_K=Decimal("1823"),
             endmember_phase=Phase.CR,
             component_basis="SiO2",
-        ),
-        None,
+        )
     )
     reference = F.observation(
         "silica-unknown-polymorph-with-multiple-solid-tables",
@@ -6912,20 +13435,85 @@ def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() 
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
+def test_unknown_polymorph_activity_conversion_has_numeric_golden_pin() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        )
+    )
+    reference = F.observation(
+        "silica-unknown-polymorph-activity-golden",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference)
+
+    assert comparison.value.point == Decimal("0.2859156906189812475869526078")
+    assert float(comparison.value.point).hex() == "0x1.24c715327cb38p-2"
+
+
+def test_unknown_alumina_activity_notice_lists_all_dictionary_crystals() -> None:
+    import json
+
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="Al2O3",
+            T_K=Decimal("1800"),
+            endmember_phase=Phase.CR,
+            component_basis="Al2O3",
+        )
+    )
+    reference = F.observation(
+        "alumina-unknown-polymorph-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference)
+    notice = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    detail = json.loads(notice.reason.split(": ", 1)[1])
+
+    assert detail["chosen_table"] == "Al-096"
+    assert {item["table"] for item in detail["alternatives"]} == {
+        "Al-097",
+        "Al-098",
+        "Al-099",
+    }
+
+
 def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> None:
     import json
 
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
-    identity = _with_activity_reference_polymorph(
+    identity = _without_activity_reference_polymorph(
         F.activity_identity(
             formula="SiO2",
             T_K=Decimal("1823"),
             endmember_phase=Phase.CR,
             component_basis="SiO2",
-        ),
-        None,
+        )
     )
     reference = F.observation(
         "silica-inference-bound-exceeds-row-band",
@@ -6955,6 +13543,36 @@ def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> 
 
     assert Decimal(detail["bound_dex"]) > Decimal("0.01")
     assert detail["row_decision_band_dex"] == "0.01"
+    assert detail["row_decision_band_refusal"] is None
+    assert any(
+        item.reason == "confidence_level_not_stated"
+        for item in comparison.notices
+    )
+
+    unmapped = replace(
+        reference,
+        observation_id="silica-inference-bound-unmapped-unit",
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="1 furlong",
+            value=Decimal("1"),
+            basis="furlong",
+        ),
+        notices=(),
+    )
+    refused_comparison = fusion_comparison_reference(
+        unmapped, engine=Engine.OPENIMCC
+    )
+    refused_inference = next(
+        item
+        for item in refused_comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    refused_detail = json.loads(refused_inference.reason.split(": ", 1)[1])
+    assert refused_detail["row_decision_band_dex"] is None
+    assert refused_detail["row_decision_band_refusal"]["reason"] == (
+        "printed_uncertainty_unit_unmapped"
+    )
     assert detail["bound_exceeds_row_band"] is True
     assert comparison.value.point != reference.value.point
 
@@ -6963,14 +13581,13 @@ def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
-    identity = _with_activity_reference_polymorph(
+    identity = _without_activity_reference_polymorph(
         F.activity_identity(
             formula="CaO",
             T_K=Decimal("1873"),
             endmember_phase=Phase.CR,
             component_basis="CaO",
-        ),
-        None,
+        )
     )
     reference = F.observation(
         "single-table-cao-reference",
@@ -6984,8 +13601,10 @@ def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
     assert comparison.value.point == Decimal("0.03698396471321415622463886555")
+    # c1ec62344 removed "source polymorph is unknown" from this notice.
+    # The activity, offset, DeltaG and table hashes are the b150r pin.
     assert tuple(notice.reason for notice in comparison.notices) == (
-        "reference_converted_via_fusion; source polymorph is unknown; "
+        "reference_converted_via_fusion; "
         "reference-state conversion (not model error); oxide=CaO; "
         "source_activity_solid=0.3; "
         "converted_activity_liquid=0.03698396471321415622463886555; "
@@ -6996,8 +13615,84 @@ def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -
         "table/accepted melting-point mismatch adds uncertainty to the "
         "metastable-liquid reference; tables=Ca-027/Ca-028; "
         "source_sha256=b6a05e07aa1156d58ec9fa701a4c3e338dbbde38c0c6c16660a23c57aac7563d/"
-        "44546e962fd516f7e9cf035429593916440008b7f81c06b5915da86b1203d072"
-    ,)
+        "44546e962fd516f7e9cf035429593916440008b7f81c06b5915da86b1203d072",
+    )
+
+
+def test_rejected_cao_reference_polymorph_is_not_converted_or_scored() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        Polymorph.CLINOENSTATITE.value,
+    )
+    source_polymorph = identity.reference_state.value.endmember.polymorph
+    assert source_polymorph is not None and source_polymorph.is_unknown
+    assert source_polymorph.reason == (
+        "polymorph clinoenstatite does not denote formula CaO"
+    )
+    reference = F.observation(
+        "cao-reference-rejected-clinoenstatite",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-rejected-cao-reference",
+    )
+
+    comparison = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    assert comparison.value.point == Decimal("0.3")
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_MISMATCH
+    assert residual.refusal.detail["reason"] == "solid_reference_polymorph_rejected"
+    assert residual.refusal.detail["polymorph_reason"] == source_polymorph.reason
+
+
+def test_source_polymorph_classification_pin() -> None:
+    from simulator.battery.score import (
+        _source_polymorph_is_rejected,
+        _source_polymorph_is_unspecified,
+    )
+
+    from simulator.battery.migrate import make_species
+
+    omitted = make_species("MgO", Phase.CR).polymorph
+    assert omitted is not None
+    unrecognised = Species("MgO", Phase.CR, State.of("unknown-form")).polymorph
+    contradictory_mgo = Species(
+        "MgO", Phase.CR, State.of(Polymorph.CLINOENSTATITE)
+    ).polymorph
+    contradictory_cao = Species(
+        "CaO", Phase.CR, State.of(Polymorph.CLINOENSTATITE)
+    ).polymorph
+    recognised = State.of(Polymorph.PERICLASE)
+
+    for state in (omitted,):
+        assert _source_polymorph_is_unspecified(state)
+        assert not _source_polymorph_is_rejected(state)
+    for state in (unrecognised, contradictory_mgo, contradictory_cao):
+        assert state is not None
+        assert not _source_polymorph_is_unspecified(state)
+        assert _source_polymorph_is_rejected(state)
+    assert not _source_polymorph_is_unspecified(recognised)
+    assert not _source_polymorph_is_rejected(recognised)
 
 
 def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
@@ -7037,9 +13732,14 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     )
     after_comparison = fusion_comparison_reference(after, engine=Engine.OPENIMCC)
 
+    assert before_comparison.value.point == before.value.point
     assert (
         before_comparison.identity.reference_state.value.endmember.phase.value
-        is Phase.L
+        is Phase.CR
+    )
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in before_comparison.notices
     )
     assert (
         after_comparison.identity.reference_state.value.endmember.phase.value
@@ -7210,21 +13910,17 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     if polymorph is None:
-        assert comparison.value.point != reference.value.point
-        assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
         assert any(
-            notice.reason.startswith("reference_converted_via_fusion;")
-            and "source polymorph is unknown" in notice.reason
+            notice.reason == "fusion_source_reference_phase_unprinted"
             for notice in comparison.notices
         )
         return
 
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        "fusion conversion missing input" in notice.reason
-        and "Ca-027 represents polymorph lime" in notice.reason
+    assert not any(
+        notice.reason.startswith("reference_converted_via_fusion;")
         for notice in comparison.notices
     )
 
@@ -7236,12 +13932,13 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["missing_input"] == (
-        "JANAF solid polymorph matching the selected table"
+    assert residual.refusal.detail["notice"] == (
+        "fusion conversion missing input for CaO: no unique JANAF solid table "
+        "for CaO polymorph quartz"
     )
 
 
-def test_silica_solid_activity_with_stated_quartz_refuses_conversion() -> None:
+def test_silica_solid_activity_above_quartz_crossing_keeps_quartz_table() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -7265,23 +13962,11 @@ def test_silica_solid_activity_with_stated_quartz_refuses_conversion() -> None:
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
-        "fusion conversion missing input" in notice.reason
-        and "O-035 represents polymorph cristobalite_high" in notice.reason
+        notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+        and "tables=O-037/O-038" in notice.band
         for notice in comparison.notices
-    )
-
-    residual, _candidate = compile_residual(
-        reference,
-        Engine.OPENIMCC,
-        context=_context(F.work(), experiment, reference, review="reviewed"),
-    )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["missing_input"] == (
-        "JANAF solid polymorph matching the selected table"
     )
 
 
@@ -7616,70 +14301,72 @@ def test_melts_liquid_reference_gap_is_attached_to_fusion_shift(
         for item in converted.notices
     )
 
-def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_internal_analytical_kume_row_uses_janaf_liquid_reference(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery import score
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.battery.records import StandardState
+    from tests.battery.test_migrate import _migrate_real_extract
 
-    inference_notice = Notice(
-        kind=NoticeKind.DERIVATION_USES_COMPILATION,
-        affected_quantities=(Quantity.ACTIVITY,),
-        reason="relation=extract_inference; standard state source inference retained",
-        origin="synthetic-reference-state-inference",
+    monkeypatch.setattr(
+        battery, "_call_with_hard_timeout", lambda call, timeout: call()
     )
-    experiment = F.kems_experiment()
-    identity = F.activity_identity(
-        formula="CaO",
-        T_K=Decimal("1933"),
-        endmember_phase=Phase.CR,
-        component_basis="CaO",
+    migrated = _migrate_real_extract(tmp_path, "kume-2000-cao-activities.yaml")
+    observation = next(
+        row
+        for row in migrated.observations.values()
+        if row.observation_id.endswith("::kume_2000_table2_sample_101")
     )
-    reference = F.observation(
-        "cao-solid-activity-unestablished-engine",
-        experiment.experiment_id,
-        identity,
-        Decimal("1"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="synthetic-unestablished-engine",
-        notices=(inference_notice,),
-    )
-
-    untouched = fusion_comparison_reference(
-        reference, engine=Engine.INTERNAL_ANALYTICAL
-    )
-    assert untouched.value.point == reference.value.point
-    assert untouched.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        "engine reference is unestablished" in item.reason
-        for item in untouched.notices
-    )
-
-    prediction = EnginePrediction(
-        engine=Engine.INTERNAL_ANALYTICAL,
-        channel="internal-analytical",
-        execution=Execution(
-            state=ExecutionState.PRODUCED,
-            call_evidence="test:unestablished-activity-reference",
+    identity = observation.identity
+    assert isinstance(identity.reference_state, State)
+    standard_state = identity.reference_state.value
+    assert isinstance(standard_state, StandardState)
+    observation = replace(
+        observation,
+        identity=replace(
+            identity,
+            fO2_Pa=State.of(Decimal("0.00001")),
+            species=replace(identity.species, polymorph=State.of("lime")),
+            reference_state=State.of(
+                replace(
+                    standard_state,
+                    endmember=replace(
+                        standard_state.endmember, polymorph=State.of("lime")
+                    ),
+                )
+            ),
         ),
-        value=Decimal("0.5"),
-        unit="dimensionless",
-        authority=Authority.CERTIFIED,
-        coefficient_sources=("nasa-cea-thermo",),
-        lineage_complete=True,
-        identity=reference.identity,
     )
-    context = _context(F.work(), experiment, reference, review="reviewed")
-    residual, _candidate = compile_residual(
-        reference,
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations={observation.observation_id: observation},
+        benches=migrated.benches,
+    )
+
+    converted = score.fusion_comparison_reference(
+        observation, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    expected = score.fusion_comparison_reference(observation)
+    assert converted.value.point == expected.value.point
+    assert converted.value.point != observation.value.point
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in converted.notices
+    )
+
+    residual, _candidate = score.compile_residual(
+        observation,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
-        prediction=prediction,
+        predict=lambda *args, **kwargs: score.predict_with_engine(
+            *args, **kwargs, isolated=False
+        ),
     )
     assert residual.numeric is not None
-    assert abs(residual.numeric.value - Decimal("0.5").log10()) < Decimal("0.000001")
-    assert inference_notice in residual.notices
-    assert any(
-        "engine reference is unestablished" in item.reason
-        for item in residual.notices
-    )
+    assert abs(residual.numeric.value - Decimal("1.281")) <= Decimal("0.001")
 
 
 def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
@@ -7710,6 +14397,470 @@ def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
     assert notice.band
 
 
+def test_magemin_without_native_activity_keeps_reference_for_unsupported_route() -> None:
+    from simulator.battery.generators.bench import _engine_reports_formula
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("2000"),
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        "lime",
+    )
+    reference = F.observation(
+        "unestablished-engine-solid-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="another-source",
+    )
+
+    result = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+    prediction = replace(
+        _predict(reference.value.point, identity), engine=Engine.MAGEMIN
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=_context(F.work(), experiment, reference),
+        prediction=prediction,
+    )
+
+    # c883dfb0a put MAGEMin on the melt-activity list, so the b150r
+    # "engine reference is unestablished for magemin" notice is gone.
+    # CaO has no native activity and the printed solid value stays.
+    assert result.value.point == reference.value.point
+    assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert not result.notices
+    assert not any(
+        "unestablished for magemin" in notice.reason
+        for notice in residual.notices
+    )
+    assert _engine_reports_formula("magemin", "CaO") == (
+        False,
+        "typed-refusal:magemin_no_native_activity:CaO",
+    )
+
+
+def test_guo_mgo_periclase_reference_matches_magemin_native_basis() -> None:
+    from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+    from simulator.battery.generators.bench import (
+        _ENGINE_REPORTED_ACTIVITY,
+        _reference_matches,
+    )
+    from simulator.battery.score import fusion_comparison_reference
+
+    _works, _experiments, observations = load_migrated_store(
+        REPO_ROOT, sources=("guo-2021-mgo-activity-cmas-slag",)
+    )
+    reference = next(
+        row for row in observations.values()
+        if row.identity.species.formula == "MgO"
+    )
+    converted = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+    standard = converted.identity.reference_state.value
+
+    assert converted is reference
+    assert standard.endmember.polymorph.value is Polymorph.PERICLASE
+    assert _reference_matches(
+        standard, _ENGINE_REPORTED_ACTIVITY["magemin"], "magemin"
+    ) == (True, "raoultian_native_crystal_activity")
+
+
+def _raw_janaf_formation_gibbs_at(table_id: str, temperature_K: Decimal) -> Decimal:
+    """Interpolate checked-in JANAF rows without the scorer's converter."""
+    table_path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/compilations/janaf/tables"
+        / f"{table_id}.yaml"
+    )
+    table = yaml.safe_load(table_path.read_text(encoding="utf-8"))["table"]
+    points = tuple(
+        (
+            Decimal(str(row["temperature"]["value"])),
+            Decimal(str(row["formation_gibbs_energy"]["value"])),
+        )
+        for row in table["values"]
+        if row.get("formation_gibbs_energy", {}).get("value") is not None
+    )
+    left, right = next(
+        (a, b)
+        for a, b in zip(points, points[1:])
+        if a[0] <= temperature_K <= b[0]
+    )
+    return left[1] + (right[1] - left[1]) * (temperature_K - left[0]) / (
+        right[0] - left[0]
+    )
+
+
+def test_silica_observation_polymorph_converts_to_magemin_quartz() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "cristobalite_high",
+    )
+    reference = F.observation(
+        "silica-polymorph-magemin-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        source_id="silica-polymorph-source",
+    )
+
+    converted = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+
+    standard = converted.identity.reference_state.value
+    assert standard.endmember.polymorph.value is Polymorph.QUARTZ
+    assert converted.value.point != reference.value.point
+    notice = next(
+        item for item in converted.notices
+        if item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and "MAGEMin native solid-reference conversion" in item.reason
+    )
+    assert "source_reference=cristobalite_high" in notice.reason
+    assert "target_polymorph=quartz" in notice.reason
+    temperature = Decimal("1823")
+    independent_value = Decimal("0.4") * (
+        (
+            _raw_janaf_formation_gibbs_at("O-035", temperature)
+            - _raw_janaf_formation_gibbs_at("O-037", temperature)
+        )
+        * Decimal(1000)
+        / (Decimal("8.31441") * temperature)
+    ).exp()
+    assert independent_value == Decimal("0.3658848311154413382374911057")
+    assert converted.value.point == independent_value
+
+
+def test_liquid_silica_reference_converts_to_magemin_quartz_standard() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="SiO2",
+        T_K=Decimal("1823"),
+        endmember_phase=Phase.L,
+        component_basis="SiO2",
+    )
+    reference = F.observation(
+        "liquid-silica-magemin-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        source_id="liquid-silica-source",
+    )
+
+    converted = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+
+    standard = converted.identity.reference_state.value
+    assert standard.endmember.phase.value is Phase.CR
+    assert standard.endmember.polymorph.value is Polymorph.QUARTZ
+    temperature = Decimal("1823")
+    independent_value = (
+        (
+            _raw_janaf_formation_gibbs_at("O-038", temperature)
+            - _raw_janaf_formation_gibbs_at("O-037", temperature)
+        )
+        * Decimal(1000)
+        / (Decimal("8.31441") * temperature)
+    ).exp()
+    assert independent_value == Decimal("0.9597711225379085591688714995")
+    assert converted.value.point == independent_value
+
+
+def test_pure_liquid_silica_activity_converts_to_one_on_liquid_basis() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    temperature = Decimal("1823")
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="SiO2",
+        T_K=temperature,
+        endmember_phase=Phase.L,
+        component_basis="SiO2",
+    )
+    reference = F.observation(
+        "pure-liquid-silica-on-liquid-standard",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        source_id="pure-liquid-silica-source",
+    )
+
+    magemin_basis = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+    liquid_basis = fusion_comparison_reference(
+        magemin_basis, engine=Engine.OPENIMCC
+    )
+
+    assert magemin_basis.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert (
+        magemin_basis.identity.reference_state.value.endmember.polymorph.value
+        is Polymorph.QUARTZ
+    )
+    assert liquid_basis.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert liquid_basis.value.point == pytest.approx(
+        Decimal("1"), rel=Decimal("1e-9")
+    )
+
+
+def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.melt_backend.base import EquilibriumResult
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "magemin-nonfinite-mgo",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id="magemin-nonfinite-source",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+
+    class FailedNativeBackend:
+        def equilibrate(self, **_kwargs):
+            return EquilibriumResult(
+                status="not_converged",
+                diagnostics={
+                    "backend_status_reason": "engine_not_converged",
+                    "magemin_native_activity_invalid": True,
+                },
+            )
+
+    handle = EngineHandle(
+        "magemin", FailedNativeBackend(), True, None, False, False
+    )
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == "engine_not_converged"
+    assert prediction.refusal_detail["elapsed_s"] >= 0.0
+    notice = next(
+        item for item in prediction.notices
+        if item.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+
+
+@pytest.mark.parametrize(
+    ("cell_refusal", "engine_status", "reason", "refusal_reason"),
+    [
+        ("out_of_basis", "out_of_domain", "out_of_domain", RefusalReason.METRIC_DOMAIN),
+        ("no_liquid", "refusal", "no_liquid", RefusalReason.ATTEMPTED_UNAVAILABLE),
+        ("engine_timeout", "TimeoutError", "engine_timeout", RefusalReason.ATTEMPTED_UNAVAILABLE),
+        ("unavailable", "RuntimeError", "runtime_error", RefusalReason.ATTEMPTED_UNAVAILABLE),
+    ],
+)
+def test_magemin_native_activity_failure_keeps_typed_cause(
+    monkeypatch: pytest.MonkeyPatch,
+    cell_refusal: str,
+    engine_status: str,
+    reason: str,
+    refusal_reason: RefusalReason,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        f"magemin-failed-activity-{reason}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id=f"magemin-failed-activity-source-{reason}",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status="refusal",
+            refusal_reason=cell_refusal,
+            engine_status=engine_status,
+            engine_reason=engine_status,
+            wall_s=0.1,
+            melt_activities={"MgO": 0.6},
+            notices=(),
+            authority=None,
+            certified_band=None,
+            hostname="test",
+            exit_code=None,
+        ),
+    )
+
+    handle = EngineHandle("magemin", object(), True, None, False, False)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.refusal_reason is refusal_reason
+    assert prediction.refusal_detail["reason"] == reason
+    assert prediction.refusal_detail["cell_refusal_reason"] == cell_refusal
+
+
+def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "magemin-out-of-domain-mgo",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id="magemin-out-of-domain-source",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={"composition_mol": {"SiO2": Decimal("0.1"), "MgO": Decimal("0.9")}}
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        experiment=experiment,
+        handles={},
+    )
+
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == "out_of_domain"
+    assert prediction.refusal_detail["out_of_domain_reason"] == "silicate_window"
+    assert prediction.refusal_detail["gate"] == "magemin_composition_validity"
+
+
+def test_magemin_native_pair_failure_has_native_missing_input_label(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "cristobalite_high",
+    )
+    reference = F.observation(
+        "silica-native-pair-missing",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="silica-native-pair-missing-source",
+    )
+    monkeypatch.setattr(
+        janaf, "_janaf_eligible_pure_crystal_tables", lambda *_args: ()
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "magemin_native_reference_conversion_missing_input"
+    )
+
+
 def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -7731,10 +14882,17 @@ def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
         source_id="another-source",
     )
 
-    def no_unique_crossing(formula: str, temperature_K: Decimal):
+    def no_unique_crossing(
+        formula: str,
+        solid_table: str,
+        liquid_table: str,
+        temperature_K: Decimal,
+    ):
         raise ValueError(f"{formula}: expected one JANAF cr/l crossing, got []")
 
-    monkeypatch.setattr(janaf, "janaf_fusion_energy", no_unique_crossing)
+    monkeypatch.setattr(janaf, "_janaf_fusion_energy_for_pair", no_unique_crossing)
+    identity = _with_activity_reference_polymorph(identity, "lime")
+    reference = replace(reference, identity=identity)
     result = fusion_comparison_reference(reference)
 
     assert result.value.point == reference.value.point
@@ -7886,7 +15044,7 @@ def test_score_store_attempts_all_owned_handle_closes(
     with pytest.raises(RuntimeError, match="close probe"):
         score_store(
             context,
-            engines=(Engine.VAPOROCK, Engine.MAGEMIN),
+            engines=(Engine.VAPOROCK, Engine.INTERNAL_ANALYTICAL),
             include_diagnostics=False,
         )
 
@@ -7896,10 +15054,7 @@ def test_score_store_attempts_all_owned_handle_closes(
 
 @pytest.mark.parametrize(
     ("formula", "temperature", "missing_reason"),
-    (
-        ("CaO", Decimal("100"), "outside the JANAF table range"),
-        ("NaO0.5", Decimal("1000"), "no JANAF fusion table pair"),
-    ),
+    (("CaO", Decimal("100"), "outside the JANAF table range"),),
 )
 def test_missing_janaf_fusion_input_refuses_activity_residual(
     formula: str, temperature: Decimal, missing_reason: str
@@ -7916,6 +15071,8 @@ def test_missing_janaf_fusion_input_refuses_activity_residual(
         endmember_phase=Phase.CR,
         component_basis=formula,
     )
+    if formula == "CaO":
+        identity = _with_activity_reference_polymorph(identity, "lime")
     reference = F.observation(
         f"missing-janaf-{formula}-activity",
         experiment.experiment_id,
@@ -8163,7 +15320,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     )
     assert (
         f"| {residual.rail.value} | {Engine.OPENIMCC.value} | "
-        "0 | 0 | 0 | 0 |"
+        "— | 0 | 0 | 0 | 0 |"
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
@@ -8298,8 +15455,11 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ] == [(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION, 1)]
 
 
-def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
+def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
+    tmp_path: Path,
+) -> None:
     import simulator.battery.score as score_module
+    from tests.battery.test_migrate import _migrate_real_extract
 
     context = load_score_context(
         sources=(
@@ -8309,12 +15469,68 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             "kems-012-sossi-2019",
         )
     )
+    fresh_sources = {
+        source_id: _migrate_real_extract(
+            tmp_path / source_id,
+            f"{source_id}.yaml",
+            use_repository_index_row=True,
+        )
+        for source_id in (
+            "kems-053-stolyarova-1991",
+            "stolyarova-1995-cao-alumina-kems",
+            "stolyarova-1996-cao-alumina-silica-kems",
+            "kems-ms2000-044",
+            "kems-012-sossi-2019",
+        )
+    }
+    fresh_observations = {
+        key: observation
+        for migrated in fresh_sources.values()
+        for key, observation in migrated.observations.items()
+    }
+    observations = {
+        key: observation
+        for key, observation in context.observations.items()
+        if observation.source_id not in fresh_sources
+    }
+    context = replace(
+        context,
+        observations={**observations, **fresh_observations},
+    )
     observations = context.observations
     filtered = context
+    fresh_stolyarova_1996_pressures = {
+        key: observation
+        for key, observation in fresh_sources[
+            "stolyarova-1996-cao-alumina-silica-kems"
+        ].observations.items()
+        if observation.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(observation.identity, Identity)
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.observation_id.split("::")[1].startswith(
+            "stolyarova_1996_table2_pO"
+        )
+        and observation.admission.status is AdmissionStatus.ADMITTED
+    }
+    assert len(fresh_stolyarova_1996_pressures) == 55
+    assert all(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        for observation in fresh_stolyarova_1996_pressures.values()
+    )
+    stolyarova_atomic_oxygen_pressures = {
+        key
+        for key in observations
+        if key.startswith(
+            "kems-053-stolyarova-1991::"
+            "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium::T=1933.00:"
+        )
+    }
     admitted_model_derived = {
         key
         for key, obs in observations.items()
         if obs.admission.status is AdmissionStatus.ADMITTED
+        and key not in stolyarova_atomic_oxygen_pressures
         and obs.evidence.class_.is_value
         and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
@@ -8337,16 +15553,6 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         if obs.source_id == "kems-053-stolyarova-1991"
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity) is Quantity.ACTIVITY
-    }
-    stolyarova_derived_pressures = {
-        key
-        for key, obs in observations.items()
-        if obs.source_id == "kems-053-stolyarova-1991"
-        and isinstance(obs.identity, Identity)
-        and quantity_token(obs.identity) is Quantity.P_PARTIAL
-        and obs.admission.status is AdmissionStatus.ADMITTED
-        and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
     stolyarova_1995_derived_pressures = {
         key
@@ -8378,7 +15584,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     }
     headline_diagnostic_references = (
         (stolyarova_activities & admitted_model_derived)
-        | stolyarova_derived_pressures
+        | stolyarova_atomic_oxygen_pressures
         | stolyarova_1995_derived_pressures
         | stolyarova_1996_derived_pressures
         | kems_model_derived
@@ -8386,16 +15592,58 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     assert len(allibert_admitted) == 16
     assert len(allibert_rejected) == 55
     assert len(stolyarova_activities) == 54
-    assert len(stolyarova_derived_pressures) == 9
-    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
-    # not measured pressures (review, Derived O / O2).
-    assert len(stolyarova_1995_derived_pressures) == 26
-    # Table 2's calculated 1933 K oxygen-pressure columns contain 30 pO,
-    # 10 p'O, and 15 p''O observations, all model-derived.
-    assert len(stolyarova_1996_derived_pressures) == 55
+    assert len(stolyarova_atomic_oxygen_pressures) == 9
+    assert all(
+        observations[key].admission.status is AdmissionStatus.ADMITTED
+        for key in stolyarova_atomic_oxygen_pressures
+    )
+    fresh_stolyarova_pressures = {
+        key: observation
+        for key, observation in fresh_sources[
+            "kems-053-stolyarova-1991"
+        ].observations.items()
+        if key in stolyarova_atomic_oxygen_pressures
+    }
+    assert set(fresh_stolyarova_pressures) == stolyarova_atomic_oxygen_pressures
+    assert all(
+        observation.admission.status is AdmissionStatus.ADMITTED
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        for observation in fresh_stolyarova_pressures.values()
+    )
+    # 4e0819f6d and 3de591b81 type the calculated oxygen columns quoted_attributed.
+    # The parents are not printed, so the rows are not model_derived.
+    # b162's 1995 model_derived count of 26 describes the pre-car extract,
+    # which this car retyped. The 1996 count of 55 is the quoted population.
+    assert len(stolyarova_1995_derived_pressures) == 0
+    assert len(stolyarova_1996_derived_pressures) == 0
+    stolyarova_1995_quoted_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1995-cao-alumina-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    }
+    stolyarova_1996_quoted_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    }
+    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9).
+    assert len(stolyarova_1995_quoted_pressures) == 26
+    # Table 2's calculated 1933 K oxygen-pressure columns: 30 pO, 10 p'O, 15 p''O.
+    assert len(stolyarova_1996_quoted_pressures) == 55
     assert {
         observations[key].observation_id.split("::")[1]
-        for key in stolyarova_1996_derived_pressures
+        for key in stolyarova_1996_quoted_pressures
     } == {
         "stolyarova_1996_table2_pO_1933k",
         "stolyarova_1996_table2_pO_prime_1933k",
@@ -8404,7 +15652,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     assert [
         sum(
             observations[key].observation_id.split("::")[1] == observation_id
-            for key in stolyarova_1996_derived_pressures
+            for key in stolyarova_1996_quoted_pressures
         )
         for observation_id in (
             "stolyarova_1996_table2_pO_1933k",
@@ -8412,13 +15660,22 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             "stolyarova_1996_table2_pO_double_prime_1933k",
         )
     ] == [30, 10, 15]
-    assert len(kems_model_derived) == 28
+    # dc7eafe24 adds the quoted Table 4 gamma successors. 5f44bd3ee copies the
+    # parent derivation onto them, and 4000d10b6 adds the printed PbO# channel:
+    # its 1573.15 K cell is admitted as model_derived (extract species.PbO,
+    # observation sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash,
+    # Table 4 p. 57). The combined KEMS cohort is 51.
+    assert len(kems_model_derived) == 51
     assert len(
-        stolyarova_activities | stolyarova_derived_pressures | kems_model_derived
-    ) == 91
-    assert len(headline_diagnostic_references) == 136
-    assert admitted_model_derived == headline_diagnostic_references
-    assert not admitted_model_derived & {
+        stolyarova_activities | stolyarova_atomic_oxygen_pressures | kems_model_derived
+    ) == 114
+    assert len(headline_diagnostic_references) == 78
+    assert admitted_model_derived == (
+        headline_diagnostic_references
+        - stolyarova_atomic_oxygen_pressures
+        - stolyarova_1996_derived_pressures
+    )
+    assert admitted_model_derived <= {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
     }
 
@@ -8465,6 +15722,20 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         if residual.reference in headline_diagnostic_references
     ]
     assert len(headline_diagnostic_residuals) == len(headline_diagnostic_references)
+    model_derived_residuals = [
+        residual
+        for residual in headline_diagnostic_residuals
+        if residual.reference in admitted_model_derived
+    ]
+    assert len(model_derived_residuals) == len(admitted_model_derived)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:model_derived"
+            for notice in residual.notices
+        )
+        for residual in model_derived_residuals
+    )
     assert all(
         "reference_measured_evidence" in residual.exclusions
         for residual in headline_diagnostic_residuals
@@ -8543,9 +15814,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert {row.reference for row in allibert_rows} == allibert_admitted
         assert all(row.status is ResidualStatus.REFUSED for row in allibert_rows)
         # b-617 types Allibert's printed per-point phases: the two xCaO = 0.80
-        # "CaO + melt" points refuse as two-phase bulk compositions; the 14
-        # single-phase points lack the pressure set required by the in-cell
-        # fallback and refuse as an unverified effusion regime.
+        # "CaO + melt" points refuse as two-phase bulk compositions. Under
+        # d-274, the 14 single-phase points with uncomputable pressure sums
+        # reach the test predictor with an unverified-apparatus notice.
         assert all(row.refusal is not None for row in allibert_rows)
         assert (
             sum(
@@ -8557,6 +15828,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert (
             sum(
                 row.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+                for row in allibert_rows
+            )
+            == 0
+        )
+        assert (
+            sum(
+                row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+                and any(
+                    notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                    for notice in row.notices
+                )
                 for row in allibert_rows
             )
             == 14
@@ -8575,9 +15857,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert len(allibert_cao_rows) == 8
         assert all(
             any(
-                notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
-                and notice.reason.startswith("reference_converted_via_fusion;")
-                and "source polymorph is unknown" in notice.reason
+                notice.reason == "fusion_source_reference_phase_unprinted"
                 for notice in row.notices
             )
             for row in allibert_cao_rows
@@ -8621,37 +15901,84 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         stolyarova_rows.extend(
             row
             for row in residuals
-            if row.reference in stolyarova_1996_derived_pressures
+            if row.reference
+            in stolyarova_1996_derived_pressures | stolyarova_1996_quoted_pressures
             and row.key.rsplit("::", 1)[-1] == engine.value
         )
-        assert len(stolyarova_rows) == 235
+        unavailable_stolyarova_refs = {
+            obs.observation_id
+            for obs in observations.values()
+            if obs.source_id
+            in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
+            and obs.admission.status is AdmissionStatus.REJECTED
+            and obs.value.kind is ValueKind.UNAVAILABLE
+            and isinstance(obs.identity, Identity)
+            and score_module.rail_for_quantity(
+                quantity_token(obs.identity),
+                species_formula=obs.identity.species.formula,
+            )
+            is not None
+        }
+        assert unavailable_stolyarova_refs <= {
+            row.reference for row in stolyarova_rows
+        }
+        expected_stolyarova_refs = {
+            observation.observation_id
+            for observation in score_module.comparison_candidates(filtered)
+            if observation.source_id
+            in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
+        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures | stolyarova_1996_quoted_pressures
+        assert {row.reference for row in stolyarova_rows} == expected_stolyarova_refs
+        assert len(stolyarova_rows) == len(expected_stolyarova_refs)
         activity_rows = [
             row for row in stolyarova_rows if row.reference in stolyarova_activities
         ]
         derived_pressure_rows = [
             row
             for row in stolyarova_rows
-            if row.reference in stolyarova_derived_pressures
+            if row.reference in stolyarova_atomic_oxygen_pressures
         ]
         assert len(activity_rows) == 54
         assert len(derived_pressure_rows) == 9
+        # 4e0819f6d and 3de591b81 type those oxygen columns quoted, so they
+        # are not the model-derived residual slice. d170a39b8 pinned the
+        # observation counts; the slice of this model-derived set is empty.
         stolyarova_1995_rows = [
             row
             for row in stolyarova_rows
             if row.reference in stolyarova_1995_derived_pressures
         ]
-        assert len(stolyarova_1995_rows) == 26
+        assert len(stolyarova_1995_rows) == 0
         stolyarova_1996_rows = [
             row
             for row in stolyarova_rows
             if row.reference in stolyarova_1996_derived_pressures
         ]
-        assert len(stolyarova_1996_rows) == 55
-        assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1996_rows)
-        assert all(not row.score_eligible for row in stolyarova_1996_rows)
+        assert len(stolyarova_1996_rows) == 0
+        stolyarova_1996_quoted_rows = [
+            row
+            for row in stolyarova_rows
+            if row.reference in stolyarova_1996_quoted_pressures
+        ]
+        assert len(stolyarova_1996_quoted_rows) == 55
+        assert all(
+            row.status is ResidualStatus.REFUSED for row in stolyarova_1996_quoted_rows
+        )
+        assert all(not row.score_eligible for row in stolyarova_1996_quoted_rows)
+        assert all(
+            observations[row.reference].evidence.class_.is_value
+            and observations[row.reference].evidence.class_.value
+            is EvidenceClass.QUOTED_ATTRIBUTED
+            and any(
+                notice.kind is NoticeKind.FIGURE_ONLY
+                and notice.reason == "evidence_class:quoted_attributed"
+                for notice in row.notices
+            )
+            for row in stolyarova_1996_quoted_rows
+        )
         assert {
             row.refusal.reason
-            for row in stolyarova_1996_rows
+            for row in stolyarova_1996_quoted_rows
             if row.refusal is not None
         } == {RefusalReason.IDENTITY_INCOMPLETE}
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
@@ -8727,9 +16054,13 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     )
     residual = next(row for row in residuals if row.reference == observation_id)
 
-    assert residual.numeric is not None
-    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.status is ResidualStatus.REFUSED
     assert residual.score_eligible is False
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in residual.notices
+    )
     # t-1225 supports this Table 2 method, so no apparatus warning is expected.
     assert not any(
         notice.kind is NoticeKind.UNVERIFIED_APPARATUS
@@ -8933,6 +16264,69 @@ def _cell_material_score_case(material, inference):
     return reference, context, bench, prediction
 
 
+def test_unlinked_knudsen_row_keeps_closure_with_assumption_notice(monkeypatch) -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    reference, context, bench, _ = _cell_material_score_case(CellMaterial.W, None)
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            composition=State.of(
+                Composition(
+                    basis="printed_mole_fraction",
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                    components=(("CaO", Decimal("0.6")), ("SiO2", Decimal("0.4"))),
+                )
+            ),
+        ),
+    )
+    requests = []
+    request_type = battery.Po2Request
+
+    def capture_request(**kwargs):
+        request = request_type(**kwargs)
+        requests.append(request)
+        return request
+
+    monkeypatch.setattr(battery, "Po2Request", capture_request)
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda name: battery.EngineHandle(
+            name=name,
+            backend=None,
+            available=False,
+            unavailable_reason="test unavailable",
+            takes_fo2=False,
+            supports_intrinsic_fo2=True,
+        ),
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        reference,
+        experiment=context.experiments[reference.experiment_id],
+        bench=bench,
+    )
+    closure_requests = [
+        request for request in requests
+        if request.mode == battery.PO2_OXYGEN_BALANCE_EFFUSION
+    ]
+    assert len(closure_requests) == 1
+    assert closure_requests[0].cell_material == "W"
+    assert closure_requests[0].po2_bar is None
+    assert not any(request.mode == battery.PO2_COMMANDED for request in requests)
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason == (
+            "model assumption: vapour-only zero-storage closure; "
+            "source_oxygen_fallback=lineage_untyped"
+        )
+        for notice in prediction.notices
+    )
+
+
 def _migrated_stolyarova_cell_context(tmp_path: Path) -> ScoreContext:
     from simulator.battery.migrate import Migrator, write_outputs
 
@@ -8998,6 +16392,26 @@ def test_inferred_cell_material_is_noticed_in_each_record_form(record_form: str)
     notices = _cell_apparatus_inference_notices(reference, experiment, bench)
     notice = next(item for item in notices if item.kind is NoticeKind.CELL_MATERIAL_INFERRED)
     assert json.loads(notice.reason.partition(":")[2])["field"] == record_form
+
+
+def test_stolyarova_partial_pressure_species_phase_follows_the_printed_field(
+    tmp_path: Path,
+) -> None:
+    """The fixture's melt string names the condensed source, not the Al vapour."""
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    reference = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    assert reference.identity.species.formula == "Al"
+    assert reference.identity.species.phase.value is Phase.G
+    assert reference.derivation is not None
+    assert "condensed source" in reference.derivation.relation
 
 
 def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
@@ -9076,8 +16490,28 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
         experiment=experiment,
         bench=bench,
     )
+    assert reference.identity.species.phase.value is Phase.G
     assert len(prediction_inputs) == 1
     assert prediction_inputs[0].cell_material == "Mo"
+    liquid = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            species=replace(reference.identity.species, phase=State.of(Phase.L)),
+        ),
+    )
+    refused = predict_with_engine(
+        Engine.OPENIMCC,
+        liquid,
+        experiment=experiment,
+        bench=bench,
+    )
+    assert len(prediction_inputs) == 1
+    assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert refused.refusal_detail["reason"] == (
+        "partial-pressure-condensed-species-not-on-gas-map"
+    )
+    assert refused.refusal_detail["observation_basis"] == "Al(l)"
 
     # This legacy extract leaves several identity axes unresolved. Use a typed
     # KEMS scoring identity for the residual while keeping the migrated row id,
@@ -9118,9 +16552,11 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
         prediction=prediction,
         derived_band=band,
     )
-    assert residual.status is ResidualStatus.MATCH
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
-    assert residual.numeric.decision_band == band
+    assert residual.numeric.decision_band is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "unparseable_printed_uncertainty"
     assert residual.score_eligible is False
     assert any(
         item.kind is NoticeKind.CELL_MATERIAL_INFERRED
@@ -9132,118 +16568,6 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     assert strata[0]["stratum"] == "cell-material-inferred"
 
 
-def test_stolyarova_rows_do_not_move_any_kems_band_path(tmp_path: Path) -> None:
-    from simulator.battery.enums import BenchIdentityBasis, CellMaterial
-    from simulator.battery.records import Bench, BenchIdentity
-    from simulator.battery.score import _derive_kems_partial_pressure_band
-
-    context = _migrated_stolyarova_cell_context(tmp_path)
-    flagged = next(
-        item
-        for item in context.observations.values()
-        if isinstance(item.identity, Identity)
-        and quantity_token(item.identity) is Quantity.P_PARTIAL
-        and item.evidence.class_.is_value
-        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
-    )
-    flagged_experiment = context.experiments[flagged.experiment_id]
-    flagged_bench = context.benches[flagged_experiment.bench_id]
-
-    ordinary_kems = F.kems_experiment(
-        "stolyarova-clean-kems", flagged_experiment.work_id or "work-1"
-    )
-    clean_bench = Bench(
-        id="stolyarova-clean-pt",
-        work_id=ordinary_kems.work_id or "work-1",
-        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
-        cell_materials=(F.located(CellMaterial.PT),),
-    )
-    clean_experiment = replace(ordinary_kems, bench_id=clean_bench.id)
-    band_identity = replace(
-        flagged.identity,
-        species=replace(flagged.identity.species, phase=State.of(Phase.G)),
-        composition=_partial_identity().composition,
-    )
-    clean_rows = tuple(
-        replace(
-            flagged,
-            observation_id=f"stolyarova-clean-{index}",
-            experiment_id=clean_experiment.experiment_id,
-            source_id="stolyarova-clean-test",
-            identity=band_identity,
-            value=Value.point_of(value),
-            notices=(),
-        )
-        for index, value in enumerate((Decimal("1e-4"), Decimal("2e-4")))
-    )
-    clean = {row.observation_id: row for row in clean_rows}
-    experiments = {
-        flagged_experiment.experiment_id: flagged_experiment,
-        clean_experiment.experiment_id: clean_experiment,
-    }
-    benches = {flagged_bench.id: flagged_bench, clean_bench.id: clean_bench}
-
-    printed_clean = {
-        row.observation_id: replace(
-            row,
-            uncertainty=Uncertainty(
-                UncertaintyKind.PRINTED,
-                verbatim="10% pressure error",
-            ),
-        )
-        for row in clean_rows
-    }
-    printed_flagged = replace(
-        flagged,
-        uncertainty=Uncertainty(
-            UncertaintyKind.PRINTED,
-            verbatim="80% pressure error",
-        ),
-    )
-    printed_flagged_replica = replace(
-        printed_flagged,
-        observation_id="stolyarova-inferred-printed-replica",
-        value=Value.point_of(Decimal("1e-2")),
-    )
-    printed_mixed = {
-        **printed_clean,
-        printed_flagged.observation_id: printed_flagged,
-        printed_flagged_replica.observation_id: printed_flagged_replica,
-    }
-    printed_baseline = _derive_kems_partial_pressure_band(
-        printed_clean, experiments, {clean_bench.id: clean_bench}
-    )
-    printed_mixed_band = _derive_kems_partial_pressure_band(
-        printed_mixed, experiments, benches
-    )
-    assert printed_baseline is not None
-    assert "printed pressure envelope" in printed_baseline.rule
-    assert printed_mixed_band == printed_baseline
-
-    flagged_replica = replace(
-        flagged,
-        observation_id="stolyarova-inferred-replicate",
-        identity=band_identity,
-        value=Value.point_of(Decimal("1e-2")),
-    )
-    replicate_flagged = replace(flagged, identity=band_identity)
-    replicate_mixed = {
-        **clean,
-        flagged.observation_id: replicate_flagged,
-        flagged_replica.observation_id: flagged_replica,
-    }
-    replicate_baseline = _derive_kems_partial_pressure_band(
-        clean, experiments, {clean_bench.id: clean_bench}
-    )
-    replicate_mixed_band = _derive_kems_partial_pressure_band(
-        replicate_mixed, experiments, benches
-    )
-    assert replicate_baseline is not None
-    assert "replicate scatter" in replicate_baseline.rule
-    assert replicate_mixed_band == replicate_baseline
-    assert derive_kems_partial_pressure_band(
-        replicate_mixed, experiments, benches=benches
-    ) == replicate_baseline
 
 
 def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
@@ -9294,9 +16618,9 @@ def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
         predict=prediction,
     )
 
-    assert residual.status is ResidualStatus.MATCH
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
-    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band is None
     assert residual.score_eligible is False
     assert "not_flagged_stratum" in residual.exclusions
     notice = next(
@@ -9326,102 +16650,8 @@ def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
             "rms_dex": "0",
         }
     ]
-    from simulator.battery.score import _derive_kems_partial_pressure_band
-
-    assert _derive_kems_partial_pressure_band(
-        context.observations, context.experiments, context.benches
-    ) == residual.numeric.decision_band
 
 
-def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
-    from simulator.battery.enums import CellMaterial
-    from simulator.battery.score import _derive_kems_partial_pressure_band
-
-    inference = Derivation(
-        relation="inferred from printed Mo oxide ions",
-        inputs=("Mo+;MoO+;MoO2+;MoO3+",),
-        parameters=(),
-        output_unit="cell material",
-    )
-    flagged, flagged_context, flagged_bench, _ = _cell_material_score_case(
-        CellMaterial.MO, inference
-    )
-    flagged_exp = flagged_context.experiments[flagged.experiment_id]
-    flagged_replica = replace(
-        flagged,
-        observation_id="inferred-replica",
-        value=Value.point_of(Decimal("1e-3")),
-    )
-
-    clean_exp = replace(flagged_exp, experiment_id="clean-kems", bench_id="clean-cell")
-    clean = replace(
-        flagged,
-        observation_id="clean-row",
-        experiment_id=clean_exp.experiment_id,
-        value=Value.point_of(Decimal("1e-6")),
-    )
-    clean_replica = replace(
-        clean,
-        observation_id="clean-replica",
-        value=Value.point_of(Decimal("2e-6")),
-    )
-    clean_bench = replace(
-        flagged_bench,
-        id="clean-cell",
-        cell_materials=(F.located(CellMaterial.PT),),
-    )
-    experiments = {
-        flagged_exp.experiment_id: flagged_exp,
-        clean_exp.experiment_id: clean_exp,
-    }
-    clean_rows = {row.observation_id: row for row in (clean, clean_replica)}
-    mixed_rows = {
-        row.observation_id: row
-        for row in (clean, clean_replica, flagged, flagged_replica)
-    }
-
-    clean_band = _derive_kems_partial_pressure_band(
-        clean_rows, experiments, {clean_bench.id: clean_bench}
-    )
-    mixed_band = _derive_kems_partial_pressure_band(
-        mixed_rows,
-        experiments,
-        {clean_bench.id: clean_bench, flagged_bench.id: flagged_bench},
-    )
-    assert clean_band is not None
-    assert mixed_band == clean_band
-    # The public helper must receive the same bench map as scoring so it can
-    # exclude inferred cell materials itself.
-    from simulator.battery.score import (
-        derive_kems_partial_pressure_band,
-        decision_band_for,
-    )
-
-    inferred_only = {
-        row.observation_id: row for row in (flagged, flagged_replica)
-    }
-    assert derive_kems_partial_pressure_band(
-        inferred_only, {flagged_exp.experiment_id: flagged_exp}
-    ) is not None
-    assert derive_kems_partial_pressure_band(
-        inferred_only,
-        {flagged_exp.experiment_id: flagged_exp},
-        benches={flagged_bench.id: flagged_bench},
-    ) is None
-    assert _derive_kems_partial_pressure_band(
-        inferred_only,
-        {flagged_exp.experiment_id: flagged_exp},
-        {flagged_bench.id: flagged_bench},
-    ) is None
-    assert decision_band_for(
-        Quantity.P_PARTIAL,
-        SourceRelation.INDEPENDENT,
-        rail=Rail.VAPOUR,
-        method=MethodToken.KNUDSEN_EFFUSION,
-        observations=inferred_only,
-        experiments={flagged_exp.experiment_id: flagged_exp},
-        derived_band=None,
-    ) is None
 
 
 @pytest.mark.parametrize(
@@ -9615,22 +16845,63 @@ def test_score_store_refuses_synthetic_unknown_reference_activity_point() -> Non
     assert residual.refusal.detail["fields"] == ["reference_state"]
 
 
-def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
+def _migrated_extract_context(*extract_names: str) -> ScoreContext:
+    from simulator.battery.migrate import Migrator
+
+    root = Path(__file__).resolve().parents[2]
+    migrator = Migrator(root)
+    for extract_name in extract_names:
+        migrator._migrate_extract(root / "data/literature/extracts" / extract_name)
+    return ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=migrator.result.observations,
+        benches=migrator.result.benches,
+        root=root,
+    )
+
+
+def test_score_store_refuses_unavailable_stolyarova_figure_only_rows() -> None:
     source_id = "stolyarova-1996-cao-alumina-silica-kems"
-    context = load_score_context(sources=(source_id,))
-    figure_row = next(
+    context = _migrated_extract_context(f"{source_id}.yaml")
+    figure_row_keys = {
+        "stolyarova_1996_fig1_al2o3_activity_figure_only",
+        "stolyarova_1996_fig1_cao_activity_figure_only",
+        "stolyarova_1996_fig1_sio2_activity_figure_only",
+        "stolyarova_1996_fig2_al2o3_activity_figure_only",
+        "stolyarova_1996_fig2_cao_activity_figure_only",
+        "stolyarova_1996_fig2_sio2_activity_figure_only",
+    }
+    figure_rows = tuple(
         obs
         for obs in context.observations.values()
-        if obs.source_id == source_id and obs.value.kind is ValueKind.CATEGORICAL
+        if obs.source_id == source_id
+        and obs.observation_id.partition("::")[2] in figure_row_keys
+    )
+    assert {
+        obs.observation_id.partition("::")[2] for obs in figure_rows
+    } == figure_row_keys
+    assert all(
+        obs.locator.figure in {"1", "2"} for obs in figure_rows
+    )
+    assert all(
+        obs.evidence.class_.value is EvidenceClass.FIGURE_ONLY for obs in figure_rows
+    )
+    assert all(
+        obs.admission.status is AdmissionStatus.REJECTED for obs in figure_rows
+    )
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in figure_rows)
+    assert all(
+        obs.value.unavailable_reason == "figure_not_digitized" for obs in figure_rows
     )
     figure_context = replace(
         context,
-        observations={figure_row.observation_id: figure_row},
+        observations={obs.observation_id: obs for obs in figure_rows},
         origins={
-            figure_row.observation_id: context.origins[figure_row.observation_id]
-        }
-        if figure_row.observation_id in context.origins
-        else {},
+            obs.observation_id: context.origins[obs.observation_id]
+            for obs in figure_rows
+            if obs.observation_id in context.origins
+        },
     )
     residuals, _ = score_store(
         figure_context,
@@ -9638,12 +16909,84 @@ def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
         include_diagnostics=True,
     )
 
-    assert len(residuals) == 1
-    refusal = residuals[0].refusal
-    assert refusal is not None
-    assert refusal.reason is RefusalReason.IDENTITY_UNKNOWN
-    assert "figure_only" in refusal.detail["quantity_reason"]
-    assert refusal.detail["value_kind"] == ValueKind.CATEGORICAL.value
+    assert {residual.reference for residual in residuals} == {
+        obs.observation_id for obs in figure_rows
+    }
+    for residual in residuals:
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.score_eligible is False
+        refusal = residual.refusal
+        assert refusal is not None
+        assert refusal.reason is RefusalReason.METRIC_DOMAIN
+        assert refusal.detail == {
+            "reason": "figure_not_digitized",
+            "value_kind": ValueKind.UNAVAILABLE.value,
+        }
+
+
+def test_score_store_refuses_rejected_unavailable_stolyarova_rows_by_state() -> None:
+    from simulator.battery.score import comparison_candidates, rail_for_quantity
+
+    context = _migrated_extract_context(
+        "kems-053-stolyarova-1991.yaml",
+        "stolyarova-1995-cao-alumina-kems.yaml",
+    )
+
+    root = context.root
+    expected_row_keys = {
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cd704583d7d4",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=a5d8822cf03d",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cc225cf7fcf4",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=90a9faf3168d",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=3f4c707e2ac9",
+        "stolyarova_1995_cao_activity_fig1_figure_only",
+        "stolyarova_1995_alumina_activity_fig1_figure_only",
+    }
+    observations = {
+        observation.observation_id: observation
+        for observation in context.observations.values()
+        if observation.observation_id.partition("::")[2] in expected_row_keys
+    }
+    assert {key.partition("::")[2] for key in observations} == expected_row_keys
+    context = replace(context, observations=observations)
+    assert not {
+        observation.observation_id
+        for observation in comparison_candidates(context)
+    } & observations.keys()
+
+    def prediction_must_not_run(*_args, **_kwargs):
+        pytest.fail("unavailable observations must refuse before prediction")
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=prediction_must_not_run,
+    )
+    assert {residual.reference for residual in residuals} == observations.keys()
+    for residual in residuals:
+        observation = observations[residual.reference]
+        expected_rail = (
+            Rail.MELT_ACTIVITY
+            if observation.source_id == "stolyarova-1995-cao-alumina-kems"
+            else Rail.THERMOCHEMISTRY
+        )
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert rail_for_quantity(
+            quantity_token(observation.identity),
+            species_formula=observation.identity.species.formula,
+        ) is expected_rail
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.score_eligible is False
+        assert residual.rail is expected_rail
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+        assert residual.refusal.detail == {
+            "reason": observation.value.unavailable_reason,
+            "value_kind": ValueKind.UNAVAILABLE.value,
+        }
 
 
 def test_score_store_records_each_in_scope_observation_in_small_fixture() -> None:
@@ -9777,9 +17120,9 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
     parsed_formulas: list[str] = []
     parse_formula = score_module.parse_species_formula
 
-    def track_formula_parse(formula: str):
+    def track_formula_parse(formula: str, *, species: Species | None = None):
         parsed_formulas.append(formula)
-        return parse_formula(formula)
+        return parse_formula(formula, species=species)
 
     monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
 
@@ -9801,6 +17144,7 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
         "reason": "quantity_not_predicted",
         "quantity": Quantity.TRANSITION_TEMPERATURE.value,
     }
+
 
     for prediction in predictions.values():
         assert prediction.value is None
@@ -9830,3 +17174,111 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
         "reason": "quantity_not_predicted",
         "quantity": Quantity.TRANSITION_TEMPERATURE.value,
     }
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION],
+)
+def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> None:
+    from simulator.battery.score import rail_for_quantity, score_store
+
+    experiment = F.tabulation_experiment(
+        experiment_id="fusion-exp", work_id="fusion-work"
+    )
+    identity = Identity(
+        quantity=quantity,
+        species=Species("Na", Phase.CR),
+        temperature_K=State.of(Decimal("1200")),
+        subtype=State.of("solid_to_liquid"),
+    )
+    observation = F.observation(
+        f"fusion::{quantity.value}",
+        experiment.experiment_id,
+        identity,
+        Decimal("12"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-fusion",
+    )
+
+    assert rail_for_quantity(quantity) is Rail.THERMOCHEMISTRY
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+
+    residuals, _candidates = score_store(
+        _context(
+            F.work("fusion-work"),
+            experiment,
+            observation,
+            review="reviewed",
+        ),
+        engines=(Engine.MAGEMIN,),
+        rail=Rail.THERMOCHEMISTRY,
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.rail is Rail.THERMOCHEMISTRY
+    assert residual.execution.state is ExecutionState.UNSUPPORTED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+
+
+@pytest.mark.parametrize("parent_id", ("parent-source::raw", "parent-source:raw"))
+def test_filtered_score_context_resolves_cross_source_validation_parent(
+    tmp_path: Path, parent_id: str
+) -> None:
+    from simulator.battery.migrate import dump_yaml, to_plain
+
+    child_source = "child-source"
+    parent_source = "parent-source"
+    child_id = f"{child_source}::reduced"
+    work = replace(F.work(), source_ids=(child_source, parent_source))
+    experiment = F.tabulation_experiment()
+    parent = F.observation(
+        parent_id,
+        experiment.experiment_id,
+        F.pref_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=parent_source,
+    )
+    child = F.observation(
+        child_id,
+        experiment.experiment_id,
+        F.pref_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id=child_source,
+        derived_from=(parent_id,),
+        derivation=Derivation(
+            "reported reduction", (parent_id,), (), "Pa"
+        ),
+    )
+
+    literature = tmp_path / "data" / "literature"
+    (literature / "works").mkdir(parents=True)
+    (literature / "extracts-v2").mkdir()
+    dump_yaml(
+        {"work": to_plain(work), "experiments": [to_plain(experiment)]},
+        literature / "works" / "work.yaml",
+    )
+    for observation in (parent, child):
+        dump_yaml(
+            {"observations": [to_plain(observation)]},
+            literature / "extracts-v2" / f"{observation.source_id}.yaml",
+        )
+
+    full = load_score_context(tmp_path)
+    filtered = load_score_context(tmp_path, sources=(child_source,))
+
+    assert child_id in full.observations
+    assert child_id in filtered.observations
+    assert parent_id not in filtered.observations
+    assert full.hard_issues_by_observation.get(child_id) is None
+    assert filtered.hard_issues_by_observation.get(child_id) == (
+        full.hard_issues_by_observation.get(child_id)
+    )

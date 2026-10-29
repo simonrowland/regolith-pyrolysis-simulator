@@ -2961,6 +2961,12 @@ corrections:
   layout_as_extracted: 13CO
   printed_token: '1300'
   evidence: PDF page 226 image visibly prints '1300 55.345 112.42 69.85 -790.766 -603.710 101.493'
+- correction_id: b1259-p228-formula_as_published
+  pdf_page: 228
+  field: formula_as_published
+  layout_as_extracted: MgSiO
+  printed_token: MgSiO3
+  evidence: PDF page 228 image visibly prints 'MgSiO3'
 - correction_id: b1259-p228-temperature-13
   pdf_page: 228
   field: temperature
@@ -12105,7 +12111,7 @@ entries:
   record_sha256: f1cdbda41d1580e5618b121bc75dd5122e0a8e3a7aeffc1bca052ad0aee43807
 - record_id: b1259-ht-0197-clinoenstatite
   path: records/b1259-ht-0197-clinoenstatite.json
-  formula: MgSiO
+  formula: MgSiO3
   phase: Crystals 298.15° to melting point 1830°K.
   name_as_published: CLINOENSTATITE
   source: *id001
@@ -12118,7 +12124,7 @@ entries:
   ambiguities: []
   untranscribed: false
   sha256: 013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83
-  record_sha256: d236c6e5ea63699857ade3f77b009c662ce8893e756db27ee45e9a759f7cdf86
+  record_sha256: b08ef49335be41d947a5cd8e5c768fd2d7f20816b05a35c00cb2982d224d259e
 - record_id: b1259-ht-0198-rhodonite
   path: records/b1259-ht-0198-rhodonite.json
   formula: MnSi0 3

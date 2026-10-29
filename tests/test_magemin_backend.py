@@ -11,6 +11,8 @@ real MAGEMin binary runs end to end when one is built locally.
 
 from __future__ import annotations
 
+import json
+import os
 import re
 import subprocess
 import sys
@@ -19,12 +21,14 @@ import threading
 import time
 import types
 import warnings
-from concurrent.futures import Future
+from concurrent.futures import Future, TimeoutError as FutureTimeoutError
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
 import pytest
 
+import simulator.engine_pool as engine_pool
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerPoolLifecycleError,
@@ -56,6 +60,68 @@ from simulator.melt_backend.magemin import (
 # not assert a latency. Any test that means to claim "within N seconds" should
 # use its own explicit figure and say so, rather than borrowing this one.
 _RENDEZVOUS_TIMEOUT_S = 30.0
+
+
+def _bootstrap_sleeping_magemin_worker():
+    return None, 'sleeping-worker-ready'
+
+
+def _handle_sleeping_magemin_request(_resource, _request, _errlog):
+    while True:
+        time.sleep(0.05)
+
+
+def _handle_successful_magemin_request(_resource, _request, _errlog):
+    return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+
+def _handle_reusable_magemin_request(_resource, request, _errlog):
+    return request.get('request_id')
+
+
+class _RegisteredMageminPool:
+    def __init__(self):
+        self.workers = (types.SimpleNamespace(
+            name="MAGEMin subprocess pool slot 0",
+        ),)
+        self.closed = False
+        engine_pool._LIVE_ENGINE_POOLS.add(self)
+
+    def close(self, *, cancel_pending=False, timeout_s=None):
+        self.closed = True
+        engine_pool._LIVE_ENGINE_POOLS.discard(self)
+
+    def _request_cancel_pending(self):
+        return None
+
+
+@pytest.fixture(scope="module")
+def _preexisting_magemin_pool():
+    pool = _RegisteredMageminPool()
+    yield pool
+    pool.close(cancel_pending=True)
+
+
+@pytest.fixture
+def _test_owned_magemin_backend(request):
+    backend = MAGEMinBackend()
+    backend._subprocess_pool = _RegisteredMageminPool()
+    request.addfinalizer(backend.close)
+    return backend
+
+
+def test_adapter_cleanup_owns_only_the_backend_created_by_that_test(
+    _preexisting_magemin_pool,
+    _test_owned_magemin_backend,
+):
+    assert _preexisting_magemin_pool.closed is False
+    assert _test_owned_magemin_backend._subprocess_pool.closed is False
+
+
+def test_preexisting_magemin_pool_survives_adapter_test_teardown(
+    _preexisting_magemin_pool,
+):
+    assert _preexisting_magemin_pool.closed is False
 
 
 def _disable_configured_magemin_path(monkeypatch):
@@ -212,6 +278,9 @@ class _ImmediateFailurePool:
         future.set_exception(self.exception)
         return future
 
+    def _abort_request(self, _future, *, diagnostic_detail=None):
+        return False
+
 
 def _make_pooled_subprocess_backend(exception):
     backend = MAGEMinBackend()
@@ -220,6 +289,481 @@ def _make_pooled_subprocess_backend(exception):
     backend._binary_path = Path('/fake/MAGEMin')
     backend._subprocess_pool = _ImmediateFailurePool(exception)
     return backend
+
+
+@pytest.mark.parametrize(
+    ('database', 'capture_error', 'nonfinite_projection'),
+    [
+        pytest.param('ig', False, False, id='normal-database'),
+        pytest.param('ig' + (' ' * 9000), False, False, id='oversized-database'),
+        pytest.param('ig' + (' ' * 9000), True, False, id='capture-error'),
+        pytest.param('ig', False, True, id='nonfinite-projection'),
+    ],
+)
+def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
+    monkeypatch, database, capture_error, nonfinite_projection,
+):
+    class RunningFuture(Future):
+        cancel_attempted = False
+
+        def cancel(self):
+            self.cancel_attempted = True
+            return super().cancel()
+
+    pending = RunningFuture()
+    assert pending.set_running_or_notify_cancel()
+
+    class PendingPool:
+        def __init__(self):
+            self.abort_calls = 0
+            self.diagnostic_detail = None
+
+        def submit(self, *_args, **_kwargs):
+            return pending
+
+        def _abort_request(self, future, *, diagnostic_detail=None):
+            assert future is pending
+            assert future.cancel_attempted
+            assert future.running()
+            self.diagnostic_detail = diagnostic_detail
+            self.abort_calls += 1
+
+    pool = PendingPool()
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._database = database
+    if capture_error:
+        def fail_diagnostic_capture(**_kwargs):
+            raise RuntimeError('diagnostic capture failed')
+
+        monkeypatch.setattr(
+            backend,
+            '_magemin_timeout_diagnostic_detail',
+            fail_diagnostic_capture,
+        )
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 0.05,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    if nonfinite_projection:
+        projection = replace(
+            projection,
+            vector=(float('nan'), *projection.vector[1:]),
+        )
+    outcomes = []
+
+    def call():
+        try:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+                composition_mol={
+                    'SiO2': 0.5,
+                    'MgO': 0.25,
+                    **{f'species-{index}': 0.01 for index in range(100)},
+                },
+            )
+        except BaseException as exc:  # returned to the asserting thread
+            outcomes.append(exc)
+
+    started_at = time.monotonic()
+    waiter = threading.Thread(target=call, daemon=True)
+    waiter.start()
+    waiter.join(timeout=3.0)
+    try:
+        assert not waiter.is_alive(), (
+            'MAGEMin waited forever on its pool future'
+        )
+        assert len(outcomes) == 1
+        assert isinstance(outcomes[0], EngineWorkerTimeout)
+        assert outcomes[0].phase == 'job'
+        assert outcomes[0].timeout_s == pytest.approx(2.5)
+        assert pending.cancel_attempted
+        assert pending.running()
+        assert pool.abort_calls == 1
+        assert pool.diagnostic_detail is not None
+        assert len(pool.diagnostic_detail) <= 8192
+        diagnostic = json.loads(pool.diagnostic_detail)
+        if capture_error:
+            assert diagnostic['diagnostic_capture_error'] == 'RuntimeError'
+            assert diagnostic['database_truncated'] is True
+        else:
+            assert diagnostic['argv'][0] == '/fake/MAGEMin'
+            if nonfinite_projection:
+                assert diagnostic['projected_bulk_vector_wt_pct'][0] == 'nan'
+        if not capture_error and len(database) > 8192:
+            assert diagnostic['argv_truncated'] is True
+            assert diagnostic['database_truncated'] is True
+        elif not capture_error:
+            assert diagnostic['database'] == database
+            assert diagnostic['argv'][2] == '--db=ig'
+        if not capture_error:
+            assert 'composition_mol_truncated":true' in pool.diagnostic_detail
+            assert 'composition_mol' in pool.diagnostic_detail
+        assert 'projected_bulk' in pool.diagnostic_detail
+        assert 'oxide_names' in pool.diagnostic_detail
+        assert 'temperature_C' in pool.diagnostic_detail
+        assert 'pressure_bar' in pool.diagnostic_detail
+        assert 'fO2_log' in pool.diagnostic_detail
+        assert 'database' in pool.diagnostic_detail
+        assert 'argv' in pool.diagnostic_detail
+        if not capture_error:
+            assert 'buffer' in pool.diagnostic_detail
+            assert 'buffer_n' in pool.diagnostic_detail
+            assert '--Temp=1200.000000' in pool.diagnostic_detail
+            assert '--Pres=0.001000' in pool.diagnostic_detail
+            assert '--db=ig' in pool.diagnostic_detail
+        assert time.monotonic() - started_at < 3.0
+    finally:
+        if waiter.is_alive():
+            pending.set_result({'phases': {'liq': {'mass_kg': 1.0}}})
+            waiter.join(timeout=1.0)
+
+
+@pytest.mark.parametrize(
+    'failure_kind',
+    [
+        pytest.param('capture-error', id='capture-error'),
+        pytest.param('log-oserror', id='log-oserror'),
+    ],
+)
+def test_magemin_timeout_kills_and_reaps_a_hung_worker(
+    tmp_path,
+    monkeypatch,
+    failure_kind,
+):
+    diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            handler=_handle_sleeping_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=30.0,
+            diagnostic_log_path=diagnostic_log_path,
+        ),
+        size=1,
+    )
+    worker = pool.workers[0]
+    original_call = worker.call
+
+    def call_with_long_worker_wall(request, *, timeout_s=None):
+        return original_call(request, timeout_s=30.0)
+
+    worker.call = call_with_long_worker_wall
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
+    if failure_kind == 'capture-error':
+        def fail_diagnostic_capture(**_kwargs):
+            raise RuntimeError('diagnostic capture failed')
+
+        monkeypatch.setattr(
+            backend,
+            '_magemin_timeout_diagnostic_detail',
+            fail_diagnostic_capture,
+        )
+    else:
+        original_open = Path.open
+
+        def fail_diagnostic_log_open(path, *args, **kwargs):
+            mode = args[0] if args else kwargs.get('mode', 'r')
+            if Path(path) == diagnostic_log_path and mode == 'a':
+                raise OSError('diagnostic log unavailable')
+            return original_open(path, *args, **kwargs)
+
+        monkeypatch.setattr(Path, 'open', fail_diagnostic_log_open)
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    worker_pid = worker.process.pid
+    outcomes = []
+
+    def call():
+        try:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+                composition_mol={'SiO2': 0.5, 'MgO': 0.25},
+            )
+        except BaseException as exc:  # returned to the asserting thread
+            outcomes.append(exc)
+
+    started_at = time.monotonic()
+    waiter = threading.Thread(target=call, daemon=True)
+    waiter.start()
+    try:
+        waiter.join(timeout=6.0)
+        assert not waiter.is_alive(), 'MAGEMin did not bound its pool future'
+        assert len(outcomes) == 1
+        assert isinstance(outcomes[0], EngineWorkerTimeout)
+        assert outcomes[0].phase == 'job'
+        assert outcomes[0].timeout_s == pytest.approx(4.45)
+        assert outcomes[0].diagnostic_detail
+        assert outcomes[0].diagnostic_detail in str(outcomes[0])
+        timeout_text = str(outcomes[0])
+        for field in (
+            'composition_mol',
+            'SiO2',
+            'MgO',
+            'projected_bulk',
+            'oxide_names',
+            'temperature_C',
+            'pressure_bar',
+            'fO2_log',
+            'buffer',
+            'buffer_n',
+            'database',
+            'argv',
+        ):
+            assert field in timeout_text
+        if failure_kind == 'capture-error':
+            assert json.loads(outcomes[0].diagnostic_detail)[
+                'diagnostic_capture_error'
+            ] == 'RuntimeError'
+            diagnostic_log = diagnostic_log_path.read_text(encoding='utf-8')
+            assert outcomes[0].diagnostic_detail in diagnostic_log
+        else:
+            for arg in (
+                '--Temp=1200.000000',
+                '--Pres=0.001000',
+                '--db=ig',
+            ):
+                assert arg in timeout_text
+        assert time.monotonic() - started_at < 5.5
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(worker_pid, 0)
+    finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
+        waiter.join(timeout=1.0)
+
+
+@pytest.mark.timeout(20)
+def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
+    diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            handler=_handle_sleeping_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=0.05,
+            diagnostic_log_path=diagnostic_log_path,
+        ),
+        size=1,
+    )
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    worker = pool.workers[0]
+    worker_pid = worker.process.pid
+    outcomes = []
+
+    def call():
+        try:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+                composition_mol={'SiO2': 0.5, 'MgO': 0.25},
+            )
+        except BaseException as exc:  # returned to the asserting thread
+            outcomes.append(exc)
+
+    waiter = threading.Thread(target=call, daemon=True)
+    waiter.start()
+    try:
+        waiter.join(timeout=3.0)
+        assert not waiter.is_alive(), 'worker timeout did not complete the future'
+        assert len(outcomes) == 1
+        timeout = outcomes[0]
+        assert isinstance(timeout, EngineWorkerTimeout)
+        assert timeout.worker_name == 'fake MAGEMin slot 0'
+        assert timeout.timeout_s == pytest.approx(0.05)
+        assert timeout.phase == 'job'
+        assert timeout.diagnostic_detail in str(timeout)
+        diagnostic = json.loads(timeout.diagnostic_detail)
+        assert diagnostic['composition_mol']
+        assert diagnostic['composition_wt_pct']
+        assert diagnostic['projected_bulk_vector_wt_pct']
+        assert diagnostic['oxide_names']
+        assert diagnostic['temperature_C'] == 1200.0
+        assert diagnostic['pressure_bar'] == 1.0
+        assert diagnostic['fO2_log'] == -8.0
+        assert diagnostic['buffer'] == 'qfm'
+        assert diagnostic['database'] == 'ig'
+        assert '--Temp=1200.000000' in diagnostic['argv']
+        assert len(timeout.diagnostic_detail) <= 8192
+
+        json_records = [
+            json.loads(line)
+            for line in diagnostic_log_path.read_text(
+                encoding='utf-8',
+            ).splitlines()
+            if line.lstrip().startswith('{')
+        ]
+        assert json_records == [diagnostic]
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(worker_pid, 0)
+    finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
+        waiter.join(timeout=1.0)
+
+
+def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
+    diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            handler=_handle_successful_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=1.0,
+            diagnostic_log_path=diagnostic_log_path,
+        ),
+        size=1,
+    )
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 1.0,
+        'worker_startup_timeout_s': 2.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    try:
+        assert backend._call_magemin(
+            projection,
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            composition_mol={'SiO2': 0.5, 'MgO': 0.25},
+        ) == {'phases': {'liq': {'mass_kg': 1.0}}}
+        assert diagnostic_log_path.read_text(encoding='utf-8') == ''
+    finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
+
+
+@pytest.mark.timeout(20)
+def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            handler=_handle_reusable_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=30.0,
+        ),
+        size=1,
+    )
+    worker = pool.workers[0]
+    connection = worker.connection
+    process = worker.process
+    worker_pid = process.pid
+    send_entered = threading.Event()
+    release_send = threading.Event()
+    send_unblocked = threading.Event()
+    real_send = connection.send
+    original_abort = worker._abort_current_call
+
+    def blocked_send(request):
+        send_entered.set()
+        release_send.wait()
+        send_unblocked.set()
+        if process.is_alive():
+            return real_send(request)
+        raise BrokenPipeError('worker exited during blocked send')
+
+    connection.send = blocked_send
+
+    def abort_and_release_send(abort_event=None):
+        try:
+            return original_abort(abort_event)
+        finally:
+            release_send.set()
+
+    worker._abort_current_call = abort_and_release_send
+
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    submitted = []
+    original_submit = pool.submit
+
+    def capture_submit(request, *, timeout_s=None):
+        future = original_submit(request, timeout_s=timeout_s)
+        submitted.append(future)
+        return future
+
+    pool.submit = capture_submit
+    caller_finished = threading.Event()
+    caller_outcomes = []
+    caller_elapsed = []
+
+    def call_magemin():
+        started_at = time.monotonic()
+        try:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+                composition_mol={'SiO2': 0.5, 'MgO': 0.25},
+            )
+        except BaseException as exc:
+            caller_outcomes.append(exc)
+        finally:
+            caller_elapsed.append(time.monotonic() - started_at)
+            caller_finished.set()
+
+    caller = threading.Thread(target=call_magemin, daemon=True)
+    caller.start()
+    try:
+        assert send_entered.wait(timeout=5.0)
+        # The MAGEMin future wait is 4.45 s for these configured budgets;
+        # the remaining margin covers the worker kill and reap joins.
+        assert caller_finished.wait(timeout=7.0), (
+            'caller did not return after aborting the blocked send'
+        )
+        assert caller_elapsed[0] < 7.0
+        assert len(caller_outcomes) == 1
+        assert isinstance(caller_outcomes[0], EngineWorkerTimeout)
+        assert caller_outcomes[0].timeout_s == pytest.approx(4.45)
+        # The consumer publishes the send failure after the caller's abort
+        # returns; this is a hang guard, not a latency assertion.
+        with pytest.raises(EngineWorkerDied) as send_failure:
+            submitted[0].result(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert send_failure.value.phase == 'call'
+        assert send_unblocked.is_set()
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(worker_pid, 0)
+
+        next_future = pool.submit({'request_id': 'slot-reused'}, timeout_s=2.0)
+        assert next_future.result(timeout=5.0) == 'slot-reused'
+        assert worker.process.pid != worker_pid
+    finally:
+        release_send.set()
+        caller.join(timeout=5.0)
+        connection.send = real_send
+        worker._abort_current_call = original_abort
+        pool.close(cancel_pending=True, timeout_s=3.0)
 
 
 def _assert_magemin_bulk_drop_projected(
@@ -262,7 +806,10 @@ def _assert_magemin_bulk_drop_projected(
 
 
 
-def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(monkeypatch):
+def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(
+    monkeypatch,
+    request,
+):
     _disable_configured_magemin_path(monkeypatch)
     fake_module = types.SimpleNamespace(minimize=lambda **kwargs: {})
     monkeypatch.setitem(sys.modules, 'pymagemin', fake_module)
@@ -273,6 +820,7 @@ def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(monkeypatch
     )
 
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', UserWarning)
         assert backend.initialize({}) is True
@@ -335,13 +883,14 @@ def test_magemin_reinitialize_closes_existing_warm_pool(monkeypatch):
     assert backend._subprocess_pool is None
 
 
-def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
+def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request):
     import simulator.melt_backend.magemin as magemin_module
 
     submitted = {}
 
     class FakeFuture:
-        def result(self):
+        def result(self, timeout=None):
+            submitted['result_timeout_s'] = timeout
             return {'phases': {'liq': {'mass_kg': 1.0}}}
 
     class FakePool:
@@ -369,6 +918,7 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
     )
 
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     assert backend.initialize({}) is True
     assert backend._subprocess_pool.size == 1
     assert backend._subprocess_pool.workers[0].call_timeout_s == pytest.approx(
@@ -384,6 +934,118 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
     assert submitted['request']['call_timeout_s'] == pytest.approx(
         MAGEMIN_WARM_CALL_TIMEOUT_S + 0.5
     )
+    assert submitted['result_timeout_s'] == pytest.approx(
+        47.4
+    )
+    assert backend._call_magemin(
+        projection,
+        1200.0,
+        1.0,
+        -8.0,
+        call_timeout_s=20.0,
+    )
+    assert submitted['result_timeout_s'] == pytest.approx(20.0)
+
+
+@pytest.mark.parametrize(
+    ('completion_s', 'should_timeout'),
+    [
+        pytest.param(45.97, False, id='legal-spawn-startup-solve'),
+        pytest.param(47.45, True, id='one-poll-tick-past-envelope'),
+    ],
+)
+def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
+    completion_s,
+    should_timeout,
+):
+    class ScheduledFuture:
+        def __init__(self):
+            self.timeout_s = None
+            self.cancelled = False
+
+        def result(self, timeout=None):
+            self.timeout_s = timeout
+            if completion_s > timeout:
+                raise FutureTimeoutError()
+            return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+        def cancel(self):
+            self.cancelled = True
+            return False
+
+    class ScheduledPool:
+        def __init__(self):
+            self.future = ScheduledFuture()
+            self.abort_detail = None
+
+        def submit(self, *_args, **_kwargs):
+            return self.future
+
+        def _abort_request(self, _future, *, diagnostic_detail=None):
+            self.abort_detail = diagnostic_detail
+            return False
+
+    pool = ScheduledPool()
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 15.0,
+        'worker_startup_timeout_s': 30.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+
+    if should_timeout:
+        with pytest.raises(EngineWorkerTimeout) as caught:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+            )
+        assert caught.value.timeout_s == pytest.approx(47.4)
+        assert pool.future.cancelled
+        assert pool.abort_detail is not None
+    else:
+        assert backend._call_magemin(
+            projection,
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+        ) == {'phases': {'liq': {'mass_kg': 1.0}}}
+        assert completion_s == pytest.approx(0.99 + 29.99 + 14.99)
+
+    assert pool.future.timeout_s == pytest.approx(47.4)
+
+
+@pytest.mark.parametrize(
+    'startup_timeout_s',
+    [
+        pytest.param(0.0, id='zero'),
+        pytest.param(-0.01, id='negative'),
+        pytest.param(float('nan'), id='nan'),
+        pytest.param(float('inf'), id='infinity'),
+    ],
+)
+def test_magemin_initialize_rejects_invalid_worker_startup_timeout(
+    monkeypatch,
+    startup_timeout_s,
+):
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_locate_binary',
+        staticmethod(lambda _explicit: Path('/fake/MAGEMin')),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_import_magemin_bridge',
+        lambda self, *, requested: ('subprocess', None),
+    )
+    backend = MAGEMinBackend()
+
+    with pytest.raises(ValueError):
+        backend.initialize({
+            'worker_startup_timeout_s': startup_timeout_s,
+        })
 
 
 def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend():
@@ -912,6 +1574,24 @@ def test_magemin_subprocess_parser_rejects_nonunit_mode_vector():
             'Phase: liq ol\nMode: 0.8 0.8\n'
         )
     assert raised.value.exception_type == 'MAGEMinOutputError'
+
+
+def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
+    from simulator.melt_backend.base import EquilibriumResult
+
+    stdout = (
+        Path(__file__).parent
+        / 'fixtures'
+        / 'magemin'
+        / 'lfdrop-diag-1-1700-phase-mode.stdout'
+    ).read_text()
+    parsed = MAGEMinBackend._parse_subprocess_stdout(stdout)
+    result = EquilibriumResult(liquid_fraction=0.0)
+    MAGEMinBackend()._populate_result(result, {'phases': parsed})
+
+    # The captured Mode vector prints 0.71766 liquid and 0.99999 total mass;
+    # the production resolver divides these because MAGEMin rounds to 5 places.
+    assert result.liquid_fraction == pytest.approx(0.7176672, abs=1e-7)
 
 
 def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
@@ -1816,6 +2496,38 @@ def test_magemin_db_projection_rejects_unknown_bulk_component():
         backend._build_db_bulk_projection({"SiO2": 50.0, "CO2": 1.0})
 
 
+def test_magemin_subprocess_argument_vector_matches_golden():
+    backend = MAGEMinBackend()
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {'fO2_buffer': 'nno'}
+    projection = backend._build_db_bulk_projection(
+        {'SiO2': 60.0, 'MgO': 40.0},
+    )
+
+    args, buffer_name, buffer_n, _warnings = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=1234.5,
+            pressure_kbar=10.0,
+            fO2_log=-8.0,
+        )
+    )
+
+    assert args == [
+        '/fake/MAGEMin',
+        '--Verb=0',
+        '--db=ig',
+        '--Temp=1234.500000',
+        '--Pres=10.000000',
+        '--sys_in=wt',
+        '--Bulk=60.000000,0.000000,0.000000,40.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000',
+        '--buffer=nno',
+        '--buffer_n=0.000000',
+    ]
+    assert (buffer_name, buffer_n) == ('nno', 0.0)
+
+
 def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
     backend = MAGEMinBackend()
     vector = backend._build_ig_bulk_vector({"FeO": 10.0, "Fe2O3": 1.0})
@@ -2524,22 +3236,26 @@ def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
 # ----------------------------------------------------------------------
 
 # Resolve a real binary at collection time so the guard is a true
-# pytest.mark.skipif rather than a runtime branch. MAGEMin v1.9.3 is built
-# locally as a sibling clone (../MAGEMin/MAGEMin); _locate_binary also
-# checks engines/magemin/{,bin/}MAGEMin and PATH.
-_LIVE_MAGEMIN_BINARY = MAGEMinBackend._locate_binary(None)
+# pytest.mark.skipif rather than a runtime branch. Include the configured local
+# binary because this seat uses an untracked engines.local.toml path.
+from simulator.engine_local_config import configured_magemin_binary_path
+
+_LIVE_MAGEMIN_BINARY = (
+    configured_magemin_binary_path() or MAGEMinBackend._locate_binary(None)
+)
 
 
 @pytest.mark.skipif(
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_smoke_runs_real_binary():
+def test_magemin_live_smoke_runs_real_binary(request):
     # End-to-end against the real MAGEMin binary: a basalt analog at
     # crustal P/T must equilibrate, report a silicate liquid, and -- the
     # invariant that matters -- leave ledger_transition None. MAGEMin is
     # shadow/diagnostic: it never gets AtomLedger authority.
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({})
@@ -2594,11 +3310,130 @@ def test_magemin_live_smoke_runs_real_binary():
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_subliquidus_run_reports_crystalline_phases():
+def test_magemin_live_native_activity_matches_direct_same_point_output(request):
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    composition = {
+        "SiO2": 49.0,
+        "TiO2": 1.5,
+        "Al2O3": 14.0,
+        "FeO": 10.0,
+        "Fe2O3": 1.0,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 2.5,
+        "K2O": 0.8,
+        "Cr2O3": 0.2,
+    }
+    temperature_C = 1429.85
+    pressure_bar = 1e-6
+    fO2_log = -8.0
+    result = backend.equilibrate(
+        temperature_C,
+        composition_kg=composition,
+        fO2_log=fO2_log,
+        pressure_bar=pressure_bar,
+        native_activity_formula="MgO",
+        call_timeout_s=20.0,
+    )
+    assert result.status == "ok", result.warnings
+
+    projection = backend._build_db_bulk_projection(composition)
+    pressure_kbar = backend._GPa_to_kbar(
+        backend._pressure_bar_to_GPa(pressure_bar)
+    )
+    buffer_name, buffer_n, _warnings = backend._resolve_buffer(
+        temperature_C=temperature_C,
+        fO2_log=fO2_log,
+    )
+    direct_args = [
+        str(_LIVE_MAGEMIN_BINARY.resolve()),
+        "--Verb=1",
+        "--db=ig",
+        f"--Temp={temperature_C:.6f}",
+        f"--Pres={pressure_kbar:.6f}",
+        "--sys_in=wt",
+        "--Bulk=" + ",".join(f"{value:.6f}" for value in projection.vector),
+        f"--buffer={buffer_name}",
+        f"--buffer_n={buffer_n:.6f}",
+        "--out_matlab=1",
+    ]
+    with tempfile.TemporaryDirectory() as tmpdir:
+        completed = subprocess.run(
+            direct_args,
+            cwd=tmpdir,
+            capture_output=True,
+            text=True,
+            timeout=20.0,
+            check=False,
+        )
+        assert completed.returncode == 0, completed.stderr
+        matlab_text = (Path(tmpdir) / "output" / "_matlab_output.txt").read_text()
+
+    direct_fields = backend._parse_subprocess_native_activities(matlab_text)
+    for formula, field in (("MgO", "aMgO"), ("SiO2", "aSiO2")):
+        direct_activity = direct_fields[field]
+        adapted_activity = result.activity_coefficients[formula]
+        assert abs(adapted_activity - direct_activity) / abs(direct_activity) <= 1e-9
+    assert result.diagnostics["magemin_solver_status"] == 0
+    assert result.diagnostics["magemin_native_phase"]
+    assert result.diagnostics["magemin_iterations"] > 0
+
+
+def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
+    monkeypatch,
+):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {"database": "ig", "timeout_s": 1.0}
+    backend._magemin_module = None
+
+    def fake_run(_args, *, cwd, **_kwargs):
+        output = Path(cwd) / "output"
+        output.mkdir()
+        (output / "_matlab_output.txt").write_text(
+            "aMgO nan\naSiO2 +8.9e-1\n"
+        )
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout="Status : 0 [success]\nPhase : liq\nMode  : 1.000000\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.magemin.subprocess.run", fake_run
+    )
+    result = backend.equilibrate(
+        1200.0,
+        composition_kg={"SiO2": 49.0, "MgO": 9.0, "Al2O3": 42.0},
+        pressure_bar=1e-6,
+        native_activity_formula="MgO",
+        call_timeout_s=1.0,
+    )
+
+    assert result.status == "not_converged"
+    assert result.diagnostics["backend_status_reason"] == "engine_not_converged"
+    assert result.diagnostics["magemin_native_activity_invalid"] is True
+    assert result.diagnostics["magemin_solver_status"] == 0
+    assert result.diagnostics["magemin_native_phase"] == ("liq",)
+    assert result.activity_coefficients == {}
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_subliquidus_run_reports_crystalline_phases(request):
     # A second live point below the liquidus: the binary must report
     # crystalline phases alongside (or instead of) the melt, and the
     # liquid fraction must drop relative to the super-liquidus case.
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({})
@@ -2640,7 +3475,7 @@ def test_magemin_live_subliquidus_run_reports_crystalline_phases():
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
+def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane(request):
     """Apollo low-Ti mare basalt sample 12009 begins crystallizing near 1230 C.
 
     Reference: Walker et al. 1971, Experimental petrology of Apollo 12 basalts,
@@ -2648,6 +3483,7 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
     analog, so the test checks a sane bracket rather than a forced retune.
     """
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({})
@@ -2905,7 +3741,9 @@ def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
     assert any("refused projected/dropped non-basis" in w for w in result.warnings)
 
 
-def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
+def test_magemin_subprocess_runs_in_fresh_temp_cwd(
+    monkeypatch, tmp_path, magemin_openmpi_tmpdir, tmp_path_factory
+):
     """MAGEMin appends _pseudosection_output.txt to its CWD; isolate per call."""
     captured: dict = {}
 
@@ -2917,6 +3755,8 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     def fake_subprocess_run(args, **kwargs):
         captured["args"] = list(args)
         captured["cwd"] = kwargs.get("cwd")
+        child_env = kwargs.get("env")
+        captured["env"] = dict(os.environ if child_env is None else child_env)
         return FakeCompleted()
 
     fake_binary = tmp_path / "MAGEMin"
@@ -2960,6 +3800,15 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     binary_arg = Path(captured["args"][0])
     assert binary_arg.is_absolute()
     assert binary_arg == fake_binary.resolve()
+    # OpenMPI uses TMPDIR for session files. Normal teardown removes this
+    # fixture-owned directory; pytest retention handles an interrupted run.
+    expected_openmpi_tmpdir = (
+        tmp_path_factory.getbasetemp() / "magemin-openmpi"
+    ).resolve()
+    assert magemin_openmpi_tmpdir.resolve() == expected_openmpi_tmpdir
+    assert Path(captured["env"].get("TMPDIR", "")).resolve() == (
+        expected_openmpi_tmpdir
+    )
 
 
 def test_magemin_subprocess_launches_are_serialized_across_callers(
@@ -3103,13 +3952,14 @@ def test_magemin_subprocess_slots_bound_concurrency(monkeypatch, tmp_path):
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree():
+def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree(request):
     """Equilibrium calls must not grow _pseudosection_output.txt in-tree."""
     binary = _LIVE_MAGEMIN_BINARY.resolve()
     dump_path = binary.parent / "_pseudosection_output.txt"
     size_before = dump_path.stat().st_size if dump_path.exists() else 0
 
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({"binary_path": str(binary)})
@@ -3198,17 +4048,15 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     buffer_n_args = [a for a in buffer_args if a.startswith("--buffer_n=")]
     assert len(buffer_n_args) == 1, buffer_args
     buffer_n = float(buffer_n_args[0].split("=", 1)[1])
-    # O'Neill 1987: logfo2_QFM = 8.58 - 25050 / T_K. At T_C = 1450,
-    # T_K = 1723.15, QFM ~ 8.58 - 14.537 = -5.957. So delta should be
-    # ~-12 - (-5.957) = -6.043. Allow generous tolerance for the
-    # calibration fit.
-    expected_offset = -12.0 - (8.58 - 25050.0 / (1450.0 + 273.15))
+    # Independent O'Neill QFM value at 1723.15 K and its expected offset.
+    qfm_at_1450C = -5.957329890026985
+    expected_offset = -6.042670109973015
     assert buffer_n == pytest.approx(expected_offset, abs=0.05), (
         f"buffer_n={buffer_n} should approximate {expected_offset}"
     )
     # Once the offset round-trips through QFM(T) we recover the
     # requested absolute fO2_log within calibration accuracy.
-    recovered_fo2_log = buffer_n + (8.58 - 25050.0 / (1450.0 + 273.15))
+    recovered_fo2_log = buffer_n + qfm_at_1450C
     assert recovered_fo2_log == pytest.approx(-12.0, abs=0.05)
     # The warning chain must explicitly name the substitution so the
     # caller knows their absolute fO2 was translated, not ignored.
@@ -3330,6 +4178,52 @@ def test_magemin_resolve_buffer_qfm_calibration_at_1450C():
     # A5 honest-substitution path; a wrong constant would silently shift
     # every Mars reducing fO2 by ~6 decades.
     qfm_at_1450C = MAGEMinBackend._qfm_logfo2_oneill(1450.0)
-    expected = 8.58 - 25050.0 / (1450.0 + 273.15)
-    assert qfm_at_1450C == pytest.approx(expected, abs=1e-9)
+    assert qfm_at_1450C == -5.957329890026985
     assert -7.0 < qfm_at_1450C < -5.0, qfm_at_1450C
+
+
+def test_magemin_qfm_buffer_offsets_are_bit_pinned():
+    backend = MAGEMinBackend()
+    expected_hex = {
+        1000.0: "-0x1.cf0c806fa67b0p-1",
+        1200.0: "-0x1.c9adf82faff0cp+1",
+        1450.0: "-0x1.82bb1b69b673ep+2",
+        1600.0: "-0x1.cd3c4b84b9f52p+2",
+    }
+
+    for temperature_C, pinned_hex in expected_hex.items():
+        _, offset, _ = backend._resolve_buffer(
+            temperature_C=temperature_C,
+            fO2_log=-12.0,
+        )
+        assert offset.hex() == pinned_hex
+
+
+def test_magemin_qfm_nonpositive_kelvin_behavior_is_bit_pinned():
+    assert MAGEMinBackend._qfm_logfo2_oneill(-200.0).hex() == "-0x1.4dddf57582f36p+8"
+    assert MAGEMinBackend._qfm_logfo2_oneill(-274.0).hex() == "0x1.cc9cac45df6b9p+14"
+    with pytest.raises(ZeroDivisionError):
+        MAGEMinBackend._qfm_logfo2_oneill(-273.15)
+
+
+def test_oneill_qfm_coefficient_has_one_production_owner():
+    repo_root = Path(__file__).resolve().parents[1]
+    tracked = subprocess.run(
+        ["git", "ls-files", "--", "simulator", "engines"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.splitlines()
+    coefficient = re.compile(r"(?<!\d)25_?050(?:\.0)?(?!\d)")
+    occurrences = []
+
+    for relative_path in tracked:
+        if not relative_path.endswith(".py"):
+            continue
+        source_path = repo_root / relative_path
+        for line in source_path.read_text(encoding="utf-8").splitlines():
+            if coefficient.search(line):
+                occurrences.append(relative_path)
+
+    assert occurrences == ["simulator/chemistry/qfm_oneill.py"]

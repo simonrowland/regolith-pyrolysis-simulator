@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -60,6 +61,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -104,6 +106,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -148,6 +151,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -192,6 +196,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -236,6 +241,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -281,6 +287,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -325,6 +332,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -369,6 +377,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -422,50 +431,32 @@ observations:
     paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
   read_from: pdf:kems-044-robinot-2026
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '12.8'
-          CaO: '10.98'
-          Fe2O3: '12.2'
-          K2O: '1.32'
-          MgO: '12.09'
-          MnO: '0.2'
-          Na2O: '2.95'
-          P2O5: '0.61'
-          SiO2: '44.41'
-          TiO2: '2.44'
-      locator:
-        published_page: 3
-        pdf_page_index: 4
-        paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.08172418613024934270801085594'
-          - - CaO
-            - '0.127464239085342539430777748'
-          - - Fe2O3
-            - '0.04973487812748101126287271143'
-          - - K2O
-            - '0.009122504867858886036952953084'
-          - - MgO
-            - '0.1952760312933907189956949072'
-          - - MnO
-            - '0.001835387197035795882020968346'
-          - - Na2O
-            - '0.03098499810301403912958973351'
-          - - P2O5
-            - '0.002797615985667152686529558572'
           - - SiO2
-            - '0.4811715634958352769163595426'
+            - '0.481171563495835276916359542'
+          - - Al2O3
+            - '0.08172418613024934270801085583'
+          - - Fe2O3
+            - '0.04973487812748101126287271137'
+          - - MgO
+            - '0.1952760312933907189956949069'
+          - - CaO
+            - '0.1274642390853425394307777478'
+          - - Na2O
+            - '0.03098499810301403912958973347'
           - - TiO2
-            - '0.01988859571412523695119102152'
+            - '0.0198885957141252369511910215'
+          - - K2O
+            - '0.009122504867858886036952953072'
+          - - P2O5
+            - '0.002797615985667152686529558568'
+          - - MnO
+            - '0.001835387197035795882020968344'
           amount_basis: mole_fraction
       locator:
         published_page: 3
@@ -477,6 +468,22 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.41'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -489,22 +496,6 @@ observations:
           - state:
               tag: value
               value: '101.960077'
-            locator:
-              published_page: 3
-              pdf_page_index: 4
-              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '10.98'
-            locator:
-              published_page: 3
-              pdf_page_index: 4
-              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
             locator:
               published_page: 3
               pdf_page_index: 4
@@ -525,22 +516,6 @@ observations:
               published_page: 3
               pdf_page_index: 4
               paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.32'
-            locator:
-              published_page: 3
-              pdf_page_index: 4
-              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              published_page: 3
-              pdf_page_index: 4
-              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
         - - original_MgO_wt_pct
           - state:
               tag: value
@@ -557,18 +532,18 @@ observations:
               published_page: 3
               pdf_page_index: 4
               paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - original_MnO_wt_pct
+        - - original_CaO_wt_pct
           - state:
               tag: value
-              value: '0.2'
+              value: '10.98'
             locator:
               published_page: 3
               pdf_page_index: 4
               paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - M_MnO_g_mol
+        - - M_CaO_g_mol
           - state:
               tag: value
-              value: '70.937044'
+              value: '56.077000000000005'
             locator:
               published_page: 3
               pdf_page_index: 4
@@ -589,38 +564,6 @@ observations:
               published_page: 3
               pdf_page_index: 4
               paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - original_P2O5_wt_pct
-          - state:
-              tag: value
-              value: '0.61'
-            locator:
-              published_page: 3
-              pdf_page_index: 4
-              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - M_P2O5_g_mol
-          - state:
-              tag: value
-              value: '141.942523996'
-            locator:
-              published_page: 3
-              pdf_page_index: 4
-              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '44.41'
-            locator:
-              published_page: 3
-              pdf_page_index: 4
-              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 3
-              pdf_page_index: 4
-              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
         - - original_TiO2_wt_pct
           - state:
               tag: value
@@ -637,7 +580,74 @@ observations:
               published_page: 3
               pdf_page_index: 4
               paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '1.32'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.61'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.8'
+          CaO: '10.98'
+          Fe2O3: '12.2'
+          K2O: '1.32'
+          MgO: '12.09'
+          MnO: '0.2'
+          Na2O: '2.95'
+          P2O5: '0.61'
+          SiO2: '44.41'
+          TiO2: '2.44'
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
 - observation_id: kems-044-robinot-2026::robinot_2026_fig1_hsc_figure_only
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -652,6 +662,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -669,9 +680,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -697,6 +708,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -741,6 +753,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -772,6 +785,16 @@ observations:
     figure: '8'
     paragraph: At the experimentally-obtained yield, a mass of 80 kg of regolith is required
   read_from: pdf:kems-044-robinot-2026
+  derived_from:
+  - kems-044-robinot-2026::robinot_2026_o2_yield_measured::field:mass_yield_percent
+  derivation:
+    relation: Required regolith mass = daily O2 mass / measured oxygen mass yield; the paper reports 0.84 kg O2/day and 80
+      kg at the experimentally obtained 1.05% yield (Figure 8, p. 12).
+    inputs:
+    - kems-044-robinot-2026::robinot_2026_o2_yield_measured::field:mass_yield_percent
+    parameters: []
+    output_unit: as_published
+    references: []
 - observation_id: kems-044-robinot-2026::robinot_2026_mass_balance_fig4c_bar_labels
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -786,6 +809,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -830,6 +854,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -875,6 +900,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -968,6 +994,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1012,6 +1039,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1031,9 +1059,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
   admission:
     status: pending
     reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
@@ -1080,6 +1108,7 @@ observations:
               paragraph: an oxygen yield of around 1.37 % was expected by thermodynamic simulation
               section: '4.3'
         output_unit: K
+        references: []
 - observation_id: kems-044-robinot-2026::robinot_2026_o2_prose_rate_points
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -1094,6 +1123,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1139,6 +1169,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1240,6 +1271,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

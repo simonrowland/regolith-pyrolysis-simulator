@@ -138,6 +138,29 @@ class _UnavailableCommitProvider(_CommitProvider):
         raise ProviderUnavailableError("authoritative provider unavailable")
 
 
+class _UnavailableStatusCommitProvider(_CommitProvider):
+    name = "unavailable_status_commit_provider"
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id=self.name,
+            intents=frozenset({ChemistryIntent.EVAPORATION_TRANSITION}),
+            is_authoritative_for=frozenset(
+                {ChemistryIntent.EVAPORATION_TRANSITION}
+            ),
+            declared_accounts=frozenset(
+                {"process.cleaned_melt", "process.overhead_gas"}
+            ),
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        return IntentResult(
+            intent=request.intent,
+            status="unavailable",
+            transition=None,
+        )
+
+
 class _FallbackCommitProvider(_CommitProvider):
     name = "fallback_commit_provider"
 
@@ -390,6 +413,79 @@ def test_fallback_proposal_commits_against_its_bound_provider_profile():
             ChemistryIntent.EVAPORATION_TRANSITION,
             result.transition,
         )
+
+
+@pytest.mark.parametrize(
+    ("request_kind", "requested_provider", "reason"),
+    [
+        (
+            "missing",
+            "none",
+            "no_authoritative_provider",
+        ),
+        (
+            "status",
+            "unavailable_status_commit_provider",
+            "authoritative_status_unavailable",
+        ),
+        (
+            "exception",
+            "unavailable_commit_provider",
+            "authoritative_provider_unavailable_error",
+        ),
+    ],
+    ids=("no-primary", "unavailable-status", "unavailable-error"),
+)
+def test_fallback_diagnostic_names_requested_provider_and_reason(
+    request_kind, requested_provider, reason
+):
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "process.cleaned_melt", {"SiO2": 0.25}, material_origin="feedstock"
+    )
+    registry = ProviderRegistry()
+    if request_kind == "status":
+        registry.register(
+            _UnavailableStatusCommitProvider(),
+            [ChemistryIntent.EVAPORATION_TRANSITION],
+        )
+    elif request_kind == "exception":
+        registry.register(
+            _UnavailableCommitProvider(),
+            [ChemistryIntent.EVAPORATION_TRANSITION],
+        )
+    registry.register(
+        _FallbackCommitProvider(),
+        [ChemistryIntent.EVAPORATION_TRANSITION],
+        fallback=True,
+    )
+    kernel = ChemistryKernel(
+        ledger,
+        registry,
+        species_formula_registry={},
+        allow_fallback_intents=frozenset(
+            {ChemistryIntent.EVAPORATION_TRANSITION}
+        ),
+    )
+
+    result = kernel.dispatch(
+        ChemistryIntent.EVAPORATION_TRANSITION,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+    )
+    assert result.transition is not None
+    assert result.transition.credits == {
+        "process.condensation_train": {"SiO2": 0.25}
+    }
+    kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, result.transition)
+    assert ledger.mol_by_account("process.condensation_train")["SiO2"] == pytest.approx(
+        0.25
+    )
+    assert result.diagnostic == {
+        "kernel_fallback_used": "fallback_commit_provider",
+        "kernel_fallback_requested_provider": requested_provider,
+        "kernel_fallback_reason": reason,
+    }
 
 
 def test_off_path_proposal_cannot_borrow_fallback_account_authority():

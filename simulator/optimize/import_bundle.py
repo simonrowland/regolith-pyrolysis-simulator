@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 import hashlib
 import io
 import json
+import math
 from pathlib import Path, PurePosixPath
 from shutil import rmtree
 import sqlite3
@@ -1478,8 +1479,8 @@ def _margin_mapping(payload: Any) -> dict[str, dict[str, Any]]:
             continue
         margins[str(gate)] = {
             "feasible": _optional_bool(item.get("feasible")),
-            "margin": _optional_number(item.get("margin")),
-            "observed": _optional_number(item.get("observed")),
+            "margin": _optional_number(item.get("margin"), allow_infinite=True),
+            "observed": _optional_number(item.get("observed"), allow_infinite=True),
         }
     return margins
 
@@ -1698,14 +1699,16 @@ def _optional_bool(value: Any) -> bool | None:
     return None
 
 
-def _optional_number(value: Any) -> float | None:
+def _optional_number(value: Any, *, allow_infinite: bool = False) -> float | None:
     if isinstance(value, bool) or value in (None, ""):
         return None
     try:
         number = float(value)
     except (TypeError, ValueError):
         return None
-    return number if number == number and number not in (float("inf"), float("-inf")) else None
+    return number if number == number and (
+        allow_infinite or number not in (float("inf"), float("-inf"))
+    ) else None
 
 
 def _truthy(value: Any) -> bool:
@@ -1728,7 +1731,22 @@ def _relative_to(path: Path, root: Path) -> str:
 
 
 def _json_dump(payload: Mapping[str, Any]) -> str:
-    return json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    return json.dumps(
+        _json_safe_infinite_values(payload),
+        indent=2,
+        sort_keys=True,
+        allow_nan=False,
+    ) + "\n"
+
+
+def _json_safe_infinite_values(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _json_safe_infinite_values(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe_infinite_values(item) for item in value]
+    if isinstance(value, float) and math.isinf(value):
+        return "+inf" if value > 0.0 else "-inf"
+    return value
 
 
 def _now() -> str:

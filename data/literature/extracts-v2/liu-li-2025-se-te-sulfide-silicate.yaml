@@ -1,0 +1,3370 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/liu-li-2025-se-te-sulfide-silicate.yaml
+observations:
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_c-1::T=1673.15:h=13f4e328b15a
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '2572'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-1
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-1
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-1
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_c-2::T=1673.15:h=febb251e515a
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '3889'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-2
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-2
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_c-3::T=1673.15:h=cffcf9ca00ba
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '429'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-3
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-3
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-3
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_c-4::T=1673.15:h=b89305a56730
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '881'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-4
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-4
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-4
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_c-5::T=1673.15:h=34cab2e2f0b2
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '499'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-5
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-5
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=C-5
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_do1::T=1473.15:h=f4084a67481d
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '1173'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=DO1
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=DO1
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=DO1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=DO1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=DO1
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: ~1.5
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '48'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: MgO
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_e-1::T=1673.15:h=6c9acb663f7e
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '1802'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-1
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-1
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-1
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '36'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_e-2::T=1573.15:h=39f91f857b55
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '967'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-2
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-2
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '36'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_e-3::T=1773.15:h=1ee18625401a
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '2218'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-3
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-3
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-3
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_e-4::T=1873.15:h=19f210d8ed49
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '2775'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-4
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-4
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-4
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_e-5::T=1773.15:h=5a4161f5f311
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '2114'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-5
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-5
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-5
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_e-6::T=1873.15:h=54641dac376d
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '2458'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-6
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-6
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=E-6
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_ed-2::T=1473.15:h=b473ae036fec
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '328'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-2
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-2
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '48'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_ed-3::T=1573.15:h=266f4bf592c3
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '427'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-3
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-3
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-3
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '36'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_ed-5::T=1773.15:h=5db48a9ce159
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '1247'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-5
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-5
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-5
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_ed-6::T=1773.15:h=f5c125a76de6
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '1596'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-6
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-6
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=ED-6
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_o-1::T=1673.15:h=88412aa730ed
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '1615'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-1
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-1
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-1
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: liu-li-2025-se-te-sulfide-silicate::liu_li_2025_table_1_s_in_silicate_melt_o-2::T=1673.15:h=b667db98ed1b
+  experiment_id: 10.1016/j.epsl.2025.119277::liu-li-2025-se-te-sulfide-silicate
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: S concentration in quenched silicate melt; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '815'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-2
+  notices: []
+  source_id: liu-li-2025-se-te-sulfide-silicate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-2
+  read_from: pdf:liu-li-2025-se-te-sulfide-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: S concentration in quenched silicate melt (Sil), Table 1.; row=O-2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Printed 1 GPa; converted to Pa.
+    delta_FMQ:
+      state:
+        tag: value
+        value: < −1.6
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+    duration_hours:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    capsule:
+      state:
+        tag: value
+        value: Graphite
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+          were not supplied.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:liu-li-2025-se-te-sulfide-silicate
+    parameters: []
+    output_unit: µg/g
+    references: []

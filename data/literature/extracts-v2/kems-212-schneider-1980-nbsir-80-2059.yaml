@@ -1,0 +1,457 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-212-schneider-1980-nbsir-80-2059.yaml
+observations:
+- observation_id: kems-212-schneider-1980-nbsir-80-2059::schneider_1980_k_psat_figure2_high_temperature_digitized::T=2112.6:h=46dab9c6adfb
+  experiment_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1::experiment::schneider-1980-kalsio4-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2112.6'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: Figure 2 gives curve-level K2O ranges, not pointwise full melt compositions.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2.06703'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: No pointwise full melt composition is printed; the curve-level K2O ranges have no closed composition identity
+      form.
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+        note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+          and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+          1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+          centres and are not snapped to gridlines.
+  notices: []
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  locator:
+    published_page: 12
+    pdf_page_index: 15
+    figure: '2'
+    note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0 and
+      7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about 1.5 K
+      for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker centres
+      and are not snapped to gridlines.
+  read_from: pdf:kems-212-schneider-1980-nbsir-80-2059
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: Figure 2 gives curve-level K2O ranges, not pointwise full melt compositions.
+      locator:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '2112.6'
+      locator:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+        note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+          and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+          1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+          centres and are not snapped to gridlines.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-212-schneider-1980-nbsir-80-2059
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000204'
+        locator:
+          published_page: 12
+          pdf_page_index: 15
+          figure: '2'
+          note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+            and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+            1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+            centres and are not snapped to gridlines.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 12
+          pdf_page_index: 15
+          figure: '2'
+          note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+            and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+            1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+            centres and are not snapped to gridlines.
+    output_unit: Pa
+    references: []
+- observation_id: kems-212-schneider-1980-nbsir-80-2059::schneider_1980_k_psat_figure2_high_temperature_digitized::T=2115.2:h=b3789b70a648
+  experiment_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1::experiment::schneider-1980-kalsio4-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2115.2'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: Figure 2 gives curve-level K2O ranges, not pointwise full melt compositions.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.676851'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: No pointwise full melt composition is printed; the curve-level K2O ranges have no closed composition identity
+      form.
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+        note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+          and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+          1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+          centres and are not snapped to gridlines.
+  notices: []
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  locator:
+    published_page: 12
+    pdf_page_index: 15
+    figure: '2'
+    note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0 and
+      7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about 1.5 K
+      for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker centres
+      and are not snapped to gridlines.
+  read_from: pdf:kems-212-schneider-1980-nbsir-80-2059
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: Figure 2 gives curve-level K2O ranges, not pointwise full melt compositions.
+      locator:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '2115.2'
+      locator:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+        note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+          and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+          1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+          centres and are not snapped to gridlines.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-212-schneider-1980-nbsir-80-2059
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000668'
+        locator:
+          published_page: 12
+          pdf_page_index: 15
+          figure: '2'
+          note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+            and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+            1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+            centres and are not snapped to gridlines.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 12
+          pdf_page_index: 15
+          figure: '2'
+          note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+            and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+            1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+            centres and are not snapped to gridlines.
+    output_unit: Pa
+    references: []
+- observation_id: kems-212-schneider-1980-nbsir-80-2059::schneider_1980_k_psat_figure2_high_temperature_digitized::T=2150.4:h=61a3c98290b7
+  experiment_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1::experiment::schneider-1980-kalsio4-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2150.4'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: Figure 2 gives curve-level K2O ranges, not pointwise full melt compositions.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '3.12081'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: No pointwise full melt composition is printed; the curve-level K2O ranges have no closed composition identity
+      form.
+    decided_by:
+      worker: codex
+      date: '2026-10-23'
+      evidence:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+        note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+          and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+          1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+          centres and are not snapped to gridlines.
+  notices: []
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  locator:
+    published_page: 12
+    pdf_page_index: 15
+    figure: '2'
+    note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0 and
+      7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about 1.5 K
+      for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker centres
+      and are not snapped to gridlines.
+  read_from: pdf:kems-212-schneider-1980-nbsir-80-2059
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: Figure 2 gives curve-level K2O ranges, not pointwise full melt compositions.
+      locator:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '2150.4'
+      locator:
+        published_page: 12
+        pdf_page_index: 15
+        figure: '2'
+        note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+          and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+          1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+          centres and are not snapped to gridlines.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-212-schneider-1980-nbsir-80-2059
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000308'
+        locator:
+          published_page: 12
+          pdf_page_index: 15
+          figure: '2'
+          note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+            and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+            1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+            centres and are not snapped to gridlines.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 12
+          pdf_page_index: 15
+          figure: '2'
+          note: Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0
+            and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about
+            1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker
+            centres and are not snapped to gridlines.
+    output_unit: Pa
+    references: []

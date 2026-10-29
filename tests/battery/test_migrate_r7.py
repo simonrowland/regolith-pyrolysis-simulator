@@ -305,6 +305,45 @@ def test_h3_pressure_evaluator_arguments_do_not_name_the_output(units):
     assert control.is_value and control.value is Quantity.P_SAT
 
 
+@pytest.mark.parametrize(
+    ("form", "expected"),
+    [
+        pytest.param("P[0]", False, id="pressure-subscript"),
+        pytest.param('p["Na"]', False, id="species-pressure-subscript"),
+        pytest.param("# pressure = P_bar", False, id="comment-only"),
+        pytest.param('"P"', False, id="string-only"),
+        pytest.param("Psat(T_K)", True, id="psat-call"),
+        pytest.param("p_sat(T_K)", True, id="p-sat-call"),
+        pytest.param(
+            "vapor_pressure(T_K) = A - B/T",
+            True,
+            id="vapor-pressure-call",
+        ),
+        pytest.param(
+            "alpha[Psat(T_K)] = A - B/T",
+            False,
+            id="psat-in-subscript-index",
+        ),
+        pytest.param(
+            "alpha[P_bar] = A - B/T",
+            False,
+            id="pressure-name-in-subscript-index",
+        ),
+        pytest.param("log10(P_bar) = A - B/T", True, id="log-pressure-positive"),
+        pytest.param(
+            "alpha(P_bar, T_K) = A * exp(-B/T)",
+            False,
+            id="pressure-only-in-arguments",
+        ),
+    ],
+)
+def test_h3_pressure_evaluator_uses_source_syntax(form, expected):
+    from simulator.battery.migrate import _pressure_evaluator
+
+    values = {"source_form": form, "coefficients": {"A": 1, "B": 2}}
+    assert _pressure_evaluator(values, "bar") is expected
+
+
 def test_g3_declared_psat_cannot_contradict_partial_pressure():
     state, reason = map_quantity("psat_series", {
         "quantity": "pure_Psat", "P_bar": 1,
@@ -386,6 +425,17 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         any(notice.band == bulk_band for notice in observation.notices)
         for observation in defaulted
     ) == 59
+    for observation in defaulted:
+        composition_condition = (observation.point_conditions or {}).get("composition")
+        assert composition_condition is not None and composition_condition.state.is_value
+        source_row = _extract_observation(
+            "kems-042-plante-1979.yaml",
+            observation.observation_id.split("::", 1)[1],
+        )
+        role = source_row["values"]["composition_role"]
+        assert role["value"] == "datum_state"
+        assert role["locator"] == source_row["locator"]
+        assert role["quote"] == source_row["quote"]
     assert all(
         any(notice.band == bulk_band for notice in observation.notices)
         for observation in defaulted
@@ -886,6 +936,26 @@ def _numeric_evidence_paths(leaves):
     ]
 
 
+def _numeric_field_evidence_paths(leaves, field):
+    field_path = re.compile(r"(?:^|\.)" + re.escape(field) + r"(?:\.|\[|$)")
+    metadata = re.compile(
+        r"(?:^|\.)(?:locator|page|published_page|pdf_page_index|index)(?:\.|\[|$)"
+    )
+    numeric = []
+    for path, value in leaves:
+        if not field_path.search(path) or metadata.search(path):
+            continue
+        if isinstance(value, bool) or value in (None, ""):
+            continue
+        try:
+            amount = Decimal(str(value))
+        except (ArithmeticError, TypeError, ValueError):
+            continue
+        if amount.is_finite():
+            numeric.append(path)
+    return numeric
+
+
 def _store_kind(path: Path) -> str | None:
     parts = path.parts
     if "extracts-v2" in parts:
@@ -963,22 +1033,20 @@ def absence_audit(paths=STORE_PATHS):
                         if temperatures:
                             contradiction = temperatures[:3]
                     elif "does not state phase" in reason:
-                        phases = [p for p, v in leaves if v not in (None, "") and
-                                  re.search(r"(?:^|[.])(?:phase|phase_as_published|phase_state_as_published|state_note_as_published|phase_from|phase_to)(?:$|\[)", p)]
+                        phases = [
+                            path
+                            for path, value in leaves
+                            if path
+                            in {
+                                "phase",
+                                "phase_as_published",
+                                "phase_state_as_published",
+                                "state_note_as_published",
+                            }
+                            and value not in (None, "")
+                        ]
                         if phases:
                             contradiction = phases[:3]
-                        elif record.get("type") == "transition_point":
-                            transition_fields = [
-                                p for p, value in leaves
-                                if value not in (None, "")
-                                and (
-                                    p == "values.property_kind"
-                                    or p.startswith("values.citation.")
-                                    or p == "locator.note"
-                                )
-                            ]
-                            if transition_fields:
-                                contradiction = transition_fields[:3]
                     elif "unit as printed not stated" in reason:
                         units = _nonempty_printed_paths(
                             record.get("units_as_published"),
@@ -999,9 +1067,21 @@ def absence_audit(paths=STORE_PATHS):
                         if found:
                             contradiction = found
                     elif match := re.search(r"source does not state (?:a numeric )?(\w+)", reason):
-                        found = [p for p, value in leaves if value not in (None, "") and
-                                 not p.endswith((".tag", ".reason")) and
-                                 re.search(r"(?:^|\.)" + re.escape(match[1]) + r"(?:\.|\[|$)", p)]
+                        if "numeric" in reason:
+                            found = _numeric_field_evidence_paths(leaves, match[1])
+                        else:
+                            found = [
+                                path
+                                for path, value in leaves
+                                if value not in (None, "")
+                                and not path.endswith((".tag", ".reason"))
+                                and re.search(
+                                    r"(?:^|\.)"
+                                    + re.escape(match[1])
+                                    + r"(?:\.|\[|$)",
+                                    path,
+                                )
+                            ]
                         if found:
                             contradiction = found[:3]
                     if contradiction:
@@ -1048,6 +1128,106 @@ def test_g1_whole_store_absence_claims_match_sources(path):
     assert not bad, f"{len(bad)} false absence claims; first witnesses: {bad[:12]}"
 
 
+def test_lu_2026_liquidus_points_keep_printed_total_pressure(tmp_path: Path) -> None:
+    from simulator.battery.identity import Identity
+
+    source_id = "lu-2026-mercury-sulfur-liquidus"
+    filename = f"{source_id}.yaml"
+    source = yaml.load((EXTRACTS_DIR / filename).read_text(), Loader=_YAML_LOADER)
+    expected: dict[str, Decimal] = {}
+    for body in (source.get("species") or {}).values():
+        for row in body.get("observations") or []:
+            values = row.get("values") or {}
+            if values.get("quantity") != "transition_temperature":
+                continue
+            for point in values.get("points") or []:
+                conditions = point.get("point_conditions") or {}
+                pressure = conditions.get("total_pressure_Pa") or {}
+                state = pressure.get("state") or {}
+                value = state.get("value") or {}
+                if state.get("tag") == "value" and value.get("kind") == "point":
+                    expected[row["observation_id"]] = Decimal(value["point"])
+
+    result = _migrate_real_extract(tmp_path, filename)
+    actual = {}
+    for observation in result.observations.values():
+        if (
+            observation.source_id != source_id
+            or not isinstance(observation.identity, Identity)
+            or quantity_token(observation.identity) is not Quantity.TRANSITION_TEMPERATURE
+            or not observation.identity.total_pressure_Pa.is_value
+        ):
+            continue
+        local_id = observation.observation_id.split("::", 2)[1].split("::T=", 1)[0]
+        actual[local_id] = observation.identity.total_pressure_Pa.value
+    assert len(expected) == 16
+    assert actual == expected
+
+
+def test_g1_sato_1976_phase_absences_match_isolated_source(tmp_path: Path) -> None:
+    filename = "sato-1976-lunar-fo2-apollo-17.yaml"
+    result = _migrate_real_extract(tmp_path, filename, write=True)
+    generated = tmp_path / "tree" / "data" / "literature" / "extracts-v2" / filename
+
+    judged, bad = absence_audit([generated])
+
+    source_id = "sato-1976-lunar-fo2-apollo-17"
+    assert len(result.observations) == 115
+    assert judged[source_id] == 115
+    assert bad == [], f"false absence claims: {bad[:12]}"
+
+
+def test_g1_absence_audit_catches_same_row_species_phase_mutation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "repo"
+    source_dir = root / "data" / "literature" / "extracts"
+    store_dir = root / "data" / "literature" / "extracts-v2"
+    source_dir.mkdir(parents=True)
+    store_dir.mkdir(parents=True)
+    monkeypatch.setitem(absence_audit.__globals__, "REPO_ROOT", root)
+
+    source = {
+        "source_id": "fixture-phase-mutation",
+        "species": {
+            "Fe": {
+                "observations": [
+                    {"observation_id": "row", "phase": "liquid"},
+                ]
+            }
+        },
+    }
+    store = {
+        "observations": [
+            {
+                "observation_id": "fixture-phase-mutation::row",
+                "source_id": "fixture-phase-mutation",
+                "identity": {
+                    "species": {
+                        "formula": "Fe",
+                        "phase": {
+                            "tag": "unknown",
+                            "reason": "source does not state phase",
+                        },
+                    }
+                },
+            }
+        ]
+    }
+    source_path = source_dir / "fixture-phase-mutation.yaml"
+    store_path = store_dir / source_path.name
+    source_path.write_text(yaml.safe_dump(source), encoding="utf-8")
+    store_path.write_text(yaml.safe_dump(store), encoding="utf-8")
+
+    judged, bad = absence_audit([store_path])
+
+    assert judged["fixture-phase-mutation"] == 1
+    assert len(bad) == 1
+    assert bad[0][1] == "fixture-phase-mutation::row"
+    assert bad[0][2] == "identity.species.phase.reason"
+    assert bad[0][4] == ["phase"]
+
+
 def test_g1_current_stolyarova_source_migrates_without_context_observation(
     tmp_path: Path,
 ):
@@ -1057,12 +1237,10 @@ def test_g1_current_stolyarova_source_migrates_without_context_observation(
     assert method_id not in result.observations
     assert len(
         [obs for obs in result.observations.values() if obs.source_id == "kems-016-stolyarova-1992"]
-    ) == 22
+    ) == 0
 
     generated = tmp_path / "tree/data/literature/extracts-v2" / filename
-    judged, bad = absence_audit([generated])
-    assert judged["kems-016-stolyarova-1992"] == 22
-    assert bad == []
+    assert not generated.exists()
 
 
 @pytest.mark.parametrize(

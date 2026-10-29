@@ -1,0 +1,797 @@
+schema_version: literature_extract.v1
+source_id: sato-1976-lunar-fo2-apollo-17
+source:
+  citation: >-
+    Sato, M. (1976), Oxygen fugacity and other thermochemical parameters of
+    Apollo 17 high-Ti basalts and their implications on the reduction mechanism,
+    Proceedings of the Lunar Science Conference, 7th, 1323-1344.
+  url: https://articles.adsabs.harvard.edu/pdf/1976LPSC....7.1323S
+  year: 1976
+extraction:
+  method: manual transcription from rendered PDF pages; tables independently read by rows and columns
+  date: '2026-10-10'
+  worker: sato76
+review_status: draft
+experiments:
+  - experiment_id: sato1976_natural_fO2
+    method: emf_cell
+    locator: {page: 1324, section: Experimental Method, note: natural-sample measurements in the silica-glass capsule}
+    sample:
+      form:
+        state: {tag: value, value: bulk rock}
+        locator: {page: 1326, table: '1', note: Table 1 reports natural-sample oxygen fugacity values for bulk-rock samples}
+  - experiment_id: sato1976_added_Fe_fO2
+    method: emf_cell
+    locator: {page: 1324, section: Experimental Method, note: measurements after addition of pure iron in the iron capsule}
+    sample:
+      form:
+        state: {tag: value, value: bulk rock}
+        locator: {page: 1326, table: '1', note: Table 1 reports sample-plus-iron oxygen fugacity values for bulk-rock samples}
+  - experiment_id: sato1976_Fe_activity_calculation
+    method: emf_cell
+    locator: {page: 1326, section: discussion following Table 1, note: Fe activity calculated from natural-sample and sample-plus-Fe curves}
+  - experiment_id: sato1973_quoted_values
+    locator: {page: 1326, table: '1', note: daggered measurements attributed to Sato et al. (1973); method not restated}
+    sample:
+      form:
+        state: {tag: value, value: bulk rock}
+        locator: {page: 1326, table: '1', note: Daggered Table 1 values report oxygen fugacity of bulk-rock samples}
+fidelity_samples:
+  - path: species.O2.observations[sato_1976_table1_70017_31].values.series[0].minus_log_fO2_atm
+    value: '15.65'
+    locator: {page: 1326, table: '1', row: '70017,31', column: 1000C}
+  - path: species.FeO.observations[sato_1976_table2_70017].values.series[0].activity
+    value: '.30'
+    locator: {page: 1328, table: '2', row: '70017', column: 1000C}
+  - path: species.Fe.observations[sato_1976_table3_70017].values.series[0].activity
+    value: '.90'
+    locator: {page: 1328, table: '3', row: '70017', column: 975C}
+  - path: species.O2.observations[sato_1976_table1_70017_31].values.series[0].fugacity_Pa
+    value: '2.2683842E-11'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_70017_31].values.series[1].fugacity_Pa
+    value: '2.2683842E-10'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_70017_31].values.series[2].fugacity_Pa
+    value: '1.3986744E-9'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_70017_31].values.series[3].fugacity_Pa
+    value: '7.0099773E-9'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_70017_31].values.series[4].fugacity_Pa
+    value: '3.0599661E-8'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_70017_31].values.series[0].fugacity_Pa
+    value: '1.5336159E-11'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_70017_31].values.series[1].fugacity_Pa
+    value: '9.2409498E-11'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_70017_31].values.series[2].fugacity_Pa
+    value: '5.5682229E-10'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_70017_31].values.series[3].fugacity_Pa
+    value: '2.5451689E-9'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_70017_31].values.series[4].fugacity_Pa
+    value: '9.2409498E-9'
+    locator: {page: 1326, table: '1', row: '70017,31', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_74275_39].values.series[0].fugacity_Pa
+    value: '5.5682229E-11'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_74275_39].values.series[1].fugacity_Pa
+    value: '5.0782796E-10'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_74275_39].values.series[2].fugacity_Pa
+    value: '2.6044535E-9'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_74275_39].values.series[3].fugacity_Pa
+    value: '1.0857169E-8'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_74275_39].values.series[4].fugacity_Pa
+    value: '4.0338209E-8'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_74275_39].values.series[0].fugacity_Pa
+    value: '2.6651190E-11'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_74275_39].values.series[1].fugacity_Pa
+    value: '1.6058930E-10'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_74275_39].values.series[2].fugacity_Pa
+    value: '9.2409498E-10'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_74275_39].values.series[3].fugacity_Pa
+    value: '4.2239290E-9'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_74275_39].values.series[4].fugacity_Pa
+    value: '1.4987066E-8'
+    locator: {page: 1326, table: '1', row: '74275,39', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_12009_35].values.series[0].fugacity_Pa
+    value: '2.5451689E-11'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_12009_35].values.series[1].fugacity_Pa
+    value: '1.6058930E-10'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_12009_35].values.series[2].fugacity_Pa
+    value: '1.0132500E-9'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_12009_35].values.series[3].fugacity_Pa
+    value: '4.0338209E-9'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_12009_35].values.series[4].fugacity_Pa
+    value: '1.6058930E-8'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12009_35].values.series[0].fugacity_Pa
+    value: '1.0132500E-11'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12009_35].values.series[1].fugacity_Pa
+    value: '1.0132500E-10'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12009_35].values.series[2].fugacity_Pa
+    value: '4.0338209E-10'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12009_35].values.series[3].fugacity_Pa
+    value: '2.0216995E-9'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12009_35].values.series[4].fugacity_Pa
+    value: '1.0132500E-8'
+    locator: {page: 1326, table: '1', row: '12009,35', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_12053_89].values.series[0].fugacity_Pa
+    value: '4.0338209E-11'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_12053_89].values.series[1].fugacity_Pa
+    value: '2.5451689E-10'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_12053_89].values.series[2].fugacity_Pa
+    value: '1.6058930E-9'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_12053_89].values.series[3].fugacity_Pa
+    value: '1.0132500E-8'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_12053_89].values.series[4].fugacity_Pa
+    value: '5.0782796E-8'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12053_89].values.series[0].fugacity_Pa
+    value: '1.0132500E-11'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12053_89].values.series[1].fugacity_Pa
+    value: '6.3931753E-11'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12053_89].values.series[2].fugacity_Pa
+    value: '3.2041778E-10'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12053_89].values.series[3].fugacity_Pa
+    value: '1.6058930E-9'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_12053_89].values.series[4].fugacity_Pa
+    value: '8.0485308E-9'
+    locator: {page: 1326, table: '1', row: '12053,89', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_15595_25].values.series[0].fugacity_Pa
+    value: '2.0216995E-11'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_15595_25].values.series[1].fugacity_Pa
+    value: '1.2756062E-10'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_15595_25].values.series[2].fugacity_Pa
+    value: '8.0485308E-10'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_15595_25].values.series[3].fugacity_Pa
+    value: '6.3931753E-9'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_15595_25].values.series[4].fugacity_Pa
+    value: '4.0338209E-8'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_15595_25].values.series[0].fugacity_Pa
+    value: '1.0132500E-11'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_15595_25].values.series[1].fugacity_Pa
+    value: '8.0485308E-11'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_15595_25].values.series[2].fugacity_Pa
+    value: '6.3931753E-10'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_15595_25].values.series[3].fugacity_Pa
+    value: '4.0338209E-9'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_added_fe_15595_25].values.series[4].fugacity_Pa
+    value: '2.0216995E-8'
+    locator: {page: 1326, table: '1', row: '15595,25', column: '1200C'}
+  - path: species.O2.observations[sato_1976_table1_15058_81].values.series[0].fugacity_Pa
+    value: '2.0216995E-11'
+    locator: {page: 1326, table: '1', row: '15058,81', column: '1000C'}
+  - path: species.O2.observations[sato_1976_table1_15058_81].values.series[1].fugacity_Pa
+    value: '1.2756062E-10'
+    locator: {page: 1326, table: '1', row: '15058,81', column: '1050C'}
+  - path: species.O2.observations[sato_1976_table1_15058_81].values.series[2].fugacity_Pa
+    value: '1.0132500E-9'
+    locator: {page: 1326, table: '1', row: '15058,81', column: '1100C'}
+  - path: species.O2.observations[sato_1976_table1_15058_81].values.series[3].fugacity_Pa
+    value: '5.0782796E-9'
+    locator: {page: 1326, table: '1', row: '15058,81', column: '1150C'}
+  - path: species.O2.observations[sato_1976_table1_15058_81].values.series[4].fugacity_Pa
+    value: '2.5451689E-8'
+    locator: {page: 1326, table: '1', row: '15058,81', column: '1200C'}
+species:
+  O2:
+    observations:
+      - observation_id: sato_1976_table1_70017_31
+        type: partial_pressure
+        experiment: sato1976_natural_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
+        locator: {page: 1326, table: '1', row: '70017,31', note: PDF p. 4; first two rows of values are natural and added-iron measurements}
+        units: '-log10(fO2/atm), as printed'
+        values:
+          method_class: measured_direct
+          quantity: fugacity
+          sample_number_as_printed: '70017,31'
+          rock_type_as_printed: High-Ti microgabbro
+          bulk_composition:
+            state: not_published
+            reason: not_published
+            pointer: Hodges and Kushiro (1974), Apollo 17 petrology and experimental determination of differentiation sequences in model moon compositions; cited for this rock's petrology (pp. 1324, 1326; reference p. 1343)
+          measurement_method: e.m.f. method using a zirconia-based solid electrolyte in the improved double-cell arrangement; Y2O3 (10 mole%)-ZrO2 electrolyte tubes
+          capsule_and_sample: About 100 mg of basalt crushed to approximately 60 mesh in synthetic sapphire mortar, in a silica-glass capsule (6 mm outside diameter, 6 mm high); natural sample then transferred to iron capsule machined from 99.7% pure Armco magnetic ingot iron rod (0.01% C). The Table 1 parenthesized values are with addition of a large quantity of pure iron.
+          method_locator: {page: 1324, section: Experimental Method}
+          composition_pointer_locator: {page: 1324, section: Results of Oxygen Fugacity Measurements}
+          condition_as_published: natural basalt fO2 measured in a silica-glass capsule; Table 1 values are printed as -log10(fO2/atm).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. The printed -log fO2 and atm basis are retained above.'
+          series:
+            - T_C: 1000
+              minus_log_fO2_atm: '15.65'
+              log_fO2: {value: '-15.65', units: 'log10(atm)'}
+              fugacity_Pa: '2.2683842E-11'
+            - T_C: 1050
+              minus_log_fO2_atm: '14.65'
+              log_fO2: {value: '-14.65', units: 'log10(atm)'}
+              fugacity_Pa: '2.2683842E-10'
+            - T_C: 1100
+              minus_log_fO2_atm: '13.86'
+              log_fO2: {value: '-13.86', units: 'log10(atm)'}
+              fugacity_Pa: '1.3986744E-9'
+            - T_C: 1150
+              minus_log_fO2_atm: '13.16'
+              log_fO2: {value: '-13.16', units: 'log10(atm)'}
+              fugacity_Pa: '7.0099773E-9'
+            - T_C: 1200
+              minus_log_fO2_atm: '12.52'
+              log_fO2: {value: '-12.52', units: 'log10(atm)'}
+              fugacity_Pa: '3.0599661E-8'
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_added_fe_70017_31
+        type: partial_pressure
+        experiment: sato1976_added_Fe_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
+        locator: {page: 1326, table: '1', row: '70017,31', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
+        units: Pa; printed -log10(fO2/atm) retained in each point
+        values:
+          method_class: measured_direct
+          quantity: fugacity
+          sample_number_as_printed: '70017,31'
+          rock_type_as_printed: High-Ti microgabbro
+          condition_as_published: basalt with addition of a large quantity of pure iron, measured in an iron capsule
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Parenthesized source values are retained.'
+          series:
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '15.82', log_fO2: {value: '-15.82', units: 'log10(atm)'}, fugacity_Pa: '1.5336159E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.04', log_fO2: {value: '-15.04', units: 'log10(atm)'}, fugacity_Pa: '9.2409498E-11'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.26', log_fO2: {value: '-14.26', units: 'log10(atm)'}, fugacity_Pa: '5.5682229E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.60', log_fO2: {value: '-13.60', units: 'log10(atm)'}, fugacity_Pa: '2.5451689E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.04', log_fO2: {value: '-13.04', units: 'log10(atm)'}, fugacity_Pa: '9.2409498E-9'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_74275_39
+        type: partial_pressure
+        experiment: sato1976_natural_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
+        locator: {page: 1326, table: '1', row: '74275,39', note: PDF p. 4; first two rows of values are natural and added-iron measurements}
+        units: '-log10(fO2/atm), as printed'
+        values:
+          method_class: measured_direct
+          quantity: fugacity
+          sample_number_as_printed: '74275,39'
+          rock_type_as_printed: High-Ti porphyritic fine-grained basalt
+          bulk_composition:
+            state: not_published
+            reason: not_published
+            pointer: Hodges and Kushiro (1974), Apollo 17 petrology and experimental determination of differentiation sequences in model moon compositions; cited for this rock's petrology (pp. 1326; reference p. 1343)
+          measurement_method: e.m.f. method using a zirconia-based solid electrolyte in the improved double-cell arrangement; Y2O3 (10 mole%)-ZrO2 electrolyte tubes
+          capsule_and_sample: About 100 mg of basalt crushed to approximately 60 mesh in synthetic sapphire mortar, in a silica-glass capsule (6 mm outside diameter, 6 mm high); natural sample then transferred to iron capsule machined from 99.7% pure Armco magnetic ingot iron rod (0.01% C). The Table 1 parenthesized values are with addition of a large quantity of pure iron.
+          method_locator: {page: 1324, section: Experimental Method}
+          composition_pointer_locator: {page: 1326, section: 'Basalt 74275,39'}
+          condition_as_published: natural basalt fO2 measured in a silica-glass capsule; Table 1 values are printed as -log10(fO2/atm).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. The printed -log fO2 and atm basis are retained above.'
+          series:
+            - T_C: 1000
+              minus_log_fO2_atm: '15.26'
+              log_fO2: {value: '-15.26', units: 'log10(atm)'}
+              fugacity_Pa: '5.5682229E-11'
+            - T_C: 1050
+              minus_log_fO2_atm: '14.30'
+              log_fO2: {value: '-14.30', units: 'log10(atm)'}
+              fugacity_Pa: '5.0782796E-10'
+            - T_C: 1100
+              minus_log_fO2_atm: '13.59'
+              log_fO2: {value: '-13.59', units: 'log10(atm)'}
+              fugacity_Pa: '2.6044535E-9'
+            - T_C: 1150
+              minus_log_fO2_atm: '12.97'
+              log_fO2: {value: '-12.97', units: 'log10(atm)'}
+              fugacity_Pa: '1.0857169E-8'
+            - T_C: 1200
+              minus_log_fO2_atm: '12.40'
+              log_fO2: {value: '-12.40', units: 'log10(atm)'}
+              fugacity_Pa: '4.0338209E-8'
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_added_fe_74275_39
+        type: partial_pressure
+        experiment: sato1976_added_Fe_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
+        locator: {page: 1326, table: '1', row: '74275,39', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
+        units: Pa; printed -log10(fO2/atm) retained in each point
+        values:
+          method_class: measured_direct
+          quantity: fugacity
+          sample_number_as_printed: '74275,39'
+          rock_type_as_printed: High-Ti porphyritic fine-grained basalt
+          condition_as_published: basalt with addition of a large quantity of pure iron, measured in an iron capsule
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Parenthesized source values are retained.'
+          series:
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '15.58', log_fO2: {value: '-15.58', units: 'log10(atm)'}, fugacity_Pa: '2.6651190E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '14.80', log_fO2: {value: '-14.80', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-10'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.04', log_fO2: {value: '-14.04', units: 'log10(atm)'}, fugacity_Pa: '9.2409498E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.38', log_fO2: {value: '-13.38', units: 'log10(atm)'}, fugacity_Pa: '4.2239290E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '12.83', log_fO2: {value: '-12.83', units: 'log10(atm)'}, fugacity_Pa: '1.4987066E-8'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_12009_35
+        experiment: sato1973_quoted_values
+        type: partial_pressure
+        locator: {page: 1326, table: '1', row: '12009,35', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
+        units: '-log10(fO2/atm), as printed'
+        values:
+          method_class: quoted_attributed
+          attribution: Sato, Hickling, and McLane (1973), cited as the source for the Table 1 dagger values.
+          quantity: fugacity
+          sample_number_as_printed: '12009,35'
+          rock_type_as_printed: Fine-grained basalt
+          condition_as_published: natural basalt fO2 from the daggered series; the paper attributes these values to Sato et al. (1973).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
+          bulk_composition:
+            state: not_published
+            reason: not_published
+            pointer: Sato, Hickling, and McLane (1973), Oxygen fugacity values of Apollo 12, 14, and 15 lunar samples and reduced state of lunar magmas; Table 1 dagger attributes these values to this source (pp. 1326, 1343)
+          series:
+            - {T_C: 1000, minus_log_fO2_atm: '15.6', log_fO2: {value: '-15.6', units: 'log10(atm)'}, fugacity_Pa: '2.5451689E-11'}
+            - {T_C: 1050, minus_log_fO2_atm: '14.8', log_fO2: {value: '-14.8', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-10'}
+            - {T_C: 1100, minus_log_fO2_atm: '14.0', log_fO2: {value: '-14.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-9'}
+            - {T_C: 1150, minus_log_fO2_atm: '13.4', log_fO2: {value: '-13.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-9'}
+            - {T_C: 1200, minus_log_fO2_atm: '12.8', log_fO2: {value: '-12.8', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-8'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_added_fe_12009_35
+        experiment: sato1973_quoted_values
+        type: partial_pressure
+        locator: {page: 1326, table: '1', row: '12009,35', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
+        units: Pa; printed -log10(fO2/atm) retained in each point
+        values:
+          method_class: quoted_attributed
+          attribution: Sato, Hickling, and McLane (1973), cited as the source for the Table 1 dagger values.
+          quantity: fugacity
+          sample_number_as_printed: '12009,35'
+          rock_type_as_printed: Fine-grained basalt
+          condition_as_published: basalt with addition of a large quantity of pure iron; parenthesized Table 1 values
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
+          series:
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', log_fO2: {value: '-16.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.0', log_fO2: {value: '-15.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-10'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.4', log_fO2: {value: '-14.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.7', log_fO2: {value: '-13.7', units: 'log10(atm)'}, fugacity_Pa: '2.0216995E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.0', log_fO2: {value: '-13.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-8'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_12053_89
+        experiment: sato1973_quoted_values
+        type: partial_pressure
+        locator: {page: 1326, table: '1', row: '12053,89', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
+        units: '-log10(fO2/atm), as printed'
+        values:
+          method_class: quoted_attributed
+          attribution: Sato, Hickling, and McLane (1973), cited as the source for the Table 1 dagger values.
+          quantity: fugacity
+          sample_number_as_printed: '12053,89'
+          rock_type_as_printed: Holocrystalline basalt
+          condition_as_published: natural basalt fO2 from the daggered series; the paper attributes these values to Sato et al. (1973).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
+          bulk_composition:
+            state: not_published
+            reason: not_published
+            pointer: Sato, Hickling, and McLane (1973), Oxygen fugacity values of Apollo 12, 14, and 15 lunar samples and reduced state of lunar magmas; Table 1 dagger attributes these values to this source (pp. 1326, 1343)
+          series:
+            - {T_C: 1000, minus_log_fO2_atm: '15.4', log_fO2: {value: '-15.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-11'}
+            - {T_C: 1050, minus_log_fO2_atm: '14.6', log_fO2: {value: '-14.6', units: 'log10(atm)'}, fugacity_Pa: '2.5451689E-10'}
+            - {T_C: 1100, minus_log_fO2_atm: '13.8', log_fO2: {value: '-13.8', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-9'}
+            - {T_C: 1150, minus_log_fO2_atm: '13.0', log_fO2: {value: '-13.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-8'}
+            - {T_C: 1200, minus_log_fO2_atm: '12.3', log_fO2: {value: '-12.3', units: 'log10(atm)'}, fugacity_Pa: '5.0782796E-8'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_added_fe_12053_89
+        experiment: sato1973_quoted_values
+        type: partial_pressure
+        locator: {page: 1326, table: '1', row: '12053,89', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
+        units: Pa; printed -log10(fO2/atm) retained in each point
+        values:
+          method_class: quoted_attributed
+          attribution: Sato, Hickling, and McLane (1973), cited as the source for the Table 1 dagger values.
+          quantity: fugacity
+          sample_number_as_printed: '12053,89'
+          rock_type_as_printed: Holocrystalline basalt
+          condition_as_published: basalt with addition of a large quantity of pure iron; parenthesized Table 1 values
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
+          series:
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', log_fO2: {value: '-16.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.2', log_fO2: {value: '-15.2', units: 'log10(atm)'}, fugacity_Pa: '6.3931753E-11'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.5', log_fO2: {value: '-14.5', units: 'log10(atm)'}, fugacity_Pa: '3.2041778E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.8', log_fO2: {value: '-13.8', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.1', log_fO2: {value: '-13.1', units: 'log10(atm)'}, fugacity_Pa: '8.0485308E-9'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_15595_25
+        experiment: sato1973_quoted_values
+        type: partial_pressure
+        locator: {page: 1326, table: '1', row: '15595,25', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
+        units: '-log10(fO2/atm), as printed'
+        values:
+          method_class: quoted_attributed
+          attribution: Sato, Hickling, and McLane (1973), cited as the source for the Table 1 dagger values.
+          quantity: fugacity
+          sample_number_as_printed: '15595,25'
+          rock_type_as_printed: Porphyritic basalt
+          condition_as_published: natural basalt fO2 from the daggered series; the paper attributes these values to Sato et al. (1973).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
+          bulk_composition:
+            state: not_published
+            reason: not_published
+            pointer: Sato, Hickling, and McLane (1973), Oxygen fugacity values of Apollo 12, 14, and 15 lunar samples and reduced state of lunar magmas; Table 1 dagger attributes these values to this source (pp. 1326, 1343)
+          series:
+            - {T_C: 1000, minus_log_fO2_atm: '15.7', log_fO2: {value: '-15.7', units: 'log10(atm)'}, fugacity_Pa: '2.0216995E-11'}
+            - {T_C: 1050, minus_log_fO2_atm: '14.9', log_fO2: {value: '-14.9', units: 'log10(atm)'}, fugacity_Pa: '1.2756062E-10'}
+            - {T_C: 1100, minus_log_fO2_atm: '14.1', log_fO2: {value: '-14.1', units: 'log10(atm)'}, fugacity_Pa: '8.0485308E-10'}
+            - {T_C: 1150, minus_log_fO2_atm: '13.2', log_fO2: {value: '-13.2', units: 'log10(atm)'}, fugacity_Pa: '6.3931753E-9'}
+            - {T_C: 1200, minus_log_fO2_atm: '12.4', log_fO2: {value: '-12.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-8'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_added_fe_15595_25
+        experiment: sato1973_quoted_values
+        type: partial_pressure
+        locator: {page: 1326, table: '1', row: '15595,25', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
+        units: Pa; printed -log10(fO2/atm) retained in each point
+        values:
+          method_class: quoted_attributed
+          attribution: Sato, Hickling, and McLane (1973), cited as the source for the Table 1 dagger values.
+          quantity: fugacity
+          sample_number_as_printed: '15595,25'
+          rock_type_as_printed: Porphyritic basalt
+          condition_as_published: basalt with addition of a large quantity of pure iron; parenthesized Table 1 values
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
+          series:
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', log_fO2: {value: '-16.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.1', log_fO2: {value: '-15.1', units: 'log10(atm)'}, fugacity_Pa: '8.0485308E-11'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.2', log_fO2: {value: '-14.2', units: 'log10(atm)'}, fugacity_Pa: '6.3931753E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.4', log_fO2: {value: '-13.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '12.7', log_fO2: {value: '-12.7', units: 'log10(atm)'}, fugacity_Pa: '2.0216995E-8'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+      - observation_id: sato_1976_table1_15058_81
+        type: partial_pressure
+        experiment: sato1976_natural_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
+        locator: {page: 1326, table: '1', row: '15058,81', note: PDF p. 4}
+        units: '-log10(fO2/atm), as printed'
+        values:
+          method_class: measured_direct
+          quantity: fugacity
+          sample_number_as_printed: '15058,81'
+          rock_type_as_printed: Porphyritic pyroxene basalt
+          bulk_composition:
+            state: not_published
+            reason: not_published
+            pointer: not_published; no bulk-composition source for 15058,81 is identified in the pages located with Table 1 (1324-1326)
+          condition_as_published: natural basalt fO2 measured in a silica-glass capsule.
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
+          fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
+          series:
+            - {T_C: 1000, minus_log_fO2_atm: '15.7', log_fO2: {value: '-15.7', units: 'log10(atm)'}, fugacity_Pa: '2.0216995E-11'}
+            - {T_C: 1050, minus_log_fO2_atm: '14.9', log_fO2: {value: '-14.9', units: 'log10(atm)'}, fugacity_Pa: '1.2756062E-10'}
+            - {T_C: 1100, minus_log_fO2_atm: '14.0', log_fO2: {value: '-14.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-9'}
+            - {T_C: 1150, minus_log_fO2_atm: '13.3', log_fO2: {value: '-13.3', units: 'log10(atm)'}, fugacity_Pa: '5.0782796E-9'}
+            - {T_C: 1200, minus_log_fO2_atm: '12.6', log_fO2: {value: '-12.6', units: 'log10(atm)'}, fugacity_Pa: '2.5451689E-8'}
+        uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
+        equipment: {}
+  FeO:
+    observations:
+      - observation_id: sato_1976_table2_70017
+        type: activity_coefficient
+        experiment: sato1976_added_Fe_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method, note: fO2 measurements used for the activity calculation}
+        locator: {page: 1328, table: '2', row: '70017', note: PDF p. 6}
+        derived_from: [sato_1976_table1_added_fe_70017_31]
+        derivation: {relation: 'Computed from the sample-plus-Fe oxygen-fugacity curve relative to the iron-wüstite buffer curve, as described on page 1326; the equation is not printed here.', inputs: [sato_1976_table1_added_fe_70017_31], output_unit: dimensionless}
+        phase_context_as_published: FeO activities of 70017 below its approximately 1105 C high-Ti solidus are discussed as subsolidus; the paper says their control is not established. It separately compares values above 1100 C with low-Ti mare-basalt melt values. Table 2 points are not individually assigned a phase.
+        phase_context_locator: {page: 1327, section: Discussion of Results, note: high-Ti solidus near 1105 C and subsolidus FeO activity discussion continued on p. 1328}
+        standard_state:
+          convention: raoultian_pure_endmember
+          endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}
+          component_basis: FeO
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series:
+            - {T_C: 1000, activity: '.30'}
+            - {T_C: 1050, activity: '.29'}
+            - {T_C: 1100, activity: '.29'}
+            - {T_C: 1150, activity: '.28'}
+            - {T_C: 1200, activity: '.25'}
+          calculation_basis: Difference between the sample-plus-Fe and iron-wüstite buffer fO2 curves gives the FeO activity; Sato and Hickling (1973) buffer measurements are compared with Eugster and Wones (1962) (pp. 1324, 1326). The equilibrium equation and coefficients are not printed here.
+          Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; Sato et al. (1973)'
+          Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
+          Fe_FeO_equilibrium_locator: {page: 1326, section: discussion of activity calculation}
+          metal_side_as_published: Pure Fe in the iron capsule; its 940 mg mass relative to less than 0.2 mg natural metal makes a(Fe) virtually unity (p. 1326).
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Hodges and Kushiro (1974), cited for 70017 petrology (pp. 1324, 1326; reference p. 1343)'}
+          measurement_method: Direct fO2 measurements by e.m.f. solid-electrolyte double-cell; natural sample and sample transferred to pure-iron capsule.
+          calculation_locator: {page: 1326, section: discussion following Table 1}
+        equipment: {}
+      - observation_id: sato_1976_table2_74275
+        type: activity_coefficient
+        experiment: sato1976_added_Fe_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method, note: fO2 measurements used for the activity calculation}
+        locator: {page: 1328, table: '2', row: '74275', note: PDF p. 6}
+        derived_from: [sato_1976_table1_added_fe_74275_39]
+        derivation: {relation: 'Computed from the sample-plus-Fe oxygen-fugacity curve relative to the iron-wüstite buffer curve, as described on page 1326; the equation is not printed here.', inputs: [sato_1976_table1_added_fe_74275_39], output_unit: dimensionless}
+        phase_context_as_published: The paper discusses subsolidus FeO activity and high-Ti solidus temperatures near 1105 C in its discussion of 70017; it does not assign a phase to each 74275 point.
+        phase_context_locator: {page: 1327, section: Discussion of Results}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 1000, activity: '.40'}, {T_C: 1050, activity: '.37'}, {T_C: 1100, activity: '.37'}, {T_C: 1150, activity: '.36'}, {T_C: 1200, activity: '.31'}]
+          calculation_basis: Difference between sample-plus-Fe and iron-wüstite buffer fO2 curves, as discussed by Sato et al. (1973); paper does not print the equilibrium equation, coefficients, or units for its free-energy expression (pp. 1326-1328).
+          Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; Sato et al. (1973)'
+          Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
+          Fe_FeO_equilibrium_locator: {page: 1326, section: discussion of activity calculation}
+          metal_side_as_published: Pure Fe in the iron capsule; its mass relative to natural metal makes a(Fe) virtually unity for the capsule measurement (p. 1326).
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Hodges and Kushiro (1974), cited for 74275 petrology (p. 1326; reference p. 1343)'}
+          measurement_method: Direct fO2 measurements by e.m.f. solid-electrolyte double-cell; natural sample and sample transferred to pure-iron capsule.
+          calculation_locator: {page: 1326, section: discussion of activity calculation}
+        equipment: {}
+      - observation_id: sato_1976_table2_12009
+        experiment: sato1973_quoted_values
+        type: activity_coefficient
+        locator: {page: 1328, table: '2', row: '12009', note: PDF p. 6}
+        derived_from: [sato_1976_table1_12009_35]
+        derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12009_35], output_unit: dimensionless}
+        phase_context_as_published: The paper discusses subsolidus FeO activity and high-Ti solidus temperatures near 1105 C in its discussion of 70017; it does not assign a phase to each 12009 point.
+        phase_context_locator: {page: 1327, section: Discussion of Results}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 1000, activity: '.24'}, {T_C: 1050, activity: '.24'}, {T_C: 1100, activity: '.24'}, {T_C: 1150, activity: '.25'}, {T_C: 1200, activity: '.26'}]
+          calculation_basis: Table 2 gives available values for other mare basalts; the paper does not state the equilibrium expression separately for this row.
+          Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; calculation discussed by Sato et al. (1973)'
+          Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
+          Fe_FeO_equilibrium_locator: {page: 1326, section: discussion of activity calculation}
+          metal_side_as_published: 'unknown; reason: not_published; pages searched: 1326-1328; the paper does not restate whether the earlier basalt activity used pure Fe, an alloy a(Fe), or a pure-metal recalculation.'
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 12009,35 (pp. 1326, 1343)'}
+          measurement_method: Values are listed among available mare-basalt activities; the paper does not restate the capsule and measurement details for this earlier sample.
+          calculation_locator: {page: 1328, table: '2', note: 'Table 1 dagger pointer and calculation discussion on page 1326'}
+        equipment: {}
+      - observation_id: sato_1976_table2_12053
+        experiment: sato1973_quoted_values
+        type: activity_coefficient
+        locator: {page: 1328, table: '2', row: '12053', note: PDF p. 6}
+        derived_from: [sato_1976_table1_12053_89]
+        derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12053_89], output_unit: dimensionless}
+        phase_context_as_published: The paper discusses subsolidus FeO activity and high-Ti solidus temperatures near 1105 C in its discussion of 70017; it does not assign a phase to each 12053 point.
+        phase_context_locator: {page: 1327, section: Discussion of Results}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 1000, activity: '.24'}, {T_C: 1050, activity: '.24'}, {T_C: 1100, activity: '.22'}, {T_C: 1150, activity: '.22'}, {T_C: 1200, activity: '.23'}]
+          calculation_basis: Table 2 gives available values for other mare basalts; the paper does not state the equilibrium expression separately for this row.
+          Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; calculation discussed by Sato et al. (1973)'
+          Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
+          Fe_FeO_equilibrium_locator: {page: 1326, section: discussion of activity calculation}
+          metal_side_as_published: 'unknown; reason: not_published; pages searched: 1326-1328; the paper does not restate whether the earlier basalt activity used pure Fe, an alloy a(Fe), or a pure-metal recalculation.'
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 12053,89 (pp. 1326, 1343)'}
+          measurement_method: Values are listed among available mare-basalt activities; the paper does not restate the capsule and measurement details for this earlier sample.
+          calculation_locator: {page: 1328, table: '2', note: 'Table 1 dagger pointer and calculation discussion on page 1326'}
+        equipment: {}
+      - observation_id: sato_1976_table2_15595
+        experiment: sato1973_quoted_values
+        type: activity_coefficient
+        locator: {page: 1328, table: '2', row: '15595', note: PDF p. 6}
+        derived_from: [sato_1976_table1_15595_25]
+        derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_15595_25], output_unit: dimensionless}
+        phase_context_as_published: The paper discusses subsolidus FeO activity and high-Ti solidus temperatures near 1105 C in its discussion of 70017; it does not assign a phase to each 15595 point.
+        phase_context_locator: {page: 1327, section: Discussion of Results}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 1000, activity: '.24'}, {T_C: 1050, activity: '.26'}, {T_C: 1100, activity: '.31'}, {T_C: 1150, activity: '.35'}, {T_C: 1200, activity: '.37'}]
+          calculation_basis: Table 2 gives available values for other mare basalts; the paper does not state the equilibrium expression separately for this row.
+          Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; calculation discussed by Sato et al. (1973)'
+          Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
+          Fe_FeO_equilibrium_locator: {page: 1326, section: discussion of activity calculation}
+          metal_side_as_published: 'unknown; reason: not_published; pages searched: 1326-1328; the paper does not restate whether the earlier basalt activity used pure Fe, an alloy a(Fe), or a pure-metal recalculation.'
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 15595,25 (pp. 1326, 1343)'}
+          measurement_method: Values are listed among available mare-basalt activities; the paper does not restate the capsule and measurement details for this earlier sample.
+          calculation_locator: {page: 1328, table: '2', note: 'Table 1 dagger pointer and calculation discussion on page 1326'}
+        equipment: {}
+  Fe:
+    observations:
+      - observation_id: sato_1976_table3_70017
+        type: activity_coefficient
+        experiment: sato1976_Fe_activity_calculation
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method, note: fO2 measurements used for the activity calculation}
+        locator: {page: 1328, table: '3', row: '70017', note: PDF p. 6}
+        derived_from: [sato_1976_table1_70017_31, sato_1976_table1_added_fe_70017_31]
+        derivation: {relation: 'Computed from the difference between natural-sample and sample-plus-Fe fO2 curves, as discussed on page 1326; the cited Sato et al. (1973) calculation is not printed as an equation here.', inputs: [sato_1976_table1_70017_31, sato_1976_table1_added_fe_70017_31], output_unit: dimensionless}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 975, activity: '.90'}, {T_C: 1000, activity: '.82'}, {T_C: 1025, activity: '.72'}, {T_C: 1050, activity: '.64'}, {T_C: 1100, activity: '.63'}, {T_C: 1150, activity: '.60'}, {T_C: 1200, activity: '.55'}]
+          metal_side_as_published: Fe^0 activity in the natural metallic phase, computed from the natural-sample and sample-plus-Fe curves; the paper describes Raoult's Law behavior at the high-Fe end of the solution.
+          metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          Fe_capsule_reference_as_published: The 940 mg pure-iron capsule relative to less than 0.2 mg natural metallic grains makes capsule Fe activity virtually unity.
+          Fe_capsule_reference_locator: {page: 1326, section: discussion following Table 1}
+          natural_Fe_activity_reference: The difference between natural-sample and sample-plus-Fe curves at a given temperature gives the natural rock Fe activity.
+          natural_Fe_activity_reference_locator: {page: 1326, section: discussion following Table 1}
+          phase_context_as_published: The paper discusses natural Fe^0 in the metallic phase and says Fe-FeS liquid formation may explain the temperature trend; it does not classify each Table 3 point's metal phase.
+          phase_context_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Hodges and Kushiro (1974), cited for 70017 petrology (pp. 1324, 1326; reference p. 1343)'}
+          measurement_method: Activities computed from fO2 measurements; for the iron-capsule measurements the capsule Fe activity was virtually unity, while Table 3 reports Fe activity in the natural metallic phase.
+          calculation_basis: The paper states the values are computed from measured fO2 and refers to the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
+          calculation_locator: {page: 1328, table: '3', note: 'calculation discussion following Table 1 on page 1326'}
+        equipment: {}
+      - observation_id: sato_1976_table3_74275
+        type: activity_coefficient
+        experiment: sato1976_Fe_activity_calculation
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method, note: fO2 measurements used for the activity calculation}
+        locator: {page: 1328, table: '3', row: '74275', note: PDF p. 6}
+        derived_from: [sato_1976_table1_74275_39, sato_1976_table1_added_fe_74275_39]
+        derivation: {relation: 'Computed from the difference between natural-sample and sample-plus-Fe fO2 curves, as discussed on page 1326; the cited Sato et al. (1973) calculation is not printed as an equation here.', inputs: [sato_1976_table1_74275_39, sato_1976_table1_added_fe_74275_39], output_unit: dimensionless}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 975, activity: '.93'}, {T_C: 1000, activity: '.68'}, {T_C: 1025, activity: '.59'}, {T_C: 1050, activity: '.56'}, {T_C: 1100, activity: '.58'}, {T_C: 1150, activity: '.62'}, {T_C: 1200, activity: '.60'}]
+          metal_side_as_published: Fe^0 activity in the natural metallic phase, computed from the natural-sample and sample-plus-Fe curves; the paper describes Raoult's Law behavior at the high-Fe end of the solution.
+          metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          Fe_capsule_reference_as_published: The 940 mg pure-iron capsule relative to less than 0.2 mg natural metallic grains makes capsule Fe activity virtually unity.
+          Fe_capsule_reference_locator: {page: 1326, section: discussion following Table 1}
+          natural_Fe_activity_reference: The difference between natural-sample and sample-plus-Fe curves at a given temperature gives the natural rock Fe activity.
+          natural_Fe_activity_reference_locator: {page: 1326, section: discussion following Table 1}
+          phase_context_as_published: The paper discusses natural Fe^0 in the metallic phase and says Fe-FeS liquid formation may explain the temperature trend; it does not classify each Table 3 point's metal phase.
+          phase_context_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Hodges and Kushiro (1974), cited for 74275 petrology (p. 1326; reference p. 1343)'}
+          measurement_method: Activities computed from fO2 measurements; for the iron-capsule measurements the capsule Fe activity was virtually unity, while Table 3 reports Fe activity in the natural metallic phase.
+          calculation_basis: The paper states the values are computed from measured fO2 and refers to the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
+          calculation_locator: {page: 1328, table: '3', note: 'calculation discussion following Table 1 on page 1326'}
+        equipment: {}
+      - observation_id: sato_1976_table3_12009
+        experiment: sato1973_quoted_values
+        type: activity_coefficient
+        locator: {page: 1328, table: '3', row: '12009', note: PDF p. 6}
+        derived_from: [sato_1976_table1_12009_35]
+        derivation: {relation: 'Table 3 metal activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12009_35], output_unit: dimensionless}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.63'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.63'}, {T_C: 1100, activity: '.63'}, {T_C: 1150, activity: '.71'}, {T_C: 1200, activity: '.79'}]
+          metal_side_as_published: Table 3 lists available Fe^0 activities for the earlier basalt; the paper does not restate the metal composition or calculation procedure for this source.
+          metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 12009,35 (pp. 1326, 1343)'}
+          measurement_method: Values appear in Table 3 with available mare-basalt metal activities; capsule and measurement details for this earlier sample are not restated here.
+          calculation_basis: The paper states values are computed from fO2 and cites the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
+          calculation_locator: {page: 1328, table: '3', note: 'Table 1 dagger pointer on page 1326'}
+        equipment: {}
+      - observation_id: sato_1976_table3_12053
+        experiment: sato1973_quoted_values
+        type: activity_coefficient
+        locator: {page: 1328, table: '3', row: '12053', note: PDF p. 6}
+        derived_from: [sato_1976_table1_12053_89]
+        derivation: {relation: 'Table 3 metal activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12053_89], output_unit: dimensionless}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.50'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.50'}, {T_C: 1100, activity: '.45'}, {T_C: 1150, activity: '.40'}, {T_C: 1200, activity: '.40'}]
+          metal_side_as_published: Table 3 lists available Fe^0 activities for the earlier basalt; the paper does not restate the metal composition or calculation procedure for this source.
+          metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 12053,89 (pp. 1326, 1343)'}
+          measurement_method: Values appear in Table 3 with available mare-basalt metal activities; capsule and measurement details for this earlier sample are not restated here.
+          calculation_basis: The paper states values are computed from fO2 and cites the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
+          calculation_locator: {page: 1328, table: '3', note: 'Table 1 dagger pointer on page 1326'}
+        equipment: {}
+      - observation_id: sato_1976_table3_15595
+        experiment: sato1973_quoted_values
+        type: activity_coefficient
+        locator: {page: 1328, table: '3', row: '15595', note: PDF p. 6}
+        derived_from: [sato_1976_table1_15595_25]
+        derivation: {relation: 'Table 3 metal activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_15595_25], output_unit: dimensionless}
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
+        standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+        units: dimensionless
+        values:
+          method_class: model_derived
+          quantity: activity
+          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.71'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.80'}, {T_C: 1100, activity: '.89'}, {T_C: 1150, activity: '.80'}, {T_C: 1200, activity: '.71'}]
+          metal_side_as_published: Table 3 lists available Fe^0 activities for the earlier basalt; the paper does not restate the metal composition or calculation procedure for this source.
+          metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          bulk_composition: {state: not_published, reason: not_published, pointer: 'Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 15595,25 (pp. 1326, 1343)'}
+          measurement_method: Values appear in Table 3 with available mare-basalt metal activities; capsule and measurement details for this earlier sample are not restated here.
+          calculation_basis: The paper states values are computed from fO2 and cites the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
+          calculation_locator: {page: 1328, table: '3', note: 'Table 1 dagger pointer on page 1326'}
+        equipment: {}

@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -55,6 +56,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -85,12 +87,15 @@ observations:
   read_from: pdf:boulliung-2025-mercury-volatile-metals-magmatic
   derived_from:
   - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_volatile_metal_measured_retention
+  - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
   derivation:
     relation: ideal_gas_law_equation_1
     inputs:
     - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_volatile_metal_measured_retention
+    - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_halogen_atmosphere_measurements
   experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
@@ -105,6 +110,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -145,6 +151,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -187,12 +194,15 @@ observations:
         source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   derived_from:
   - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
+  - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
   derivation:
     relation: ideal_gas_law_equation_1
     inputs:
     - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
+    - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure_1400c
   experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
@@ -207,6 +217,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -249,6 +260,17 @@ observations:
         note: The conclusion states the result for about 40 ppb Hg at 1400 C; the supplied PDF does not print a separate calculation
           table.
         source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  derived_from:
+  - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping
+  - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
+  derivation:
+    relation: ideal_gas_law_equation_1
+    inputs:
+    - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping
+    - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
+    parameters: []
+    output_unit: Pa
+    references: []
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
   experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
@@ -263,6 +285,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -318,6 +341,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -345,6 +369,17 @@ observations:
     note: Table 3 itself is not present as readable tabulated data in the supplied PDF; only the prose classification is recorded.
     source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   read_from: pdf:boulliung-2025-mercury-volatile-metals-magmatic
+  derived_from:
+  - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping
+  - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
+  derivation:
+    relation: HSC_Chemistry_GEM_free_energy_minimization
+    inputs:
+    - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping
+    - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
+    parameters: []
+    output_unit: qualitative_species_assignments
+    references: []
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_tl_equilibrium_comparator
   experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
@@ -359,6 +394,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -398,6 +434,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

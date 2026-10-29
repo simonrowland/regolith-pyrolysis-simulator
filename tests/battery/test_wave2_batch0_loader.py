@@ -18,7 +18,7 @@ from simulator.battery.enums import EvidenceClass, ValueKind
 from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.identity import atm_to_pa
 from simulator.battery.migrate import (
-    Migrator,
+    REPO_ROOT,
     _sample_from_plain,
     migrate,
     wt_pct_to_mole_fraction,
@@ -50,6 +50,96 @@ def _migrate_obs(tmp_path: Path, values: dict):
     root.mkdir(parents=True)
     result = migrate(_write_min_tree(root, extract), write=False)
     return row, result
+
+
+def test_series_item_derived_from_stays_on_that_row(tmp_path: Path) -> None:
+    from simulator.battery.stable_ids import series_row_extra
+
+    extract = deepcopy(FIXTURE_EXTRACT)
+    na = extract["species"]["Na"]["observations"]
+
+    def parent(observation_id: str, pressure: float) -> dict:
+        return {
+            "observation_id": observation_id,
+            "type": "psat_series",
+            "locator": {"table": "I", "page": 2},
+            "phase": "gas",
+            "regime": "knudsen_effusion",
+            "units": "atm",
+            "values": {
+                "quantity": "pure_Psat",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+                "T_K": 1100,
+                "pressure_atm": pressure,
+            },
+        }
+
+    row_a = {
+        "run": "a",
+        "T_K": 1400,
+        "pressure_atm": 3,
+        "derived_from": ["parent_a"],
+    }
+    row_b = {
+        "run": "b",
+        "T_K": 1500,
+        "pressure_atm": 4,
+        "derived_from": ["parent_b"],
+    }
+    bare_a = {key: value for key, value in row_a.items() if key != "derived_from"}
+    assert series_row_extra(row_a) == series_row_extra(bare_a)
+    na.extend([parent("parent_a", 1), parent("parent_b", 2)])
+    na.append(
+        {
+            "observation_id": "reduced",
+            "type": "psat_series",
+            "locator": {"table": "II", "page": 4},
+            "phase": "gas",
+            "regime": "knudsen_effusion",
+            "units": "atm",
+            "derivation": {
+                "relation": "fit from source measurements",
+                "inputs": ["parent_a", "parent_b"],
+                "parameters": [],
+                "output_unit": "atm",
+            },
+            "values": {
+                "quantity": "pure_Psat",
+                "method_class": "directly_reduced_measurement",
+                "admission_status": "admitted",
+                "derived_from": ["parent_a", "parent_b"],
+                "series": [row_a, row_b],
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path / "tree", extract), write=False)
+    children = {
+        obs.observation_id: obs
+        for obs in result.observations.values()
+        if "reduced" in obs.observation_id
+    }
+    assert len(children) == 2, [
+        (obs.observation_id, obs.derived_from)
+        for obs in result.observations.values()
+    ]
+    bare_b = {key: value for key, value in row_b.items() if key != "derived_from"}
+    by_suffix = {}
+    for obs_id, obs in children.items():
+        if ":row=a:" in obs_id:
+            by_suffix["a"] = obs
+            assert series_row_extra(bare_a) in obs_id
+        else:
+            by_suffix["b"] = obs
+            assert series_row_extra(bare_b) in obs_id
+    assert by_suffix["a"].derived_from == ("fixture-source::parent_a",)
+    assert by_suffix["b"].derived_from == ("fixture-source::parent_b",)
+    assert by_suffix["a"].derivation is not None
+    assert by_suffix["a"].derivation.inputs == by_suffix["a"].derived_from
+    assert by_suffix["b"].derivation is not None
+    assert by_suffix["b"].derivation.inputs == by_suffix["b"].derived_from
+    assert "fixture-source::parent_a" in result.observations
+    assert "fixture-source::parent_b" in result.observations
 
 
 def test_exploded_row_parent_derived_from_points_at_children(tmp_path: Path) -> None:
@@ -481,15 +571,14 @@ def test_exploded_rows_inherit_parent_temperature_provenance(tmp_path: Path) -> 
     assert "fixture-source::na_psat" not in result.observations
 
 
-def test_kambayashi_table3_children_keep_1573_K() -> None:
-    """The 1300 C table loses its waypoint when rows replace the parent."""
+def test_kambayashi_table3_children_keep_printed_celsius_temperature() -> None:
+    """Each row keeps the source's 1300 C condition after replacing the parent."""
 
     path = (
         Path(__file__).resolve().parents[2]
         / "data/literature/extracts/kems-057-kambayashi-1985.yaml"
     )
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = factories.migrate_one_extract(REPO_ROOT, path)
     stem = "kambayashi_1985_pbo_table3_ion_current_ratios_1300c"
     children = [
         obs
@@ -500,7 +589,8 @@ def test_kambayashi_table3_children_keep_1573_K() -> None:
     assert all("::point:" not in obs.observation_id for obs in children)
     for obs in children:
         located = obs.point_conditions["temperature_K"]
-        assert located.state.value == Decimal("1573")
+        # Exact source pin: 1300 C is converted once to 1573.15 K.
+        assert located.state.value == Decimal("1573.15")
         experiment = migrator.result.experiments[obs.experiment_id]
         bench = migrator.result.benches.get(experiment.bench_id)
         if bench is None:
@@ -512,7 +602,7 @@ def test_kambayashi_table3_children_keep_1573_K() -> None:
         assert bench is not None
         selected = collect_consumer_inputs(experiment, bench, obs).waypoints["temperature_K"].selected
         assert selected is not None
-        assert selected.value.point == Decimal("1573")
+        assert selected.value.point == Decimal("1573.15")
 
 
 def test_no_temperature_ids_follow_the_printed_row(tmp_path: Path) -> None:
@@ -549,8 +639,7 @@ def test_flemetakis_list_rows_are_not_collapsed() -> None:
         Path(__file__).resolve().parents[2]
         / "data/literature/extracts/ta-flemetakis-2024.yaml"
     )
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = factories.migrate_one_extract(REPO_ROOT, path)
     # Eight observations, four of them list-row tables (68 printed rows).
     # Replacing each table with one child would leave 8. Each printed list
     # row has to remain its own observation.

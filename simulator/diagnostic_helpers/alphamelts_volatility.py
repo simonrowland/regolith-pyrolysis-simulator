@@ -16,7 +16,15 @@ from typing import Any
 import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _is_missing_antoine_intercept,
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+    _antoine_skip_reason_for_refusal,
+    _read_antoine_coefficients,
+)
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     canonical_melt_oxide_activity_name,
@@ -27,6 +35,7 @@ from engines.builtin.vapor_pressure import (
     VaporPressureComputationError,
     _ELLINGHAM_THERMO,
     _is_noncertifying_pseudo_vapor_pressure_runtime,
+    _raise_invalid_antoine_coefficient,
     _range_tuple,
     vapor_pressure_antoine_coefficients,
     vapor_pressure_source_label,
@@ -166,6 +175,7 @@ def alphamelts_activity_volatility_diagnostic(
 
     grid = []
     vapor_model_limits: dict[str, Any] = {}
+    antoine_skip_notices: list[str] = []
     for pO2_bar in pO2_values:
         computed = _analytical_vapor_pressures_from_activities(
             vapor_pressure_data=vapor_data,
@@ -176,6 +186,16 @@ def alphamelts_activity_volatility_diagnostic(
             vacuum_floor_bar=float(vacuum_floor_bar),
         )
         vapor_model_limits.update(computed["extrapolated_beyond_valid_range_K"])
+        for notice in _antoine_skip_notices_for_omitted_species(
+            computed.get("warnings", ()),
+            {
+                species: payload.get("P_eq_Pa")
+                for species, payload in computed["species"].items()
+                if isinstance(payload, Mapping)
+            },
+        ):
+            if notice not in antoine_skip_notices:
+                antoine_skip_notices.append(notice)
         grid.append(
             {
                 "pO2_bar": pO2_bar,
@@ -228,6 +248,7 @@ def alphamelts_activity_volatility_diagnostic(
             list(domain.get("warnings", ()))
             + list(primary.get("warnings", ()))
             + list(comparison.get("warnings", ()))
+            + antoine_skip_notices
         ),
     }
 
@@ -284,6 +305,7 @@ def _analytical_vapor_pressures_from_activities(
         return {
             "species": {},
             "extrapolated_beyond_valid_range_K": {},
+            "warnings": [],
         }
     pO2 = _finite_positive("pO2_bar", pO2_bar)
     floor_bar = _finite_positive("vacuum_floor_bar", vacuum_floor_bar)
@@ -291,6 +313,8 @@ def _analytical_vapor_pressures_from_activities(
     comp_wt = _finite_positive_mapping(composition_wt_pct)
     by_species: dict[str, dict[str, Any]] = {}
     extrapolations: dict[str, Any] = {}
+    warnings: list[str] = []
+    antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
 
     from simulator.vapour_rail.catalog import compiled_catalog_for
 
@@ -360,10 +384,25 @@ def _analytical_vapor_pressures_from_activities(
             temperature_K=T_K,
         ):
             continue
-        A = float(antoine.get("A", 0.0) or 0.0)
-        B = float(antoine.get("B", 0.0) or 0.0)
-        C = float(antoine.get("C", 0.0) or 0.0)
-        if not (A > 0.0 and T_K > 300.0):
+        try:
+            A, B, C = _read_antoine_coefficients(antoine)
+        except _AntoineCoefficientRefusal as exc:
+            if not _is_missing_antoine_intercept(exc):
+                _raise_invalid_antoine_for_volatility_diagnostic(
+                    exc,
+                    species=str(species),
+                )
+            _append_antoine_skip_notice(
+                warnings,
+                antoine_skip_notice_keys,
+                antoine,
+                species=species,
+                site="alphamelts_volatility.metal_antoine",
+                temperature_K=T_K,
+                reason=_antoine_skip_reason_for_refusal(exc),
+            )
+            continue
+        if T_K <= 300.0:
             continue
         activity = float(activities.get(parent_oxide, 0.0) or 0.0)
         wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
@@ -483,10 +522,23 @@ def _analytical_vapor_pressures_from_activities(
     for species, data in (vapor_pressure_data.get("oxide_vapors", {}) or {}).items():
         data = data or {}
         antoine = data.get("antoine", {}) or {}
-        A = float(antoine.get("A", 0.0) or 0.0)
-        B = float(antoine.get("B", 0.0) or 0.0)
-        C = float(antoine.get("C", 0.0) or 0.0)
-        if not A > 0.0:
+        try:
+            A, B, C = _read_antoine_coefficients(antoine)
+        except _AntoineCoefficientRefusal as exc:
+            if not _is_missing_antoine_intercept(exc):
+                _raise_invalid_antoine_for_volatility_diagnostic(
+                    exc,
+                    species=str(species),
+                )
+            _append_antoine_skip_notice(
+                warnings,
+                antoine_skip_notice_keys,
+                antoine,
+                species=species,
+                site="alphamelts_volatility.oxide_vapor_antoine",
+                temperature_K=T_K,
+                reason=_antoine_skip_reason_for_refusal(exc),
+            )
             continue
         parent_oxide = str(data.get("parent_oxide", "") or "")
         if not parent_oxide:
@@ -569,6 +621,7 @@ def _analytical_vapor_pressures_from_activities(
     return {
         "species": by_species,
         "extrapolated_beyond_valid_range_K": extrapolations,
+        "warnings": warnings,
     }
 
 
@@ -646,8 +699,11 @@ def _oxide_vapor_pressure_Pa(
             field="P_eq_pO2",
         )
         activity_factor *= scale
-    elif species == "SiO" and pO2_bar > vacuum_floor_bar:
-        suppression = math.sqrt(vacuum_floor_bar / pO2_bar)
+    elif species == "SiO":
+        from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
+
+        reference_bar = float(data.get("pO2_reference_bar", vacuum_floor_bar) or vacuum_floor_bar)
+        suppression = _sio_oxygen_pressure_factor(pO2_bar, reference_bar)
         P_eq_Pa = _finite_number(
             P_eq_Pa * suppression,
             species=species,
@@ -902,6 +958,20 @@ def _finite_number(value: float, *, species: str, field: str) -> float:
             f"species={species} field={field} value={value!r}"
         )
     return numeric
+
+
+def _raise_invalid_antoine_for_volatility_diagnostic(
+    refusal: _AntoineCoefficientRefusal,
+    *,
+    species: str,
+) -> None:
+    if refusal.invalid_kind == "nonfinite":
+        _raise_invalid_antoine_coefficient(
+            refusal,
+            species=species,
+            field="P_reference_Antoine_Pa",
+        )
+    raise ValueError(str(refusal)) from refusal
 
 
 def _pow10(log10_value: float, *, species: str) -> float:

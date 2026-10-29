@@ -266,6 +266,58 @@ def _build_equilibrium_for_basalt(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.parametrize('mode', ['thermoengine', 'python_api', 'subprocess'])
+@pytest.mark.parametrize('gas,admission', [
+    (3.7e-7, 'environment'), (1.3e-12, 'observation'), (None, 'environment'),
+])
+def test_equilibrium_forwards_transport_controls_separately_from_redox(mode, gas, admission):
+    backend = _FakeAlphaMELTSBackend(
+        mode=mode, equilibrium=_build_equilibrium_for_basalt(),
+    )
+    calls = []
+
+    def equilibrate(*, vapor_transport_pO2_bar=None,
+                    vapor_transport_floor_bar=None,
+                    vapor_transport_pO2_admission='environment', **kwargs):
+        calls.append((vapor_transport_pO2_bar, vapor_transport_floor_bar,
+                      vapor_transport_pO2_admission, kwargs))
+        return backend._equilibrium
+
+    backend.equilibrate = equilibrate
+    request = _make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(), fO2_log=-12.0,
+    )
+    if gas is not None:
+        request = replace(request, control_inputs={
+            'pO2_bar': gas, 'vacuum_floor_bar': 1.3e-12,
+            'pO2_admission': admission,
+        })
+    result = AlphaMELTSProvider(backend).dispatch(request)
+    assert result.status == 'ok'
+    assert result.transition is None
+    sent_gas, sent_floor, sent_admission, kwargs = calls[-1]
+    assert sent_gas == gas
+    assert sent_floor == (None if gas is None else 1.3e-12)
+    assert kwargs['fO2_log'] == -12.0
+    assert sent_admission == admission
+
+
+@pytest.mark.parametrize('mode', ['thermoengine', 'python_api', 'subprocess'])
+def test_equilibrium_transport_signature_gate_preserves_legacy_backends(mode):
+    backend = _FakeAlphaMELTSBackend(
+        mode=mode, equilibrium=_build_equilibrium_for_basalt(),
+    )
+    request = replace(_make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(),
+    ), control_inputs={'pO2_bar': 3.7e-7, 'vacuum_floor_bar': 1.3e-12})
+    result = AlphaMELTSProvider(backend).dispatch(request)
+    assert result.status == 'ok'
+    assert 'vapor_transport_pO2_bar' not in backend.calls[-1]
+    assert 'vapor_transport_floor_bar' not in backend.calls[-1]
+
+
 def test_provider_declares_silicate_intent_set():
     provider = AlphaMELTSProvider(backend=None)
     profile = provider.capability_profile()
@@ -1354,6 +1406,48 @@ def test_parser_sr10_current_filtered_values_are_pinned_without_notice():
     assert diagnostics.liquid_composition_wt_pct == {'SiO2': 49.0}
     assert diagnostics.activity_coefficients == {'SiO2': 0.95}
     assert diagnostics.backend_warnings == ()
+
+
+def test_parser_sr03_invalid_oxide_activity_omissions_emit_repair_notices():
+    """Kill the mutation that silently drops invalid oxide activities."""
+    legacy = SimpleNamespace(
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        activity_coefficients={
+            'SiO2': 0.42,
+            'Al2O3': float('nan'),
+            'FeO': 0.0,
+            'MgO': float('inf'),
+            'CaO': -0.1,
+            'Na': 0.7,
+        },
+        status='ok',
+        warnings=[],
+    )
+
+    diagnostics = project_equilibrium_to_diagnostics(
+        legacy,
+        mode='subprocess',
+        engine_version='fake-alphamelts subprocess',
+    )
+
+    assert diagnostics.activity_coefficients == {
+        'SiO2': 0.42,
+        'FeO': 0.0,
+        'CaO': -0.1,
+        'Na': 0.7,
+    }
+    assert diagnostics.backend_warnings == (
+        "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
+        "'Al2O3' for phase liquid: nan",
+        "AlphaMELTS provider omitted nonpositive diagnostic_oxide_activities field "
+        "'FeO' for phase liquid: 0.0",
+        "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
+        "'MgO' for phase liquid: inf",
+        "AlphaMELTS provider omitted nonpositive diagnostic_oxide_activities field "
+        "'CaO' for phase liquid: -0.1",
+    )
 
 
 def test_parser_sr11_current_path_values_are_pinned_without_notice():

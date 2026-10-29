@@ -11,6 +11,7 @@ import tempfile
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -23,6 +24,7 @@ from simulator.battery.enums import (
     PerBasis,
     MetricOperation,
     Quantity,
+    Rail,
     RefusalReason,
     ResidualStatus,
 )
@@ -79,6 +81,21 @@ VAPOROCK_ROOT = _vaporock_root()
 
 def _require_openimcc() -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
+
+
+def _openimcc_pack_temperature_band() -> tuple[float, float]:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    pack = openimcc_bridge._load_pack(openimcc_bridge.DEFAULT_BACKEND_PACK_NAME)
+    domains = tuple(
+        tuple(map(float, domain)) for domain in pack.kernel_datapack.domains
+    )
+    assert domains
+    # The scorer publishes one pack-wide interval, so mixed complex domains
+    # require an explicit policy change rather than a silently wrong band.
+    assert len(set(domains)) == 1
+    return domains[0]
 
 
 def _require_ti_gas() -> None:
@@ -210,13 +227,15 @@ def test_openimcc_battery_emits_one_notice_per_exhausted_sink(
     composition_mol, expected_sinks
 ) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+    from simulator.accounting import resolve_species_formula
 
-    molar_mass = {"Na2O": 61.9789, "CaO": 56.077, "Al2O3": 101.961, "TiO2": 79.866}
     backend = _OpenImccBatteryBackend("openimcc")
     result = backend.equilibrate(
         temperature_C=1800.0 - 273.15,
         composition_kg={
-            oxide: amount * molar_mass[oxide] / 1000.0
+            oxide: amount
+            * resolve_species_formula(oxide).molar_mass_g_per_mol()
+            / 1000.0
             for oxide, amount in composition_mol.items()
         },
         composition_mol=composition_mol,
@@ -260,6 +279,7 @@ def test_openimcc_battery_keeps_package_envelope_slack(composition_mol) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
 
     backend = _OpenImccBatteryBackend("openimcc")
+    # Preserve this input exactly at the packaged-envelope boundary.
     molar_mass = {"K2O": 94.196, "Na2O": 61.9789, "SiO2": 60.0843}
     result = backend.equilibrate(
         temperature_C=1800.0 - 273.15,
@@ -531,7 +551,7 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     backend = handle.backend
     assert backend is not None
     assert handle.identity["pack_digest"] == (
-        "d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e"
+        "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
     )
     assert handle.identity["model_id"] == backend.model_id
     cell = equilibrate_cell(
@@ -564,6 +584,9 @@ def test_openimcc_battery_reports_runtime_backend_pack(monkeypatch) -> None:
     assert backend.model_id == expected_pack.model_id
     assert backend._identity["pack_digest"] == openimcc_bridge._pack_digest(
         expected_pack
+    )
+    assert backend._identity["openimcc_commit"] == (
+        openimcc_bridge.imported_openimcc_commit() or "unverified"
     )
 
 
@@ -676,8 +699,10 @@ def test_reactive_cell_wo3_dominated_balance_matches_analytic_root(monkeypatch) 
     )
     species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
 
-    def pressure_model(logp: float) -> dict[str, float]:
-        return {"Si": si_o_pressure_scale * 10.0 ** (-logp)}
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {
+            "Si": si_o_pressure_scale * 10.0 ** (-math.log10(po2_bar))
+        }
 
     solved, pressures, _balance, fraction, info = battery._solve_cell_oxygen_balance(
         pressure_model,
@@ -708,8 +733,8 @@ def test_reactive_cell_buffer_pins_at_selected_buffer(monkeypatch) -> None:
     )
     species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
 
-    def pressure_model(logp: float) -> dict[str, float]:
-        return {"Si": 1e-12 * 10.0 ** (-logp)}
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {"Si": 1e-12 * 10.0 ** (-math.log10(po2_bar))}
 
     solved, _pressures, _balance, _fraction, info = battery._solve_cell_oxygen_balance(
         pressure_model,
@@ -722,6 +747,328 @@ def test_reactive_cell_buffer_pins_at_selected_buffer(monkeypatch) -> None:
     assert info["buffer_pinned"] is True
     assert solved == pytest.approx(10.0**-15.0)
     assert info["buffer_pO2_bar"] == pytest.approx(solved)
+
+
+def test_openimcc_cell_balance_pre_generalization_golden(monkeypatch) -> None:
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda _material, _temperature: (
+            {"WO3": (-250_000.0, 3.0)},
+            -15.0,
+            {"WO3": {"table_id": "O-068", "source_sha256": "test"}},
+        ),
+    )
+    species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
+
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {"Si": 1e-12 * 10.0 ** (-math.log10(po2_bar))}
+
+    solved, pressures, balance, fraction, info = battery._solve_cell_oxygen_balance(
+        pressure_model,
+        species,
+        temperature_K=1933.0,
+        cell_material="W",
+        oxygen_balance_from_pressure_model=openimcc.oxygen_balance_from_pressure_model,
+    )
+
+    assert (
+        solved.hex(),
+        pressures["Si"].hex(),
+        pressures["WO3"].hex(),
+        balance["residual"].hex(),
+        fraction.hex(),
+        info["buffer_pO2_bar"].hex(),
+    ) == (
+        "0x1.203af9ee75616p-50",
+        "0x1.f400000000000p+9",
+        "0x1.9f47e60278c26p-53",
+        "0x1.0000000000000p+0",
+        "0x1.0000000000000p+0",
+        "0x1.203af9ee75616p-50",
+    )
+
+
+def test_cell_balance_calls_pressure_model_at_commanded_po2(monkeypatch) -> None:
+    import math
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda _material, _temperature: ({}, None, {}),
+    )
+    species = openimcc.oxygen_balance_species_metadata(
+        {"Mg": "MgO", "O": None}
+    )
+
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        assert math.isfinite(po2_bar) and po2_bar > 0.0
+        root_po2 = math.sqrt(po2_bar)
+        return {
+            "Mg": 1e-8 / root_po2,
+            "O": 2e-8 * root_po2,
+        }
+
+    solved, pressures, _balance, _fraction, _info = (
+        battery._solve_cell_oxygen_balance(
+            pressure_model,
+            species,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    ratio = (
+        pressures["O"]
+        * math.sqrt(species["Mg"].molar_mass)
+        / (pressures["Mg"] * math.sqrt(species["O"].molar_mass))
+    )
+    assert solved > 0.0
+    assert ratio == pytest.approx(1.0, rel=1e-9)
+
+
+def test_vapor_engine_brackets_inside_vaporock_sum_pressure_domain() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+    from simulator.melt_backend.vaporock import vaporock_sum_pressure_sane
+
+    trials: list[tuple[float, bool, float]] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        pressures_pa = {
+            "K": 1e-6 * po2_bar**-0.25 * 1e5,
+            "O2": 0.02264 * po2_bar * 1e5,
+        }
+        admitted, sum_bar = vaporock_sum_pressure_sane(pressures_pa)
+        trials.append((po2_bar, admitted, sum_bar))
+        return SimpleNamespace(
+            status="ok" if admitted else "refusal",
+            refusal_reason=None if admitted else "sum_pressure_sanity",
+            engine_reason=f"sum pressure {sum_bar:g} bar",
+            gas_partial_pressures_Pa=pressures_pa,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    po2_bar, pressures, balance, _fraction, _info = (
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    assert po2_bar == pytest.approx(9.99164171950111e-05, rel=1e-8)
+    assert balance["residual"] < 1e-12
+    assert all(admitted for _po2, admitted, _sum_bar in trials)
+    assert pressures["O2"] > 0.0
+
+
+def test_vapor_engine_reports_domain_when_no_admitted_bracket_exists() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+    from simulator.melt_backend.vaporock import vaporock_sum_pressure_sane
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        pressures_pa = {"K": 1e-6 * po2_bar**-0.25 * 1e5}
+        admitted, sum_bar = vaporock_sum_pressure_sane(pressures_pa)
+        return SimpleNamespace(
+            status="ok" if admitted else "refusal",
+            refusal_reason=None if admitted else "sum_pressure_sanity",
+            engine_reason=f"sum pressure {sum_bar:g} bar",
+            gas_partial_pressures_Pa=pressures_pa,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    detail = str(exc_info.value)
+    assert exc_info.value.reason_code == "oxygen_balance_no_admitted_bracket"
+    assert "no sign-changing bracket was found in the admitted pO2 window" in detail
+    assert "reachable from the chosen start" in detail
+    assert "start_pO2_bar=1e-06" in detail
+    assert "searched_window_pO2_bar=[1e-28, 1]" in detail
+    assert "does not establish whether a root exists in another admitted window" in detail
+    assert "lower_stop=" in detail and "lower_stop=None" not in detail
+    assert "upper_stop=" in detail and "upper_stop=None" not in detail
+    assert "lower_stop=pO2=1e-29 bar; guard=sum_pressure_sanity" in detail
+    assert "upper_stop=OpenIMCC Knudsen molecular-flow limit pO2=1 bar" in detail
+
+
+def test_vapor_engine_finds_admitted_start_away_from_seed() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    trials: list[tuple[float, str]] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = math.log10(po2_bar)
+        if not -14.0 <= logp <= -9.0:
+            trials.append((po2_bar, "domain"))
+            return SimpleNamespace(
+                status="refusal",
+                refusal_reason="outside_test_domain",
+                engine_reason=f"outside admitted window at log10(pO2)={logp:g}",
+                gas_partial_pressures_Pa={},
+                invalid_gas_partial_pressure_components=(),
+            )
+
+        trials.append((po2_bar, "ok"))
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={
+                "K": 1e-16 * po2_bar**-0.25 * 1e5,
+                "O2": 0.02264 * po2_bar * 1e5,
+            },
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    solved_po2_bar, pressures_bar, balance, _fraction, _info = (
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    assert trials[0][0] == pytest.approx(1e-6)
+    assert trials[0][1] == "domain"
+    assert [round(math.log10(po2)) for po2, _status in trials[:7]] == [
+        -6,
+        -5,
+        -7,
+        -4,
+        -8,
+        -3,
+        -9,
+    ]
+    first_admitted = next(po2 for po2, status in trials if status == "ok")
+    assert first_admitted == pytest.approx(1e-9)
+    assert 1e-14 <= solved_po2_bar <= 1e-9
+    assert balance["residual"] < 1e-12
+
+    direct_cell = engine_call_at_po2(solved_po2_bar)
+    assert direct_cell.status == "ok"
+    for species, pressure_pa in direct_cell.gas_partial_pressures_Pa.items():
+        assert pressures_bar[species] == pytest.approx(
+            pressure_pa / 1e5, rel=1e-9
+        )
+
+
+def test_vapor_engine_lists_guards_when_every_start_grid_point_is_refused() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    trials: list[float] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = round(math.log10(po2_bar))
+        trials.append(logp)
+        if logp < -15:
+            reason, engine_reason = "engine_crash", "subprocess_died"
+        elif logp < -5:
+            reason, engine_reason = (
+                "engine_crash",
+                "subprocess_fe_free_absolute_fo2_crash",
+            )
+        else:
+            reason, engine_reason = "out_of_basis", "temperature_range"
+        return SimpleNamespace(
+            status="refusal",
+            refusal_reason=reason,
+            engine_reason=engine_reason,
+            gas_partial_pressures_Pa={},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    detail = str(exc_info.value)
+    assert exc_info.value.reason_code == "oxygen_balance_no_admitted_bracket"
+    assert sorted(trials) == list(range(-30, 1))
+    assert "engine_crash: subprocess_died: 15" in detail
+    assert "engine_crash: subprocess_fe_free_absolute_fo2_crash: 10" in detail
+    assert "out_of_basis: temperature_range: 6" in detail
+
+
+def test_feo_association_channel_uses_catalog_parent_for_oxygen_balance() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _engine_gas_pressures_bar_for_oxygen_balance,
+        _vapor_engine_oxygen_balance_species_metadata,
+    )
+    from simulator.melt_backend.vaporock import _parent_oxide_for_vaporock_gas
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    channel = "FeO_association_gas"
+    vapor_data = load_cached_safe_yaml(
+        (Path(__file__).resolve().parents[1] / "data" / "vapor_pressures.yaml")
+        .read_text(encoding="utf-8")
+    )
+    expected_parent = vapor_data["families"][
+        "oxide_vapors_feo_association_family"
+    ]["physical_properties"]["species"][channel]["parent_oxide"]
+    assert _parent_oxide_for_vaporock_gas(channel) == expected_parent
+    metadata = _vapor_engine_oxygen_balance_species_metadata((channel,))
+
+    pressures_bar = _engine_gas_pressures_bar_for_oxygen_balance(
+        {channel: 1.0e5}, metadata
+    )
+
+    assert set(metadata) == {expected_parent}
+    assert pressures_bar == {expected_parent: pytest.approx(1.0)}
+
+
+@pytest.mark.parametrize("gas_species", ("NaOH(g)", "KOH(g)"))
+def test_positive_hydroxide_pressure_refuses_dry_cell_oxygen_balance(
+    gas_species: str,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={
+                "K": 1e-6 * po2_bar**-0.25 * 1e5,
+                "O2": 0.02264 * po2_bar * 1e5,
+                gas_species: 1.0,
+            },
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert (
+        exc_info.value.reason_code == "h_bearing_channel_in_dry_cell_balance"
+    )
+    assert gas_species in str(exc_info.value)
 
 
 def test_unknown_cell_material_is_a_typed_refusal() -> None:
@@ -900,17 +1247,26 @@ def test_stolyarova_1991_w_cell_pressure_and_residual_report() -> None:
         assert len(point_rows) == 1, x_sio2
 
 
-def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_regime_flagged(tmp_path: Path) -> None:
-    # Suppose my change is wrong in the way that matters most: restoring the
-    # old reactive_cell_oxygen_reservoir refusal makes this red, because typed
-    # [W] rows never request oxygen_balance_effusion with cell_material W.
+def test_stolyarova_typed_w_cell_scores_at_source_oxygen_and_flags_uncalibrated_regime(tmp_path: Path, monkeypatch) -> None:
+    # d-216 commands linked source oxygen; other typed W rows retain the
+    # labelled closure. Neither route may restore the reactive-cell refusal.
 
     _require_oxygen_balance()
     _require_openimcc()
     from simulator.battery.oxygen_balance import IMCC_ENGINES
     from simulator.battery.score import quantity_token
+    from simulator.battery.source_oxygen import SourceOxygenFallbackReason
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
     from tests.battery.test_migrate import _migrate_real_extract
 
+    requests = []
+    original_equilibrate = battery.equilibrate_cell
+
+    def capture_request(*args, po2, **kwargs):
+        requests.append(po2)
+        return original_equilibrate(*args, po2=po2, **kwargs)
+
+    monkeypatch.setattr(battery, "equilibrate_cell", capture_request)
     result = _migrate_real_extract(tmp_path, "kems-053-stolyarova-1991.yaml")
     context = ScoreContext(
         works=result.works,
@@ -937,10 +1293,12 @@ def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_
     }
     residuals = []
     tagged = []
+    linked_seen = closure_seen = anchor_seen = 0
     handles = {engine.value: open_battery_engine(engine.value) for engine in engines}
     for observation in rows:
         for engine in engines:
-            residual, _candidate = compile_residual(
+            requests.clear()
+            residual, candidate = compile_residual(
                 observation, engine, context=context, handles=handles
             )
             residuals.append(residual)
@@ -964,9 +1322,64 @@ def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_
                 if notice.origin == "engine:%s" % engine.value
                 and notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
             ]
-            assert len(solved) == 1, (observation.observation_id, engine.value)
-            payload = json.loads(solved[0].reason.split(" ", 1)[1])
-            assert payload.get("cell_material") == "W"
+            assert candidate is not None and len(requests) == 1
+            condition = (candidate.provenance or {}).get("source_oxygen_condition")
+            if condition is not None:
+                linked_seen += 1
+                assert not solved
+                assert requests[0].mode == battery.PO2_COMMANDED
+                pressure_Pa = Decimal(condition["value"]["point"])
+                assert requests[0].po2_bar == pytest.approx(
+                    float(pressure_Pa / Decimal("1e5")), rel=1e-10
+                )
+                assert candidate.identity.fO2_Pa.value == pressure_Pa
+                derivation = condition["derivation"]
+                assert derivation["inputs"] == condition["derived_from"]
+                parents = [result.observations[key] for key in condition["derived_from"]]
+                oxygen = [
+                    parent for parent in parents
+                    if parent.identity.species.formula == "O"
+                ]
+                assert len(oxygen) == 1
+                assert oxygen[0].experiment_id == observation.experiment_id
+                assert oxygen[0].identity.temperature_K == observation.identity.temperature_K
+                assert oxygen[0].identity.composition == observation.identity.composition
+                assert "JANAF O-001" in derivation["relation"]
+                assert "cell-metal activity as assumed by the source" in derivation["relation"]
+                parameters = dict(derivation["parameters"])
+                assert parameters["K_O"]["locator"]["source_path"].endswith("/O-001.yaml")
+                if (
+                    observation.identity.temperature_K.value == 1933
+                    and dict(observation.identity.composition.value.components)["CaO"] == Decimal("0.6")
+                ):
+                    # Table Ib: pO=6.8e-10 atm. JANAF G(1933)=126.02894
+                    # kJ/mol gives K_O=3.930428016089429e-4; convert to bar
+                    # before (pO_bar/K_O)^2 = 3.0730622426279393e-12 bar.
+                    assert oxygen[0].value.point == Decimal("6.8e-10") * Decimal("101325")
+                    assert requests[0].po2_bar == pytest.approx(
+                        3.0730622426279393e-12, rel=1e-10
+                    )
+                    anchor_seen += 1
+            else:
+                closure_seen += 1
+                assert requests[0].mode == PO2_OXYGEN_BALANCE_EFFUSION
+                assert len(solved) == 1, (observation.observation_id, engine.value)
+                payload = json.loads(solved[0].reason.split(" ", 1)[1])
+                assert payload.get("cell_material") == "W"
+                fallback = [
+                    notice for notice in residual.notices
+                    if notice.origin == "source oxygen selection"
+                ]
+                assert len(fallback) == 1
+                prefix = "model assumption: vapour-only zero-storage closure; source_oxygen_fallback="
+                assert fallback[0].reason.startswith(prefix)
+                assert SourceOxygenFallbackReason(fallback[0].reason.removeprefix(prefix))
+    assert linked_seen > 0 and closure_seen > 0 and anchor_seen > 0
+    assert all(
+        residual.refusal is None
+        or residual.refusal.detail.get("reason") != "reactive_cell_oxygen_reservoir"
+        for residual in residuals
+    )
     report = []
     for engine in engines:
         bucket = [
@@ -1223,7 +1636,7 @@ binary_pot_residual, binary_pot_candidate = next(
 )
 assert binary_pot_residual.key == (
     "kems-042-plante-1979::plante1979_table2_s1104_r001_quoted:"
-    "T=1302::p_partial::vapour::openimcc"
+    "T=1302::p_partial::vapour::openimcc::fo2_mode=shared_ladder"
 )
 assert binary_pot_residual.candidate == binary_pot_candidate.observation_id
 assert {
@@ -1232,7 +1645,7 @@ assert {
     if candidate.engine is not None
 } == {(True, "independent")}
 assert any(
-    "openimcc-pack-digest:d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e"
+    "openimcc-pack-digest:02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
     in candidate.engine.coefficient_sources
     for _, candidate in engine_rows
     if candidate.engine is not None
@@ -1241,8 +1654,13 @@ summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
 )
-# b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
+# d-128 keeps the printed band score-eligible and adds an informational notice.
 assert summary["n_score_eligible"] == 160
+assert all(
+    any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
+    for residual, candidate in engine_rows
+    if candidate.observation_id.startswith("engine:openimcc:")
+)
 assert summary["n_inside_band"] == 56
 assert abs(float(summary["median_dex"]) - (-0.193144973432544415)) < 0.00000001
 assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
@@ -1265,7 +1683,7 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout.strip().splitlines()[-1])
-    # b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
+    # d-128 keeps the printed band score-eligible and adds an informational notice.
     assert result["headline"]["n_score_eligible"] == 160
     assert result["headline"]["n_inside_band"] == 56
     assert float(result["headline"]["median_dex"]) == pytest.approx(
@@ -1403,6 +1821,263 @@ def test_openimcc_domain_policy_flags_extrapolation() -> None:
     assert any(
         str(row.get("authority")) == "extrapolated" for row in current.notices
     )
+
+
+def test_openimcc_pack_complexes_share_temperature_domain() -> None:
+    floor, ceiling = _openimcc_pack_temperature_band()
+    assert floor < ceiling
+
+
+@pytest.mark.parametrize(
+    "composition_mol",
+    ({"SiO2": 1.0}, {"SiO2": 0.5, "TiO2": 0.5}),
+)
+@pytest.mark.parametrize("outside_side", ("below", "above"))
+def test_openimcc_pack_domain_flags_even_without_active_complex(
+    composition_mol, outside_side, monkeypatch
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    floor, ceiling = _openimcc_pack_temperature_band()
+    temperature_K = floor - 100.0 if outside_side == "below" else ceiling + 100.0
+    package_results = []
+    evaluate = openimcc_bridge.evaluate
+
+    def capture_result(**kwargs):
+        result = evaluate(**kwargs)
+        package_results.append(result)
+        return result
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture_result)
+    backend = _OpenImccBatteryBackend("openimcc")
+    cell = backend.equilibrate(
+        temperature_C=temperature_K - 273.15,
+        composition_mol=composition_mol,
+    )
+
+    assert package_results and package_results[-1].extrapolated is False
+    notice = next(
+        row
+        for row in cell.diagnostics["imcc_notices"]
+        if row["kind"] == "openimcc_temperature_extrapolated"
+    )
+    assert notice["authority"] == "extrapolated"
+    assert notice["certified_band"]["temperature_K"] == [floor, ceiling]
+    assert f"[{floor:g}, {ceiling:g}] K" in notice["reason"]
+    assert "extrapolated: Delta_r Cp = 0 continuation" not in notice["reason"]
+
+
+def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
+    monkeypatch,
+) -> None:
+    _require_openimcc()
+    import openimcc
+    from simulator.melt_backend import openimcc_bridge
+
+    observation_id = (
+        "kems-ms2000-044::"
+        "ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2"
+    )
+    context = load_score_context(sources=("kems-ms2000-044",))
+    reference = context.observations[observation_id]
+    focused_context = replace(context, observations={observation_id: reference})
+    floor, ceiling = _openimcc_pack_temperature_band()
+    bridge_calls = []
+    package_bridge_evaluate = openimcc_bridge.evaluate
+
+    def capture_bridge_call(**kwargs):
+        bridge_calls.append(dict(kwargs))
+        return package_bridge_evaluate(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture_bridge_call)
+    residuals, candidates = score_store(
+        focused_context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+    assert residual.numeric is not None
+    candidate = candidates[residual.candidate]
+    assert candidate.value.point is not None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:openimcc"
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == f"[{floor:g}, {ceiling:g}] K"
+    assert candidate.authority is Authority.EXTRAPOLATED
+    assert candidate.certified_band == {
+        "temperature_K": (Decimal(str(floor)), Decimal(str(ceiling)))
+    }
+
+    assert len(bridge_calls) == 1
+    call = bridge_calls[0]
+    assert call["temperature_K"] < floor
+    assert call["allow_extrapolation"] is True
+    package_result = openimcc.evaluate(
+        call["composition_mol"],
+        call["temperature_K"],
+        pack=openimcc_bridge._load_pack(call["pack"]),
+        basis_type="mol",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    direct_activity = dict(
+        zip(
+            package_result.parent_oxides,
+            package_result.parent_activity,
+            strict=True,
+        )
+    )["SiO2"]
+    assert float(candidate.value.point) == pytest.approx(direct_activity, rel=1e-9)
+    assert "T outside openimcc datapack" in notice.reason
+    assert "extrapolated: Delta_r Cp = 0 continuation" in notice.reason
+    assert "uncertainty band unavailable" in notice.reason
+    assert notice.reason != "; ".join(package_result.labels.notices)
+
+
+def test_openimcc_below_floor_vapour_residual_has_temperature_flag() -> None:
+    _require_openimcc()
+
+    observation_id = (
+        "kems-042-plante-1979::"
+        "plante1979_table2_s1104_r001_quoted"
+    )
+    context = _plante_score_context()
+    reference = context.observations[observation_id]
+    focused_context = replace(context, observations={observation_id: reference})
+    floor, ceiling = _openimcc_pack_temperature_band()
+
+    residuals, _candidates = score_store(
+        focused_context,
+        engines=(Engine.OPENIMCC,),
+        work_id="kems-042-plante-1979",
+        rail=Rail.VAPOUR,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+    assert residual.numeric is not None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:openimcc"
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == f"[{floor:g}, {ceiling:g}] K"
+    assert "T outside openimcc datapack" in notice.reason
+
+
+def test_openimcc_in_domain_score_store_row_has_no_temperature_flag() -> None:
+    observation_id = (
+        "kems-ms2000-044::"
+        "ms2000_044_sio2_activity_k_system_xsio2_0892_t1723_class_quote_r2"
+    )
+    context = load_score_context(sources=("kems-ms2000-044",))
+    reference = context.observations[observation_id]
+    floor, ceiling = _openimcc_pack_temperature_band()
+    temperature_K = float(reference.identity.temperature_K.value)
+    assert floor <= temperature_K <= ceiling
+    focused_context = replace(context, observations={observation_id: reference})
+
+    residuals, _candidates = score_store(
+        focused_context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+    assert residual.numeric is not None
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:openimcc"
+        for notice in residual.notices
+    )
+
+
+def test_openimcc_empty_package_notices_keep_score_store_temperature_flag(
+    monkeypatch,
+) -> None:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    observation_id = (
+        "kems-ms2000-044::"
+        "ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2"
+    )
+    context = load_score_context(sources=("kems-ms2000-044",))
+    reference = context.observations[observation_id]
+    focused_context = replace(context, observations={observation_id: reference})
+    floor, ceiling = _openimcc_pack_temperature_band()
+    evaluate = openimcc_bridge.evaluate
+
+    def evaluate_without_notices(**kwargs):
+        result = evaluate(**kwargs)
+        return replace(
+            result,
+            labels=replace(result.labels, notices=()),
+            notices=(),
+        )
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", evaluate_without_notices)
+    residuals, _candidates = score_store(
+        focused_context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+    assert residual.numeric is not None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:openimcc"
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == f"[{floor:g}, {ceiling:g}] K"
+    assert "T outside openimcc datapack" in notice.reason
+
+
+def test_openimcc_temperature_reason_keeps_package_notice_separate(monkeypatch) -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    package_notice = "openimcc:typed-below-domain-notice:preserve-this-text"
+    evaluate = openimcc_bridge.evaluate
+
+    def evaluate_with_package_notice(**kwargs):
+        result = evaluate(**kwargs)
+        return replace(
+            result,
+            labels=replace(result.labels, notices=(package_notice,)),
+            notices=(package_notice,),
+        )
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", evaluate_with_package_notice)
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        temperature_C=1600.0 - 273.15,
+        composition_mol={"K2O": 0.457, "SiO2": 0.543},
+    )
+    extrapolation_notice = next(
+        row
+        for row in result.diagnostics["imcc_notices"]
+        if row["kind"] == "openimcc_temperature_extrapolated"
+    )
+    assert "T outside openimcc datapack" in extrapolation_notice["reason"]
+    assert package_notice not in extrapolation_notice["reason"]
+    forwarded_notice = next(
+        row
+        for row in result.diagnostics["imcc_notices"]
+        if row["kind"] == "openimcc_notice"
+    )
+    assert forwarded_notice["reason"] == package_notice
 
 
 def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
@@ -1559,8 +2234,17 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         if row["rail"] == "vapour"
     }
     openimcc = summary[Engine.OPENIMCC.value]
-    # b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
+    # d-128 flags each printed band whose source does not state a confidence level.
+    openimcc_rows = [
+        residual for residual, candidate in rows
+        if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
+    ]
     assert openimcc["n_score_eligible"] == 160
+    assert len(openimcc_rows) == 162
+    assert all(
+        any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
+        for residual in openimcc_rows
+    )
     assert openimcc["n_inside_band"] == 56
     assert float(openimcc["band_width_dex"]) == pytest.approx(
         0.14612803567823803, abs=1e-12
@@ -1741,13 +2425,13 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
 
 
 
-def test_allibert_single_phase_table_ii_refuses_without_in_cell_pressures() -> None:
-    """The 14 printed-melt rows lack the evidence needed for the flow fallback."""
+def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures() -> None:
+    """The 14 Allibert rows include seven numeric, flagged OpenIMCC results."""
 
     import tempfile
     from pathlib import Path
 
-    from simulator.battery.enums import RefusalReason
+    from simulator.battery.enums import NoticeKind, RefusalReason
     from simulator.battery.identity import quantity_token
     from tests.battery.test_migrate import _migrate_real_extract
 
@@ -1785,13 +2469,346 @@ def test_allibert_single_phase_table_ii_refuses_without_in_cell_pressures() -> N
         include_diagnostics=True,
     )
     assert len(residuals) == 14
-    assert all(residual.status is ResidualStatus.REFUSED for residual in residuals)
-    assert all(residual.numeric is None for residual in residuals)
-    assert all(
+    # d-274 keeps the 14-row cohort out of effusion refusals and headlines.
+    assert not any(
         residual.refusal is not None
         and residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-        and residual.refusal.detail["primary_check"] == "in_cell_partial_pressure_sum"
         for residual in residuals
+    )
+    scored = [residual for residual in residuals if residual.numeric is not None]
+    assert len(scored) == 7
+    assert {residual.reference for residual in scored} == {
+        observation.observation_id
+        for observation in rows
+        if observation.identity.species.formula == "Al2O3"
+    }
+    unscored = [residual for residual in residuals if residual.numeric is None]
+    assert len(unscored) == 7
+    assert {residual.reference for residual in unscored} == {
+        observation.observation_id
+        for observation in rows
+        if observation.identity.species.formula == "CaO"
+    }
+    assert all(
+        residual.score_eligible is False
+        and any(
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            and "in_cell_partial_pressure_sum" in notice.reason
+            for notice in residual.notices
+        )
+        for residual in scored
+    )
+
+
+def _fe2o3_partial_observation():
+    """Si partial pressure over a melt that still carries Fe2O3."""
+
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("SiO2", Decimal("0.75")),
+            ("FeO", Decimal("0.15")),
+            ("Fe2O3", Decimal("0.10")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula="SiO2",
+        component_basis="SiO2",
+        composition=composition,
+        T_K=Decimal("1673.15"),
+        fO2_Pa=Decimal("1e-4"),
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Si", Phase.G),
+    )
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "openimcc-fe2o3-si-gas",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+    )
+    return experiment, observation
+
+
+def test_openimcc_fe2o3_battery_row_predicts_with_fold_notice() -> None:
+    _require_openimcc()
+    experiment, observation = _fe2o3_partial_observation()
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+    assert prediction.value is not None
+    assert math.isfinite(float(prediction.value))
+    assert prediction.value > 0
+    assert prediction.refusal_reason is None
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "ferric folded to FeOt"
+        for notice in prediction.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "ferric component collapsed until d-072"
+        for notice in prediction.notices
+    )
+
+    work = F.work()
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={"": None, observation.source_id: "reviewed"},
+        hostname="test",
+    )
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation.observation_id},
+    )
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "ferric folded to FeOt"
+        for notice in residual.notices
+    )
+
+
+def test_openimcc_battery_fe2o3_fold_conserves_iron_moles(monkeypatch) -> None:
+    _require_openimcc()
+    # Hand count, not a call to feot_equivalent_moles.
+    # n(FeO) = 1 mol and n(Fe2O3) = 0.25 mol.
+    # Each Fe2O3 formula unit carries two Fe atoms, so
+    # n(FeOt) = n(FeO) + 2 * n(Fe2O3) = 1 + 2 * 0.25 = 1.5 mol.
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.state import MOLAR_MASS
+
+    composition_mol = {"SiO2": 2.0, "FeO": 1.0, "Fe2O3": 0.25}
+    expected_feot = 1.0 + 2.0 * 0.25
+    assert expected_feot == 1.5
+
+    original_evaluate = openimcc_bridge.evaluate
+    observed: list[dict[str, object]] = []
+
+    def capture(**kwargs):
+        observed.append(dict(kwargs))
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture)
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_mol=composition_mol,
+    )
+    sent = observed[-1]["composition_mol"]
+    assert sent["FeO"] == expected_feot
+    assert "Fe2O3" not in sent
+    assert sent["SiO2"] == 2.0
+    assert composition_mol["Fe2O3"] == 0.25
+    fold_rows = [
+        row
+        for row in result.diagnostics["imcc_notices"]
+        if row.get("code") == "openimcc_fe2o3_fold"
+    ]
+    assert len(fold_rows) == 1
+    assert fold_rows[0]["kind"] == "openimcc_notice"
+    assert fold_rows[0]["authority"] is None
+    assert fold_rows[0]["reason"] == "ferric folded to FeOt"
+    assert fold_rows[0]["basis"] == "Fe_atoms"
+    assert any(
+        row.get("code") == "openimcc_ferric_component_collapsed"
+        and row.get("message") == "ferric component collapsed until d-072"
+        for row in result.diagnostics["imcc_notices"]
+    )
+    assert result.status == "ok"
+
+    # kg-only input is a 1 kg batch: wt% = kg * 100, n_i = (wt%/100) * 1000 / M_i.
+    # n(FeOt) = n(FeO) + 2 * n(Fe2O3) on that vector.
+    composition_kg = {"SiO2": 0.60, "FeO": 0.20, "Fe2O3": 0.20}
+    n_feo = (0.20 * 100.0 / 100.0) * 1000.0 / float(MOLAR_MASS["FeO"])
+    n_fe2o3 = (0.20 * 100.0 / 100.0) * 1000.0 / float(MOLAR_MASS["Fe2O3"])
+    expected_kg_feot = n_feo + 2.0 * n_fe2o3
+    backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg=composition_kg,
+    )
+    assert "composition_kg" not in observed[-1]
+    sent_kg = observed[-1]["composition_mol"]
+    assert sent_kg["FeO"] == expected_kg_feot
+    assert "Fe2O3" not in sent_kg
+
+
+def test_openimcc_battery_without_fe2o3_is_bit_identical(monkeypatch) -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    original_evaluate = openimcc_bridge.evaluate
+    observed: list[dict[str, object]] = []
+
+    def capture(**kwargs):
+        observed.append(dict(kwargs))
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture)
+    composition_mol = {"K2O": 0.5, "SiO2": 0.5}
+    composition_kg = {"K2O": 0.07, "SiO2": 0.93}
+    backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol=composition_mol,
+        composition_kg={"K2O": 0.0470978, "SiO2": 0.0300415},
+    )
+    assert observed[-1]["composition_mol"] is composition_mol
+    assert "composition_kg" not in observed[-1]
+
+    wt_result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg=composition_kg,
+    )
+    assert observed[-1]["composition_kg"] is composition_kg
+    assert "composition_mol" not in observed[-1]
+    direct = original_evaluate(
+        composition_kg=composition_kg,
+        temperature_K=1800.0,
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    assert wt_result.activity_coefficients == dict(direct.parent_oxide_activities)
+    assert wt_result.activity_coefficient_details == {
+        str(name): dict(row) for name, row in direct.activity_coefficients.items()
+    }
+
+    zero_ferric = {"SiO2": 1.0, "Fe2O3": 0.0}
+    folded, fold_notices = openimcc_bridge.fold_ferric_to_feot(zero_ferric)
+    assert folded is zero_ferric
+    assert fold_notices == ()
+
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-9)
+    handle = open_battery_engine("openimcc")
+    with_fold = equilibrate_cell(
+        handle,
+        _binary_probe(),
+        temperature_K=1800.0,
+        po2=po2,
+        isolated=False,
+    )
+    real_fold = openimcc_bridge.fold_ferric_to_feot
+
+    def passthrough(composition):
+        return composition, ()
+
+    monkeypatch.setattr(openimcc_bridge, "fold_ferric_to_feot", passthrough)
+    bypassed = equilibrate_cell(
+        handle,
+        _binary_probe(),
+        temperature_K=1800.0,
+        po2=po2,
+        isolated=False,
+    )
+    assert with_fold.status == "ok"
+    assert bypassed.status == "ok"
+    assert with_fold.melt_activities == bypassed.melt_activities
+    assert with_fold.gas_partial_pressures_Pa == bypassed.gas_partial_pressures_Pa
+    assert with_fold.notices == bypassed.notices
+    assert not any(
+        row.get("code") == "openimcc_fe2o3_fold" for row in with_fold.notices
+    )
+
+    experiment = F.tabulation_experiment()
+    identity = F.activity_identity(
+        formula="SiO2",
+        component_basis="SiO2",
+        composition=Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(
+                ("SiO2", Decimal("0.8")),
+                ("K2O", Decimal("0.2")),
+            ),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        ),
+        T_K=Decimal("1800"),
+        fO2_Pa=Decimal("1e-4"),
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Si", Phase.G),
+    )
+    observation = F.observation(
+        "openimcc-no-fe2o3-si-gas",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+    )
+    work = F.work()
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={"": None, observation.source_id: "reviewed"},
+        hostname="test",
+    )
+    # The passthrough is installed above, so this residual is the bypass.
+    bypass_residual, _candidate = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation.observation_id},
+    )
+    monkeypatch.setattr(openimcc_bridge, "fold_ferric_to_feot", real_fold)
+    folded_residual, _candidate = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation.observation_id},
+    )
+    assert folded_residual == bypass_residual
+
+
+def test_bypassing_fe2o3_fold_restores_openimcc_refusal(monkeypatch) -> None:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    def passthrough(composition):
+        return composition, ()
+
+    monkeypatch.setattr(openimcc_bridge, "fold_ferric_to_feot", passthrough)
+    pot = BinaryPot(
+        pot_id="openimcc-fe2o3-refusal",
+        kato_1993_table4_system=None,
+        why="mutation: raw Fe2O3 must be refused again",
+        composition_wt_pct={"SiO2": 60.0, "FeO": 20.0, "Fe2O3": 20.0},
+    )
+    cell = equilibrate_cell(
+        open_battery_engine("openimcc"),
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode="commanded", po2_bar=1.0e-9),
+        isolated=False,
+    )
+    assert cell.status == "refusal"
+    assert "imcc_ferric_input_unsupported" in str(cell.engine_reason)
+
+    _experiment, observation = _fe2o3_partial_observation()
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert "imcc_ferric_input_unsupported" in str(
+        prediction.refusal_detail.get("engine_reason")
     )
 
 

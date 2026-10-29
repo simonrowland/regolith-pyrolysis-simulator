@@ -5,6 +5,8 @@ from types import SimpleNamespace
 
 import pytest
 
+import simulator.core as core_module
+import simulator.fe_redox as fe_redox_module
 from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import (
@@ -14,8 +16,10 @@ from simulator.fe_redox import (
     KRESS91_LN_FO2_COEFFICIENT,
     floor_vacuum_pressure_bar,
     feo_iw_log10_fO2_bar,
+    intrinsic_melt_fO2,
     kress91_fe3_over_sigma_fe,
     kress91_ferrous_feo_activity,
+    kress91_log10_fO2_from_fe3_over_sigma_fe,
     kress91_ln_fO2_temperature_delta,
     kress91_referenced_log_fO2,
     kress91_split,
@@ -36,6 +40,96 @@ KRESS91_MOL_FRACTIONS = {
     'P2O5': 0.001,
     'FeOt': 0.184,
 }
+
+
+def _no_iron_redox_diagnostic_sim() -> SimpleNamespace:
+    return SimpleNamespace(
+        melt=SimpleNamespace(
+            oxygen_reservoir=SimpleNamespace(melt_intrinsic_fO2_log=-9.0),
+            melt_fO2_log=-9.0,
+        ),
+        overhead=SimpleNamespace(pressure_mbar=0.0),
+        _melt_headspace_composition_mbar=None,
+        _melt_oxide_wt_pct=lambda: {},
+        _vacuum_floor_bar=lambda: 1.0e-9,
+        _oxygen_numerical_floor_bar=lambda: 1.0e-9,
+        _feot_equivalent_wt_pct=lambda _comp: 0.0,
+    )
+
+
+def test_legacy_iw_current_outputs_are_bit_identical_at_pinned_temperatures() -> None:
+    """Pin both legacy IW call paths before consolidating their shared line.
+
+    Mutation caught: changing the legacy IW coefficients in either resolver
+    or diagnostic moves at least one pinned hexadecimal float result.
+    """
+    expected_hex = {
+        -1.0: "-0x1.2000000000000p+3",
+        0.0: "-0x1.2000000000000p+3",
+        1873.15: "-0x1.fd6049b57f6fep+2",
+        2500.0: "-0x1.14395810624dcp+2",
+        4000.0: "-0x1.deb851eb851e0p-3",
+    }
+    for temperature_K, expected in expected_hex.items():
+        assert intrinsic_melt_fO2({"FeO": 1.0}, temperature_K).hex() == expected
+        diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
+            _no_iron_redox_diagnostic_sim(),
+            temperature_K,
+        )
+        assert diagnostic["iw_log"].hex() == expected
+
+
+def test_legacy_iw_nonfinite_outputs_match_green_pins() -> None:
+    """Pin the distinct nonfinite results from origin/work-v064-green."""
+    expected = (
+        (math.nan, "0x0.0p+0", "-0x1.2000000000000p+3"),
+        (math.inf, "0x0.0p+0", "0x1.a47ae147ae148p+2"),
+        (-math.inf, "-0x1.2000000000000p+3", "-0x1.2000000000000p+3"),
+    )
+    for temperature_K, intrinsic_hex, diagnostic_hex in expected:
+        intrinsic = intrinsic_melt_fO2({"FeO": 1.0}, temperature_K)
+        assert intrinsic.hex() == intrinsic_hex
+        diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
+            _no_iron_redox_diagnostic_sim(),
+            temperature_K,
+        )
+        assert diagnostic["iw_log"].hex() == diagnostic_hex
+        assert diagnostic["native_fe_saturation"] is True
+
+
+def test_legacy_iw_callers_use_the_shared_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Catch restoring either caller's inline legacy IW expression."""
+    calls: list[tuple[float, float]] = []
+
+    def owner_sentinel(
+        temperature_K: float,
+        *,
+        vacuum_floor_bar: float,
+    ) -> float:
+        calls.append((temperature_K, vacuum_floor_bar))
+        return -4.25
+
+    monkeypatch.setattr(
+        fe_redox_module,
+        "legacy_iw_log10_fO2_bar",
+        owner_sentinel,
+    )
+    monkeypatch.setattr(
+        core_module,
+        "legacy_iw_log10_fO2_bar",
+        owner_sentinel,
+    )
+
+    intrinsic = fe_redox_module.intrinsic_melt_fO2({"FeO": 1.0}, 2000.0)
+    diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
+        _no_iron_redox_diagnostic_sim(),
+        2000.0,
+    )
+
+    assert intrinsic == diagnostic["iw_log"] == -4.25
+    assert calls == [(2000.0, 1.0e-9), (2000.0, 1.0e-9)]
 
 
 @pytest.mark.parametrize('pressure_bar', [0.0, -1.0])
@@ -111,6 +205,50 @@ def test_kress91_shared_function_matches_inline_formula_pins(
     ) == pytest.approx(expected_fe3, rel=0, abs=1.0e-15)
     assert split['fe3'] == pytest.approx(expected_fe3, rel=0, abs=1.0e-15)
     assert split['ratio'] == pytest.approx(expected_ratio, rel=0, abs=1.0e-15)
+
+
+def test_kress91_inverse_recovers_the_pinned_forward_log() -> None:
+    """The inverse is the forward relation run backwards.
+
+    The expected log is the independent input of the pinned forward case,
+    not a second copy of the inverse algebra.
+    """
+
+    fO2_log = -9.0
+    T_K = 1843.15
+    pressure_bar = 1.0e-6
+    fe3 = kress91_fe3_over_sigma_fe(
+        fO2_log=fO2_log,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    recovered = kress91_log10_fO2_from_fe3_over_sigma_fe(
+        fe3_over_sigma_fe=fe3,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    assert recovered == pytest.approx(fO2_log, abs=1.0e-9)
+    assert kress91_fe3_over_sigma_fe(
+        fO2_log=recovered,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    ) == pytest.approx(fe3, rel=0, abs=1.0e-12)
+
+
+@pytest.mark.parametrize("fraction", [0.0, 1.0])
+def test_kress91_inverse_refuses_a_fraction_with_no_finite_fugacity(
+    fraction: float,
+) -> None:
+    with pytest.raises(Kress91InvalidControls):
+        kress91_log10_fO2_from_fe3_over_sigma_fe(
+            fe3_over_sigma_fe=fraction,
+            mol_fractions=KRESS91_MOL_FRACTIONS,
+            T_K=1843.15,
+            pressure_bar=1.0e-6,
+        )
 
 
 def test_kress91_valid_finite_controls_stay_exactly_golden_neutral() -> None:
@@ -584,11 +722,12 @@ def test_core_inline_kress91_full_split_regression_pins() -> None:
     assert split['fe2o3_over_feo_molar'] == pytest.approx(
         0.020159198364662897, rel=0, abs=1.0e-15
     )
+    # Formula-mass projection (SC-333 S333-04) changes only the final wt% basis.
     assert split['fe2o3_equiv_wt_pct'] == pytest.approx(
-        0.585472552554371, rel=0, abs=1.0e-12
+        0.5854828394288029, rel=0, abs=1.0e-12
     )
     assert split['feo_equiv_wt_pct'] == pytest.approx(
-        13.066348090398607, rel=0, abs=1.0e-12
+        13.066577668850247, rel=0, abs=1.0e-12
     )
 
 

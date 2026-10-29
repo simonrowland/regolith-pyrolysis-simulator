@@ -192,12 +192,14 @@ ENGINE_POINT_CONSUMERS = (
     "cached-real",
     "openimcc",
 )
-# Engines whose equilibrate result fills activity_coefficients.
-# magemin, vaporock, internal-analytical, and cached-real do not.
+# Engines whose equilibrate result carries per-species activities. This list
+# does not imply gamma support; coefficients stay on their separate result map.
 MELT_ACTIVITY_ENGINES = (
     "alphamelts",
     "thermoengine",
     "openimcc",
+    "internal-analytical",
+    "magemin",
 )
 # Activity and activity coefficient only. Interaction parameters stay on
 # engine_point; they are not this observable.
@@ -375,10 +377,24 @@ def charge_moles_by_species(
         if observation.experiment_id != experiment.experiment_id:
             raise ValueError("Observation belongs to a different experiment")
         conditions = observation.point_conditions or {}
-        fields = {field: conditions[key] for field, key in (
-            ("mass_kg", "mass_kg"), ("initial_composition", "composition"),
-            ("printed_composition", "printed_composition"),
-        ) if key in conditions}
+        fields = {
+            field: conditions[key]
+            for field, key in (
+                ("mass_kg", "mass_kg"),
+                ("printed_composition", "printed_composition"),
+            )
+            if key in conditions
+        }
+        row_composition = conditions.get("composition")
+        if isinstance(row_composition, Located):
+            if row_composition.state.is_value:
+                if not isinstance(row_composition.state.value, Composition):
+                    return SpeciesWaypoints({}, WaypointAbsence(
+                        "charge_moles_by_species",
+                        GapReason.UNSUPPORTED_PRINT_FORM,
+                        (f"observation[{observation.observation_id}].point_conditions.composition",),
+                    ))
+            fields["initial_composition"] = row_composition
         if fields:
             scoped = replace(experiment, sample=replace(experiment.sample, **fields))
             result = charge_moles_by_species(scoped, bench)
@@ -784,7 +800,10 @@ def normalized_composition(
             field == "initial_composition"
             and key in point
             and located is not None
-            and not located.state.is_value
+            and (
+                not located.state.is_value
+                or not isinstance(located.state.value, Composition)
+            )
         ):
             return WaypointResult(
                 "normalized_composition",
@@ -800,6 +819,10 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
+        if field == "initial_composition" and not isinstance(raw, Composition):
+            unsupported = True
+            missing.append(path)
+            continue
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
         basis_inference: Derivation | None = None
@@ -2132,5 +2155,7 @@ def consumer_readiness(experiment: Experiment, bench: Bench, observation: Observ
 
     inputs = collect_consumer_inputs(experiment, bench, observation)
     generated = (kems_case(inputs), vacuum_pyrolysis_preset(inputs, modelling_inputs=modelling_inputs),
-                 *engine_point_requests(inputs), *melt_activity_requests(inputs))
+                 *engine_point_requests(inputs), *melt_activity_requests(
+                     inputs, experiment=experiment, bench=bench, observation=observation,
+                 ))
     return tuple(item.readiness for item in generated)

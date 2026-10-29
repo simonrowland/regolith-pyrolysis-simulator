@@ -1,25 +1,39 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import Engine, FO2Channel, MethodToken, Rail, ResidualStatus
+from simulator.battery.enums import (
+    Engine,
+    FO2Channel,
+    MethodToken,
+    Phase,
+    Rail,
+    RefusalReason,
+    ResidualStatus,
+)
 from simulator.battery.records import SweepGas
-from simulator.battery.score import ScoreContext, score_store
+from simulator.battery.score import (
+    ScoreContext,
+    fusion_comparison_reference,
+    score_store,
+)
 from simulator.battery.waypoints import GapReason, oxygen_condition
 from tests.battery.test_migrate import _migrate_real_extract
 from tests.battery.test_waypoints import _bench
 
 
 @pytest.mark.parametrize(
-    ("filename", "observation_selectors", "page", "pdf_page_index"),
+    ("filename", "observation_selectors", "page", "pdf_page_index", "published_page"),
     [
         (
             "kume-2000-cao-activities.yaml",
             ("kume_2000_table2_sample_101",),
-            555,
+            2,
             1,
+            555,
         ),
         (
             "ohta-1996-cao-mgo-al2o3-activities.yaml",
@@ -29,14 +43,16 @@ from tests.battery.test_waypoints import _bench
                 "ohta_1996_al2o3_activity_ca2_spinel_saturation_1873",
                 "ohta_1996_al2o3_activity_ca2_spinel_saturation_1823",
             ),
-            983,
             1,
+            0,
+            983,
         ),
         (
             "seki-2011-ca-o-solubility-fe-cao-al2o3.yaml",
             ("seki_2011_table3_calculated_a_CaO",),
-            1370,
             2,
+            1,
+            1370,
         ),
     ],
 )
@@ -46,6 +62,7 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
     observation_selectors: tuple[str, ...],
     page: int,
     pdf_page_index: int,
+    published_page: int,
 ) -> None:
     migrated = _migrate_real_extract(tmp_path, filename)
     observations = [
@@ -68,7 +85,7 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         assert experiment.locator is not None
         assert experiment.locator.page == page
         assert experiment.locator.pdf_page_index == pdf_page_index
-        assert experiment.locator.published_page == page
+        assert experiment.locator.published_page == published_page
         assert experiment.locator.paragraph
 
     context = ScoreContext(
@@ -88,10 +105,33 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         for residual in (scored[reference] for reference in target_ids)
     )
     if filename == "kume-2000-cao-activities.yaml":
-        own_row = scored[next(iter(target_ids))]
-        assert own_row.status is ResidualStatus.REFUSED
+        observation = observations[0]
+        experiment = migrated.experiments[observation.experiment_id]
+        oxygen = oxygen_condition(experiment, _bench(), observation)
+        assert oxygen.selected is None
+        assert oxygen.absence is not None
+        assert oxygen.absence.reason is GapReason.MISSING_EVIDENCE
+        converted = fusion_comparison_reference(
+            observation, engine=Engine.INTERNAL_ANALYTICAL
+        )
+        assert converted.identity.reference_state is not None
+        assert converted.identity.reference_state.is_value
+        # d-165: the paper specifies CaO(s), but not its polymorph. The former
+        # inferred-liquid pin was 0.00002451128698546067397078399944 from
+        # 0.000228; the comparison now keeps the printed value and refuses.
+        assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
+        assert converted.value.point == observation.value.point == Decimal("0.000228")
+        assert any(
+            notice.reason == "fusion_source_reference_phase_unprinted"
+            for notice in converted.notices
+        )
+        own_row = scored[observation.observation_id]
+        assert own_row.numeric is None
         assert own_row.refusal is not None
-        assert own_row.refusal.reason.value == "unsupported"
+        assert own_row.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+        assert own_row.refusal.detail["reason"] == (
+            "fusion_source_reference_phase_unprinted"
+        )
 
 
 def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None:
@@ -116,7 +156,12 @@ def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None
     residual = next(row for row in residuals if row.reference == observation.observation_id)
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
-    assert residual.refusal.reason.value == "method_unknown"
+    # d-165 keeps the missing polymorph as a secondary refusal; measurement
+    # validity remains primary when the quoted source method is unknown.
+    assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+    assert residual.refusal.detail["secondary_reasons"] == [
+        "fusion_source_reference_phase_unprinted"
+    ]
 
 
 def test_kume_own_experiments_keep_published_deoxidized_argon_control(

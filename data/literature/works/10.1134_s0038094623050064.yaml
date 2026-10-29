@@ -11,7 +11,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:murchison-degassing-2023-springer
       role: pdf
@@ -25,12 +25,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:murchison-degassing-2023-springer
-      role: table_csv
-      path: tables/murchison-degassing-2023-springer
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:murchison-degassing-2023-springer
       role: pdftotext
       path: unknown
@@ -107,6 +101,7 @@ experiments:
               published_page: 574
               note: 1.1 +/- 0.1 bar helium; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -210,6 +205,7 @@ experiments:
               published_page: 574
               note: 1.1 +/- 0.1 bar helium; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value

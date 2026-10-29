@@ -1,0 +1,663 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2002-aluminosilicate-solid-phases.yaml
+observations:
+- observation_id: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_fig2a_sio_replica::T=1724.7:h=027d6d705772
+  experiment_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628::experiment::shornikov-2002-doklady-solid-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1724.7'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.680325332925'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  locator:
+    page: 2
+    published_page: 83
+    pdf_page_index: 1
+    figure: '2'
+    note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). This filled diamond
+      is at (5892.5, 2993.5). It is 0.144 dex below the legend-VIII diamond at (5898.5, 2903.8), at 1724.7 K against 1725.5
+      K. The caption on this page says: Replica filled symbols refer to data on samples with changed composition. The new
+      mole percent is not printed, so the composition is unknown and 84.14 mol% is not stored. T is unchanged. T = 1700 +
+      (x-5692.0)/8.105 from the labelled ticks 1700 at x=5692.0 and 1800 at x=6502.5. The -5 tick is the 8-row stub at y=2882-2889,
+      centre 2885.5. The -6 tick is the same kind of stub at y=3505-3512, centre 3508.5. y=3442.5 is the top of the -6 glyph,
+      not the tick. (3508.5-2885.5) = 623 px per log unit. neg_log10_p = 5 + (y-2885.5)/623. Example: y=2993.5 reads 5 + 108/623
+      = 5.173. The centre is the dark centroid inside a 30 px radius, threshold 70. Half the diamond, clear of the dotted
+      line, is 24 px: 24/623 = 0.039 dex and 3.0 K. Partial pressure is not an activity, so the pure-oxide rule is not applied.'
+  read_from: pdf:shornikov-2002-aluminosilicate-solid-phases
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.7'
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). This filled
+          diamond is at (5892.5, 2993.5). It is 0.144 dex below the legend-VIII diamond at (5898.5, 2903.8), at 1724.7 K against
+          1725.5 K. The caption on this page says: Replica filled symbols refer to data on samples with changed composition.
+          The new mole percent is not printed, so the composition is unknown and 84.14 mol% is not stored. T is unchanged.
+          T = 1700 + (x-5692.0)/8.105 from the labelled ticks 1700 at x=5692.0 and 1800 at x=6502.5. The -5 tick is the 8-row
+          stub at y=2882-2889, centre 2885.5. The -6 tick is the same kind of stub at y=3505-3512, centre 3508.5. y=3442.5
+          is the top of the -6 glyph, not the tick. (3508.5-2885.5) = 623 px per log unit. neg_log10_p = 5 + (y-2885.5)/623.
+          Example: y=2993.5 reads 5 + 108/623 = 5.173. The centre is the dark centroid inside a 30 px radius, threshold 70.
+          Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. Partial pressure is not an activity,
+          so the pure-oxide rule is not applied.'
+    composition:
+      state:
+        tag: unknown
+        reason: 'Caption, published page 83: Replica filled symbols refer to data on samples with changed composition. The
+          new mole percent is not printed.'
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: Mean (5892.5, 2993.5); filled-diamond dark centroid; replica filled symbol, composition changed and not printed;
+          audit shornikov_2002_f2a_sio_01.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:shornikov-2002-aluminosilicate-solid-phases
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000006714289'
+        locator:
+          page: 2
+          published_page: 83
+          pdf_page_index: 1
+          figure: '2'
+          note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). This filled
+            diamond is at (5892.5, 2993.5). It is 0.144 dex below the legend-VIII diamond at (5898.5, 2903.8), at 1724.7 K
+            against 1725.5 K. The caption on this page says: Replica filled symbols refer to data on samples with changed
+            composition. The new mole percent is not printed, so the composition is unknown and 84.14 mol% is not stored.
+            T is unchanged. T = 1700 + (x-5692.0)/8.105 from the labelled ticks 1700 at x=5692.0 and 1800 at x=6502.5. The
+            -5 tick is the 8-row stub at y=2882-2889, centre 2885.5. The -6 tick is the same kind of stub at y=3505-3512,
+            centre 3508.5. y=3442.5 is the top of the -6 glyph, not the tick. (3508.5-2885.5) = 623 px per log unit. neg_log10_p
+            = 5 + (y-2885.5)/623. Example: y=2993.5 reads 5 + 108/623 = 5.173. The centre is the dark centroid inside a 30
+            px radius, threshold 70. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. Partial
+            pressure is not an activity, so the pure-oxide rule is not applied.'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 2
+          published_page: 83
+          pdf_page_index: 1
+          figure: '2'
+          note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). This filled
+            diamond is at (5892.5, 2993.5). It is 0.144 dex below the legend-VIII diamond at (5898.5, 2903.8), at 1724.7 K
+            against 1725.5 K. The caption on this page says: Replica filled symbols refer to data on samples with changed
+            composition. The new mole percent is not printed, so the composition is unknown and 84.14 mol% is not stored.
+            T is unchanged. T = 1700 + (x-5692.0)/8.105 from the labelled ticks 1700 at x=5692.0 and 1800 at x=6502.5. The
+            -5 tick is the 8-row stub at y=2882-2889, centre 2885.5. The -6 tick is the same kind of stub at y=3505-3512,
+            centre 3508.5. y=3442.5 is the top of the -6 glyph, not the tick. (3508.5-2885.5) = 623 px per log unit. neg_log10_p
+            = 5 + (y-2885.5)/623. Example: y=2993.5 reads 5 + 108/623 = 5.173. The centre is the dark centroid inside a 30
+            px radius, threshold 70. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. Partial
+            pressure is not an activity, so the pure-oxide rule is not applied.'
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_fig2a_sio_viii::T=1725.5:h=d180b94f00ce
+  experiment_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628::experiment::shornikov-2002-doklady-solid-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1725.5'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.8414'
+        - - SiO2
+          - '0.1586'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.947799825525'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  locator:
+    page: 2
+    published_page: 83
+    pdf_page_index: 1
+    figure: '2'
+    note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled diamonds
+      lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The offset diamond
+      at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown composition. T ticks
+      bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105. Spacing further right
+      is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6 at y=3508.5, so (3508.5-2885.5)
+      = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8 reads 5 + 18.3/623 = 5.029. The -4 to
+      -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph, not the tick. Centres are dark centroids inside
+      a 30 px radius, threshold 70. The line-inflated component bbox is not the marker width. Half the diamond, clear of the
+      dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The diamond beside the VIII legend glyph is not a datum. Partial
+      pressure is not an activity, so the pure-oxide rule is not applied.'
+  read_from: pdf:shornikov-2002-aluminosilicate-solid-phases
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1725.5'
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled
+          diamonds lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The
+          offset diamond at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown
+          composition. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105.
+          Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6 at
+          y=3508.5, so (3508.5-2885.5) = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8 reads
+          5 + 18.3/623 = 5.029. The -4 to -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph, not the
+          tick. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox is not the
+          marker width. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The diamond beside
+          the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule is not applied.'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_percent_Al2O3
+          components:
+          - - Al2O3
+            - '0.8414'
+          - - SiO2
+            - '0.1586'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: Mean (5898.5, 2903.8); filled-diamond dark centroid; legend VIII, 84.14 mol% Al2O3, not an axis read; audit
+          shornikov_2002_f2a_sio_02.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:shornikov-2002-aluminosilicate-solid-phases
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000009354057'
+        locator:
+          page: 2
+          published_page: 83
+          pdf_page_index: 1
+          figure: '2'
+          note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled
+            diamonds lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The
+            offset diamond at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown
+            composition. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105.
+            Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6
+            at y=3508.5, so (3508.5-2885.5) = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8
+            reads 5 + 18.3/623 = 5.029. The -4 to -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph,
+            not the tick. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox
+            is not the marker width. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The
+            diamond beside the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule
+            is not applied.'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 2
+          published_page: 83
+          pdf_page_index: 1
+          figure: '2'
+          note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled
+            diamonds lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The
+            offset diamond at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown
+            composition. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105.
+            Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6
+            at y=3508.5, so (3508.5-2885.5) = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8
+            reads 5 + 18.3/623 = 5.029. The -4 to -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph,
+            not the tick. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox
+            is not the marker width. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The
+            diamond beside the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule
+            is not applied.'
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_fig2a_sio_viii::T=1743.2:h=e7f0f09bbd57
+  experiment_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628::experiment::shornikov-2002-doklady-solid-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1743.2'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.8414'
+        - - SiO2
+          - '0.1586'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.96764625195'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  locator:
+    page: 2
+    published_page: 83
+    pdf_page_index: 1
+    figure: '2'
+    note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled diamonds
+      lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The offset diamond
+      at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown composition. T ticks
+      bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105. Spacing further right
+      is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6 at y=3508.5, so (3508.5-2885.5)
+      = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8 reads 5 + 18.3/623 = 5.029. The -4 to
+      -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph, not the tick. Centres are dark centroids inside
+      a 30 px radius, threshold 70. The line-inflated component bbox is not the marker width. Half the diamond, clear of the
+      dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The diamond beside the VIII legend glyph is not a datum. Partial
+      pressure is not an activity, so the pure-oxide rule is not applied.'
+  read_from: pdf:shornikov-2002-aluminosilicate-solid-phases
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.2'
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled
+          diamonds lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The
+          offset diamond at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown
+          composition. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105.
+          Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6 at
+          y=3508.5, so (3508.5-2885.5) = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8 reads
+          5 + 18.3/623 = 5.029. The -4 to -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph, not the
+          tick. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox is not the
+          marker width. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The diamond beside
+          the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule is not applied.'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_percent_Al2O3
+          components:
+          - - Al2O3
+            - '0.8414'
+          - - SiO2
+            - '0.1586'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: Mean (6042.5, 2897.7); filled-diamond dark centroid; legend VIII, 84.14 mol% Al2O3, not an axis read; audit
+          shornikov_2002_f2a_sio_03.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:shornikov-2002-aluminosilicate-solid-phases
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000009549926'
+        locator:
+          page: 2
+          published_page: 83
+          pdf_page_index: 1
+          figure: '2'
+          note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled
+            diamonds lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The
+            offset diamond at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown
+            composition. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105.
+            Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6
+            at y=3508.5, so (3508.5-2885.5) = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8
+            reads 5 + 18.3/623 = 5.029. The -4 to -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph,
+            not the tick. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox
+            is not the marker width. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The
+            diamond beside the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule
+            is not applied.'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 2
+          published_page: 83
+          pdf_page_index: 1
+          figure: '2'
+          note: 'Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled
+            diamonds lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The
+            offset diamond at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown
+            composition. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105.
+            Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6
+            at y=3508.5, so (3508.5-2885.5) = 623 px per log unit and neg_log10_p = 5 + (y-2885.5)/623. Example: y=2903.8
+            reads 5 + 18.3/623 = 5.029. The -4 to -5 gap is 608 px and was not used. y=3442.5 is the top of the -6 glyph,
+            not the tick. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox
+            is not the marker width. Half the diamond, clear of the dotted line, is 24 px: 24/623 = 0.039 dex and 3.0 K. The
+            diamond beside the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule
+            is not applied.'
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_mullite_delta_fH
+  experiment_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628::experiment::shornikov-2002-doklady-solid-kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1676.0, 2180.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '12.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.8'
+      unit: kJ/mol
+      basis: as printed
+      note: confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: this work, least squares of the Gibbs energies from equations (4) and (5)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_mullite_delta_fH
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    equation: '6'
+    note: Least squares of ΔfG over 1676–2180 K. The same digits are later tabulated as this work in shornikov-2003-mullite-thermodynamics
+      (RJPC 77(7) 1044–1050) with a printed span 1720–2180 K and a 1950 K row label. This row keeps the Doklady wording and
+      the 1676–2180 K span. No single temperature is printed here, so none is invented.
+  read_from: pdf:shornikov-2002-aluminosilicate-solid-phases
+  derivation:
+    relation: Least squares of the Gibbs energies of formation from equations (4) and (5) over 1676-2180 K. The Gibbs-energy
+      grid is not printed.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mol
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 84
+        pdf_page_index: 2
+        equation: '6'
+        note: Equations (4) and (5) supply the Gibbs energies. The grid is not printed. Equation (6) is the least-squares
+          result on published page 84.
+    references: []

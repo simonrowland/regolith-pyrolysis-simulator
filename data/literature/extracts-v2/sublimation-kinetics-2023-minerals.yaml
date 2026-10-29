@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -65,8 +66,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.08'
+    kind: unavailable
+    unavailable_reason: sample_mass_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -124,6 +125,7 @@ observations:
               paragraph: conclusions
               section: '5'
         output_unit: K
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig3_factsage_full_silicate_vs_demaria_figure_only
   experiment_id: 10.3390/min13010079::experiment::apollo-12022-factsage
   identity:
@@ -138,6 +140,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -211,6 +214,206 @@ observations:
     pdf_page_index: 6
     figure: '3'
   read_from: pdf:sublimation-kinetics-2023-minerals
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4454917556583907461809776937'
+          - - FeO
+            - '0.1849027244706631278343171463'
+          - - MgO
+            - '0.16042013096379654385872894'
+          - - Al2O3
+            - '0.05490915921806480449788752472'
+          - - CaO
+            - '0.1055795091443572984791498064'
+          - - TiO2
+            - '0.04001287189512889262963651761'
+          - - Cr2O3
+            - '0.001344645271037509295110597272'
+          - - MnO
+            - '0.002182596425334022351282892584'
+          - - Na2O
+            - '0.0046963779953533810250393144'
+          - - K2O
+            - '0.0004602289578736738478695676035'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+        figure: '3'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.22'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '21.45'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.44'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.04'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.56'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5.16'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.33'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.47'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 6
+              pdf_page_index: 6
+              figure: '3'
+        output_unit: mole_fraction
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig4_proxy_oxide_vs_demaria_figure_only
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -225,6 +428,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -311,6 +515,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -397,6 +602,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -484,6 +690,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -533,8 +740,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '1.02'
+    kind: unavailable
+    unavailable_reason: sample_mass_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -588,6 +795,7 @@ observations:
               pdf_page_index: 10
               section: '5'
         output_unit: K
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::T=1073.15:h=26640cfaec7e
   experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
@@ -602,6 +810,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -672,6 +881,7 @@ observations:
               pdf_page_index: 5
               section: '3.1'
         output_unit: K
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::T=1423.15:h=3dcafca0b145
   experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
@@ -686,6 +896,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -756,6 +967,7 @@ observations:
               pdf_page_index: 5
               section: '3.1'
         output_unit: K
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::T=298.15:row=abstract:h=efb3276e176c
   experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
@@ -770,6 +982,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -840,6 +1053,7 @@ observations:
               pdf_page_index: 1
               paragraph: abstract
         output_unit: K
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_fig1_ssa_curve_figure_only
   experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
@@ -854,6 +1068,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -896,6 +1111,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -962,95 +1178,7 @@ observations:
               figure: '2'
               section: '3.1'
         output_unit: K
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_quoted_spec_density
-  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
-  identity:
-    quantity:
-      tag: value
-      value: density
-    species:
-      formula: LMS-1
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile density does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile density does not use per
-    temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile density does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile density does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile density does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile density does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile density does not use reservoir
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile density does not use fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile density does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile density does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile density does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile density does not use wall
-  value:
-    kind: point
-    point: '3.03'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_from_other_workers
-    attribution: For BET calculations a sample density of 3.03 g/cm3 was used as per LMS-1 simulant specifications [10].
-  admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - density
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: sublimation-kinetics-2023-minerals::shaw_2023_lms1_quoted_spec_density
-  source_id: sublimation-kinetics-2023-minerals
-  locator:
-    published_page: 3
-    pdf_page_index: 3
-    section: '2.2'
-  read_from: pdf:sublimation-kinetics-2023-minerals
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_sintering_apparatus
   experiment_id: 10.3390/min13010079::experiment::lms1-sintering-series
   identity:
@@ -1065,6 +1193,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1114,6 +1243,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1163,8 +1293,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '1.38'
+    kind: unavailable
+    unavailable_reason: sample_mass_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1218,6 +1348,7 @@ observations:
               pdf_page_index: 10
               section: '5'
         output_unit: K
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table1_apollo_12022_composition_snyder
   experiment_id: 10.3390/min13010079::experiment::apollo-12022-factsage
   identity:
@@ -1232,6 +1363,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1285,6 +1417,206 @@ observations:
     pdf_page_index: 4
     table: '1'
   read_from: pdf:sublimation-kinetics-2023-minerals
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4454917556583907461809776937'
+          - - FeO
+            - '0.1849027244706631278343171463'
+          - - MgO
+            - '0.16042013096379654385872894'
+          - - Al2O3
+            - '0.05490915921806480449788752472'
+          - - CaO
+            - '0.1055795091443572984791498064'
+          - - TiO2
+            - '0.04001287189512889262963651761'
+          - - Cr2O3
+            - '0.001344645271037509295110597272'
+          - - MnO
+            - '0.002182596425334022351282892584'
+          - - Na2O
+            - '0.0046963779953533810250393144'
+          - - K2O
+            - '0.0004602289578736738478695676035'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.22'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '21.45'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.44'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.04'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.56'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5.16'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.33'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.47'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        output_unit: mole_fraction
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1073.15:h=6f172ee26c63
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -1299,6 +1631,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1348,8 +1681,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.000000000032'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1403,12 +1736,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1173.15:h=5aad9b4640e6
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -1423,6 +1751,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1472,8 +1801,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000000014'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1527,12 +1856,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1273.15:h=07bf09ab080a
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -1547,6 +1871,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1596,8 +1921,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.000000031'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1651,12 +1976,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1323.15:h=a551374296db
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -1671,6 +1991,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1720,8 +2041,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00000013'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1775,12 +2096,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1373.15:h=4371c318198b
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -1795,6 +2111,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1844,8 +2161,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00000046'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1899,12 +2216,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1423.15:h=3eaca3124688
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -1919,6 +2231,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1968,8 +2281,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000015'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -2023,12 +2336,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1473.15:h=ba0b4749d4e7
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2043,6 +2351,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2092,8 +2401,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000046'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -2147,12 +2456,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1073.15:h=bd7ee815379f
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2167,6 +2471,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2271,6 +2576,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2293,6 +2599,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1173.15:h=86946c1f77fa
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2307,6 +2614,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2411,6 +2719,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2433,6 +2742,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1273.15:h=e5650257708a
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2447,6 +2757,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2551,6 +2862,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2573,6 +2885,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1323.15:h=df0af1224da2
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2587,6 +2900,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2691,6 +3005,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2713,6 +3028,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1373.15:h=b418da2a399b
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2727,6 +3043,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2831,6 +3148,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2853,6 +3171,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1423.15:h=47f7ebd71855
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2867,6 +3186,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2971,6 +3291,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2993,6 +3314,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1473.15:h=f967591dd634
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -3007,6 +3329,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3111,6 +3434,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3133,6 +3457,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1073.15:h=d0ef1293e07a
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3147,6 +3472,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3196,8 +3522,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000000021'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3249,12 +3575,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1173.15:h=2b8fb66a2723
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3269,6 +3590,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3318,8 +3640,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00000006'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3371,12 +3693,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1273.15:h=4d0020499a44
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3391,6 +3708,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3440,8 +3758,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00000097'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3493,12 +3811,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1323.15:h=1c35e07225a9
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3513,6 +3826,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3562,8 +3876,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000033'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3615,12 +3929,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1373.15:h=ab74ae0675ac
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3635,6 +3944,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3684,8 +3994,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00001'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3737,12 +4047,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1423.15:h=827f924aea24
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3757,6 +4062,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3806,8 +4112,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00003'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3859,12 +4165,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1473.15:h=8e857c4e90c2
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3879,6 +4180,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3928,8 +4230,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00008'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3981,12 +4283,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1073.15:h=dcf0d6307219
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4001,6 +4298,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4104,6 +4402,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4126,6 +4425,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1173.15:h=e3a5de31b946
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4140,6 +4440,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4243,6 +4544,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4265,6 +4567,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1273.15:h=2cc7eeb0dd70
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4279,6 +4582,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4382,6 +4686,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4404,6 +4709,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1323.15:h=ec4f25257dcd
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4418,6 +4724,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4521,6 +4828,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4543,6 +4851,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1373.15:h=b43c7535536f
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4557,6 +4866,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4660,6 +4970,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4682,6 +4993,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1423.15:h=c54b254e601a
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4696,6 +5008,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4799,6 +5112,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4821,6 +5135,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1473.15:h=d35a4c18a57d
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4835,6 +5150,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4938,6 +5254,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4960,6 +5277,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1073.15:h=ad79d074f703
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4974,6 +5292,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5023,8 +5342,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000000034'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5076,12 +5395,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1173.15:h=96515ec44f47
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5096,6 +5410,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5145,8 +5460,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.000000082'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5198,12 +5513,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1273.15:h=7b08740af713
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5218,6 +5528,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5267,8 +5578,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000016'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5320,12 +5631,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1323.15:h=f5b37a001820
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5340,6 +5646,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5389,8 +5696,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000059'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5442,12 +5749,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1373.15:h=f3755c85a5e3
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5462,6 +5764,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5511,8 +5814,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00002'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5564,12 +5867,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1423.15:h=ca3ebbfcb62a
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5584,6 +5882,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5633,8 +5932,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.000063'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5686,12 +5985,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1473.15:h=8695e90ddac2
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5706,6 +6000,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5755,8 +6050,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00018'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5808,12 +6103,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
+        references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1073.15:h=552956d8387d
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5828,6 +6118,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5932,6 +6223,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5954,6 +6246,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1173.15:h=817d9aa54374
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5968,6 +6261,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6072,6 +6366,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6094,6 +6389,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1273.15:h=66e356075e73
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -6108,6 +6404,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6212,6 +6509,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6234,6 +6532,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1323.15:h=51f35553922b
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -6248,6 +6547,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6352,6 +6652,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6374,6 +6675,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1373.15:h=ca44ac1539f0
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -6388,6 +6690,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6492,6 +6795,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6514,6 +6818,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1423.15:h=45b1734107ca
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -6528,6 +6833,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6632,6 +6938,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6654,6 +6961,7 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1473.15:h=f59d54b81bd5
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -6668,6 +6976,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6772,6 +7081,7 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6794,3 +7104,4 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
+    references: []

@@ -1,0 +1,605 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  citation: 'Shornikov, S. I., Archakov, I. Yu., and Shultz, M. M. (2000). Thermodynamic Properties of the Melts Containing
+    Titanium Dioxide. TITANIUM’99: SCIENCE AND TECHNOLOGY, 1469–1473.'
+  source_ids:
+  - shornikov-2000-titania-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2000-titania-melts
+      role: pdf
+      path: raw/shornikov-2000-titania-melts/shornikov-2000-titania-melts.pdf
+      sha256:
+        tag: value
+        value: a1c39ef788494d493df06553e16bc692083bca0928f8846f97079a8112d39840
+    - asset_id: pdftotext:shornikov-2000-titania-melts
+      role: pdftotext
+      path: text/shornikov-2000-titania-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2000-titania-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924::shornikov-2000-titania-melts
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  locator:
+    page: 3
+    published_page: 1471
+    pdf_page_index: 2
+    figure: '2'
+    note: 600 dpi render. Tick lines are the PDF stroke centres of the labelled ticks only (half-ticks were not fitted). x
+      = -36.126471 + 0.03510144*px, least-squares residual max 0.00354 (0 at x=1029.15, 10 at x=1314.13, 20 at x=1599.08,
+      30 at x=1883.78, 40 at x=2168.73, 50 at x=2453.67). y = 9.212003 + -0.00407267*px, residual max 0.00035 (0 at y=2261.85,
+      -1 at y=2507.52, -2 at y=2752.94, -3 at y=2998.61, -4 at y=3244.00). Log axes are fitted in the printed log value. Marker
+      centre is the mean of same-kind filled paths of one glyph (centre within 0.28 of the path size, or a same-x copy (x
+      within 2 px) within 0.50 of a triangle or 0.62 of any other marker). Centre allowance is max(1 px, overprint spread).
+      The rendered tick ink agrees with these stroke centres within about 1 px. Panel c series 1 filled circle SiO2, this
+      work, 2100 K. Activity stored as 10**(log10 a). The axis value is log10 a.; panel=c; series=1; marker_symbol=filled
+      circle
+context:
+- observation_id: shornikov_2000_activity_method_deviation
+  type: textual_fact
+  locator:
+    page: 2
+    published_page: 1470
+    pdf_page_index: 1
+    section: Results and Discussion
+    equation: '5'
+  units: percent relative deviation
+  attribution: This work
+  values:
+    quantity: unavailable
+    schema_gap: The comparison is a relative difference between activity-calculation methods, not an activity value or an
+      existing scored quantity.
+    candidate_tokens:
+    - activity
+    evidence_class: model_derived
+    result_as_printed: The deviations with the same data calculated in the frames of the Belton–Fruehan method [30] were less
+      then 15%.
+    methods_compared_as_printed: Activity values obtained using vapor pressures compared with values calculated by the Belton–Fruehan
+      method [30].
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_activity_method_deviation
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_figure1_kems_vapor_pressures
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 1470
+    pdf_page_index: 1
+    figure: '1'
+  panel: whole_figure
+  attribution: This work
+  units: atm; x composition in mole %
+  values:
+    quantity: partial_pressure
+    species:
+    - SiO
+    - Ca
+    - TiO
+    - TiO2
+    - O
+    phase: gas over CaSiO3–CaTiO3 system melt
+    temperature_as_printed: 2100 K
+    axes_as_printed:
+      x: x(TiO2), mole %
+      y: log p(i), atm
+    caption: The values of the gas phase vapor species partial pressures 1 – (SiO), 2 – (Ca), 3 – (TiO), 4 – (TiO2), and 5
+      – (O) over the CaSiO3–CaTiO3 system melts at 2100 K. The values of the atomic oxygen partial pressures were calculated
+      using the data on equilibriums from (1) to (4).
+    KEMS_calibration_standards_as_printed: Partial pressures of silver [28] and (SiO) over silica [23, 24] were used as standards.
+    cross_sections_as_printed: Molecule cross sections were calculated by the additivity rule from atomic cross sections [29].
+    method_locator:
+      page: 1
+      published_page: 1469
+      pdf_page_index: 0
+      section: Results and Discussion
+    method_as_printed: Partial pressures were determined by the Hertz–Knudsen equation taking into account partial coefficients
+      of silica evaporation [24], and showed good coincidence with values calculated using the ion-current comparison method.
+    series:
+    - series_id: '1'
+      name: SiO(g)
+      marker: filled circle
+      marker_count: 25
+      evidence_class: measured_reduced
+    - series_id: '2'
+      name: Ca(g)
+      marker: filled square
+      marker_count: 32
+      evidence_class: measured_reduced
+    - series_id: '3'
+      name: TiO(g)
+      marker: filled upward triangle
+      marker_count: 21
+      evidence_class: measured_reduced
+    - series_id: '4'
+      name: TiO2(g)
+      marker: filled downward triangle
+      marker_count: 30
+      evidence_class: measured_reduced
+    - series_id: '5'
+      name: O(g)
+      marker: filled diamond
+      marker_count: 22
+      evidence_class: model_derived
+      derivation_as_printed: Calculated from equilibrium constants for reactions (1)–(4).
+    digitisation: 130 markers stored as figure_only partial_pressure observations (SiO 25, Ca 32, TiO 21, TiO2 30, O 22).
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_figure1_kems_vapor_pressures
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_figure2a_casitio2_phase_diagram
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 1471
+    pdf_page_index: 2
+    figure: '2'
+  panel: a
+  attribution: Phase diagram according to [2], as printed in the caption
+  units: temperature K; x(TiO2) mole %
+  values:
+    quantity: equilibrium_phase_composition
+    species:
+    - CaSiO3
+    - CaTiO3
+    phase: phase fields and boundaries in the CaSiO3–CaTiO3 system
+    temperature_as_printed: T (K), plotted range 1600–2200
+    axes_as_printed:
+      x: x(TiO2), mole %
+      y: T, K
+    caption: Figure 2 phase diagram (a) for the CaSiO3–CaTiO3 system, shown according to [2].
+    series:
+    - name: 'I: liquid'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: 'II: β-CaSiO3 + liquid'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: 'III: CaTiO3 + liquid'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: 'IV: β-CaSiO3 + CaTiO3'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: continuous liquidus and solidus; no filled marker paths; not sampled.
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_figure2a_casitio2_phase_diagram
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_figure2b_casial2o4_phase_diagram
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 1471
+    pdf_page_index: 2
+    figure: '2'
+  panel: b
+  attribution: Phase diagram according to [32], as printed in the caption
+  units: temperature K; x(Al2O3) mole %
+  values:
+    quantity: equilibrium_phase_composition
+    species:
+    - CaSiO3
+    - CaAl2O4
+    phase: phase fields and boundaries in the CaSiO3–CaAl2O4 system
+    temperature_as_printed: T (K), plotted range 1500–1900
+    axes_as_printed:
+      x: x(Al2O3), mole %
+      y: T, K
+    caption: Figure 2 phase diagram (b) for the CaSiO3–CaAl2O4 system, shown according to [32].
+    series:
+    - name: 'I: liquid'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: 'II: β-CaSiO3 + liquid'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: 'III and IV: Ca2Al2SiO7 + liquid'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: 'V: CaAl2O4 + liquid'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: 'VI: β-CaSiO3 + Ca2Al2SiO7'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: 'VII: Ca2Al2SiO7 + CaAl2O4'
+      marker: phase-field label and boundary
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: continuous liquidus and solidus; no filled marker paths; not sampled.
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_figure2b_casial2o4_phase_diagram
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_figure2c_casitio2_oxide_activities
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 1471
+    pdf_page_index: 2
+    figure: '2'
+  panel: c
+  attribution: This work
+  units: log activity as printed; x(TiO2) mole %
+  values:
+    quantity: activity
+    digitised_as: figure_only activity observations on the named species
+    species:
+    - SiO2
+    - CaO
+    - TiO2
+    phase: liquid CaSiO3–CaTiO3 system melts
+    temperature_as_printed: 2100 K
+    axes_as_printed:
+      x: x(TiO2), mole %
+      y: log a(i)
+    caption: Activities of individual oxides in the CaSiO3–CaTiO3 system, obtained by the high-temperature mass-spectrometric
+      Knudsen effusion method in the present work at 2100 K.
+    series:
+    - name: SiO2
+      marker: filled circle
+      marker_count: 25
+      evidence_class: measured_reduced
+      standard_state_as_printed: Partial vapor pressure of the same vapor species over individual SiO2; physical phase of
+        the pure-oxide reference is not stated.
+      standard_state_locator:
+        page: 2
+        published_page: 1470
+        pdf_page_index: 1
+        section: Results and Discussion
+    - name: CaO
+      marker: filled square
+      marker_count: 27
+      evidence_class: measured_reduced
+      standard_state_as_printed: Partial vapor pressure of the same vapor species over individual CaO; physical phase of the
+        pure-oxide reference is not stated.
+      standard_state_locator:
+        page: 2
+        published_page: 1470
+        pdf_page_index: 1
+        section: Results and Discussion
+    - name: TiO2
+      marker: filled upward triangle
+      marker_count: 40
+      evidence_class: measured_reduced
+      standard_state_as_printed: Partial vapor pressure of the same vapor species over individual TiO2; physical phase of
+        the pure-oxide reference is not stated.
+      standard_state_locator:
+        page: 2
+        published_page: 1470
+        pdf_page_index: 1
+        section: Results and Discussion
+    digitisation: 92 markers stored as figure_only activity observations (SiO2 25, CaO 27, TiO2 40).
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_figure2c_casitio2_oxide_activities
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_figure2d_casial2o4_oxide_activities
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 1471
+    pdf_page_index: 2
+    figure: '2'
+  panel: d
+  attribution: Previous data [31], as printed in the caption
+  units: log activity as printed; x(Al2O3) mole %
+  values:
+    quantity: activity
+    digitised_as: figure_only activity observations on the named species
+    species:
+    - SiO2
+    - CaO
+    - Al2O3
+    phase: liquid CaSiO3–CaAl2O4 system melts
+    temperature_as_printed: 1933 K
+    axes_as_printed:
+      x: x(Al2O3), mole %
+      y: log a(i)
+    caption: Activities of individual oxides in the CaSiO3–CaAl2O4 system, previous data [31] at 1933 K.
+    series:
+    - name: SiO2
+      marker: filled circle
+      marker_count: 7
+      evidence_class: quoted_attributed
+      standard_state_as_printed: Not stated in this article for the previous-data series [31].
+    - name: CaO
+      marker: filled square
+      marker_count: 10
+      evidence_class: quoted_attributed
+      standard_state_as_printed: Not stated in this article for the previous-data series [31].
+    - name: Al2O3
+      marker: filled upward triangle
+      marker_count: 6
+      evidence_class: quoted_attributed
+      standard_state_as_printed: Not stated in this article for the previous-data series [31].
+    digitisation: 23 markers stored as figure_only activity observations (SiO2 7, CaO 10, Al2O3 6).
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_figure2d_casial2o4_oxide_activities
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_figure2e_casitio2_compound_activities
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 1471
+    pdf_page_index: 2
+    figure: '2'
+  panel: e
+  attribution: This work
+  units: log activity as printed; x(TiO2) mole %
+  values:
+    quantity: activity
+    digitised_as: figure_only activity observations on the named species
+    species:
+    - CaSiO3
+    - CaTiO3
+    phase: liquid CaSiO3–CaTiO3 system melts
+    temperature_as_printed: 2100 K
+    axes_as_printed:
+      x: x(TiO2), mole %
+      y: log a(i)
+    caption: Activities of compounds in the CaSiO3–CaTiO3 system, obtained by the high-temperature mass-spectrometric Knudsen
+      effusion method in the present work at 2100 K.
+    series:
+    - name: CaSiO3
+      marker: filled circle
+      marker_count: 22
+      evidence_class: measured_reduced
+      standard_state_as_printed: CaSiO3 and CaTiO3 were selected as standards for the CaSiO3–CaTiO3 section; the physical
+        state is not stated.
+      standard_state_locator:
+        page: 4
+        published_page: 1472
+        pdf_page_index: 3
+        section: Results and Discussion
+    - name: CaTiO3
+      marker: filled upward triangle
+      marker_count: 22
+      evidence_class: measured_reduced
+      standard_state_as_printed: CaSiO3 and CaTiO3 were selected as standards for the CaSiO3–CaTiO3 section; the physical
+        state is not stated.
+      standard_state_locator:
+        page: 4
+        published_page: 1472
+        pdf_page_index: 3
+        section: Results and Discussion
+    digitisation: 42 markers stored as figure_only activity observations (CaSiO3 21, CaTiO3 21). Two legend glyphs beside
+      numerals 1 and 2 are refused in the audit.
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_figure2e_casitio2_compound_activities
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_figure2f_casial2o4_compound_activities
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 1471
+    pdf_page_index: 2
+    figure: '2'
+  panel: f
+  attribution: Previous data [31], as printed in the caption
+  units: log activity as printed; x(Al2O3) mole %
+  values:
+    quantity: activity
+    digitised_as: figure_only activity observations on the named species
+    species:
+    - CaSiO3
+    - CaAl2O4
+    - Ca2Al2SiO8
+    phase: liquid CaSiO3–CaAl2O4 system melts
+    temperature_as_printed: 1933 K
+    axes_as_printed:
+      x: x(Al2O3), mole %
+      y: log a(i)
+    caption: Activities of compounds in the CaSiO3–CaAl2O4 system, previous data [31] at 1933 K.
+    series:
+    - name: CaSiO3
+      marker: filled circle
+      marker_count: 5
+      evidence_class: quoted_attributed
+      standard_state_as_printed: Calcium methasilicate and calcium methaaluminate were selected as standards for the CaSiO3–CaAl2O4
+        section; physical state is not stated.
+      standard_state_locator:
+        page: 4
+        published_page: 1472
+        pdf_page_index: 3
+        section: Results and Discussion
+    - name: CaAl2O4
+      marker: filled square
+      marker_count: 5
+      evidence_class: quoted_attributed
+      standard_state_as_printed: Calcium methasilicate and calcium methaaluminate were selected as standards for the CaSiO3–CaAl2O4
+        section; physical state is not stated.
+      standard_state_locator:
+        page: 4
+        published_page: 1472
+        pdf_page_index: 3
+        section: Results and Discussion
+    - name: Ca2Al2SiO8
+      marker: filled upward triangle
+      marker_count: 4
+      evidence_class: quoted_attributed
+      standard_state_as_printed: Not stated in this article for the Ca2Al2SiO8 activity in previous data [31].
+    digitisation: 14 markers stored as figure_only activity observations (CaSiO3 5, CaAl2O4 5, Ca2Al2SiO8 4).
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_figure2f_casial2o4_compound_activities
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_figure3_normalized_formation_gibbs_energy
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 1472
+    pdf_page_index: 3
+    figure: '3'
+  panel: whole_figure
+  attribution: Present work and cited works [32], as distinguished in the caption
+  units: dimensionless ΔfG/RT; x composition in mole %
+  values:
+    quantity: unavailable
+    schema_gap: The plotted ordinate is dimensionless ΔfG/RT; the delta_fG token represents energy and does not fit this normalized
+      quantity.
+    species:
+    - CaSiO3
+    - CaTiO3
+    - CaAl2O4
+    phase: liquid CaSiO3–CaTiO3 and CaSiO3–CaAl2O4 system melts
+    temperature_as_printed: Series 1 at 1933 K; series 2 at 2100 K
+    axes_as_printed:
+      x: x(TiO2, Al2O3), mole %
+      y: ΔfG / RT
+    caption: Gibbs energies of formation of CaSiO3–CaAl2O4 system melts (1) and CaSiO3–CaTiO3 system melts (2), determined
+      by the high-temperature mass-spectrometric Knudsen effusion method; series 1 is from [32] at 1933 K and series 2 is
+      from the present study at 2100 K.
+    series:
+    - series_id: '1'
+      name: CaSiO3–CaAl2O4 system
+      marker: filled circle
+      marker_count: 6
+      evidence_class: quoted_attributed
+      attribution: '[32]'
+    - series_id: '2'
+      name: CaSiO3–CaTiO3 system
+      marker: filled square
+      marker_count: 24
+      evidence_class: model_derived
+    digitisation: '30 data markers read in the audit sidecar (series 1, 6 circles; series 2, 24 squares). Not scored: the
+      ordinate is ΔfG/RT. Two legend glyphs refused.'
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_figure3_normalized_formation_gibbs_energy
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_kems_calibration_and_method
+  type: method
+  locator:
+    page: 1
+    published_page: 1469
+    pdf_page_index: 0
+    section: Annotation and Results and Discussion
+  units: partial pressure method and calibration standards
+  attribution: This work
+  values:
+    quantity: KEMS partial-pressure method
+    method_class: method_only
+    method_as_printed: Partial pressures were determined by the high-temperature mass-spectrometric Knudsen effusion method
+      using the Hertz–Knudsen equation and ion-current comparison. Partial coefficients of silica evaporation were taken into
+      account.
+    KEMS_calibration_standards_as_printed: Partial pressures of silver [28] and (SiO) over silica [23, 24] were used as standards;
+      the cross sections of molecules were calculated by the additivity rule from atomic cross sections [29].
+    temperature_range_as_printed: 1700–2500 K
+    composition_ranges_as_printed:
+      CaO: 30–50 mole %
+      SiO2: 16–60 mole %
+      TiO2: 5–50 mole %
+    candidate_token: equilibrium_phase_composition
+    composition_range_reason_context_only: The abstract describes experimental coverage ranges, not sample-specific compositions;
+      incomplete compositions are not reconstructed.
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_kems_calibration_and_method
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_model_activity_integration_limit
+  type: textual_fact
+  locator:
+    page: 2
+    published_page: 1470
+    pdf_page_index: 1
+    section: Results and Discussion
+  units: mole % TiO2; K
+  attribution: This work
+  values:
+    quantity: equilibrium_phase_composition
+    evidence_class: model_derived
+    candidate_token: equilibrium_phase_composition
+    quantity_as_printed: Integration limit x*(TiO2) for the CaO activity calculation
+    value_as_printed: 31.98 ± 0.15 mole % TiO2 at 2100 K
+    basis_as_printed: Found from consideration of the rules of evaporation in the CaO–TiO2–SiO2 system melts.
+    composition_as_printed:
+      system: CaO–TiO2–SiO2 melt
+      x_TiO2: 31.98 ± 0.15 mole %
+      other_components:
+        state: unknown
+        reason: Only the TiO2 coordinate of the multicomponent melt is printed here.
+    reason_context_only: Model-derived integration limit with an incomplete multicomponent composition; not a measured composition
+      observation.
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_model_activity_integration_limit
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2
+- observation_id: shornikov_2000_quoted_perovskite_liquidus_coordinate
+  type: textual_fact
+  locator:
+    page: 2
+    published_page: 1470
+    pdf_page_index: 1
+    section: Results and Discussion
+  units: mole % TiO2
+  attribution: '[2]'
+  values:
+    quantity: equilibrium_phase_composition
+    candidate_token: equilibrium_phase_composition
+    evidence_class: quoted_attributed
+    quantity_as_printed: TiO2 coordinate on the perovskite liquidus line
+    value_as_printed: 31.92 mole % TiO2
+    composition_as_printed:
+      system: CaO–TiO2–SiO2 melt
+      x_TiO2: 31.92 mole %
+      other_components:
+        state: unknown
+        reason: The cited value is only a TiO2 coordinate on the perovskite liquidus line.
+    relation_as_printed: The placement of the present-work integration limit on the perovskite liquidus line coincides with
+      the value obtained in [2].
+    reason_context_only: Quoted incomplete composition coordinate; the full multicomponent composition is not printed.
+  context_id: shornikov-2000-titania-melts::context::shornikov_2000_quoted_perovskite_liquidus_coordinate
+  work_id: c1aa08b4bd4fdde353c483ed92a92fa0016a0644fa4fd12aee5b02790fb06924
+  source_id: shornikov-2000-titania-melts
+  species: SiO2

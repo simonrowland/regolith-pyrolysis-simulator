@@ -6,7 +6,13 @@ source:
   corpus_asset: shornikov-1997-cao-alumina-vapor.pdf
   corpus_sha256: 77e3fd13ba6ce30de43945c4d80be1f439de1fa93dd7685f6f7dff91afe69d90
 extraction:
-  method: pdftotext -layout transcription checked against the rendered PDF page; Table 2 measured p(Ca), p(Al), and p(AlO) pressures retained, Table 1 relative ion signals retained as unscored context, Figs. 1–2 left figure-only. The printed p(O) and p(O2) columns are excluded because the paper calculates them from equilibria (1)–(3).
+  method: >-
+    pdftotext -layout transcription checked against rendered PDF pages. Table 2
+    pressure columns and Table 1 relative ion signals are retained as before.
+    Figure 1(a) marked comparison-series activities are digitized from the
+    600-dpi page render; the current-study curve and Figure 2 remain
+    figure-only. Tick calibration and raw pixel reads are in
+    crown4-1018-figure-read-audit.md.
   date: '2026-09-30'
   worker: codex
 review_status: draft
@@ -202,7 +208,6 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: pCa × 10^9
         pressure_atm_conversion: pressure_atm = printed pCa coefficient × 10^-9 atm
-        note: The printed p(O) and p(O2) columns are author-calculated from gas-phase equilibria (1)–(3), not measured partial pressures, and are not included in this extract.
         points:
         - CaO_mole_fraction_as_printed: '0.143'
           composition_mol: {CaO: '0.143', Al2O3: '0.857'}
@@ -747,27 +752,1739 @@ species:
         ionization_voltage_eV_as_printed: 70
         note: Mass-spectral signal only; Table 2 has no Al2O partial-pressure column. No partial pressure is inferred from ion intensity.
     observations: []
+  O:
+    observations:
+    - observation_id: shornikov_1997_o_pressure_eq1_table2_1933k
+      type: partial_pressure
+      locator:
+        table: '2'
+        published_page: 20
+        pdf_page_index: 1
+        note: 'Table 2 calculated oxygen pressure column at 1933 K.'
+      T_range_K: [1933.0, 1933.0]
+      phase: gas
+      reaction: 'MoO3(g) = MoO2(g) + O(g)'
+      reaction_as_printed: 'MoO3 = MoO2 + O'
+      standard_state: {tag: unknown, reason: 'not printed in this paper: gas reference pressure/state'}
+      reservoir: {tag: unknown, reason: 'not printed in this paper'}
+      experiment: shornikov-1997-mo-cell-kems
+      regime: kems_effusion
+      units: 'atm as printed; pressure_atm is printed coefficient times 10^-9 atm'
+      uncertainty:
+        note: 'No individual uncertainty is printed for these calculated pressure cells.'
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Shornikov, Stolyarova, and Shul’ts (1997), Table 2
+        generator: author-reported gas-equilibrium calculation
+        admission_status: admitted
+        method: thermodynamic equilibrium calculation
+        method_as_printed: "Author-calculated from gas equilibrium (1): pO = I(MoO3)+ σ(MoO2) / [I(MoO2)+ σ(MoO3)] × K1°(T), using thermodynamic data [40]."
+        composition_component: CaO–Al2O3 melt
+        composition_basis: mole fraction
+        temperature_K: 1933.0
+        pressure_scale_as_printed: 'pO × 10^9'
+        pressure_atm_conversion: 'pressure_atm = printed coefficient times 10^-9 atm'
+        points:
+        - CaO_mole_fraction_as_printed: '0.000'
+          composition_mol: {CaO: '0.000', Al2O3: '1.000'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '2.11'
+          pressure_atm: '2.11e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.000'
+                  - - Al2O3
+                    - '1.000'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.000; x(Al2O3)=1−x(CaO)=1.000 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.000; coefficient 2.11.'
+        - CaO_mole_fraction_as_printed: '0.143'
+          composition_mol: {CaO: '0.143', Al2O3: '0.857'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '2.24'
+          pressure_atm: '2.24e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.143'
+                  - - Al2O3
+                    - '0.857'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.143; x(Al2O3)=1−x(CaO)=0.857 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.143; coefficient 2.24.'
+        - CaO_mole_fraction_as_printed: '0.333'
+          composition_mol: {CaO: '0.333', Al2O3: '0.667'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '2.50'
+          pressure_atm: '2.5e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.333'
+                  - - Al2O3
+                    - '0.667'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.333; x(Al2O3)=1−x(CaO)=0.667 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.333; coefficient 2.50.'
+        - CaO_mole_fraction_as_printed: '0.500'
+          composition_mol: {CaO: '0.500', Al2O3: '0.500'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '2.63'
+          pressure_atm: '2.63e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.500'
+                  - - Al2O3
+                    - '0.500'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.500; x(Al2O3)=1−x(CaO)=0.500 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.500; coefficient 2.63.'
+        - CaO_mole_fraction_as_printed: '0.625'
+          composition_mol: {CaO: '0.625', Al2O3: '0.375'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '2.89'
+          pressure_atm: '2.89e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.625'
+                  - - Al2O3
+                    - '0.375'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.625; x(Al2O3)=1−x(CaO)=0.375 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.625; coefficient 2.89.'
+        - CaO_mole_fraction_as_printed: '0.632'
+          composition_mol: {CaO: '0.632', Al2O3: '0.368'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '3.03'
+          pressure_atm: '3.03e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.632'
+                  - - Al2O3
+                    - '0.368'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.632; x(Al2O3)=1−x(CaO)=0.368 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.632; coefficient 3.03.'
+        - CaO_mole_fraction_as_printed: '0.750'
+          composition_mol: {CaO: '0.750', Al2O3: '0.250'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '3.16'
+          pressure_atm: '3.16e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.750'
+                  - - Al2O3
+                    - '0.250'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.750; x(Al2O3)=1−x(CaO)=0.250 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.750; coefficient 3.16.'
+        - CaO_mole_fraction_as_printed: '0.860'
+          composition_mol: {CaO: '0.860', Al2O3: '0.140'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '3.25'
+          pressure_atm: '3.25e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.860'
+                  - - Al2O3
+                    - '0.140'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.860; x(Al2O3)=1−x(CaO)=0.140 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.860; coefficient 3.25.'
+        - CaO_mole_fraction_as_printed: '1.000'
+          composition_mol: {CaO: '1.000', Al2O3: '0.000'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq1_times_10^9_atm_as_printed: '3.51'
+          pressure_atm: '3.51e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '1.000'
+                  - - Al2O3
+                    - '0.000'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=1.000; x(Al2O3)=1−x(CaO)=0.000 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=1.000; coefficient 3.51.'
+    - observation_id: shornikov_1997_o_pressure_eq2_table2_1933k
+      type: partial_pressure
+      locator:
+        table: '2'
+        published_page: 20
+        pdf_page_index: 1
+        note: 'Table 2 calculated oxygen pressure column at 1933 K.'
+      T_range_K: [1933.0, 1933.0]
+      phase: gas
+      reaction: 'AlO(g) = Al(g) + O(g)'
+      reaction_as_printed: 'AlO = Al + O'
+      standard_state: {tag: unknown, reason: 'not printed in this paper: gas reference pressure/state'}
+      reservoir: {tag: unknown, reason: 'not printed in this paper'}
+      experiment: shornikov-1997-mo-cell-kems
+      regime: kems_effusion
+      units: 'atm as printed; pressure_atm is printed coefficient times 10^-9 atm'
+      uncertainty:
+        note: 'No individual uncertainty is printed for these calculated pressure cells.'
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Shornikov, Stolyarova, and Shul’ts (1997), Table 2
+        generator: author-reported gas-equilibrium calculation
+        admission_status: admitted
+        method: thermodynamic equilibrium calculation
+        method_as_printed: "Author-calculated from gas equilibrium (2): pO = I(AlO)+ σ(Al) / [I(Al)+ σ(AlO)] × K2°(T), using thermodynamic data [40]."
+        composition_component: CaO–Al2O3 melt
+        composition_basis: mole fraction
+        temperature_K: 1933.0
+        pressure_scale_as_printed: 'pO × 10^9'
+        pressure_atm_conversion: 'pressure_atm = printed coefficient times 10^-9 atm'
+        points:
+        - CaO_mole_fraction_as_printed: '0.000'
+          composition_mol: {CaO: '0.000', Al2O3: '1.000'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: '2.23'
+          pressure_atm: '2.23e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.000'
+                  - - Al2O3
+                    - '1.000'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.000; x(Al2O3)=1−x(CaO)=1.000 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.000; coefficient 2.23.'
+        - CaO_mole_fraction_as_printed: '0.143'
+          composition_mol: {CaO: '0.143', Al2O3: '0.857'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: '2.29'
+          pressure_atm: '2.29e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.143'
+                  - - Al2O3
+                    - '0.857'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.143; x(Al2O3)=1−x(CaO)=0.857 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.143; coefficient 2.29.'
+        - CaO_mole_fraction_as_printed: '0.333'
+          composition_mol: {CaO: '0.333', Al2O3: '0.667'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: '2.62'
+          pressure_atm: '2.62e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.333'
+                  - - Al2O3
+                    - '0.667'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.333; x(Al2O3)=1−x(CaO)=0.667 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.333; coefficient 2.62.'
+        - CaO_mole_fraction_as_printed: '0.500'
+          composition_mol: {CaO: '0.500', Al2O3: '0.500'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: '2.69'
+          pressure_atm: '2.69e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.500'
+                  - - Al2O3
+                    - '0.500'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.500; x(Al2O3)=1−x(CaO)=0.500 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.500; coefficient 2.69.'
+        - CaO_mole_fraction_as_printed: '0.625'
+          composition_mol: {CaO: '0.625', Al2O3: '0.375'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: '2.97'
+          pressure_atm: '2.97e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.625'
+                  - - Al2O3
+                    - '0.375'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.625; x(Al2O3)=1−x(CaO)=0.375 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.625; coefficient 2.97.'
+        - CaO_mole_fraction_as_printed: '0.632'
+          composition_mol: {CaO: '0.632', Al2O3: '0.368'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: '3.09'
+          pressure_atm: '3.09e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.632'
+                  - - Al2O3
+                    - '0.368'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.632; x(Al2O3)=1−x(CaO)=0.368 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.632; coefficient 3.09.'
+        - CaO_mole_fraction_as_printed: '0.750'
+          composition_mol: {CaO: '0.750', Al2O3: '0.250'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: '3.28'
+          pressure_atm: '3.28e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.750'
+                  - - Al2O3
+                    - '0.250'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.750; x(Al2O3)=1−x(CaO)=0.250 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.750; coefficient 3.28.'
+        - CaO_mole_fraction_as_printed: '0.860'
+          composition_mol: {CaO: '0.860', Al2O3: '0.140'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: '3.30'
+          pressure_atm: '3.3e-9'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.860'
+                  - - Al2O3
+                    - '0.140'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.860; x(Al2O3)=1−x(CaO)=0.140 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.860; coefficient 3.30.'
+        - CaO_mole_fraction_as_printed: '1.000'
+          composition_mol: {CaO: '1.000', Al2O3: '0.000'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O_by_eq2_times_10^9_atm_as_printed: null
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '1.000'
+                  - - Al2O3
+                    - '0.000'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=1.000; x(Al2O3)=1−x(CaO)=0.000 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=1.000; the pO column prints an em dash.'
+  O2:
+    observations:
+    - observation_id: shornikov_1997_o2_pressure_table2_1933k
+      type: partial_pressure
+      locator:
+        table: '2'
+        published_page: 20
+        pdf_page_index: 1
+        note: 'Table 2 calculated oxygen pressure column at 1933 K.'
+      T_range_K: [1933.0, 1933.0]
+      phase: gas
+      reaction: 'O2(g) = 2 O(g)'
+      reaction_as_printed: '(O2) = 2(O)'
+      standard_state: {tag: unknown, reason: 'not printed in this paper: gas reference pressure/state'}
+      reservoir: {tag: unknown, reason: 'not printed in this paper'}
+      experiment: shornikov-1997-mo-cell-kems
+      regime: kems_effusion
+      units: 'atm as printed; pressure_atm is printed coefficient times 10^-11 atm'
+      uncertainty:
+        note: 'No individual uncertainty is printed for these calculated pressure cells.'
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Shornikov, Stolyarova, and Shul’ts (1997), Table 2
+        generator: author-reported gas-equilibrium calculation
+        admission_status: admitted
+        method: thermodynamic equilibrium calculation
+        method_as_printed: "Author-calculated using gas equilibrium (3), O2 = 2O, and thermodynamic data [40]. The paper does not identify which atomic-O estimate is used as input."
+        composition_component: CaO–Al2O3 melt
+        composition_basis: mole fraction
+        temperature_K: 1933.0
+        pressure_scale_as_printed: 'pO2 × 10^11'
+        pressure_atm_conversion: 'pressure_atm = printed coefficient times 10^-11 atm'
+        points:
+        - CaO_mole_fraction_as_printed: '0.000'
+          composition_mol: {CaO: '0.000', Al2O3: '1.000'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '2.91'
+          pressure_atm: '2.91e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.000'
+                  - - Al2O3
+                    - '1.000'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.000; x(Al2O3)=1−x(CaO)=1.000 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.000; coefficient 2.91.'
+        - CaO_mole_fraction_as_printed: '0.143'
+          composition_mol: {CaO: '0.143', Al2O3: '0.857'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '3.29'
+          pressure_atm: '3.29e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.143'
+                  - - Al2O3
+                    - '0.857'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.143; x(Al2O3)=1−x(CaO)=0.857 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.143; coefficient 3.29.'
+        - CaO_mole_fraction_as_printed: '0.333'
+          composition_mol: {CaO: '0.333', Al2O3: '0.667'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '4.09'
+          pressure_atm: '4.09e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.333'
+                  - - Al2O3
+                    - '0.667'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.333; x(Al2O3)=1−x(CaO)=0.667 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.333; coefficient 4.09.'
+        - CaO_mole_fraction_as_printed: '0.500'
+          composition_mol: {CaO: '0.500', Al2O3: '0.500'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '4.53'
+          pressure_atm: '4.53e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.500'
+                  - - Al2O3
+                    - '0.500'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.500; x(Al2O3)=1−x(CaO)=0.500 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.500; coefficient 4.53.'
+        - CaO_mole_fraction_as_printed: '0.625'
+          composition_mol: {CaO: '0.625', Al2O3: '0.375'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '5.47'
+          pressure_atm: '5.47e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.625'
+                  - - Al2O3
+                    - '0.375'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.625; x(Al2O3)=1−x(CaO)=0.375 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.625; coefficient 5.47.'
+        - CaO_mole_fraction_as_printed: '0.632'
+          composition_mol: {CaO: '0.632', Al2O3: '0.368'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '6.01'
+          pressure_atm: '6.01e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.632'
+                  - - Al2O3
+                    - '0.368'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.632; x(Al2O3)=1−x(CaO)=0.368 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.632; coefficient 6.01.'
+        - CaO_mole_fraction_as_printed: '0.750'
+          composition_mol: {CaO: '0.750', Al2O3: '0.250'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '6.54'
+          pressure_atm: '6.54e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.750'
+                  - - Al2O3
+                    - '0.250'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.750; x(Al2O3)=1−x(CaO)=0.250 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.750; coefficient 6.54.'
+        - CaO_mole_fraction_as_printed: '0.860'
+          composition_mol: {CaO: '0.860', Al2O3: '0.140'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '6.92'
+          pressure_atm: '6.92e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.860'
+                  - - Al2O3
+                    - '0.140'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=0.860; x(Al2O3)=1−x(CaO)=0.140 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=0.860; coefficient 6.92.'
+        - CaO_mole_fraction_as_printed: '1.000'
+          composition_mol: {CaO: '1.000', Al2O3: '0.000'}
+          T_C: '1659.85'
+          T_K: 1933.0
+          P_O2_times_10^11_atm_as_printed: '8.07'
+          pressure_atm: '8.07e-11'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '1.000'
+                  - - Al2O3
+                    - '0.000'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: "Printed x(CaO)=1.000; x(Al2O3)=1−x(CaO)=0.000 is the binary complement."
+            temperature_K:
+              state: {tag: value, value: 1933.0}
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: 'Table 2 heading: partial pressures at 1933 K.'
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: 'Table 2 row x(CaO)=1.000; coefficient 8.07.'
   CaO:
     observations:
     - observation_id: shornikov_1997_cao_activities_fig1_figure_only
       type: activity_coefficient
       locator:
         figure: '1'
+        panel: 'a'
         published_page: 21
         pdf_page_index: 2
-        note: This-work KEMS curve (1) at 1933 K; figure also compares earlier measurements and models.
-      T_range_K:
-      - 1933.0
-      - 1933.0
+        note: "This-work KEMS curve (1) at 1933 K; unmarked curve retained as typed figure-only evidence."
+      T_range_K: [1933.0, 1933.0]
       phase: CaO–Al2O3 melt
       regime: kems_effusion
-      units: dimensionless activity as plotted
+      units: dimensionless activity
       values:
-        quantity: CaO_activity_figure_only
+        quantity: activity
         method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: Figure 1 is not digitized; the CaO activity is reduced from measured partial pressures by the comparison method.
+        status: typed_refusal
+        reason: unmarked curve not digitized
+        activity: null
+        unavailable_reason: unmarked_curve_not_digitized
+    - observation_id: shornikov_1997_cao_fig1_series3_sulfide_1773k
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: 'a'
+        symbol: filled circles
+        published_page: 21
+        pdf_page_index: 2
+        note: "Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only."
+      T_range_K: [1773.0, 1773.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        composition_component: CaO
+        composition_basis: figure_axis_mole_percent
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        series: "Series 3; filled circles; reference [31]"
+        points:
+          - CaO_mole_percent_as_plotted: '58.13'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.5813'
+              Al2O3: '0.4187'
+            activity: 0.20
+            read_uncertainty_dex: 0.001121
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.5813']
+                    - [Al2O3, '0.4187']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=58.13 mole%; -log10(a_CaO)=0.690; independent pixel reads (1665.00,927.00) and (1665.00,927.00); read uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-01."
+          - CaO_mole_percent_as_plotted: '60.12'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.6012'
+              Al2O3: '0.3988'
+            activity: 0.25
+            read_uncertainty_dex: 0.001121
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.6012']
+                    - [Al2O3, '0.3988']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=60.12 mole%; -log10(a_CaO)=0.609; independent pixel reads (1710.00,891.00) and (1710.00,891.00); read uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-02."
+          - CaO_mole_percent_as_plotted: '61.97'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.6197'
+              Al2O3: '0.3803'
+            activity: 0.30
+            read_uncertainty_dex: 0.001121
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.6197']
+                    - [Al2O3, '0.3803']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=61.97 mole%; -log10(a_CaO)=0.529; independent pixel reads (1752.00,855.00) and (1752.00,855.00); read uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-03."
+          - CaO_mole_percent_as_plotted: '63.82'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.6382'
+              Al2O3: '0.3618'
+            activity: 0.37
+            read_uncertainty_dex: 0.001121
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.6382']
+                    - [Al2O3, '0.3618']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=63.82 mole%; -log10(a_CaO)=0.428; independent pixel reads (1794.00,810.00) and (1794.00,810.00); read uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-04."
+          - CaO_mole_percent_as_plotted: '65.94'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.6594'
+              Al2O3: '0.3406'
+            activity: 0.49
+            read_uncertainty_dex: 0.001121
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.6594']
+                    - [Al2O3, '0.3406']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=65.94 mole%; -log10(a_CaO)=0.313; independent pixel reads (1842.00,759.00) and (1842.00,759.00); read uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-05."
+          - CaO_mole_percent_as_plotted: '68.19'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.6819'
+              Al2O3: '0.3181'
+            activity: 0.64
+            read_uncertainty_dex: 0.001121
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-06
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.6819']
+                    - [Al2O3, '0.3181']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=68.19 mole%; -log10(a_CaO)=0.192; independent pixel reads (1893.00,705.00) and (1893.00,705.00); read uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-06."
+          - CaO_mole_percent_as_plotted: '70.97'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.7097'
+              Al2O3: '0.2903'
+            activity: 0.90
+            read_uncertainty_dex: 0.001121
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-07
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.7097']
+                    - [Al2O3, '0.2903']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=70.97 mole%; -log10(a_CaO)=0.044; independent pixel reads (1956.00,639.00) and (1956.00,639.00); read uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-07."
+
+    - observation_id: shornikov_1997_cao_fig1_series4_sulfide_1873k
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: 'a'
+        symbol: filled squares
+        published_page: 21
+        pdf_page_index: 2
+        note: "Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only."
+      T_range_K: [1873.0, 1873.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        composition_component: CaO
+        composition_basis: figure_axis_mole_percent
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        series: "Series 4; filled squares; reference [34]"
+        points:
+          - CaO_mole_percent_as_plotted: '14.43'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.1443'
+              Al2O3: '0.8557'
+            activity: 0.010
+            read_uncertainty_dex: 0.000011
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.1443']
+                    - [Al2O3, '0.8557']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=14.43 mole%; -log10(a_CaO)=1.994; independent pixel reads (674.36,1508.36) and (674.37,1508.37); read uncertainty 0.000011 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-01."
+          - CaO_mole_percent_as_plotted: '33.33'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.3333'
+              Al2O3: '0.6667'
+            activity: 0.025
+            read_uncertainty_dex: 0.001121
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3333']
+                    - [Al2O3, '0.6667']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=33.33 mole%; -log10(a_CaO)=1.597; independent pixel reads (1102.93,1331.50) and (1102.88,1331.50); read uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-02."
+          - CaO_mole_percent_as_plotted: '50.35'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.5035'
+              Al2O3: '0.4965'
+            activity: 0.11
+            read_uncertainty_dex: 0.000022
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.5035']
+                    - [Al2O3, '0.4965']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=50.35 mole%; -log10(a_CaO)=0.975; independent pixel reads (1488.65,1054.25) and (1488.58,1054.23); read uncertainty 0.000022 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-03."
+          - CaO_mole_percent_as_plotted: '60.12'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.6012'
+              Al2O3: '0.3988'
+            activity: 0.33
+            read_uncertainty_dex: 0.000034
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.6012']
+                    - [Al2O3, '0.3988']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=60.12 mole%; -log10(a_CaO)=0.482; independent pixel reads (1710.08,834.36) and (1710.14,834.39); read uncertainty 0.000034 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-04."
+          - CaO_mole_percent_as_plotted: '63.27'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.6327'
+              Al2O3: '0.3673'
+            activity: 0.47
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.6327']
+                    - [Al2O3, '0.3673']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=63.27 mole%; -log10(a_CaO)=0.332; independent pixel reads (1781.50,767.44) and (1781.50,767.50); read uncertainty 0.0001 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-05."
+          - CaO_mole_percent_as_plotted: '75.04'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.7504'
+              Al2O3: '0.2496'
+            activity: 0.91
+            read_uncertainty_dex: 0.000034
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-06
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.7504']
+                    - [Al2O3, '0.2496']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=75.04 mole%; -log10(a_CaO)=0.043; independent pixel reads (2048.17,638.38) and (2048.20,638.41); read uncertainty 0.000034 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-06."
+
+    - observation_id: shornikov_1997_cao_fig1_series5_emf_1773k
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: 'a'
+        symbol: open triangles
+        published_page: 21
+        pdf_page_index: 2
+        note: "Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only."
+      T_range_K: [1773.0, 1773.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        composition_component: CaO
+        composition_basis: figure_axis_mole_percent
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        series: "Series 5; open triangles; reference [18]"
+        points:
+          - CaO_mole_percent_as_plotted: '14.48'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.1448'
+              Al2O3: '0.8552'
+            activity: 0.0057
+            read_uncertainty_dex: 0.0010
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.1448']
+                    - [Al2O3, '0.8552']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=14.48 mole%; -log10(a_CaO)=2.242; independent pixel reads (675.55,1619.08) and (675.50,1620.00); read uncertainty 0.0010 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-01."
+          - CaO_mole_percent_as_plotted: '33.39'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.3339'
+              Al2O3: '0.6661'
+            activity: 0.031
+            read_uncertainty_dex: 0.0008
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.3339']
+                    - [Al2O3, '0.6661']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=33.39 mole%; -log10(a_CaO)=1.502; independent pixel reads (1104.13,1289.25) and (1104.50,1290.00); read uncertainty 0.0008 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-02."
+          - CaO_mole_percent_as_plotted: '50.30'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.503'
+              Al2O3: '0.497'
+            activity: 0.089
+            read_uncertainty_dex: 0.0006
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.503']
+                    - [Al2O3, '0.497']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=50.30 mole%; -log10(a_CaO)=1.052; independent pixel reads (1487.46,1088.48) and (1487.50,1089.00); read uncertainty 0.0006 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-03."
+          - CaO_mole_percent_as_plotted: '63.01'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.6301'
+              Al2O3: '0.3699'
+            activity: 0.24
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.6301']
+                    - [Al2O3, '0.3699']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=63.01 mole%; -log10(a_CaO)=0.618; independent pixel reads (1775.55,894.89) and (1775.50,895.00); read uncertainty 0.0001 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-04."
+          - CaO_mole_percent_as_plotted: '70.78'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.7078'
+              Al2O3: '0.2922'
+            activity: 0.56
+            read_uncertainty_dex: 0.0006
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.7078']
+                    - [Al2O3, '0.2922']
+                locator:
+                  page: 3
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: a
+                  note: "x(CaO)=70.78 mole%; -log10(a_CaO)=0.248; independent pixel reads (1951.74,729.97) and (1952.50,730.50); read uncertainty 0.0006 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-05."
+
+    - observation_id: shornikov_1997_cao_fig1_curve2_2060k_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: a
+        published_page: 21
+        pdf_page_index: 2
+        note: "Curve (2) of Fig. 1(a), comparison at 2060 K, reference [4]. The caption names no marker symbol for this curve."
+      T_range_K: [2060.0, 2060.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        status: typed_refusal
+        reason: unmarked curve not digitized
+        activity: null
+        unavailable_reason: unmarked_curve_not_digitized
+        curve_as_printed: '2'
+        temperature_as_printed_K: 2060
+    - observation_id: shornikov_1997_cao_fig1_curve6_monte_carlo_1773k_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: a
+        published_page: 21
+        pdf_page_index: 2
+        note: "Curve (6) of Fig. 1(a), Monte Carlo calculation at 1773 K, reference [41]."
+      T_range_K: [1773.0, 1773.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        status: typed_refusal
+        reason: calculated curve not digitized
+        activity: null
+        unavailable_reason: calculated_curve_not_digitized
+        curve_as_printed: '6'
+        temperature_as_printed_K: 1773
+    - observation_id: shornikov_1997_cao_fig1_curve7_associated_1873k_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: a
+        published_page: 21
+        pdf_page_index: 2
+        note: "Curve (7) of Fig. 1(a), associated-solution calculation at 1873 K, reference [42]."
+      T_range_K: [1873.0, 1873.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        status: typed_refusal
+        reason: calculated curve not digitized
+        activity: null
+        unavailable_reason: calculated_curve_not_digitized
+        curve_as_printed: '7'
+        temperature_as_printed_K: 1873
+    - observation_id: shornikov_1997_cao_fig1_curve8_associated_1773k_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: a
+        published_page: 21
+        pdf_page_index: 2
+        note: "Curve (8) of Fig. 1(a), associated-solution calculation at 1773 K, reference [43]."
+      T_range_K: [1773.0, 1773.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        status: typed_refusal
+        reason: calculated curve not digitized
+        activity: null
+        unavailable_reason: calculated_curve_not_digitized
+        curve_as_printed: '8'
+        temperature_as_printed_K: 1773
+    - observation_id: shornikov_1997_cao_fig1_curve9_polymer_1773k_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: a
+        published_page: 21
+        pdf_page_index: 2
+        note: "Curve (9) of Fig. 1(a), polymer-model calculation at 1773 K, reference [44]."
+      T_range_K: [1773.0, 1773.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        status: typed_refusal
+        reason: calculated curve not digitized
+        activity: null
+        unavailable_reason: calculated_curve_not_digitized
+        curve_as_printed: '9'
+        temperature_as_printed_K: 1773
   Al2O3:
     observations:
     - observation_id: shornikov_1997_al2o3_activities_fig1_figure_only

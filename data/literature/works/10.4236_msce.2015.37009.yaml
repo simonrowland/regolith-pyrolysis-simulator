@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-040-stolyarova-2015
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-040-stolyarova-2015
-      role: table_csv
-      path: tables/kems-040-stolyarova-2015
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-040-stolyarova-2015
       role: pdftotext
       path: unknown
@@ -68,7 +62,7 @@ experiments:
   locator:
     page: 82
     table: '1'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-040-stolyarova-2015/tables.md
+    source_path: text/kems-040-stolyarova-2015/ocr-repair/kems-040-stolyarova-2015.md
   apparatus:
     cell_material_and_liner:
       state:

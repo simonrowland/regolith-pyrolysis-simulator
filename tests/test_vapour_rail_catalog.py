@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import sys
 from types import SimpleNamespace
+import zlib
 
 import pytest
 import yaml
@@ -491,8 +492,12 @@ def test_require_git_history_skips_only_missing_history(
 ) -> None:
     from tests import git_history
 
-    def completed(returncode: int = 0, stderr: str = "") -> subprocess.CompletedProcess:
-        return subprocess.CompletedProcess([], returncode, "true\n", stderr)
+    def completed(
+        returncode: int = 0,
+        stderr: str = "",
+        stdout: str = "true\n",
+    ) -> subprocess.CompletedProcess:
+        return subprocess.CompletedProcess([], returncode, stdout, stderr)
 
     def run_results(results):
         remaining = iter(results)
@@ -508,7 +513,9 @@ def test_require_git_history_skips_only_missing_history(
         return fake_run
 
     monkeypatch.setattr(
-        git_history.subprocess, "run", run_results((completed(), completed()))
+        git_history.subprocess,
+        "run",
+        run_results((completed(), completed(stdout="commit\n"))),
     )
     try:
         require_git_history(tmp_path, "reachable")
@@ -526,10 +533,35 @@ def test_require_git_history_skips_only_missing_history(
     monkeypatch.setattr(
         git_history.subprocess,
         "run",
-        run_results((completed(), completed(128, "fatal: unknown revision"))),
+        run_results(
+            (
+                completed(),
+                completed(128, "fatal: unknown revision"),
+                completed(stdout=""),
+            )
+        ),
     )
     with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
         require_git_history(tmp_path, "unreachable")
+
+    monkeypatch.setattr(
+        git_history.subprocess,
+        "run",
+        run_results(
+            (
+                completed(),
+                completed(
+                    128,
+                    "error: short object ID deadbee is ambiguous\n"
+                    "fatal: Needed a single revision\n",
+                ),
+                completed(stdout="deadbeef00000000000000000000000000000000\n"),
+            )
+        ),
+    )
+    with pytest.raises(subprocess.CalledProcessError) as error:
+        require_git_history(tmp_path, "deadbee")
+    assert "ambiguous" in (error.value.stderr or "")
 
     def other_error(*_args, **_kwargs):
         raise subprocess.CalledProcessError(
@@ -545,6 +577,81 @@ def test_require_git_history_skips_only_missing_history(
         assert raised.stderr == "fatal: permission denied"
     else:
         pytest.fail("unrelated Git error should propagate")
+
+
+def _init_history_repo(root: Path) -> Path:
+    root.mkdir()
+    subprocess.run(
+        ["git", "-C", str(root), "init", "-q"],
+        capture_output=True,
+        check=True,
+    )
+    return root
+
+
+def _history_git(root: Path, *args: str, input: bytes | None = None) -> bytes:
+    return subprocess.run(
+        ["git", "-C", str(root), *args],
+        input=input,
+        capture_output=True,
+        check=True,
+    ).stdout
+
+
+def _write_ambiguous_history_objects(root: Path) -> str:
+    tree = _history_git(root, "mktree", input=b"").decode().strip()
+    seen: dict[str, tuple[str, bytes]] = {}
+    for counter in range(100_000):
+        body = (
+            f"tree {tree}\n"
+            "author History test <history@example.invalid> 0 +0000\n"
+            f"committer History test <history@example.invalid> {counter} +0000\n"
+            f"\nambiguous history object {counter}\n"
+        ).encode("utf-8")
+        raw = f"commit {len(body)}\0".encode("ascii") + body
+        object_id = hashlib.sha1(raw).hexdigest()
+        prefix = object_id[:7]
+        previous = seen.get(prefix)
+        if previous is not None:
+            for candidate_id, candidate_raw in (previous, (object_id, raw)):
+                object_path = (
+                    root / ".git" / "objects" / candidate_id[:2] / candidate_id[2:]
+                )
+                object_path.parent.mkdir(parents=True, exist_ok=True)
+                object_path.write_bytes(zlib.compress(candidate_raw))
+            return prefix
+        seen[prefix] = object_id, raw
+    pytest.fail("could not generate an ambiguous seven-character Git prefix")
+
+
+def test_require_git_history_skips_absent_object_in_tmp_repo(tmp_path: Path) -> None:
+    repo = _init_history_repo(tmp_path / "missing-history")
+
+    with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
+        require_git_history(repo, "f" * 40)
+
+
+def test_require_git_history_rejects_blob_object_in_tmp_repo(tmp_path: Path) -> None:
+    repo = _init_history_repo(tmp_path / "blob-history")
+    blob = _history_git(repo, "hash-object", "-w", "--stdin", input=b"not a commit\n")
+    blob_id = blob.decode().strip()
+
+    with pytest.raises(ValueError, match="not a commit"):
+        require_git_history(repo, blob_id)
+
+
+def test_require_git_history_rejects_ambiguous_ack_prefix_in_tmp_repo(
+    tmp_path: Path,
+) -> None:
+    repo = _init_history_repo(tmp_path / "ambiguous-history")
+    ack_dir = repo / "scripts" / "store_neutral_acks"
+    ack_dir.mkdir(parents=True)
+    prefix = _write_ambiguous_history_objects(repo)
+    ack = ack_dir / f"{prefix}.txt"
+    ack.write_text("ambiguous prefix test receipt\n", encoding="utf-8")
+
+    with pytest.raises(subprocess.CalledProcessError):
+        require_git_history(repo, ack.stem)
 
 
 def test_t622_oxidative_window_envelope_evidence_is_reproducible(
@@ -1649,16 +1756,8 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
     )
 
 
-def test_alo2_pathological_fO2_no_longer_explodes() -> None:
-    """b-148: AlO2 must not reach ~1e63 Pa when fed the 1e300 pO2 sentinel.
-
-    Hand algebra of the pre-fix path:
-      P = P_ref(a=1, pO2_ref=1) * a * (pO2 / pO2_ref)^0.25
-      with pO2 = 1e300 → (1e300)^0.25 = 1e75, so unit-ref ~1e-8 Pa → ~1e67 Pa.
-    After the physical pO2 envelope clamp, the same call is bounded by
-    (100 bar)^0.25 ≈ 3.2 and must stay far below 1e9 Pa.
-    """
-    from simulator.physical_constants import CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+def test_alo2_extreme_oxygen_is_predicted_and_flagged() -> None:
+    """Finite oxygen remains the input even far outside the evaluator band."""
 
     catalog = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
@@ -1672,16 +1771,25 @@ def test_alo2_pathological_fO2_no_longer_explodes() -> None:
     assert unit.pressure_pa < 1.0e-3
     assert unit.pressure_pa > 0.0
 
-    # Pathological fO2 sentinel that previously produced ~1e63–1e66 Pa dumps.
+    # Al2O3(l) + 1/2 O2(g) -> 2 AlO2(g) gives P_AlO2 proportional to
+    # pO2**(1/4) at fixed T/activity. From 100 to 1e300 bar, the dimensionless
+    # oxygen ratio is 1e298, hence 298/4 = 74.5 pressure decades. The same
+    # expression continues through the band edge; the notice limits evidence.
     exploded = evaluator.evaluate(
         1800.0 + 273.15, source_activity=0.1, pO2_bar=1.0e300
     )
-    assert exploded.pressure_pa < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
-    # And must be within a few dex of the unit-ref * a * (100)^0.25 bound.
     capped = evaluator.evaluate(
         1800.0 + 273.15, source_activity=0.1, pO2_bar=100.0
     )
-    assert exploded.pressure_pa == pytest.approx(capped.pressure_pa, rel=0.0, abs=0.0)
+    assert math.isfinite(exploded.pressure_pa)
+    assert math.log10(exploded.pressure_pa / capped.pressure_pa) == pytest.approx(74.5)
+    notice = exploded.extrapolation_notice
+    assert notice["reason"] == "pO2_outside_evaluator_band"
+    assert notice["pO2_bar_used"] == 1e300
+    assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["was_clamped"] is False
+    assert capped.extrapolation_notice is None
 
 
 def test_physical_melt_dissociation_pO2_bar_clamps_sentinel() -> None:

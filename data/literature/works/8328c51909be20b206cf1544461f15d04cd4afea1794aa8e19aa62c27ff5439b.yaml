@@ -1,0 +1,177 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b
+  citation: Shornikov, S. I., and Golyapa, E. S. (2023). Thermodynamic properties of the MgO–P4O10 melts. Experiment in Geosciences,
+    29(1), 60–62.
+  source_ids:
+  - shornikov-2023-mgo-phosphate-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2023-mgo-phosphate-melts
+      role: pdf
+      path: raw/shornikov-2023-mgo-phosphate-melts/shornikov-2023-mgo-phosphate-melts.pdf
+      sha256:
+        tag: value
+        value: 30f8d7addc009d6e290c92b4a761ea9d58d18532e22f04dea51d215be780d431
+    - asset_id: pdftotext:shornikov-2023-mgo-phosphate-melts
+      role: pdftotext
+      path: text/shornikov-2023-mgo-phosphate-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2023-mgo-phosphate-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Symbols on Figs. 2 and 3 are Ding et al. (2015), Oetting and McDonald (1963), Lopatin et al. (1986) and
+      Lopatin and Semenov (1989). They are not measurements of this article.' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b
+  locator:
+    page: 5
+    published_page: 62
+    pdf_page_index: 4
+    figure: '2'
+- experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Semi-empirical model, 600–1800 K, described in Shornikov (2019). Oxide activities, mixing energies and
+      partial pressures are calculated. Parents are the cited ΔG° compilations, not printed per point.' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    section: Abstract
+context:
+- observation_id: shornikov_2023_mgo_fig1_phase_diagram
+  type: thermodynamic_example
+  units: not an activity
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 61
+    figure: '1'
+  values:
+    admission_status: refused
+    reason: Fig. 1 is the phase diagram according to Ding et al. (2015). Congruent melting temperatures 1630, 1658, 1438 and
+      1183 K and the 1328 K Mg3P2O8 transition are cited from Berak (1958), not measured here.
+  context_id: shornikov-2023-mgo-phosphate-melts::context::shornikov_2023_mgo_fig1_phase_diagram
+  work_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b
+  source_id: shornikov-2023-mgo-phosphate-melts
+  species: MgO
+- observation_id: shornikov_2023_mgo_fig2_mixing_curves
+  type: thermodynamic_example
+  units: kJ/mol
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 62
+    figure: '2'
+    panel: B
+  values:
+    admission_status: refused
+    reason: Panel B curves 9–11 are mixing energies. Curve 9 is calculated in this study and has no discrete markers. Curves
+      10 and 11 are Ding et al. (2015) and Lopatin and Semenov (1989). The prose minimum is the stored number. Coordinates
+      were not read.
+  context_id: shornikov-2023-mgo-phosphate-melts::context::shornikov_2023_mgo_fig2_mixing_curves
+  work_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b
+  source_id: shornikov-2023-mgo-phosphate-melts
+  species: MgO
+- observation_id: shornikov_2023_mgo_mixing_energy_minimum
+  type: thermodynamic_example
+  units: kJ/mol
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 61
+    section: Results
+    figure: '2'
+  values:
+    quantity: minimum mixing energy
+    method_class: quoted_attributed
+    temperature_K: 1673
+    composition: MgP2O6
+    mixing_energy_kJ_mol: '-175'
+    sentence_as_published: The minimum value of mixing energy in the MgO–P4O10 melts at 1673 K is in the composition region
+      close to MgP2O6 and is equal to –175 kJ/mol.
+    reference_phase: Mixing energy in the melt. The article gives ΔG° of MgO and P4O10 in both the crystalline and liquid
+      phases as model inputs. The reference phase is not stated.
+  context_id: shornikov-2023-mgo-phosphate-melts::context::shornikov_2023_mgo_mixing_energy_minimum
+  work_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b
+  source_id: shornikov-2023-mgo-phosphate-melts
+  species: MgO
+- observation_id: shornikov_2023_mgo_vapor_species
+  type: thermodynamic_example
+  units: not printed as a pressure
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 61
+    section: Results
+  values:
+    species_as_printed: Mg, Mg2, MgO, P, P2, P3, P4, PO, PO2, P2O3, P2O4, P2O5, P3O6, P4O6, P4O7, P4O8, P4O9, P4O10, MgPO2,
+      MgPO3, O, O2, O3, O4
+    reason: The list is the vapor set used in the equilibrium calculation. No numerical partial pressure is printed in the
+      text.
+  context_id: shornikov-2023-mgo-phosphate-melts::context::shornikov_2023_mgo_vapor_species
+  work_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b
+  source_id: shornikov-2023-mgo-phosphate-melts
+  species: MgO

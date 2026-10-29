@@ -22,14 +22,19 @@ import time
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_FLOOR
+from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence
 
+import yaml
+
+from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
+    AmountBasis,
     Authority,
     CellMaterial,
     CONDENSED_PHASES,
@@ -37,17 +42,26 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    Fo2Mode,
     FORMATION_QUANTITIES,
+    FUSION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
     MEASURED_EVIDENCE,
     MELT_ACTIVITY_QUANTITIES,
     MetricOperation,
     MethodToken,
     NoticeKind,
+    PHASE_BASIS_TOKENS,
+    PHASE_COMPOSITION_QUANTITIES,
+    PRINTED_CAPACITY_QUANTITIES,
     PerBasis,
     Phase,
+    PhaseRole,
     Polymorph,
+    PolymorphRejectionKind,
     PURE_STANDARD_THERMO,
+    QuenchDirection,
+    QuenchState,
     Quantity,
     ReferenceStateConvention,
     Rail,
@@ -55,6 +69,8 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     UncertaintyKind,
+    ValenceDenominatorKind,
+    ValenceValueForm,
     VAPORIZATION_ENTHALPIES,
     ValueKind,
     residual_status_token,
@@ -62,12 +78,26 @@ from simulator.battery.enums import (
 from simulator.battery.identity import (
     Identity,
     IdentityEqualKind,
+    IdentityEqualOutcome,
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
+    _AXIS_NAMES,
     identity_equal,
+    _identity_equal,
+    _same_row_redox_identity_equal,
+    _same_row_knudsen_residue_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     profile_for,
     quantity_token,
+)
+from simulator.battery.source_oxygen import (
+    CO_MEASURED_CONSISTENCY_ORIGIN,
+    SourceOxygenCondition,
+    linked_source_pressure,
+    oxygen_pressure_point,
+    printed_source_pressure,
+    resolve_source_oxygen,
+    source_oxygen_closure_notice,
 )
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.battery.migrate import (
@@ -75,10 +105,18 @@ from simulator.battery.migrate import (
     canonicalize_rail,
     iter_observation_store_paths,
     load_migrated_benches,
+    load_migrated_context,
     load_migrated_store,
     load_yaml,
+    _convert_compilation_amount,
+    _log_fO2_to_pa,
+    convert_areal_mass_to_kg_per_m2,
+    convert_pressure_to_pa,
+    fe3_fe2_ratio_from_ferric_fraction,
+    fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
     path_matches_source_tokens,
+    phase_for_sample_form,
     source_filter_tokens,
     to_plain,
 )
@@ -105,36 +143,52 @@ from simulator.battery.records import (
     Work,
     _is_source_internally_inconsistent,
     as_decimal,
+    charge_value,
     phase_token,
     polymorph_token,
     Species,
     StandardState,
     union_notices,
 )
+from simulator.melt_backend.base import (
+    MULTIVALENT_MELT_ELEMENTS,
+    EquilibriumResult,
+    multivalent_components,
+)
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
     OXYGEN_BALANCE_NOTICE_PREFIX,
+    _cell_material_class,
+    _cell_oxygen_class,
     has_own_engine_solved_oxygen_balance,
 )
+from simulator.battery.composition import composition_wt_pct
 from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
     openimcc_pack_coefficient_sources,
 )
 from simulator.battery.validate import (
+    ValidationIssue,
+    _asset_ids,
     _observation_lineage,
+    observation_issue_location,
     _pressure_blocking_notices,
     _resolve_coefficient_sources,
     _table_ids,
     _VAPOUR_EQUILIBRIUM,
+    validate_corpus,
 )
 from simulator.battery.validity import (
     GateOutcome,
+    _calibration_grounded,
     _partial_pressure_observations_by_experiment,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
+from simulator.fe_redox import feo_iw_log10_fO2_bar
+from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 
 # Explicit closed set. openimcc is the only IMCC producer. Do not build this from
@@ -161,6 +215,64 @@ _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
     _VAPOUR_EQUILIBRIUM
     | {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
 )
+# Equilibrium partial pressures from these two predictors are independent of
+# total pressure. The evaluation proof is in test_score's pressure-axis test.
+_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
+    {
+        (Engine.OPENIMCC, Quantity.P_PARTIAL),
+        (Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL),
+    }
+)
+_SPECIES_FORMULA_INDEPENDENT_QUANTITIES = frozenset(
+    {Quantity.MASS_LOSS_FRACTION}
+)
+
+
+def _pressure_independent_comparison(
+    reference: Observation, prediction: EnginePrediction
+) -> bool:
+    identity = reference.identity
+    if not isinstance(identity, Identity):
+        return False
+    quantity = quantity_token(identity)
+    pressure = identity.total_pressure_Pa
+    return (
+        (prediction.engine, quantity)
+        in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+        and (pressure is None or not pressure.is_value)
+    )
+
+
+def _score_identity_equal(
+    left: Identity, right: Identity
+) -> IdentityEqualOutcome:
+    left_quantity = quantity_token(left)
+    right_quantity = quantity_token(right)
+    if (
+        left_quantity is Quantity.MASS_LOSS_FRACTION
+        or right_quantity is Quantity.MASS_LOSS_FRACTION
+    ):
+        if left_quantity is not right_quantity:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_MISMATCH, ("quantity",)
+            )
+        # This bulk ratio has no species axis. The predictor validates its
+        # composition, pressure/regime, duration, mass, and area from the
+        # experiment; the scored identity coordinate is its printed T.
+        left_temperature = temperature_of(left)
+        right_temperature = temperature_of(right)
+        if left_temperature is None or right_temperature is None:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_UNKNOWN, ("temperature_K",)
+            )
+        if left_temperature != right_temperature:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_MISMATCH, ("temperature_K",)
+            )
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+    return identity_equal(left, right)
+
+
 TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
 TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
 # Engines that consume the SF04 magma companion workbook. Never score them
@@ -229,6 +341,8 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.ACTIVITY: MetricOperation.DEX,
     Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,
     Quantity.DELTA_FG: MetricOperation.ABSOLUTE,
+    Quantity.ENTHALPY_OF_FUSION: MetricOperation.ABSOLUTE,
+    Quantity.ENTROPY_OF_FUSION: MetricOperation.ABSOLUTE,
     Quantity.H_MINUS_H298: MetricOperation.ABSOLUTE,
     Quantity.PARTIAL_MOLAR_ENTHALPY: MetricOperation.ABSOLUTE,
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: MetricOperation.ABSOLUTE,
@@ -238,7 +352,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.LOG10_KF: MetricOperation.ABSOLUTE,
     Quantity.LOG10_K_STAR: MetricOperation.ABSOLUTE,
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: MetricOperation.ABSOLUTE,
-    Quantity.MASS_LOSS_FRACTION: MetricOperation.RELATIVE,
+    Quantity.MASS_LOSS_FRACTION: MetricOperation.ABSOLUTE,
     Quantity.MASS_LOSS_FRACTION_VS_T: MetricOperation.RELATIVE,
     Quantity.YIELD_FRACTION: MetricOperation.RELATIVE,
     Quantity.O2_YIELD: MetricOperation.RELATIVE,
@@ -246,7 +360,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
     Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
     Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
-    Quantity.FE3_FE2_RATIO: MetricOperation.RELATIVE,
+    Quantity.FE3_FE2_RATIO: MetricOperation.DEX,
     Quantity.VISCOSITY: MetricOperation.DEX,
     Quantity.DENSITY: MetricOperation.RELATIVE,
     Quantity.ELECTRICAL_CONDUCTIVITY: MetricOperation.DEX,
@@ -258,54 +372,39 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVOLVED_GAS_YIELD: MetricOperation.RELATIVE,
     Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
     Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
+    # Equilibrium ratios (not a closed phase basis) are absolute. Printed
+    # component amounts and L_X are dex; metric_operation_for_identity
+    # returns dex when the subtype is a PHASE_BASIS_TOKENS value.
+    # Printed log10 C_S / log10 C_Cl are already logs and are often negative,
+    # so they take absolute, the same shape as log10_Kf.
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: MetricOperation.ABSOLUTE,
+    Quantity.DISTRIBUTION_RATIO: MetricOperation.DEX,
+    Quantity.SULFIDE_CAPACITY: MetricOperation.ABSOLUTE,
+    Quantity.CHLORIDE_CAPACITY: MetricOperation.ABSOLUTE,
 }
 
-# Legacy ΔfG bands from the residual ledger, retained as labeled fallbacks for
-# comparisons without a compilation-derived band. The independent value is
-# used for every relation: lineage labels do not select a decision threshold.
-# Printed cell uncertainty and family residual bands supersede these values.
-# Searched and not used as decision bands (do not invent a tolerance):
-# - data/vapour_rail_validation_pins.yaml policy.margin_dex 0.01 is a pin /
-#   regression envelope; SCHEMA-PROPOSAL-v2.1 forbids using a pin as the
-#   agreement threshold.
-# - validation-data/vapour_rail_sf04_high_t_DECISION.md 0.5 dex is an SF04
-#   high-T species-disagreement check, "NOT evidence for a physical or
-#   numerical ceiling".
-# - openimcc's published-pack SHA-256 pins the package data, not an accuracy band.
-# - engines/builtin/melt_effect_adjustment.py ±0.3 dex is a mixed-matte
-#   error estimate, not an activity agreement band.
-# - evaporation-α envelopes and the Robinot O2 error budget are value
-#   ranges / lab diagnostics, not residual decision bands.
-# - docs/lab-validation-whitepaper.md ~11% exp.1/exp.2 O2 floor
-#   (|1.17−1.05|/1.11) is two runs of one apparatus at different heating
-#   rates, not a sourced agreement band for o2_yield, yield_fraction, or
-#   mass_loss_fraction. Using it would invent a yield tolerance.
-THERMOCHEMISTRY_DECISION_BANDS: dict[SourceRelation, DecisionBand] = {
-    SourceRelation.INDEPENDENT: DecisionBand(
-        Decimal("1.0"),
-        "kJ_per_declared_mol_basis",
-        "LEGACY fallback: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.independent_tabulation",
-    ),
-    SourceRelation.SAME_INPUT: DecisionBand(
-        Decimal("0.05"),
-        "kJ_per_declared_mol_basis",
-        "LEGACY historical only: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
-    ),
-    SourceRelation.TRAINING: DecisionBand(
-        Decimal("0.05"),
-        "kJ_per_declared_mol_basis",
-        "LEGACY historical only: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
-    ),
-}
-
-# Statistical floor for estimating a MAD, not a physics threshold.
-MIN_DERIVED_BAND_N = 10
-
-# Formation Gibbs energies stored in kJ/mol. Not log10_Kf (dimensionless), not
-# cp/S (J/mol/K), not delta_fH or H-H298 (not sourced by this band).
-GIBBS_BAND_QUANTITIES: frozenset[Quantity] = frozenset(
-    {Quantity.DELTA_FG}
-)
+# The ticket line uses the two-sided normal percentile p=95. 1.95996398454 is
+# Φ⁻¹((1 + .95) / 2); evaluating Φ(1.95996398454) gives 0.975, the upper
+# endpoint of the central 95% interval. MAD(N(0,1)) = Φ⁻¹(.75), so the
+# consistency scale is 1/Φ⁻¹(.75) = 1.482602218505602.
+DECISION_BAND_PERCENTILE = 95
+NORMAL_95_TICKET_MULTIPLIER = Decimal("1.959963984540054")
+MAD_NORMAL_SCALE = Decimal("1.482602218505602")
+DECISION_BAND_POLICY_VERSION = "q6-v1"
+DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
+# Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
+MIN_RESIDUAL_SUMMARY_N = 10
+# Candidate axes, the same names identity equality walks, owned by identity.
+# Phase roles and valence_basis were added after the stored ratchet. The
+# group key drops them unless the quantity profile names them. Adding either
+# to every key misses every stored token. valence_basis stays on valence_ratio
+# rows, where the profile requires it.
+_ALIGNMENT_AXES = _AXIS_NAMES
+_ROLE_ALIGNMENT_AXES = frozenset({
+    "phase_role",
+    "counter_phase_role",
+    "valence_basis",
+})
 _UNIT_DIMENSION: dict[str, str] = {
     "kJ_per_declared_mol_basis": "energy_per_mol",
     "J_per_declared_mol_basis_per_K": "energy_per_mol_per_K",
@@ -320,8 +419,14 @@ _NOT_VAPOUR_QUANTITIES: frozenset[Quantity] = frozenset(
         Quantity.ISOTOPE_DELTA,
         Quantity.ION_INTENSITY_RATIO,
         Quantity.ION_INTENSITY,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        Quantity.DISTRIBUTION_RATIO,
+        Quantity.SULFIDE_CAPACITY,
+        Quantity.CHLORIDE_CAPACITY,
     }
 )
+_REDOX_DISTRIBUTION_ELEMENTS = frozenset({"Fe", "Cr", "Mn", "Ti", "P"})
+_LIQUID_PHASE_NAMES = frozenset({"liq", "liquid", "melt", "slag", "glass"})
 
 ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.VAPOROCK: "vaporock",
@@ -339,6 +444,20 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
+
+
+def _attempt_coefficient_sources(
+    engine: Engine, coefficient_sources: tuple[str, ...] | None
+) -> tuple[str, ...]:
+    """Use explicit attempt ancestry, falling back only when it was unspecified."""
+
+    return (
+        ENGINE_COEFFICIENT_SOURCES[engine]
+        if coefficient_sources is None
+        else coefficient_sources
+    )
+
+
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
@@ -386,11 +505,16 @@ FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
+FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
+FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
+FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
+FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
+FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
 
 
 @dataclass(frozen=True)
@@ -417,6 +541,10 @@ def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
     return {"reason": "quantity_not_predicted", "quantity": quantity.value}
 
 
+def _is_quantity_not_predicted(quantity: Quantity | None) -> bool:
+    return quantity is Quantity.LOG10_K_REACTION
+
+
 @dataclass(frozen=True)
 class ScoreContext:
     works: Mapping[str, Work]
@@ -426,6 +554,18 @@ class ScoreContext:
     extract_review: Mapping[str, str | None] = field(default_factory=dict)
     hostname: str = ""
     benches: Mapping[str, Bench] = field(default_factory=dict)
+    root: Path = REPO_ROOT
+    hard_issues_by_observation: Mapping[str, tuple[ValidationIssue, ...]] = field(
+        default_factory=dict
+    )
+
+
+@dataclass(frozen=True)
+class _PrintedBandResolution:
+    band: DecisionBand | None = None
+    refusal: Mapping[str, object] | None = None
+    notice: Notice | None = None
+    standard_uncertainty_dex: Decimal | None = None
 
 
 @dataclass(frozen=True)
@@ -520,22 +660,173 @@ def engines_from_names(names: Sequence[str] | None) -> tuple[Engine, ...]:
     return tuple(out)
 
 
-def parse_species_formula(formula: str) -> tuple[tuple[str, float], ...] | None:
-    """Closed element-symbol parse. None → unmatched, never string equality."""
+def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
+    return species is not None and phase_token(species) is phase
+
+
+def parse_species_formula(
+    formula: str, *, species: Species | None = None
+) -> tuple[tuple[str, float], ...] | None:
+    """Parse explicit stoichiometry; None → unmatched, never string equality.
+
+    The baseline ``formula_composition`` result is returned unchanged. Its
+    source-derived extension accepts element symbols with numeric counts,
+    nested ``()[]{}`` groups, hydrate segments (including fractional or
+    decimal water multipliers) separated by a middle dot, TeX math wrappers /
+    ``\\text{}``, and TeX or Unicode subscripts. Newly normalized terminal
+    phase or polymorph labels require a matching existing species axis, as in
+    ``$AsCl_3(g)$`` and ``$Fe(α)$``. A terminal bracket phase label that the
+    accounting parser would strip, as in ``Fe2O3[s]``, uses that same axis
+    before the fallback. Mineral names, variable compositions, and unverified
+    charge or phase labels remain unmatched.
+    """
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    return formula_composition(formula)
+    established = formula_composition(formula)
+    if established is not None:
+        return established
+
+    text = formula.strip()
+    if text.startswith("$") and text.endswith("$"):
+        text = text[1:-1].strip()
+    if "$" in text:
+        return None
+    text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
+    text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
+    text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
+    text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
+    # formula_composition reads the ASCII-dot water-adduct separator as a
+    # decimal count. Refuse that normalized form first; raw fast-path results
+    # and explicit middle-dot hydrates stay unchanged.
+    if "·" not in text and re.search(r"\.\d+H2O", text):
+        return None
+    phase_labels = {
+        "c": Phase.CR,
+        "cr": Phase.CR,
+        "s": Phase.CR,
+        "solid": Phase.CR,
+        "l": Phase.L,
+        "liq": Phase.L,
+        "liquid": Phase.L,
+        "g": Phase.G,
+        "gas": Phase.G,
+        "vapor": Phase.G,
+        "aq": Phase.AQ,
+    }
+    annotation = re.search(r"\(([^()]*)\)$", text)
+    if annotation is not None:
+        label = annotation.group(1).strip().lower()
+        annotated_phase = phase_labels.get(label)
+        if annotated_phase is not None:
+            if not _species_axis_matches_phase(species, annotated_phase):
+                return None
+        else:
+            from simulator.battery.polymorph_dictionary import coerce_polymorph_token
+
+            try:
+                annotated_polymorph = coerce_polymorph_token(label)
+            except ValueError:
+                annotated_polymorph = None
+            if annotated_polymorph is not None:
+                if species is None or polymorph_token(species) is not annotated_polymorph:
+                    return None
+                text = text[: annotation.start()]
+        if annotated_phase is not None:
+            text = text[: annotation.start()]
+
+    # Accounting strips these terminal brackets with no species axis. Bare
+    # [c] is not in that suffix list and stays unmatched.
+    bracket = re.search(r"\[([^\[\]]*)\]$", text)
+    if bracket is not None:
+        label = bracket.group(1).strip().lower()
+        if label != "c":
+            annotated_phase = phase_labels.get(label)
+            if annotated_phase is not None:
+                if not _species_axis_matches_phase(species, annotated_phase):
+                    return None
+                text = text[: bracket.start()]
+
+    charge_annotation = re.search(r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$", text)
+    if charge_annotation is not None:
+        signs = next(group for group in charge_annotation.groups() if group is not None)
+        annotated_charge = len(signs) * (1 if signs[0] == "+" else -1)
+        if any(sign != signs[0] for sign in signs):
+            return None
+        if species is None or charge_value(species) != annotated_charge:
+            return None
+        text = text[: charge_annotation.start()]
+
+    if "·" in text:
+        hydrated: defaultdict[str, float] = defaultdict(float)
+        try:
+            from simulator.accounting.formulas import parse_formula
+
+            # Parse each middle-dot segment separately so hydrate multipliers
+            # such as 1/2 and 6.5 do not collide with period splitting.
+            for segment in text.split("·"):
+                multiplier_match = re.match(
+                    r"^(\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", segment
+                )
+                multiplier = 1.0
+                body = segment
+                if multiplier_match is not None:
+                    number = multiplier_match.group(1)
+                    if "/" in number:
+                        numerator, denominator = number.split("/", 1)
+                        if int(denominator) == 0:
+                            return None
+                        multiplier = int(numerator) / int(denominator)
+                    else:
+                        multiplier = float(number)
+                    body = segment[multiplier_match.end() :]
+                if not body:
+                    return None
+                composition = formula_composition(body)
+                if composition is None:
+                    parsed_body = parse_formula(body, species=body).elements
+                    composition = tuple(
+                        sorted(
+                            (str(symbol), float(count))
+                            for symbol, count in parsed_body.items()
+                        )
+                    )
+                for symbol, count in composition:
+                    hydrated[symbol] += multiplier * count
+        except ValueError:
+            return None
+        return tuple(sorted(hydrated.items()))
+
+    parsed = formula_composition(text)
+    if parsed is not None:
+        return parsed
+    if "." in text:
+        return None
+    try:
+        from simulator.accounting.formulas import parse_formula
+
+        elements = parse_formula(text, species=text).elements
+    except ValueError:
+        return None
+    return tuple(sorted((str(symbol), float(count)) for symbol, count in elements.items()))
 
 
-def _is_raw_element_label(formula: str) -> bool:
+def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bool:
     """Na, K, Fe. Not an oxide, and not a label the formula parser rejects."""
 
-    parsed = parse_species_formula(formula)
+    parsed = parse_species_formula(formula, species=species)
     if parsed is None or len(parsed) != 1:
         return False
     element, count = parsed[0]
     return element != "O" and count == 1
+
+
+# Inverse of simulator.melt_backend.vaporock._GAS_NAMESPACE_SUFFIX.
+# The vapour adapter appends this exact suffix when a gas formula collides
+# with a melt oxide (SiO2(g) -> SiO2_gas). The scorer does not import the
+# vapour backend to read a four-character suffix. The emitter constant stays
+# in the adapter.
+_GAS_PHASE_SUFFIX = "_gas"
 
 
 def match_reported_species(
@@ -543,34 +834,102 @@ def match_reported_species(
     reported: Mapping[str, float],
     *,
     oxide_activity: bool = False,
+    species: Species | None = None,
 ) -> tuple[str, float] | None:
+    """Match one reported species, ignoring repair notices."""
+
+    matched, _repair_notices = _match_reported_species_with_notices(
+        formula,
+        reported,
+        oxide_activity=oxide_activity,
+        species=species,
+    )
+    return matched
+
+
+def _match_reported_species_with_notices(
+    formula: str,
+    reported: Mapping[str, float],
+    *,
+    oxide_activity: bool = False,
+    species: Species | None = None,
+    notice_field: str = "diagnostic_oxide_activities",
+    notice_phase: str = "liquid",
+) -> tuple[tuple[str, float] | None, tuple[str, ...]]:
     """Closed-formula match. Oxide activity never accepts a raw element label.
 
     ``oxide_activity`` compares a parent-oxide formula to the canonical oxide
     map (``SiO2_Liq`` to ``SiO2``). A vapour row for elemental Na still matches
     ``Na`` when this flag is false.
+
+    Vapour rows also accept one explicit alias: a reported key that is exactly
+    the requested formula plus ``_gas``, and only when that stem's closed
+    formula equals the target. ``SiO2_gas`` matches ``SiO2``. ``SiO2gas``,
+    ``SiO2_gaseous``, and a stem that does not parse do not. An exact formula
+    hit in the first pass wins over the suffixed key. Oxide activity does
+    not use this alias.
     """
 
-    target = parse_species_formula(formula)
+    target = parse_species_formula(formula, species=species)
     if target is None:
-        return None
-    if oxide_activity and _is_raw_element_label(formula):
-        return None
-    for name, value in reported.items():
-        if oxide_activity and _is_raw_element_label(str(name)):
-            continue
-        parsed = parse_species_formula(str(name))
-        if parsed == target:
-            return str(name), float(value)
-    if not oxide_activity:
-        return None
-    from engines.alphamelts.domain import canonical_oxide_activity_map
+        return None, ()
+    if oxide_activity and _is_raw_element_label(formula, species=species):
+        return None, ()
+    oxide_activities: Mapping[str, float] = {}
+    repair_notices: tuple[str, ...] = ()
+    if oxide_activity:
+        from engines.alphamelts.domain import (
+            _canonical_oxide_value_map_with_notices,
+        )
 
-    for name, value in canonical_oxide_activity_map(reported).items():
-        parsed = parse_species_formula(name)
+        oxide_activities, repair_notices = (
+            _canonical_oxide_value_map_with_notices(
+                reported,
+                field=notice_field,
+                phase=notice_phase,
+            )
+        )
+    for name, value in reported.items():
+        if oxide_activity and _is_raw_element_label(str(name), species=species):
+            continue
+        parsed = parse_species_formula(str(name), species=species)
         if parsed == target:
-            return str(name), float(value)
-    return None
+            return (str(name), float(value)), repair_notices
+    if not oxide_activity:
+        suffix = _GAS_PHASE_SUFFIX
+        for name, value in reported.items():
+            text = str(name)
+            if len(text) <= len(suffix) or not text.endswith(suffix):
+                continue
+            stem = text[: -len(suffix)]
+            if parse_species_formula(stem, species=species) == target:
+                return (text, float(value)), ()
+        return None, ()
+
+    for name, value in oxide_activities.items():
+        parsed = parse_species_formula(name, species=species)
+        if parsed == target:
+            return (str(name), float(value)), repair_notices
+    return None, repair_notices
+
+
+def _oxide_projection_notices(
+    warnings: Sequence[str],
+    *,
+    quantity: Quantity | None,
+    engine: Engine,
+) -> tuple[Notice, ...]:
+    if quantity is None:
+        return ()
+    return tuple(
+        Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(quantity,),
+            reason=warning,
+            origin=f"engine:{engine.value}",
+        )
+        for warning in warnings
+    )
 
 
 def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail | None:
@@ -585,22 +944,34 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
 
     if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
         return Rail.RESIDUE_COMPOSITION
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION or quantity in PRINTED_CAPACITY_QUANTITIES:
+        return Rail.MELT_ACTIVITY
+    if quantity is Quantity.DISTRIBUTION_RATIO:
+        # Fe, Cr, Mn, Ti, and P stay on redox. Every other distribution
+        # ratio is a melt-activity row. It is not left without a rail.
+        if _distribution_ratio_on_redox_rail(species_formula):
+            return Rail.REDOX
+        return Rail.MELT_ACTIVITY
     if quantity in _VAPOUR_EQUILIBRIUM:
         if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
         return Rail.VAPOUR
     if quantity in MELT_ACTIVITY_QUANTITIES:
+        # Sample phase is not a quantity property. A typed non-melt sample
+        # is refused by melt_activity_sample_phase_refusal after source
+        # validity, and stays on this rail so the refusal is visible.
         return Rail.MELT_ACTIVITY
     if (
         quantity in FORMATION_QUANTITIES
         or quantity in EQUILIBRIUM_FIT_QUANTITIES
         or quantity in PURE_STANDARD_THERMO
+        or quantity in FUSION_QUANTITIES
         or quantity in VAPORIZATION_ENTHALPIES
     ):
         return Rail.THERMOCHEMISTRY
     if quantity is Quantity.WALL_DEPOSIT_MASS:
         return Rail.WALL_DEPOSITION
-    if quantity is Quantity.FE3_FE2_RATIO:
+    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
         return Rail.REDOX
     if quantity in {
         Quantity.YIELD_FRACTION,
@@ -626,7 +997,6 @@ def no_headline_rail_reason(
 ) -> str:
     """Why rail_for_quantity returned None. Not a rail token."""
 
-    del species_formula
     if quantity is None:
         return "quantity_unknown"
     if quantity in _NOT_VAPOUR_QUANTITIES:
@@ -634,6 +1004,146 @@ def no_headline_rail_reason(
     if quantity in KINETIC_YIELD_QUANTITIES:
         return "non_alkali_kinetic"
     return f"no_headline_rail:{quantity.value}"
+
+
+# Spellings written by residual_key. Readers parse them with residual_key_slots.
+# A missing quantity in the key is not the refusal-detail reason of the same
+# spelling; that detail stays a refusal payload, not a key field.
+NO_HEADLINE_RAIL_TOKEN = "none"
+MISSING_QUANTITY_KEY_TOKEN = "quantity_unknown"
+
+
+# Only a typed crystal. Liquid, glass, supercooled liquid, gas, and
+# aqueous stay on the melt-activity path. A psat template that leaves
+# phase "gas" on an activity row is not a solid solution.
+SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
+    "sample_phase_not_melt_activity_observable"
+)
+SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE = (
+    "sample_phase_crystalline_vs_liquid_engine"
+)
+
+
+def crystalline_sample_detail(
+    phase: Phase | None,
+    *,
+    quantity: Quantity,
+    reason: str,
+) -> dict[str, object] | None:
+    """Detail when ``phase`` is a typed crystal. Otherwise None.
+
+    One owner for both rails. The caller names which phase it read and
+    which reason the refusal carries. Liquid, glass, supercooled liquid,
+    gas, aqueous, and an untyped phase stay on the path.
+    """
+
+    if phase is not Phase.CR:
+        return None
+    return {
+        "reason": reason,
+        "sample_phase": phase.value,
+        "quantity": quantity.value,
+    }
+
+
+def melt_activity_sample_phase_refusal(
+    identity: Identity,
+) -> dict[str, object] | None:
+    """Detail when a crystalline sample is not a melt-activity observable.
+
+    ``Phase.CR`` is the solid-solution sample, read from the activity
+    species. Unknown, not-applicable, liquid, glass, supercooled liquid,
+    gas, and aqueous are not that statement. ``None`` means score it.
+    """
+
+    quantity = quantity_token(identity)
+    if quantity not in MELT_ACTIVITY_QUANTITIES:
+        return None
+    return crystalline_sample_detail(
+        phase_token(identity.species),
+        quantity=quantity,
+        reason=SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE,
+    )
+
+
+def _experiment_sample_phase(experiment: Experiment | None) -> Phase | None:
+    """Sample phase from ``experiment.sample.form`` through PHASE_MAP.
+
+    The store does not carry a typed Phase on the experiment. A missing
+    form and untyped prose are None and stay on the scoring path.
+    """
+
+    if experiment is None:
+        return None
+    form = experiment.sample.form
+    if form is None or not form.state.is_value:
+        return None
+    value = form.state.value
+    if not isinstance(value, str):
+        return None
+    return phase_for_sample_form(value)
+
+
+def vapour_crystalline_sample_liquid_engine_refusal(
+    identity: Identity,
+    *,
+    engine: Engine,
+    experiment: Experiment | None,
+) -> dict[str, object] | None:
+    """Detail when crystalline-sample vapour is outside a liquid engine.
+
+    The sample phase is the experiment form, not the gas species. A
+    liquid engine consumes that sample as one homogeneous liquid, so a
+    typed crystal is another phase. Non-liquid engines are not this
+    refusal. ``None`` means score it.
+    """
+
+    if engine not in SINGLE_LIQUID_ENGINES:
+        return None
+    quantity = quantity_token(identity)
+    if quantity is not Quantity.P_PARTIAL:
+        return None
+    detail = crystalline_sample_detail(
+        _experiment_sample_phase(experiment),
+        quantity=quantity,
+        reason=SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE,
+    )
+    if detail is None:
+        return None
+
+    reservoir = stated_pure_substance_reservoir(identity)
+    temperature_K = temperature_of(identity)
+    if reservoir is None or temperature_K is None:
+        return detail
+    compound = reservoir[0]
+
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+
+    try:
+        janaf_fusion_energy(compound, temperature_K)
+    except ValueError as exc:
+        if str(exc) != f"no JANAF fusion table pair for {compound}":
+            return detail
+        detail["fusion_data"] = {
+            "status": "not_available_to_simulator",
+            "compound": compound,
+        }
+    return detail
+
+
+def _sample_phase_not_observable_prediction(
+    engine: Engine, identity: Identity, detail: Mapping[str, object]
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail=detail,
+        identity=identity,
+    )
 
 
 def residual_key(
@@ -646,14 +1156,43 @@ def residual_key(
 ) -> str:
     """Stable comparison slot: lineage + quantity + identity T + rail + engine.
 
-    Run/version are excluded (v2.1 pin_key_map). No headline rail is the
-    token ``none``, never a borrowed vapour or SiO label.
+    Run/version are excluded (v2.1 pin_key_map). No headline rail is
+    ``NO_HEADLINE_RAIL_TOKEN``, never a borrowed vapour or SiO label.
     """
 
-    q = "quantity_unknown" if quantity is None else quantity.value
+    q = MISSING_QUANTITY_KEY_TOKEN if quantity is None else quantity.value
     t = "" if temperature_K is None else f":T={_dec_token(temperature_K)}"
-    rail_token = "none" if rail is None else rail.value
+    rail_token = NO_HEADLINE_RAIL_TOKEN if rail is None else rail.value
     return f"{reference_id}{t}::{q}::{rail_token}::{engine.value}"
+
+
+def _key_for_fo2_mode(key: str, mode: Fo2Mode | None) -> str:
+    return key if mode is None else f"{key}::fo2_mode={mode.value}"
+
+
+def _without_fo2_mode_key_suffix(key: object) -> str:
+    """Drop the trailing ``::fo2_mode=`` field ``_key_for_fo2_mode`` appends.
+
+    The engine remains the field in front of that suffix.
+    """
+
+    text = str(key or "")
+    marker = "::fo2_mode="
+    head, found, tail = text.rpartition(marker)
+    if found and tail and "::" not in tail:
+        return head
+    return text
+
+
+def _engine_from_residual_key(key: object) -> str:
+    return _without_fo2_mode_key_suffix(key).rsplit("::", 1)[-1]
+
+
+def _fo2_mode_from_notices(notices: Sequence[Notice]) -> Fo2Mode | None:
+    return next(
+        (notice.fo2_mode for notice in notices if notice.fo2_mode is not None),
+        None,
+    )
 
 
 def _dec_token(value: Decimal) -> str:
@@ -663,15 +1202,99 @@ def _dec_token(value: Decimal) -> str:
     return text or "0"
 
 
+def _residual_key_parts(key: object) -> tuple[str, str, str, str] | None:
+    """Split a residual key into head, quantity, rail, and engine.
+
+    None when the key is not four ``::`` fields. A trailing ``::fo2_mode=``
+    field is removed first. An empty quantity field becomes
+    ``MISSING_QUANTITY_KEY_TOKEN``.
+    """
+
+    parts = _without_fo2_mode_key_suffix(key).rsplit("::", 3)
+    if len(parts) != 4:
+        return None
+    head, quantity, rail, engine = parts
+    if not quantity:
+        quantity = MISSING_QUANTITY_KEY_TOKEN
+    return (head, quantity, rail, engine)
+
+
+def _temperature_token(head: str) -> Decimal | None:
+    """Identity temperature ``residual_key`` appends as ``:T=`` on the reference head."""
+
+    _prefix, marker, token = head.rpartition(":T=")
+    if not marker or not token:
+        return None
+    try:
+        value = Decimal(token)
+    except InvalidOperation:
+        return None
+    if not value.is_finite():
+        return None
+    return value
+
+
+def residual_key_slots(key: object) -> tuple[str, str, str, Decimal | None]:
+    """Return quantity, rail, engine, and identity temperature from a residual key.
+
+    A key that is not four ``::`` fields has no rail, engine, or temperature,
+    and its quantity is ``MISSING_QUANTITY_KEY_TOKEN``.
+    """
+
+    parts = _residual_key_parts(key)
+    if parts is None:
+        return (MISSING_QUANTITY_KEY_TOKEN, "", "", None)
+    head, quantity, rail, engine = parts
+    return (quantity, rail, engine, _temperature_token(head))
+
+
 def metric_operation(quantity: Quantity | None) -> MetricOperation | None:
     if quantity is None:
         return None
     return QUANTITY_METRIC.get(quantity)
 
 
+def _distribution_ratio_on_redox_rail(formula: str) -> bool:
+    """Fe, Cr, Mn, Ti, or P in the component. Oxygen does not count."""
+
+    parsed = parse_species_formula(formula)
+    if parsed is None:
+        return False
+    elements = {element for element, count in parsed if count > 0 and element != "O"}
+    return bool(elements & _REDOX_DISTRIBUTION_ELEMENTS)
+
+
 def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
-    """Select the stored residue metric from its measured subtype."""
+    """Select an identity-aware metric when the quantity's form requires it."""
     quantity = quantity_token(identity)
+    if quantity is Quantity.VALENCE_RATIO:
+        basis = identity.valence_basis
+        if basis is None or not basis.is_value:
+            return None
+        if basis.value.value_form in {
+            ValenceValueForm.FRACTION,
+            ValenceValueForm.RATIO,
+        }:
+            return MetricOperation.DEX
+        if basis.value.value_form in {
+            ValenceValueForm.LOG10_RATIO,
+            ValenceValueForm.AVERAGE_OXIDATION_STATE,
+        }:
+            return MetricOperation.ABSOLUTE
+        return None
+    if quantity in PRINTED_CAPACITY_QUANTITIES:
+        return MetricOperation.ABSOLUTE
+    if quantity is Quantity.DISTRIBUTION_RATIO:
+        return MetricOperation.DEX
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        subtype = (
+            identity.subtype.value
+            if identity.subtype is not None and identity.subtype.is_value
+            else None
+        )
+        if subtype in PHASE_BASIS_TOKENS:
+            return MetricOperation.DEX
+        return MetricOperation.ABSOLUTE
     if quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
         return metric_operation(quantity)
     subtype = identity.subtype.value if identity.subtype.is_value else None
@@ -680,6 +1303,25 @@ def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
     if subtype == "oxide_wt_percent":
         return MetricOperation.ABSOLUTE
     return metric_operation(quantity)
+
+
+def _phase_component_reference_wt_percent(
+    identity: Identity, reference: Decimal
+) -> Decimal:
+    """Convert a printed mass-ppm phase amount for comparison with wt% engines."""
+    quantity = quantity_token(identity)
+    subtype = (
+        identity.subtype.value
+        if identity.subtype is not None and identity.subtype.is_value
+        else None
+    )
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and subtype == "element_ppm_by_mass"
+    ):
+        # 1 ppm = 1e-6 mass fraction = 1e-4 wt%; 250 ppm = 0.025 wt%.
+        return reference / Decimal("10000")
+    return reference
 
 
 def _residual_metric_operation(
@@ -887,8 +1529,6 @@ def _missing_apparatus_fact(
         and allow_unknown_method
     ):
         return "method_unknown"
-    if name == "kems_calibration" and allow_calibration:
-        return "calibration"
     if name == "background_pressure_stated" and not getattr(check, "passed", True):
         return "background_pressure"
     if name == "orifice_knudsen" and not getattr(check, "passed", True):
@@ -899,6 +1539,10 @@ def _missing_apparatus_fact(
     if name == "background_pressure" and not getattr(check, "passed", True):
         # A stated high or straddling background is an explicit invalid input,
         # not an unverified apparatus fact.
+        return None
+    if name == "in_cell_partial_pressure_sum" and not getattr(check, "passed", True):
+        if detail.get("printed_partial_pressure_sum_Pa") is None:
+            return "in_cell_partial_pressure_sum"
         return None
     if name == "geometry_determinants" and allow_calibration:
         missing = detail.get("missing")
@@ -935,9 +1579,9 @@ def _unverified_apparatus_notices(
         return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
-    source_is_kems = bool(reference.source_id and reference.source_id.startswith("kems-"))
     author_reported_pressure = (
-        source_is_kems
+        experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
         and reference.evidence.original_method_class
         in {"measured", "measured_direct", "measured_tabulated"}
     )
@@ -985,10 +1629,18 @@ def _unverified_apparatus_notices(
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
     )
+    figure_only_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    )
     calibration_flagged_partial_pressure = (
         quantity is Quantity.P_PARTIAL
         and reference.evidence.class_.is_value
-        and reference.evidence.class_.value in MEASURED_EVIDENCE
+        and (
+            reference.evidence.class_.value in MEASURED_EVIDENCE
+            or reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        )
         and _has_calibration_not_grounded(gates.checks)
     )
     calibration_flagged_activity = (
@@ -998,6 +1650,7 @@ def _unverified_apparatus_notices(
     )
     if not (
         measured_pressure
+        or figure_only_partial_pressure
         or comparison_activity
         or unknown_method_activity
         or calibration_flagged_partial_pressure
@@ -1007,7 +1660,7 @@ def _unverified_apparatus_notices(
     allow_calibration = (
         author_reported_pressure or comparison_activity or calibration_flagged_activity
     )
-    missing: set[str] = set()
+    missing: dict[str, Mapping] = {}
     calibration_notice = None
     calibration_reason = None
     for check in gates.checks:
@@ -1019,7 +1672,7 @@ def _unverified_apparatus_notices(
                 (allow_calibration or calibration_flagged_partial_pressure)
                 and _has_calibration_not_grounded((check,))
             ):
-                missing.add("calibration_not_grounded")
+                missing["calibration_not_grounded"] = detail
                 notice_text = detail.get("calibration_notice")
                 if isinstance(notice_text, str):
                     calibration_notice = notice_text
@@ -1034,14 +1687,56 @@ def _unverified_apparatus_notices(
         )
         if fact is None:
             return ()
-        missing.add(fact)
+        missing[fact] = detail
     if not missing:
         return ()
-    return tuple(
-        Notice(
-            kind=NoticeKind.UNVERIFIED_APPARATUS,
-            affected_quantities=(quantity,),
-            reason=(
+    notices: list[Notice] = []
+    for fact in sorted(missing):
+        detail = missing[fact]
+        if fact == "in_cell_partial_pressure_sum":
+            pressure_detail = detail.get("pressure_sum_detail")
+            if isinstance(pressure_detail, Mapping):
+                detail = pressure_detail
+            original_reason = str(
+                detail.get("reason") or "printed in-cell pressure sum is unavailable"
+            )
+            pressure_limit = detail.get("pressure_limit_Pa")
+            limit_basis = detail.get("limit_basis")
+            limit_source = detail.get("limit_source")
+            regime_limit = (
+                f"{pressure_limit} Pa"
+                if pressure_limit is not None
+                else "unavailable"
+            )
+            limit_detail = "; ".join(
+                str(value) for value in (limit_source, limit_basis) if value
+            )
+            if limit_detail:
+                regime_limit += f" ({limit_detail})"
+            notices.append(
+                Notice(
+                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        f"apparatus_unverified:{fact}; original_reason={original_reason}; "
+                        "authority=extrapolated; "
+                        f"regime_limit={regime_limit}"
+                    ),
+                    origin=reference.observation_id,
+                    band=(
+                        f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
+                        if pressure_limit is not None
+                        else "free-molecular in-cell pressure limit unavailable"
+                    ),
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
+            continue
+        notices.append(
+            Notice(
+                kind=NoticeKind.UNVERIFIED_APPARATUS,
+                affected_quantities=(quantity,),
+                reason=(
                 "calibration_not_grounded: "
                 f"{calibration_notice or 'Calibration is not grounded.'}"
                 + (
@@ -1056,11 +1751,11 @@ def _unverified_apparatus_notices(
                     if fact == "method_unknown"
                     else f"apparatus_unverified:{fact}"
                 )
-            ),
-            origin=reference.observation_id,
+                ),
+                origin=reference.observation_id,
+            )
         )
-        for fact in sorted(missing)
-    )
+    return tuple(notices)
 
 
 def _flagged_stratum_notices(
@@ -1186,12 +1881,32 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
-    if NoticeKind.FIGURE_ONLY.value in kinds:
+    if any(
+        isinstance(reason, str)
+        and reason.startswith(
+            f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
+        )
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE)
+    if any(
+        kind == NoticeKind.FIGURE_ONLY.value
+        and (reason == "figure_only" or reason.startswith("figure_only:"))
+        for kind, reason in notices
+    ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
+    if NoticeKind.APPROXIMATE_VALUE.value in kinds:
+        strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
+    if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
+        strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
+    if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
+        strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
+    if NoticeKind.QUENCH_ALTERED.value in kinds:
+        strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
     return tuple(strata)
 
 
@@ -1211,6 +1926,265 @@ def _is_fusion_conversion_reason(reason: object) -> bool:
 
 def _is_flagged_stratum_notice(notice: Notice) -> bool:
     return bool(flagged_strata((notice,)))
+
+
+def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
+    if source_polymorph is None:
+        return True
+    if not source_polymorph.is_unknown:
+        return False
+    return source_polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
+
+
+def _rt_ln_10_j_per_mol_K(temperature_K: Decimal) -> Decimal:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    return JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+
+
+def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
+    return (
+        source_polymorph is not None
+        and source_polymorph.is_unknown
+        and source_polymorph.rejection_kind
+        in (
+            PolymorphRejectionKind.UNRECOGNISED,
+            PolymorphRejectionKind.CONTRADICTS_FORMULA,
+        )
+    )
+
+
+def _fusion_energy_when_polymorph_absent(
+    reference: Observation,
+    formula: str,
+    temperature_K: Decimal,
+) -> tuple[Observation, object, Notice | None, Notice | None]:
+    """JANAF fusion for a pure-solid identity that never named a polymorph.
+
+    A migrated source that omits the polymorph is ``PolymorphRejectionKind.OMITTED``
+    and is refused before this runs (d-165). ``polymorph is None`` is the
+    melt-activity benchmark's pure-solid standard: the stable JANAF crystal at
+    T supplies the fusion pair, and a stability-bound notice records the
+    inference. Returns ``(reference, fusion, refusal, inference)``. A refusal
+    notice means the value must stay on the solid number.
+    """
+
+    from simulator.battery.generators.janaf import (
+        _JANAF_POLYMORPH_BY_TABLE,
+        JANAF_R_J_PER_MOL_K,
+        JANAFFusionPolymorphUnavailable,
+        _janaf_eligible_pure_crystal_tables,
+        _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
+        janaf_fusion_energy,
+    )
+
+    fusion = janaf_fusion_energy(formula, temperature_K)
+    expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
+    observed_polymorph = None
+    identity = reference.identity
+    if isinstance(identity, Identity) and identity.reference_state is not None:
+        observed_polymorph = polymorph_token(identity.reference_state.value.endmember)
+    if expected_polymorph is None or observed_polymorph is expected_polymorph:
+        return reference, fusion, None, None
+
+    inferred_reference_notice: Notice | None = None
+    unique_unknown_polymorph_table = False
+    try:
+        eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
+            formula, temperature_K
+        )
+        stability = None
+        if len(eligible_solid_tables) > 1:
+            stability = _janaf_stable_crystal_set(
+                formula, temperature_K, eligible_solid_tables
+            )
+    except JANAFFusionPolymorphUnavailable as exc:
+        return (
+            reference,
+            fusion,
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: "
+                    f"incomplete JANAF stability candidate set: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF stability data for {formula}: {exc}",
+            ),
+            None,
+        )
+
+    if len(eligible_solid_tables) == 1:
+        unique_unknown_polymorph_table = (
+            eligible_solid_tables[0][0] == fusion.crystal_table
+        )
+    elif len(eligible_solid_tables) > 1:
+        assert stability is not None
+        stable_table = stability.selected.table_id
+        stable_polymorph = stability.selected.polymorph
+        stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
+        alternatives = tuple(
+            (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
+            for item in stability.alternatives
+        )
+        if alternatives:
+            # Equal chemical potential: changing the pure-solid standard shifts
+            # activity by exp(dG/RT), so d log10(a) = dG / (R T ln 10).
+            bound_by_alternative = tuple(
+                (
+                    abs(gibbs_kJ_per_mol - stable_gibbs_kJ_per_mol)
+                    * Decimal(1000)
+                    / (
+                        JANAF_R_J_PER_MOL_K
+                        * temperature_K
+                        * Decimal(10).ln()
+                    ),
+                    table_id,
+                    polymorph,
+                    gibbs_kJ_per_mol,
+                )
+                for table_id, polymorph, gibbs_kJ_per_mol in alternatives
+            )
+            bound_dex, max_table, max_polymorph, _max_gibbs = max(
+                bound_by_alternative, key=lambda item: item[0]
+            )
+            assert reference.value.point is not None
+            row_band = _printed_uncertainty_band(
+                Quantity.ACTIVITY,
+                reference.uncertainty,
+                reference.value.point,
+                source_observation=reference,
+            )
+            if row_band.notice is not None:
+                reference = replace(
+                    reference,
+                    notices=union_notices(reference.notices, (row_band.notice,)),
+                )
+            bound_exceeds_row_band = (
+                None
+                if row_band.band is None
+                else bound_dex > row_band.band.value
+            )
+            inference_detail = {
+                "oxide": formula,
+                "temperature_K": str(temperature_K),
+                "chosen_polymorph": stable_polymorph.value,
+                "chosen_table": stable_table,
+                "alternatives": [
+                    {"polymorph": polymorph.value, "table": table_id}
+                    for table_id, polymorph, _gibbs in alternatives
+                ],
+                "bound_dex": str(bound_dex),
+                "maximum_alternative": {
+                    "polymorph": max_polymorph.value,
+                    "table": max_table,
+                },
+                "row_decision_band_dex": (
+                    None if row_band.band is None else str(row_band.band.value)
+                ),
+                "row_decision_band_refusal": (
+                    None if row_band.refusal is None else dict(row_band.refusal)
+                ),
+                "bound_exceeds_row_band": bound_exceeds_row_band,
+                "authority": Authority.CERTIFIED.value,
+            }
+            inferred_reference_notice = Notice(
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "reference_polymorph_inferred_from_stability: "
+                    + json.dumps(inference_detail, sort_keys=True)
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF stability bound {bound_dex} dex",
+                authority=Authority.CERTIFIED,
+                certification=(
+                    "NIST-JANAF solid formation Gibbs energies compared at T"
+                ),
+            )
+        unique_unknown_polymorph_table = True
+        if stable_table != fusion.crystal_table:
+            fusion = _janaf_fusion_energy_for_pair(
+                formula, stable_table, fusion.liquid_table, temperature_K
+            )
+
+    if not unique_unknown_polymorph_table:
+        observed = (
+            "unknown" if observed_polymorph is None else observed_polymorph.value
+        )
+        return (
+            reference,
+            fusion,
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "fusion conversion missing input: JANAF solid table "
+                    f"{fusion.crystal_table} represents polymorph "
+                    f"{expected_polymorph.value}, but measured reference polymorph "
+                    f"is {observed}"
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF {fusion.crystal_table} requires "
+                    f"{expected_polymorph.value} solid reference"
+                ),
+            ),
+            inferred_reference_notice,
+        )
+    return reference, fusion, None, inferred_reference_notice
+
+
+def _janaf_fusion_energy_for_reference(
+    reference: Observation,
+    temperature_K: Decimal,
+):
+    """Resolve the JANAF pair for the phase named by the source reference."""
+
+    from simulator.battery.generators.janaf import (
+        _fusion_table_pair,
+        _janaf_fusion_energy_for_pair,
+        JANAFFusionPolymorphUnavailable,
+    )
+
+    identity = reference.identity
+    if not isinstance(identity, Identity) or identity.reference_state is None:
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+    standard_state = identity.reference_state.value
+    polymorph = polymorph_token(standard_state.endmember)
+    if polymorph is None:
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+    formula = standard_state.endmember.formula
+    # JANAF has no tridymite table. The existing B1259 correction moves that
+    # named reference to cristobalite before this JANAF fusion pair is used.
+    janaf_polymorph = (
+        Polymorph.CRISTOBALITE_HIGH
+        if formula == "SiO2" and polymorph is Polymorph.TRIDYMITE
+        else polymorph
+    )
+    solid_table, liquid_table = _fusion_table_pair(formula, janaf_polymorph)
+    return _janaf_fusion_energy_for_pair(
+        formula, solid_table, liquid_table, temperature_K
+    )
+
+
+def _score_eligibility_notices(notices: Sequence[Notice]) -> tuple[Notice, ...]:
+    """Remove diagnostic engine band flags; authority gates eligibility."""
+
+    return tuple(
+        notice
+        for notice in notices
+        if not (
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.origin.startswith("engine:")
+        )
+    )
 
 
 @lru_cache(maxsize=1)
@@ -1273,8 +2247,6 @@ def _janaf_pure_solid_table_temperature_range(
     if len(set(temperatures)) < 2:
         return None
     return min(temperatures), max(temperatures)
-
-
 @lru_cache(maxsize=1)
 def _b1259_tridymite_cristobalite_offset_rows() -> tuple[
     tuple[Decimal, Decimal, Decimal], ...
@@ -1362,10 +2334,489 @@ def _b1259_tridymite_cristobalite_delta_g(
     return delta_h - temperature_K * delta_s, lower, upper, extrapolated
 
 
+# Holzheid 1997 p. 30 eq. (9), J/mol. Printed comparison only: it is not the
+# conversion. d/dT of a + b T - c T ln T is b - c (ln T + 1).
+_HOLZHEID_EQ9_J = (Decimal("-244118"), Decimal("115.559"), Decimal("8.474"))
+_HOLZHEID_EQ9_SLOPE_AT_K = Decimal("1673.15")
+# Holzheid 1997 pp. 30–31 printed γ_stoich/γ_wüstite. Comparison only.
+_HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
+_HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
+_FEO_WUSTITE_FORMULA = "Fe(1-x)O"
+_FEO_STOICHIOMETRIC_FORMULA = "FeO"
+_KELVIN_FROM_CELSIUS = Decimal("273.15")
+_IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
+# Cold and hot ends of the Holzheid and Distin rows this conversion scores.
+_FEO_SCORED_SPAN_K = (Decimal("1578"), Decimal("2233.15"))
+
+
+@dataclass(frozen=True)
+class _IronSaturatedFeOCalibration:
+    temperatures_K: tuple[Decimal, ...]
+    intercept_J: Decimal
+    slope_J_per_mol_K: Decimal
+    fusion_tm_K: Decimal
+    fusion_h_J: Decimal
+    fusion_s_J_per_mol_K: Decimal
+    window_low_K: Decimal
+    window_high_K: Decimal
+    comparison_text: str
+
+
+def _display_decimal(value: Decimal, quantum: str) -> str:
+    return format(value.quantize(Decimal(quantum)), "f")
+
+
+def _least_squares_line(
+    xs: tuple[Decimal, ...], ys: tuple[Decimal, ...]
+) -> tuple[Decimal, Decimal]:
+    """Exact least squares y = intercept + slope x for Decimal inputs."""
+
+    count = Decimal(len(xs))
+    sum_x = sum(xs, Decimal(0))
+    sum_y = sum(ys, Decimal(0))
+    sum_xx = sum((x * x for x in xs), Decimal(0))
+    sum_xy = sum((x * y for x, y in zip(xs, ys)), Decimal(0))
+    denominator = count * sum_xx - sum_x * sum_x
+    slope = (count * sum_xy - sum_x * sum_y) / denominator
+    intercept = (sum_y - slope * sum_x) / count
+    return intercept, slope
+
+
+def _janaf_formation_gibbs_J(table_id: str, temperature_K: Decimal) -> Decimal:
+    """Formation Gibbs energy in J/mol from the production JANAF interpolator."""
+
+    from simulator.battery.generators.janaf import (
+        _fusion_table_points,
+        _interpolate_formation_gibbs,
+    )
+
+    points, _digest = _fusion_table_points(table_id)
+    return _interpolate_formation_gibbs(points, temperature_K) * Decimal(1000)
+
+
+def _darken_gurry_iron_boundary_ratios() -> tuple[tuple[Decimal, Decimal], ...]:
+    """Stored Table III B rows: (T/K, pCO2/pCO) on the iron–liquid-oxide boundary."""
+
+    path = (
+        REPO_ROOT
+        / "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
+    )
+    document = load_yaml(path)
+    if not isinstance(document, Mapping):
+        raise ValueError("Darken & Gurry extract is not a mapping")
+    species = document.get("species")
+    if not isinstance(species, Mapping):
+        raise ValueError("Darken & Gurry extract has no species map")
+    rows: list[tuple[Decimal, Decimal]] = []
+    for block in species.values():
+        if not isinstance(block, Mapping):
+            continue
+        observations = block.get("observations")
+        if not isinstance(observations, list):
+            continue
+        for obs in observations:
+            if not isinstance(obs, Mapping):
+                continue
+            values = obs.get("values")
+            if not isinstance(values, Mapping) or "pCO2_over_pCO_as_printed" not in values:
+                continue
+            conditions = obs.get("point_conditions")
+            boundary = None
+            if isinstance(conditions, Mapping):
+                raw_boundary = conditions.get("equilibrium_boundary")
+                if isinstance(raw_boundary, Mapping):
+                    state = raw_boundary.get("state")
+                    if isinstance(state, Mapping):
+                        boundary = state.get("value")
+            if boundary != "iron and liquid oxide":
+                continue
+            temperature_K = Decimal(str(values["T_C"])) + _KELVIN_FROM_CELSIUS
+            ratio = Decimal(str(values["pCO2_over_pCO_as_printed"]))
+            if ratio <= 0:
+                raise ValueError(
+                    f"Darken & Gurry iron-boundary ratio is not positive: {ratio}"
+                )
+            rows.append((temperature_K, ratio))
+    rows.sort()
+    if len(rows) != 3:
+        raise ValueError(
+            "expected 3 Darken & Gurry iron-boundary gas ratios, "
+            f"found {len(rows)}"
+        )
+    return tuple(rows)
+
+
+def _iron_fusion_from_janaf() -> tuple[Decimal, Decimal, Decimal]:
+    """ΔH_fus (J/mol), ΔS_fus (J/mol/K) and Tm (K) from the unparsed Fe-003 lines.
+
+    The 1809 K DELTA <-> LIQUID and TRANSITION rows fail the 8-column parser,
+    so enthalpy and entropy are read from the stored raw_line. Columns match
+    every parsed neighbour: T, Cp, S, -[G-H]/T, H-H(Tr), label.
+    """
+
+    from simulator.battery.generators.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / "Fe-003.yaml")
+    table = document.get("table") if isinstance(document, Mapping) else None
+    ambiguities = table.get("parse_ambiguities") if isinstance(table, Mapping) else None
+    if not isinstance(ambiguities, list):
+        raise ValueError("Fe-003 parse_ambiguities are missing")
+    solid: tuple[Decimal, Decimal] | None = None
+    liquid: tuple[Decimal, Decimal] | None = None
+    melting_K: Decimal | None = None
+    for item in ambiguities:
+        if not isinstance(item, Mapping):
+            continue
+        parts = str(item.get("raw_line") or "").split("\t")
+        if len(parts) < 6:
+            continue
+        temperature = Decimal(parts[0])
+        if temperature != Decimal("1809"):
+            continue
+        entropy = Decimal(parts[2])
+        enthalpy_kJ = Decimal(parts[4])
+        label = parts[5]
+        melting_K = temperature
+        if "DELTA" in label and "LIQUID" in label:
+            solid = (entropy, enthalpy_kJ)
+        elif label.startswith("TRANSITION"):
+            liquid = (entropy, enthalpy_kJ)
+    if solid is None or liquid is None or melting_K is None:
+        raise ValueError("Fe-003 is missing the 1809 K DELTA <-> LIQUID pair")
+    return (
+        (liquid[1] - solid[1]) * Decimal(1000),
+        liquid[0] - solid[0],
+        melting_K,
+    )
+
+
+def _holzheid_eq9_slope_J_per_mol_K(temperature_K: Decimal) -> Decimal:
+    """Temperature derivative of Holzheid eq. (9). Comparison only."""
+
+    _intercept, slope, log_coefficient = _HOLZHEID_EQ9_J
+    return slope - log_coefficient * (temperature_K.ln() + 1)
+
+
+def _feo_reference_delta_g_J(
+    intercept_J: Decimal,
+    slope_J_per_mol_K: Decimal,
+    temperature_K: Decimal,
+    fusion_tm_K: Decimal,
+    fusion_h_J: Decimal,
+    fusion_s_J_per_mol_K: Decimal,
+) -> Decimal:
+    """Iron-boundary ΔG versus the stable iron phase, in J/mol.
+
+    Premise: at iron saturation a_Fe = 1, so the measured gas ratio fixes
+    mu_FeO = mu_Fe + mu_O of the FeO component in the saturated liquid.
+    Algebra: ΔG_w,vs_solid = R T ln(pCO2/pCO) + ΔfG(CO2) - ΔfG(CO), fitted
+    as intercept + slope T. Above the iron melting point the stable element
+    phase is liquid, so subtract ΔG_fus(Fe) = ΔH_fus - T ΔS_fus. At exactly
+    Tm the solid branch is kept.
+    Units: R is J/(mol K), the JANAF formation values are converted from
+    kJ/mol to J/mol, and ΔH_fus is J/mol. The ratio ln(factor) is then
+    (ΔG_w,vs_stable - ΔfG(FeO,l)) / (R T), dimensionless.
+    Sanity: the fitted anchors display as 1.841, 1.724 and 1.627; the factor
+    stays above 1 from 1578 K through 2233.15 K; omitting the fusion shift
+    drops the 1960 °C factor through 1, so the shift is applied only for
+    T > 1809 K.
+    """
+
+    delta_g = intercept_J + slope_J_per_mol_K * temperature_K
+    if temperature_K > fusion_tm_K:
+        delta_g -= fusion_h_J - temperature_K * fusion_s_J_per_mol_K
+    return delta_g
+
+
+def _feo_reference_factor(
+    calibration: _IronSaturatedFeOCalibration,
+    temperature_K: Decimal,
+    *,
+    intercept_J: Decimal | None = None,
+    slope_J_per_mol_K: Decimal | None = None,
+) -> Decimal:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    intercept = calibration.intercept_J if intercept_J is None else intercept_J
+    slope = (
+        calibration.slope_J_per_mol_K
+        if slope_J_per_mol_K is None
+        else slope_J_per_mol_K
+    )
+    delta_g = _feo_reference_delta_g_J(
+        intercept,
+        slope,
+        temperature_K,
+        calibration.fusion_tm_K,
+        calibration.fusion_h_J,
+        calibration.fusion_s_J_per_mol_K,
+    )
+    delta_f_g = _janaf_formation_gibbs_J("Fe-019", temperature_K)
+    return (
+        (delta_g - delta_f_g) / (JANAF_R_J_PER_MOL_K * temperature_K)
+    ).exp()
+
+
+def _feo_jackknife_factors(
+    calibration: _IronSaturatedFeOCalibration,
+    temperature_K: Decimal,
+    delta_g_w_J: tuple[Decimal, ...],
+) -> tuple[Decimal, Decimal]:
+    """Min and max factor from the three pair-fits. A sensitivity, not a CI."""
+
+    factors: list[Decimal] = []
+    temperatures = calibration.temperatures_K
+    for left in range(len(temperatures)):
+        for right in range(left + 1, len(temperatures)):
+            intercept, slope = _least_squares_line(
+                (temperatures[left], temperatures[right]),
+                (delta_g_w_J[left], delta_g_w_J[right]),
+            )
+            factors.append(
+                _feo_reference_factor(
+                    calibration,
+                    temperature_K,
+                    intercept_J=intercept,
+                    slope_J_per_mol_K=slope,
+                )
+            )
+    return min(factors), max(factors)
+
+
+@lru_cache(maxsize=1)
+def _iron_saturated_feo_calibration() -> tuple[
+    _IronSaturatedFeOCalibration, tuple[Decimal, ...]
+]:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    ratios = _darken_gurry_iron_boundary_ratios()
+    temperatures = tuple(temperature for temperature, _ratio in ratios)
+    delta_g_w = tuple(
+        JANAF_R_J_PER_MOL_K * temperature * ratio.ln()
+        + _janaf_formation_gibbs_J("C-095", temperature)
+        - _janaf_formation_gibbs_J("C-093", temperature)
+        for temperature, ratio in ratios
+    )
+    intercept, slope = _least_squares_line(temperatures, delta_g_w)
+    fusion_h, fusion_s, fusion_tm = _iron_fusion_from_janaf()
+    calibration = _IronSaturatedFeOCalibration(
+        temperatures_K=temperatures,
+        intercept_J=intercept,
+        slope_J_per_mol_K=slope,
+        fusion_tm_K=fusion_tm,
+        fusion_h_J=fusion_h,
+        fusion_s_J_per_mol_K=fusion_s,
+        window_low_K=min(temperatures),
+        window_high_K=max(temperatures),
+        comparison_text="",
+    )
+    checked = (
+        temperatures
+        + _FEO_SCORED_SPAN_K
+        + (fusion_tm, Decimal("1673.15"), Decimal("1873.15"))
+    )
+    for temperature in checked:
+        if _feo_reference_factor(calibration, temperature) <= 1:
+            raise ValueError(
+                "iron-saturated FeO factor is not above 1 at "
+                f"{temperature} K"
+            )
+    at_melting = _feo_reference_delta_g_J(
+        intercept, slope, fusion_tm, fusion_tm, fusion_h, fusion_s
+    )
+    if at_melting != intercept + slope * fusion_tm:
+        raise ValueError("iron-fusion shift applied at the iron melting point")
+    above = fusion_tm + 1
+    shifted = _feo_reference_delta_g_J(
+        intercept, slope, above, fusion_tm, fusion_h, fusion_s
+    )
+    if not shifted > intercept + slope * above:
+        raise ValueError("iron-fusion shift missing above 1809 K")
+    factor_1400 = _feo_reference_factor(calibration, Decimal("1673.15"))
+    factor_1600 = _feo_reference_factor(calibration, Decimal("1873.15"))
+    eq9_slope = _holzheid_eq9_slope_J_per_mol_K(_HOLZHEID_EQ9_SLOPE_AT_K)
+    comparison = (
+        "Holzheid printed comparison at 1400 C: "
+        f"{_display_decimal(factor_1400, '0.001')} vs "
+        f"{_HOLZHEID_PRINTED_FACTOR_1400_C}; at 1600 C: "
+        f"{_display_decimal(factor_1600, '0.001')} vs "
+        f"{_HOLZHEID_PRINTED_FACTOR_1600_C}; equation (9) slope "
+        f"{_display_decimal(eq9_slope, '0')} vs "
+        f"{_display_decimal(slope, '0.0')} J/mol/K"
+    )
+    calibration = replace(calibration, comparison_text=comparison)
+    return calibration, delta_g_w
+
+
+def _iron_saturated_feo_comparison(
+    reference: Observation, *, engine: Engine | None
+) -> Observation | None:
+    """Retag iron-saturated Fe(1-x)O(l) onto stoichiometric FeO(l).
+
+    The standard-state change is the FeO component's chemical potential,
+    mu_FeO = mu_Fe + mu_O, in the iron-saturated liquid. a_Fe = 1 fixes
+    mu_Fe. Distin's dissolved-oxygen bound is a factor 0.972–0.985 on that
+    activity; it is not applied, and it sits inside the jackknife envelope.
+    No mole fraction redefines the reported activity or activity coefficient.
+
+    Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
+    (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
+    condensed-phase standard state. V dP is about 0.01 J/mol and is not
+    applied. The gas ratios are Darken & Gurry's direct Table III B
+    iron-and-liquid-oxide measurements. Page 801 states
+    N_O/N_Fe = (3r−1)/(2r); that identity fixes composition and does not
+    multiply this partial. Distin p. 75 converts to the stoichiometric oxide
+    by an earlier procedure and prints no factor.
+
+    Supercooled liquid FeO(l) is the comparison convention for a melt
+    component below the oxide's melting marker. Rows outside the measured
+    gas window are scored and flagged, not refused.
+    """
+
+    identity = reference.identity
+    if (
+        reference.admission.status is not AdmissionStatus.ADMITTED
+        or not isinstance(identity, Identity)
+        or identity.reference_state is None
+        or not identity.reference_state.is_value
+        or not isinstance(identity.reference_state.value, StandardState)
+    ):
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return None
+    standard_state = identity.reference_state.value
+    if (
+        identity.species.formula != _FEO_STOICHIOMETRIC_FORMULA
+        or standard_state.endmember.formula != _FEO_WUSTITE_FORMULA
+        or standard_state.component_basis != _FEO_WUSTITE_FORMULA
+        or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        or phase_token(standard_state.endmember) is not Phase.L
+        or reference.value.kind is not ValueKind.POINT
+        or reference.value.point is None
+        or reference.value.point <= 0
+    ):
+        return None
+    if engine is not None:
+        from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
+        if engine.value not in MELT_ACTIVITY_ENGINES:
+            return None
+    temperature_K = temperature_of(identity)
+    if temperature_K is None:
+        if engine is None:
+            return None
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(quantity,),
+            reason=(
+                f"{_IRON_SATURATED_FEO_MISSING_INPUT} activity observation "
+                "has no temperature_K"
+            ),
+            origin=reference.observation_id,
+            band="Darken & Gurry iron-boundary conversion requires temperature_K",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    try:
+        calibration, delta_g_w = _iron_saturated_feo_calibration()
+        factor = _feo_reference_factor(calibration, temperature_K)
+        jackknife_low, jackknife_high = _feo_jackknife_factors(
+            calibration, temperature_K, delta_g_w
+        )
+    except ValueError as exc:
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(quantity,),
+            reason=f"{_IRON_SATURATED_FEO_MISSING_INPUT} {exc}",
+            origin=reference.observation_id,
+            band=f"Darken & Gurry / JANAF FeO reference: {exc}",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    converted = reference.value.point * factor
+    log_f_spread_dex = (
+        Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
+    ).log10()
+    stoichiometric = replace(
+        standard_state,
+        endmember=replace(
+            standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
+        ),
+        component_basis=_FEO_STOICHIOMETRIC_FORMULA,
+    )
+    iron_phase = "liquid" if temperature_K > calibration.fusion_tm_K else "solid"
+    conversion_notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(quantity,),
+        reason=(
+            "source_flagged_less_reliable: basis=Darken & Gurry 1946 "
+            "(JACS 68:798-816), Table III B, p. 803 direct Fe/wustite "
+            "pCO2/pCO ratios, which the authors flag as less reliable on "
+            "p. 811; uncertainty ±0.035 dex in log f centred on 1.792, "
+            "reaching Holzheid/Barin 1.94 at 1400 C; credible-route "
+            "log-f spread log10(1.94/1.792) = "
+            f"{_display_decimal(log_f_spread_dex, '0.0001')} dex; "
+            "IW shift Δlog10(fO2) = 2 Δlog10(f) = "
+            f"{_display_decimal(2 * log_f_spread_dex, '0.001')} dex; "
+            "Masson 1965 Temkin estimate 0.936 is EXCLUDED from the band "
+            "(stated validity N_Fe2+ 0.7-0.9; this case lies outside it); "
+            "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric "
+            f"FeO(l); source_value={reference.value.point}; "
+            f"converted_value={converted}; "
+            f"factor={_display_decimal(factor, '0.001')}; "
+            "jackknife sensitivity factor "
+            f"[{_display_decimal(jackknife_low, '0.001')}, "
+            f"{_display_decimal(jackknife_high, '0.001')}] "
+            "is not a confidence interval; "
+            f"T={temperature_K} K; iron_phase={iron_phase}; "
+            f"{calibration.comparison_text}"
+        ),
+        origin=reference.observation_id,
+    )
+    notices: tuple[Notice, ...] = (conversion_notice,)
+    if (
+        temperature_K < calibration.window_low_K
+        or temperature_K > calibration.window_high_K
+    ):
+        notices += (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason="D&G iron-boundary line extrapolated",
+                origin=reference.observation_id,
+                band=(
+                    f"{calibration.window_low_K}-{calibration.window_high_K} K"
+                ),
+            ),
+        )
+    row_band = _printed_uncertainty_band(
+        quantity,
+        reference.uncertainty,
+        reference.value.point,
+        source_observation=reference,
+    )
+    if row_band.notice is not None:
+        notices += (row_band.notice,)
+    return replace(
+        reference,
+        identity=replace(identity, reference_state=State.of(stoichiometric)),
+        value=replace(reference.value, point=converted),
+        notices=union_notices(reference.notices, notices),
+    )
+
+
 def fusion_comparison_reference(
     reference: Observation, *, engine: Engine | None = None
 ) -> Observation:
-    """Single owner of solid/liquid reference selection for both the battery scorer and melt-activity benchmark."""
+    """Single owner of reference-state selection for the scorer and the melt benchmark.
+
+    Crystal activities move onto the liquid endmember by the JANAF fusion
+    energy. Iron-saturated Fe(1-x)O(l) activities and activity coefficients
+    move onto stoichiometric FeO(l) by the Darken & Gurry oxygen potential.
+    """
+
+    iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
+    if iron_saturated is not None:
+        return iron_saturated
 
     identity = reference.identity
     if (
@@ -1379,20 +2830,44 @@ def fusion_comparison_reference(
         return reference
     standard_state = identity.reference_state.value
     formula = standard_state.endmember.formula
+    observed_reference_phase = phase_token(standard_state.endmember)
+    magemin_native_reference = any(
+        notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and notice.reason.startswith("MAGEMin native solid-reference conversion;")
+        for notice in reference.notices
+    )
+    magemin_native_formula = False
+    if engine is Engine.MAGEMIN:
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        magemin_native_formula = formula in MAGEMIN_NATIVE_MELT_ACTIVITIES
     if (
         identity.species.formula != formula
         or standard_state.component_basis != formula
         or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
-        or phase_token(standard_state.endmember) is not Phase.CR
+        or (
+            observed_reference_phase is not Phase.CR
+            and not (
+                engine is Engine.MAGEMIN
+                and magemin_native_formula
+                and observed_reference_phase is Phase.L
+            )
+        )
         or reference.value.kind is not ValueKind.POINT
         or reference.value.point is None
         or reference.value.point <= 0
     ):
         return reference
 
+    if _source_polymorph_is_rejected(standard_state.endmember.polymorph):
+        return reference
+
     if engine is not None:
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
+        # Internal analytical registers a Raoultian pure liquid endmember basis;
+        # its solid Kume observations must therefore be shifted to liquid before
+        # comparing the predicted liquid activity.
         if engine.value not in MELT_ACTIVITY_ENGINES:
             notice = Notice(
                 kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
@@ -1428,15 +2903,51 @@ def fusion_comparison_reference(
 
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
+        JANAFFusionPolymorphUnavailable,
+        _janaf_eligible_pure_crystal_tables,
         _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
         janaf_fusion_energy,
     )
+
+    # d-165: a source that records the solid but not its polymorph stays on the
+    # printed number. polymorph is None is not that record — the melt-activity
+    # benchmark's pure-solid identity never set the axis, and the stable JANAF
+    # crystal still converts it onto the liquid basis.
+    if (
+        observed_reference_phase is Phase.CR
+        and standard_state.endmember.polymorph is not None
+        and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
+    ):
+        notice = Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason="fusion_source_reference_phase_unprinted",
+            origin=reference.observation_id,
+            band="JANAF fusion conversion requires the source-named solid polymorph",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+    magemin_target_polymorph: Polymorph | None = None
+    magemin_source_polymorph: Polymorph | None = None
+    if engine is Engine.MAGEMIN:
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        native = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(formula)
+        if native is None:
+            return reference
+        magemin_target_polymorph = Polymorph(native[1])
+        magemin_source_polymorph = polymorph_token(standard_state.endmember)
+        if magemin_source_polymorph is magemin_target_polymorph:
+            # Guo's MgO measurement is already on the periclase standard.
+            return reference
 
     def fusion_missing_input_notice(reason: str) -> Notice | None:
         if not any(
             expected in reason
             for expected in (
                 f"no JANAF fusion table pair for {formula}",
+                "no unique JANAF solid table",
                 "JANAF crystal/liquid tables do not overlap",
                 "JANAF tables have fewer than two complete overlap nodes",
                 "expected one JANAF cr/l crossing",
@@ -1446,6 +2957,7 @@ def fusion_comparison_reference(
                 "needed JANAF table node row missing or changed",
                 "JANAF cached table is incomplete",
                 "JANAF table values are missing",
+                "JANAF cache hash does not match source sidecar",
                 "JANAF table has fewer than two Gibbs points",
                 "spans missing grid node",
             )
@@ -1459,8 +2971,33 @@ def fusion_comparison_reference(
             band=f"JANAF fusion data for {formula}: {reason}",
         )
 
+    inferred_reference_notice: Notice | None = None
     try:
-        fusion = janaf_fusion_energy(formula, temperature_K)
+        if engine is Engine.MAGEMIN:
+            # The MAGEMin adapter resolves the source and target crystal
+            # tables itself and reads only this oxide's liquid table. A liquid
+            # reference names no crystal polymorph, so the source-named lookup
+            # cannot supply that table.
+            fusion = janaf_fusion_energy(formula, temperature_K)
+        elif standard_state.endmember.polymorph is None:
+            (
+                reference,
+                fusion,
+                absent_polymorph_refusal,
+                inferred_reference_notice,
+            ) = _fusion_energy_when_polymorph_absent(
+                reference, formula, temperature_K
+            )
+            if absent_polymorph_refusal is not None:
+                extra = (absent_polymorph_refusal,)
+                if inferred_reference_notice is not None:
+                    extra = (inferred_reference_notice, absent_polymorph_refusal)
+                return replace(
+                    reference,
+                    notices=union_notices(reference.notices, extra),
+                )
+        else:
+            fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
     except ValueError as exc:
         reason = str(exc)
         notice = fusion_missing_input_notice(reason)
@@ -1468,205 +3005,168 @@ def fusion_comparison_reference(
             raise
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
+    if engine is Engine.MAGEMIN:
+        assert magemin_target_polymorph is not None
+        source_polymorph = magemin_source_polymorph
+        target_polymorph = magemin_target_polymorph
+
+        try:
+            eligible = _janaf_eligible_pure_crystal_tables(formula, temperature_K)
+            target_tables = tuple(
+                table for table, polymorph in eligible
+                if polymorph is target_polymorph
+            )
+            if len(target_tables) != 1:
+                raise ValueError(
+                    f"expected one JANAF table for MAGEMin {target_polymorph.value}, "
+                    f"got {[table for table in target_tables]}"
+                )
+            if observed_reference_phase is Phase.L:
+                source_table = fusion.liquid_table
+                source_label = "liquid"
+                inferred_source = False
+                source_pair = None
+            elif source_polymorph is None or _source_polymorph_is_unspecified(
+                standard_state.endmember.polymorph
+            ):
+                stability = _janaf_stable_crystal_set(
+                    formula, temperature_K, eligible
+                )
+                source_table = stability.selected.table_id
+                source_polymorph = stability.selected.polymorph
+                source_label = source_polymorph.value
+                inferred_source = True
+                source_pair = _janaf_fusion_energy_for_pair(
+                    formula, source_table, fusion.liquid_table, temperature_K
+                )
+            else:
+                source_tables = tuple(
+                    table for table, polymorph in eligible
+                    if polymorph is source_polymorph
+                )
+                if len(source_tables) != 1:
+                    raise ValueError(
+                        f"expected one JANAF table for observed "
+                        f"{source_polymorph.value}, got {list(source_tables)}"
+                    )
+                source_table = source_tables[0]
+                source_label = source_polymorph.value
+                inferred_source = False
+                source_pair = _janaf_fusion_energy_for_pair(
+                    formula, source_table, fusion.liquid_table, temperature_K
+                )
+            target_pair = _janaf_fusion_energy_for_pair(
+                formula, target_tables[0], fusion.liquid_table, temperature_K
+            )
+        except (ValueError, JANAFFusionPolymorphUnavailable) as exc:
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: MAGEMin "
+                    f"native reference could not be resolved: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF solid-reference pair for MAGEMin {formula}: {exc}",
+            )
+            return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+        # MAGEMin's native ig activities use periclase for MgO and quartz for
+        # SiO2 (the low-pressure basis used by this scorer; the official API
+        # also names coesite at high pressure). At equal chemical potential,
+        # mu=G°+RT ln(a), so a_target=a_source*exp((G_source-G_target)/RT).
+        # With ΔG_fus=G_liquid-G_crystal, G_source-G_target is
+        # ΔG_fus(target)-ΔG_fus(source), fixing the conversion sign. The
+        # JANAF kJ/mol difference is multiplied by 1000 J/kJ and divided by
+        # R[J/(mol K)]*T[K], so the exponent is dimensionless. Pure-limit
+        # check: when source and target are the same pure polymorph, ΔG=0 and
+        # activity 1 remains 1.
+        delta_g_source_minus_target_J_per_mol = (
+            target_pair.delta_g_fus_kJ_per_mol
+            if source_pair is None
+            else target_pair.delta_g_fus_kJ_per_mol
+            - source_pair.delta_g_fus_kJ_per_mol
+        ) * Decimal(1000)
+        converted_activity = reference.value.point * (
+            delta_g_source_minus_target_J_per_mol
+            / (JANAF_R_J_PER_MOL_K * temperature_K)
+        ).exp()
+        native_endmember = replace(
+            standard_state.endmember,
+            phase=Phase.CR,
+            polymorph=State.of(target_polymorph),
+        )
+        native_state = replace(standard_state, endmember=native_endmember)
+        native_identity = replace(identity, reference_state=State.of(native_state))
+        conversion_notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "MAGEMin native solid-reference conversion; "
+                f"formula={formula}; source_reference={source_label}; "
+                f"target_polymorph={target_polymorph.value}; "
+                f"source_activity={reference.value.point}; "
+                f"target_activity={converted_activity}; "
+                f"delta_g_source_minus_target={delta_g_source_minus_target_J_per_mol} J/mol; "
+                f"source_table={source_table}; target_table={target_tables[0]}; "
+                f"inferred_source_polymorph={inferred_source}"
+            ),
+            origin=reference.observation_id,
+            band=f"JANAF reference {source_label} to {target_polymorph.value}",
+            authority=Authority.CERTIFIED,
+            certification="NIST-JANAF crystal Gibbs energies compared at T",
+        )
+        return replace(
+            reference,
+            value=replace(reference.value, point=converted_activity),
+            identity=native_identity,
+            notices=union_notices(reference.notices, (conversion_notice,)),
+        )
+
+    if engine is not Engine.MAGEMIN and magemin_native_reference:
+        # The prior MAGEMin conversion explicitly established a quartz solid
+        # basis. Resolve that same JANAF table when the next owner request is
+        # for a liquid-reference engine; the generic stable-solid choice can
+        # be a different SiO2 polymorph at this temperature.
+        source_polymorph = polymorph_token(standard_state.endmember)
+        try:
+            eligible = _janaf_eligible_pure_crystal_tables(formula, temperature_K)
+            source_tables = tuple(
+                table for table, polymorph in eligible
+                if polymorph is source_polymorph
+            )
+            if len(source_tables) != 1:
+                raise ValueError(
+                    f"expected one JANAF table for MAGEMin source "
+                    f"{source_polymorph}, got {list(source_tables)}"
+                )
+            fusion = _janaf_fusion_energy_for_pair(
+                formula, source_tables[0], fusion.liquid_table, temperature_K
+            )
+        except (ValueError, JANAFFusionPolymorphUnavailable) as exc:
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: MAGEMin "
+                    f"source reference could not be resolved for liquid basis: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF MAGEMin source/liquid pair for {formula}: {exc}",
+            )
+            return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
     # JANAF Mg-008 (MgO(cr), periclase) and Mg-009 (MgO(l)) give, by node
     # interpolation at 1873 K, G_s°=-345.91812 and G_l°=-317.44751 kJ/mol.
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = {
-        "Ca-027": Polymorph.LIME,
-        "Al-096": Polymorph.CORUNDUM,
-        "Mg-008": Polymorph.PERICLASE,
-        "O-035": Polymorph.CRISTOBALITE_HIGH,
-    }.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
         and fusion.crystal_table == "O-035"
         and observed_polymorph is Polymorph.TRIDYMITE
     )
-    source_polymorph = standard_state.endmember.polymorph
-    source_polymorph_is_unknown = (
-        source_polymorph is not None
-        and source_polymorph.is_unknown
-        and not (source_polymorph.reason or "").startswith("unrecognised polymorph ")
-    )
-    source_polymorph_is_unspecified = (
-        source_polymorph is None or source_polymorph_is_unknown
-    )
-    unique_unknown_polymorph_table = False
-    inferred_reference_notice: Notice | None = None
-    eligible_solid_tables: tuple[tuple[str, Polymorph | None], ...] = ()
-    if (
-        expected_polymorph is not None
-        and observed_polymorph is not expected_polymorph
-        and source_polymorph_is_unspecified
-    ):
-        eligible_solid_tables = tuple(
-            (table_id, table_polymorph)
-            for candidate_formula, table_id, table_polymorph
-            in _janaf_pure_solid_table_index()
-            if candidate_formula == formula
-            and (
-                table_range := _janaf_pure_solid_table_temperature_range(table_id)
-            ) is not None
-            and table_range[0] <= temperature_K <= table_range[1]
-        )
-        if len(eligible_solid_tables) == 1:
-            unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
-                fusion.crystal_table
-            )
-        elif len(eligible_solid_tables) > 1:
-            from simulator.battery.generators import janaf as janaf_tables
-
-            candidates: list[tuple[str, Polymorph, Decimal]] = []
-            for table_id, table_polymorph in eligible_solid_tables:
-                if table_polymorph is None:
-                    candidates = []
-                    break
-                try:
-                    points, _source_sha256 = janaf_tables._fusion_table_points(
-                        table_id
-                    )
-                    gibbs_kJ_per_mol = janaf_tables._interpolate_formation_gibbs(
-                        points, temperature_K
-                    )
-                except ValueError:
-                    continue
-                candidates.append((table_id, table_polymorph, gibbs_kJ_per_mol))
-
-            if len(candidates) == len(eligible_solid_tables) and candidates:
-                stable_table, stable_polymorph, stable_gibbs_kJ_per_mol = min(
-                    candidates, key=lambda item: item[2]
-                )
-                alternatives = tuple(
-                    item for item in candidates if item[0] != stable_table
-                )
-                if alternatives:
-                    # For equal chemical potential, changing the pure-solid
-                    # standard state shifts activity by exp(dG/RT). Therefore
-                    # d log10(a) = dG / (R T ln 10); J/mol divided by
-                    # (J/mol/K) K is dimensionless, and ln(10) converts ln to
-                    # log10. JANAF gives the quartz alternative to cristobalite
-                    # as 0.038716 dex at 1823 K and 0.039634 dex at 1873 K.
-                    # Its Al2O3 delta/gamma/kappa alternatives give a maximum
-                    # 0.209434 dex at 1823 K and 0.188226 dex at 1873 K. Those
-                    # transition aluminas are metastable relative to corundum
-                    # at these temperatures, so this is an upper bound over
-                    # tabulated phases, not a claim that experiments used them.
-                    # Tridymite is absent from these JANAF tables, so the SiO2
-                    # bound does not cover tridymite.
-                    bound_by_alternative = tuple(
-                        (
-                            abs(gibbs_kJ_per_mol - stable_gibbs_kJ_per_mol)
-                            * Decimal(1000)
-                            / (
-                                JANAF_R_J_PER_MOL_K
-                                * temperature_K
-                                * Decimal(10).ln()
-                            ),
-                            table_id,
-                            polymorph,
-                            gibbs_kJ_per_mol,
-                        )
-                        for table_id, polymorph, gibbs_kJ_per_mol in alternatives
-                    )
-                    bound_dex, max_table, max_polymorph, _max_gibbs = max(
-                        bound_by_alternative, key=lambda item: item[0]
-                    )
-                    row_band = _printed_uncertainty_band(
-                        Quantity.ACTIVITY,
-                        reference.uncertainty,
-                        reference.value.point,
-                        source_observation=reference,
-                    )
-                    bound_exceeds_row_band = (
-                        None if row_band is None else bound_dex > row_band.value
-                    )
-                    inference_detail = {
-                        "oxide": formula,
-                        "temperature_K": str(temperature_K),
-                        "chosen_polymorph": stable_polymorph.value,
-                        "chosen_table": stable_table,
-                        "alternatives": [
-                            {"polymorph": polymorph.value, "table": table_id}
-                            for table_id, polymorph, _gibbs in alternatives
-                        ],
-                        "bound_dex": str(bound_dex),
-                        "maximum_alternative": {
-                            "polymorph": max_polymorph.value,
-                            "table": max_table,
-                        },
-                        "row_decision_band_dex": (
-                            None if row_band is None else str(row_band.value)
-                        ),
-                        "bound_exceeds_row_band": bound_exceeds_row_band,
-                        "authority": Authority.CERTIFIED.value,
-                    }
-                    inferred_reference_notice = Notice(
-                        kind=NoticeKind.DERIVATION_USES_COMPILATION,
-                        affected_quantities=(Quantity.ACTIVITY,),
-                        reason=(
-                            "reference_polymorph_inferred_from_stability: "
-                            + json.dumps(inference_detail, sort_keys=True)
-                        ),
-                        origin=reference.observation_id,
-                        band=f"JANAF stability bound {bound_dex} dex",
-                        authority=Authority.CERTIFIED,
-                        certification=(
-                            "NIST-JANAF solid formation Gibbs energies compared at T"
-                        ),
-                    )
-                    unique_unknown_polymorph_table = True
-                    if stable_table != fusion.crystal_table:
-                        try:
-                            fusion = _janaf_fusion_energy_for_pair(
-                                formula,
-                                stable_table,
-                                fusion.liquid_table,
-                                temperature_K,
-                            )
-                        except ValueError as exc:
-                            notice = fusion_missing_input_notice(str(exc))
-                            if notice is None:
-                                raise
-                            notices = (notice,)
-                            if inferred_reference_notice is not None:
-                                notices = (inferred_reference_notice, notice)
-                            return replace(
-                                reference,
-                                notices=union_notices(reference.notices, notices),
-                            )
-    if (
-        expected_polymorph is not None
-        and observed_polymorph is not expected_polymorph
-        and not tridymite_to_cristobalite
-        and not unique_unknown_polymorph_table
-    ):
-        observed = "unknown" if observed_polymorph is None else observed_polymorph.value
-        notice = Notice(
-            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason=(
-                "fusion conversion missing input: JANAF solid table "
-                f"{fusion.crystal_table} represents polymorph "
-                f"{expected_polymorph.value}, but measured reference polymorph "
-                f"is {observed}"
-            ),
-            origin=reference.observation_id,
-            band=(
-                f"JANAF {fusion.crystal_table} requires "
-                f"{expected_polymorph.value} solid reference"
-            ),
-        )
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
-
-    if inferred_reference_notice is not None:
-        reference = replace(
-            reference,
-            notices=union_notices(reference.notices, (inferred_reference_notice,)),
-        )
-
     tridymite_notice: Notice | None = None
     tridymite_offset_dex = Decimal(0)
     if tridymite_to_cristobalite:
@@ -1675,8 +3175,8 @@ def fusion_comparison_reference(
         )
         # At equal chemical potential, G_cr + RT ln(a_cr) =
         # G_tr + RT ln(a_tr), so ln(a_cr/a_tr) = -ΔG_tr/(RT).
-        tridymite_offset_dex = -delta_g_tr_J_per_mol / (
-            JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+        tridymite_offset_dex = -delta_g_tr_J_per_mol / _rt_ln_10_j_per_mol_K(
+            temperature_K
         )
         authority = Authority.EXTRAPOLATED if extrapolated else Authority.CERTIFIED
         band = f"B1259 common printed H/S band [{band_lo}, {band_hi}] K"
@@ -1702,9 +3202,7 @@ def fusion_comparison_reference(
         )
 
     delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
-    offset_dex = delta_g_fus_J_per_mol / (
-        JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
-    )
+    offset_dex = delta_g_fus_J_per_mol / _rt_ln_10_j_per_mol_K(temperature_K)
     liquid_endmember = replace(
         standard_state.endmember,
         phase=Phase.L,
@@ -1751,35 +3249,45 @@ def fusion_comparison_reference(
     # move it to liquid. Since μ=G°+RT ln(a), each step multiplies activity
     # by exp(−ΔG/RT). B1259's common printed H/S grid ends at 2000 K; its edge
     # H/S are held beyond that limit (dCp=0) and the notice marks extrapolation.
-    above_crossing_notice: Notice | None = None
+    magemin_above_crossing_notice: Notice | None = None
     if (
         temperature_K >= fusion.melting_temperature_K
         and not tridymite_to_cristobalite
     ):
-        inferred_conversion = inferred_reference_notice is not None
-        domain_notice = Notice(
-            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason=(
-                f"solid reference recorded at T={temperature_K} K >= "
-                f"JANAF T_fus={fusion.melting_temperature_K} K; "
-                + (
-                    "inferred solid-reference activity converted numerically; "
+        if magemin_native_reference:
+            # The engine already named its solid standard. Convert that known
+            # reference; do not invent a polymorph for an unprinted source.
+            magemin_above_crossing_notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"solid reference recorded at T={temperature_K} K >= "
+                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    "MAGEMin native solid-reference activity converted numerically; "
+                    "its explicit polymorph table supplies the source standard; "
                     "liquid is natural"
-                    if inferred_conversion
-                    else "no numeric reference-state conversion applied because "
-                    "liquid is natural"
-                )
-            ),
-            origin=reference.observation_id,
-            band=(
-                f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
-                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
-            ),
-        )
-        if inferred_conversion:
-            above_crossing_notice = domain_notice
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                ),
+            )
         else:
+            domain_notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"solid reference recorded at T={temperature_K} K >= "
+                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    "no numeric reference-state conversion applied because liquid is natural"
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                ),
+            )
             notices = (domain_notice,) if melts_notice is None else (
                 domain_notice,
                 melts_notice,
@@ -1822,7 +3330,6 @@ def fusion_comparison_reference(
         affected_quantities=(Quantity.ACTIVITY,),
         reason=(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
-            f"{'source polymorph is unknown; ' if source_polymorph_is_unknown else ''}"
             "reference-state conversion (not model error); "
             f"oxide={formula}; source_activity_solid={reference.value.point}; "
             f"converted_activity_liquid={converted_activity}; "
@@ -1838,8 +3345,10 @@ def fusion_comparison_reference(
         origin=reference.observation_id,
     )
     notices = (notice,)
-    if above_crossing_notice is not None:
-        notices = (above_crossing_notice,) + notices
+    if inferred_reference_notice is not None:
+        notices = (inferred_reference_notice,) + notices
+    if magemin_above_crossing_notice is not None:
+        notices = (magemin_above_crossing_notice,) + notices
     if melts_notice is not None:
         notices += (melts_notice,)
     if tridymite_notice is not None:
@@ -1863,36 +3372,6 @@ def temperature_of(identity: Identity) -> Decimal | None:
     if state is not None and state.is_value and state.value is not None:
         return as_decimal(state.value)
     return None
-
-
-def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
-    """Convert an engine-basis composition to oxide wt%.
-
-    Premise: Identity.composition is a complete ordered map on
-    mol_inventory or mole_fraction. Equilibrate cells take oxide wt%.
-    Algebra: m_i = n_i M_i; w_i = 100 m_i / Σ m_j.
-    Unit check: (mol)×(g/mol) = g; g/g × 100 = wt%.
-    Sanity: equal moles of SiO2 (60.084) and MgO (40.304) → ~59.9/40.1 wt%.
-    """
-
-    from simulator.diagnostic_helpers.binary_pot_scoring import oxide_molar_mass_g_mol
-
-    masses: dict[str, float] = {}
-    for oxide, amount in composition.components:
-        parsed = parse_species_formula(oxide)
-        if parsed is None:
-            return None
-        n = float(amount)
-        if not math.isfinite(n) or n < 0.0:
-            return None
-        mass = n * oxide_molar_mass_g_mol(oxide)
-        if not math.isfinite(mass) or mass < 0.0:
-            return None
-        masses[oxide] = mass
-    total = sum(masses.values())
-    if total <= 0.0:
-        return None
-    return {k: 100.0 * v / total for k, v in masses.items() if v > 0.0}
 
 
 def blocking_qualifications(
@@ -1947,8 +3426,8 @@ def lineage_complete_for(
     """True when every engine alias is mapped and store ids resolve.
 
     Without a store, completeness is the mapping itself: unmapped MELTS
-    aliases stay incomplete. With a store, ``_resolve_coefficient_sources``
-    must return a set (unknown strings are not independence).
+    aliases stay incomplete. With a store, the resolver must return a
+    complete ancestry. An incomplete result is not independence.
     """
 
     lineage_sources = coefficient_lineage_sources(sources)
@@ -1960,10 +3439,9 @@ def lineage_complete_for(
     expanded = expand_coefficient_sources(lineage_sources)
     if works is None or observations is None:
         return True
-    return (
-        _resolve_coefficient_sources(expanded, observations, works, experiments)
-        is not None
-    )
+    return _resolve_coefficient_sources(
+        expanded, observations, works, experiments
+    ).complete
 
 
 def resolve_source_relation(
@@ -1978,18 +3456,49 @@ def resolve_source_relation(
     if not lineage_complete:
         return SourceRelation.UNKNOWN
     table_ids = _table_ids(works)
-    ref_ids = _observation_lineage(reference.observation_id, observations, table_ids)
+    ref_ids = _observation_lineage(
+        reference.observation_id,
+        observations,
+        table_ids,
+        asset_ids=_asset_ids(works),
+    )
     cand_ids = _resolve_coefficient_sources(
         coefficient_lineage_sources(coefficient_sources),
         observations,
         works,
         experiments,
     )
-    if ref_ids is None or cand_ids is None:
+    if (
+        not ref_ids.complete
+        or not cand_ids.complete
+        or ref_ids.ids is None
+        or cand_ids.ids is None
+    ):
         return SourceRelation.UNKNOWN
-    if ref_ids & cand_ids:
+    if ref_ids.ids & cand_ids.ids:
         return SourceRelation.SAME_INPUT
     return SourceRelation.INDEPENDENT
+
+
+KC91_CALIBRATION_SOURCES = {
+    "citation": "Kress & Carmichael (1991); Partzsch et al. (2004), p. 566",
+    "attributions": (
+        "K&C88+; K&C91",
+        "Kilinc et al. (1983)",
+        "Sack et al. (1980)",
+        "Thornber et al. (1980)",
+    ),
+}
+
+
+def _kc91_calibration_source_overlap(attribution: str | None) -> bool:
+    if not attribution:
+        return False
+    normalized = attribution.casefold()
+    return any(
+        normalized.startswith(label.casefold())
+        for label in KC91_CALIBRATION_SOURCES["attributions"]
+    )
 
 
 def selected_lineage_level(
@@ -2051,7 +3560,10 @@ def build_conjuncts(
         and isinstance(reference.identity, Identity)
         and isinstance(candidate.identity, Identity)
     ):
-        identity_ok = identity_equal(reference.identity, candidate.identity).kind is IdentityEqualKind.EQUAL
+        identity_ok = (
+            _score_identity_equal(reference.identity, candidate.identity).kind
+            is IdentityEqualKind.EQUAL
+        )
     cand_ok = False
     if candidate is not None:
         cev = candidate.evidence.class_
@@ -2063,6 +3575,9 @@ def build_conjuncts(
     independent = (
         source_relation is SourceRelation.INDEPENDENT and lineage_complete
     )
+    # Engine band notices remain visible to the measured report's flagged
+    # population. Prediction authority is already gated separately.
+    eligibility_notices = _score_eligibility_notices(notices)
     return EligibleConjuncts(
         status=status,
         finite_numeric_point_endpoints=finite_points,
@@ -2076,11 +3591,11 @@ def build_conjuncts(
         candidate_engine_prediction_authority_allowed=cand_ok,
         no_blocking_qualification=not blocking_qualifications(
             quantity,
-            notices,
+            eligibility_notices,
             oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
         ),
         not_flagged_stratum=not any(
-            _is_flagged_stratum_notice(notice) for notice in notices
+            _is_flagged_stratum_notice(notice) for notice in eligibility_notices
         ),
         selected_independent_lineage_level=selected_lineage_level(
             reference, comparison_ids
@@ -2121,15 +3636,7 @@ def band_dimension_matches(
 def pooled_log_pressure_sd(
     replicate_log_pressures: Sequence[Sequence[Decimal | int | float]],
 ) -> Decimal | None:
-    """Return the pooled sample SD of replicate ``log10(p)`` values.
-
-    Premise: rows in one replicate group share composition, temperature, and
-    method, so their log-pressure spread estimates measurement scatter.
-    Algebra: for group g, s²_g = Σ(x_g−x̄_g)²/(n_g−1); pool with
-    s² = Σ(n_g−1)s²_g / Σ(n_g−1). Unit check: x = log10(p), so s is dex;
-    no pressure unit remains. Sanity: groups ``(−1, 0, 1)`` and ``(9, 10,
-    11)`` both have SD 1, hence the pooled result is 1 dex.
-    """
+    """Return the pooled sample SD of replicate log10(p) values."""
 
     sum_squares = Decimal(0)
     degrees_of_freedom = 0
@@ -2177,11 +3684,23 @@ def _printed_pressure_uncertainty_dex(observation: Observation) -> Decimal | Non
             continue
         fraction = Decimal(match.group(1)) / Decimal(100)
         if fraction > 0:
-            # The source prints a relative pressure envelope. Convert its
-            # upper multiplicative edge to the dex residual metric; this is
-            # the same ~0.15 dex reading used by the source's ±40% statement.
+            # The source prints a relative pressure envelope. Convert its upper
+            # multiplicative edge to the dex residual metric.
             return (Decimal(1) + fraction).ln() / Decimal(10).ln()
     return None
+
+
+def _is_source_wide_kems_pressure_envelope(
+    quantity: Quantity,
+    method: MethodToken | None,
+    observation: Observation | None,
+) -> bool:
+    return (
+        quantity is Quantity.P_PARTIAL
+        and method is MethodToken.KNUDSEN_EFFUSION
+        and observation is not None
+        and _printed_pressure_uncertainty_dex(observation) is not None
+    )
 
 
 def _observation_flagged_strata(
@@ -2218,6 +3737,25 @@ def _observation_flagged_strata(
     )
 
 
+def _has_ungrounded_kems_partial_pressure_calibration(
+    observation: Observation,
+    experiment: Experiment | None,
+) -> bool:
+    identity = observation.identity
+    if (
+        experiment is None
+        or not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.P_PARTIAL
+        or not experiment.method.is_value
+        or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+    ):
+        return False
+    calibration = (
+        None if experiment.apparatus is None else experiment.apparatus.calibration
+    )
+    return not _calibration_grounded(calibration)
+
+
 def _kems_replicate_groups(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
@@ -2232,14 +3770,19 @@ def _kems_replicate_groups(
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
-        if _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment, benches
+        experiment = experiments.get(observation.experiment_id)
+        if _has_ungrounded_kems_partial_pressure_calibration(
+            observation, experiment
         ):
+            continue
+        strata = _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment, benches
+        )
+        if strata:
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
             continue
-        experiment = experiments.get(observation.experiment_id)
         if (
             experiment is None
             or not experiment.method.is_value
@@ -2265,9 +3808,7 @@ def _kems_replicate_groups(
             str(temperature),
             tuple((name, str(amount)) for name, amount in composition.value.components),
         )
-        groups.setdefault(key, []).append(
-            point.ln() / Decimal(10).ln()
-        )
+        groups.setdefault(key, []).append(point.ln() / Decimal(10).ln())
     return tuple(tuple(values) for values in groups.values() if len(values) >= 2)
 
 
@@ -2277,13 +3818,11 @@ def derive_kems_partial_pressure_band(
     *,
     benches: Mapping[str, Bench] | None = None,
 ) -> DecisionBand | None:
-    """Derive a band from measured rows and their optional bench context.
+    """Resolve the source-printed or replicate band for measured KEMS pressures."""
 
-    Pass the bench map when a row's cell material is stored on its Bench. The
-    private scorer path supplies the same map directly; a missing band never
-    falls back to this helper from ``decision_band_for``.
-    """
-    return _derive_kems_partial_pressure_band(observations, experiments, benches or {})
+    return _derive_kems_partial_pressure_band(
+        observations, experiments, benches or {}
+    )
 
 
 def _derive_kems_partial_pressure_band(
@@ -2291,12 +3830,7 @@ def _derive_kems_partial_pressure_band(
     experiments: Mapping[str, Experiment],
     benches: Mapping[str, Bench],
 ) -> DecisionBand | None:
-    """Derive one KEMS p_partial band from admitted measured observations.
-
-    Printed pressure uncertainty is preferred. If a row has no usable printed
-    pressure uncertainty, exact composition/T replicate groups supply the
-    pooled log-pressure scatter; no engine residual enters this calculation.
-    """
+    """Resolve one band from admitted measured KEMS partial-pressure rows."""
 
     candidates = []
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
@@ -2307,14 +3841,19 @@ def _derive_kems_partial_pressure_band(
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
-        if _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment, benches
+        experiment = experiments.get(observation.experiment_id)
+        if _has_ungrounded_kems_partial_pressure_calibration(
+            observation, experiment
         ):
+            continue
+        strata = _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment, benches
+        )
+        if strata:
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
             continue
-        experiment = experiments.get(observation.experiment_id)
         if (
             experiment is None
             or not experiment.method.is_value
@@ -2328,11 +3867,14 @@ def _derive_kems_partial_pressure_band(
     if not candidates:
         return None
 
-    printed_observations = [
-        (observation, width)
-        for observation in candidates
-        if (width := _printed_pressure_uncertainty_dex(observation)) is not None
-    ]
+    printed_observations = []
+    for observation in candidates:
+        reference_value = point_magnitude(observation.value)
+        if reference_value is None:
+            continue
+        pressure_width = _printed_pressure_uncertainty_dex(observation)
+        if pressure_width is not None:
+            printed_observations.append((observation, pressure_width))
     printed = [width for _, width in printed_observations]
     if printed:
         width = _rms(printed)
@@ -2363,109 +3905,530 @@ def _derive_kems_partial_pressure_band(
     )
     if replicate_scatter is None:
         return None
-    width = replicate_scatter
-    if width is None or not width.is_finite() or width <= 0:
+    if not replicate_scatter.is_finite() or replicate_scatter <= 0:
         return None
     rule = (
         "KEMS p_partial measured uncertainty: replicate scatter (pooled replicate "
         "log10 pressure SD; used because no admitted printed pressure envelope "
         "exists)"
     )
-    return DecisionBand(width, "dimensionless", rule)
+    return DecisionBand(replicate_scatter, "dimensionless", rule)
+
+
+def _decision_band_kind(
+    band: DecisionBand | Mapping[str, object] | str | None,
+) -> str:
+    """Return the policy kind encoded by the owning rule's stable token."""
+    if band is None:
+        return "no_band"
+    if isinstance(band, DecisionBand):
+        rule = band.rule
+    elif isinstance(band, Mapping):
+        rule = str(band.get("rule") or "")
+    else:
+        rule = band or ""
+    kind = str(rule).split(":", 1)[0]
+    return kind if kind in {
+        "printed_1sigma", "printed_2sigma", "printed_range",
+        "printed_unstated", "derived_scatter",
+    } else "other"
 
 
 def decision_band_for(
     quantity: Quantity | None,
     source_relation: SourceRelation,
     *,
-    rail: Rail | None = None,
-    method: MethodToken | None = None,
-    observations: Mapping[str, Observation] | None = None,
-    experiments: Mapping[str, Experiment] | None = None,
+    printed_band: DecisionBand | None = None,
+    printed_refusal: Mapping[str, object] | None = None,
     derived_band: DecisionBand | None = None,
     operation: MetricOperation | None = None,
 ) -> DecisionBand | None:
-    if (
-        quantity is Quantity.P_PARTIAL
-        and rail is Rail.VAPOUR
-        and method is MethodToken.KNUDSEN_EFFUSION
-        and observations is not None
-        and experiments is not None
-    ):
-        # A None band is meaningful: the bench-aware scoring derivation found
-        # no unflagged candidates.  Do not refill it with the public helper,
-        # whose inputs cannot include the bench map.
-        band = derived_band
-        if band is not None and band_dimension_matches(
-            quantity, band, operation=operation
-        ):
-            return band
-    if derived_band is not None:
-        if band_dimension_matches(quantity, derived_band, operation=operation):
-            return derived_band
-        return None
-    if quantity not in GIBBS_BAND_QUANTITIES:
-        return None
-    band = THERMOCHEMISTRY_DECISION_BANDS[SourceRelation.INDEPENDENT]
+    """Choose a printed or derived band, then apply its quantity and unit gates.
+
+    ``source_relation`` labels lineage only. A KEMS pressure envelope covers
+    admitted measured partial-pressure rows whose cell uncertainty is unparseable;
+    other printed-uncertainty refusals block derived-band fallthrough.
+    """
+    del source_relation
+    band = printed_band if printed_band is not None else derived_band
     if band is None:
         return None
-    if not band_dimension_matches(quantity, band):
+    kems_pressure_band = band.rule.startswith(
+        "KEMS p_partial measured uncertainty:"
+    )
+    if kems_pressure_band:
+        if quantity is not Quantity.P_PARTIAL:
+            return None
+    elif printed_refusal is not None:
+        return None
+    if not band_dimension_matches(quantity, band, operation=operation):
         return None
     return band
 
 
-def _mapped_reading_uncertainty_dex(
-    uncertainty: Uncertainty,
-) -> Decimal | None:
-    """Dex width from mapped PRINTED verbatim or typed value/basis=dex.
+_UNCERTAINTY_NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
+_UNCERTAINTY_RANGE_RE = re.compile(
+    rf"[\[(]\s*({_UNCERTAINTY_NUMBER})\s*[,;–—]\s*({_UNCERTAINTY_NUMBER})\s*[\])]"
+)
+_UNCERTAINTY_PAIR_RE = re.compile(
+    rf"({_UNCERTAINTY_NUMBER})\s+(?:–|—|to)\s+({_UNCERTAINTY_NUMBER})",
+    re.IGNORECASE,
+)
+_UNCERTAINTY_SCALAR_RE = re.compile(_UNCERTAINTY_NUMBER)
+_LOG10_ACTIVITY_STANDARD_DEVIATION_RE = re.compile(
+    r"\bstandard\s+deviation\s+(?:of|in)\s+log\s*10\s*(?:\(\s*a\s*\)|a\b|activity\b)",
+    re.IGNORECASE,
+)
 
-    Extracts store reading uncertainty as a verbatim mapping with keys such as
-    ``dex``, ``sigma_log10P_dex_per_point``, or nested
-    ``figure_reading_estimate.log10_p_atm_absolute_uncertainty_dex``. A typed
-    ``value`` with a dex ``basis`` is accepted the same way. Scalar PRINTED
-    strings remain handled by ``_printed_uncertainty_band``.
-    """
 
-    if uncertainty.value is not None and uncertainty.basis:
-        basis = uncertainty.basis.casefold()
-        if "dex" in basis:
-            raw = uncertainty.value
-            if isinstance(raw, tuple):
-                raw = abs(raw[1] - raw[0])
+def _is_log10_activity_standard_deviation(text: str) -> bool:
+    return _LOG10_ACTIVITY_STANDARD_DEVIATION_RE.search(text) is not None
+
+
+def _uncertainty_original(uncertainty: Uncertainty) -> str:
+    value = uncertainty.verbatim
+    if value is None:
+        value = uncertainty.value
+    if isinstance(value, Mapping):
+        return json.dumps(to_plain(value), ensure_ascii=False, sort_keys=True)
+    return str(value)
+
+
+def _uncertainty_scope_covers_cell(uncertainty: Uncertainty, observation: object) -> bool:
+    parent = getattr(observation, "parent", None)
+    if parent is None or parent.value.kind is not ValueKind.SERIES:
+        return True
+    raw = uncertainty.verbatim
+    if isinstance(raw, Mapping):
+        for key, value in raw.items():
+            name = str(key).casefold()
+            if name in {"covers_series", "applies_to_series"} and value is True:
+                return True
+            if name in {"scope", "applies_to", "coverage", "series_coverage"}:
+                if value is True:
+                    return True
+                if isinstance(value, str) and re.search(
+                    r"\b(series|all cells?|each cell|every cell|each point|every point)\b",
+                    value,
+                    re.IGNORECASE,
+                ):
+                    return True
+    if isinstance(raw, str) and re.search(
+        r"\b(all|each|every)\s+(cell|point|value)\b|\bseries\s+(uncertainty|error)\b",
+        raw,
+        re.IGNORECASE,
+    ):
+        return True
+    return False
+
+
+def _mapping_uncertainty_value(
+    mapping: Mapping[str, object],
+    *,
+    exact_fields: Sequence[str] = (),
+) -> tuple[object | None, str | None]:
+    for field_name in exact_fields:
+        if field_name not in mapping:
+            continue
+        value = mapping[field_name]
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        try:
+            as_decimal(value)
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            if isinstance(value, str):
+                scalar = _uncertainty_scalar_from_text(value)
+                if scalar is not None:
+                    unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
+                    return scalar, unit
+            return None, None
+        else:
+            return value, None
+    for key, value in mapping.items():
+        if str(key).casefold() in {"value", "amount", "error_value", "uncertainty_value"}:
+            if isinstance(value, (tuple, list)) and len(value) == 2:
+                return value, "range"
             try:
-                width = abs(as_decimal(raw))
+                as_decimal(value)
             except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                width = None
-            if width is not None and width.is_finite() and width > 0:
-                return width
+                if isinstance(value, str):
+                    scalar = _uncertainty_scalar_from_text(value)
+                    if scalar is not None:
+                        unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
+                        return scalar, unit
+            else:
+                return value, None
+    for key, value in mapping.items():
+        name = str(key).casefold()
+        if name in {"range", "bounds", "interval", "limits"} and isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        if isinstance(value, Mapping):
+            nested, unit = _mapping_uncertainty_value(value)
+            if nested is not None:
+                return nested, unit or ("dex" if "dex" in name else None)
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            try:
+                as_decimal(value[0]); as_decimal(value[1])
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                continue
+            return value, "range"
+        if any(token in name for token in ("uncert", "error", "sigma", "std", "dex", "width", "range")):
+            try:
+                as_decimal(value)
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                if isinstance(value, str):
+                    scalar = _uncertainty_scalar_from_text(value)
+                    if scalar is not None:
+                        unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
+                        return scalar, "dex" if "dex" in name else unit
+                continue
+            return value, "dex" if "dex" in name else None
+    return None, None
 
-    verbatim = uncertainty.verbatim
-    if isinstance(verbatim, Mapping):
-        return _dex_width_from_mapping(verbatim)
+
+def _mapping_uncertainty_unit(mapping: Mapping[str, object]) -> str | None:
+    for key, value in mapping.items():
+        if str(key).casefold() in {"unit", "units", "basis_unit"} and isinstance(value, str):
+            return value
     return None
 
 
-def _dex_width_from_mapping(mapping: Mapping[str, object]) -> Decimal | None:
-    keys = (
-        "dex",
-        "sigma_log10P_dex_per_point",
-        "sigma_log10p_dex_per_point",
-        "log10_p_atm_absolute_uncertainty_dex",
+def _uncertainty_scalar_from_text(raw: str) -> str | None:
+    # Prefer the number attached to ±. Otherwise remove numeric kind labels
+    # (1-sigma, 2-sigma, 95% CI) before selecting the printed width.
+    match = re.search(rf"(?:±|\+/-)\s*({_UNCERTAINTY_NUMBER})", raw)
+    if match is not None:
+        return match.group(1)
+    match = re.search(
+        rf"(?:standard\s+error|standard\s+deviation|\bsigma\b|\berror\b|\buncertainty\b)\s*[:=]?\s*({_UNCERTAINTY_NUMBER})",
+        raw,
+        re.IGNORECASE,
     )
-    lower = {str(key).casefold(): value for key, value in mapping.items()}
-    for key in keys:
-        if key.casefold() not in lower:
+    if match is not None:
+        return match.group(1)
+    without_kind = re.sub(
+        r"\b95\s*%\s*(?:ci|confidence interval)\b", " ", raw,
+        flags=re.IGNORECASE,
+    )
+    without_kind = re.sub(
+        r"\b95\s*(?:ci|confidence interval)\b|\b[12]\s*-?\s*(?:sigma|σ)\b",
+        " ",
+        without_kind,
+        flags=re.IGNORECASE,
+    )
+    match = _UNCERTAINTY_SCALAR_RE.search(without_kind)
+    return None if match is None else match.group(0)
+
+
+def _printed_uncertainty_source(
+    uncertainty: Uncertainty,
+    *,
+    exact_fields: Sequence[str] = (),
+) -> tuple[Decimal | tuple[Decimal, Decimal] | None, str, str | None]:
+    raw = uncertainty.verbatim
+    basis = uncertainty.basis or ""
+    unit = (
+        "dex" if "dex" in basis.casefold()
+        else "fraction" if basis.casefold() in {"relative", "fraction"}
+        else None
+    )
+    value: object | None = uncertainty.value
+    shape = "scalar"
+    if isinstance(value, tuple):
+        shape = "range"
+    if value is None and isinstance(raw, Mapping):
+        value, mapped_unit = _mapping_uncertainty_value(
+            raw, exact_fields=exact_fields
+        )
+        if mapped_unit == "range":
+            shape = "range"
+        elif mapped_unit is not None:
+            unit = unit or mapped_unit
+        unit = unit or _mapping_uncertainty_unit(raw)
+    elif value is None and isinstance(raw, str):
+        match = _UNCERTAINTY_RANGE_RE.search(raw) or _UNCERTAINTY_PAIR_RE.search(raw)
+        if match is not None:
+            value = (match.group(1), match.group(2))
+            shape = "range"
+        else:
+            value = _uncertainty_scalar_from_text(raw)
+    if isinstance(raw, Mapping):
+        unit = unit or _mapping_uncertainty_unit(raw)
+    if unit is None and isinstance(raw, str):
+        raw_values = value if isinstance(value, (tuple, list)) else (value,)
+        reported: set[Decimal] = set()
+        for part in raw_values:
+            if part is None:
+                continue
+            try:
+                reported.add(as_decimal(part))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                continue
+        for match in re.finditer(
+            rf"({_UNCERTAINTY_NUMBER})\s*(?:%|percent)(?![A-Za-z])", raw,
+            re.IGNORECASE,
+        ):
+            try:
+                percent_value = as_decimal(match.group(1))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                continue
+            if percent_value in reported:
+                unit = "%"
+                break
+    if value is None:
+        return None, shape, unit
+    try:
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            lower, upper = as_decimal(value[0]), as_decimal(value[1])
+            if not lower.is_finite() or not upper.is_finite() or upper < lower:
+                return None, "range", unit
+            return (lower, upper), "range", unit
+        parsed = abs(as_decimal(value))
+    except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+        return None, shape, unit
+    if not parsed.is_finite():
+        return None, shape, unit
+    return parsed, shape, unit
+
+
+def _temperature_envelope_value(
+    uncertainty: Uncertainty,
+    observation: Observation | None,
+) -> tuple[Decimal | None, dict[str, object] | None, bool]:
+    raw = uncertainty.verbatim
+    if not isinstance(raw, Mapping) or not isinstance(
+        raw.get("log10_a_envelope"), Mapping
+    ):
+        return None, None, False
+    envelope = raw["log10_a_envelope"]
+    temperature = None
+    if observation is not None:
+        state = observation.identity.temperature_K
+        if isinstance(state, State) and state.is_value:
+            try:
+                temperature = as_decimal(state.value)
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                pass
+    available = [str(key) for key in envelope]
+    if temperature is None:
+        return None, {
+            "reason": "printed_uncertainty_temperature_missing",
+            "available_temperatures": available,
+        }, True
+    for key, value in envelope.items():
+        match = re.fullmatch(
+            r"\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))_([CK])\s*", str(key)
+        )
+        if match is None:
             continue
         try:
-            width = abs(as_decimal(lower[key.casefold()]))
-        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            keyed_temperature = Decimal(match.group(1))
+            if match.group(2) == "C":
+                keyed_temperature += Decimal("273.15")
+            if keyed_temperature == temperature:
+                try:
+                    parsed = abs(as_decimal(value))
+                except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                    return None, {
+                        "reason": "unparseable_printed_uncertainty",
+                        "temperature_K": str(temperature),
+                        "available_temperatures": available,
+                    }, True
+                if parsed.is_finite():
+                    return parsed, None, True
+        except InvalidOperation:
             continue
-        if width.is_finite() and width > 0:
-            return width
-    nested = mapping.get("figure_reading_estimate")
-    if isinstance(nested, Mapping):
-        return _dex_width_from_mapping(nested)
+    return None, {
+        "reason": "printed_uncertainty_temperature_unavailable",
+        "temperature_K": str(temperature),
+        "available_temperatures": available,
+    }, True
+
+
+def _uncertainty_unit(
+    quantity: Quantity,
+    uncertainty: Uncertainty,
+    observation: Observation | None,
+    mapped_unit: str | None,
+    source_value: Decimal | tuple[Decimal, Decimal],
+    raw_text: str,
+) -> str:
+    if mapped_unit:
+        return mapped_unit
+    unit_texts = [raw_text]
+    if isinstance(uncertainty.verbatim, Mapping):
+        unit_texts = [
+            str(value)
+            for key, value in uncertainty.verbatim.items()
+            if key not in {"confidence_level", "locator", "parent", "k"}
+            and isinstance(value, str)
+        ] or [raw_text]
+    basis = uncertainty.basis or ""
+    if basis:
+        basis = basis.replace("_", " ")
+        unit_basis = re.sub(
+            r"\b(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*sigma|standard error|standard deviation|range|limits?|maximum error|maximum deviation)\b",
+            " ",
+            basis,
+            flags=re.IGNORECASE,
+        ).strip(" ,;()")
+        if unit_basis and unit_basis.casefold() not in {"relative", "fraction"}:
+            return unit_basis
+        if basis.casefold() in {"relative", "fraction"}:
+            return basis
+    source_values = (
+        set(source_value)
+        if isinstance(source_value, tuple)
+        else {source_value}
+    )
+    if isinstance(source_value, tuple):
+        for text in unit_texts:
+            range_match = _UNCERTAINTY_RANGE_RE.search(text) or _UNCERTAINTY_PAIR_RE.search(text)
+            if range_match is not None:
+                unit = text[range_match.end() :].strip().strip(" ,;[]()")
+                unit = re.sub(
+                    r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
+                    "",
+                    unit,
+                    flags=re.IGNORECASE,
+                ).strip()
+                if unit and re.search(r"[A-Za-z°µμ%]", unit):
+                    return unit
+    suffix_re = re.compile(r"(" + _UNCERTAINTY_NUMBER + r")\s*([^\d\s].*)$")
+    for text in unit_texts:
+        for suffix in reversed(tuple(suffix_re.finditer(text))):
+            try:
+                suffix_value = abs(as_decimal(suffix.group(1)))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                continue
+            if suffix_value not in source_values:
+                continue
+            unit = suffix.group(2).strip().strip(" ,;[]()")
+            unit = re.sub(
+                r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
+                "",
+                unit,
+                flags=re.IGNORECASE,
+            ).strip()
+            if unit and re.search(r"[A-Za-z°µμ%]", unit):
+                return unit
+    if observation is not None:
+        locator = observation.locator
+        note = None if locator is None else locator.note
+        unit_match = None if note is None else re.search(r"\bunit=['\"]([^'\"]+)['\"]", note)
+        if unit_match is not None:
+            return unit_match.group(1)
+        if observation.derivation is not None:
+            return observation.derivation.output_unit
+    return QUANTITY_UNITS[quantity]
+
+
+def _convert_uncertainty_width(
+    quantity: Quantity,
+    width: Decimal,
+    source_unit: str,
+) -> tuple[Decimal | None, str | None]:
+    unit = re.sub(r"\s+", "", source_unit).casefold()
+    expected = QUANTITY_UNITS[quantity]
+    if unit in {expected.casefold(), "1", "fraction", "relative"}:
+        return width, "fraction" if unit in {"fraction", "relative"} else expected
+    if unit in {"%", "percent", "percentage"}:
+        return width / Decimal(100), "fraction"
+    if unit == "dex":
+        return width, "dex"
+    if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE, Quantity.FUGACITY}:
+        converted, _ = convert_pressure_to_pa(width, source_unit)
+        return converted, expected
+    if quantity is Quantity.TRANSITION_TEMPERATURE and unit in {"c", "°c", "degc", "kelvin", "k"}:
+        return width, expected  # temperature increments have the same K and °C size
+    if quantity is Quantity.MASS_LOSS_AREAL_DENSITY:
+        converted, _ = convert_areal_mass_to_kg_per_m2(width, source_unit)
+        return converted, expected
+    if quantity in {
+        Quantity.DELTA_FG, Quantity.DELTA_FH, Quantity.H_MINUS_H298,
+        Quantity.CP, Quantity.S,
+    }:
+        converted = _convert_compilation_amount(width, quantity, source_unit)
+        return (None, expected) if converted is None else (converted[0], expected)
+    return None, expected
+
+
+def _metric_uncertainty_width(
+    operation: MetricOperation,
+    quantity: Quantity,
+    reference: Decimal,
+    amount: Decimal,
+    amount_unit: str,
+) -> Decimal | None:
+    if amount_unit == "dex":
+        return amount if operation is MetricOperation.DEX else None
+    if amount_unit == "fraction":
+        if operation is MetricOperation.ABSOLUTE:
+            amount = abs(reference) * amount
+    if operation is MetricOperation.ABSOLUTE:
+        return abs(amount)
+    if amount_unit == "fraction":
+        fraction = abs(amount)
+    else:
+        if reference == 0:
+            return None
+        fraction = abs(amount) / abs(reference)
+    if operation is MetricOperation.RELATIVE:
+        return fraction
+    if operation is MetricOperation.DEX:
+        if fraction >= 1:
+            return None
+        ln10 = Decimal(10).ln()
+        return max(
+            abs((Decimal(1) + fraction).ln() / ln10),
+            abs((Decimal(1) - fraction).ln() / ln10),
+        )
     return None
+
+
+def _confidence_level_notice(
+    quantity: Quantity,
+    uncertainty: Uncertainty,
+    source_observation: Observation | None,
+    source_value: Decimal | tuple[Decimal, Decimal] | None,
+) -> Notice | None:
+    confidence_level = (
+        uncertainty.verbatim.get("confidence_level", "not_stated")
+        if isinstance(uncertainty.verbatim, Mapping)
+        else "not_stated"
+    )
+    if confidence_level != "not_stated" or (
+        quantity is Quantity.ACTIVITY
+        and _is_log10_activity_standard_deviation(_uncertainty_original(uncertainty))
+    ):
+        return None
+    source_fields = (
+        [
+            str(key)
+            for key, value in uncertainty.verbatim.items()
+            if key not in {"note", "confidence_level", "locator", "parent", "k"}
+            and value is not None
+        ]
+        if isinstance(uncertainty.verbatim, Mapping)
+        else []
+    )
+    field = ", ".join(source_fields) if source_fields else "uncertainty"
+    locator = (
+        json.dumps(to_plain(source_observation.locator), ensure_ascii=False, sort_keys=True)
+        if source_observation is not None and source_observation.locator is not None
+        else "not available"
+    )
+    if source_value is None:
+        detail = f"original={_uncertainty_original(uncertainty)}"
+    else:
+        detail = f"printed_width={source_value}"
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason="confidence_level_not_stated",
+        origin="decision-band",
+        band=f"field={field}; {detail}; locator={locator}",
+    )
 
 
 def _printed_uncertainty_band(
@@ -2474,132 +4437,441 @@ def _printed_uncertainty_band(
     reference: Decimal,
     *,
     source_observation: Observation | None = None,
-) -> DecisionBand | None:
-    """Convert a printed cell uncertainty to the scorer's metric unit.
-
-    Accepts scalar PRINTED strings (``±30%``) and the mapped reading forms
-    extracts actually store (``dex`` / ``sigma_log10P_dex_per_point`` / nested
-    figure-reading dex), plus typed dex value+basis.
-    """
-
+    method: MethodToken | None = None,
+    band_basis: str = "row_printed",
+) -> _PrintedBandResolution:
     if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
-        return None
-    # The band must be in the residual's own metric: the same identity-aware
-    # selector populate_numeric uses (residue element ppm is DEX, oxide wt%
-    # ABSOLUTE), not the quantity default (b-693/b-691 r2 finding 4).
-    operation = _residual_metric_operation(quantity, source_observation)
-    mapped = _mapped_reading_uncertainty_dex(uncertainty)
-    if mapped is not None:
-        if operation is MetricOperation.DEX:
-            return DecisionBand(
-                mapped, "dimensionless", "source-printed per-cell uncertainty"
+        return _PrintedBandResolution()
+    if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
+        return _PrintedBandResolution()
+    if _is_source_wide_kems_pressure_envelope(
+        quantity, method, source_observation
+    ):
+        # This source-wide KEMS envelope is pooled by the registered resolver;
+        # the generic per-cell parser would mistake its pressure label for a unit.
+        return _PrintedBandResolution(
+            notice=_confidence_level_notice(
+                quantity, uncertainty, source_observation, None
             )
-        # Mapped dex widths are already in log10 space; only attach on DEX rails.
-        return None
-    if not isinstance(uncertainty.verbatim, str):
-        return None
-    match = re.fullmatch(
-        r"\s*(?:(?:±|\+/-)\s*)?\(?([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\)?\s*(%)?\s*",
-        uncertainty.verbatim,
-    )
-    if match is None:
-        return None
-    try:
-        width = abs(Decimal(match.group(1)))
-    except InvalidOperation:
-        return None
-    if not width.is_finite():
-        return None
-
-    if operation is None:
-        return None
-    percent = match.group(2) is not None
-    if operation is MetricOperation.RELATIVE:
-        if percent:
-            width /= Decimal(100)
-        elif reference != 0:
-            width /= abs(reference)
-        else:
-            return None
-        unit = "dimensionless"
-    elif operation is MetricOperation.DEX:
-        if reference <= 0:
-            return None
-        fraction = width / Decimal(100) if percent else width / reference
-        if fraction >= 1:
-            return None
-        ln10 = Decimal(10).ln()
-        width = max(
-            abs((Decimal(1) + fraction).ln() / ln10),
-            abs((Decimal(1) - fraction).ln() / ln10),
         )
-        unit = "dimensionless"
-    else:
-        if percent:
-            return None
-        if source_observation is None:
-            return None
-        locator = source_observation.locator
+    raw_text = _uncertainty_original(uncertainty)
+    confidence_level = (
+        uncertainty.verbatim.get("confidence_level", "not_stated")
+        if isinstance(uncertainty.verbatim, Mapping)
+        else "not_stated"
+    )
+    log10_activity_sigma = (
+        band_basis == "row_printed"
+        and quantity is Quantity.ACTIVITY
+        and _is_log10_activity_standard_deviation(raw_text)
+    )
+    if log10_activity_sigma:
+        confidence_level = "one_sigma"
+    exact_fields: list[str] = []
+    if source_observation is not None:
         derivation = source_observation.derivation
-        source_unit_match = (
-            re.search(r"\bunit='([^']+)'", locator.note)
-            if locator is not None and locator.note is not None
-            else None
-        )
-        if (
-            source_unit_match is None
-            or derivation is None
-            or derivation.output_unit != QUANTITY_UNITS[quantity]
-        ):
-            return None
-        source_unit = source_unit_match.group(1)
-        if quantity in {Quantity.DELTA_FG, Quantity.H_MINUS_H298}:
-            source_scale = {
-                "J/mol": Decimal("0.001"),
-                "kJ/mol": Decimal(1),
-                "kJ/mol at 298.15 K": Decimal(1),
-                "kcal gfw^-1": Decimal("4.184"),
-            }.get(source_unit)
-        elif quantity in {Quantity.CP, Quantity.S}:
-            source_scale = {
-                "J/mol·K": Decimal(1),
-                "cal deg^-1 gfw^-1": Decimal("4.184"),
-            }.get(source_unit)
-        elif quantity in {Quantity.LOG10_KF, Quantity.LOG10_K_STAR}:
-            source_scale = Decimal(1) if source_unit == "dimensionless" else None
-        else:
-            source_scale = None
-        if source_scale is None:
-            return None
-        width *= source_scale
-        unit = QUANTITY_UNITS[quantity]
-    return DecisionBand(width, unit, "source-printed per-cell uncertainty")
-
-
-def _residual_distribution_band(
-    values: Sequence[Decimal], *, unit: str, family: str, quantity: Quantity
-) -> DecisionBand | None:
-    """Twice the median absolute deviation for one family and quantity.
-
-    Center at the sample median, then estimate MAD as the sample median of
-    absolute deviations from that center (no normal-consistency multiplier).
-    The band's width is twice that estimator; membership is tested against
-    zero using ``abs(residual) <= width``.
-    """
-
-    if len(values) < MIN_DERIVED_BAND_N:
-        return None
-    center = _median(values)
-    if center is None:
-        return None
-    mad = _median([abs(value - center) for value in values])
-    if mad is None:
-        return None
-    return DecisionBand(
-        Decimal(2) * mad,
-        unit,
-        f"{family}/{quantity.value} residual distribution: 2x median absolute deviation; derived_n={len(values)}",
+        if derivation is not None:
+            # Parameter names are optional. A derivation that only names
+            # output_unit contributes no original_ fields.
+            parameters = getattr(derivation, "parameters", ())
+            exact_fields.extend(
+                name.removeprefix("original_")
+                for name, _ in parameters
+                if name.startswith("original_")
+            )
+        identity = getattr(source_observation, "identity", None)
+        if isinstance(identity, Identity):
+            subtype = identity.subtype
+            if isinstance(subtype, State) and subtype.is_value and subtype.value:
+                exact_fields.append(str(subtype.value))
+    exact_fields.append(quantity.value)
+    source_value, shape, mapped_unit = _printed_uncertainty_source(
+        uncertainty, exact_fields=exact_fields
     )
+    envelope_value, envelope_refusal, is_temperature_envelope = (
+        _temperature_envelope_value(uncertainty, source_observation)
+    )
+    if envelope_refusal is not None:
+        return _PrintedBandResolution(refusal=envelope_refusal)
+    if is_temperature_envelope:
+        source_value = envelope_value
+        shape = "scalar"
+        mapped_unit = "dex"
+    if source_value is None:
+        return _PrintedBandResolution(
+            refusal={
+                "reason": "unparseable_printed_uncertainty",
+                "quantity": quantity.value,
+                "original": raw_text,
+            }
+        )
+    operation = _residual_metric_operation(quantity, source_observation)
+    if operation is None:
+        return _PrintedBandResolution(
+            refusal={"reason": "uncertainty_metric_missing", "original": raw_text}
+        )
+    source_unit = (
+        "dex"
+        if log10_activity_sigma
+        else _uncertainty_unit(
+            quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
+        )
+    )
+    if confidence_level in {"two_sigma", "ci95"}:
+        kind = "printed_2sigma"
+    elif confidence_level == "one_sigma":
+        kind = "printed_1sigma"
+    elif confidence_level == "range_half_width":
+        kind = "printed_range"
+    elif re.search(
+        r"\b(?:range|limits?|maximum error|maximum deviation|bounding)\b",
+        raw_text,
+        re.IGNORECASE,
+    ):
+        kind = "printed_range"
+    else:
+        kind = "printed_unstated"
+    if isinstance(source_value, tuple):
+        lower, upper = source_value
+        width = (upper - lower) / Decimal(2)
+    else:
+        width = source_value
+    converted, converted_unit = _convert_uncertainty_width(
+        quantity, width, source_unit
+    )
+    if converted is None:
+        return _PrintedBandResolution(
+            refusal={
+                "reason": "printed_uncertainty_unit_unmapped",
+                "quantity": quantity.value,
+                "source_unit": source_unit,
+                "original": raw_text,
+            }
+        )
+    ticket = _metric_uncertainty_width(
+        operation,
+        quantity,
+        reference,
+        converted,
+        converted_unit or QUANTITY_UNITS[quantity],
+    )
+    if ticket is None or ticket < 0 or not ticket.is_finite():
+        return _PrintedBandResolution(
+            refusal={
+                "reason": "printed_uncertainty_outside_metric_domain",
+                "quantity": quantity.value,
+                "original": raw_text,
+            }
+    )
+    if confidence_level == "not_stated":
+        if shape == "range" or kind == "printed_range":
+            kind = "printed_range"
+        else:
+            kind = "printed_unstated"
+    elif kind == "printed_1sigma":
+        ticket *= NORMAL_95_TICKET_MULTIPLIER
+    unit = "dimensionless" if operation in {MetricOperation.RELATIVE, MetricOperation.DEX} else QUANTITY_UNITS[quantity]
+    rule = f"{kind}: source-printed uncertainty; original={raw_text}"
+    notice = _confidence_level_notice(
+        quantity, uncertainty, source_observation, source_value
+    )
+    standard_uncertainty_dex = None
+    if operation is MetricOperation.DEX:
+        if confidence_level in {"one_sigma", "ci95"}:
+            standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
+        elif confidence_level == "two_sigma":
+            standard_uncertainty_dex = ticket / Decimal(2)
+    return _PrintedBandResolution(
+        DecisionBand(ticket, unit, rule, band_basis=band_basis),
+        notice=notice,
+        standard_uncertainty_dex=standard_uncertainty_dex,
+    )
+
+
+def _alignment_axes(profile: object) -> tuple[str, ...]:
+    """Group-key axes. Role axes stay out unless this profile names them."""
+
+    named = profile.required | profile.permitted_not_applicable
+    return tuple(
+        name
+        for name in _ALIGNMENT_AXES
+        if name not in _ROLE_ALIGNMENT_AXES or name in named
+    )
+
+
+def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
+    state = getattr(identity, name)
+    required = name in profile.required
+    permitted_na = name in profile.permitted_not_applicable
+    if state is None:
+        return {"state": "not_applicable"} if not required else None
+    if state.is_value:
+        if not required and not permitted_na:
+            return None
+        return to_plain(state.value)
+    if state.is_not_applicable and permitted_na and not required:
+        return {"state": "not_applicable"}
+    return None
+
+
+def _source_alignment_group_key(
+    observation: Observation,
+    *,
+    tier: str,
+) -> dict[str, object] | None:
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return None
+    quantity = quantity_token(identity)
+    if quantity is None or identity.species is None:
+        return None
+    phase = phase_token(identity.species)
+    charge = identity.species.charge
+    if phase is None or not isinstance(charge, State) or not charge.is_value:
+        return None
+    polymorph = polymorph_token(identity.species)
+    if phase is Phase.CR and polymorph is None:
+        return None
+    unit = QUANTITY_UNITS.get(quantity)
+    if not unit or (
+        observation.derivation is not None
+        and observation.derivation.output_unit != unit
+    ):
+        return None
+    profile = profile_for(identity)
+    axes: dict[str, object] = {}
+    for name in _alignment_axes(profile):
+        value = _axis_alignment_value(identity, name, profile)
+        if value is None:
+            return None
+        axes[name] = value
+    if isinstance(identity.temperature_K, State) and identity.temperature_K.is_value:
+        aligned_temperature = to_plain(identity.temperature_K.value)
+    else:
+        aligned_temperature = None
+    return {
+        "comparison_set": tier,
+        "formula": identity.species.formula,
+        "charge": str(charge.value),
+        "phase": phase.value,
+        "polymorph": None if polymorph is None else polymorph.value,
+        "quantity": quantity.value,
+        "unit": unit,
+        "axes": axes,
+        "aligned_T_K": aligned_temperature,
+    }
+
+
+def _group_token(group_key: Mapping[str, object]) -> str:
+    return json.dumps(group_key, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _read_decision_band_ratchet(
+    root: Path,
+) -> tuple[dict[str, dict[str, object]], bool, list[dict[str, object]]]:
+    path = root / DECISION_BAND_RATCHET_RELATIVE_PATH
+    if not path.is_file():
+        return {}, True, []
+    payload = load_yaml(path)
+    if not isinstance(payload, Mapping) or not isinstance(payload.get("groups", []), list):
+        raise ValueError(f"invalid decision-band ratchet: {path}")
+    raw_history = payload.get("history", [])
+    if not isinstance(raw_history, list) or any(
+        not isinstance(row, Mapping) for row in raw_history
+    ):
+        raise ValueError(f"invalid decision-band ratchet history: {path}")
+    history = [dict(row) for row in raw_history]
+    if payload.get("policy_version") != DECISION_BAND_POLICY_VERSION:
+        return {}, False, history
+    entries: dict[str, dict[str, object]] = {}
+    for raw in payload.get("groups", []):
+        if not isinstance(raw, Mapping) or raw.get("policy_version") != DECISION_BAND_POLICY_VERSION:
+            continue
+        group_key = raw.get("group_key")
+        if not isinstance(group_key, Mapping):
+            continue
+        try:
+            line = as_decimal(raw.get("ticket_line"))
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            continue
+        if line.is_finite() and line > 0:
+            entries[_group_token(group_key)] = dict(raw)
+    return entries, False, history
+
+
+def _source_band_catalog(
+    context: ScoreContext,
+    ratchet_entries: Mapping[str, Mapping[str, object]],
+) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
+    from simulator.battery.compilation_tier import (
+        _iter_compilation_series_cells,
+        is_compilation_evidence,
+    )
+
+    comparison_ids = {row.observation_id for row in comparison_candidates(context)}
+    sources: dict[str, dict[str, dict[str, object]]] = defaultdict(dict)
+    identities: dict[str, Identity] = {}
+    group_keys: dict[str, dict[str, object]] = {}
+    for parent in context.observations.values():
+        origin = context.origins.get(parent.observation_id)
+        if is_internal_consistency(origin) or is_sf04_workbook(parent):
+            continue
+        compilation = is_compilation_evidence(parent) or is_compilation_source(parent.source_id, origin)
+        if compilation:
+            tier = "compilation"
+        elif parent.observation_id in comparison_ids:
+            tier = "empirical"
+        else:
+            continue
+        if not parent.source_id:
+            continue
+        identity = parent.identity
+        experiment = context.experiments.get(parent.experiment_id)
+        if (
+            not compilation
+            and parent.observation_id in comparison_ids
+            and _has_ungrounded_kems_partial_pressure_calibration(
+                parent, experiment
+            )
+        ):
+            continue
+        for cell in _iter_compilation_series_cells(parent, origin):
+            if not isinstance(cell.identity, Identity):
+                continue
+            quantity = quantity_token(cell.identity)
+            if quantity is None:
+                continue
+            magnitude = point_magnitude(cell.value)
+            if magnitude is None or not magnitude.is_finite():
+                continue
+            key_doc = _source_alignment_group_key(cell, tier=tier)
+            if key_doc is None:
+                continue
+            key = _group_token(key_doc)
+            group_keys[key] = key_doc
+            identities[key] = cell.identity
+            source = sources[key].setdefault(
+                parent.source_id,
+                {"values": set()},
+            )
+            source["values"].add(magnitude)
+
+    bands: dict[str, DecisionBand] = {}
+    records: list[dict[str, object]] = []
+    no_band_reasons: dict[str, str] = {}
+    for key, by_source in sources.items():
+        if len(by_source) < 2:
+            no_band_reasons[key] = "derived_band_insufficient_sources"
+            continue
+        if any(len(row["values"]) != 1 for row in by_source.values()):
+            continue
+        source_ids = sorted(by_source)
+        source_values = [next(iter(by_source[source]["values"])) for source in source_ids]
+        center = _median(source_values)
+        identity = identities[key]
+        quantity = quantity_token(identity)
+        if center is None or quantity is None:
+            continue
+        operation = metric_operation_for_identity(identity)
+        if operation is None:
+            continue
+        deviations = [compute_metric(operation, value, center) for value in source_values]
+        if any(value is None for value in deviations):
+            continue
+        mad = _median([abs(value) for value in deviations if value is not None])
+        if mad is None:
+            continue
+        if mad == 0:
+            no_band_reasons[key] = "zero_scatter_aligned_group"
+            continue
+        sigma = MAD_NORMAL_SCALE * mad
+        unit = "dimensionless" if operation in {MetricOperation.RELATIVE, MetricOperation.DEX} else QUANTITY_UNITS[quantity]
+        ticket = NORMAL_95_TICKET_MULTIPLIER * sigma
+        if not ticket.is_finite() or ticket <= 0:
+            continue
+        old = ratchet_entries.get(key)
+        old_line = None
+        if old is not None and old.get("unit") == unit:
+            try:
+                old_line = as_decimal(old.get("ticket_line"))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                old_line = None
+        effective = min(ticket, old_line) if old_line is not None and old_line > 0 else ticket
+        action = (
+            "new"
+            if old_line is None or old_line <= 0
+            else "down"
+            if ticket < old_line
+            else "held"
+        )
+        rule = (
+            f"derived_scatter: source-only sigma=1.482602218505602×MAD; n_sources={len(source_ids)}; "
+            f"mad={mad}; sigma={sigma}; percentile={DECISION_BAND_PERCENTILE}; "
+            f"ticket_line={effective}; ratchet_action={action}"
+        )
+        bands[key] = DecisionBand(effective, unit, rule)
+        records.append({
+            "group_key": group_keys[key],
+            "policy_version": DECISION_BAND_POLICY_VERSION,
+            "ticket_line": str(effective),
+            "old_line": None if old_line is None else str(old_line),
+            "new_line": str(ticket),
+            "effective_line": str(effective),
+            "ratchet_action": action,
+            "unit": unit,
+            "band_kind": "derived_scatter",
+            "sigma": str(sigma),
+            "mad": str(mad),
+            "n_sources": len(source_ids),
+            "source_ids": source_ids,
+            "aligned_T_K": group_keys[key]["aligned_T_K"],
+            "percentile": DECISION_BAND_PERCENTILE,
+        })
+    records.sort(key=lambda row: _group_token(row["group_key"]))
+    return bands, records, no_band_reasons
+
+
+def update_decision_band_ratchet(context: ScoreContext) -> int:
+    """Explicitly accept current source-derived minima into the YAML ratchet."""
+    existing, _missing, history = _read_decision_band_ratchet(context.root)
+    _bands, current, no_band_reasons = _source_band_catalog(context, existing)
+    merged = dict(existing)
+    for key, reason in no_band_reasons.items():
+        if reason == "zero_scatter_aligned_group":
+            merged.pop(key, None)
+    for row in current:
+        key = _group_token(row["group_key"])
+        merged[key] = row
+        history.append({
+            "group_key": row["group_key"],
+            "policy_version": row["policy_version"],
+            "old_line": row["old_line"],
+            "new_line": row["new_line"],
+            "effective_line": row["effective_line"],
+            "action": row["ratchet_action"],
+        })
+    # Preserve accepted groups that temporarily have no current aligned source;
+    # a later reappearance of the same exact group remains ratchet-down-only.
+    ordered = [merged[key] for key in sorted(merged)]
+    path = context.root / DECISION_BAND_RATCHET_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".partial")
+    temporary.write_text(
+        yaml.safe_dump(
+            {
+                "policy_version": DECISION_BAND_POLICY_VERSION,
+                "percentile": DECISION_BAND_PERCENTILE,
+                "groups": ordered,
+                "history": history,
+            },
+            sort_keys=False,
+            allow_unicode=True,
+            width=120,
+        ),
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+    return len(current)
 
 
 def populate_numeric(
@@ -2613,6 +4885,8 @@ def populate_numeric(
     method: MethodToken | None = None,
     observations: Mapping[str, Observation] | None = None,
     experiments: Mapping[str, Experiment] | None = None,
+    printed_band: DecisionBand | None = None,
+    printed_refusal: Mapping[str, object] | None = None,
     derived_band: DecisionBand | None = None,
     operation_override: MetricOperation | None = None,
     band_operation: MetricOperation | None = None,
@@ -2634,26 +4908,14 @@ def populate_numeric(
             "candidate": str(candidate),
             "reference": str(reference),
         }
-    if (
-        rail is None
-        and method is None
-        and observations is None
-        and experiments is None
-    ):
-        # Keep the narrow two-argument call for existing focused callers that
-        # replace the band resolver while testing the dimension guard.
-        band = decision_band_for(quantity, source_relation)
-    else:
-        band = decision_band_for(
-            quantity,
-            source_relation,
-            rail=rail,
-            method=method,
-            observations=observations,
-            experiments=experiments,
-            derived_band=derived_band,
-            operation=band_operation,
-        )
+    band = decision_band_for(
+        quantity,
+        source_relation,
+        printed_band=printed_band,
+        printed_refusal=printed_refusal,
+        derived_band=derived_band,
+        operation=band_operation,
+    )
     # Dimension guard. decision_band_for normally filters mismatched bands;
     # keep this check for callers that replace it in a focused test.
     if band is not None and not band_dimension_matches(
@@ -2765,6 +5027,7 @@ def cell_notices(
     cell: object,
 ) -> tuple[Notice, ...]:
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        AUTHORITY_EXTRAPOLATED,
         AUTHORITY_FALLBACK,
         _FLOOR_INVERSION_REASON,
     )
@@ -2776,13 +5039,37 @@ def cell_notices(
             continue
         kind = str(row.get("kind") or "")
         if _row_out_of_certified_band(kind, row):
+            raw_band = row.get("certified_band") or row.get("band")
+            band = str(raw_band or "")
+            if kind == "openimcc_temperature_extrapolated" and isinstance(
+                raw_band, Mapping
+            ):
+                intervals = _interval_certified_band(raw_band)
+                temperature_band = (
+                    None if intervals is None else intervals.get("temperature_K")
+                )
+                if temperature_band is not None:
+                    band = (
+                        f"[{temperature_band[0]:g}, {temperature_band[1]:g}] K"
+                    )
+            reason = row.get("gate_reason")
+            if reason is None:
+                reason = row.get("reason")
+            if reason is None:
+                reason = kind
             notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                     affected_quantities=(quantity,),
-                    reason=str(row.get("gate_reason") or row.get("reason") or kind),
+                    reason=str(reason),
                     origin=f"engine:{engine.value}",
-                    band=str(row.get("certified_band") or row.get("band") or ""),
+                    band=band,
+                    authority=(
+                        Authority.EXTRAPOLATED
+                        if kind == "openimcc_temperature_extrapolated"
+                        and row.get("authority") == AUTHORITY_EXTRAPOLATED
+                        else None
+                    ),
                 )
             )
         elif kind == "floor_inversion":
@@ -2835,6 +5122,15 @@ def cell_notices(
                     ),
                 )
             )
+        elif kind == NoticeKind.ENGINE_MODEL_CAVEAT.value:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
         elif kind == NoticeKind.INPUT_OMITTED.value:
             notices.append(
                 Notice(
@@ -2844,10 +5140,10 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind == "openimcc_notice":
+        elif kind in {"openimcc_flag", "openimcc_notice"}:
             notices.append(
                 Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
                     origin=f"engine:{engine.value}",
@@ -2862,7 +5158,8 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind in {"openimcc_flag", "openimcc_gas_unavailable"}:
+        elif kind == "openimcc_gas_unavailable":
+            # No existing kind represents an unavailable engine channel.
             notices.append(
                 Notice(
                     kind=NoticeKind.SOURCE_DISAGREEMENT,
@@ -2898,59 +5195,6 @@ def cell_notices(
     return tuple(notices)
 
 
-# More than one oxidation state in silicate melts over the fO2 range these
-# engines are asked to run. The generator owns the table; scorer and contract
-# use that same mapping so redox admission cannot drift between consumers.
-
-
-def _oxide_lookup_key(name: str) -> str:
-    key = str(name).strip()
-    if key.endswith("_Liq"):
-        key = key[:-4]
-    if key.endswith("*"):
-        key = key[:-1]
-    return key
-
-
-def _elements_of_component(name: str) -> frozenset[str]:
-    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
-
-    key = _oxide_lookup_key(name)
-    canonical = MELTS_OXIDE_ALIASES.get(key.lower())
-    formula = "FeO" if canonical == "FeO_total" else (canonical or key)
-    parsed = formula_composition(formula)
-    if not parsed:
-        return frozenset()
-    return frozenset(element for element, _count in parsed)
-
-
-def _is_multivalent_name(name: str) -> bool:
-    from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
-
-    return any(
-        element in MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name)
-    )
-
-
-def multivalent_components(
-    composition: Composition | None,
-    species: str | None,
-) -> tuple[str, ...]:
-    """Names that hold a multivalent element at a positive amount, plus the species.
-
-    A printed zero does not count, so FeO = 0 cannot hide TiO2.
-    """
-
-    present: list[str] = []
-    if composition is not None:
-        for name, amount in composition.components:
-            if amount > 0 and _is_multivalent_name(str(name)):
-                present.append(str(name))
-    if species and _is_multivalent_name(species) and species not in present:
-        present.append(species)
-    return tuple(sorted(set(present)))
-
-
 def stated_pure_substance_reservoir(identity: Identity) -> tuple[str, str] | None:
     """Pot formula and phase when the row states a pure condensed reservoir.
 
@@ -2965,7 +5209,7 @@ def stated_pure_substance_reservoir(identity: Identity) -> tuple[str, str] | Non
     token = phase_token(src)
     if token not in CONDENSED_PHASES:
         return None
-    if parse_species_formula(src.formula) is None:
+    if parse_species_formula(src.formula, species=src) is None:
         return None
     if quantity_token(identity) is Quantity.P_SAT and src.formula != identity.species.formula:
         return None
@@ -2984,12 +5228,23 @@ def oxygen_is_scorer_input(
     """
 
     quantity = quantity_token(identity)
-    redox = multivalent_components(composition, identity.species.formula)
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+
+    redox = (
+        multivalent_components(
+            composition,
+            identity.species.formula,
+            oxide_aliases=MELTS_OXIDE_ALIASES,
+        )
+        if quantity in MELT_ACTIVITY_QUANTITIES
+        else ()
+    )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         if redox:
             return True, "melt contains multivalent " + ", ".join(redox), redox
-        from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
-
+        # fO2 changes melt activity through redox speciation. With no
+        # multivalent element in this fixed oxide composition, there is no
+        # redox pair for oxygen potential to shift, so fO2 is not an input.
         return (
             False,
             "melt has no multivalent element "
@@ -3002,6 +5257,24 @@ def oxygen_is_scorer_input(
         return True, f"{qname} requires oxygen", redox
     qname = quantity.value if quantity is not None else "quantity"
     return False, f"{qname} does not take oxygen as an input; oxygen was omitted", redox
+
+
+def _has_intrinsic_redox_activity(engine: Engine, point: Observation) -> bool:
+    if engine is not Engine.INTERNAL_ANALYTICAL:
+        return False
+    identity = point.identity
+    if (
+        not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.ACTIVITY
+    ):
+        return False
+    state = identity.composition
+    composition = (
+        state.value
+        if state is not None and state.is_value and state.value is not None
+        else None
+    )
+    return bool(oxygen_is_scorer_input(identity, composition)[2])
 
 
 def _unfilled_inputs(identity: Identity) -> dict[str, str]:
@@ -3121,12 +5394,66 @@ def _activity_contract_refusal(
     )
 
 
+def _activity_request_or_contract_refusal(
+    engine: Engine,
+    *,
+    experiment: Experiment,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+) -> tuple[Any, EnginePrediction | None]:
+    """Ready melt-activity request, or the contract refusal when it is not.
+
+    One owner for both ``predict_with_engine`` and ``compile_residual``.
+    A malformed row composition is ``RefusalReason.INVALID_SOURCE``.
+    ``run_validity_gates`` does not read that composition.
+    """
+
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    generated = activity_request_for_engine(
+        experiment, observation, engine.value, fo2_mode=fo2_mode
+    )
+    if generated is not None and generated.payload is not None:
+        return generated, None
+    requested = (
+        identity.composition
+        if identity.composition is not None and identity.composition.is_value
+        else None
+    )
+    return None, _activity_contract_refusal(
+        engine,
+        channel=channel,
+        sources=sources,
+        identity=identity,
+        requested=requested,
+        generated=generated,
+    )
+
+
 def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
     return Notice(
         kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
+    )
+
+
+def _pressure_independent_comparison_notice(
+    quantity: Quantity, prediction: EnginePrediction
+) -> Notice:
+    return Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(quantity,),
+        reason=(
+            "identity comparison does not require total_pressure_Pa: "
+            f"{prediction.engine.value} equilibrium {quantity.value} is "
+            "total-pressure-independent"
+        ),
+        origin="score:comparison_identity",
     )
 
 
@@ -3168,70 +5495,24 @@ def _reactive_cell_not_modelled_notice(
     )
 
 
-def _figure_only_notice(
+def _evidence_class_notice(
     quantity: Quantity | None, observation: Observation
 ) -> Notice:
-    # Quantity may be unknown (typed refusal quantity_unknown); the evidence
-    # class label must still attach. Empty affected_quantities is allowed only
-    # for FIGURE_ONLY (see Notice.__post_init__).
+    # Keep evidence labels on the existing FIGURE_ONLY notice channel. Quantity
+    # may be unknown (typed refusal quantity_unknown); empty affected_quantities
+    # is allowed only for FIGURE_ONLY (see Notice.__post_init__).
+    evidence_class = observation.evidence.class_
+    class_label = evidence_class.value.value if evidence_class.is_value else "unknown"
     return Notice(
         kind=NoticeKind.FIGURE_ONLY,
         affected_quantities=() if quantity is None else (quantity,),
-        reason="figure_only",
+        reason=(
+            "figure_only"
+            if class_label == EvidenceClass.FIGURE_ONLY.value
+            else f"evidence_class:{class_label}"
+        ),
         origin=observation.observation_id,
     )
-
-
-def _cell_material_class(
-    materials: Sequence[Located[CellMaterial]] | None,
-) -> str:
-    if not materials:
-        return "unknown"
-    values: list[CellMaterial] = []
-    for material in materials:
-        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
-            return "unknown"
-        values.append(material.state.value)
-    if any(
-        material in {
-            CellMaterial.W,
-            CellMaterial.MO,
-            CellMaterial.TA,
-            CellMaterial.NB,
-            CellMaterial.C_GRAPHITE,
-            CellMaterial.RE,
-        }
-        for material in values
-    ):
-        return "reactive"
-    if all(material in {CellMaterial.PT, CellMaterial.IR} for material in values):
-        return "inert"
-    return "not_inert"
-
-
-_MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
-
-
-def _uniform_modelled_reactive_cell(
-    materials: Sequence[Located[CellMaterial]] | None,
-) -> str | None:
-    """W or Mo when every typed entry is that same modelled reservoir metal."""
-
-    if not materials:
-        return None
-    values: list[CellMaterial] = []
-    for material in materials:
-        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
-            return None
-        values.append(material.state.value)
-    if not values:
-        return None
-    metal = values[0]
-    if metal not in _MODELLED_REACTIVE_CELL:
-        return None
-    if any(item is not metal for item in values):
-        return None
-    return metal.value
 
 
 def _bench_for_score(
@@ -3263,21 +5544,215 @@ def _printed_point_composition(observation: Observation) -> State[Composition] |
     return point.state
 
 
-def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
-    engine = prediction.engine
+def _solved_effusion_oxygen_payload(
+    engine: Engine | None,
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> Mapping[str, object] | None:
     if engine is None:
         return None
-    prefix = OXYGEN_BALANCE_NOTICE_PREFIX
-    for notice in prediction.notices:
-        if notice.origin != f"engine:{engine.value}":
+    origin = f"engine:{engine.value}"
+    for notice in notices:
+        if isinstance(notice, Notice):
+            notice_origin, reason = notice.origin, notice.reason
+        elif isinstance(notice, Mapping):
+            notice_origin, reason = notice.get("origin"), notice.get("reason")
+        else:
             continue
-        if not notice.reason.startswith(prefix):
+        if notice_origin != origin or not isinstance(reason, str):
             continue
-        payload = json.loads(notice.reason.split(" ", 1)[1])
+        if not reason.startswith(OXYGEN_BALANCE_NOTICE_PREFIX):
+            continue
+        payload = json.loads(reason[len(OXYGEN_BALANCE_NOTICE_PREFIX) :])
+        if not isinstance(payload, Mapping):
+            continue
         value = payload.get("pO2_bar")
         if isinstance(value, (int, float)) and math.isfinite(float(value)):
-            return float(value)
+            return payload
     return None
+
+
+def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
+    payload = _solved_effusion_oxygen_payload(
+        prediction.engine, prediction.notices
+    )
+    value = None if payload is None else payload.get("pO2_bar")
+    if isinstance(value, (int, float)) and math.isfinite(float(value)):
+        return float(value)
+    return None
+
+
+def _is_glass_valence_identity(identity: object) -> bool:
+    return (
+        isinstance(identity, Identity)
+        and quantity_token(identity)
+        in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+        and phase_token(identity.species) is Phase.GLASS
+    )
+
+
+def _melt_identity_for_valence(identity: Identity) -> Identity:
+    """Use the run melt as the prediction state for a quenched glass assay."""
+
+    if not _is_glass_valence_identity(identity):
+        return identity
+    return replace(identity, species=replace(identity.species, phase=Phase.L))
+
+
+def _melt_prediction_reference(reference: Observation) -> Observation:
+    if not isinstance(reference.identity, Identity):
+        return reference
+    identity = _melt_identity_for_valence(reference.identity)
+    return reference if identity is reference.identity else replace(reference, identity=identity)
+
+
+def _residual_quench_state(reference: Observation) -> QuenchState | None:
+    return reference.quench_state if _is_glass_valence_identity(reference.identity) else None
+
+
+def _quench_notices(reference: Observation) -> tuple[Notice, ...]:
+    identity = reference.identity
+    if not _is_glass_valence_identity(identity):
+        return ()
+    quantity = quantity_token(identity)
+    assert quantity is not None
+    notices: list[Notice] = []
+    if reference.quench_state is QuenchState.ASSERTED_ALTERED:
+        notices.append(
+            Notice(
+                kind=NoticeKind.QUENCH_ALTERED,
+                affected_quantities=(quantity,),
+                reason="source asserts that quenching altered the measured valence",
+                origin=reference.observation_id,
+            )
+        )
+    basis = (
+        identity.valence_basis.value
+        if quantity is Quantity.VALENCE_RATIO
+        and identity.valence_basis is not None
+        and identity.valence_basis.is_value
+        else None
+    )
+    if (
+        reference.quench_direction is QuenchDirection.OXIDISING
+        and quantity is Quantity.VALENCE_RATIO
+        and identity.species.formula == "Cr"
+        and basis is not None
+        and basis.numerator_oxidation_states == (2,)
+        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+        and basis.value_form is ValenceValueForm.FRACTION
+    ):
+        notices.append(
+            Notice(
+                kind=NoticeKind.QUENCH_OXIDISING,
+                affected_quantities=(quantity,),
+                reason=(
+                    "oxidising quench re-oxidises Cr2+; quenched Cr2+/SumCr "
+                    "is a lower bound"
+                ),
+                origin=reference.observation_id,
+            )
+        )
+    return tuple(notices)
+
+
+def paired_quench_diagnostics(
+    context: ScoreContext,
+) -> tuple[dict[str, object], ...]:
+    """Pair same-run in-situ and glass valence ratios for the score report."""
+
+    by_experiment_source: dict[
+        tuple[str, str], list[Observation]
+    ] = defaultdict(list)
+    for observation in comparison_candidates(context):
+        identity = observation.identity
+        if not isinstance(identity, Identity):
+            continue
+        quantity = quantity_token(identity)
+        if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+            continue
+        phase = phase_token(identity.species)
+        if phase not in {Phase.L, Phase.GLASS}:
+            continue
+        if not observation.source_id:
+            continue
+        if quantity is Quantity.VALENCE_RATIO:
+            basis = identity.valence_basis
+            if (
+                basis is None
+                or not basis.is_value
+                or basis.value.value_form
+                not in {ValenceValueForm.FRACTION, ValenceValueForm.RATIO}
+            ):
+                continue
+        ratio = point_magnitude(observation.value)
+        if ratio is not None and ratio.is_finite() and ratio > 0:
+            by_experiment_source[
+                (observation.experiment_id, observation.source_id)
+            ].append(observation)
+
+    pairs: list[dict[str, object]] = []
+    for (experiment_id, _source_id), observations in sorted(
+        by_experiment_source.items()
+    ):
+        glasses = [
+            row for row in observations
+            if phase_token(row.identity.species) is Phase.GLASS
+        ]
+        in_situ_rows = [
+            row for row in observations
+            if phase_token(row.identity.species) is Phase.L
+        ]
+        for glass in glasses:
+            glass_identity = _melt_identity_for_valence(glass.identity)
+            in_situ_matches = [
+                row for row in in_situ_rows
+                if identity_equal(
+                    glass_identity,
+                    _melt_identity_for_valence(row.identity),
+                ).kind is IdentityEqualKind.EQUAL
+            ]
+            if len(in_situ_matches) != 1:
+                continue
+            in_situ = in_situ_matches[0]
+            glass_matches = [
+                row for row in glasses
+                if identity_equal(
+                    _melt_identity_for_valence(row.identity),
+                    _melt_identity_for_valence(in_situ.identity),
+                ).kind is IdentityEqualKind.EQUAL
+            ]
+            if len(glass_matches) != 1:
+                continue
+            glass_ratio = point_magnitude(glass.value)
+            in_situ_ratio = point_magnitude(in_situ.value)
+            if glass_ratio is None or in_situ_ratio is None:
+                continue
+            # Premise: these are the same run and valence identity, observed
+            # once in the melt and once after quenching.
+            # Algebra: log10(glass) - log10(melt) = log10(glass / melt).
+            # Units: both ratios are dimensionless, so the difference is dex.
+            # Sanity: identical ratios give log10(1) = 0.
+            delta_log10 = glass_ratio.log10() - in_situ_ratio.log10()
+            pairs.append(
+                {
+                    "experiment_id": experiment_id,
+                    "in_situ_observation": in_situ.observation_id,
+                    "glass_observation": glass.observation_id,
+                    "in_situ_ratio": in_situ_ratio,
+                    "glass_ratio": glass_ratio,
+                    "quench_state": glass.quench_state,
+                    "delta_log10": delta_log10,
+                }
+            )
+    return tuple(
+        sorted(
+            pairs,
+            key=lambda row: (
+                str(row["experiment_id"]),
+                str(row["glass_observation"]),
+            ),
+        )
+    )
 
 
 def _comparison_identity(
@@ -3297,24 +5772,88 @@ def _comparison_identity(
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
+    shared_oxygen_condition = any(
+        notice.fo2_mode is Fo2Mode.SHARED_LADDER
+        for notice in prediction.notices
+    )
+    melt_identity = _melt_identity_for_valence(identity)
+    source_pressure = _source_oxygen_pressure_for_score(reference)
+    resolved_oxygen = solved_oxygen_balance or source_pressure is not None
+    pressure_independent = _pressure_independent_comparison(reference, prediction)
+    redox = quantity_token(identity) in {
+        Quantity.FE3_FE2_RATIO,
+        Quantity.VALENCE_RATIO,
+    }
+    fusion_polymorph_flag = (
+        quantity_token(identity) in FUSION_QUANTITIES
+        and any(
+            notice.reason.startswith("fusion_solid_polymorph_unspecified:")
+            for notice in prediction.notices
+        )
+    )
     comparison_activity = (
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
-    if not solved_oxygen_balance and not comparison_activity:
+    if (
+        not resolved_oxygen
+        and not shared_oxygen_condition
+        and not pressure_independent
+        and not comparison_activity
+        and not redox
+        and melt_identity is identity
+        and not fusion_polymorph_flag
+    ):
         return identity
     updates: dict[str, State] = {}
+    if melt_identity is not identity:
+        updates["species"] = melt_identity.species
+    if redox and isinstance(prediction.identity, Identity):
+        # Redox predictions consume the row's printed composition and oxygen
+        # condition; compare both sides at those exact point conditions.
+        # fO2_Pa on both identities is log10_fo2_to_pa of that printed log.
+        # Exact equality is the check; this does not rebuild or relax it.
+        for field_name in ("composition", "fO2_Pa", "total_pressure_Pa"):
+            actual = getattr(identity, field_name)
+            used = getattr(prediction.identity, field_name)
+            if (actual is None or not actual.is_value) and used is not None and used.is_value:
+                updates[field_name] = used
+    if (
+        shared_oxygen_condition
+        and "fO2_Pa" in profile_for(identity).required
+        and (identity.fO2_Pa is None or not identity.fO2_Pa.is_value)
+        and isinstance(prediction.identity, Identity)
+    ):
+        # The prediction identity carries the exact commanded bar value. Use
+        # it as the comparison condition on both sides, while leaving the
+        # stored reference identity untouched.
+        used_oxygen = prediction.identity.fO2_Pa
+        if used_oxygen is not None and used_oxygen.is_value:
+            updates["fO2_Pa"] = used_oxygen
+    if fusion_polymorph_flag:
+        call_evidence = prediction.execution.call_evidence or ""
+        fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
+        solid_table = fusion_pair.partition("/")[0]
+        from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
+
+        solid_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(solid_table)
+        if solid_polymorph is not None:
+            updates["species"] = replace(
+                identity.species, polymorph=State.of(solid_polymorph)
+            )
     if identity.composition is None or not identity.composition.is_value:
         point = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
-    if solved_oxygen_balance and (
+    if source_pressure is not None:
+        updates["fO2_Pa"] = State.of(source_pressure)
+    elif solved_oxygen_balance and (
         identity.fO2_Pa is None or not identity.fO2_Pa.is_value
     ):
         po2_bar = _solved_effusion_po2_bar(prediction)
         if po2_bar is not None:
             updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * Decimal("1e5"))
-    if solved_oxygen_balance and (
+    if (resolved_oxygen or pressure_independent) and (
         identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
     ):
         quantity = quantity_token(identity)
@@ -3328,33 +5867,820 @@ def _comparison_identity(
 
 
 def _derived_fo2_condition(observation: Observation) -> bool:
-    point = (observation.point_conditions or {}).get("fO2_Pa")
-    if point is not None:
-        if point.inference is not None:
-            return True
-        note = point.locator.note if point.locator is not None else None
-        if note is not None and "derived condition" in note.casefold():
-            return True
-    return any(
-        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
-        and notice.reason.startswith("fO2_Pa is a DERIVED condition")
-        for notice in observation.notices
-    )
+    # d-216 printed-vs-derived lives in fo2_ladder, which calls source_oxygen.
+    from simulator.battery.fo2_ladder import derived_fo2_condition
+
+    return derived_fo2_condition(observation)
 
 
 def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
-    if _derived_fo2_condition(observation):
-        return False
-    fo2 = identity.fO2_Pa
-    if fo2 is not None and fo2.is_value and fo2.value is not None:
-        return True
-    point = (observation.point_conditions or {}).get("fO2_Pa")
-    return bool(
-        point is not None
-        and point.inference is None
-        and point.state.is_value
+    from simulator.battery.fo2_ladder import has_printed_fo2
+
+    return has_printed_fo2(observation, identity)
+
+
+def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | None:
+    if quantity_token(observation.identity) not in _VAPOUR_EQUILIBRIUM:
+        return None
+    pressure = linked_source_pressure(observation)
+    if pressure is None and _has_printed_fo2(observation, observation.identity):
+        pressure = printed_source_pressure(observation)
+        identity_pressure = observation.identity.fO2_Pa
+        if pressure is not None and identity_pressure is not None and identity_pressure.is_value:
+            pressure = identity_pressure.value
+    return pressure
+
+
+_FE_REDOX_RATIO_UNDEFINED = object()
+_KRESS91_SOURCES = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
+_MELTS_FE_REDOX_ENGINES = (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+_FE_REDOX_NO_SPLIT_DETAIL = (
+    "no fixed-T/fO2/composition ferric output without phase-equilibrium execution"
+)
+
+
+@dataclass(frozen=True)
+class _FeRedoxMaterial:
+    temperature: Decimal
+    composition_state: State[Composition]
+    composition_wt: dict[str, float]
+
+
+@dataclass(frozen=True)
+class _FeRedoxKressBasis:
+    mol_fractions: dict[str, float]
+    dropped_components: tuple[str, ...]
+    dropped_mass_fraction: float | None
+
+
+@dataclass(frozen=True)
+class _FeRedoxRefusal:
+    reason: RefusalReason
+    detail: dict[str, object]
+
+
+def _open_cached_battery_handle(
+    engine: Engine,
+    handles: Mapping[str, object] | None,
+) -> object:
+    """Open one battery engine, reusing a live handle and dropping a dead one."""
+
+    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+
+    handle_map: Mapping[str, object] = {} if handles is None else handles
+    handle = handle_map.get(engine.value)
+    if handle is not None and (
+        not getattr(handle, "available", False)
+        or getattr(handle, "backend", None) is None
+    ):
+        if isinstance(handle_map, dict):
+            handle_map.pop(engine.value, None)
+        handle = None
+    if handle is None:
+        handle = open_battery_engine(engine.value)
+        if (
+            isinstance(handle_map, dict)
+            and getattr(handle, "available", False)
+            and getattr(handle, "backend", None) is not None
+        ):
+            handle_map[engine.value] = handle
+    return handle
+
+
+def _printed_condition_decimal(observation: Observation, key: str) -> Decimal | None:
+    located = (observation.point_conditions or {}).get(key)
+    if not isinstance(located, Located) or located.inference is not None:
+        return None
+    if not located.state.is_value or located.state.value is None:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        return point_magnitude(raw)
+    try:
+        return as_decimal(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def _fe_redox_material(
+    observation: Observation, identity: Identity
+) -> _FeRedoxMaterial | _FeRedoxRefusal:
+    """Temperature and the full oxide weight map.
+
+    Kress mol fractions are ``_fe_redox_kress_basis``. OpenIMCC does not
+    call that helper. A MELTS pot is this weight map, not the Kress basis.
+    """
+
+    temperature = temperature_of(identity) or _printed_condition_decimal(
+        observation, "temperature_K"
+    )
+    if temperature is None or not temperature.is_finite() or temperature <= 0:
+        return _FeRedoxRefusal(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "temperature_K"},
+        )
+
+    composition_state = identity.composition
+    if composition_state is None or not composition_state.is_value:
+        composition_state = _printed_point_composition(observation)
+    if (
+        composition_state is None
+        or not composition_state.is_value
+        or not isinstance(composition_state.value, Composition)
+    ):
+        return _FeRedoxRefusal(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+        )
+    composition = composition_state.value
+    try:
+        composition_wt = (
+            {oxide: float(amount) for oxide, amount in composition.components}
+            if composition.amount_basis is AmountBasis.MASS_PERCENT
+            else composition_wt_pct(composition)
+        )
+        if composition_wt is None:
+            raise ValueError("composition cannot be converted to oxide weights")
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        return _FeRedoxRefusal(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_composition", "detail": str(exc)},
+        )
+    return _FeRedoxMaterial(
+        temperature=temperature,
+        composition_state=composition_state,
+        composition_wt=composition_wt,
     )
 
+
+def _fe_redox_kress_basis(
+    composition_wt: Mapping[str, float],
+) -> _FeRedoxKressBasis | _FeRedoxRefusal:
+    """Kress91 mol fractions and the FeOt refusal.
+
+    Premise: Borisov stores mole fractions of oxide formula units and the
+    combined iron key is single-cation. Algebra: x_i -> w_i ∝ x_i M_i, then
+    the production converter divides by M_i and renormalizes to x_i while
+    treating FeO as FeOt. Unit check: (mol fraction × g/mol)/(g/mol) is a
+    mole fraction. Sanity: no measured redox split is used, and the printed
+    six-significant-figure composition remains closed after the FeOt rename.
+    """
+
+    from simulator.fe_redox import (
+        kress91_dropped_components,
+        melt_mol_fractions_for_kress91,
+    )
+
+    try:
+        dropped_components, dropped_mass_fraction = kress91_dropped_components(
+            composition_wt
+        )
+        mol_fractions = melt_mol_fractions_for_kress91(composition_wt)
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        return _FeRedoxRefusal(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_composition", "detail": str(exc)},
+        )
+    if not mol_fractions or mol_fractions.get("FeOt", 0.0) <= 0.0:
+        return _FeRedoxRefusal(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "total_iron"},
+        )
+    return _FeRedoxKressBasis(
+        mol_fractions=mol_fractions,
+        dropped_components=tuple(dropped_components),
+        dropped_mass_fraction=dropped_mass_fraction,
+    )
+
+
+def _printed_fe_redox_fo2_log(
+    observation: Observation, identity: Identity
+) -> Decimal | None:
+    """Printed log10(fO2/bar), or None when oxygen is missing or only derived.
+
+    The extract labels this column log10 fO2; its air rows are about -0.68,
+    i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
+    A derived fO2 is not a printed command. Callers that require a printed
+    value refuse; an engine that computes its own fO2 does not.
+    """
+
+    fo2_log = _printed_condition_decimal(observation, "fO2_log")
+    if fo2_log is None:
+        if _derived_fo2_condition(observation):
+            return None
+        oxygen_pa = identity.fO2_Pa
+        point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
+        if (
+            (oxygen_pa is None or not oxygen_pa.is_value or oxygen_pa.value is None)
+            and isinstance(point_oxygen, Located)
+            and point_oxygen.inference is None
+            and point_oxygen.state.is_value
+            and point_oxygen.state.value is not None
+        ):
+            oxygen_pa = point_oxygen.state
+        if (
+            oxygen_pa is not None
+            and oxygen_pa.is_value
+            and oxygen_pa.value is not None
+        ):
+            oxygen_value = float(oxygen_pa.value)
+            if oxygen_value > 0.0 and math.isfinite(oxygen_value):
+                fo2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
+    if fo2_log is None or not fo2_log.is_finite():
+        return None
+    return fo2_log
+
+
+def _fe_redox_pressure(
+    observation: Observation, identity: Identity
+) -> tuple[float, State[Any]] | _FeRedoxRefusal:
+    pressure_pa = identity.total_pressure_Pa
+    point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
+    if (
+        (pressure_pa is None or not pressure_pa.is_value or pressure_pa.value is None)
+        and point_pressure is not None
+    ):
+        pressure_pa = State.of(point_pressure)
+    if (
+        pressure_pa is not None
+        and pressure_pa.is_value
+        and pressure_pa.value is not None
+    ):
+        pressure_bar = float(pressure_pa.value) / 100000.0
+    elif observation.source_id == "borisov-2018-compilation":
+        # The cited compilation is explicitly a 1-atm dataset.
+        pressure_bar = 1.01325
+        pressure_pa = State.of(Decimal("101325"))
+    else:
+        return _FeRedoxRefusal(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "total_pressure_Pa"},
+        )
+    if pressure_bar < 0.0 or not math.isfinite(pressure_bar):
+        return _FeRedoxRefusal(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_input", "input": "total_pressure_Pa"},
+        )
+    assert pressure_pa is not None
+    return pressure_bar, pressure_pa
+
+
+def _oxide_weight_fe_ratio(
+    mapping: Mapping[str, object],
+    *,
+    fe2o3_key: str,
+    feo_key: str,
+) -> Decimal | object | None:
+    """Battery ratio from one weight pair. None means the pair is absent.
+
+    Both keys present and a None converter result is undefined: do not
+    fall through to another map. The two maps are not mixed.
+    """
+
+    if fe2o3_key not in mapping or feo_key not in mapping:
+        return None
+    try:
+        fe2o3 = as_decimal(mapping[fe2o3_key])
+        feo = as_decimal(mapping[feo_key])
+    except (TypeError, ValueError, ArithmeticError):
+        return _FE_REDOX_RATIO_UNDEFINED
+    if not fe2o3.is_finite() or not feo.is_finite():
+        return _FE_REDOX_RATIO_UNDEFINED
+    ratio = fe3_fe2_ratio_from_oxide_wt_pct(fe2o3, feo)
+    if ratio is None:
+        return _FE_REDOX_RATIO_UNDEFINED
+    return ratio
+
+
+def _reported_engine_fe3_fe2_ratio(cell: object) -> Decimal | object | None:
+    """Fe3+/Fe2+ from the cell. None means the engine reported no ferric split.
+
+    Prefer ``fe_redox_split`` weights, else liquid ``Fe2O3`` and ``FeO``.
+    ``Fe3Fet_Liq`` is Fe3+/Fe total and is used only when neither map has
+    both weights. ``_fe_redox_split`` remains the ThermoEngine emitter.
+    """
+
+    split = getattr(cell, "fe_redox_split", None) or {}
+    if not isinstance(split, Mapping):
+        split = {}
+    liquid = getattr(cell, "liquid_composition_wt_pct", None) or {}
+    if not isinstance(liquid, Mapping):
+        liquid = {}
+    from_split = _oxide_weight_fe_ratio(
+        split, fe2o3_key="Fe2O3_wt_pct", feo_key="FeO_wt_pct"
+    )
+    if from_split is not None:
+        return from_split
+    from_liquid = _oxide_weight_fe_ratio(liquid, fe2o3_key="Fe2O3", feo_key="FeO")
+    if from_liquid is not None:
+        return from_liquid
+    if "Fe3Fet_Liq" in split:
+        try:
+            fraction = as_decimal(split["Fe3Fet_Liq"])
+        except (TypeError, ValueError, ArithmeticError):
+            return _FE_REDOX_RATIO_UNDEFINED
+        ratio = fe3_fe2_ratio_from_ferric_fraction(fraction)
+        if ratio is None:
+            return _FE_REDOX_RATIO_UNDEFINED
+        return ratio
+    if any(key in split for key in ("FeO_wt_pct", "Fe2O3_wt_pct")) or any(
+        key in liquid for key in ("FeO", "Fe2O3")
+    ):
+        return _FE_REDOX_RATIO_UNDEFINED
+    return None
+
+
+def _predict_fe_redox(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+) -> EnginePrediction:
+    """Predict Fe3+/Fe2+ from Kress91, OpenIMCC, or a MELTS ferric split.
+
+    Internal-analytical keeps the Kress91 split. OpenIMCC calls
+    ``openimcc.evaluate_redox`` on the printed composition and fO2, and
+    does not apply the Kress FeOt gate.
+    AlphaMELTS and ThermoEngine report the split they already compute; the
+    battery ratio is ``fe3_fe2_ratio_from_oxide_wt_pct`` or
+    ``fe3_fe2_ratio_from_ferric_fraction``. Other engines stay refused.
+    """
+
+    if engine not in (
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.OPENIMCC,
+        *_MELTS_FE_REDOX_ENGINES,
+    ):
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            authority=Authority.REFUSED,
+            coefficient_sources=_KRESS91_SOURCES,
+            refusal_reason=RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX,
+            refusal_detail={
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value,
+                "engine": engine.value,
+                "detail": _FE_REDOX_NO_SPLIT_DETAIL,
+            },
+            identity=identity,
+        )
+
+    melts = engine in _MELTS_FE_REDOX_ENGINES
+    melts_sources = ENGINE_COEFFICIENT_SOURCES[engine]
+
+    def refused(
+        reason: RefusalReason,
+        detail: Mapping[str, object],
+        *,
+        sources: tuple[str, ...] | None = None,
+        execution_state: ExecutionState = ExecutionState.NOT_PROBED,
+        call_evidence: str | None = None,
+        notices: tuple[Notice, ...] = (),
+        authority: Authority = Authority.REFUSED,
+        certified_band: Mapping[str, tuple[float, float]] | None = None,
+        identity_out: Identity | None = None,
+        version: str | None = None,
+    ) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=execution_state, call_evidence=call_evidence),
+            authority=authority,
+            notices=notices,
+            coefficient_sources=sources if sources is not None else (
+                melts_sources
+                if melts or engine is Engine.OPENIMCC
+                else _KRESS91_SOURCES
+            ),
+            lineage_complete=False,
+            certified_band=certified_band,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity_out if identity_out is not None else identity,
+            version=version,
+        )
+
+    material = _fe_redox_material(observation, identity)
+    if isinstance(material, _FeRedoxRefusal):
+        return refused(material.reason, material.detail)
+
+    # Offer 20 checks printed fO2 and Fe atoms before any Kress projection.
+    # Internal-analytical and MELTS keep the stack's FeOt gate here.
+    kress_basis: _FeRedoxKressBasis | None = None
+    if engine is not Engine.OPENIMCC:
+        kress_basis = _fe_redox_kress_basis(material.composition_wt)
+        if isinstance(kress_basis, _FeRedoxRefusal):
+            return refused(kress_basis.reason, kress_basis.detail)
+
+    fo2_log = _printed_fe_redox_fo2_log(observation, identity)
+    handle: object | None = None
+    if fo2_log is None and melts:
+        # Missing printed fO2 is a refusal unless this engine computes its own.
+        # The flag is on the opened handle, not a hardcoded engine name.
+        handle = _open_cached_battery_handle(engine, handles)
+        if not getattr(handle, "available", False) or getattr(
+            handle, "backend", None
+        ) is None:
+            return refused(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                {
+                    "reason": "unavailable",
+                    "engine_reason": str(
+                        getattr(handle, "unavailable_reason", None) or ""
+                    ),
+                },
+                execution_state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence=(
+                    f"open_battery_engine:{getattr(handle, 'name', engine.value)}"
+                ),
+            )
+        if not getattr(handle, "supports_intrinsic_fo2", False):
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "printed_fO2"},
+            )
+    elif fo2_log is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "printed_fO2"},
+        )
+
+    if engine is Engine.OPENIMCC:
+        assert fo2_log is not None
+        try:
+            from simulator.accounting.formulas import parse_formula
+
+            inventory: dict[str, float] = {}
+            for oxide, weight_percent in material.composition_wt.items():
+                formula = parse_formula(oxide, species=oxide)
+                oxide_moles = weight_percent / formula.molar_mass_g_mol
+                for element, atom_moles in formula.atom_moles(oxide_moles).items():
+                    inventory[element] = (
+                        inventory.get(element, 0.0) + atom_moles
+                    )
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return refused(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_redox_composition", "detail": str(exc)},
+            )
+        if inventory.get("Fe", 0.0) <= 0.0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "total_iron"},
+            )
+        try:
+            import openimcc
+        except ImportError as exc:
+            return refused(
+                RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+                {
+                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                    "detail": str(exc),
+                },
+            )
+        try:
+            result = openimcc.evaluate_redox(
+                inventory,
+                float(material.temperature),
+                "imposed",
+                lambda_imposed=float(fo2_log) * math.log(10.0),
+            )
+        except openimcc.ImccRefusal as exc:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "openimcc_redox_refused", "detail": str(exc)},
+            )
+        prediction_value = result.ferric_fe_mol / result.ferrous_fe_mol
+        if not math.isfinite(prediction_value) or prediction_value <= 0.0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+            )
+
+        extrapolated_rows = tuple(result.extrapolated_redox_rows)
+        authority = (
+            Authority.EXTRAPOLATED if extrapolated_rows else Authority.BRIDGE
+        )
+        band = tuple(
+            Decimal(str(value))
+            for value in result.active_row_band_intersection_K
+        )
+        notices: tuple[Notice, ...] = ()
+        if extrapolated_rows:
+            band_text = f"[{band[0]:g}, {band[1]:g}] K"
+            notices = (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    reason=(
+                        "openimcc_redox_pack_extrapolation; rows="
+                        f"{', '.join(extrapolated_rows)}; "
+                        f"flags={', '.join(result.flags)}"
+                    ),
+                    origin="openimcc.evaluate_redox",
+                    band=band_text,
+                    authority=authority,
+                ),
+            )
+        notices += tuple(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                reason=str(flag),
+                origin="openimcc.evaluate_redox",
+            )
+            for flag in result.flags
+        )
+        prediction_identity = replace(
+            identity,
+            composition=material.composition_state,
+            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="openimcc.evaluate_redox",
+            ),
+            value=as_decimal(str(prediction_value)),
+            unit="dimensionless",
+            authority=authority,
+            notices=notices,
+            coefficient_sources=(
+                f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
+            ),
+            lineage_complete=False,
+            certified_band={"temperature_K": band},
+            identity=prediction_identity,
+            version="openimcc-redox",
+        )
+
+    pressure = _fe_redox_pressure(observation, identity)
+    if isinstance(pressure, _FeRedoxRefusal):
+        return refused(pressure.reason, pressure.detail)
+    pressure_bar, pressure_pa = pressure
+
+    if not melts:
+        assert kress_basis is not None
+        from simulator.fe_redox import (
+            KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+            _kress91_fe3_fe2_ratio,
+            kress91_split,
+            kress91_temperature_band_case,
+        )
+
+        # Identity fO2_Pa is log10_fo2_to_pa of that printed log. The predictor
+        # still receives the printed log, with no frame shift.
+        assert fo2_log is not None
+        band = kress91_temperature_band_case(float(material.temperature) - 273.15)
+        try:
+            split = kress91_split(
+                fO2_log=float(fo2_log),
+                mol_fractions=kress_basis.mol_fractions,
+                T_K=float(material.temperature),
+                pressure_bar=pressure_bar,
+            )
+            prediction_value = _kress91_fe3_fe2_ratio(float(split["ratio"]))
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return refused(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_redox_controls", "detail": str(exc)},
+            )
+        if not math.isfinite(prediction_value) or prediction_value <= 0.0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+            )
+
+        authority = Authority.BRIDGE
+        if not band["authoritative"]:
+            authority = Authority.EXTRAPOLATED
+        certified_band = {
+            "temperature_K": (
+                Decimal(str(KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)),
+                Decimal(str(KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15)),
+            )
+        }
+        certified_band_text = (
+            f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
+            f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
+        )
+        notices: tuple[Notice, ...] = ()
+        if kress_basis.dropped_components and kress_basis.dropped_mass_fraction is not None:
+            notices = (
+                Notice(
+                    kind=NoticeKind.COMPOSITION_PROJECTED,
+                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    reason=(
+                        "Kress91 oxide basis omits composition components: "
+                        f"{', '.join(kress_basis.dropped_components)}; "
+                        f"dropped_mass_fraction={kress_basis.dropped_mass_fraction:.6g}; "
+                        f"authority={authority.value}; certified_band={certified_band_text}"
+                    ),
+                    origin="simulator.fe_redox:melt_mol_fractions_for_kress91",
+                    band=certified_band_text,
+                    dropped=kress_basis.dropped_components,
+                    dropped_mass_fraction=Decimal(str(kress_basis.dropped_mass_fraction)),
+                    authority=authority,
+                ),
+            )
+        if not band["authoritative"]:
+            notices += (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    reason=(
+                        f"kress91_{band['status']}; authority={band['source']}; "
+                        f"calibrated_temperature_C=[{KRESS91_LIQUID_CALIBRATION_MIN_T_C:g},"
+                        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C:g}]"
+                    ),
+                    origin="simulator.fe_redox:kress91_split",
+                    band=(
+                        f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
+                        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
+                    ),
+                    authority=authority,
+                ),
+            )
+        prediction_identity = replace(
+            identity,
+            composition=material.composition_state,
+            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            total_pressure_Pa=pressure_pa,
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="simulator.fe_redox:kress91_split",
+            ),
+            value=as_decimal(str(prediction_value)),
+            unit="dimensionless",
+            authority=authority,
+            notices=notices,
+            coefficient_sources=_KRESS91_SOURCES,
+            lineage_complete=False,
+            certified_band=certified_band,
+            identity=prediction_identity,
+            version="Kress-Carmichael-1991",
+        )
+
+    if handle is None:
+        handle = _open_cached_battery_handle(engine, handles)
+        if (
+            not getattr(handle, "available", False)
+            or getattr(handle, "backend", None) is None
+        ):
+            return refused(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                {
+                    "reason": "unavailable",
+                    "engine_reason": str(
+                        getattr(handle, "unavailable_reason", None) or ""
+                    ),
+                },
+                execution_state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence=(
+                    f"open_battery_engine:{getattr(handle, 'name', engine.value)}"
+                ),
+            )
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        PO2_ENGINE_DEFAULT,
+        REFUSAL_ENGINE_CRASH,
+        REFUSAL_TIMEOUT,
+        REFUSAL_UNAVAILABLE,
+        Po2Request,
+        equilibrate_cell,
+        identity_battery_pot,
+    )
+
+    # Absolute log10(bar) from the printed value. The adapter applies its own
+    # buffer-or-Absolute convention and refuses an unapplied absolute fO2.
+    # Intrinsic engines receive no commanded pO2 and not the default -9.
+    if fo2_log is not None:
+        po2 = Po2Request(
+            mode=PO2_COMMANDED,
+            po2_bar=float(10.0 ** float(fo2_log)),
+        )
+        prediction_identity = replace(
+            identity,
+            composition=material.composition_state,
+            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            total_pressure_Pa=pressure_pa,
+        )
+    else:
+        po2 = Po2Request(mode=PO2_ENGINE_DEFAULT, po2_bar=None)
+        prediction_identity = replace(
+            identity,
+            composition=material.composition_state,
+            total_pressure_Pa=pressure_pa,
+        )
+    cell = equilibrate_cell(
+        handle,
+        identity_battery_pot(
+            f"obs:{observation.observation_id}",
+            material.composition_wt,
+        ),
+        temperature_K=float(material.temperature),
+        po2=po2,
+        qualification=False,
+        isolated=isolated,
+        physical_pressure_bar=pressure_bar,
+    )
+    name = str(getattr(handle, "name", engine.value))
+    call_evidence = (
+        f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
+        f":exit={getattr(cell, 'exit_code', None)}"
+    )
+    model_id = getattr(cell, "model_id", None)
+    version = None if model_id is None else (str(model_id) or None)
+    status = getattr(cell, "status", None)
+    if status != "ok":
+        # The activity/vapour classifier in predict_with_engine stays on that
+        # path (OpenIMCC species, internal-analytical input reasons). Redox
+        # only separates an unavailable cell from an engine refusal.
+        typed = str(getattr(cell, "refusal_reason", None) or status or "unavailable")
+        engine_reason = str(getattr(cell, "engine_reason", None) or "")
+        unavailable = typed in {
+            REFUSAL_TIMEOUT,
+            REFUSAL_UNAVAILABLE,
+            REFUSAL_ENGINE_CRASH,
+            "subprocess_died",
+        } or getattr(cell, "exit_signal", None)
+        if unavailable:
+            return refused(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                {"refusal_reason": typed, "engine_reason": engine_reason},
+                execution_state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence=call_evidence,
+                version=version,
+            )
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {"refusal_reason": typed, "engine_reason": engine_reason},
+            execution_state=ExecutionState.UNSUPPORTED,
+            call_evidence=call_evidence,
+            version=version,
+        )
+
+    ratio = _reported_engine_fe3_fe2_ratio(cell)
+    notices = cell_notices(Quantity.FE3_FE2_RATIO, engine, cell)
+    authority, certified_band = _flags_from_scored_cell(
+        cell, Authority.BRIDGE, None
+    )
+    if ratio is None:
+        return refused(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX,
+            {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value,
+                "engine": engine.value,
+                "detail": "equilibrium result has no FeO/Fe2O3 split and no Fe3Fet_Liq",
+            },
+            execution_state=ExecutionState.PRODUCED,
+            call_evidence=call_evidence,
+            notices=notices,
+            authority=authority,
+            certified_band=certified_band,
+            identity_out=prediction_identity,
+            version=version,
+        )
+    if ratio is _FE_REDOX_RATIO_UNDEFINED or not isinstance(ratio, Decimal):
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+            execution_state=ExecutionState.PRODUCED,
+            call_evidence=call_evidence,
+            notices=notices,
+            identity_out=prediction_identity,
+            version=version,
+        )
+    expanded = expand_coefficient_sources(melts_sources)
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence=call_evidence,
+        ),
+        value=ratio,
+        unit="dimensionless",
+        authority=authority,
+        notices=notices,
+        coefficient_sources=expanded,
+        lineage_complete=lineage_complete_for(melts_sources),
+        certified_band=certified_band,
+        identity=prediction_identity,
+        version=version,
+    )
 
 def total_pressure_bar_for_score(
     identity: Identity,
@@ -3416,7 +6742,11 @@ def _implied_alpha_activity_observation(observation: Observation) -> Observation
     """
 
     metadata = _implied_alpha_metadata(observation)
-    if metadata is None or not isinstance(observation.identity, Identity):
+    if (
+        metadata is None
+        or not isinstance(observation.identity, Identity)
+        or observation.identity.species is None
+    ):
         return None
     oxide = str(metadata["oxide_formula"])
     coefficient_formula = _IMPLIED_ALPHA_SINGLE_CATION_FORMULAS.get(oxide, oxide)
@@ -3457,6 +6787,8 @@ def _implied_alpha_coefficient_basis_matches(
     if not isinstance(expected_identity, Identity) or not isinstance(
         actual_identity, Identity
     ):
+        return False
+    if expected_identity.species is None or actual_identity.species is None:
         return False
     if actual_identity.species.formula != expected_identity.species.formula:
         return False
@@ -3525,18 +6857,49 @@ def _knudsen_vapour_equilibrium(
     )
 
 
-def _cell_oxygen_class(
-    materials: Sequence[Located[CellMaterial]] | None,
-) -> tuple[str, str | None]:
-    """(material class, modelled reactive reservoir metal or None)."""
+def _payload_fo2_notice(quantity: Quantity, payload: Mapping) -> Notice | None:
+    tier = payload.get("fO2_tier")
+    if tier is None:
+        return None
+    from simulator.battery.fo2_ladder import ResolvedFo2, fo2_tier_notice
 
-    material_class = _cell_material_class(materials)
-    modelled = (
-        _uniform_modelled_reactive_cell(materials)
-        if material_class == "reactive"
-        else None
+    log = payload.get("fO2_log")
+    bar = payload.get("fO2_bar")
+    return fo2_tier_notice(
+        quantity,
+        ResolvedFo2(
+            float(log) if log is not None else float("nan"),
+            int(tier),
+            str(payload.get("fO2_route") or ""),
+            bool(payload.get("fO2_borrowed")),
+            None if bar is None else float(bar),
+        ),
     )
-    return material_class, modelled
+
+
+def _payload_fo2_bar(payload: Mapping) -> float | None:
+    bar = payload.get("fO2_bar")
+    if bar is not None:
+        return float(bar)
+    log = payload.get("fO2_log")
+    return None if log is None else 10.0 ** float(log)
+
+
+def _prediction_identity_with_fo2(
+    identity: Identity, po2_bar: float | None
+) -> Identity:
+    if (
+        po2_bar is None
+        or not math.isfinite(po2_bar)
+        or po2_bar <= 0.0
+        or "fO2_Pa" not in profile_for(identity).required
+        or (identity.fO2_Pa is not None and identity.fO2_Pa.is_value)
+    ):
+        return identity
+    return replace(
+        identity,
+        fO2_Pa=State.of(Decimal(str(po2_bar)) * PA_PER_BAR_DEC),
+    )
 
 
 def _oxygen_input_request(
@@ -3549,48 +6912,1452 @@ def _oxygen_input_request(
     quantity: Quantity,
     composition_value: Composition | None,
     input_notices: list[Notice],
+    observation: Observation | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    temperature_K: float | None = None,
+    composition_wt: Mapping[str, float] | None = None,
+    force_ladder: bool = False,
 ) -> "Po2Request | EnginePrediction":
-    """The scorer's one oxygen-input decision (b-693/b-691 r2 finding 5).
+    """The scorer's one oxygen-input decision.
 
-    A printed fO2 is the commanded point (fO2_Pa is fugacity; pO2_bar =
-    fO2_Pa / 1e5 under the stated ideal-gas assumption, 1 bar = 100000 Pa
-    exactly). Otherwise a quantity that needs oxygen refuses
-    ``missing_fO2``; one that does not records the omission notice on
-    ``input_notices`` and runs with oxygen not an input. Every cell branch of
-    ``predict_with_engine`` consumes this; none re-derives it.
+    A printed identity fO2 is commanded as float(fO2_Pa)/1e5, the same
+    division this path already used. Anything else goes through the row
+    ladder once. A tier-3 effusion closure is the oxygen-balance mode, not
+    a commanded number; engines that cannot solve it are rewritten by the
+    comparison path onto the internal-analytical closure. A row the ladder
+    cannot resolve refuses ``missing_fO2`` for every engine when oxygen is
+    required. ``force_ladder`` still asks the ladder for a quantity that
+    does not require oxygen; it does not override a closure, and it does
+    not fill a Knudsen cell that cannot close. Any other quantity that
+    does not take oxygen records the omission and runs with oxygen not an
+    input.
+
+    Callers that predate the ladder pass no observation. They keep the
+    identity-only decision: command an identity fO2, refuse ``missing_fO2``
+    when oxygen is required, otherwise omit it. They do not run the ladder,
+    so a missing fO2 stays a refusal rather than a tier-4 fill.
     """
 
-    # Same lazy import predict_with_engine already uses (no new layer edge).
     from simulator.diagnostic_helpers.binary_pot_battery import (
         PO2_COMMANDED,
         PO2_NOT_AN_INPUT,
+        PO2_OXYGEN_BALANCE_EFFUSION,
         Po2Request,
     )
 
     oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(
         identity, composition_value
     )
-    fo2_state = identity.fO2_Pa
-    if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
-        return Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
-    if oxygen_required:
+    if observation is None:
+        fo2_state = identity.fO2_Pa
+        if (
+            fo2_state is not None
+            and fo2_state.is_value
+            and fo2_state.value is not None
+        ):
+            return Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=float(fo2_state.value) / 1.0e5,
+            )
+        if oxygen_required:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail={
+                    "reason": "missing_fO2",
+                    "quantity": quantity.value,
+                    "why": oxygen_why,
+                    "multivalent": list(redox),
+                },
+                notices=tuple(input_notices),
+            )
+        input_notices.append(_omission_notice(quantity, oxygen_why))
+        return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+
+    from simulator.battery.fo2_ladder import (
+        ResolvedFo2,
+        fo2_tier_notice,
+        resolve_row_fo2,
+    )
+
+    if _has_printed_fo2(observation, identity):
+        fo2_state = identity.fO2_Pa
+        if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
+            po2_bar = float(fo2_state.value) / 1.0e5
+            if math.isfinite(po2_bar) and po2_bar > 0.0:
+                input_notices.append(
+                    fo2_tier_notice(
+                        quantity,
+                        ResolvedFo2(
+                            math.log10(po2_bar),
+                            1,
+                            "identity_fO2_Pa",
+                            False,
+                            po2_bar=po2_bar,
+                        ),
+                    )
+                )
+            return Po2Request(mode=PO2_COMMANDED, po2_bar=po2_bar)
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=composition_value,
+        composition_wt=composition_wt,
+        temperature_K=temperature_K,
+        quantity=quantity,
+    )
+    if resolved is not None and resolved.closure:
+        if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
+            input_notices.append(fo2_tier_notice(quantity, resolved))
+        return Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material=resolved.cell_material,
+        )
+    if oxygen_required or force_ladder:
+        if resolved is not None and not resolved.closure:
+            input_notices.append(fo2_tier_notice(quantity, resolved))
+            bar = (
+                resolved.po2_bar
+                if resolved.po2_bar is not None
+                else 10.0 ** resolved.log10_fO2_bar
+            )
+            return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
+        if oxygen_required:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail={
+                    "reason": "missing_fO2",
+                    "quantity": quantity.value,
+                    "why": oxygen_why,
+                    "multivalent": list(redox),
+                },
+                notices=tuple(input_notices),
+            )
+    input_notices.append(_omission_notice(quantity, oxygen_why))
+    return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+
+
+def _borrow_internal_analytical_effusion(
+    *,
+    engine: Engine,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    quantity: Quantity,
+    observation: Observation,
+    experiment: Experiment | None,
+    bench: Bench | None,
+    handles: Mapping[str, object] | None,
+    isolated: bool | None,
+    notices: list[Notice],
+) -> "Po2Request | EnginePrediction":
+    """Command the internal-analytical closure for an engine that cannot solve it.
+
+    The solver stays in the internal-analytical adapter. This function reads
+    the solved bar off that engine's notice and does not copy the balance.
+    """
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+    )
+    from simulator.battery.fo2_ladder import ResolvedFo2, fo2_tier_notice
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        handles=handles,
+        isolated=isolated,
+        experiment=experiment,
+        bench=bench,
+    )
+    bar = _solved_effusion_po2_bar(prediction)
+    if bar is None or not math.isfinite(bar) or bar <= 0.0:
         return _input_refusal(
             engine=engine,
             channel=channel,
             sources=sources,
             identity=identity,
             requested=requested,
-            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            reason=RefusalReason.UNSUPPORTED,
             detail={
-                "reason": "missing_fO2",
-                "quantity": quantity.value,
-                "why": oxygen_why,
-                "multivalent": list(redox),
+                "reason": "internal_analytical_oxygen_balance_unavailable",
+                "engine": engine.value,
             },
-            notices=tuple(input_notices),
+            notices=tuple(notices),
         )
-    input_notices.append(_omission_notice(quantity, oxygen_why))
-    return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    notices.append(
+        fo2_tier_notice(
+            quantity,
+            ResolvedFo2(
+                math.log10(bar),
+                3,
+                "effusion_oxygen_balance; effusion closure borrowed from internal-analytical",
+                True,
+                po2_bar=bar,
+            ),
+        )
+    )
+    return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
+
+
+def _battery_hero_oxygen_condition(
+    reference: str,
+    observations: Mapping[str, Observation],
+    engine: Engine,
+    notices: Iterable[Notice | Mapping[str, object]] = (),
+) -> tuple[str, Decimal | None, Decimal | None, str | None, str | None, str]:
+    """Return the oxygen condition used for a scored row and its provenance."""
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        PO2_NOT_AN_INPUT,
+    )
+
+    solved = _solved_effusion_oxygen_payload(engine, notices)
+    if solved is not None and solved.get("kind") == (
+        "fo2_oxygen_balance_effusion_solved"
+    ):
+        source_raw = solved.get("oxygen_condition_source")
+        source = source_raw if isinstance(source_raw, str) and source_raw else None
+        kind_raw = solved.get("kind")
+        kind = kind_raw if isinstance(kind_raw, str) else None
+        try:
+            pO2_bar = as_decimal(solved.get("pO2_bar"))
+            if not pO2_bar.is_finite() or pO2_bar <= 0:
+                raise ValueError("oxygen balance has no positive finite pO2")
+            # At these pressures fO2 ≈ pO2, so log10(fO2) is log10(pO2_bar).
+            log10_fO2_bar = pO2_bar.log10()
+            fO2_Pa = pO2_bar * PA_PER_BAR_DEC
+        except (TypeError, ValueError, ArithmeticError):
+            return (
+                "missing",
+                None,
+                None,
+                source,
+                kind,
+                "invalid solved oxygen balance condition",
+            )
+        return "solved", log10_fO2_bar, fO2_Pa, source, kind, ""
+
+    observation = observations.get(reference)
+    if observation is None or not isinstance(observation.identity, Identity):
+        return "missing", None, None, None, None, "no fO2 for this row"
+    identity = observation.identity
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return "missing", None, None, None, None, "no fO2 for this row"
+
+    requested = identity.composition
+    if requested is None or not requested.is_value:
+        requested = _printed_point_composition(observation)
+    composition_value = (
+        requested.value
+        if requested is not None and requested.is_value
+        else None
+    )
+    decision = _oxygen_input_request(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        identity=identity,
+        requested=requested,
+        quantity=quantity,
+        composition_value=composition_value,
+        input_notices=[],
+    )
+    if isinstance(decision, EnginePrediction):
+        detail = decision.refusal_detail or {}
+        reason = (
+            "no fO2 for this row"
+            if detail.get("reason") == "missing_fO2"
+            else "scorer did not produce an oxygen request"
+        )
+        return "missing", None, None, None, None, reason
+    if decision.mode == PO2_NOT_AN_INPUT:
+        return (
+            "not_an_input",
+            None,
+            None,
+            None,
+            None,
+            "oxygen is not an input for this row",
+        )
+    if decision.mode != PO2_COMMANDED or decision.po2_bar is None:
+        return (
+            "missing",
+            None,
+            None,
+            None,
+            None,
+            "scorer did not produce an oxygen request",
+        )
+
+    try:
+        pO2_bar = as_decimal(decision.po2_bar)
+        if not pO2_bar.is_finite() or pO2_bar <= 0:
+            raise ValueError("oxygen request is outside the positive finite domain")
+        log10_fO2_bar = pO2_bar.log10()
+        fO2_Pa = pO2_bar * PA_PER_BAR_DEC
+    except (TypeError, ValueError, ArithmeticError):
+        return "missing", None, None, None, None, "invalid scorer oxygen request"
+    mode = "printed" if _has_printed_fo2(observation, identity) else "commanded"
+    return mode, log10_fO2_bar, fO2_Pa, "observations-v2", mode, ""
+
+
+@dataclass(frozen=True)
+class _CapacitySolute:
+    element: str
+    pressure_key: str
+    fugacity_parameter: str
+    flag: str
+    refusal: RefusalReason
+
+
+# The scorer does not own a sulfide-capacity model. C_S and C_Cl are the
+# defining rearrangement of the dissolved amount the engine already returned.
+_CAPACITY_SOLUTES: dict[Quantity, _CapacitySolute] = {
+    Quantity.SULFIDE_CAPACITY: _CapacitySolute(
+        element="S",
+        pressure_key="pS2_Pa",
+        fugacity_parameter="sulfur_fugacity_bar",
+        flag="models_dissolved_sulfur",
+        refusal=RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR,
+    ),
+    Quantity.CHLORIDE_CAPACITY: _CapacitySolute(
+        element="Cl",
+        pressure_key="pCl2_Pa",
+        fugacity_parameter="chloride_fugacity_bar",
+        flag="models_dissolved_chloride",
+        refusal=RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE,
+    ),
+}
+
+
+def _capacity_solute(quantity: Quantity | None) -> _CapacitySolute | None:
+    if quantity is None:
+        return None
+    return _CAPACITY_SOLUTES.get(quantity)
+
+
+def _adapter_models_dissolved_solute(engine: Engine, solute: _CapacitySolute) -> bool:
+    """Read the adapter's declaration. No engine list lives here."""
+
+    from simulator.melt_backend.base import battery_adapter_class
+
+    adapter = battery_adapter_class(engine.value)
+    if adapter is None:
+        return False
+    return bool(getattr(adapter, solute.flag, False))
+
+
+def _printed_point_pa(observation: Observation, key: str) -> Decimal | None:
+    """A printed positive point pressure, in pascal. Never a default."""
+
+    located = (observation.point_conditions or {}).get(key)
+    if located is None or located.inference is not None or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None or raw.approximate:
+            return None
+        raw = raw.point
+    if raw is None:
+        return None
+    try:
+        pa = as_decimal(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not pa.is_finite() or pa <= 0:
+        return None
+    return pa
+
+
+@dataclass(frozen=True)
+class _CapacityLaw:
+    """Recognised capacity rearrangement. Dispatch is on this identity.
+
+    C = (wt% solute) * fO2**oxygen_exponent / fAnion**anion_exponent.
+    bar_standard_state: those fugacities are over the 1 bar standard state.
+    When false, the ratio is dimensionless in any shared pressure unit.
+    """
+
+    identity: str
+    oxygen_exponent: Fraction
+    anion_exponent: Fraction
+    bar_standard_state: bool
+
+
+# Fincham–Richardson: 1/2 S2 + O2-(melt) = 1/2 O2 + S2-(melt).
+_FINCHAM_RICHARDSON = _CapacityLaw(
+    "fincham_richardson", Fraction(1, 2), Fraction(1, 2), False
+)
+# Charge balance: 1/2 Cl2 + 1/2 O^2- = Cl- + 1/4 O2. See _log10_printed_capacity.
+_CHLORIDE_CHARGE_BALANCE = _CapacityLaw(
+    "chloride_charge_balance", Fraction(1, 4), Fraction(1, 2), True
+)
+_CAPACITY_LAWS: dict[Quantity, _CapacityLaw] = {
+    Quantity.SULFIDE_CAPACITY: _FINCHAM_RICHARDSON,
+    Quantity.CHLORIDE_CAPACITY: _CHLORIDE_CHARGE_BALANCE,
+}
+
+_FUGACITY_SPECIES = re.compile(r"^(?:[pf])_?\(?((?:cl|o|s)2)\)?$")
+_WEIGHT_PERCENT_SOLUTE = re.compile(r"^wt%_?(s|cl)$")
+_CAPACITY_SYMBOL = re.compile(r"^c_?(s|cl)$")
+
+
+def _matching_paren(text: str, open_at: int) -> int | None:
+    if open_at < 0 or open_at >= len(text) or text[open_at] != "(":
+        return None
+    depth = 0
+    for index in range(open_at, len(text)):
+        char = text[index]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
+
+def _strip_wrapping_parens(token: str) -> str:
+    body = token
+    while (
+        body.startswith("(")
+        and body.endswith(")")
+        and _matching_paren(body, 0) == len(body) - 1
+    ):
+        body = body[1:-1]
+    return body
+
+
+def _fraction_token(token: str) -> Fraction | None:
+    body = _strip_wrapping_parens(token)
+    if not body or body[0] in "+-":
+        return None
+    try:
+        if "/" in body:
+            numerator, denominator = body.split("/", 1)
+            if not numerator.isdecimal() or not denominator.isdecimal():
+                return None
+            return Fraction(int(numerator), int(denominator))
+        if re.fullmatch(r"\d+(?:\.\d+)?", body) is None:
+            return None
+        return Fraction(body)
+    except (ValueError, ZeroDivisionError, ArithmeticError):
+        return None
+
+
+def _capacity_equation_text(relation: str) -> str | None:
+    """Equation body. A top-level comma or semicolon starts a citation note."""
+
+    depth = 0
+    cut = len(relation)
+    for index, char in enumerate(relation):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+        elif char in ",;" and depth == 0:
+            cut = index
+            break
+    if depth != 0 and cut == len(relation):
+        return None
+    text = relation[:cut]
+    text = (
+        text.replace("·", "*")
+        .replace("×", "*")
+        .replace("−", "-")
+        .replace("–", "-")
+        .replace("—", "-")
+    )
+    text = re.sub(r"\s+", "", text).casefold().replace("^", "**")
+    needle = "sqrt("
+    while True:
+        start = text.find(needle)
+        if start < 0:
+            return text or None
+        open_at = start + len(needle) - 1
+        close_at = _matching_paren(text, open_at)
+        if close_at is None:
+            return None
+        inner = text[open_at + 1 : close_at]
+        text = f"{text[:start]}({inner})**(1/2){text[close_at + 1 :]}"
+
+
+def _solute_of_capacity_symbol(lhs: str) -> str | None:
+    body = lhs[len("log10") :] if lhs.startswith("log10") else lhs
+    match = _CAPACITY_SYMBOL.fullmatch(_strip_wrapping_parens(body))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _weight_percent_solute(token: str) -> str | None:
+    match = _WEIGHT_PERCENT_SOLUTE.fullmatch(_strip_wrapping_parens(token))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _fugacity_species(token: str) -> str | None:
+    match = _FUGACITY_SPECIES.fullmatch(_strip_wrapping_parens(token))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _ratio_parts(token: str) -> tuple[str, str] | None:
+    depth = 0
+    slash: int | None = None
+    for index, char in enumerate(token):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+        elif char == "/" and depth == 0:
+            if slash is not None:
+                return None
+            slash = index
+    if depth != 0 or slash is None or slash == 0 or slash == len(token) - 1:
+        return None
+    return token[:slash], token[slash + 1 :]
+
+
+def _apply_fugacity(
+    token: str,
+    exponent: Fraction,
+    solute: str,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[Fraction, Fraction] | None:
+    species = _fugacity_species(token)
+    if species == "o2":
+        return oxygen + exponent, anion
+    if (species == "s2" and solute == "s") or (species == "cl2" and solute == "cl"):
+        return oxygen, anion + exponent
+    return None
+
+
+def _apply_gas_term(
+    argument: str,
+    exponent: Fraction,
+    solute: str,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[Fraction, Fraction] | None:
+    stripped = _strip_wrapping_parens(argument)
+    if "/" not in stripped:
+        return _apply_fugacity(stripped, exponent, solute, oxygen, anion)
+    parts = _ratio_parts(stripped)
+    if parts is None:
+        return None
+    left, right = parts
+    step = _apply_fugacity(left, exponent, solute, oxygen, anion)
+    if step is None:
+        return None
+    oxygen, anion = step
+    return _apply_fugacity(right, -exponent, solute, oxygen, anion)
+
+
+def _capacity_exponents(
+    solute: str,
+    weight_solute: str | None,
+    weight_exponent: Fraction,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[str, Fraction, Fraction] | None:
+    # anion is the signed power. A capacity has it in the denominator.
+    if weight_solute != solute or weight_exponent != 1 or oxygen <= 0 or anion >= 0:
+        return None
+    return solute, oxygen, -anion
+
+
+def _split_power(factor: str) -> tuple[str, Fraction] | None:
+    if "**" not in factor:
+        return factor, Fraction(1)
+    base, exponent, *rest = factor.split("**")
+    if rest or not base or not exponent:
+        return None
+    parsed = _fraction_token(exponent)
+    if parsed is None:
+        return None
+    return base, parsed
+
+
+def _split_product(expr: str) -> list[tuple[int, str]] | None:
+    if not expr:
+        return None
+    parts: list[tuple[int, str]] = []
+    buf: list[str] = []
+    depth = 0
+    sign = 1
+    index = 0
+    while index < len(expr):
+        char = expr[index]
+        if char == "(":
+            depth += 1
+            buf.append(char)
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+            buf.append(char)
+        elif (
+            char == "*"
+            and depth == 0
+            and index + 1 < len(expr)
+            and expr[index + 1] == "*"
+        ):
+            buf.append("**")
+            index += 1
+        elif char in {"*", "/"} and depth == 0:
+            parts.append((sign, "".join(buf)))
+            buf = []
+            sign = 1 if char == "*" else -1
+        else:
+            buf.append(char)
+        index += 1
+    if depth != 0:
+        return None
+    parts.append((sign, "".join(buf)))
+    if any(not factor for _sign, factor in parts):
+        return None
+    return parts
+
+
+def _parse_product_capacity(
+    solute: str, rhs: str
+) -> tuple[str, Fraction, Fraction] | None:
+    factors = _split_product(rhs)
+    if factors is None:
+        return None
+    oxygen = Fraction(0)
+    anion = Fraction(0)
+    weight_solute: str | None = None
+    weight_exponent = Fraction(0)
+    for sign, factor in factors:
+        powered = _split_power(factor)
+        if powered is None:
+            return None
+        base, power = powered
+        exponent = Fraction(sign) * power
+        stripped = _strip_wrapping_parens(base)
+        weight = _weight_percent_solute(stripped)
+        if weight is not None:
+            if weight_solute is not None:
+                return None
+            weight_solute = weight
+            weight_exponent = exponent
+            continue
+        step = _apply_gas_term(stripped, exponent, solute, oxygen, anion)
+        if step is None:
+            return None
+        oxygen, anion = step
+    return _capacity_exponents(
+        solute, weight_solute, weight_exponent, oxygen, anion
+    )
+
+
+def _read_log_term(
+    text: str, index: int
+) -> tuple[Fraction, str, int] | None:
+    if index >= len(text) or text[index] not in "+-":
+        return None
+    sign = Fraction(1 if text[index] == "+" else -1)
+    index += 1
+    if index < len(text) and text[index] == "(":
+        close_at = _matching_paren(text, index)
+        if close_at is None:
+            return None
+        coeff = _fraction_token(text[index : close_at + 1])
+        index = close_at + 1
+    else:
+        fraction = re.match(r"(\d+)/(\d+)", text[index:])
+        decimal = re.match(r"\d+(?:\.\d+)?", text[index:])
+        if fraction is not None:
+            coeff = _fraction_token(fraction.group(0))
+            index += fraction.end()
+        elif decimal is not None:
+            coeff = _fraction_token(decimal.group(0))
+            index += decimal.end()
+        else:
+            return None
+    if coeff is None:
+        return None
+    if index < len(text) and text[index] == "*":
+        if index + 1 < len(text) and text[index + 1] == "*":
+            return None
+        index += 1
+    prefix = "log10("
+    if not text.startswith(prefix, index):
+        return None
+    open_at = index + len(prefix) - 1
+    close_at = _matching_paren(text, open_at)
+    if close_at is None:
+        return None
+    return sign * coeff, text[open_at + 1 : close_at], close_at + 1
+
+
+def _parse_log_capacity(
+    solute: str, rhs: str
+) -> tuple[str, Fraction, Fraction] | None:
+    prefix = "log10("
+    if not rhs.startswith(prefix):
+        return None
+    close_at = _matching_paren(rhs, len(prefix) - 1)
+    if close_at is None:
+        return None
+    weight = _weight_percent_solute(rhs[len(prefix) : close_at])
+    rest = rhs[close_at + 1 :]
+    if weight is None or not rest:
+        return None
+    oxygen = Fraction(0)
+    anion = Fraction(0)
+    index = 0
+    while index < len(rest):
+        term = _read_log_term(rest, index)
+        if term is None:
+            return None
+        coeff, argument, index = term
+        step = _apply_gas_term(argument, coeff, solute, oxygen, anion)
+        if step is None:
+            return None
+        oxygen, anion = step
+    return _capacity_exponents(solute, weight, Fraction(1), oxygen, anion)
+
+
+def _parse_printed_capacity(
+    relation: str,
+) -> tuple[str, Fraction, Fraction] | None:
+    """Exponents of one printed capacity equation, or None.
+
+    The result is (solute, oxygen_exponent, anion_exponent) for
+    C = (wt% solute) * fO2**oxygen / fAnion**anion. Citations are not read.
+    """
+
+    text = _capacity_equation_text(relation)
+    if text is None or text.count("=") != 1:
+        return None
+    lhs, rhs = text.split("=", 1)
+    solute = _solute_of_capacity_symbol(lhs)
+    if solute is None or not rhs:
+        return None
+    if lhs.startswith("log10"):
+        return _parse_log_capacity(solute, rhs)
+    return _parse_product_capacity(solute, rhs)
+
+
+def _recognised_capacity_law(
+    quantity: Quantity | None, relation: str
+) -> _CapacityLaw | None:
+    """Law whose exponent identity is the printed equation. Not a text search."""
+
+    parsed = _parse_printed_capacity(relation)
+    if parsed is None or quantity is None:
+        return None
+    solute, oxygen, anion = parsed
+    law = _CAPACITY_LAWS.get(quantity)
+    if law is None:
+        return None
+    expected = "s" if quantity is Quantity.SULFIDE_CAPACITY else "cl"
+    if solute != expected or oxygen != law.oxygen_exponent or anion != law.anion_exponent:
+        return None
+    return law
+
+
+def _log10_printed_capacity(
+    weight_percent: Decimal,
+    p_o2_pa: Decimal,
+    p_anion_pa: Decimal,
+    law: _CapacityLaw,
+) -> Decimal | None:
+    """log10 of the printed capacity the row's defining equation names.
+
+    The engine's dissolved amount is the only solute number. This is that
+    amount rearranged by the printed definition, not a second capacity model.
+    A non-positive weight percent has no logarithm and is refused. It is
+    not stored as zero.
+
+    Sulfide, Fincham and Richardson. Equilibrium
+    1/2 S2 + O2-(melt) = 1/2 O2 + S2-(melt), so
+    C_S = (wt% S) * (fO2 / fS2) ** (1/2). The ratio is dimensionless in
+    any shared unit, so the printed pascal values are used as printed.
+    One weight percent at pO2 = 10000 Pa and pS2 = 100 Pa is log10 C_S = 1.
+
+    Chloride, charge balance. Equilibrium
+    1/2 Cl2(g) + 1/2 O^2-(melt) = Cl^-(melt) + 1/4 O2(g), so
+    K is proportional to x_Cl * fO2**(1/4) / (fCl2**(1/2) * a_O^2-**(1/2)).
+    Folding a_O^2- into the capacity gives
+    C_Cl = (wt% Cl) * fO2**(1/4) / fCl2**(1/2).
+    Fugacities are in bar, dimensionless over the 1 bar standard state.
+    Sanity: fO2 = fCl2 = 10 Pa = 1e-4 bar and 1 wt% Cl give
+    C_Cl = 1 * (1e-4)**(1/4) / (1e-4)**(1/2) = 0.1 / 0.01 = 10,
+    so log10 C_Cl = 1.
+    """
+
+    if (
+        not weight_percent.is_finite()
+        or not p_o2_pa.is_finite()
+        or not p_anion_pa.is_finite()
+        or weight_percent <= 0
+        or p_o2_pa <= 0
+        or p_anion_pa <= 0
+    ):
+        return None
+    if law is _FINCHAM_RICHARDSON:
+        capacity = weight_percent * (p_o2_pa / p_anion_pa).sqrt()
+    elif law is _CHLORIDE_CHARGE_BALANCE:
+        f_o2 = p_o2_pa / PA_PER_BAR_DEC
+        f_cl2 = p_anion_pa / PA_PER_BAR_DEC
+        capacity = weight_percent * f_o2.sqrt().sqrt() / f_cl2.sqrt()
+    else:
+        return None
+    if not capacity.is_finite() or capacity <= 0:
+        return None
+    return Decimal(str(math.log10(float(capacity))))
+
+
+def _equilibrate_phase_assemblage(
+    engine: Engine,
+    *,
+    temperature_C: float,
+    composition_kg: Mapping[str, float],
+    fO2_log: float,
+    pressure_bar: float,
+    solute_fugacity_bar: float | None = None,
+    solute_fugacity_parameter: str | None = None,
+) -> EquilibriumResult:
+    """One melt-backend equilibrate. Tests replace this; it does not default pO2 or P.
+
+    A capacity call passes the printed solute fugacity. An adapter that
+    declares the solute and cannot be told that fugacity fails closed.
+    """
+
+    import inspect
+
+    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+
+    handle = open_battery_engine(engine.value)
+    backend = getattr(handle, "backend", None)
+    if backend is None:
+        reason = getattr(handle, "unavailable_reason", None) or "backend unavailable"
+        raise RuntimeError(str(reason))
+    kwargs: dict[str, object] = {
+        "temperature_C": temperature_C,
+        "composition_kg": dict(composition_kg),
+        "fO2_log": fO2_log,
+        "pressure_bar": pressure_bar,
+    }
+    if solute_fugacity_bar is not None:
+        if not solute_fugacity_parameter:
+            raise RuntimeError("printed solute fugacity has no parameter name")
+        parameters = inspect.signature(backend.equilibrate).parameters
+        accepts = solute_fugacity_parameter in parameters or any(
+            item.kind is inspect.Parameter.VAR_KEYWORD for item in parameters.values()
+        )
+        if not accepts:
+            raise RuntimeError(
+                f"{type(backend).__name__} does not accept {solute_fugacity_parameter}"
+            )
+        kwargs[solute_fugacity_parameter] = solute_fugacity_bar
+    return backend.equilibrate(**kwargs)
+
+
+def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
+    state = getattr(identity, name, None)
+    if state is None or not isinstance(state, State) or not state.is_value:
+        return None
+    if isinstance(state.value, PhaseRole):
+        return state.value
+    return None
+
+
+def _printed_total_pressure_bar(
+    identity: Identity, observation: Observation
+) -> Decimal | None:
+    state = identity.total_pressure_Pa
+    raw: object = None
+    if state is not None and state.is_value and state.value is not None:
+        raw = state.value
+    else:
+        located = (observation.point_conditions or {}).get("total_pressure_Pa")
+        if located is None or located.inference is not None or not located.state.is_value:
+            return None
+        raw = located.state.value
+        if isinstance(raw, Value):
+            raw = raw.point
+    if raw is None:
+        return None
+    try:
+        pa = as_decimal(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not pa.is_finite() or pa <= 0:
+        return None
+    return pa / Decimal("1e5")
+
+
+def _printed_fo2_log10_bar(identity: Identity) -> float | None:
+    state = identity.fO2_Pa
+    if state is None or not state.is_value or state.value is None:
+        return None
+    try:
+        pa = as_decimal(state.value)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not pa.is_finite() or pa <= 0:
+        return None
+    return float(pa.log10() - Decimal("1e5").log10())
+
+
+def _select_phase_composition(
+    result: EquilibriumResult, role: PhaseRole
+) -> tuple[Mapping[str, float] | None, str | None]:
+    comps = dict(result.phase_compositions or {})
+    exact = [name for name in comps if name.casefold() == role.value]
+    if len(exact) > 1:
+        return None, "ambiguous_phase"
+    if len(exact) == 1:
+        return comps[exact[0]], None
+    if role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}:
+        liquids = [name for name in comps if name.casefold() in _LIQUID_PHASE_NAMES]
+        if len(liquids) > 1:
+            return None, "ambiguous_phase"
+        if len(liquids) == 1:
+            return comps[liquids[0]], None
+        liquid = dict(result.liquid_composition_wt_pct or {})
+        if liquid:
+            return liquid, None
+        return None, "phase_not_in_assemblage"
+    needles = ("metal", "alloy") if role is PhaseRole.METAL else ("matte", "sulfide")
+    hits = [name for name in comps if any(needle in name.casefold() for needle in needles)]
+    if len(hits) > 1:
+        return None, "ambiguous_phase"
+    if len(hits) == 1:
+        return comps[hits[0]], None
+    return None, "phase_not_in_assemblage"
+
+
+def _component_wt(
+    formula: str,
+    phase_map: Mapping[str, float],
+    *,
+    oxide: bool,
+    phase: str,
+) -> tuple[float | None, tuple[str, ...]]:
+    matched, repair_notices = _match_reported_species_with_notices(
+        formula,
+        phase_map,
+        oxide_activity=oxide,
+        notice_field="phase_compositions",
+        notice_phase=phase,
+    )
+    if matched is None:
+        return None, repair_notices
+    return matched[1], repair_notices
+
+
+def _predict_phase_row(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> EnginePrediction:
+    """One printed component, or one printed L_X, from an assemblage."""
+
+    quantity = quantity_token(identity)
+
+    def refused(
+        reason: RefusalReason,
+        detail: dict[str, object],
+        *,
+        execution: ExecutionState = ExecutionState.UNSUPPORTED,
+        notices: tuple[Notice, ...] = (),
+    ) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=execution),
+            authority=Authority.REFUSED,
+            notices=notices,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity,
+        )
+
+    solute = _capacity_solute(quantity)
+    if solute is not None and not _adapter_models_dissolved_solute(engine, solute):
+        return refused(
+            solute.refusal,
+            {
+                "reason": solute.refusal.value,
+                "engine": engine.value,
+                "quantity": quantity.value if quantity is not None else "",
+                "detail": (
+                    "adapter does not model dissolved "
+                    f"{solute.element}; the scorer does not compute a capacity"
+                ),
+            },
+        )
+    if solute is None and engine not in MELTS_ENGINES:
+        return refused(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+            {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+                "engine": engine.value,
+                "quantity": quantity.value if quantity is not None else "",
+                "detail": "engine does not report an equilibrium phase assemblage",
+            },
+        )
+
+    role = _phase_role_value(identity, "phase_role")
+    if role is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "phase_role"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    counter = _phase_role_value(identity, "counter_phase_role")
+    if quantity is Quantity.DISTRIBUTION_RATIO and counter is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "counter_phase_role"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
+    if solute is None:
+        # Engine phase maps are wt%. mole_fraction and ppm_mass are closed
+        # bases on another scale. ppm_mass_to_wt_percent is the ppm scale
+        # rule and is not applied here: the stored point stays as printed.
+        # element_ppm_by_mass stays scoreable; it is not ppm_mass.
+        if subtype in PHASE_BASIS_TOKENS and subtype not in {
+            "wt_percent",
+            "element_ppm_by_mass",
+        }:
+            return refused(
+                RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                {
+                    "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                    "basis": subtype,
+                    "engine_basis": "wt_percent",
+                    "detail": (
+                        "engine phase maps are wt%; "
+                        f"{subtype} is not converted to wt%"
+                    ),
+                },
+            )
+        if subtype not in {"wt_percent", "element_ppm_by_mass"}:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "basis"},
+                execution=ExecutionState.NOT_PROBED,
+            )
+    temperature = temperature_of(identity)
+    if temperature is None or not temperature.is_finite() or temperature <= 0:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "temperature_K"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    composition_state = identity.composition
+    if (
+        composition_state is None
+        or not composition_state.is_value
+        or not isinstance(composition_state.value, Composition)
+    ):
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
+    ):
+        return refused(
+            RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+            {
+                "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                "identity_amount_basis": AmountBasis.MASS_PERCENT.value,
+                "engine_basis": "mole_fraction or mol_inventory",
+                "detail": "printed mass-percent phase identity cannot be read as moles",
+            },
+        )
+    wt = composition_wt_pct(composition_state.value)
+    if not wt:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    fo2_log = _printed_fo2_log10_bar(identity)
+    if fo2_log is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "fO2_Pa"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    pressure_bar = _printed_total_pressure_bar(identity, observation)
+    if pressure_bar is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "total_pressure_Pa"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    anion_pa: Decimal | None = None
+    law: _CapacityLaw | None = None
+    if solute is not None:
+        relation = ""
+        if observation.derivation is not None and observation.derivation.relation:
+            relation = observation.derivation.relation.strip()
+        if not relation:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "defining_equation"},
+                execution=ExecutionState.NOT_PROBED,
+            )
+        law = _recognised_capacity_law(quantity, relation)
+        if law is None:
+            return refused(
+                RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED,
+                {
+                    "reason": RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED.value,
+                    "input": "defining_equation",
+                    "quantity": quantity.value if quantity is not None else "",
+                },
+            )
+        anion_pa = _printed_point_pa(observation, solute.pressure_key)
+        if anion_pa is None:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": solute.pressure_key},
+                execution=ExecutionState.NOT_PROBED,
+            )
+    try:
+        call_kwargs: dict[str, object] = {}
+        if solute is not None and anion_pa is not None:
+            call_kwargs["solute_fugacity_bar"] = float(anion_pa / Decimal("1e5"))
+            call_kwargs["solute_fugacity_parameter"] = solute.fugacity_parameter
+        result = _equilibrate_phase_assemblage(
+            engine,
+            temperature_C=float(temperature - Decimal("273.15")),
+            composition_kg={name: amount / 1000.0 for name, amount in wt.items()},
+            fO2_log=fo2_log,
+            pressure_bar=float(pressure_bar),
+            **call_kwargs,
+        )
+    except Exception as exc:  # a backend failure is a counted refusal
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": "phase_assemblage_unavailable",
+                "engine": engine.value,
+                "detail": f"{type(exc).__name__}: {exc}",
+            },
+            execution=ExecutionState.NOT_PROBED,
+        )
+
+    formula = identity.species.formula
+    phase_map, phase_issue = _select_phase_composition(result, role)
+    if phase_map is None:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": phase_issue or "phase_not_in_assemblage",
+                "phase_role": role.value,
+                "engine": engine.value,
+            },
+        )
+    # Capacity uses the solute weight percent, including an elemental label.
+    # Oxide matching would drop raw S and Cl.
+    oxide = solute is None and role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
+    amount, amount_warnings = _component_wt(
+        formula,
+        phase_map,
+        oxide=oxide,
+        phase=role.value,
+    )
+    notices = _oxide_projection_notices(
+        amount_warnings,
+        quantity=quantity,
+        engine=engine,
+    )
+    if amount is None or not math.isfinite(amount):
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "phase_component_absent",
+                "phase_role": role.value,
+                "formula": formula,
+            },
+            notices=notices,
+        )
+    if quantity is Quantity.DISTRIBUTION_RATIO:
+        assert counter is not None
+        counter_map, counter_issue = _select_phase_composition(result, counter)
+        if counter_map is None:
+            return refused(
+                RefusalReason.UNSUPPORTED,
+                {
+                    "reason": counter_issue or "phase_not_in_assemblage",
+                    "phase_role": counter.value,
+                    "engine": engine.value,
+                },
+                notices=notices,
+            )
+        counter_oxide = counter in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
+        counter_amount, counter_warnings = _component_wt(
+            formula,
+            counter_map,
+            oxide=counter_oxide,
+            phase=counter.value,
+        )
+        notices = union_notices(
+            notices,
+            _oxide_projection_notices(
+                counter_warnings,
+                quantity=quantity,
+                engine=engine,
+            ),
+        )
+        if counter_amount is None or not math.isfinite(counter_amount):
+            return refused(
+                RefusalReason.UNSUPPORTED,
+                {
+                    "reason": "phase_component_absent",
+                    "phase_role": counter.value,
+                    "formula": formula,
+                },
+                notices=notices,
+            )
+        if amount <= 0 or counter_amount <= 0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "nonpositive_phase_amount",
+                    "numerator": str(amount),
+                    "denominator": str(counter_amount),
+                },
+                notices=notices,
+            )
+        predicted = Decimal(str(amount)) / Decimal(str(counter_amount))
+    elif solute is not None:
+        assert anion_pa is not None and law is not None
+        p_o2_pa = as_decimal(identity.fO2_Pa.value)
+        predicted = _log10_printed_capacity(
+            Decimal(str(amount)), p_o2_pa, anion_pa, law
+        )
+        if predicted is None:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "nonpositive_phase_amount", "amount": str(amount)},
+                notices=notices,
+            )
+    else:
+        if amount <= 0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "nonpositive_phase_amount", "amount": str(amount)},
+                notices=notices,
+            )
+        predicted = Decimal(str(amount))
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED, call_evidence="phase_assemblage"
+        ),
+        value=predicted,
+        unit=QUANTITY_UNITS[quantity] if quantity is not None else None,
+        authority=Authority.BRIDGE,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+    )
+
+
+def _predict_mass_loss_with_residue(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    experiment: Experiment | None,
+    observation: Observation,
+) -> EnginePrediction:
+    from simulator.battery.residue import (
+        ResidueEngineNonconvergence,
+        ResidueInventoryRefusal,
+        predict_mass_loss_fraction,
+    )
+
+    def omission_notices(payload: object) -> tuple[Notice, ...]:
+        if not isinstance(payload, str) or not payload:
+            return ()
+        parsed = json.loads(payload)
+        if not isinstance(parsed, Mapping):
+            return ()
+        rows = parsed.get("notices")
+        if not isinstance(rows, list):
+            return ()
+        built: list[Notice] = []
+        for item in rows:
+            if not isinstance(item, Mapping):
+                continue
+            if item.get("kind") != NoticeKind.INPUT_OMITTED.value:
+                continue
+            reason = item.get("reason")
+            origin = item.get("origin")
+            if not isinstance(reason, str) or not reason:
+                continue
+            if not isinstance(origin, str) or not origin:
+                continue
+            built.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+                    reason=reason,
+                    origin=origin,
+                )
+            )
+        return tuple(built)
+
+    source_path = (
+        REPO_ROOT / "data/literature/extracts" / f"{observation.source_id}.yaml"
+    )
+    source_document = load_yaml(source_path) if source_path.is_file() else {}
+    temperature = temperature_of(identity)
+    try:
+        result = predict_mass_loss_fraction(
+            engine.value,
+            experiment,
+            temperature_K=None if temperature is None else float(temperature),
+            source_document=source_document,
+            observation=observation,
+        )
+    except ResidueInventoryRefusal as exc:
+        reason = exc.reason
+        if reason in {
+            "engine_capability_unsupported", "residue_method_unsupported",
+        }:
+            refusal = RefusalReason.UNSUPPORTED
+            execution = ExecutionState.UNSUPPORTED
+        elif reason.endswith("_not_stated"):
+            refusal = RefusalReason.IDENTITY_INCOMPLETE
+            execution = ExecutionState.NOT_PROBED
+        elif reason == "openimcc_not_importable":
+            refusal = RefusalReason.OPENIMCC_NOT_IMPORTABLE
+            execution = ExecutionState.ATTEMPTED_UNAVAILABLE
+        elif reason == "initial_composition_invalid":
+            refusal = RefusalReason.METRIC_DOMAIN
+            execution = ExecutionState.NOT_PROBED
+        elif reason in {
+            "evaporation_coefficients_not_sourced", "alpha_not_sourced",
+            "area_shape_not_self_similar", "preheat_bound_not_negligible",
+        }:
+            refusal = RefusalReason.UNDERDETERMINED_APPARATUS
+            execution = ExecutionState.NOT_PROBED
+        else:
+            refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
+            execution = ExecutionState.ATTEMPTED_UNAVAILABLE
+        detail: dict[str, object] = {"reason": reason, "detail": exc.detail}
+        if reason.endswith("_not_stated"):
+            detail["missing_input"] = exc.detail
+        elif reason in {"evaporation_coefficients_not_sourced", "alpha_not_sourced"}:
+            detail["missing_input"] = Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        if refusal is RefusalReason.UNSUPPORTED:
+            detail.update({"engine": engine.value, "capability": exc.detail})
+        payload = getattr(exc, "below_threshold_omissions", None)
+        if isinstance(payload, str) and payload:
+            detail["below_threshold_omissions"] = payload
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=execution),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=refusal,
+            refusal_detail=detail,
+            notices=omission_notices(payload),
+            identity=identity,
+        )
+    except ResidueEngineNonconvergence as exc:
+        detail = {
+            "reason": exc.reason,
+            "engine": engine.value,
+            "detail": exc.detail,
+        }
+        payload = getattr(exc, "below_threshold_omissions", None)
+        if isinstance(payload, str) and payload:
+            detail["below_threshold_omissions"] = payload
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+            refusal_detail=detail,
+            notices=omission_notices(payload),
+            identity=identity,
+        )
+
+    notices = tuple(
+        Notice(
+            kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
+                "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
+                or flag.startswith("alpha_extrapolated:")
+            ) else NoticeKind.FALLBACK),
+            affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+            reason=flag,
+            origin=f"engine:{engine.value}",
+        )
+        for flag in result.engine_flags
+        if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
+        or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
+    ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
+    domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=as_decimal(str(result.mass_loss_fraction)),
+        unit="dimensionless",
+        coefficient_basis="initial_sample_mass",
+        authority=(
+            Authority.EXTRAPOLATED if domain_notices else Authority.BRIDGE
+        ),
+        notices=notices,
+        coefficient_sources=(*sources, *json.loads(result.engine_metadata.get("alpha_sources", "[]"))),
+        lineage_complete=False,
+        identity=identity,
+        version=(
+            "method_class=calculated_residue_integrator; "
+            "sourced_alpha; bounded_unsourced_channels_and_preheat; self_similar_printed_area"
+        ),
+    )
 
 
 def predict_with_engine(
@@ -3601,31 +8368,50 @@ def predict_with_engine(
     isolated: bool | None = None,
     experiment: Experiment | None = None,
     bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
     _require_score_engine(engine)
+    identity = observation.identity
+    quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if _is_quantity_not_predicted(quantity):
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail=_quantity_not_predicted_detail(quantity),
+            identity=identity,
+        )
+    sample_phase_detail = (
+        melt_activity_sample_phase_refusal(identity)
+        if isinstance(identity, Identity)
+        else None
+    )
     from simulator.diagnostic_helpers.binary_pot_battery import (
         ARM_HEADLINE,
         ARM_QUALIFICATION,
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
-        PO2_NOT_AN_INPUT,
         PO2_OXYGEN_BALANCE_EFFUSION,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
         Po2Request,
+        _OxygenBalanceEngineTrialRefusal,
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
         assess_qualification_gate,
         equilibrate_cell,
         identity_battery_pot,
-        open_battery_engine,
     )
 
     quantity = quantity_token(observation.identity)
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    identity = observation.identity
     if not isinstance(identity, Identity) or quantity is None:
         return EnginePrediction(
             engine=engine,
@@ -3636,10 +8422,65 @@ def predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
         )
+    if quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
+        return _predict_mass_loss_with_residue(
+            engine,
+            identity,
+            channel,
+            sources,
+            experiment,
+            observation,
+        )
+    if engine is Engine.MAGEMIN and quantity in _VAPOUR_EQUILIBRIUM:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "engine_missing_observable",
+                "engine": engine.value,
+                "observable": "vapour species",
+                "species": identity.species.formula,
+                "quantity": quantity.value,
+            },
+            identity=identity,
+        )
+    if quantity is Quantity.FE3_FE2_RATIO:
+        return _predict_fe_redox(
+            engine,
+            observation,
+            identity,
+            channel,
+            handles=handles,
+            isolated=isolated,
+        )
+    phase_basis = (
+        identity.subtype.value
+        if identity.subtype is not None and identity.subtype.is_value
+        else None
+    )
+    # Equilibrium ratios share EQUILIBRIUM_PHASE_COMPOSITION but are not
+    # phase rows. They stay on the not-predicted path.
+    if (
+        quantity in PRINTED_CAPACITY_QUANTITIES
+        or quantity is Quantity.DISTRIBUTION_RATIO
+        or (
+            quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and phase_basis in PHASE_BASIS_TOKENS
+        )
+    ):
+        return _predict_phase_row(engine, observation, identity, channel, sources)
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
-        if quantity not in _engine_thermo_quantities(engine):
+        if (
+            quantity not in _engine_thermo_quantities(engine)
+            and quantity not in FUSION_QUANTITIES
+        ):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -3651,7 +8492,10 @@ def predict_with_engine(
                 identity=identity,
             )
     formula = identity.species.formula
-    if parse_species_formula(formula) is None:
+    if (
+        quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        and parse_species_formula(formula, species=identity.species) is None
+    ):
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -3661,6 +8505,15 @@ def predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "species_formula_unparsed", "formula": formula},
             identity=identity,
+        )
+    vapour_phase_detail = vapour_crystalline_sample_liquid_engine_refusal(
+        identity,
+        engine=engine,
+        experiment=experiment,
+    )
+    if vapour_phase_detail is not None:
+        return _sample_phase_not_observable_prediction(
+            engine, identity, vapour_phase_detail
         )
     static_equilibrium_pressure = (
         quantity is Quantity.P_SAT
@@ -3714,11 +8567,16 @@ def predict_with_engine(
                 identity=identity,
             )
         if engine is Engine.INTERNAL_ANALYTICAL:
-            from engines.antoine import _antoine_log10_pressure
+            from engines.antoine import (
+                _AntoineCoefficientRefusal,
+                _antoine_log10_pressure,
+                _read_antoine_coefficients,
+            )
             from engines.builtin.vapor_pressure import (
                 COEFF_BLOCK_PURE_COMPONENT,
                 VaporPressureComputationError,
                 _pow10_pressure_or_raise,
+                declared_antoine_segment_phase,
                 vapor_pressure_valid_range_K,
                 wall_condensation_antoine_coefficients,
             )
@@ -3728,9 +8586,52 @@ def predict_with_engine(
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
             )
             row = vapor_pressure_data.get("metals", {}).get(formula)
-            coefficients, coefficient_block = wall_condensation_antoine_coefficients(
-                row, float(T)
-            )
+            try:
+                coefficients, coefficient_block = wall_condensation_antoine_coefficients(
+                    row, float(T)
+                )
+            except VaporPressureComputationError as exc:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.INVALID_IDENTITY,
+                    refusal_detail={
+                        "reason": "static_equilibrium_pressure_invalid",
+                        "detail": str(exc),
+                        "formula": formula,
+                    },
+                    identity=identity,
+                )
+            if coefficients.get("selection_refusal"):
+                left_basis = (
+                    f"{coefficients.get('left_segment')}({coefficients.get('left_phase')})"
+                )
+                right_basis = (
+                    f"{coefficients.get('right_segment')}({coefficients.get('right_phase')})"
+                )
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+                    refusal_detail={
+                        "reason": coefficients["selection_refusal"],
+                        "left_segment_basis": left_basis,
+                        "right_segment_basis": right_basis,
+                        "left_phase": coefficients.get("left_phase"),
+                        "right_phase": coefficients.get("right_phase"),
+                        "left_segment": coefficients.get("left_segment"),
+                        "right_segment": coefficients.get("right_segment"),
+                        "formula": formula,
+                        "temperature_K": str(T),
+                    },
+                    identity=identity,
+                )
             if not coefficients or coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
                 return EnginePrediction(
                     engine=engine,
@@ -3745,19 +8646,42 @@ def predict_with_engine(
                     },
                     identity=identity,
                 )
-            log_pressure = _antoine_log10_pressure(
-                float(coefficients["A"]),
-                float(coefficients["B"]),
-                float(coefficients.get("C", 0.0)),
-                float(T),
-            )
+            segment_phase = declared_antoine_segment_phase(coefficients)
+            reservoir_phase = reservoir[1]
+            if segment_phase is not None and segment_phase != reservoir_phase:
+                segment_name = str(coefficients.get("name") or coefficient_block)
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+                    refusal_detail={
+                        "reason": "antoine-reservoir-phase-mismatch",
+                        "observation_reservoir_basis": (
+                            f"{reservoir[0]}({reservoir_phase})"
+                        ),
+                        "segment_basis": f"{segment_name}({segment_phase})",
+                        "formula": formula,
+                        "segment": segment_name,
+                    },
+                    identity=identity,
+                )
             try:
+                A, B, C = _read_antoine_coefficients(coefficients)
+                log_pressure = _antoine_log10_pressure(A, B, C, float(T))
                 pressure = _pow10_pressure_or_raise(
                     log_pressure,
                     species=formula,
                     field="static_equilibrium_total_pressure_Pa",
                 )
-            except (OverflowError, VaporPressureComputationError):
+            except (
+                _AntoineCoefficientRefusal,
+                OverflowError,
+                VaporPressureComputationError,
+                ZeroDivisionError,
+            ) as exc:
                 return EnginePrediction(
                     engine=engine,
                     channel=channel,
@@ -3767,6 +8691,7 @@ def predict_with_engine(
                     refusal_reason=RefusalReason.INVALID_IDENTITY,
                     refusal_detail={
                         "reason": "static_equilibrium_pressure_invalid",
+                        "detail": str(exc),
                         "formula": formula,
                     },
                     identity=identity,
@@ -3794,6 +8719,15 @@ def predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         ),
                     )
+            if segment_phase is None:
+                notices = notices + (
+                    Notice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        affected_quantities=(Quantity.P_SAT,),
+                        reason="antoine-segment-phase-undeclared",
+                        origin=observation.observation_id,
+                    ),
+                )
             sidecar_sources = expand_coefficient_sources(("antoine_sidecar",))
             return EnginePrediction(
                 engine=engine,
@@ -3839,15 +8773,30 @@ def predict_with_engine(
     # Formation and pure-standard quantities are not melt activities or
     # partial pressures. A missing branch used to read those maps and
     # return the wrong unit. Refuse instead of emitting 0.
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
+    if (
+        quantity in FORMATION_QUANTITIES
+        or quantity in PURE_STANDARD_THERMO
+        or quantity in FUSION_QUANTITIES
+    ):
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
+        coefficient_sources = _attempt_coefficient_sources(
+            engine, attempt.coefficient_sources
+        )
+        lineage_complete = (
+            lineage_complete_for(coefficient_sources)
+            if attempt.value is not None
+            else False
+        )
         if attempt.value is not None:
             exec_state = ExecutionState.PRODUCED
         elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
-        elif attempt.refusal_reason is RefusalReason.UNSUPPORTED:
+        elif attempt.refusal_reason in {
+            RefusalReason.UNSUPPORTED,
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+        }:
             exec_state = ExecutionState.UNSUPPORTED
         else:
             exec_state = ExecutionState.NOT_PROBED
@@ -3861,8 +8810,8 @@ def predict_with_engine(
             unit=attempt.unit,
             authority=attempt.authority,
             notices=attempt.notices,
-            coefficient_sources=sources,
-            lineage_complete=lineage_complete_for(sources) if attempt.value is not None else False,
+            coefficient_sources=coefficient_sources,
+            lineage_complete=lineage_complete,
             refusal_reason=attempt.refusal_reason,
             refusal_detail=attempt.refusal_detail,
             identity=identity,
@@ -3873,12 +8822,36 @@ def predict_with_engine(
     input_notices: list[Notice] = []
     composition_value: Composition | None = None
     activity_payload: Mapping | None = None
+    activity_fo2_bar: float | None = None
     if quantity in MELT_ACTIVITY_QUANTITIES and experiment is not None:
         # Activity rows use the melt-activity contract. A gap is a typed
         # refusal. No engine fO2 default is an input on this path.
         from simulator.battery.enums import AmountBasis
-        from simulator.battery.generators.bench import activity_request_for_engine
         from simulator.battery.records import Composition as OxideComposition
+        from simulator.chemistry.melt_activity import (
+            MELT_OXIDE_CATIONS_PER_FORMULA,
+        )
+
+        if (
+            engine is Engine.INTERNAL_ANALYTICAL
+            and quantity is Quantity.ACTIVITY
+            and formula not in MELT_OXIDE_CATIONS_PER_FORMULA
+        ):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                authority=Authority.REFUSED,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+                refusal_detail={
+                    "reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value,
+                    "formula": formula,
+                    "model": "simulator.chemistry.melt_activity.melt_oxide_activity",
+                },
+                identity=identity,
+            )
 
         if experiment is None:
             return EnginePrediction(
@@ -3894,17 +8867,26 @@ def predict_with_engine(
                 },
                 identity=identity,
             )
-        generated = activity_request_for_engine(experiment, observation, engine.value)
-        if generated is None or generated.payload is None:
-            return _activity_contract_refusal(
-                engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=identity.composition if identity.composition is not None and identity.composition.is_value else None,
-                generated=generated,
+        generated, contract_refusal = _activity_request_or_contract_refusal(
+            engine,
+            experiment=experiment,
+            observation=observation,
+            identity=identity,
+            channel=channel,
+            sources=sources,
+            fo2_mode=fo2_mode,
+        )
+        if contract_refusal is not None:
+            return contract_refusal
+        assert generated is not None and generated.payload is not None
+        # Malformed composition is INVALID_SOURCE above. A crystal sample
+        # with a valid request is still not a melt observable.
+        if sample_phase_detail is not None:
+            return _sample_phase_not_observable_prediction(
+                engine, identity, sample_phase_detail
             )
         activity_payload = generated.payload
+        activity_fo2_bar = _payload_fo2_bar(activity_payload)
         moles = dict(activity_payload.get("composition_mol") or {})
         built = OxideComposition(
             "oxides",
@@ -3913,6 +8895,27 @@ def predict_with_engine(
         )
         requested = identity.composition if identity.composition is not None and identity.composition.is_value else State.of(built)
         composition_value = built
+        if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
+            unsupported_components = sorted(
+                set(moles) - set(MELT_OXIDE_CATIONS_PER_FORMULA)
+            )
+            if unsupported_components:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.UNSUPPORTED),
+                    authority=Authority.REFUSED,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+                    refusal_detail={
+                        "reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value,
+                        "unsupported_composition_components": unsupported_components,
+                        "model": "simulator.chemistry.melt_activity.melt_oxide_activity",
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                )
         wt = composition_wt_pct(built)
         if wt is None:
             return EnginePrediction(
@@ -3926,7 +8929,106 @@ def predict_with_engine(
                 identity=identity,
                 requested_composition=requested,
             )
+        if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
+            from simulator.chemistry.melt_activity import melt_oxide_activity
+
+            activity = melt_oxide_activity(
+                formula,
+                moles,
+                temperature_K=float(T),
+            )
+            if activity is None:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.IDENTITY_INCOMPLETE,
+                    detail={
+                        "reason": "melt_activity_missing_composition",
+                        "formula": formula,
+                    },
+                    notices=tuple(input_notices),
+                )
+
+            # melt_oxide_activity returns single-cation a(MO_x) on its
+            # Raoultian pure-liquid reference. Battery activity identities
+            # name the parent oxide; mu(MO_x)=mu(parent)/c therefore gives
+            # a(parent)=a(MO_x)^c via the production result's conversion.
+            parent_activity = activity.thermodynamic_parent_activity()
+            authority = Authority.BRIDGE
+            notices: list[Notice] = list(input_notices)
+            tier_notice = _payload_fo2_notice(quantity, activity_payload)
+            if tier_notice is not None:
+                notices.append(tier_notice)
+            certified_band = None
+            if activity.valid_range_K is not None:
+                low, high = (float(activity.valid_range_K[0]), float(activity.valid_range_K[1]))
+                certified_band = {
+                    "temperature_K": (Decimal(str(low)), Decimal(str(high)))
+                }
+                if activity.authority_status == (
+                    "out_of_gamma_domain_status_bearing_non_authoritative"
+                ):
+                    authority = Authority.EXTRAPOLATED
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(Quantity.ACTIVITY,),
+                            reason=(activity.warning or "melt oxide activity extrapolated"),
+                            origin=(
+                                "simulator.chemistry.melt_activity.melt_oxide_activity"
+                            ),
+                            band=f"[{low:g}, {high:g}] K",
+                            authority=Authority.EXTRAPOLATED,
+                        )
+                    )
+            elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            activity.warning
+                            or "melt_oxide_activity has no certified evidence tier"
+                        ),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                )
+            activity_sources = tuple(
+                dict.fromkeys((*sources, activity.citation))
+            )
+            activity_lineage_complete = lineage_complete_for(activity_sources)
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=(
+                        "simulator.chemistry.melt_activity.melt_oxide_activity:"
+                        f"{formula}"
+                    ),
+                ),
+                value=as_decimal(str(parent_activity)),
+                unit="dimensionless",
+                authority=authority,
+                notices=tuple(notices),
+                coefficient_sources=activity_sources,
+                lineage_complete=activity_lineage_complete,
+                certified_band=certified_band,
+                identity=_prediction_identity_with_fo2(identity, activity_fo2_bar),
+                requested_composition=requested,
+                version=activity.activity_model,
+            )
     elif identity.composition is not None and identity.composition.is_value:
+        if sample_phase_detail is not None:
+            return _sample_phase_not_observable_prediction(
+                engine, identity, sample_phase_detail
+            )
         requested = identity.composition
         assert identity.composition.value is not None
         composition_value = identity.composition.value
@@ -3967,6 +9069,29 @@ def predict_with_engine(
             )
         )
 
+    if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY and wt is not None:
+        from engines.magemin.domain import MAGEMinDomainGate
+
+        valid, warnings, gate_reason = MAGEMinDomainGate.validate_with_reason(wt)
+        if not valid:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                authority=Authority.REFUSED,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.METRIC_DOMAIN,
+                refusal_detail={
+                    "reason": "out_of_domain",
+                    "out_of_domain_reason": gate_reason,
+                    "gate": "magemin_composition_validity",
+                    "warnings": warnings,
+                },
+                identity=identity,
+                requested_composition=requested,
+            )
+
     if composition_value is None and wt is None:
         return EnginePrediction(
             engine=engine,
@@ -3978,7 +9103,6 @@ def predict_with_engine(
             refusal_detail={"reason": "quantity_has_no_engine_pot", "quantity": quantity.value},
             identity=identity,
         )
-
     pressure_bar: float | None = None
     if activity_payload is None:
         pressure_bar, pressure_notice, pressure_invalid = total_pressure_bar_for_score(
@@ -3999,19 +9123,52 @@ def predict_with_engine(
             input_notices.append(pressure_notice)
 
     knudsen_vapour = _knudsen_vapour_equilibrium(quantity, experiment)
-    oxygen_balance_effusion = knudsen_vapour and not _has_printed_fo2(
-        observation, identity
+    # d-216: a linked or printed source pressure is the row's fO2 before
+    # the ladder runs, so every engine is commanded the measured condition.
+    source_pressure = _source_oxygen_pressure_for_score(observation)
+    if knudsen_vapour and source_pressure is not None:
+        identity = replace(identity, fO2_Pa=State.of(source_pressure))
+    # A found source pressure is commanded below. The shared ladder is only
+    # the unlinked Knudsen closure: no linked or printed pressure on the row.
+    shared_oxygen = (
+        knudsen_vapour
+        and source_pressure is None
+        and not _has_printed_fo2(observation, identity)
     )
+
+    def oxygen_decision(*, force_ladder: bool = False):
+        return _oxygen_input_request(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            quantity=quantity,
+            composition_value=composition_value,
+            input_notices=input_notices,
+            observation=observation,
+            experiment=experiment,
+            bench=bench,
+            temperature_K=float(T),
+            composition_wt=wt if isinstance(wt, dict) else None,
+            force_ladder=force_ladder,
+        )
+
     if activity_payload is not None:
         # The contract's oxygen point, or none. Never an engine default.
-        if "fO2_log" in activity_payload:
-            po2 = Po2Request(
-                mode=PO2_COMMANDED,
-                po2_bar=10.0 ** float(activity_payload["fO2_log"]),
-            )
+        # A payload bar is the printed pascal command; a log is 10**fO2_log.
+        if "fO2_bar" in activity_payload or "fO2_log" in activity_payload:
+            tier_notice = _payload_fo2_notice(quantity, activity_payload)
+            if tier_notice is not None:
+                input_notices.append(tier_notice)
+            bar = activity_fo2_bar
+            po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
         else:
-            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
-    elif oxygen_balance_effusion:
+            decision = oxygen_decision()
+            if isinstance(decision, EnginePrediction):
+                return decision
+            po2 = decision
+    elif shared_oxygen:
         cell_materials = bench.cell_materials if bench is not None else None
         material_class, modelled = _cell_oxygen_class(cell_materials)
         if material_class == "reactive" and modelled is None:
@@ -4020,16 +9177,7 @@ def predict_with_engine(
             input_notices.append(
                 _reactive_cell_not_modelled_notice(quantity, cell_materials)
             )
-            decision = _oxygen_input_request(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                quantity=quantity,
-                composition_value=composition_value,
-                input_notices=input_notices,
-            )
+            decision = oxygen_decision()
             if isinstance(decision, EnginePrediction):
                 return decision
             po2 = decision
@@ -4063,43 +9211,39 @@ def predict_with_engine(
                 notices=tuple(input_notices),
             )
         else:
-            if engine not in OXYGEN_BALANCE_EFFUSION_ENGINES:
-                return _input_refusal(
-                    engine=engine,
-                    channel=channel,
-                    sources=sources,
-                    identity=identity,
-                    requested=requested,
-                    reason=RefusalReason.UNSUPPORTED,
-                    detail={
-                        "reason": "oxygen_balance_effusion_unsupported_engine",
-                        "engine": engine.value,
-                    },
-                    notices=tuple(input_notices),
+            # Inert or uniform W/Mo. The ladder returns the tier-3 effusion
+            # closure, the same condition for every engine. Engines that
+            # cannot solve it borrow the internal-analytical closure later.
+            decision = oxygen_decision()
+            if isinstance(decision, EnginePrediction):
+                return decision
+            po2 = decision
+            if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+                input_notices.append(
+                    source_oxygen_closure_notice(quantity, observation)
                 )
-            # The openimcc bridge discards pressure_bar; its balance solve uses
-            # printed composition-derived activities and T, never measured p_K.
-            po2 = Po2Request(
-                mode=PO2_OXYGEN_BALANCE_EFFUSION,
-                po2_bar=None,
-                cell_material=modelled,
-            )
     else:
-        decision = _oxygen_input_request(
-            engine=engine,
-            channel=channel,
-            sources=sources,
-            identity=identity,
-            requested=requested,
-            quantity=quantity,
-            composition_value=composition_value,
-            input_notices=input_notices,
-        )
-        if isinstance(decision, EnginePrediction):
-            return decision
-        po2 = decision
-        # Printed-O2 (or oxygen-not-required) Knudsen path: still flag an
-        # unmodelled reactive cell so the label travels with the prediction.
+        if (
+            knudsen_vapour
+            and source_pressure is not None
+            and not _has_printed_fo2(observation, identity)
+        ):
+            # Derived linked source pressure is the measured condition.
+            # Command it here. The ladder treats that fO2 as not printed
+            # and would replace it with the effusion closure. A printed
+            # fO2 stays on oxygen_decision so both cell branches attach
+            # the same tier-1 notice.
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=float(source_pressure) / 1.0e5,
+            )
+        else:
+            decision = oxygen_decision()
+            if isinstance(decision, EnginePrediction):
+                return decision
+            po2 = decision
+        # Printed, linked, or oxygen-not-required Knudsen path: still flag
+        # an unmodelled reactive cell so the label travels with the prediction.
         if knudsen_vapour and bench is not None:
             material_class, modelled = _cell_oxygen_class(bench.cell_materials)
             if material_class == "reactive" and modelled is None:
@@ -4129,23 +9273,36 @@ def predict_with_engine(
                 requested_composition=requested,
             )
 
+    species_phase = (
+        phase_token(identity.species) if isinstance(identity, Identity) else None
+    )
+    if quantity is Quantity.P_PARTIAL and species_phase in CONDENSED_PHASES:
+        # gas_partial_pressures_Pa is a gas map. A condensed species is a
+        # different basis. Refuse before the engine is opened; the formula
+        # matcher stays formula-only for activities and oxide maps.
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            notices=tuple(input_notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+            refusal_detail={
+                "reason": "partial-pressure-condensed-species-not-on-gas-map",
+                "observation_basis": (
+                    f"{identity.species.formula}({species_phase.value})"
+                ),
+                "map_basis": "gas_partial_pressures_Pa(g)",
+                "formula": identity.species.formula,
+                "species_phase": species_phase.value,
+            },
+            identity=identity,
+            requested_composition=requested,
+        )
+
     handle_map = handles if handles is not None else {}
-    handle = handle_map.get(engine.value)
-    if handle is not None and (
-        not getattr(handle, "available", False)
-        or getattr(handle, "backend", None) is None
-    ):
-        if isinstance(handle_map, dict):
-            handle_map.pop(engine.value, None)
-        handle = None
-    if handle is None:
-        handle = open_battery_engine(engine.value)
-        if (
-            isinstance(handle_map, dict)
-            and getattr(handle, "available", False)
-            and getattr(handle, "backend", None) is not None
-        ):
-            handle_map[engine.value] = handle
+    handle = _open_cached_battery_handle(engine, handle_map)
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
     if engine is Engine.OPENIMCC:
@@ -4223,6 +9380,21 @@ def predict_with_engine(
     extra_notices: list[Notice] = list(input_notices)
     authority = Authority.BRIDGE
     certified_band = None
+    if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
+        extra_notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "MAGEMin ig melt_activity validation band is not established; "
+                    "native activity is predicted outside a certified temperature band"
+                ),
+                origin="engine:magemin",
+                band="MAGEMin ig melt_activity validation band not established",
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+        authority = Authority.EXTRAPOLATED
     if name in MELTS_FAMILY_ENGINES:
         gate = assess_qualification_gate(wt, float(T))
         if not gate.get("valid"):
@@ -4235,16 +9407,178 @@ def predict_with_engine(
     use_isolated = isolated
     if use_isolated is None:
         use_isolated = qualification and name in MELTS_FAMILY_ENGINES
-    cell = equilibrate_cell(
-        handle,
-        pot,
-        temperature_K=float(T),
-        po2=po2,
-        qualification=qualification,
-        isolated=use_isolated,
-        arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
-        physical_pressure_bar=pressure_bar,
+    # MAGEMin's existing warm-worker hard wall is 15 s; the scorer's 20 s
+    # cell timeout remains a secondary bound. call_timeout_s carries the
+    # remaining cell budget into the worker, whose 15 s pool limit kills the
+    # observed >50 s non-finite Gamma loop. Expiry maps below to
+    # engine_not_converged with this cell's elapsed wall time.
+    native_activity_formula = (
+        formula
+        if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
+        else None
     )
+    if (
+        po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
+        and engine not in OXYGEN_BALANCE_EFFUSION_ENGINES
+    ):
+        borrowed = _borrow_internal_analytical_effusion(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            quantity=quantity,
+            observation=observation,
+            experiment=experiment,
+            bench=bench,
+            handles=handle_map,
+            isolated=use_isolated,
+            notices=extra_notices,
+        )
+        if isinstance(borrowed, EnginePrediction):
+            return borrowed
+        po2 = borrowed
+
+    def engine_call_failure(exc: Exception) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence=f"equilibrate_cell:{name}:exception",
+            ),
+            authority=Authority.REFUSED,
+            notices=tuple(extra_notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+            refusal_detail={
+                "reason": "engine_call_exception",
+                "exception": type(exc).__name__,
+                "detail": str(exc),
+            },
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
+
+    if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
+        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
+    }:
+
+        def engine_call_at_po2(pO2_bar: float) -> object:
+            return equilibrate_cell(
+                handle,
+                pot,
+                temperature_K=float(T),
+                po2=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=pO2_bar,
+                ),
+                qualification=qualification,
+                isolated=use_isolated,
+                arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                physical_pressure_bar=pressure_bar,
+                native_activity_formula=native_activity_formula,
+            )
+
+        try:
+            solved_pO2_bar, _pressures, balance, cell_fraction, cell_info = (
+                _solve_vapor_engine_cell_oxygen_balance(
+                    engine_call_at_po2,
+                    temperature_K=float(T),
+                    cell_material=po2.cell_material,
+                    fixed_point_activities=engine is Engine.ALPHAMELTS,
+                )
+            )
+        except _OxygenBalanceEngineTrialRefusal as exc:
+            cell = exc.cell
+        except _OxygenBalanceRefusal as exc:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.UNSUPPORTED,
+                    call_evidence=f"cell_oxygen_balance:{name}",
+                ),
+                authority=Authority.REFUSED,
+                notices=tuple(extra_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={"reason": exc.reason_code, "detail": str(exc)},
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        except Exception as exc:
+            return engine_call_failure(exc)
+        else:
+            solved_notice = {
+                "kind": "fo2_oxygen_balance_effusion_solved",
+                "pO2_bar": solved_pO2_bar,
+                "relative_residual": balance["residual"],
+                "bracket_log10_bar": balance["bracket"],
+                "dominant_O_carriers": balance["dominant_O_carriers"],
+                "dominant_metal_carriers": balance["dominant_metal_carriers"],
+                "cell_material": cell_info["cell_material"],
+                "cell_oxide_flux_fraction": cell_fraction,
+                "buffer_pinned": cell_info["buffer_pinned"],
+                "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
+                "cell_oxide_janaf_sources": cell_info[
+                    "cell_oxide_janaf_sources"
+                ],
+            }
+            extra_notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        OXYGEN_BALANCE_NOTICE_PREFIX
+                        + " "
+                        + json.dumps(
+                            solved_notice,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        )
+                    ),
+                    origin=f"engine:{engine.value}",
+                )
+            )
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=solved_pO2_bar,
+            )
+            try:
+                cell = equilibrate_cell(
+                    handle,
+                    pot,
+                    temperature_K=float(T),
+                    po2=po2,
+                    qualification=qualification,
+                    isolated=use_isolated,
+                    arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                    physical_pressure_bar=pressure_bar,
+                    native_activity_formula=native_activity_formula,
+                )
+            except Exception as exc:
+                return engine_call_failure(exc)
+    else:
+        try:
+            cell = equilibrate_cell(
+                handle,
+                pot,
+                temperature_K=float(T),
+                po2=po2,
+                qualification=qualification,
+                isolated=use_isolated,
+                arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                physical_pressure_bar=pressure_bar,
+                native_activity_formula=native_activity_formula,
+            )
+        except Exception as exc:
+            return engine_call_failure(exc)
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
@@ -4261,6 +9595,44 @@ def predict_with_engine(
     if status != "ok":
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
+        if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
+            cell_status = str(getattr(cell, "engine_status", "") or "")
+            if typed in {"out_of_domain", "out_of_basis"} or cell_status == "out_of_domain":
+                refusal_reason = RefusalReason.METRIC_DOMAIN
+                typed_reason = "out_of_domain"
+            else:
+                refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+                if typed == REFUSAL_TIMEOUT:
+                    typed_reason = "engine_timeout"
+                elif typed == "no_liquid":
+                    typed_reason = "no_liquid"
+                elif cell_status == "RuntimeError":
+                    typed_reason = "runtime_error"
+                else:
+                    typed_reason = "engine_not_converged"
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=refusal_reason,
+                refusal_detail={
+                    "reason": typed_reason,
+                    "elapsed_s": float(getattr(cell, "wall_s", 0.0) or 0.0),
+                    "cell_refusal_reason": typed,
+                    "engine_status": cell_status,
+                    "engine_reason": engine_side_reason,
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
         openimcc_outside_species = engine is Engine.OPENIMCC and any(
             token in f"{typed} {engine_side_reason}"
             for token in (
@@ -4457,6 +9829,7 @@ def predict_with_engine(
 
     magnitude: float | None = None
     converter_reason = ""
+    activity_repair_warnings: tuple[str, ...] = ()
     # The melt-activity gate already required the measured species to equal
     # the admitted endmember. Compare that exact identity; never substitute a
     # different species into the residual.
@@ -4552,20 +9925,37 @@ def predict_with_engine(
         # The converter refuses Na2O, CaO, MgO, FeO, and K2O, including a
         # same-named key. It returns a(SiO2) from SiO2_Liq and a(H2O)
         # from H2O or H2O_Liq. Element labels are not oxide activities.
-        from engines.alphamelts.domain import melts_endmember_to_parent_oxide_activity
+        from engines.alphamelts.domain import (
+            _canonical_oxide_activity_map_with_notices,
+            melts_endmember_to_parent_oxide_activity,
+        )
 
+        if engine is Engine.ALPHAMELTS:
+            _, activity_repair_warnings = (
+                _canonical_oxide_activity_map_with_notices(reported)
+            )
         value, converter_reason = melts_endmember_to_parent_oxide_activity(
             reported, compared,
         )
         magnitude = value
     else:
-        matched = match_reported_species(
+        matched, activity_repair_warnings = _match_reported_species_with_notices(
             compared,
             reported,
             oxide_activity=quantity in MELT_ACTIVITY_QUANTITIES,
+            species=identity.species,
         )
         if matched is not None:
             _name, magnitude = matched
+    if activity_repair_warnings:
+        notices = union_notices(
+            notices,
+            _oxide_projection_notices(
+                activity_repair_warnings,
+                quantity=quantity,
+                engine=engine,
+            ),
+        )
     if magnitude is None:
         detail: dict[str, object] = {
             "reason": "species_unmatched_in_engine_output",
@@ -4609,6 +9999,36 @@ def predict_with_engine(
             requested_composition=requested,
             version=engine_version,
         )
+    if (
+        engine is Engine.THERMOENGINE
+        and quantity is Quantity.ACTIVITY
+        and qualification
+    ):
+        # The shared MELTS commissioning gate owns the 1073.15-1700 K /
+        # 30-80 wt% SiO2 band. A numeric ThermoEngine gamma outside it is
+        # retained as extrapolated, with the gamma-domain notice used by this
+        # activity rail rather than the generic commissioning notice.
+        qualification_notice = qualification_battery_notice(
+            quantity, engine, gate
+        )
+        notices = tuple(
+            notice
+            for notice in notices
+            if not (
+                notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.origin == f"engine:{engine.value}"
+            )
+        )
+        notices = union_notices(
+            notices,
+            (
+                replace(
+                    qualification_notice,
+                    kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                    authority=Authority.EXTRAPOLATED,
+                ),
+            ),
+        )
     expanded = expand_coefficient_sources(sources)
     return EnginePrediction(
         engine=engine,
@@ -4622,7 +10042,10 @@ def predict_with_engine(
         lineage_complete=lineage_complete_for(sources),
         certified_band=certified_band,
         coefficient_basis=coefficient_basis,
-        identity=identity,
+        identity=_prediction_identity_with_fo2(
+            identity,
+            po2.po2_bar if po2.mode == PO2_COMMANDED else None,
+        ),
         requested_composition=requested,
         version=engine_version,
     )
@@ -4656,6 +10079,9 @@ def candidate_observation(
         source_id=reference.source_id,
         locator=reference.locator,
         read_from=reference.read_from,
+        point_conditions=(
+            reference.point_conditions if _source_oxygen_pressure_for_score(reference) is not None else None
+        ),
         engine=EngineTrace(
             name=prediction.engine,
             channel=prediction.channel,
@@ -4671,12 +10097,120 @@ def candidate_observation(
             dict(prediction.refusal_detail)
             if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
             and prediction.value is not None
-            else None
+            else (
+                {"source_oxygen_condition": reference.provenance["source_oxygen_condition"]}
+                if reference.provenance and "source_oxygen_condition" in reference.provenance
+                else None
+            )
         ),
     )
 
 
 _HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
+
+
+def _openimcc_liquid_row_extrapolated_notice(
+    *,
+    reason: str,
+    origin: str,
+    band: str,
+    authority: Authority | None = None,
+) -> Notice:
+    """One scored notice for an OpenIMCC liquid row used below its fitted floor."""
+
+    return Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+        reason=reason,
+        origin=origin,
+        band=band,
+        authority=authority,
+    )
+
+
+def _liquid_rows_below_floor_notices(
+    liquid_rows_used: object, *, origin: str
+) -> tuple[Notice, ...]:
+    """Carry each recorded below-floor liquid row onto a scored notice.
+
+    The reason is the provenance flag itself. The band is that row's fitted
+    interval, which is the certified band the flag was recorded against.
+    """
+
+    if isinstance(liquid_rows_used, (str, bytes)) or not isinstance(
+        liquid_rows_used, Sequence
+    ):
+        return ()
+    notices: list[Notice] = []
+    seen: set[tuple[str, str]] = set()
+    for row in liquid_rows_used:
+        if not isinstance(row, Mapping):
+            continue
+        liquid = row.get("liquid_row")
+        if not isinstance(liquid, Mapping) or not liquid.get(
+            "extrapolated_below_floor"
+        ):
+            continue
+        row_name = str(liquid.get("row") or row.get("parent") or "")
+        fit = liquid.get("T_fit_K")
+        band = row_name
+        if (
+            isinstance(fit, Sequence)
+            and not isinstance(fit, (str, bytes))
+            and len(fit) == 2
+        ):
+            try:
+                low = float(fit[0])
+                high = float(fit[1])
+            except (TypeError, ValueError):
+                pass
+            else:
+                if math.isfinite(low) and math.isfinite(high):
+                    band = f"{row_name} [{low:g}, {high:g}] K".strip()
+        key = (row_name, band)
+        if key in seen:
+            continue
+        seen.add(key)
+        notices.append(
+            _openimcc_liquid_row_extrapolated_notice(
+                reason="extrapolated_below_floor",
+                origin=origin,
+                band=band,
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+    return tuple(notices)
+
+
+def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
+    """A single slow cell is transient infrastructure, not a cohort refusal."""
+    return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
+
+
+def _hashimoto_engine_floor_inversion_notices(
+    engine: Engine, diagnostics: object
+) -> tuple[Notice, ...]:
+    if not isinstance(diagnostics, Sequence) or isinstance(diagnostics, (str, bytes)):
+        return ()
+    notices: list[Notice] = []
+    for row in diagnostics:
+        if not isinstance(row, Mapping) or row.get("kind") != "floor_inversion":
+            continue
+        original = row.get("original")
+        band = row.get("band")
+        if original is None or band is None:
+            continue
+        notices.append(
+            Notice(
+                kind=NoticeKind.FLOOR_INVERSION,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=f"{row.get('reason') or 'floor_inversion'}:{row.get('species')}",
+                origin=f"engine:{engine.value}",
+                original=as_decimal(original),
+                band=json.dumps(band, sort_keys=True, default=str),
+            )
+        )
+    return tuple(notices)
 
 
 def _hashimoto_residue_prediction(
@@ -4794,9 +10328,21 @@ def _hashimoto_residue_prediction(
             }
         )
         primary_geometry = primary.primary_geometry_policy_id
-        run_refusal = (primary.provenance.get("geometry_refusal_by_geometry") or {}).get(
-            primary_geometry
+        geometry_refusals = primary.provenance.get("geometry_refusal_by_geometry") or {}
+        production_refusals = production.provenance.get("geometry_refusal_by_geometry") or {}
+        timeout_refusal = next(
+            (
+                refusal
+                for refusal in (
+                    *geometry_refusals.values(),
+                    *production_refusals.values(),
+                )
+                if isinstance(refusal, Mapping)
+                and str(refusal.get("reason") or "").startswith("engine_timeout:")
+            ),
+            None,
         )
+        run_refusal = timeout_refusal or geometry_refusals.get(primary_geometry)
         if run_refusal:
             from simulator.battery.residue import ResidueInventoryRefusal
 
@@ -4818,6 +10364,37 @@ def _hashimoto_residue_prediction(
                 band="1973-2273 K; engine tip 191960ce8",
             )
         ]
+        notices.extend(
+            _hashimoto_engine_floor_inversion_notices(
+                engine,
+                primary_provenance.get("engine_floor_inversion_diagnostics"),
+            )
+        )
+        surface_floor = primary_provenance.get("surface_pO2_balance_floor")
+        if isinstance(surface_floor, Mapping):
+            floor_steps = int(surface_floor.get("steps_at_floor") or 0)
+            floor_pO2 = surface_floor.get("pO2_bar")
+            if floor_steps > 0 and floor_pO2 is not None:
+                floor_first_step = surface_floor.get("first_step")
+                floor_fraction = float(
+                    surface_floor.get("fraction_of_time_at_floor") or 0.0
+                )
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FLOOR_INVERSION,
+                        affected_quantities=(
+                            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                        ),
+                        reason="surface_pO2_at_balance_floor",
+                        origin="residue-oxygen-balance",
+                        original=as_decimal(floor_pO2),
+                        band=(
+                            f"steps_at_floor={floor_steps}; "
+                            f"first_step={floor_first_step}; "
+                            f"fraction_of_time_at_floor={floor_fraction:.17g}"
+                        ),
+                    )
+                )
         integration = primary.provenance.get("integration") or {}
         if integration.get("refinement_status") == "unconverged_at_cap":
             notices.append(
@@ -4829,16 +10406,12 @@ def _hashimoto_residue_prediction(
                     band=f"N={integration.get('steps')}; N_cap=256",
                 )
             )
-        if primary.provenance.get("openimcc_liquid_row_extrapolated"):
-            notices.append(
-                Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                    reason="OpenIMCC liquid-row extrapolation below fitted temperature floor",
-                    origin="hashimoto-residue-addendum-a",
-                    band="liquid-row floors are recorded in provenance",
-                )
+        notices.extend(
+            _liquid_rows_below_floor_notices(
+                primary.provenance.get("liquid_rows_used"),
+                origin="hashimoto-residue-addendum-a",
             )
+        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -4859,7 +10432,8 @@ def _hashimoto_residue_prediction(
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if cache_key not in cache:
+        infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
+        if cache_key not in cache and not infrastructure_failure:
             cache[cache_key] = {"__cohort_error__": str(reason)}
         detail: dict[str, object] = {
             "reason": str(reason),
@@ -4869,13 +10443,35 @@ def _hashimoto_residue_prediction(
         }
         if getattr(exc, "detail", None):
             detail["detail"] = str(exc.detail)
+        engine_floor_diagnostics: object = ()
+        if getattr(exc, "reason", None) == "hashimoto_internal_analytical_channels_missing":
+            try:
+                refusal_detail = json.loads(str(exc.detail))
+            except (TypeError, ValueError):
+                refusal_detail = {}
+            if isinstance(refusal_detail, Mapping):
+                engine_floor_diagnostics = refusal_detail.get(
+                    "engine_floor_inversion_diagnostics", ()
+                )
+        notices = _hashimoto_engine_floor_inversion_notices(
+            engine, engine_floor_diagnostics
+        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
+            execution=Execution(
+                state=(
+                    ExecutionState.ATTEMPTED_UNAVAILABLE
+                    if infrastructure_failure
+                    else ExecutionState.NOT_PROBED
+                )
+            ),
             coefficient_sources=sources,
+            notices=notices,
             refusal_reason=(
-                RefusalReason.OPENIMCC_NOT_IMPORTABLE
+                RefusalReason.ATTEMPTED_UNAVAILABLE
+                if infrastructure_failure
+                else RefusalReason.OPENIMCC_NOT_IMPORTABLE
                 if str(reason) == "openimcc_not_importable"
                 else RefusalReason.UNSUPPORTED
             ),
@@ -4885,6 +10481,48 @@ def _hashimoto_residue_prediction(
 
 
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
+
+
+def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
+    """Translate the residue owner's extent result to the scoring contract."""
+    from simulator.battery.residue import (
+        ResidueEngineNonconvergence, ResidueInventoryRefusal,
+        predict_knudsen_residue_composition,
+    )
+
+    experiment = context.experiments.get(reference.experiment_id)
+    try:
+        cache_key = (f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}", engine)
+        if cache is not None and cache_key in cache:
+            result = cache[cache_key]
+        else:
+            result = predict_knudsen_residue_composition(
+                engine.value, reference, experiment, context.observations.values(),
+                _bench_for_score(experiment, context.benches) if experiment is not None else None,
+            )
+            if cache is not None:
+                cache[cache_key] = result
+        provenance = {k: v for k, v in result.items() if k != "notices"}
+        value = result["composition_wt_pct"].get(reference.identity.species.formula)
+        if value is None:
+            raise ResidueInventoryRefusal("channel_missing", reference.identity.species.formula)
+        return EnginePrediction(
+            engine=engine, channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
+            value=Decimal(str(value)), unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
+            notices=result["notices"], identity=reference.identity,
+            refusal_detail=provenance,
+        )
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        return EnginePrediction(
+            engine=engine, channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else RefusalReason.UNSUPPORTED,
+            refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
+            notices=getattr(exc, "notices", ()), identity=reference.identity,
+        )
 
 
 def _sossi_residue_prediction(
@@ -4991,6 +10629,12 @@ def _sossi_residue_prediction(
         prediction = cache[cache_key].get(short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
+        run_refusal = prediction.provenance.get("run_refusal")
+        if isinstance(run_refusal, Mapping):
+            raise ResidueInventoryRefusal(
+                str(run_refusal.get("reason") or "sossi_run_refused"),
+                json.dumps(run_refusal, sort_keys=True, default=str),
+            )
         if formula in prediction.channel_missing_elements:
             raise ResidueInventoryRefusal(
                 "channel_missing", f"no {formula} evaporation channel for {engine.value}"
@@ -5063,6 +10707,12 @@ def _sossi_residue_prediction(
                     ),
                 )
             )
+        notices.extend(
+            _liquid_rows_below_floor_notices(
+                provenance.get("liquid_rows_used"),
+                origin="sossi-residue-r5",
+            )
+        )
         if any(
             details.get("status") == "unconverged_at_cap"
             for details in (provenance.get("integration") or {}).values()
@@ -5094,9 +10744,12 @@ def _sossi_residue_prediction(
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if cache_key not in cache:
+        infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
+        if cache_key not in cache and not infrastructure_failure:
             cache[cache_key] = {"__cohort_error__": str(reason)}
-        if reason == "oxygen_condition_missing":
+        if infrastructure_failure:
+            refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
+        elif reason == "oxygen_condition_missing":
             refusal = RefusalReason.IDENTITY_INCOMPLETE
         elif reason == "channel_missing":
             refusal = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
@@ -5107,7 +10760,13 @@ def _sossi_residue_prediction(
         return EnginePrediction(
             engine=engine,
             channel=channel,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
+            execution=Execution(
+                state=(
+                    ExecutionState.ATTEMPTED_UNAVAILABLE
+                    if infrastructure_failure
+                    else ExecutionState.NOT_PROBED
+                )
+            ),
             coefficient_sources=sources,
             refusal_reason=refusal,
             refusal_detail={
@@ -5125,7 +10784,7 @@ def _is_bulk_not_liquid_composition(observation: Observation) -> bool:
     """Read the source's two-phase marker; never classify from composition values."""
 
     identity = observation.identity
-    if isinstance(identity, Identity):
+    if isinstance(identity, Identity) and identity.species is not None:
         phase = identity.species.phase
         if isinstance(phase, State) and phase.is_unknown:
             reason = phase.reason or ""
@@ -5176,6 +10835,31 @@ def _none_uncertainty() -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.NONE)
 
 
+def _printed_fo2_names_observation(reference: Observation) -> bool:
+    """The printed fO2 derivation lists this observation. A number does not.
+
+    identity.fO2_Pa is a State and has no inputs. The name is the Located
+    inference on fO2_Pa or oxygen_partial_pressure_Pa. Inputs that do not
+    list this observation_id are not a name, including a unit conversion.
+    """
+    point = oxygen_pressure_point(reference)
+    if point is None or point.inference is None:
+        return False
+    return reference.observation_id in point.inference.inputs
+
+
+def _is_selected_condition_observation(
+    reference: Observation, oxygen: SourceOxygenCondition
+) -> bool:
+    """Identity with the selected condition: an input, or the condition itself."""
+    if reference.observation_id == oxygen.observation.observation_id:
+        return True
+    if reference.observation_id in oxygen.used_observations:
+        return True
+    derivation = oxygen.observation.derivation
+    return derivation is not None and reference.observation_id in derivation.inputs
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -5188,14 +10872,29 @@ def compile_residual(
     lineage_observation_id: str | None = None,
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
     derived_band: DecisionBand | None = None,
+    derived_band_reason: str | None = None,
+    ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
+    fo2_mode: Fo2Mode | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     source_reference = reference
-    reference = fusion_comparison_reference(reference, engine=engine)
+    sample_phase_detail = (
+        melt_activity_sample_phase_refusal(reference.identity)
+        if isinstance(reference.identity, Identity)
+        else None
+    )
+    # A crystalline sample is not converted onto a liquid reference. That
+    # conversion is a melt comparison, and this row is not one.
+    if sample_phase_detail is None:
+        reference = fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    formula = identity.species.formula if isinstance(identity, Identity) else ""
+    formula = (
+        identity.species.formula
+        if isinstance(identity, Identity) and identity.species is not None
+        else ""
+    )
     rail = rail_for_quantity(quantity, species_formula=formula)
     T = temperature_of(identity) if isinstance(identity, Identity) else None
     key = residual_key(
@@ -5233,15 +10932,69 @@ def compile_residual(
         else _bench_for_score(experiment, context.benches)
     )
     flagged_notices = _flagged_stratum_notices(reference, experiment, gates, bench)
-    figure_only_notices: tuple[Notice, ...] = ()
-    evidence_class = reference.evidence.class_
-    figure_only = (
+    evidence_class_notices: tuple[Notice, ...] = ()
+    evidence_class = source_reference.evidence.class_
+    non_measured_comparison = (
+        not evidence_class.is_value
+        or evidence_class.value not in MEASURED_EVIDENCE
+    ) and not (
         evidence_class.is_value
-        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+        and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
     )
-    if figure_only:
-        figure_only_notices = (_figure_only_notice(quantity, reference),)
-    notices = union_notices(reference.notices, flagged_notices, figure_only_notices)
+    if non_measured_comparison:
+        evidence_class_notices = (_evidence_class_notice(quantity, source_reference),)
+    # Value owns approximation; this notice carries it through the stratum/report flow.
+    approximate_value_notices = (
+        (
+            Notice(
+                kind=NoticeKind.APPROXIMATE_VALUE,
+                affected_quantities=(quantity,),
+                reason="approximate_printed_value",
+                origin=reference.observation_id,
+            ),
+        )
+        if reference.value.approximate and quantity is not None
+        else ()
+    )
+    notices = union_notices(
+        reference.notices,
+        flagged_notices,
+        evidence_class_notices,
+        approximate_value_notices,
+        _quench_notices(reference),
+    )
+    if fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity is not None:
+        from simulator.battery.fo2_ladder import engine_intrinsic_fo2_notice
+
+        notices = union_notices(
+            notices,
+            (engine_intrinsic_fo2_notice(quantity),),
+        )
+    validation_notices: list[Notice] = []
+    for observation_id in dict.fromkeys(
+        (source_reference.observation_id, lineage_observation_id)
+    ):
+        if observation_id is None:
+            continue
+        issues = context.hard_issues_by_observation.get(observation_id, ())
+        if not issues:
+            continue
+        issue_codes = set()
+        for issue in issues:
+            location = observation_issue_location(issue.path)
+            field = "" if location is None else location[1]
+            issue_codes.add(
+                issue.reason.value if not field else f"{issue.reason.value}:{field}"
+            )
+        validation_notices.append(
+            Notice(
+                kind=NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
+                affected_quantities=() if quantity is None else (quantity,),
+                reason="hard_validation_issue:" + ",".join(sorted(issue_codes)),
+                origin=observation_id,
+            )
+        )
+    notices = union_notices(notices, tuple(validation_notices))
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -5255,6 +11008,7 @@ def compile_residual(
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
         all_notices = union_notices(notices, extra_notices)
+        result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
         excl = exclusions or ("status_match_or_mismatch",)
         if (
             not _reference_has_measured_evidence(reference)
@@ -5263,7 +11017,7 @@ def compile_residual(
             excl = (*excl, "reference_measured_evidence")
         return (
             Residual(
-                key=key,
+                key=_key_for_fo2_mode(key, result_mode),
                 reference=reference.observation_id,
                 execution=execution,
                 rail=rail,
@@ -5283,9 +11037,40 @@ def compile_residual(
                 ),
                 numeric=None,
                 refusal=ResidualRefusal(reason, dict(detail), check_refs=_check_refs(gates, reason)),
+                quench_state=_residual_quench_state(reference),
+                fo2_mode=result_mode,
             ),
             candidate,
         )
+
+    if _is_quantity_not_predicted(quantity):
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            _quantity_not_predicted_detail(quantity),
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            exclusions=("status_match_or_mismatch",),
+        )
+
+    if (
+        quantity is Quantity.ACTIVITY
+        and isinstance(identity, Identity)
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+    ):
+        source_polymorph = identity.reference_state.value.endmember.polymorph
+        if _source_polymorph_is_rejected(source_polymorph):
+            assert source_polymorph is not None
+            return _refused(
+                RefusalReason.IDENTITY_MISMATCH,
+                {
+                    "reason": "solid_reference_polymorph_rejected",
+                    "formula": identity.reference_state.value.endmember.formula,
+                    "polymorph_reason": source_polymorph.reason,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("identity_equal", "status_match_or_mismatch"),
+            )
 
     if quantity is None:
         detail: dict[str, object] = {"reason": "quantity_unknown"}
@@ -5342,6 +11127,7 @@ def compile_residual(
                 engine,
                 context=context,
                 prediction=prediction,
+                fo2_mode=fo2_mode,
                 comparison_ids=comparison_ids,
                 predict=predict,
                 handles=handles,
@@ -5379,13 +11165,21 @@ def compile_residual(
         reason_token = "value_unknown"
         if reference.value.kind is ValueKind.UNAVAILABLE:
             reason_token = reference.value.unavailable_reason or "value_unavailable"
+        elif (
+            quantity is Quantity.MASS_LOSS_FRACTION
+            and reference.value.kind is ValueKind.INTERVAL
+        ):
+            reason_token = "observed_mass_loss_interval_not_point"
         return _refused(
             RefusalReason.METRIC_DOMAIN,
             {"reason": reason_token, "value_kind": reference.value.kind.value},
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
         )
-    if parse_species_formula(formula) is None:
+    if (
+        quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        and parse_species_formula(formula, species=identity.species) is None
+    ):
         return _refused(
             RefusalReason.IDENTITY_UNKNOWN,
             {"reason": "species_formula_unparsed", "formula": formula},
@@ -5400,6 +11194,21 @@ def compile_residual(
         if apparatus_flagged
         else gates
     )
+    if isinstance(identity, Identity):
+        vapour_phase_detail = vapour_crystalline_sample_liquid_engine_refusal(
+            identity,
+            engine=engine,
+            experiment=experiment,
+        )
+        if vapour_phase_detail is not None:
+            # Phase identity, not an apparatus or engine result. A typed
+            # crystal is out of domain for a liquid engine whether or not
+            # the effusion gate would also refuse. The row stays counted.
+            return _refused(
+                RefusalReason.UNSUPPORTED,
+                vapour_phase_detail,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+            )
     if not gates.passed and not apparatus_flagged:
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
@@ -5408,17 +11217,97 @@ def compile_residual(
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
 
+    unprinted_reference_phase = next(
+        (
+            notice
+            for notice in notices
+            if notice.reason == "fusion_source_reference_phase_unprinted"
+        ),
+        None,
+    )
+    if (
+        unprinted_reference_phase is not None
+        and engine is Engine.INTERNAL_ANALYTICAL
+    ):
+        if experiment is not None and experiment.method.is_unknown:
+            return _refused(
+                RefusalReason.METHOD_UNKNOWN,
+                {
+                    "reason": RefusalReason.METHOD_UNKNOWN.value,
+                    "method_reason": experiment.method.reason,
+                    "secondary_reasons": [unprinted_reference_phase.reason],
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("experiment_method_known", "source_polymorph_printed"),
+            )
+        return _refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": unprinted_reference_phase.reason,
+                "formula": formula,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("source_reference_polymorph_printed",),
+        )
+
+    if sample_phase_detail is not None:
+        # Validity gates do not read the row composition. The activity
+        # contract does. A malformed print is INVALID_SOURCE and wins.
+        # Any other contract gap stays behind this return: a crystalline
+        # sample is not a melt observable even when its reference also
+        # fails to match. The injected predictor is not the contract.
+        if experiment is not None and isinstance(identity, Identity):
+            contract_observation = implied_alpha_reference or reference
+            contract_identity = contract_observation.identity
+            if isinstance(contract_identity, Identity):
+                _generated, contract_refusal = _activity_request_or_contract_refusal(
+                    engine,
+                    experiment=experiment,
+                    observation=contract_observation,
+                    identity=contract_identity,
+                    channel=ENGINE_CHANNELS[engine],
+                    sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                    fo2_mode=fo2_mode or Fo2Mode.SHARED_LADDER,
+                )
+                if (
+                    contract_refusal is not None
+                    and contract_refusal.refusal_reason is RefusalReason.INVALID_SOURCE
+                ):
+                    return _refused(
+                        RefusalReason.INVALID_SOURCE,
+                        contract_refusal.refusal_detail
+                        or {"reason": RefusalReason.INVALID_SOURCE.value},
+                        execution=contract_refusal.execution,
+                    )
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            sample_phase_detail,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+        )
+
     missing_fusion_input = next(
         (
             notice
             for notice in notices
             if notice.reason.startswith("fusion conversion missing input:")
             or notice.reason.startswith("fusion conversion missing input for ")
+            or notice.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT)
         ),
         None,
     )
     if missing_fusion_input is not None:
-        if "JANAF solid table " in missing_fusion_input.reason:
+        native_pair_failure = (
+            engine is Engine.MAGEMIN
+            and "MAGEMin native reference could not be resolved:"
+            in missing_fusion_input.reason
+        )
+        if missing_fusion_input.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT):
+            missing_input = (
+                "Darken & Gurry iron-boundary ratios and JANAF formation rows"
+            )
+        elif native_pair_failure:
+            missing_input = "JANAF source/target tables for MAGEMin native reference"
+        elif "JANAF solid table " in missing_fusion_input.reason:
             missing_input = "JANAF solid polymorph matching the selected table"
         elif "no temperature_K" in missing_fusion_input.reason:
             missing_input = "activity observation temperature_K"
@@ -5427,7 +11316,9 @@ def compile_residual(
         return _refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {
-                "reason": "solid_liquid_reference_conversion_missing_input",
+                "reason": "magemin_native_reference_conversion_missing_input"
+                if native_pair_failure
+                else "solid_liquid_reference_conversion_missing_input",
                 "missing_input": missing_input,
                 "notice": missing_fusion_input.reason,
             },
@@ -5435,8 +11326,87 @@ def compile_residual(
             exclusions=("reference_state_conversion_inputs_present",),
         )
 
+    if (
+        prediction is None and predict in (None, predict_with_engine)
+        and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and experiment is not None and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    ):
+        prediction = _knudsen_residue_prediction(context, reference, engine)
     if prediction is None:
         predictor = predict or predict_with_engine
+        if (
+            predictor is predict_with_engine
+            and _knudsen_vapour_equilibrium(quantity, experiment)
+        ):
+            # Identity, whether fO2 is printed or supplied by the selector.
+            # A printed command is not overwritten. A row is a condition
+            # input when its observation_id is in the selected derivation,
+            # when it is the condition observation, or when the printed
+            # fO2 derivation names it. A matching pressure is not that name.
+            recorded = _bench_for_score(experiment, context.benches)
+            oxygen = resolve_source_oxygen(
+                reference,
+                point_observations if point_observations is not None else context.observations.values(),
+                recorded,
+            )
+            printed_fo2 = _has_printed_fo2(reference, reference.identity)
+            if (
+                isinstance(oxygen, SourceOxygenCondition)
+                and _is_selected_condition_observation(reference, oxygen)
+            ):
+                return _refused(
+                    RefusalReason.UNSUPPORTED,
+                    {
+                        "reason": "used_as_scoring_condition",
+                        "derivation": to_plain(oxygen.observation.derivation),
+                        "derived_from": list(oxygen.observation.derived_from or ()),
+                    },
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                )
+            if _printed_fo2_names_observation(reference):
+                detail: dict[str, object] = {
+                    "reason": "used_as_scoring_condition",
+                    "match": "printed_fo2_names_observation",
+                }
+                if isinstance(oxygen, SourceOxygenCondition):
+                    detail["derivation"] = to_plain(oxygen.observation.derivation)
+                    detail["derived_from"] = list(oxygen.observation.derived_from or ())
+                return _refused(
+                    RefusalReason.UNSUPPORTED,
+                    detail,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                )
+            if isinstance(oxygen, SourceOxygenCondition):
+                consistency = tuple(
+                    notice for notice in oxygen.observation.notices
+                    if notice.origin == CO_MEASURED_CONSISTENCY_ORIGIN
+                )
+                notices = union_notices(notices, consistency)
+                if not printed_fo2:
+                    reference = replace(
+                        reference,
+                        point_conditions={
+                            **(reference.point_conditions or {}),
+                            "fO2_Pa": Located(
+                                State.of(oxygen.observation.value),
+                                locator=oxygen.observation.locator,
+                                inference=oxygen.observation.derivation,
+                            ),
+                        },
+                        provenance={
+                            **(reference.provenance or {}),
+                            "source_oxygen_condition": to_plain(oxygen.observation),
+                        },
+                    )
+            elif not printed_fo2:
+                reference = replace(
+                    reference,
+                    provenance={
+                        **(reference.provenance or {}),
+                        "source_oxygen_fallback": oxygen.reason.value,
+                    },
+                )
         predictor_kwargs: dict[str, object] = {
             "handles": handles,
             "experiment": experiment,
@@ -5450,13 +11420,23 @@ def compile_residual(
             recorded = _bench_for_score(experiment, context.benches)
             if recorded is not None:
                 predictor_kwargs["bench"] = recorded
+        if predictor is predict_with_engine and fo2_mode is not None:
+            predictor_kwargs["fo2_mode"] = fo2_mode
         prediction = predictor(
             engine,
-            implied_alpha_reference or reference,
+            _melt_prediction_reference(implied_alpha_reference or reference),
             **predictor_kwargs,
         )
 
     notices = union_notices(notices, prediction.notices)
+    result_mode = fo2_mode or _fo2_mode_from_notices(notices)
+    if quantity is not None and _pressure_independent_comparison(
+        reference, prediction
+    ):
+        notices = union_notices(
+            notices,
+            (_pressure_independent_comparison_notice(quantity, prediction),),
+        )
     expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
     lineage_complete = lineage_complete_for(
         prediction.coefficient_sources,
@@ -5485,6 +11465,44 @@ def compile_residual(
         observations=context.observations,
         experiments=context.experiments,
     )
+    if (
+        rail is Rail.REDOX
+        and engine is Engine.INTERNAL_ANALYTICAL
+        and quantity is Quantity.FE3_FE2_RATIO
+    ):
+        # The attribution split applies only when both walks are COMPLETE.
+        # An unresolved Kress citation, a printed-unresolved coefficient,
+        # or an incomplete reference stays UNKNOWN.
+        reference_lineage = _observation_lineage(
+            relation_reference.observation_id,
+            context.observations,
+            _table_ids(context.works),
+            asset_ids=_asset_ids(context.works),
+        )
+        coefficient_lineage = _resolve_coefficient_sources(
+            coefficient_lineage_sources(prediction.coefficient_sources),
+            context.observations,
+            context.works,
+            context.experiments,
+        )
+        if reference_lineage.complete and coefficient_lineage.complete:
+            attribution = (
+                None
+                if reference.evidence is None
+                else reference.evidence.attribution
+            )
+            source_relation = (
+                SourceRelation.TRAINING
+                if _kc91_calibration_source_overlap(attribution)
+                else SourceRelation.INDEPENDENT
+            )
+    if (
+        quantity in FUSION_QUANTITIES
+        and prediction.engine is Engine.INTERNAL_ANALYTICAL
+        and reference.read_from in prediction.coefficient_sources
+        and source_relation is SourceRelation.SAME_INPUT
+    ):
+        source_relation = SourceRelation.TRAINING
     compilation = is_compilation_evidence(reference) or is_compilation_source(
         reference.source_id, origin
     )
@@ -5600,8 +11618,15 @@ def compile_residual(
         )
 
     candidate = candidate_observation(reference, prediction)
+    knudsen_extent = (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and experiment is not None and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and prediction.execution.call_evidence == f"{engine.value}:knudsen_residue_extent"
+    )
     compared_reference = reference.identity
     compared_candidate = candidate.identity
+    source_identity = source_reference.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
         compared_reference = _comparison_identity(
             compared_reference, reference, prediction
@@ -5609,7 +11634,38 @@ def compile_residual(
         compared_candidate = _comparison_identity(
             compared_candidate, reference, prediction
         )
-    equal = identity_equal(compared_reference, compared_candidate)
+    source_phase_missing = (
+        quantity is Quantity.ACTIVITY
+        and isinstance(source_identity, Identity)
+        and source_identity.reference_state is not None
+        and source_identity.reference_state.is_value
+        and isinstance(source_identity.reference_state.value, StandardState)
+        and _source_polymorph_is_unspecified(
+            source_identity.reference_state.value.endmember.polymorph
+        )
+    )
+    if knudsen_extent:
+        equal = _same_row_knudsen_residue_identity_equal(
+            compared_reference, compared_candidate
+        )
+    elif fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity in MELT_ACTIVITY_QUANTITIES:
+        equal = _identity_equal(
+            compared_reference,
+            compared_candidate,
+            ignore_fO2=True,
+        )
+    elif quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+        equal = _same_row_redox_identity_equal(
+            compared_reference, compared_candidate
+        )
+    elif source_phase_missing:
+        equal = _identity_equal(
+            compared_reference,
+            compared_candidate,
+            allow_unknown_species_polymorph=True,
+        )
+    else:
+        equal = _score_identity_equal(compared_reference, compared_candidate)
     if equal.kind is not IdentityEqualKind.EQUAL:
         reason = (
             RefusalReason.IDENTITY_MISMATCH
@@ -5628,67 +11684,275 @@ def compile_residual(
             exclusions=("identity_equal",),
         )
 
+    if (
+        quantity is Quantity.VALENCE_RATIO
+        and isinstance(identity, Identity)
+        and identity.valence_basis is not None
+        and identity.valence_basis.is_value
+    ):
+        basis = identity.valence_basis.value
+        range_excess = basis._physical_range_excess(prediction.value)
+        if range_excess is not None:
+            lower, upper, excess = range_excess
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.PREDICTION_OUTSIDE_PHYSICAL_RANGE,
+                        affected_quantities=(Quantity.VALENCE_RATIO,),
+                        reason=(
+                            f"prediction fraction valence value {prediction.value} "
+                            f"is outside physical range [{lower}, {upper}] by {excess}"
+                        ),
+                        origin=prediction.engine.value,
+                        original=prediction.value,
+                    ),
+                ),
+            )
+
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
+    ref_point = _phase_component_reference_wt_percent(identity, ref_point)
+    printed = _PrintedBandResolution()
+    fusion_band_refusal: Mapping[str, object] | None = None
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
-        cell_band = derived_band
-        if (
-            cell_band is None
-            and quantity is Quantity.P_PARTIAL
-            and rail is Rail.VAPOUR
-            and experiment is not None
-            and experiment.method.is_value
-            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        ):
-            cell_band = _derive_kems_partial_pressure_band(
-                context.observations, context.experiments, context.benches
-            )
-        if compilation and quantity is not Quantity.P_PARTIAL:
-            cell_band = _printed_uncertainty_band(
-                quantity,
-                reference.uncertainty,
-                ref_point,
-                source_observation=reference,
-            ) or cell_band
         row_operation = _residual_metric_operation(quantity, reference)
-        own_band_operation: MetricOperation | None = None
-        if figure_only:
-            # Figure reading band comes only from this row's stored uncertainty.
-            # Never fall back to the global measured KEMS cell band (that
-            # borrows another source's envelope). Being the row's own band, it
-            # is dimension-checked in the row's identity-aware metric (r2 F4).
-            cell_band = _printed_uncertainty_band(
-                quantity,
-                reference.uncertainty,
-                ref_point,
-                source_observation=reference,
+        band_uncertainty = source_reference.uncertainty
+        band_basis = None
+        if band_uncertainty.kind is UncertaintyKind.PRINTED:
+            band_basis = "row_printed"
+        elif band_uncertainty.kind is UncertaintyKind.NONE and experiment is not None:
+            work = context.works.get(experiment.work_id or "")
+            method_uncertainties = (
+                None if work is None else work.source_method_uncertainties
             )
-            if cell_band is not None:
-                own_band_operation = row_operation
+            source_method_uncertainty = (
+                None
+                if method_uncertainties is None or source_reference.source_id is None
+                else method_uncertainties.get(source_reference.source_id)
+            )
+            if (
+                source_method_uncertainty is not None
+                and (
+                    quantity is None
+                    or source_method_uncertainty.quantity is not quantity
+                )
+            ):
+                source_method_uncertainty = None
+            if source_method_uncertainty is not None:
+                band_basis = "source_method"
+                if source_method_uncertainty.basis not in {
+                    "log10_dex", "absolute", "relative_percent"
+                }:
+                    printed = _PrintedBandResolution(
+                        refusal={
+                            "reason": "source_method_uncertainty_basis_unmapped",
+                            "basis": source_method_uncertainty.basis,
+                        }
+                    )
+                elif source_method_uncertainty.value <= 0:
+                    printed = _PrintedBandResolution(
+                        refusal={
+                            "reason": "source_method_uncertainty_value_nonpositive",
+                            "value": str(source_method_uncertainty.value),
+                        }
+                    )
+                else:
+                    printed_unit = {
+                        "log10_dex": "dex",
+                        "absolute": QUANTITY_UNITS[quantity],
+                        "relative_percent": "%",
+                    }[source_method_uncertainty.basis]
+                    band_uncertainty = Uncertainty(
+                        kind=UncertaintyKind.PRINTED,
+                        verbatim={
+                            "value": source_method_uncertainty.value,
+                            "unit": printed_unit,
+                            "confidence_level": source_method_uncertainty.meaning,
+                            "note": source_method_uncertainty.locator.note,
+                        },
+                        value=source_method_uncertainty.value,
+                        basis=printed_unit,
+                    )
+        if printed.refusal is None:
+            printed = _printed_uncertainty_band(
+                quantity,
+                band_uncertainty,
+                ref_point,
+                source_observation=source_reference,
+                method=(
+                    experiment.method.value
+                    if experiment is not None and experiment.method.is_value
+                    else None
+                ),
+                band_basis=band_basis or "row_printed",
+            )
+        if printed.notice is not None:
+            notices = union_notices(notices, (printed.notice,))
+
+        source_phase_missing = any(
+            notice.reason == "fusion_source_reference_phase_unprinted"
+            for notice in reference.notices
+        )
+        fusion_conversion = any(
+            _is_fusion_conversion_notice(notice) for notice in reference.notices
+        )
+        if source_phase_missing:
+            fusion_band_refusal = {
+                "reason": "fusion_source_reference_phase_unprinted"
+            }
+        elif fusion_conversion:
+            assert T is not None
+            fusion_energy = _janaf_fusion_energy_for_reference(source_reference, T)
+            if fusion_energy.sigma_delta_g_fus_kJ_per_mol is None:
+                fusion_band_refusal = {
+                    "reason": "conversion_uncertainty_unprinted",
+                    "crystal_table": fusion_energy.crystal_table,
+                }
+            elif printed.refusal is not None:
+                fusion_band_refusal = dict(printed.refusal)
+            elif printed.standard_uncertainty_dex is None:
+                fusion_band_refusal = {
+                    "reason": "fusion_measurement_uncertainty_unprinted_or_not_1sigma"
+                }
+            else:
+                sigma_delta_g = fusion_energy.sigma_delta_g_fus_kJ_per_mol
+                assert sigma_delta_g is not None
+                # Treat the printed row/method sigma and JANAF conversion sigma
+                # as independent standard uncertainties (GUM quadrature).
+                # From dG_fus = R*T*ln(10)*delta(log10(a)),
+                # sigma_conv = sigma_dG_fus/(R*T*ln(10)); J/mol divided by
+                # J/(mol K)*K is dimensionless dex. This code consumes sigma_dG_fus.
+                # If sigma_dH_fus is 10% of 9.6 kJ/mol, then
+                # sigma_dG_fus = sigma_dH_fus*(1 - 1703/1996) ~= 0.14 kJ/mol,
+                # giving 0.14*1000 J/kJ / (8.31441 J/(mol K)*1703 K*ln(10))
+                # ~= 0.004 dex. Taking 10% of dH_fus directly would instead
+                # give sigma_dG_fus=0.96 kJ/mol and ~= 0.029 dex.
+                sigma_conversion_dex = (
+                    sigma_delta_g
+                    * Decimal(1000)
+                    / _rt_ln_10_j_per_mol_K(T)
+                )
+                sigma_total_dex = (
+                    printed.standard_uncertainty_dex**2
+                    + sigma_conversion_dex**2
+                ).sqrt()
+                combined_basis = (
+                    "fusion_combined_source_method"
+                    if band_basis == "source_method"
+                    else "fusion_combined_row_printed"
+                )
+                printed = replace(
+                    printed,
+                    band=DecisionBand(
+                        NORMAL_95_TICKET_MULTIPLIER * sigma_total_dex,
+                        "dimensionless",
+                        (
+                            "fusion_combined_1sigma: independent printed reading "
+                            "and JANAF conversion uncertainties; GUM quadrature"
+                        ),
+                        band_basis=combined_basis,
+                    ),
+                    standard_uncertainty_dex=sigma_total_dex,
+                )
+        if fusion_band_refusal is not None:
+            reason = str(fusion_band_refusal["reason"])
+            printed = replace(
+                printed,
+                band=None,
+                refusal=fusion_band_refusal,
+                standard_uncertainty_dex=None,
+            )
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        affected_quantities=(quantity,),
+                        reason=reason,
+                        origin="decision-band",
+                        band=json.dumps(
+                            dict(fusion_band_refusal), sort_keys=True
+                        ),
+                    ),
+                ),
+            )
+        if (
+            derived_band_reason is not None
+            and printed.band is None
+            and printed.refusal is None
+        ):
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(quantity,),
+                        reason=derived_band_reason,
+                        origin="decision-band",
+                    ),
+                ),
+            )
+        method = (
+            experiment.method.value
+            if experiment is not None and experiment.method.is_value
+            else None
+        )
+        source_wide_kems_band = _is_source_wide_kems_pressure_envelope(
+            quantity, method, reference
+        )
+        if (
+            printed.band is None
+            and printed.refusal is None
+            and derived_band is not None
+            and ratchet_missing
+            and not source_wide_kems_band
+        ):
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(quantity,),
+                        reason="decision_band_ratchet_missing_first_run",
+                        origin="decision-band-ratchet",
+                        band=DECISION_BAND_RATCHET_RELATIVE_PATH.as_posix(),
+                    ),
+                ),
+            )
+        printed_applies = (
+            band_uncertainty.kind is UncertaintyKind.PRINTED
+            and _uncertainty_scope_covers_cell(band_uncertainty, source_reference)
+        )
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
             candidate=prediction.value,
             reference=ref_point,
             source_relation=source_relation,
             metric_uncertainty=(
-                reference.uncertainty
-                if reference.uncertainty.kind is UncertaintyKind.PRINTED
+                band_uncertainty
+                if printed_applies
                 else None
             ),
-            rail=rail,
-            method=(
-                experiment.method.value
-                if experiment is not None and experiment.method.is_value
-                else None
-            ),
-            observations=context.observations,
-            experiments=context.experiments,
-            derived_band=cell_band,
+            printed_band=printed.band,
+            printed_refusal=printed.refusal,
+            derived_band=derived_band,
             operation_override=row_operation,
-            band_operation=own_band_operation,
+            band_operation=row_operation,
         )
+        if (
+            numeric is None
+            and metric_reason is RefusalReason.METRIC_DOMAIN
+            and row_operation is MetricOperation.DEX
+            and ref_point <= 0
+        ):
+            metric_detail = {
+                **metric_detail,
+                "reason": "observed_value_outside_metric_domain",
+                "observed_value": str(ref_point),
+            }
     if numeric is None:
         return _refused(
             metric_reason or RefusalReason.METRIC_DOMAIN,
@@ -5708,11 +11972,14 @@ def compile_residual(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
-    if figure_only:
+    if (
+        evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+    ):
         band_preserving_kinds.add(NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG)
     has_no_band_flag = any(
         notice.kind not in band_preserving_kinds for notice in flagged_notices
-    ) or any(_is_fusion_conversion_notice(notice) for notice in notices)
+    ) or fusion_band_refusal is not None
     if has_no_band_flag:
         numeric = replace(numeric, decision_band=None)
     if implied_alpha:
@@ -5747,12 +12014,15 @@ def compile_residual(
     )
     if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
+    if knudsen_extent:
+        # Carry the identity owner's validated comparison into eligibility.
+        conjuncts = replace(conjuncts, identity_equal=equal.kind is IdentityEqualKind.EQUAL)
     if is_sf04_workbook(reference):
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
     eligible = conjuncts.eligible()
     return (
         Residual(
-            key=key,
+            key=_key_for_fo2_mode(key, result_mode),
             reference=reference.observation_id,
             execution=prediction.execution,
             rail=rail,
@@ -5764,7 +12034,16 @@ def compile_residual(
             candidate=candidate.observation_id,
             candidate_request=None,
             numeric=numeric,
-            refusal=None,
+            refusal=(
+                None
+                if printed.refusal is None
+                else ResidualRefusal(
+                    RefusalReason.DECISION_RULE_MISSING,
+                    dict(printed.refusal),
+                )
+            ),
+            quench_state=_residual_quench_state(reference),
+            fo2_mode=result_mode,
         ),
         candidate,
     )
@@ -5808,6 +12087,35 @@ def load_score_context(
     else:
         works, experiments, observations = load_migrated_store(root, sources=sources)
     benches = load_migrated_benches(root)
+    validation_observations = observations
+    if sources is not None:
+        referenced_ids: set[str] = set()
+        for observation in observations.values():
+            referenced_ids.update(observation.derived_from or ())
+            if observation.derivation is not None:
+                referenced_ids.update(observation.derivation.inputs)
+            if observation.admission.superseded_by is not None:
+                referenced_ids.add(observation.admission.superseded_by)
+        unresolved_reference_ids = referenced_ids.difference(observations).difference(
+            _asset_ids(works)
+        )
+        if unresolved_reference_ids:
+            _, _, all_observations = load_migrated_store(root)
+            validation_observations = {
+                **observations,
+                **{
+                    observation_id: all_observations[observation_id]
+                    for observation_id in unresolved_reference_ids
+                    if observation_id in all_observations
+                },
+            }
+    validation = validate_corpus(
+        works,
+        experiments,
+        validation_observations,
+        benches=benches,
+        context_rows=load_migrated_context(root),
+    )
     origins: dict[str, str] = {}
     extract_review: dict[str, str | None] = {}
     literature = root / "data" / "literature"
@@ -5855,41 +12163,72 @@ def load_score_context(
         extract_review=extract_review,
         hostname=socket.gethostname(),
         benches=benches,
+        root=root,
+        hard_issues_by_observation=validation.hard_issues_by_observation,
+    )
+
+
+def _is_compilation_thermo_reference(
+    observation: Observation, origin: str | None
+) -> bool:
+    evidence_class = observation.evidence.class_
+    quantity = (
+        quantity_token(observation.identity)
+        if isinstance(observation.identity, Identity)
+        else None
+    )
+    compilation = (
+        evidence_class.is_value
+        and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
+    ) or is_compilation_source(observation.source_id, origin)
+    return bool(
+        quantity in FORMATION_QUANTITIES | PURE_STANDARD_THERMO
+        and compilation
+        and not is_internal_consistency(origin)
+        and not is_sf04_workbook(observation)
     )
 
 
 def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
-    """Measured or figure_only evidence, admitted or pending (pending is diagnostic).
+    """Admitted or pending comparison evidence; class labels do not gate scoring.
 
-    FIGURE_ONLY rows are candidates (owner mandate: score everything; evidence
-    class is a label). They stay out of the certified/measured headline via
-    the figure_only notice and by not being in MEASURED_EVIDENCE.
+    Compilation-assessed and compilation-thermo rows stay on their compilation
+    scoring route. Other admitted/pending rows outside internal ledgers use the
+    comparison route and carry a typed label notice when residuals are compiled.
+
+    Quoted valence ratios are on that route so unsupported engine attempts
+    remain counted refusals while the quoted evidence class stays unchanged.
     """
 
     out: list[Observation] = []
     for obs in context.observations.values():
         ev = obs.evidence.class_
-        if not (
-            ev.is_value
-            and (
-                ev.value in MEASURED_EVIDENCE
-                or ev.value is EvidenceClass.FIGURE_ONLY
-            )
-        ):
-            continue
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
+            continue
+        origin = getattr(context, "origins", {}).get(obs.observation_id)
+        if is_internal_consistency(origin):
+            continue
+        if ev.is_value and ev.value is EvidenceClass.COMPILATION_ASSESSED:
+            continue
+        if _is_compilation_thermo_reference(obs, origin):
             continue
         out.append(obs)
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
 def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
-    """Compilation / ledger / model-derived rows: never empirical headline."""
+    """Compilation, ledger, and SF04 rows scored through diagnostic paths."""
+
+    from simulator.battery.compilation_tier import is_compilation_evidence
 
     out: list[Observation] = []
     for obs in context.observations.values():
         origin = context.origins.get(obs.observation_id)
-        if is_internal_consistency(origin) or is_compilation_source(obs.source_id, origin):
+        if (
+            is_internal_consistency(origin)
+            or is_compilation_evidence(obs)
+            or is_compilation_source(obs.source_id, origin)
+        ):
             out.append(obs)
             continue
         if is_sf04_workbook(obs):
@@ -5918,7 +12257,23 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
             and obs.value.kind is ValueKind.CATEGORICAL
             and obs.identity.quantity.is_unknown
         )
-        if activity_reference_unknown or categorical_quantity_unknown:
+        unavailable_on_known_rail = (
+            status is AdmissionStatus.REJECTED
+            and obs.value.kind is ValueKind.UNAVAILABLE
+            and rail_for_quantity(
+                quantity_token(obs.identity),
+                species_formula=(
+                    obs.identity.species.formula
+                    if obs.identity.species is not None
+                    else None
+                ),
+            ) is not None
+        )
+        if (
+            activity_reference_unknown
+            or categorical_quantity_unknown
+            or unavailable_on_known_rail
+        ):
             out.append(obs)
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
@@ -5931,6 +12286,7 @@ def _score_store_with_decisions(
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
+    measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
     _stream: _ResidualJsonlStream | None = None,
@@ -5944,7 +12300,6 @@ def _score_store_with_decisions(
     resolved_handles = dict(provided_handles)
     refs = list(comparison_candidates(context))
     fusion_diagnostic_ids: set[str] = set()
-    admitted_model_derived_ids: set[str] = set()
     if include_diagnostics:
         seen = {o.observation_id for o in refs}
         for obs in diagnostic_references(context):
@@ -5961,22 +12316,16 @@ def _score_store_with_decisions(
                 if obs.observation_id not in seen:
                     refs.append(converted)
                     seen.add(obs.observation_id)
-        for obs in context.observations.values():
-            evidence_class = obs.evidence.class_
-            if (
-                obs.admission.status is not AdmissionStatus.ADMITTED
-                or not evidence_class.is_value
-                or evidence_class.value is not EvidenceClass.MODEL_DERIVED
-                or obs.observation_id in seen
-            ):
-                continue
-            refs.append(obs)
-            seen.add(obs.observation_id)
-            admitted_model_derived_ids.add(obs.observation_id)
         for obs in _refusal_diagnostic_references(context):
             if obs.observation_id not in seen:
                 refs.append(obs)
                 seen.add(obs.observation_id)
+    if measured_only:
+        refs = [
+            obs for obs in refs
+            if obs.evidence.class_.is_value
+            and obs.evidence.class_.value in MEASURED_EVIDENCE
+        ]
     if work_id:
         filtered: list[Observation] = []
         for obs in refs:
@@ -5990,7 +12339,12 @@ def _score_store_with_decisions(
         kept: list[Observation] = []
         for obs in refs:
             quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
-            formula = obs.identity.species.formula if isinstance(obs.identity, Identity) else ""
+            formula = (
+                obs.identity.species.formula
+                if isinstance(obs.identity, Identity)
+                and obs.identity.species is not None
+                else ""
+            )
             if rail_for_quantity(quantity, species_formula=formula) is rail:
                 kept.append(obs)
         refs = kept
@@ -5998,7 +12352,6 @@ def _score_store_with_decisions(
     if limit is not None:
         refs = refs[: int(limit)]
     from simulator.battery.compilation_tier import (
-        compilation_family,
         _compilation_series_point_count,
         _iter_compilation_series_cells,
         is_compilation_evidence,
@@ -6007,7 +12360,6 @@ def _score_store_with_decisions(
     comparison_ids = {o.observation_id for o in comparison_candidates(context)}
     residuals: list[Residual] | None = [] if _stream is None else None
     candidates: dict[str, Observation] = {}
-    compilation_family_by_reference: dict[str, tuple[str, Quantity]] = {}
     # Snapshot. Engine candidates are returned separately and are not
     # lineage inputs. The work-input index is this snapshot.
     observations = dict(context.observations)
@@ -6024,12 +12376,17 @@ def _score_store_with_decisions(
         _compilation_series_point_count(obs, origins.get(obs.observation_id))
         for obs in refs
     ) * max(len(engine_set), 1)
-    family_residuals: dict[tuple[str, Quantity, str, str], list[Decimal]] = {}
     from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
 
     table_index = build_printed_thermo_index(observations)
-    kems_band = _derive_kems_partial_pressure_band(
-        observations, context.experiments, context.benches
+    ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
+        context.root
+    )
+    source_bands, _source_band_records, source_band_reasons = _source_band_catalog(
+        context, ratchet_entries
+    )
+    kems_partial_pressure_band = derive_kems_partial_pressure_band(
+        observations, context.experiments, benches=context.benches
     )
     residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
@@ -6037,7 +12394,6 @@ def _score_store_with_decisions(
             for obs in refs:
                 origin = origins.get(obs.observation_id)
                 for point in _iter_compilation_series_cells(obs, origin):
-                    family_quantity: tuple[str, Quantity] | None = None
                     point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (
                         obs.observation_id not in empirical_ids
@@ -6051,28 +12407,47 @@ def _score_store_with_decisions(
                         if isinstance(point.identity, Identity)
                         else None
                     )
-                    thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
-                    compilation_thermo = (
-                        thermo
-                        and (
-                            is_compilation_evidence(point)
-                            or is_compilation_source(point.source_id, point_origin)
-                        )
+                    compilation_thermo = _is_compilation_thermo_reference(
+                        point, point_origin
+                    )
+                    source_tier = (
+                        "compilation"
+                        if is_compilation_evidence(point)
+                        or is_compilation_source(point.source_id, point_origin)
+                        else "empirical"
+                        if obs.observation_id in comparison_ids
+                        else None
+                    )
+                    source_band = None
+                    source_band_reason = None
+                    if (
+                        source_tier is not None
                         and not is_internal_consistency(point_origin)
                         and not is_sf04_workbook(point)
-                    )
-                    if compilation_thermo and quantity is not None:
-                        family_quantity = (
-                            compilation_family(point.source_id, point_origin),
-                            quantity,
+                    ):
+                        group_key = _source_alignment_group_key(
+                            point, tier=source_tier
                         )
-                        if _stream is None:
-                            compilation_family_by_reference[point.observation_id] = family_quantity
+                        if group_key is not None:
+                            source_key = _group_token(group_key)
+                            source_band = source_bands.get(source_key)
+                            source_band_reason = source_band_reasons.get(source_key)
+                    derived_band = source_band
+                    derived_band_reason = source_band_reason
+                    experiment = context.experiments.get(point.experiment_id)
+                    if (
+                        derived_band is None
+                        and quantity is Quantity.P_PARTIAL
+                        and experiment is not None
+                        and experiment.method.is_value
+                        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+                    ):
+                        derived_band = kems_partial_pressure_band
+                        derived_band_reason = None
                     for engine in engine_set:
                         prediction = None
                         if (
                             diagnostic
-                            and obs.observation_id not in admitted_model_derived_ids
                             and point.observation_id not in fusion_diagnostic_ids
                             and predict is None
                             and not compilation_thermo
@@ -6113,6 +12488,19 @@ def _score_store_with_decisions(
                                 engine,
                                 residue_prediction_cache,
                             )
+                        if (
+                            predict is None
+                            and isinstance(point.identity, Identity)
+                            and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                            and experiment is not None and experiment.method.is_value
+                            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+                        ):
+                            prediction = _knudsen_residue_prediction(
+                                context, point, engine, residue_prediction_cache,
+                            )
+                        intrinsic_redox_activity = _has_intrinsic_redox_activity(
+                            engine, point
+                        )
                         residual, candidate = compile_residual(
                             point,
                             engine,
@@ -6127,21 +12515,62 @@ def _score_store_with_decisions(
                                 else None
                             ),
                             table_index=table_index,
-                            derived_band=kems_band,
+                            derived_band=derived_band,
+                            derived_band_reason=derived_band_reason,
+                            ratchet_missing=ratchet_missing,
                             point_observations=point_observations_by_experiment.get(
                                 point.experiment_id, ()
+                            ),
+                            fo2_mode=(
+                                Fo2Mode.SHARED_LADDER
+                                if intrinsic_redox_activity
+                                else None
                             ),
                         )
                         if _stream is None:
                             assert residuals is not None
                             residuals.append(residual)
                         else:
-                            _stream.append(residual, candidate, family_quantity)
-                        family_key = _family_pool_key(residual, family_quantity)
-                        if family_key is not None:
-                            family_residuals.setdefault(family_key, []).append(
-                                residual.numeric.value  # type: ignore[union-attr]
+                            _stream.append(residual, candidate)
+                        if (
+                            residual.fo2_mode is Fo2Mode.SHARED_LADDER
+                            and intrinsic_redox_activity
+                            and prediction is None
+                            and predict is None
+                        ):
+                            total += 1
+                            intrinsic_residual, intrinsic_candidate = compile_residual(
+                                point,
+                                engine,
+                                context=live_context,
+                                comparison_ids=comparison_ids,
+                                handles=resolved_handles,
+                                lineage_observation_id=(
+                                    obs.observation_id
+                                    if point.observation_id != obs.observation_id
+                                    else None
+                                ),
+                                table_index=table_index,
+                                derived_band=derived_band,
+                                derived_band_reason=derived_band_reason,
+                                ratchet_missing=ratchet_missing,
+                                point_observations=point_observations_by_experiment.get(
+                                    point.experiment_id, ()
+                                ),
+                                fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
                             )
+                            if _stream is None:
+                                assert residuals is not None
+                                residuals.append(intrinsic_residual)
+                            else:
+                                _stream.append(
+                                    intrinsic_residual,
+                                    intrinsic_candidate,
+                                )
+                            if intrinsic_candidate is not None and _stream is None:
+                                candidates[intrinsic_candidate.observation_id] = (
+                                    intrinsic_candidate
+                                )
                         if candidate is not None and _stream is None:
                             candidates[candidate.observation_id] = candidate
                         done += 1
@@ -6187,66 +12616,14 @@ def _score_store_with_decisions(
                         add_note(f"additional engine handle cleanup failure: {error!r}")
                 raise first_error
 
-    family_bands = {
-        key: _residual_distribution_band(
-            values, unit=key[2], family=key[0], quantity=key[1]
-        )
-        for key, values in family_residuals.items()
-    }
-    family_pool_sizes = {
-        key: len(values)
-        for key, values in family_residuals.items()
-        if len(values) < MIN_DERIVED_BAND_N
-    }
-    family_residuals.clear()
     if _stream is not None:
         _stream.finalize(
-            family_pool_sizes=family_pool_sizes,
-            family_bands=family_bands,
             context=context,
             engines=engine_set,
         )
         return (), {}, []
 
     assert residuals is not None
-    banded_residuals: list[Residual] = []
-    for residual in residuals:
-        family_quantity = compilation_family_by_reference.get(residual.reference)
-        numeric = residual.numeric
-        apply, band, no_band = _family_band_update(
-            numeric=numeric,
-            status=residual.status,
-            key=residual.key,
-            source_relation=residual.source_relation,
-            family_quantity=family_quantity,
-            flagged=_has_flagged_decision_notice(residual),
-            family_pool_sizes=family_pool_sizes,
-            family_bands=family_bands,
-        )
-        if not apply:
-            banded_residuals.append(residual)
-            continue
-        assert numeric is not None
-        if no_band:
-            updated_numeric = replace(numeric, decision_band=None)
-            banded_residuals.append(
-                replace(
-                    residual,
-                    numeric=updated_numeric,
-                    status=ResidualStatus.NO_BAND,
-                )
-            )
-            continue
-        assert band is not None
-        updated_numeric = replace(numeric, decision_band=band)
-        banded_residuals.append(
-            replace(
-                residual,
-                numeric=updated_numeric,
-                status=match_status(updated_numeric),
-            )
-        )
-    residuals = banded_residuals
     residuals.sort(
         key=lambda r: (
             "" if r.rail is None else r.rail.value,
@@ -6268,6 +12645,7 @@ def _score_store_to_jsonl(
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
+    measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
 ) -> tuple[int, _ResidualReportMetadata]:
@@ -6282,6 +12660,7 @@ def _score_store_to_jsonl(
             work_id=work_id,
             limit=limit,
             include_diagnostics=include_diagnostics,
+            measured_only=measured_only,
             predict=predict,
             handles=handles,
             _stream=stream,
@@ -6504,29 +12883,45 @@ def write_residuals_jsonl(
     path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
 
-def load_residuals_jsonl(path: Path) -> tuple[dict[str, object], ...]:
-    rows: list[dict[str, object]] = []
-    if not path.is_file():
-        return ()
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        payload = json.loads(line)
-        if isinstance(payload, dict) and not is_store_stamp_payload(payload):
-            rows.append(payload)
-    return tuple(rows)
+def iter_residual_payloads(
+    path: Path, *, strict: bool = False
+) -> Iterator[tuple[int, dict[str, object]]]:
+    """Yield ``(line_number, object)`` for one residual ledger.
 
+    Blank lines and the store-stamp line are skipped. A missing file yields
+    nothing. ``strict`` raises ``ValueError`` naming ``path:line`` when a
+    line is not JSON or not an object. Otherwise a non-object line is
+    skipped and invalid JSON propagates as ``JSONDecodeError``.
+    """
 
-def _iter_residuals_jsonl(path: Path) -> Iterable[dict[str, object]]:
     if not path.is_file():
         return
     with path.open(encoding="utf-8") as stream:
-        for line in stream:
+        for number, line in enumerate(stream, start=1):
             if not line.strip():
                 continue
-            payload = json.loads(line)
-            if isinstance(payload, dict) and not is_store_stamp_payload(payload):
-                yield payload
+            try:
+                payload = json.loads(line)
+            except json.JSONDecodeError as exc:
+                if strict:
+                    raise ValueError(f"{path}:{number}: {exc.msg}") from exc
+                raise
+            if not isinstance(payload, dict):
+                if strict:
+                    raise ValueError(f"{path}:{number}: residual row is not an object")
+                continue
+            if is_store_stamp_payload(payload):
+                continue
+            yield number, payload
+
+
+def load_residuals_jsonl(path: Path) -> tuple[dict[str, object], ...]:
+    return tuple(payload for _number, payload in iter_residual_payloads(path))
+
+
+def _iter_residuals_jsonl(path: Path) -> Iterable[dict[str, object]]:
+    for _number, payload in iter_residual_payloads(path):
+        yield payload
 
 
 @dataclass(frozen=True)
@@ -6590,7 +12985,7 @@ def _median(values: Sequence[Decimal]) -> Decimal | None:
 def _bias_to_scatter_ratio(
     signed_median: Decimal | None, mad: Decimal | None, n: int
 ) -> Decimal | None:
-    if signed_median is None or mad is None or mad == 0 or n < MIN_DERIVED_BAND_N:
+    if signed_median is None or mad is None or mad == 0 or n < MIN_RESIDUAL_SUMMARY_N:
         return None
     return abs(signed_median) / mad
 
@@ -6599,6 +12994,23 @@ def _rms(values: Sequence[Decimal]) -> Decimal | None:
     if not values:
         return None
     return (sum((value * value for value in values), Decimal(0)) / Decimal(len(values))).sqrt()
+
+
+def _median_rms_from_float64(values: Sequence[float]) -> tuple[Decimal, Decimal] | None:
+    """``_median`` and ``_rms`` for one ``array('d')`` group.
+
+    The resident store is float64. This builds one Decimal per sample so the
+    two definitions stay in ``_median`` and ``_rms``, then drops that vector.
+    """
+
+    if not values:
+        return None
+    decimals = tuple(Decimal(str(value)) for value in values)
+    median = _median(decimals)
+    rms = _rms(decimals)
+    if median is None or rms is None:
+        return None
+    return median, rms
 
 
 def _iqr(values: Sequence[Decimal]) -> Decimal | None:
@@ -6623,14 +13035,27 @@ def _iqr(values: Sequence[Decimal]) -> Decimal | None:
 def _measured_residuals(
     residuals: Sequence[Residual],
     context: ScoreContext | None,
+    *,
+    include_engine_out_of_band: bool = False,
 ) -> list[Residual]:
-    """Keep only measured-evidence rows outside flagged and compilation tiers."""
+    """Keep measured rows outside flagged/compilation tiers.
+
+    The headline can retain engine band diagnostics; certified metrics cannot.
+    """
+
+    def unflagged(residual: Residual) -> bool:
+        notices = (
+            _score_eligibility_notices(residual.notices)
+            if include_engine_out_of_band
+            else residual.notices
+        )
+        return not flagged_strata(notices)
 
     if context is None:
         return [
             residual
             for residual in residuals
-            if not flagged_strata(residual.notices)
+            if unflagged(residual)
             and _reference_has_measured_evidence(
                 None, exclusions=residual.exclusions
             )
@@ -6640,7 +13065,7 @@ def _measured_residuals(
     return [
         residual
         for residual in residuals
-        if not flagged_strata(residual.notices)
+        if unflagged(residual)
         if _reference_has_measured_evidence(
             context.observations.get(residual.reference),
             exclusions=residual.exclusions,
@@ -6683,7 +13108,6 @@ def _compilation_decision_strata(
     )
 
     strata: dict[tuple[str, str, str, str], list[Residual]] = defaultdict(list)
-    derived_n: dict[tuple[str, str, str], int] = defaultdict(int)
     for residual in residuals:
         if residual.numeric is None or residual.status is ResidualStatus.REFUSED or any(
             _is_flagged_stratum_notice(notice)
@@ -6705,17 +13129,6 @@ def _compilation_decision_strata(
         )
         engine = _engine_of(residual)
         key = (family, quantity.value, engine)
-        band = None if residual.numeric is None else residual.numeric.decision_band
-        if (
-            residual.numeric is not None
-            and band is None
-            and not any(
-                _is_flagged_stratum_notice(notice)
-                or _is_fusion_conversion_notice(notice)
-                for notice in residual.notices
-            )
-        ):
-            derived_n[key] += 1
         strata[(*key, residual.source_relation.value)].append(residual)
 
     rendered = []
@@ -6724,28 +13137,17 @@ def _compilation_decision_strata(
         center = _median(values)
         mad = None if center is None else _median([abs(value - center) for value in values])
         bands = [r.numeric.decision_band for r in bucket if r.numeric is not None and r.numeric.decision_band is not None]
-        kinds = sorted({
-            "printed" if band.rule == "source-printed per-cell uncertainty"
-            else "derived_2xMAD" if "residual distribution" in band.rule
-            else "legacy_fallback"
-            for band in bands
-        }) or ["no_band"]
+        kinds = sorted({_decision_band_kind(band) for band in bands}) or ["no_band"]
         widths = sorted({str(band.value) for band in bands})
         units = sorted({band.unit for band in bands})
         band_n = sorted({
-            int(band.rule.rsplit("derived_n=", 1)[1])
-            for band in bands if "derived_n=" in band.rule
+            int(band.rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
+            for band in bands if "n_sources=" in band.rule
         })
-        if not band_n and not bands and derived_n[(family, quantity, engine)] > 0:
-            band_n = [derived_n[(family, quantity, engine)]]
-        derived_rows = [
-            r for r in bucket
-            if r.numeric is not None
-            and r.numeric.decision_band is not None
-            and "residual distribution" in r.numeric.decision_band.rule
-        ]
-        tail_in = sum(1 for r in derived_rows if r.status is ResidualStatus.MATCH) if "derived_2xMAD" in kinds else None
-        tail_out = sum(1 for r in derived_rows if r.status is ResidualStatus.MISMATCH) if "derived_2xMAD" in kinds else None
+        no_band_reasons = _owner_no_band_reasons(
+            notice for residual in bucket for notice in residual.notices
+        )
+        band_fields = _compilation_band_value_fields(widths, band_n, no_band_reasons)
         rendered.append({
             "family": family,
             "quantity": quantity,
@@ -6760,18 +13162,50 @@ def _compilation_decision_strata(
                 else str(ratio)
             ),
             "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-            "band_value": widths[0] if len(widths) == 1 else widths,
+            **band_fields,
             "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
             "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-            "band_derived_n": band_n[0] if len(band_n) == 1 else band_n,
             "match_count": sum(1 for r in bucket if r.status is ResidualStatus.MATCH),
             "mismatch_count": sum(1 for r in bucket if r.status is ResidualStatus.MISMATCH),
             "no_band_count": sum(1 for r in bucket if r.status is ResidualStatus.NO_BAND),
-            "tail_in_count": tail_in,
-            "tail_out_count": tail_out,
-            "no_band_reason": "derived_band_insufficient_n" if not bands and 0 < derived_n[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
+            "tail_in_count": None,
+            "tail_out_count": None,
         })
     return rendered
+
+
+def _compilation_band_value_fields(
+    widths: Sequence[str], derived_n: Sequence[int], no_band_reasons: Sequence[str]
+) -> dict[str, object]:
+    """Serialize compilation band values consistently across report paths."""
+
+    recorded_n = list(derived_n)
+    return {
+        "band_value": widths[0] if len(widths) == 1 else widths,
+        "band_derived_n": (
+            recorded_n[0]
+            if len(recorded_n) == 1
+            else recorded_n or None
+        ),
+        "no_band_reason": (
+            no_band_reasons[0]
+            if not widths and len(no_band_reasons) == 1
+            else None
+        ),
+    }
+
+
+def _owner_no_band_reasons(
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> tuple[str, ...]:
+    reasons = set()
+    for notice in notices:
+        kind = notice.kind.value if isinstance(notice, Notice) else notice.get("kind")
+        origin = notice.origin if isinstance(notice, Notice) else notice.get("origin")
+        reason = notice.reason if isinstance(notice, Notice) else notice.get("reason")
+        if kind == NoticeKind.FALLBACK.value and origin == "decision-band" and reason:
+            reasons.add(str(reason))
+    return tuple(sorted(reasons))
 
 
 def _headline_band_width(bucket: Sequence[Residual]) -> Decimal | None:
@@ -6826,11 +13260,14 @@ def _e15_axis_component(observation: Observation, series: str) -> str | None:
         return "SiO2"
     if "_pO_prime_" in series:
         return "Al2O3"
-    if observation.identity.species.formula in {"Ca", "CaO"}:
+    species = observation.identity.species
+    if species is None:
+        return None
+    if species.formula in {"Ca", "CaO"}:
         return "CaO"
-    if observation.identity.species.formula in {"SiO", "SiO2"}:
+    if species.formula in {"SiO", "SiO2"}:
         return "SiO2"
-    if observation.identity.species.formula in {"Al", "AlO", "Al2O3", "O"}:
+    if species.formula in {"Al", "AlO", "Al2O3", "O"}:
         return "Al2O3" if "_pO_" not in series else "CaO"
     return None
 
@@ -6868,7 +13305,7 @@ def _e15_residual_point(
         engine = str(
             request.get("engine")
             if isinstance(request, Mapping) and request.get("engine")
-            else str(row.get("key") or "").rsplit("::", 1)[-1]
+            else _engine_from_residual_key(row.get("key"))
         )
         try:
             residual_dex = as_decimal(numeric.get("value"))
@@ -7093,6 +13530,7 @@ def _e15_condensed_phase(observation: Observation) -> str | None:
     if (
         observation.source_id == "kems-053-stolyarova-1991"
         and isinstance(identity, Identity)
+        and identity.species is not None
         and identity.species.formula == "SiO2"
     ):
         return "cr"
@@ -7408,11 +13846,7 @@ def _headline_metric_row(
         "n_inside_band": len(matches),
         "n_match": len(matches),
         "match_rate": match_rate,
-        "match_rate_label": (
-            "band membership; derived_2xMAD means tail membership, not accuracy"
-            if tier == "compilation"
-            else "band membership"
-        ),
+        "match_rate_label": "band membership",
         "rms_dex": None if rms is None else str(rms),
         "median_dex": None if signed_median is None else str(signed_median),
         "median_abs_dex": None if median is None else str(median),
@@ -7441,10 +13875,12 @@ def headline_rows(
         return _all_numeric_rows_from_residuals(
             residuals, context=context, engines=engines
         )
-    groups: dict[tuple[str, str], list[Residual]] = {}
+    groups: dict[tuple[str, str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
     if tier == "measured":
-        tier_residuals = _measured_residuals(residuals, context)
+        tier_residuals = _measured_residuals(
+            residuals, context, include_engine_out_of_band=True
+        )
     elif tier == "compilation":
         tier_residuals = _compilation_residuals(residuals, context)
     else:
@@ -7454,15 +13890,26 @@ def headline_rows(
             continue
         engine = _engine_of(residual)
         engines_seen.add(engine)
-        groups.setdefault((residual.rail.value, engine), []).append(residual)
+        relation = _source_relation_headline_key(
+            residual.rail.value, engine, residual.source_relation.value
+        )
+        groups.setdefault(
+            (residual.rail.value, engine, relation), []
+        ).append(residual)
     engine_names = [engine.value for engine in engines or ()]
     engine_names.extend(name for name in sorted(engines_seen) if name not in engine_names)
     for rail in Rail:
         for engine in engine_names or [e.value for e in SCORE_ENGINE_SET]:
-            groups.setdefault((rail.value, engine), [])
+            special_redox = _has_source_relation_headline_group(
+                groups, rail.value, engine
+            )
+            if not special_redox:
+                groups.setdefault((rail.value, engine, ""), [])
     rows: list[dict[str, object]] = []
-    for (rail, engine), bucket in sorted(groups.items()):
+    for (rail, engine, relation), bucket in sorted(groups.items()):
         row = _headline_metric_row(rail, engine, bucket, tier=tier)
+        if relation:
+            row.update(_redox_source_relation_fields(relation))
         row["decision_strata"] = (
             _compilation_decision_strata(
                 [
@@ -7471,6 +13918,10 @@ def headline_rows(
                     if _engine_of(r) == engine
                     and r.rail is not None
                     and r.rail.value == rail
+                    and (
+                        not relation
+                        or r.source_relation.value == relation
+                    )
                 ],
                 context,
             )
@@ -7484,6 +13935,1203 @@ def headline_rows(
         )
         rows.append(row)
     return rows
+
+
+def measured_engine_rail_records(
+    residuals: Iterable[Mapping[str, object]],
+    *,
+    context: ScoreContext,
+    engines: Sequence[Engine],
+) -> list[dict[str, object]]:
+    """Measured-candidate counts and native-unit error metrics by engine/rail."""
+
+    measured_reference = _payload_measured_reference(
+        context.observations, context.origins
+    )
+    groups: dict[tuple[str, str, str], list[Mapping[str, object]]] = defaultdict(list)
+    certified: set[int] = set()
+    flagged: dict[int, bool] = {}
+    for residual in residuals:
+        rail = str(residual.get("rail") or "")
+        if not rail:
+            continue
+        engine = _ScorePayloadAccumulator._engine(residual)
+        relation = str(residual.get("source_relation") or SourceRelation.UNKNOWN.value)
+        groups[(rail, engine, relation)].append(residual)
+        flagged[id(residual)] = bool(_flagged_payload_strata(residual))
+        if measured_reference(residual) and _headline_payload_admits(
+            residual, tier="measured"
+        ):
+            certified.add(id(residual))
+
+    records: list[dict[str, object]] = []
+    for rail in Rail:
+        for engine in engines:
+            relations = tuple(
+                relation
+                for relation in SourceRelation
+                if (rail.value, engine.value, relation.value) in groups
+            ) or (SourceRelation.UNKNOWN,)
+            for relation in relations:
+                bucket = groups.get((rail.value, engine.value, relation.value), [])
+                numeric: list[tuple[Mapping[str, object], Mapping[str, object], Decimal]] = []
+                for row in bucket:
+                    metric = row.get("numeric")
+                    if not isinstance(metric, Mapping) or metric.get("value") is None:
+                        continue
+                    try:
+                        value = as_decimal(metric["value"])
+                    except (KeyError, TypeError, ValueError, ArithmeticError):
+                        continue
+                    numeric.append((row, metric, value))
+                certified_numeric = [item for item in numeric if id(item[0]) in certified]
+                flagged_numeric = [item for item in numeric if flagged[id(item[0])]]
+                by_metric: dict[tuple[str, str], list[tuple[Mapping[str, object], Decimal]]] = defaultdict(list)
+                for row, metric, value in numeric:
+                    by_metric[(str(metric.get("operation") or ""), str(metric.get("unit") or ""))].append((row, value))
+                metrics: list[dict[str, object]] = []
+                for (operation, unit), metric_rows in sorted(by_metric.items()):
+                    values = [value for _row, value in metric_rows]
+                    metrics.append({
+                        "operation": operation,
+                        "unit": "dex" if operation == MetricOperation.DEX.value else unit,
+                        "n": len(values),
+                        "all_numeric": {
+                            "rms": _optional_decimal(_rms(values)),
+                            "median_abs": _optional_decimal(_median_abs(values)),
+                        },
+                        "certified": {
+                            "n": sum(id(row) in certified for row, _value in metric_rows),
+                            "rms": _optional_decimal(_rms([value for row, value in metric_rows if id(row) in certified])),
+                            "median_abs": _optional_decimal(_median_abs([value for row, value in metric_rows if id(row) in certified])),
+                        },
+                        "flagged": {
+                            "n": sum(flagged[id(row)] for row, _value in metric_rows),
+                            "rms": _optional_decimal(_rms([value for row, value in metric_rows if flagged[id(row)]])),
+                            "median_abs": _optional_decimal(_median_abs([value for row, value in metric_rows if flagged[id(row)]])),
+                        },
+                    })
+                refusal_counts: dict[str, int] = defaultdict(int)
+                for row in bucket:
+                    if row.get("status") == ResidualStatus.REFUSED.value:
+                        refusal = row.get("refusal")
+                        reason = (
+                            str(refusal.get("reason") or "untyped_refusal")
+                            if isinstance(refusal, Mapping)
+                            else "untyped_refusal"
+                        )
+                        refusal_counts[reason] += 1
+                record = {
+                    "rail": rail.value,
+                    "engine": engine.value,
+                    "candidates": len(bucket),
+                    "numeric": len(numeric),
+                    "certified_numeric": len(certified_numeric),
+                    "flagged_numeric": len(flagged_numeric),
+                    "refused": sum(row.get("status") == ResidualStatus.REFUSED.value for row in bucket),
+                    "refused_by_reason": dict(sorted(refusal_counts.items())),
+                    "in_band": sum(
+                        isinstance(row.get("numeric"), Mapping)
+                        and row["numeric"].get("decision_band") is not None
+                        and row.get("status") == ResidualStatus.MATCH.value
+                        for row in bucket
+                    ),
+                    "metrics": metrics,
+                }
+                relation_key = _source_relation_headline_key(
+                    rail.value, engine.value, relation.value
+                )
+                if relation_key:
+                    record.update(_redox_source_relation_fields(relation_key))
+                else:
+                    record["source_relation"] = relation.value
+                records.append(record)
+    return records
+
+
+def _paired_engine_rail_benchmarks(
+    residuals: Iterable[Mapping[str, object]],
+    *,
+    primary_engines: Sequence[str],
+    comparison_engines: Sequence[str],
+    rails: Sequence[str],
+) -> list[dict[str, object]]:
+    """Choose each primary's lowest-RMS comparison on pairwise shared rows.
+
+    Only one numeric dex row per engine/reference/rail is unambiguous enough
+    to pair. Missing rows and duplicates are excluded from that comparison.
+    A result is returned for every requested rail and primary, including an
+    explicit unavailable record when no comparison engine shares rows.
+    """
+
+    values: dict[tuple[str, str], dict[str, list[Decimal]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for row in residuals:
+        rail = str(row.get("rail") or "")
+        reference = str(row.get("reference") or "")
+        numeric = row.get("numeric")
+        if (
+            not rail
+            or not reference
+            or not isinstance(numeric, Mapping)
+            or numeric.get("operation") != MetricOperation.DEX.value
+            or numeric.get("value") is None
+        ):
+            continue
+        engine = _engine_from_payload(row)
+        if engine == "unknown":
+            continue
+        try:
+            value = as_decimal(numeric["value"])
+        except (KeyError, TypeError, ValueError, ArithmeticError):
+            continue
+        if not value.is_finite():
+            continue
+        values[(rail, reference)][engine].append(value)
+
+    records: list[dict[str, object]] = []
+    comparison_names = set(comparison_engines) - set(primary_engines)
+    for rail in sorted(set(rails)):
+        for primary_engine in primary_engines:
+            pairs_by_engine: dict[str, list[tuple[Decimal, Decimal]]] = defaultdict(list)
+            for (row_rail, _reference), by_engine in values.items():
+                if row_rail != rail:
+                    continue
+                primary_values = by_engine.get(primary_engine, ())
+                if len(primary_values) != 1:
+                    continue
+                primary_value = primary_values[0]
+                for engine in comparison_names:
+                    comparison_values = by_engine.get(engine, ())
+                    if len(comparison_values) == 1:
+                        pairs_by_engine[engine].append(
+                            (primary_value, comparison_values[0])
+                        )
+
+            candidates: list[tuple[Decimal, str, Decimal, int]] = []
+            for engine, pairs in pairs_by_engine.items():
+                benchmark_rms = _rms([comparison for _primary, comparison in pairs])
+                primary_rms = _rms([primary for primary, _comparison in pairs])
+                if benchmark_rms is not None and primary_rms is not None:
+                    candidates.append(
+                        (benchmark_rms, engine, primary_rms, len(pairs))
+                    )
+            if not candidates:
+                records.append(
+                    {
+                        "rail": rail,
+                        "primary_engine": primary_engine,
+                        "benchmark_engine": None,
+                        "n": 0,
+                        "primary_rms_dex": None,
+                        "benchmark_rms_dex": None,
+                    }
+                )
+                continue
+
+            benchmark_rms, engine, primary_rms, count = min(
+                candidates, key=lambda candidate: (candidate[0], candidate[1])
+            )
+            records.append(
+                {
+                    "rail": rail,
+                    "primary_engine": primary_engine,
+                    "benchmark_engine": engine,
+                    "n": count,
+                    "primary_rms_dex": str(primary_rms),
+                    "benchmark_rms_dex": str(benchmark_rms),
+                }
+            )
+    return records
+
+
+_BATTERY_HERO_DECK_SOURCE_RAILS = (
+    Rail.VAPOUR.value,
+    Rail.REDOX.value,
+    Rail.SIO_EVOLUTION.value,
+    Rail.RESIDUE_COMPOSITION.value,
+)
+_BATTERY_HERO_DECK_CHART_IDS = (
+    "polymerisation",
+    "redox_sensitivity",
+    "sio_evolution",
+    "residue_composition",
+    "fo2_cross_comparison",
+)
+
+
+@dataclass(frozen=True)
+class _BatteryHeroNboTRefusal:
+    reason: Literal["free_oxygen_beyond_orthosilicate"]
+    detail: Mapping[str, Decimal]
+
+
+def _battery_hero_state_value(value: object) -> object | None:
+    if isinstance(value, Mapping):
+        return value.get("value") if value.get("tag") == "value" else None
+    return value
+
+
+def _battery_hero_nbo_t(
+    composition_raw: object,
+) -> Decimal | _BatteryHeroNboTRefusal | None:
+    """Calculate oxide-basis NBO/T from the composition used by the scorer.
+
+    Network formers T are Si, Al, and P: each is represented by tetrahedral
+    oxide units in the declared mole composition. Fe and other variable-valence
+    or coordination cations are not counted as T because this composition does
+    not resolve their coordination state. Let B be bridging oxygen and N be
+    non-bridging oxygen. Since O = B + N and each tetrahedron has four corners,
+    4T = 2B + N; subtracting gives N = 2O - 4T and NBO/T = (2*O - 4*T)/T.
+    This network derivation is valid only while 0 <= N <= 4T: there is no free
+    O2- beyond orthosilicate and no tricluster oxygen. Non-mole compositions
+    and negative results are unavailable rather than converted or clipped.
+    """
+
+    if not isinstance(composition_raw, Mapping):
+        return None
+    if composition_raw.get("amount_basis") != AmountBasis.MOLE_FRACTION.value:
+        return None
+    components = composition_raw.get("components")
+    if (
+        not isinstance(components, Sequence)
+        or isinstance(components, (str, bytes))
+        or not components
+    ):
+        return None
+
+    oxygen = Decimal(0)
+    tetrahedral_formers = Decimal(0)
+    try:
+        for component in components:
+            if (
+                not isinstance(component, Sequence)
+                or isinstance(component, (str, bytes))
+                or len(component) != 2
+            ):
+                return None
+            formula, raw_amount = component
+            amount = as_decimal(raw_amount)
+            parsed = formula_composition(str(formula))
+            if (
+                parsed is None
+                or not amount.is_finite()
+                or amount < 0
+            ):
+                return None
+            atom_counts = {element: Decimal(str(count)) for element, count in parsed}
+            if "B" in atom_counts:
+                return None
+            oxygen += amount * atom_counts.get("O", Decimal(0))
+            tetrahedral_formers += amount * sum(
+                (atom_counts.get(element, Decimal(0)) for element in ("Si", "Al", "P")),
+                Decimal(0),
+            )
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not oxygen.is_finite() or tetrahedral_formers <= 0:
+        return None
+    nbo_t = (Decimal(2) * oxygen - Decimal(4) * tetrahedral_formers) / tetrahedral_formers
+    if not nbo_t.is_finite():
+        return None
+    tolerance = Decimal("1e-9")
+    if abs(nbo_t - Decimal(4)) <= tolerance:
+        return Decimal(4)
+    if nbo_t < 0:
+        return Decimal(0) if nbo_t >= -tolerance else None
+    if nbo_t > Decimal(4):
+        return _BatteryHeroNboTRefusal(
+            reason="free_oxygen_beyond_orthosilicate",
+            detail={"computed_value": nbo_t},
+        )
+    return nbo_t
+
+
+def _battery_hero_delta_iw(
+    temperature_raw: object, fO2_pa_raw: object
+) -> Decimal | None:
+    try:
+        temperature = as_decimal(temperature_raw)
+        fO2_pa = as_decimal(fO2_pa_raw)
+        if (
+            not temperature.is_finite()
+            or temperature <= 0
+            or not fO2_pa.is_finite()
+            or fO2_pa <= 0
+        ):
+            return None
+        fO2_bar = fO2_pa / PA_PER_BAR_DEC
+        # The production FeO-IW buffer owns the fit; do not duplicate it here.
+        iw_log10_fO2_bar = Decimal(
+            str(feo_iw_log10_fO2_bar(float(temperature), a_feo=1.0))
+        )
+        delta_iw = fO2_bar.log10() - iw_log10_fO2_bar
+        return delta_iw if delta_iw.is_finite() else None
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+
+
+def _battery_hero_pO2_bin(fO2_pa_raw: object) -> tuple[int, str] | None:
+    try:
+        fO2_pa = as_decimal(fO2_pa_raw)
+        if not fO2_pa.is_finite() or fO2_pa <= 0:
+            return None
+        # Scored fO2_Pa is converted to pO2_bar under the scorer's stated
+        # ideal-gas assumption; use the same exact Pa/bar conversion here.
+        pO2_bar = fO2_pa / PA_PER_BAR_DEC
+        lower_decade = int(pO2_bar.log10().to_integral_value(rounding=ROUND_FLOOR))
+        return (
+            lower_decade,
+            f"10^{lower_decade}–10^{lower_decade + 1} bar",
+        )
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+
+
+def _battery_hero_deck_payload(row: Mapping[str, object]) -> dict[str, object]:
+    """Retain only deck inputs while the plotter streams the full archive."""
+
+    candidate = row.get("candidate_observation")
+    candidate = candidate if isinstance(candidate, Mapping) else {}
+    identity = candidate.get("identity")
+    identity = identity if isinstance(identity, Mapping) else {}
+    value = candidate.get("value")
+    value = value if isinstance(value, Mapping) else {}
+    numeric = row.get("numeric")
+    numeric = numeric if isinstance(numeric, Mapping) else {}
+    return {
+        "candidate_request": {"engine": _engine_from_payload(row)},
+        "candidate_observation": {
+            "identity": {
+                key: identity[key]
+                for key in (
+                    "composition",
+                    "fO2_Pa",
+                    "quantity",
+                    "species",
+                    "temperature_K",
+                )
+                if key in identity
+            },
+            "value": {
+                key: value[key]
+                for key in ("kind", "point")
+                if key in value
+            },
+        },
+        "notices": tuple(row.get("notices") or ()),
+        "numeric": {
+            "operation": numeric.get("operation"),
+            "value": numeric.get("value"),
+        },
+        "rail": row.get("rail"),
+        "reference": row.get("reference"),
+    }
+
+
+def _battery_hero_deck_store_observations(
+    rows: Iterable[Mapping[str, object]],
+) -> dict[str, Observation]:
+    references = {
+        str(row.get("reference") or "")
+        for row in rows
+        if row.get("reference")
+    }
+    sources = tuple(
+        sorted(
+            {
+                reference.split("::", 1)[0]
+                for reference in references
+                if "::" in reference
+            }
+        )
+    )
+    if not sources:
+        return {}
+
+    observation_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
+    if not observation_dir.is_dir():
+        raise FileNotFoundError(f"BLOCKED: need-full-seat {REPO_ROOT}")
+    tokens = source_filter_tokens(sources)
+    if not any(
+        path_matches_source_tokens(path, observation_dir, tokens)
+        for path in iter_observation_store_paths(observation_dir)
+    ):
+        return {}
+    _works, _experiments, observations = load_migrated_store(sources=sources)
+    return observations
+
+
+def _battery_hero_deck_join_key(
+    observation: Observation,
+) -> tuple[str, str | Decimal] | None:
+    point_conditions = observation.point_conditions or {}
+    for key, multiplier in (
+        ("time_s", Decimal(1)),
+        ("duration_s", Decimal(1)),
+        ("time_min", Decimal(60)),
+    ):
+        located = point_conditions.get(key)
+        if (
+            not isinstance(located, Located)
+            or located.inference is not None
+            or not located.state.is_value
+            or located.state.value is None
+        ):
+            continue
+        raw = located.state.value
+        if isinstance(raw, Value):
+            raw = point_magnitude(raw)
+        try:
+            seconds = as_decimal(raw) * multiplier
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if seconds.is_finite():
+            return "time_s", seconds
+
+    identity = observation.identity
+    if isinstance(identity, Identity) and identity.exposure is not None:
+        exposure_state = identity.exposure
+        if exposure_state.is_value and exposure_state.value is not None:
+            duration = exposure_state.value.duration_s
+            if duration.is_value and duration.value is not None:
+                return "time_s", duration.value
+
+    for key in ("run_key", "run_id"):
+        located = point_conditions.get(key)
+        if (
+            isinstance(located, Located)
+            and located.inference is None
+            and located.state.is_value
+            and located.state.value is not None
+        ):
+            return "run", str(located.state.value)
+    return None
+
+
+def _battery_hero_mass_loss_fraction(
+    reference: str,
+    observations: Mapping[str, Observation],
+) -> tuple[Decimal | None, str | None]:
+    residue = observations.get(reference)
+    if residue is None:
+        return None, "no recorded mass loss"
+    join_key = _battery_hero_deck_join_key(residue)
+    if join_key is None:
+        return None, "no recorded mass loss"
+    matches = [
+        observation
+        for observation in observations.values()
+        if observation.experiment_id == residue.experiment_id
+        and quantity_token(observation.identity) is Quantity.MASS_LOSS_FRACTION
+        and _battery_hero_deck_join_key(observation) == join_key
+    ]
+    if not matches:
+        return None, "no recorded mass loss"
+    if len(matches) != 1:
+        return None, "ambiguous recorded mass loss"
+    measurement = matches[0].value
+    if measurement.kind is not ValueKind.POINT or measurement.point is None:
+        return None, "invalid recorded mass loss"
+    try:
+        fraction = as_decimal(measurement.point)
+    except (TypeError, ValueError, ArithmeticError):
+        return None, "invalid recorded mass loss"
+    if not fraction.is_finite() or fraction < 0 or fraction > 1:
+        return None, "invalid recorded mass loss"
+    return fraction, None
+
+
+def _battery_hero_deck_records(
+    rows: Iterable[Mapping[str, object]],
+    *,
+    primary_engines: Sequence[str] = (),
+    comparison_engines: Sequence[str] = (),
+    observations: Mapping[str, Observation] | None = None,
+) -> dict[str, object]:
+    """Score plotted deck axes and chart-specific same-row summaries."""
+
+    observations = observations or {}
+    points: list[dict[str, object]] = []
+    benchmark_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
+    metric_values: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
+    unavailable: dict[tuple[str, str], int] = defaultdict(int)
+    axis_refusals: dict[tuple[str, str, str], int] = defaultdict(int)
+    axis_refusal_details: dict[
+        tuple[str, str, str], list[Mapping[str, str]]
+    ] = defaultdict(list)
+    engines: set[str] = set()
+
+    def refuse_axis(
+        chart: str,
+        engine: str,
+        reason: str,
+        *,
+        detail: Mapping[str, object] | None = None,
+    ) -> None:
+        unavailable[(chart, engine)] += 1
+        key = (chart, engine, reason)
+        axis_refusals[key] += 1
+        if detail is not None:
+            axis_refusal_details[key].append(
+                {str(name): str(value) for name, value in detail.items()}
+            )
+
+    def add_point(
+        chart: str,
+        row: Mapping[str, object],
+        *,
+        facet: str,
+        x_value: Decimal,
+        y_value: Decimal,
+        residual_dex: Decimal,
+        **fields: object,
+    ) -> None:
+        engine = _engine_from_payload(row)
+        engines.add(engine)
+        point: dict[str, object] = {
+            "chart": chart,
+            "engine": engine,
+            "facet": facet,
+            "x_value": str(x_value),
+            "y_value": str(y_value),
+            "residual_dex": str(residual_dex),
+            "flagged": bool(_flagged_payload_strata(row)),
+            "reference": str(row.get("reference") or ""),
+            **fields,
+        }
+        points.append(point)
+        benchmark_rows[chart].append({**row, "rail": chart})
+
+    for row in rows:
+        rail = str(row.get("rail") or "")
+        if rail not in _BATTERY_HERO_DECK_SOURCE_RAILS:
+            continue
+        engine = _engine_from_payload(row)
+        if engine != "unknown":
+            engines.add(engine)
+        numeric = row.get("numeric")
+        candidate = row.get("candidate_observation")
+        identity = candidate.get("identity") if isinstance(candidate, Mapping) else None
+        identity = identity if isinstance(identity, Mapping) else {}
+        if (
+            not isinstance(numeric, Mapping)
+            or numeric.get("operation") != MetricOperation.DEX.value
+            or numeric.get("value") is None
+        ):
+            continue
+        try:
+            residual_dex = as_decimal(numeric["value"])
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if not residual_dex.is_finite():
+            continue
+
+        species = identity.get("species")
+        formula = str(species.get("formula") or "") if isinstance(species, Mapping) else ""
+        composition = _battery_hero_state_value(identity.get("composition"))
+        temperature = _battery_hero_state_value(identity.get("temperature_K"))
+        fO2_pa = _battery_hero_state_value(identity.get("fO2_Pa"))
+        quantity = str(_battery_hero_state_value(identity.get("quantity")) or "")
+
+        is_redox_species = (
+            rail == Rail.VAPOUR.value and formula in {"Fe", "SiO", "Na"}
+        ) or (rail == Rail.SIO_EVOLUTION.value and formula == "SiO")
+        oxygen_condition = None
+        if is_redox_species:
+            try:
+                oxygen_engine = Engine(engine)
+            except ValueError:
+                oxygen_condition = (
+                    "missing",
+                    None,
+                    None,
+                    None,
+                    None,
+                    "scorer engine is unavailable",
+                )
+            else:
+                oxygen_condition = _battery_hero_oxygen_condition(
+                    str(row.get("reference") or ""),
+                    observations,
+                    oxygen_engine,
+                    row.get("notices") or (),
+                )
+        if is_redox_species:
+            assert oxygen_condition is not None
+            (
+                mode,
+                log10_fO2_bar,
+                request_fO2_pa,
+                oxygen_source,
+                oxygen_kind,
+                oxygen_reason,
+            ) = oxygen_condition
+            delta_iw = (
+                _battery_hero_delta_iw(temperature, request_fO2_pa)
+                if mode in {"printed", "commanded", "solved"}
+                and request_fO2_pa is not None
+                else None
+            )
+            if delta_iw is None:
+                reason = oxygen_reason
+                if mode in {"printed", "commanded", "solved"}:
+                    reason = "no finite temperature or delta-IW for this row"
+                refuse_axis("redox_sensitivity", engine, reason)
+            else:
+                add_point(
+                    "redox_sensitivity",
+                    row,
+                    facet=formula,
+                    x_value=delta_iw,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                    oxygen_mode=mode,
+                    oxygen_source=oxygen_source,
+                    oxygen_kind=oxygen_kind,
+                    log10_fO2_bar=str(log10_fO2_bar),
+                    fO2_Pa=str(request_fO2_pa),
+                )
+
+        if rail == Rail.VAPOUR.value:
+            nbo_t = _battery_hero_nbo_t(composition)
+            if nbo_t is None:
+                refuse_axis("polymerisation", engine, "no usable NBO/T")
+            elif isinstance(nbo_t, _BatteryHeroNboTRefusal):
+                refuse_axis(
+                    "polymerisation",
+                    engine,
+                    nbo_t.reason,
+                    detail=nbo_t.detail,
+                )
+            else:
+                add_point(
+                    "polymerisation",
+                    row,
+                    facet=formula,
+                    x_value=nbo_t,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                )
+
+        elif rail == Rail.SIO_EVOLUTION.value and formula == "SiO":
+            assert oxygen_condition is not None
+            (
+                mode,
+                log10_fO2_bar,
+                request_fO2_pa,
+                oxygen_source,
+                oxygen_kind,
+                oxygen_reason,
+            ) = oxygen_condition
+            pO2_bin = (
+                _battery_hero_pO2_bin(request_fO2_pa)
+                if mode in {"printed", "commanded", "solved"}
+                and request_fO2_pa is not None
+                else None
+            )
+            try:
+                temperature_value = as_decimal(temperature)
+            except (TypeError, ValueError, ArithmeticError):
+                temperature_value = Decimal("NaN")
+            if (
+                pO2_bin is None
+                or not temperature_value.is_finite()
+                or temperature_value <= 0
+            ):
+                reason = oxygen_reason
+                if mode in {"printed", "commanded", "solved"}:
+                    reason = "no finite temperature or pO2 bin for this row"
+                refuse_axis("sio_evolution", engine, reason)
+            else:
+                decade, group_label = pO2_bin
+                add_point(
+                    "sio_evolution",
+                    row,
+                    facet=group_label,
+                    x_value=temperature_value,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                    group_index=decade,
+                    group_label=group_label,
+                    oxygen_mode=mode,
+                    oxygen_source=oxygen_source,
+                    oxygen_kind=oxygen_kind,
+                    log10_fO2_bar=str(log10_fO2_bar),
+                    fO2_Pa=str(request_fO2_pa),
+                )
+
+        elif rail == Rail.REDOX.value and quantity == "fe3_fe2_ratio":
+            components = composition.get("components") if isinstance(composition, Mapping) else None
+            has_measured_composition = (
+                isinstance(components, Sequence)
+                and not isinstance(components, (str, bytes))
+                and bool(components)
+                and not composition.get("proxy_flag")
+            )
+            value_payload = candidate.get("value") if isinstance(candidate, Mapping) else None
+            raw_prediction = (
+                value_payload.get("point")
+                if isinstance(value_payload, Mapping)
+                and value_payload.get("kind") == "point"
+                else None
+            )
+            try:
+                prediction = as_decimal(raw_prediction)
+                fO2_value = as_decimal(fO2_pa)
+                if not has_measured_composition:
+                    raise ValueError("no measured composition")
+                if not prediction.is_finite() or prediction <= 0:
+                    raise ValueError("no positive measured redox prediction")
+                if not fO2_value.is_finite() or fO2_value <= 0:
+                    raise ValueError("no measured fO2")
+                # residual_dex = log10(predicted / measured), the score.py
+                # metric contract. Recover the measured scalar at that recorded
+                # precision because the score row serializes the prediction and
+                # residual, but not a second copy of the reference value.
+                measured = prediction / (Decimal(10) ** residual_dex)
+                if not measured.is_finite() or measured <= 0:
+                    raise ValueError("measured redox recovery left the metric domain")
+            except (TypeError, ValueError, ArithmeticError) as exc:
+                refuse_axis("fo2_cross_comparison", engine, str(exc))
+                continue
+            add_point(
+                "fo2_cross_comparison",
+                row,
+                facet="Fe3+/Fe2+ ratio",
+                x_value=measured,
+                y_value=prediction,
+                residual_dex=residual_dex,
+                fO2_Pa=str(fO2_value),
+                quantity=quantity,
+            )
+
+        elif rail == Rail.RESIDUE_COMPOSITION.value:
+            metric_values[("residue_composition", engine)].append(residual_dex)
+            reference = str(row.get("reference") or "")
+            fraction_evaporated, refusal_reason = _battery_hero_mass_loss_fraction(
+                reference,
+                observations,
+            )
+            if fraction_evaporated is None:
+                refuse_axis(
+                    "residue_composition",
+                    engine,
+                    refusal_reason or "no recorded mass loss",
+                )
+            else:
+                add_point(
+                    "residue_composition",
+                    row,
+                    facet=formula or quantity,
+                    x_value=fraction_evaporated,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                    fraction_evaporated=str(fraction_evaporated),
+                )
+
+    values_by_chart_engine: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
+    for point in points:
+        values_by_chart_engine[(str(point["chart"]), str(point["engine"]))].append(
+            as_decimal(point["residual_dex"])
+        )
+    metrics: dict[tuple[str, str], dict[str, object]] = {}
+    for chart in _BATTERY_HERO_DECK_CHART_IDS:
+        for engine in sorted(engines):
+            values = metric_values.get((chart, engine))
+            if values is None:
+                values = values_by_chart_engine.get((chart, engine), [])
+            metrics[(chart, engine)] = {
+                "rail": chart,
+                "engine": engine,
+                "n": len(values),
+                "rms_dex": None if not values else str(_rms(values)),
+                "median_abs_dex": (
+                    None if not values else str(_median_abs(values))
+                ),
+            }
+    benchmarks = {
+        (str(record["rail"]), str(record["primary_engine"])): record
+        for record in _paired_engine_rail_benchmarks(
+            (row for chart_rows in benchmark_rows.values() for row in chart_rows),
+            primary_engines=primary_engines,
+            comparison_engines=comparison_engines,
+            rails=_BATTERY_HERO_DECK_CHART_IDS,
+        )
+    } if primary_engines else {}
+    return {
+        "points": tuple(points),
+        "metrics": metrics,
+        "benchmarks": benchmarks,
+        "unavailable_axis_counts": dict(unavailable),
+        "axis_refusals": dict(axis_refusals),
+        "axis_refusal_details": {
+            key: tuple(details)
+            for key, details in axis_refusal_details.items()
+        },
+    }
+
+
+def _battery_hero_sio2_mole_fraction(composition_raw: object) -> Decimal | None:
+    """Return the scorer-declared SiO2 mole fraction, or None when unavailable."""
+
+    if not isinstance(composition_raw, Mapping):
+        return None
+    if composition_raw.get("amount_basis") != AmountBasis.MOLE_FRACTION.value:
+        return None
+    components = composition_raw.get("components")
+    if (
+        not isinstance(components, Sequence)
+        or isinstance(components, (str, bytes))
+        or not components
+    ):
+        return None
+    sio2_fraction = Decimal(0)
+    try:
+        for component in components:
+            if (
+                isinstance(component, Sequence)
+                and not isinstance(component, (str, bytes))
+                and len(component) == 2
+                and component[0] == "SiO2"
+            ):
+                sio2_fraction = as_decimal(component[1])
+                break
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not sio2_fraction.is_finite() or sio2_fraction < 0 or sio2_fraction > 1:
+        return None
+    return sio2_fraction
+
+
+def _battery_hero_sweet_spot_records(
+    samples: Iterable[tuple[str, str, object, object, object]],
+) -> list[dict[str, object]]:
+    """Score median |dex| cells over declared SiO2 mole fraction and T.
+
+    Each sample is ``(rail, engine, temperature_K, composition, signed_dex)``;
+    the caller unwraps serialized State fields, while this owner assigns bins
+    and computes the median. All engines on a rail receive the same complete
+    grid. Composition components are a complete map, so an omitted SiO2
+    component is zero when the declared amount basis is mole fraction.
+    """
+
+    sio2_width = Decimal("0.05")
+    temperature_width = Decimal("100")
+    values_by_cell: dict[tuple[str, str, int, int], list[Decimal]] = defaultdict(
+        list
+    )
+    temperature_bins_by_rail: dict[str, set[int]] = defaultdict(set)
+    engines_by_rail: dict[str, set[str]] = defaultdict(set)
+
+    for rail, engine, temperature_raw, composition_raw, dex_raw in samples:
+        if not rail or not engine:
+            continue
+        sio2_fraction = _battery_hero_sio2_mole_fraction(composition_raw)
+        if sio2_fraction is None:
+            continue
+        try:
+            temperature = as_decimal(temperature_raw)
+            dex = as_decimal(dex_raw)
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if not temperature.is_finite() or not dex.is_finite():
+            continue
+
+        temperature_bin = math.floor(temperature / temperature_width)
+        sio2_bin = (
+            19
+            if sio2_fraction == 1
+            else math.floor(sio2_fraction / sio2_width)
+        )
+        key = (str(rail), str(engine), temperature_bin, sio2_bin)
+        values_by_cell[key].append(dex)
+        temperature_bins_by_rail[str(rail)].add(temperature_bin)
+        engines_by_rail[str(rail)].add(str(engine))
+
+    records: list[dict[str, object]] = []
+    for rail in sorted(temperature_bins_by_rail):
+        temperature_bins = temperature_bins_by_rail[rail]
+        for engine in sorted(engines_by_rail[rail]):
+            for temperature_bin in range(
+                min(temperature_bins), max(temperature_bins) + 1
+            ):
+                temperature_lower = Decimal(temperature_bin) * temperature_width
+                for sio2_bin in range(20):
+                    cell_values = values_by_cell.get(
+                        (rail, engine, temperature_bin, sio2_bin), []
+                    )
+                    records.append(
+                        {
+                            "rail": rail,
+                            "engine": engine,
+                            "temperature_lower_K": str(temperature_lower),
+                            "temperature_upper_K": str(
+                                temperature_lower + temperature_width
+                            ),
+                            "sio2_lower": str(Decimal(sio2_bin) * sio2_width),
+                            "sio2_upper": str(Decimal(sio2_bin + 1) * sio2_width),
+                            "n": len(cell_values),
+                            "color_eligible": len(cell_values) >= 3,
+                            "median_abs_dex": (
+                                None
+                                if not cell_values
+                                else str(_median_abs(cell_values))
+                            ),
+                        }
+                    )
+    return records
+
+
+@dataclass
+class _BatteryHeroBinAccumulator:
+    residual_sum: float = 0.0
+    temperature_sum: float = 0.0
+    n: int = 0
+    flagged: bool = False
+
+
+def _battery_hero_facet(rail: str, formula: str, observable: str) -> str:
+    if rail == Rail.REDOX.value:
+        return observable if observable != "unknown" else "unknown observable"
+    return formula if formula else "unknown species"
+
+
+def _battery_hero_minor_foulant_facets(formula: str) -> tuple[str, ...]:
+    composition = dict(formula_composition(formula) or ())
+    elements = set(composition)
+    facets = [
+        f"minor:{element}"
+        for element in ("P", "S", "Cl", "C")
+        if element in elements
+    ]
+    alkali = elements.intersection({"Na", "K"})
+    halide = bool(elements.intersection({"Cl", "F"})) and not elements.intersection(
+        {"O", "S", "C"}
+    )
+    sulfate = composition.get("S", 0.0) > 0 and composition.get("O", 0.0) == (
+        4 * composition["S"]
+    )
+    carbonate = composition.get("C", 0.0) > 0 and composition.get("O", 0.0) == (
+        3 * composition["C"]
+    )
+    if alkali and (halide or sulfate or carbonate):
+        facets.append("minor:alkali_salts")
+    return tuple(facets)
+
+
+def _battery_hero_element_series_records(
+    series: Mapping[
+        tuple[str, str, str], Sequence[Mapping[str, object]]
+    ],
+) -> dict[tuple[str, str], list[dict[str, object]]]:
+    """Pool binned residual points by each formula element."""
+
+    bins: dict[tuple[str, str, str, str, int], _BatteryHeroBinAccumulator] = {}
+    for (engine, formula, _rail), points in series.items():
+        elements = set(parse_formula_elements(formula) or ())
+        for element in elements:
+            for point in points:
+                bin_index = int(point["bin_index"])
+                composition_key = str(point["composition_key"])
+                composition_label = str(point["composition_label"])
+                accumulator = bins.setdefault(
+                    (
+                        engine,
+                        element,
+                        composition_key,
+                        composition_label,
+                        bin_index,
+                    ),
+                    _BatteryHeroBinAccumulator(),
+                )
+                count = int(point["n"])
+                accumulator.residual_sum += float(point["residual_dex"]) * count
+                accumulator.temperature_sum += float(point["temperature_K"]) * count
+                accumulator.n += count
+                accumulator.flagged = accumulator.flagged or bool(point["flagged"])
+
+    grouped: dict[tuple[str, str], list[dict[str, object]]] = defaultdict(list)
+    for (
+        engine,
+        element,
+        composition_key,
+        composition_label,
+        bin_index,
+    ), accumulator in sorted(bins.items()):
+        grouped[(engine, element)].append(
+            {
+                "bin_index": bin_index,
+                "temperature_K": accumulator.temperature_sum / accumulator.n,
+                "residual_dex": accumulator.residual_sum / accumulator.n,
+                "n": accumulator.n,
+                "flagged": accumulator.flagged,
+                "composition_key": composition_key,
+                "composition_label": composition_label,
+                "observable": "pooled",
+            }
+        )
+    return {
+        key: sorted(points, key=lambda point: int(point["bin_index"]))
+        for key, points in grouped.items()
+    }
+
+
+def _battery_hero_binned_score_records(
+    database: sqlite3.Connection,
+    *,
+    selected_rails: Sequence[str],
+    hero_rails: Sequence[str],
+    bin_width_K: float,
+    composition_sio2_by_key: Mapping[str, float],
+) -> dict[str, object]:
+    """Deduplicate and bin battery hero residuals from the streamed score table.
+
+    The caller stages raw numeric score rows in ``scored``. This owner performs
+    the SQL duplicate average, RMS accumulation, temperature binning, and
+    element pooling, returning finished records for presentation.
+    """
+
+    selected = set(selected_rails)
+    hero = set(hero_rails)
+    bins: dict[
+        tuple[str, str, str, str, str, str, int], _BatteryHeroBinAccumulator
+    ] = {}
+    hero_bins: dict[
+        tuple[str, str, str, str, str, str, int], _BatteryHeroBinAccumulator
+    ] = {}
+    unique_points: dict[str, int] = defaultdict(int)
+    residual_square_sums: dict[str, float] = defaultdict(float)
+    for row in database.execute(
+        """SELECT engine, species, rail, composition_key, composition_label,
+                  observable, MIN(temperature_K), MAX(flagged), AVG(residual_dex)
+             FROM scored
+            GROUP BY engine, species, rail, composition_key, composition_label,
+                     observable, experiment, temperature_key
+            ORDER BY engine, species, rail, composition_key, observable,
+                     MIN(temperature_K)"""
+    ):
+        (
+            engine,
+            formula,
+            rail,
+            composition_key,
+            composition_label,
+            observable,
+            temperature,
+            flagged,
+            residual,
+        ) = row
+        if rail in selected:
+            unique_points[engine] += 1
+            residual_square_sums[engine] += float(residual) ** 2
+        bin_index = math.floor(float(temperature) / bin_width_K)
+        if rail in selected:
+            key = (
+                engine,
+                formula,
+                rail,
+                composition_key,
+                composition_label,
+                observable,
+                bin_index,
+            )
+            accumulator = bins.setdefault(key, _BatteryHeroBinAccumulator())
+            accumulator.residual_sum += float(residual)
+            accumulator.temperature_sum += float(temperature)
+            accumulator.n += 1
+            accumulator.flagged = accumulator.flagged or bool(flagged)
+        if rail in hero:
+            facets = [_battery_hero_facet(rail, formula, observable)]
+            if rail == Rail.VAPOUR.value:
+                facets.extend(_battery_hero_minor_foulant_facets(formula))
+            for facet in facets:
+                key = (
+                    rail,
+                    facet,
+                    engine,
+                    composition_key,
+                    composition_label,
+                    observable,
+                    bin_index,
+                )
+                accumulator = hero_bins.setdefault(
+                    key, _BatteryHeroBinAccumulator()
+                )
+                accumulator.residual_sum += float(residual)
+                accumulator.temperature_sum += float(temperature)
+                accumulator.n += 1
+                accumulator.flagged = accumulator.flagged or bool(flagged)
+
+    series: dict[tuple[str, str, str], list[dict[str, object]]] = defaultdict(list)
+    for key, accumulator in sorted(bins.items()):
+        (
+            engine,
+            formula,
+            rail,
+            composition_key,
+            composition_label,
+            observable,
+            bin_index,
+        ) = key
+        series[(engine, formula, rail)].append(
+            {
+                "bin_index": bin_index,
+                "temperature_K": accumulator.temperature_sum / accumulator.n,
+                "residual_dex": accumulator.residual_sum / accumulator.n,
+                "n": accumulator.n,
+                "flagged": accumulator.flagged,
+                "composition_key": composition_key,
+                "composition_label": composition_label,
+                "observable": observable,
+            }
+        )
+
+    hero_series: dict[tuple[str, str, str, str], list[dict[str, object]]] = defaultdict(list)
+    for key, accumulator in sorted(hero_bins.items()):
+        rail, facet, engine, composition_key, composition_label, observable, bin_index = key
+        hero_series[(rail, facet, engine, composition_key)].append(
+            {
+                "bin_index": bin_index,
+                "temperature_K": accumulator.temperature_sum / accumulator.n,
+                "residual_dex": accumulator.residual_sum / accumulator.n,
+                "n": accumulator.n,
+                "flagged": accumulator.flagged,
+                "composition_key": composition_key,
+                "composition_label": composition_label,
+                "observable": observable,
+                "composition_sio2_mole_fraction": composition_sio2_by_key.get(
+                    composition_key
+                ),
+            }
+        )
+
+    summary_records = {
+        engine: {
+            "unique_points": count,
+            "rms_dex": math.sqrt(residual_square_sums[engine] / count),
+        }
+        for engine, count in sorted(unique_points.items())
+    }
+    series_records = {
+        key: sorted(points, key=lambda point: int(point["bin_index"]))
+        for key, points in series.items()
+    }
+    hero_records = {
+        key: sorted(points, key=lambda point: int(point["bin_index"]))
+        for key, points in hero_series.items()
+    }
+    return {
+        "summaries": summary_records,
+        "series": series_records,
+        "hero_series": hero_records,
+        "element_series": _battery_hero_element_series_records(series_records),
+    }
+
+
+def _optional_decimal(value: Decimal | None) -> str | None:
+    return None if value is None else str(value)
 
 
 def flagged_stratum_rows(
@@ -7570,8 +15218,46 @@ class _AllNumericFact:
 def _residual_key_quantity(key: object) -> str:
     """Quantity token of a ``residual_key`` (``…::q::rail::engine``)."""
 
-    parts = str(key or "").rsplit("::", 3)
-    return parts[1] if len(parts) == 4 and parts[1] else "quantity_unknown"
+    parts = _residual_key_parts(key)
+    if parts is None:
+        return MISSING_QUANTITY_KEY_TOKEN
+    return parts[1]
+
+
+def numeric_comparison_available(status: object) -> bool:
+    """Whether this residual status stored a numeric comparison.
+
+    Match, mismatch, and no_band did. Refused did not, and neither did a
+    status that is not a ``ResidualStatus``. This is not score eligibility.
+    """
+
+    try:
+        token = status if isinstance(status, ResidualStatus) else ResidualStatus(str(status))
+    except ValueError:
+        return False
+    return token is not ResidualStatus.REFUSED
+
+
+def numeric_comparison_transition(base_status: object, tip_status: object) -> str | None:
+    """Name a refused/numeric status change.
+
+    ``"scored"`` when a refusal gains a numeric comparison, ``"refused"``
+    when a numeric comparison becomes a refusal. Any other pair, including
+    an unknown status, returns None.
+    """
+
+    base_refused = (
+        base_status is ResidualStatus.REFUSED
+        or base_status == ResidualStatus.REFUSED.value
+    )
+    tip_refused = (
+        tip_status is ResidualStatus.REFUSED or tip_status == ResidualStatus.REFUSED.value
+    )
+    if base_refused and numeric_comparison_available(tip_status):
+        return "scored"
+    if numeric_comparison_available(base_status) and tip_refused:
+        return "refused"
+    return None
 
 
 def _all_numeric_source_id(reference: str, observation: Observation | None) -> str:
@@ -7807,6 +15493,87 @@ def _payload_measured_reference(
     return member
 
 
+class _AllNumericPayloadAccumulator:
+    """Stream payload rows into the scorer-owned all-numeric headline."""
+
+    def __init__(
+        self,
+        *,
+        engines: Sequence[Engine],
+        observations: Mapping[str, Observation] | None = None,
+        origins: Mapping[str, str] | None = None,
+        retain_report_facts: bool = True,
+    ) -> None:
+        from simulator.battery.compilation_tier import reference_observation
+
+        self._engines = tuple(engines)
+        self._observations = observations
+        self._reference_observation = reference_observation
+        self._measured_reference = _payload_measured_reference(observations, origins)
+        self._headline = _AllNumericHeadline() if retain_report_facts else None
+        self._rms_squares: dict[tuple[str, str], Decimal] = defaultdict(Decimal)
+        self._rms_counts: dict[tuple[str, str], int] = defaultdict(int)
+
+    def add(self, row: Mapping[str, object]) -> None:
+        reference = str(row.get("reference") or "")
+        engine = _ScorePayloadAccumulator._engine(row)
+        fact = _all_numeric_fact(
+            row,
+            engine=engine,
+            observation=(
+                None
+                if self._observations is None
+                else self._reference_observation(self._observations, reference)
+            ),
+            certified=(
+                self._measured_reference(row)
+                and _headline_payload_admits(row, tier="measured")
+                if self._headline is not None
+                else False
+            ),
+        )
+        if fact is None:
+            return
+        if fact.operation == MetricOperation.DEX.value:
+            key = (fact.rail, fact.engine)
+            self._rms_squares[key] += fact.value * fact.value
+            self._rms_counts[key] += 1
+        if self._headline is not None:
+            self._headline.add(fact)
+
+    def records(self) -> list[dict[str, object]]:
+        if self._headline is None:
+            raise RuntimeError("report facts were not retained")
+        return self._headline.records(engine.value for engine in self._engines)
+
+    def rms_records(self) -> list[dict[str, object]]:
+        engines = {engine.value for engine in self._engines}
+        engines.update(engine for _rail, engine in self._rms_counts)
+        records: list[dict[str, object]] = []
+        for rail in Rail:
+            for engine in sorted(engines):
+                count = self._rms_counts[(rail.value, engine)]
+                rms = (
+                    None
+                    if count == 0
+                    else str(
+                        (
+                            self._rms_squares[(rail.value, engine)]
+                            / Decimal(count)
+                        ).sqrt()
+                    )
+                )
+                records.append(
+                    {
+                        "rail": rail.value,
+                        "engine": engine,
+                        "n_dex": count,
+                        "rms_dex": rms,
+                    }
+                )
+        return records
+
+
 def all_numeric_payload_records(
     rows: Iterable[Mapping[str, object]],
     *,
@@ -7820,26 +15587,14 @@ def all_numeric_payload_records(
     membership plus the measured headline row filter.
     """
 
-    from simulator.battery.compilation_tier import reference_observation
-
-    measured_reference = _payload_measured_reference(observations, origins)
-    owner = _AllNumericHeadline()
+    owner = _AllNumericPayloadAccumulator(
+        engines=engines,
+        observations=observations,
+        origins=origins,
+    )
     for row in rows:
-        reference = str(row.get("reference") or "")
-        owner.add(
-            _all_numeric_fact(
-                row,
-                engine=_ScorePayloadAccumulator._engine(row),
-                observation=(
-                    None
-                    if observations is None
-                    else reference_observation(observations, reference)
-                ),
-                certified=measured_reference(row)
-                and _headline_payload_admits(row, tier="measured"),
-            )
-        )
-    return owner.records(engine.value for engine in engines)
+        owner.add(row)
+    return owner.records()
 
 
 def _all_numeric_markdown_lines(
@@ -8040,15 +15795,114 @@ def notice_backlog(residuals: Sequence[Residual]) -> dict[str, int]:
 
 
 def _engine_of(residual: Residual) -> str:
-    if residual.candidate_request is not None:
-        return residual.candidate_request.engine.value
-    if residual.candidate and residual.candidate.startswith("engine:"):
-        parts = residual.candidate.split(":")
+    request = residual.candidate_request
+    return _engine_from_payload(
+        {
+            "candidate_request": (
+                {"engine": request.engine.value} if request is not None else None
+            ),
+            "candidate": residual.candidate,
+            "key": residual.key,
+        }
+    )
+
+
+def _engine_from_payload(row: Mapping[str, object]) -> str:
+    request = row.get("candidate_request")
+    if isinstance(request, Mapping) and request.get("engine"):
+        return str(request["engine"])
+    candidate = row.get("candidate")
+    if isinstance(candidate, str) and candidate.startswith("engine:"):
+        parts = candidate.split(":")
         if len(parts) >= 2:
             return parts[1]
-    if residual.key:
-        return residual.key.rsplit("::", 1)[-1]
+    if row.get("key"):
+        return _engine_from_residual_key(row["key"])
     return "unknown"
+
+
+def _residual_engine_observable(row: Mapping[str, object]) -> bool:
+    """Whether this engine can report the refused quantity on its rail."""
+
+    execution = row.get("execution")
+    if isinstance(execution, Mapping) and execution.get("call_evidence"):
+        return True
+
+    rail = str(row.get("rail") or "")
+    engine = _engine_from_payload(row)
+    refusal = row.get("refusal")
+    reason = ""
+    detail_reason = ""
+    if isinstance(refusal, Mapping):
+        reason = str(refusal.get("reason") or "")
+        detail = refusal.get("detail")
+        detail_reason = str(detail.get("reason") or "") if isinstance(detail, Mapping) else ""
+    # Phase-composition and capacity refusals stay in the ledger. They are
+    # counted, including when this engine is outside the melt-activity list.
+    if reason in {
+        RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value,
+    } or detail_reason in {
+        RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value,
+    }:
+        return True
+    if rail == Rail.VAPOUR.value and engine == Engine.MAGEMIN.value:
+        return False
+    if rail == Rail.MELT_ACTIVITY.value:
+        # No call means the engine was never asked. An unsupported refusal
+        # is then not an observation, for every engine, including those that
+        # report melt activity when they are run. "unsupported_species" is
+        # the hero-census reason string, not OUTSIDE_SUPPORTED_SPECIES.
+        called = isinstance(execution, Mapping) and bool(
+            execution.get("call_evidence")
+        )
+        if not called and reason in {
+            RefusalReason.UNSUPPORTED.value,
+            "unsupported_species",
+        }:
+            return False
+        from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
+        if engine not in MELT_ACTIVITY_ENGINES:
+            return False
+
+    if not isinstance(refusal, Mapping):
+        return True
+    if (
+        reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE
+    ):
+        return False
+    if (
+        rail == Rail.MELT_ACTIVITY.value
+        and reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE
+    ):
+        return False
+    if rail == Rail.REDOX.value and reason == RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value:
+        return False
+    if (
+        rail == Rail.THERMOCHEMISTRY.value
+        and reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == "quantity_not_predicted"
+    ):
+        request = row.get("candidate_request")
+        raw_quantity = request.get("quantity") if isinstance(request, Mapping) else None
+        try:
+            quantity = Quantity(str(raw_quantity))
+            engine_value = Engine(engine)
+        except ValueError:
+            return True
+        from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+        return (
+            quantity in _engine_thermo_quantities(engine_value)
+            or quantity in FUSION_QUANTITIES
+        )
+    return True
 
 
 def candidate_rail_census(
@@ -8074,7 +15928,11 @@ def candidate_rail_census(
     for obs in comparison_candidates(context):
         identity = obs.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-        formula = identity.species.formula if isinstance(identity, Identity) else ""
+        formula = (
+            identity.species.formula
+            if isinstance(identity, Identity) and identity.species is not None
+            else ""
+        )
         rail = rail_for_quantity(quantity, species_formula=formula)
         if rail is None:
             reason = no_headline_rail_reason(quantity, species_formula=formula)
@@ -8151,7 +16009,7 @@ class _ResidualRowsPayloadView:
             engine = _engine_of(residual)
             relation = residual.source_relation.value
             family_values[(family, quantity.value, engine, relation)].add(value)
-            rail = residual.rail.value if residual.rail else "none"
+            rail = residual.rail.value if residual.rail else NO_HEADLINE_RAIL_TOKEN
             if numeric.operation is MetricOperation.DEX and numeric.decision_band.unit == "dimensionless":
                 headline_values[("compilation", rail, engine)].add(value)
             if numeric.operation is not None:
@@ -8184,7 +16042,7 @@ def _report_engine_set(rows: Iterable[Mapping[str, object]]) -> tuple[Engine, ..
         engine = (
             str(request.get("engine"))
             if isinstance(request, Mapping) and request.get("engine")
-            else str(row.get("key") or "").rsplit("::", 1)[-1]
+            else _engine_from_residual_key(row.get("key"))
         )
         if engine:
             names.add(engine)
@@ -8202,7 +16060,7 @@ def render_score_report(
     studio_hostname: str | None = None,
     root: Path | None = None,
 ) -> str:
-    return _render_score_report_from_payloads_legacy(
+    report = _render_score_report_from_payloads_legacy(
         _ResidualRowsPayloadView(residuals, context),
         context=context,
         engines=engines,
@@ -8212,6 +16070,94 @@ def render_score_report(
         studio_hostname=studio_hostname,
         store_stamp=derive_store_stamp(root or REPO_ROOT),
     )
+    return _append_quench_pair_diagnostics(
+        report, paired_quench_diagnostics(context)
+    )
+
+
+def _append_quench_pair_diagnostics(
+    report: str, diagnostics: Sequence[Mapping[str, object]]
+) -> str:
+    if not diagnostics:
+        return report
+    lines = [
+        "## Paired in-situ / quenched valence diagnostics",
+        "",
+        "Δlog10 is the dimensionless glass-to-melt ratio difference in dex.",
+        "",
+        "| experiment | in-situ observation | glass observation | in-situ ratio | glass ratio | quench_state | Δlog10 (dex) |",
+        "|---|---|---|---:|---:|---|---:|",
+    ]
+    for row in diagnostics:
+        lines.append(
+            f"| {row['experiment_id']} | {row['in_situ_observation']} | "
+            f"{row['glass_observation']} | {row['in_situ_ratio']} | "
+            f"{row['glass_ratio']} | {row['quench_state']} | "
+            f"{row['delta_log10']} |"
+        )
+    section = "\n".join(lines)
+    return f"{report.rstrip()}\n\n{section}\n"
+
+
+def _append_nasa9_fit_comparison_stratum(
+    report: str, comparisons: Iterable[Mapping[str, object]]
+) -> str:
+    counts: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0, 0])
+    refusals: dict[tuple[str, str, str, str], int] = defaultdict(int)
+    for row in comparisons:
+        channel = row.get("comparison_channel")
+        if not isinstance(channel, str) or not channel.startswith("nasa9_fit:"):
+            continue
+        engine = channel.partition(":")[2]
+        quantity = str(row.get("quantity") or "unknown")
+        numeric = row.get("value") is not None and row.get("status") != "refused"
+        group = counts[(engine, quantity)]
+        group[0] += 1
+        group[1 if numeric else 2] += 1
+        if numeric:
+            continue
+        reason = str(row.get("refusal_reason") or "untyped")
+        detail = row.get("refusal_detail")
+        detail_text = json.dumps(
+            dict(detail) if isinstance(detail, Mapping) else {},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        refusals[(engine, quantity, reason, detail_text)] += 1
+
+    if not counts:
+        return report
+
+    lines = [
+        "## NASA-9 fit comparison stratum",
+        "",
+        "Fit comparisons are separate from printed-cell comparisons and measured-tier counts.",
+        "",
+        "| engine | quantity | n comparisons | n numeric | n refused |",
+        "|---|---|---:|---:|---:|",
+    ]
+    for (engine, quantity), (total, numeric, refused) in sorted(counts.items()):
+        lines.append(
+            f"| {engine} | {quantity} | {total} | {numeric} | {refused} |"
+        )
+    lines.extend(["", "### Typed refusal diagnostics", ""])
+    if not refusals:
+        lines.append("None.")
+    else:
+        lines.extend(
+            [
+                "| engine | quantity | reason | count | detail |",
+                "|---|---|---|---:|---|",
+            ]
+        )
+        for (engine, quantity, reason, detail), count in sorted(refusals.items()):
+            safe_detail = detail.replace("|", "\\|").replace("`", "\\`")
+            lines.append(
+                f"| {engine} | {quantity} | `{reason}` | {count} | `{safe_detail}` |"
+            )
+    section = "\n".join(lines)
+    return f"{report.rstrip()}\n\n{section}\n"
 
 
 def _render_score_report_from_payloads_legacy(
@@ -8320,10 +16266,11 @@ def _render_score_report_from_payloads_legacy(
     else:
         lines.extend(
             [
-                "| rail | engine | n candidates | n refused | n scored | n score eligible | "
+                "| rail | engine | population / source relation | n candidates | "
+                "n refused | n scored | n score eligible | "
                 "n inside band | RMS dex | median dex | median abs dex | band width dex | "
                 "RMS/band | n no band | match rate |",
-                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+                "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in aggregate.headline_records(engines=report_engines):
@@ -8332,7 +16279,9 @@ def _render_score_report_from_payloads_legacy(
             rate = row["match_rate"]
             rate_s = "—" if rate is None else f"{rate:.3f}"
             lines.append(
-                f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
+                f"| {row['rail']} | {row['engine']} | "
+                f"{row.get('population', row.get('source_relation', '—'))} | "
+                f"{row['n_candidates']} | "
                 f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
                 f"{row['n_inside_band']} | {row['rms_dex'] or '—'} | "
                 f"{row['median_dex'] or '—'} | {row['median_abs_dex'] or '—'} | "
@@ -8695,11 +16644,7 @@ def _headline_payload_record(
             if not stats["n_banded"]
             else int(stats["n_inside_band"]) / int(stats["n_banded"])
         ),
-        "match_rate_label": (
-            "band membership; derived_2xMAD means tail membership, not accuracy"
-            if tier == "compilation"
-            else "band membership"
-        ),
+        "match_rate_label": "band membership",
         "rms_dex": None if rms is None else str(rms),
         "median_dex": None if signed_median is None else str(signed_median),
         "median_abs_dex": None if not dex_values else str(_median_abs(dex_values)),
@@ -8714,6 +16659,20 @@ def _headline_payload_record(
     return record
 
 
+def _source_relation_headline_key(rail: str, engine: str, relation: str) -> str:
+    if rail == Rail.REDOX.value and engine == Engine.INTERNAL_ANALYTICAL.value:
+        return relation or SourceRelation.UNKNOWN.value
+    return ""
+
+
+def _has_source_relation_headline_group(
+    groups: Mapping[tuple[str, str, str], object], rail: str, engine: str
+) -> bool:
+    return any(
+        key[0] == rail and key[1] == engine and bool(key[2]) for key in groups
+    )
+
+
 def headline_payloads(
     rows: Iterable[Mapping[str, object]],
     engines: Sequence[Engine],
@@ -8724,21 +16683,24 @@ def headline_payloads(
 ) -> list[dict[str, object]]:
     if tier not in {"measured", "compilation"}:
         raise ValueError(f"unknown headline tier {tier!r}")
-    groups: dict[tuple[str, str], dict[str, object]] = {}
+    groups: dict[tuple[str, str, str], dict[str, object]] = {}
     engine_names = [e.value for e in engines]
     for rail in Rail:
         for engine in engine_names:
-            groups[(rail.value, engine)] = _empty_headline_payload_stats()
+            groups[(rail.value, engine, "")] = _empty_headline_payload_stats()
     for row in rows:
         if not _headline_payload_admits(row, tier=tier):
             continue
         rail = str(row.get("rail"))
         engine = str(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-            or str(row.get("key") or "").rsplit("::", 1)[-1]
+            or _engine_from_residual_key(row.get("key"))
+        )
+        relation = _source_relation_headline_key(
+            rail, engine, str(row.get("source_relation") or "")
         )
         stats = groups.setdefault(
-            (rail, engine),
+            (rail, engine, relation),
             _empty_headline_payload_stats(),
         )
         stats["n_candidates"] = int(stats["n_candidates"]) + 1
@@ -8783,20 +16745,26 @@ def headline_payloads(
             except (TypeError, ValueError, ArithmeticError):
                 pass
     out: list[dict[str, object]] = []
-    for (rail, engine), stats in sorted(groups.items()):
+    for (rail, engine, relation), stats in sorted(groups.items()):
+        if (
+            not relation
+            and _has_source_relation_headline_group(groups, rail, engine)
+        ):
+            continue
         typed_widths = getattr(rows, "_typed_headline_band_values", {}).get(
             (tier, rail, engine)
         )
-        out.append(
-            _headline_payload_record(
-                tier,
-                rail,
-                engine,
-                stats,
-                typed_widths=typed_widths,
-                include_eligible_references=False,
-            )
+        record = _headline_payload_record(
+            tier,
+            rail,
+            engine,
+            stats,
+            typed_widths=typed_widths,
+            include_eligible_references=False,
         )
+        if relation:
+            record.update(_redox_source_relation_fields(relation))
+        out.append(record)
     return out
 
 
@@ -8833,66 +16801,6 @@ def _has_flagged_decision_notice(residual: Residual) -> bool:
     )
 
 
-def _family_pool_key(
-    residual: Residual,
-    family_quantity: tuple[str, Quantity] | None,
-) -> tuple[str, Quantity, str, str] | None:
-    numeric = residual.numeric
-    if (
-        numeric is None
-        or residual.status is ResidualStatus.REFUSED
-        or family_quantity is None
-        or (
-            numeric.decision_band is not None
-            and numeric.decision_band.rule == "source-printed per-cell uncertainty"
-        )
-        or _has_flagged_decision_notice(residual)
-    ):
-        return None
-    family, quantity = family_quantity
-    engine = residual.key.rsplit("::", 1)[-1]
-    return (family, quantity, numeric.unit, engine)
-
-
-def _family_band_update(
-    *,
-    numeric: ResidualNumeric | None,
-    status: ResidualStatus,
-    key: str,
-    source_relation: SourceRelation,
-    family_quantity: tuple[str, Quantity] | None,
-    flagged: bool,
-    family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
-    family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
-) -> tuple[bool, DecisionBand | None, bool]:
-    if (
-        numeric is None
-        or status is ResidualStatus.REFUSED
-        or family_quantity is None
-        or (
-            numeric.decision_band is not None
-            and numeric.decision_band.rule == "source-printed per-cell uncertainty"
-        )
-        or flagged
-    ):
-        return False, None, False
-    family, quantity = family_quantity
-    engine = key.rsplit("::", 1)[-1]
-    band_key = (family, quantity, numeric.unit, engine)
-    band = family_bands.get(band_key)
-    has_insufficient_pool = (
-        band is None
-        and 0 < family_pool_sizes.get(band_key, 0) < MIN_DERIVED_BAND_N
-    )
-    if band is None and not has_insufficient_pool:
-        band = decision_band_for(quantity, source_relation)
-    if has_insufficient_pool:
-        return True, None, True
-    if band is None or not band_dimension_matches(quantity, band):
-        return False, None, False
-    return True, band, False
-
-
 class _ResidualJsonlStream:
     """Keep the in-flight JSONL on disk and sort rows without retaining them."""
 
@@ -8925,17 +16833,10 @@ class _ResidualJsonlStream:
         self._database.execute(
             "CREATE TABLE residual_order ("
             "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-            "key TEXT NOT NULL, offset INTEGER NOT NULL, family TEXT, quantity TEXT, "
-            "engine TEXT NOT NULL, relation TEXT NOT NULL, band_value TEXT, "
-            "band_rule TEXT, status TEXT NOT NULL, flagged INTEGER NOT NULL, "
-            "has_numeric INTEGER NOT NULL, numeric_value TEXT)"
+            "key TEXT NOT NULL, offset INTEGER NOT NULL, band_value TEXT, "
+            "numeric_value TEXT)"
         )
-        self._pending: list[
-            tuple[
-                str, str, str, int, str | None, str | None, str, str,
-                str | None, str | None, str, int, int, str | None
-            ]
-        ] = []
+        self._pending: list[tuple[str, str, str, int, str | None, str | None]] = []
         self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         self.headline_band_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
         self.tier_band_values: dict[
@@ -8949,14 +16850,12 @@ class _ResidualJsonlStream:
         self,
         residual: Residual,
         candidate: Observation | None,
-        family_quantity: tuple[str, Quantity] | None,
     ) -> None:
         offset = self.file.tell()
         line = dumps_residual_line(residual, candidate).encode("utf-8")
         self.file.write(line + b"\n")
         numeric = residual.numeric
         decision_band = None if numeric is None else numeric.decision_band
-        flagged = _has_flagged_decision_notice(residual)
         band_value = None if decision_band is None else str(decision_band.value)
         numeric_value = None if numeric is None else str(numeric.value)
         self._pending.append(
@@ -8965,15 +16864,7 @@ class _ResidualJsonlStream:
                 residual.reference,
                 residual.key,
                 offset,
-                None if family_quantity is None else family_quantity[0],
-                None if family_quantity is None else family_quantity[1].value,
-                residual.key.rsplit("::", 1)[-1],
-                residual.source_relation.value,
                 band_value,
-                None if decision_band is None else decision_band.rule,
-                residual.status.value,
-                int(flagged),
-                int(numeric is not None),
                 numeric_value,
             )
         )
@@ -8988,9 +16879,8 @@ class _ResidualJsonlStream:
         if not self._pending:
             return
         self._database.executemany(
-            "INSERT INTO residual_order (rail, reference, key, offset, family, quantity, "
-            "engine, relation, band_value, band_rule, status, flagged, has_numeric, "
-            "numeric_value) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO residual_order (rail, reference, key, offset, band_value, "
+            "numeric_value) VALUES (?, ?, ?, ?, ?, ?)",
             self._pending,
         )
         self._database.commit()
@@ -9003,8 +16893,6 @@ class _ResidualJsonlStream:
     def finalize(
         self,
         *,
-        family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
-        family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
         context: ScoreContext,
         engines: Sequence[Engine],
     ) -> None:
@@ -9031,52 +16919,15 @@ class _ResidualJsonlStream:
                 with self.partial_path.open("rb") as source:
                     output.write(source.readline())
                     rows = self._database.execute(
-                        "SELECT offset, reference, family, quantity, engine, relation, "
-                        "band_value, band_rule, status, flagged, has_numeric, "
-                        "numeric_value "
+                        "SELECT offset, band_value, numeric_value "
                         "FROM residual_order "
                         "ORDER BY rail COLLATE BINARY, reference COLLATE BINARY, "
                         "key COLLATE BINARY, seq"
                     )
-                    for (
-                        offset,
-                        reference,
-                        family,
-                        quantity,
-                        engine,
-                        relation,
-                        band_value,
-                        band_rule,
-                        status,
-                        flagged,
-                        has_numeric,
-                        numeric_value,
-                    ) in rows:
+                    for offset, band_value, numeric_value in rows:
                         source.seek(offset)
                         raw_line = source.readline()
-                        can_apply_family_band = (
-                            family is not None
-                            and quantity is not None
-                            and status != ResidualStatus.REFUSED.value
-                            and band_rule != "source-printed per-cell uncertainty"
-                            and not flagged
-                            and has_numeric
-                        )
                         payload = json.loads(raw_line)
-                        applied = False
-                        typed_band_value = None
-                        if can_apply_family_band:
-                            applied, typed_band_value = _apply_family_band_to_payload(
-                                payload,
-                                family_pool_sizes=family_pool_sizes,
-                                family_bands=family_bands,
-                                family_quantity=(
-                                    None
-                                    if family is None or quantity is None
-                                    else (family, Quantity(quantity))
-                                ),
-                            )
-                        band_value = typed_band_value if applied else band_value
                         numeric_payload = payload.get("numeric")
                         report_payload = payload
                         if (
@@ -9095,13 +16946,6 @@ class _ResidualJsonlStream:
                                 typed_value=str(band_value),
                                 row_metadata=row_metadata,
                             )
-                        if applied:
-                            raw_line = json.dumps(
-                                payload,
-                                sort_keys=True,
-                                ensure_ascii=False,
-                                separators=(",", ":"),
-                            ).encode("utf-8") + b"\n"
                         output.write(raw_line)
                 output.flush()
             self.report_aggregate = report_aggregate
@@ -9196,58 +17040,6 @@ class _ResidualJsonlStream:
         self._temporary.cleanup()
 
 
-def _apply_family_band_to_payload(
-    payload: dict[str, object],
-    *,
-    family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
-    family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
-    family_quantity: tuple[str, Quantity] | None,
-) -> tuple[bool, str | None]:
-    numeric_payload = payload.get("numeric")
-    if not isinstance(numeric_payload, dict):
-        return False, None
-    raw_band = numeric_payload.get("decision_band")
-    band = (
-        DecisionBand(
-            as_decimal(raw_band["value"]),
-            str(raw_band["unit"]),
-            str(raw_band["rule"]),
-        )
-        if isinstance(raw_band, Mapping)
-        else None
-    )
-    numeric = ResidualNumeric(
-        operation=MetricOperation(str(numeric_payload["operation"])),
-        unit=str(numeric_payload["unit"]),
-        value=as_decimal(numeric_payload["value"]),
-        decision_band=band,
-    )
-    status = ResidualStatus(str(payload["status"]))
-    source_relation = SourceRelation(str(payload["source_relation"]))
-    apply, updated_band, no_band = _family_band_update(
-        numeric=numeric,
-        status=status,
-        key=str(payload.get("key") or ""),
-        source_relation=source_relation,
-        family_quantity=family_quantity,
-        flagged=bool(_flagged_payload_strata(payload)),
-        family_pool_sizes=family_pool_sizes,
-        family_bands=family_bands,
-    )
-    if not apply:
-        return False, None
-    if no_band:
-        numeric_payload.pop("decision_band", None)
-        payload["status"] = ResidualStatus.NO_BAND.value
-    else:
-        assert updated_band is not None
-        plain_band = to_plain(updated_band)
-        numeric_payload["decision_band"] = plain_band
-        updated_numeric = replace(numeric, decision_band=updated_band)
-        payload["status"] = match_status(updated_numeric).value
-    return True, None if no_band else str(updated_band.value)
-
-
 def flagged_stratum_payloads(
     rows: Iterable[Mapping[str, object]],
     engines: Sequence[Engine],
@@ -9267,7 +17059,7 @@ def flagged_stratum_payloads(
             continue
         engine = str(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-            or str(row.get("key") or "").rsplit("::", 1)[-1]
+            or _engine_from_residual_key(row.get("key"))
         )
         if engine_names and engine not in engine_names:
             continue
@@ -9310,6 +17102,22 @@ def flagged_stratum_payloads(
     ]
 
 
+def _redox_source_relation_fields(relation: str) -> dict[str, str]:
+    population = {
+        SourceRelation.TRAINING.value: "calibration_source_overlap_fit_fidelity",
+        SourceRelation.INDEPENDENT.value: "independent_source_accuracy",
+    }.get(relation)
+    fields = {"source_relation": relation}
+    if population is not None:
+        fields["population"] = population
+    if relation == SourceRelation.TRAINING.value:
+        fields["attribution_basis"] = (
+            "Observation.evidence.attribution via Residual.reference"
+        )
+        fields["calibration_source_citation"] = KC91_CALIBRATION_SOURCES["citation"]
+    return fields
+
+
 def headline_payload_records(
     rows: Iterable[Mapping[str, object]],
     *,
@@ -9318,6 +17126,8 @@ def headline_payload_records(
     origins: Mapping[str, str] | None = None,
 ) -> list[dict[str, object]]:
     """Machine-readable headline records from residual payloads."""
+
+    rows = tuple(rows)
 
     compilation_rows: Iterable[Mapping[str, object]] = ()
     is_measured = _payload_measured_reference(observations, origins)
@@ -9352,7 +17162,6 @@ def headline_payload_records(
         )
 
         payload_groups: dict[tuple[str, str, str, str, str], dict[str, object]] = {}
-        derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         for row in compilation_rows:
             reference = str(row.get("reference") or "")
             observation = compilation_row_observation(reference, observations, origins)
@@ -9364,7 +17173,7 @@ def headline_payload_records(
                 continue
             engine = str(
                 ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-                or str(row.get("key") or "").rsplit("::", 1)[-1]
+                or _engine_from_residual_key(row.get("key"))
             )
             family = compilation_family(observation.source_id, compilation_origin(reference, origins))
             relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
@@ -9373,13 +17182,14 @@ def headline_payload_records(
                 continue
             band_data = numeric.get("decision_band")
             band = None if not isinstance(band_data, Mapping) else DecisionBand(
-                as_decimal(band_data["value"]), str(band_data["unit"]), str(band_data["rule"])
+                as_decimal(band_data["value"]),
+                str(band_data["unit"]),
+                str(band_data["rule"]),
+                str(band_data.get("band_basis") or "derived_scatter"),
             )
             flagged = bool(_flagged_payload_strata(row))
             if flagged:
                 continue
-            if band is None and not flagged:
-                derived_ns[key] += 1
             rail = str(row.get("rail") or "")
             group = payload_groups.setdefault(
                 (*key, relation, rail),
@@ -9389,11 +17199,10 @@ def headline_payload_records(
                     "widths": set(),
                     "units": set(),
                     "band_derived_n": set(),
+                    "no_band_reasons": set(),
                     "match_count": 0,
                     "mismatch_count": 0,
                     "no_band_count": 0,
-                    "tail_in_count": 0,
-                    "tail_out_count": 0,
                 },
             )
             value = as_decimal(numeric["value"])
@@ -9405,23 +17214,18 @@ def headline_payload_records(
                 group["mismatch_count"] = int(group["mismatch_count"]) + 1
             elif status == ResidualStatus.NO_BAND.value:
                 group["no_band_count"] = int(group["no_band_count"]) + 1
+            group["no_band_reasons"].update(  # type: ignore[union-attr]
+                _owner_no_band_reasons(row.get("notices", ()))
+            )
             if band is None:
                 continue
-            if band.rule == "source-printed per-cell uncertainty":
-                group["kinds"].add("printed")  # type: ignore[union-attr]
-            elif "residual distribution" in band.rule:
-                group["kinds"].add("derived_2xMAD")  # type: ignore[union-attr]
-                if status == ResidualStatus.MATCH.value:
-                    group["tail_in_count"] = int(group["tail_in_count"]) + 1
-                elif status == ResidualStatus.MISMATCH.value:
-                    group["tail_out_count"] = int(group["tail_out_count"]) + 1
-            else:
-                group["kinds"].add("legacy_fallback")  # type: ignore[union-attr]
+            band_kind = _decision_band_kind(band)
+            group["kinds"].add(band_kind)  # type: ignore[union-attr]
             group["widths"].add(str(band_data["value"]))  # type: ignore[union-attr]
             group["units"].add(band.unit)  # type: ignore[union-attr]
-            if "derived_n=" in band.rule:
+            if "n_sources=" in band.rule:
                 group["band_derived_n"].add(  # type: ignore[union-attr]
-                    int(band.rule.rsplit("derived_n=", 1)[1])
+                    int(band.rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
                 )
         typed_band_values = getattr(rows, "_typed_family_band_values", {})
         for (family, quantity, engine, relation, _rail), group in payload_groups.items():
@@ -9447,11 +17251,13 @@ def headline_payload_records(
                 mad = None if center is None else _median([abs(value - center) for value in values])
                 kinds = sorted(group["kinds"]) or ["no_band"]
                 derived_n = sorted(group["band_derived_n"])
-                if not derived_n and not group["widths"] and derived_ns[(family, quantity, engine)] > 0:
-                    derived_n = [derived_ns[(family, quantity, engine)]]
                 widths = sorted(group["widths"])
                 units = sorted(group["units"])
-                derived = "derived_2xMAD" in kinds
+                band_fields = _compilation_band_value_fields(
+                    widths,
+                    derived_n,
+                    sorted(group["no_band_reasons"]),
+                )
                 strata.append({
                     "family": family, "quantity": quantity, "engine": engine, "relation": relation,
                     "n": len(values),
@@ -9463,17 +17269,15 @@ def headline_payload_records(
                         else str(ratio)
                     ),
                     "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-                    "band_value": widths[0] if len(widths) == 1 else widths,
+                    **band_fields,
                     "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
                     "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-                    "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n,
                     "match_count": group["match_count"],
                     "mismatch_count": group["mismatch_count"],
                     "no_band_count": group["no_band_count"],
-                    "tail_in_count": group["tail_in_count"] if derived else None,
-                    "tail_out_count": group["tail_out_count"] if derived else None,
-                    "no_band_reason": "derived_band_insufficient_n" if not group["widths"] and 0 < derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
-                })
+                    "tail_in_count": None,
+                    "tail_out_count": None,
+        })
             record["decision_strata"] = strata
     return records
 
@@ -9540,7 +17344,7 @@ class _ScorePayloadAccumulator:
             {} if typed_tier_band_values is None else typed_tier_band_values
         )
         self.headline_groups: dict[
-            str, dict[tuple[str, str], dict[str, object]]
+            str, dict[tuple[str, str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
         self.e15_points: list[_E15ResidualPoint] = []
@@ -9553,7 +17357,6 @@ class _ScorePayloadAccumulator:
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
-        self.derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         self.refusal_counts: dict[str, int] = defaultdict(int)
         self.admission_with = 0
         self.admission_alone = 0
@@ -9566,7 +17369,7 @@ class _ScorePayloadAccumulator:
         for tier in self.headline_groups:
             for rail in Rail:
                 for engine in engines:
-                    self.headline_groups[tier][(rail.value, engine.value)] = (
+                    self.headline_groups[tier][(rail.value, engine.value, "")] = (
                         _empty_headline_payload_stats()
                     )
 
@@ -9591,12 +17394,7 @@ class _ScorePayloadAccumulator:
 
     @staticmethod
     def _engine(row: Mapping[str, object]) -> str:
-        request = row.get("candidate_request")
-        return str(
-            request.get("engine")
-            if isinstance(request, Mapping) and request.get("engine")
-            else str(row.get("key") or "").rsplit("::", 1)[-1]
-        )
+        return _engine_from_payload(row)
 
     def _add_headline(
         self,
@@ -9609,7 +17407,12 @@ class _ScorePayloadAccumulator:
         observation: Observation | None = None,
     ) -> None:
         groups = self.headline_groups[tier]
-        stats = groups.setdefault((rail, engine), _empty_headline_payload_stats())
+        relation = _source_relation_headline_key(
+            rail, engine, str(row.get("source_relation") or "")
+        )
+        stats = groups.setdefault(
+            (rail, engine, relation), _empty_headline_payload_stats()
+        )
         stats["n_candidates"] = int(stats["n_candidates"]) + 1
         status = str(row.get("status") or "")
         exclusions = tuple(row.get("exclusions") or ())
@@ -9668,8 +17471,6 @@ class _ScorePayloadAccumulator:
         if flagged:
             return
         key = (family, quantity.value, engine)
-        if not isinstance(band_data, Mapping):
-            self.derived_ns[key] += 1
         relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
         rail = str(row.get("rail") or "")
         group_key = (*key, relation, rail)
@@ -9681,11 +17482,10 @@ class _ScorePayloadAccumulator:
                 "widths": set(),
                 "units": set(),
                 "band_derived_n": set(),
+                "no_band_reasons": set(),
                 "match_count": 0,
                 "mismatch_count": 0,
                 "no_band_count": 0,
-                "tail_in_count": 0,
-                "tail_out_count": 0,
             },
         )
         value = numeric_value
@@ -9698,23 +17498,20 @@ class _ScorePayloadAccumulator:
             group["mismatch_count"] = int(group["mismatch_count"]) + 1
         elif status == ResidualStatus.NO_BAND.value:
             group["no_band_count"] = int(group["no_band_count"]) + 1
+        group["no_band_reasons"].update(  # type: ignore[union-attr]
+            _owner_no_band_reasons(row.get("notices", ()))
+        )
         if not isinstance(band_data, Mapping):
             return
-        band_rule = str(band_data["rule"])
-        if band_rule == "source-printed per-cell uncertainty":
-            group["kinds"].add("printed")
-        elif "residual distribution" in band_rule:
-            group["kinds"].add("derived_2xMAD")
-            if status == ResidualStatus.MATCH.value:
-                group["tail_in_count"] = int(group["tail_in_count"]) + 1
-            elif status == ResidualStatus.MISMATCH.value:
-                group["tail_out_count"] = int(group["tail_out_count"]) + 1
-        else:
-            group["kinds"].add("legacy_fallback")
+        band_kind = _decision_band_kind(band_data)
+        band_rule = str(band_data.get("rule") or "")
+        group["kinds"].add(band_kind)
         group["widths"].add(str(band_data["value"]))
         group["units"].add(str(band_data["unit"]))
-        if "derived_n=" in band_rule:
-            group["band_derived_n"].add(int(band_rule.rsplit("derived_n=", 1)[1]))
+        if "n_sources=" in band_rule:
+            group["band_derived_n"].add(
+                int(band_rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
+            )
 
     def _row_metadata(
         self, row: Mapping[str, object]
@@ -9751,7 +17548,7 @@ class _ScorePayloadAccumulator:
             )
             family = ""
             tier_quantity = "unknown"
-            tier_rail = "none"
+            tier_rail = NO_HEADLINE_RAIL_TOKEN
             tier_uncertainty = ""
             family_quantity = None
             if is_compilation and observation is not None:
@@ -9765,6 +17562,7 @@ class _ScorePayloadAccumulator:
                 formula = (
                     observation.identity.species.formula
                     if isinstance(observation.identity, Identity)
+                    and observation.identity.species is not None
                     else ""
                 )
                 headline_rail = rail_for_quantity(token, species_formula=formula)
@@ -9978,23 +17776,40 @@ class _ScorePayloadAccumulator:
             keys = {
                 key for key in groups
                 if engines is None or key[1] in selected_names
+                if not (
+                    key[0] == Rail.REDOX.value
+                    and key[1] == Engine.INTERNAL_ANALYTICAL.value
+                    and key[2] == ""
+                    and any(
+                        other[0] == key[0]
+                        and other[1] == key[1]
+                        and other[2]
+                        for other in groups
+                    )
+                )
             }
             for rail in Rail:
                 for engine in selected_names:
-                    keys.add((rail.value, engine))
-            for rail, engine in sorted(keys):
-                stats = groups.get((rail, engine), _empty_headline_payload_stats())
-                records.append(
-                    _headline_payload_record(
-                        tier,
-                        rail,
-                        engine,
-                        stats,
-                        typed_widths=self.typed_headline_band_values.get(
-                            (tier, rail, engine)
-                        ),
-                    )
+                    if not _has_source_relation_headline_group(
+                        groups, rail.value, engine
+                    ):
+                        keys.add((rail.value, engine, ""))
+            for rail, engine, relation in sorted(keys):
+                stats = groups.get(
+                    (rail, engine, relation), _empty_headline_payload_stats()
                 )
+                record = _headline_payload_record(
+                    tier,
+                    rail,
+                    engine,
+                    stats,
+                    typed_widths=self.typed_headline_band_values.get(
+                        (tier, rail, engine)
+                    ),
+                )
+                if relation:
+                    record.update(_redox_source_relation_fields(relation))
+                records.append(record)
         self._add_compilation_decision_strata(records)
         return records
 
@@ -10026,15 +17841,13 @@ class _ScorePayloadAccumulator:
                 )
                 kinds = sorted(group["kinds"]) or ["no_band"]
                 derived_n = sorted(group["band_derived_n"])
-                if (
-                    not derived_n
-                    and not group["widths"]
-                    and self.derived_ns[(family, quantity, engine)] > 0
-                ):
-                    derived_n = [self.derived_ns[(family, quantity, engine)]]
                 widths = sorted(group["widths"])
                 units = sorted(group["units"])
-                derived = "derived_2xMAD" in kinds
+                band_fields = _compilation_band_value_fields(
+                    widths,
+                    derived_n,
+                    sorted(group["no_band_reasons"]),
+                )
                 strata.append(
                     {
                         "family": family,
@@ -10050,21 +17863,14 @@ class _ScorePayloadAccumulator:
                             else str(ratio)
                         ),
                         "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-                        "band_value": widths[0] if len(widths) == 1 else widths,
+                        **band_fields,
                         "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
                         "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-                        "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n,
                         "match_count": group["match_count"],
                         "mismatch_count": group["mismatch_count"],
                         "no_band_count": group["no_band_count"],
-                        "tail_in_count": group["tail_in_count"] if derived else None,
-                        "tail_out_count": group["tail_out_count"] if derived else None,
-                        "no_band_reason": (
-                            "derived_band_insufficient_n"
-                            if not group["widths"]
-                            and 0 < self.derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N
-                            else None
-                        ),
+                        "tail_in_count": None,
+                        "tail_out_count": None,
                     }
                 )
             record["decision_strata"] = strata
@@ -10269,10 +18075,11 @@ def render_score_report_from_payloads(
                 if observations is not None
                 else []
             ),
-            "| rail | engine | n candidates | n refused | n scored | n score eligible | "
+            "| rail | engine | population / source relation | n candidates | "
+            "n refused | n scored | n score eligible | "
             "n inside band | RMS dex | median dex | median abs dex | band width dex | "
             "RMS/band | n no band | match rate |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+            "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = (
@@ -10289,7 +18096,9 @@ def render_score_report_from_payloads(
         band = row["band_width_dex"] or "—"
         ratio = row["rms_over_band"] or "—"
         lines.append(
-            f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
+            f"| {row['rail']} | {row['engine']} | "
+            f"{row.get('population', row.get('source_relation', '—'))} | "
+            f"{row['n_candidates']} | "
             f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
             f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
             f"{row['n_no_band']} | {rate_s} |"
@@ -10457,7 +18266,13 @@ def render_score_report_from_payloads(
     else:
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
     lines.append("")
-    return "\n".join(lines)
+    report = "\n".join(lines)
+    if observations is None:
+        return report
+    pair_context = ScoreContext({}, {}, observations, origins or {})
+    return _append_quench_pair_diagnostics(
+        report, paired_quench_diagnostics(pair_context)
+    )
 
 
 def _legacy_bucket(row: Mapping[str, object]) -> str:

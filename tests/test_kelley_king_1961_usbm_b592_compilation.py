@@ -7,6 +7,7 @@ import inspect
 import json
 import math
 import re
+import runpy
 from html.parser import HTMLParser
 
 import pytest
@@ -97,6 +98,10 @@ def _assert_fixture(records, fixture):
 def test_image_verified_fixture_matches_records():
     fixture = json.loads((COMPILATION_ROOT / "source/image-verified-fixture.json").read_text())
     _assert_fixture(_records(), fixture)
+
+
+def test_published_equation_loader_reports_no_equations_when_source_has_none():
+    assert b592_loader.load_published_curves() == ()
 
 
 def test_image_verified_fixture_mutation_is_detected():
@@ -201,7 +206,44 @@ def test_actinium_image_proven_row_alignment_correction_is_explicit():
         assert correction["printed_token"] == correction["ocr_token"] == "15.0±1.0"
         assert correction["quote"]
         assert record["rows"][0]["cells"][correction["column"]]["ocr_suspect"]
-    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 308
+    # The two image-verified page-101 token corrections blank Al(g) and fill Al+++.
+    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 310
+
+
+def test_page_101_al_entropy_cells_match_the_printed_rows():
+    blocks = [
+        json.loads(line)
+        for line in (COMPILATION_ROOT / "source/mineru-tables.jsonl")
+        .read_text()
+        .splitlines()
+    ]
+    build_records = runpy.run_path(str(COMPILATION_ROOT / "harvest.py"))["build_records"]
+    records = build_records(blocks)
+
+    al_g = next(record for record in records if record["rows"][0]["raw"][0] == "Al(g)")
+    other_sources = al_g["rows"][0]["cells"]["entropy_other_sources"]
+    assert other_sources["raw"] == ""
+    correction = next(
+        item for item in al_g["corrections"]
+        if item["column"] == "entropy_other_sources"
+    )
+    assert correction["ocr_token"] == "-76±10"
+    assert correction["printed_token"] == ""
+
+    al_ion = next(
+        record for record in records if record["rows"][0]["raw"][0] == "Al+++(aq)"
+    )
+    assert al_ion["rows"][0]["cells"]["entropy_other_sources"]["raw"] == "-76±10"
+    assert al_ion["rows"][0]["cells"]["entropy_recommended"]["raw"] == "-76±10"
+
+    committed_al_g = next(
+        record for record in _records() if record["record_id"] == "table-006-0003"
+    )
+    assert committed_al_g["rows"][0]["cells"]["entropy_other_sources"]["raw"] == ""
+    committed_al_ion = next(
+        record for record in _records() if record["record_id"] == "table-006-0004"
+    )
+    assert committed_al_ion["rows"][0]["cells"]["entropy_other_sources"]["raw"] == "-76±10"
 
 
 def _assert_repaired_identities(records):
@@ -727,7 +769,9 @@ def test_all_public_loader_entry_points_preserve_suspect_safety(tmp_path):
         for name, value in inspect.getmembers(b592_loader, inspect.isfunction)
         if value.__module__ == b592_loader.__name__ and not name.startswith("_")
     }
-    assert public_functions == {"load_manifest", "load_records", "lookup_temperature"}
+    assert public_functions == {
+        "load_manifest", "load_published_curves", "load_records", "lookup_temperature"
+    }
     with pytest.raises(OCRSuspectRow):
         load_manifest()
     manifest = load_manifest(include_ocr_suspect=True)

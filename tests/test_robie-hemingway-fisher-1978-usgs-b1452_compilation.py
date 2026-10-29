@@ -1,16 +1,15 @@
 """Coverage and source-losslessness checks for USGS Bulletin 1452."""
 
 import copy
-import os
 import hashlib
 import json
 import re
 import shutil
 import subprocess
 from functools import lru_cache
-from pathlib import Path
 
 import pytest
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     COMPILATION_ROOT,
     ROLE,
@@ -39,9 +38,7 @@ MINERU_CHUNKS = [
 ]
 
 
-CORPUS_CHECKOUT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_CHECKOUT = regolith_corpus_root()
 MINERU_ROOT = (
     CORPUS_CHECKOUT
     / "text"

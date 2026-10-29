@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -34,19 +35,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    attribution: The major outgassed volatiles from ordinary chondritic material are CH4, H2, H2O, N2, and NH3 (the latter
-      at conditions where hydrous minerals form). Contrary to widely held assumptions, CO is never the major C-bearing gas
-      during ordinary chondrite metamorphism.
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type described by
+      Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
   admission:
     status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 462
+    page: 2
     published_page: 462
     pdf_page_index: 1
     paragraph: Abstract
@@ -65,6 +64,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -82,12 +82,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    attribution: The major outgassed volatiles from ordinary chondritic material are CH4, H2, H2O, N2, and NH3 (the latter
-      at conditions where hydrous minerals form). Contrary to widely held assumptions, CO is never the major C-bearing gas
-      during ordinary chondrite metamorphism.
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type described by
+      Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
   admission:
     status: rejected
     reason: Gas speciation, elemental distribution, fO2, mineralogy, and sensitivity panels exist only as Figs 2–17. No printed
@@ -120,6 +118,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -151,9 +150,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 465
+    page: 4
     published_page: 465
-    pdf_page_index: 4
+    pdf_page_index: 3
     figure: '1'
     section: '2.4'
     note: Printed T–P program numbers from §2.4 prose; Fig. 1 itself is figure-only
@@ -172,6 +171,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -200,7 +200,7 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 472
+    page: 12
     published_page: 472
     pdf_page_index: 11
     paragraph: '3.1'
@@ -212,7 +212,7 @@ observations:
         tag: value
         value: '1200'
       locator:
-        page: 472
+        page: 12
         published_page: 472
         pdf_page_index: 11
         paragraph: '3.1'
@@ -231,6 +231,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -258,9 +259,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 466
+    page: 5
     published_page: 466
-    pdf_page_index: 5
+    pdf_page_index: 4
     figure: '2'
     section: '2.5'
     note: Quoted Gooding and Muenow (1977) Holbrook L6 vacuum stepwise heating; Fig. 2 is this work's model overlay
@@ -279,6 +280,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -306,9 +308,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 466
+    page: 5
     published_page: 466
-    pdf_page_index: 5
+    pdf_page_index: 4
     section: '2.5'
     note: Quoted Muenow et al. (1995) vacuum heating of ordinary chondrites; not this work
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -326,6 +328,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -350,9 +353,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 464
+    page: 3
     published_page: 464
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '1'
     note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -370,6 +373,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -394,9 +398,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 464
+    page: 3
     published_page: 464
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '1'
     note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -414,6 +418,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -438,9 +443,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 464
+    page: 3
     published_page: 464
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '1'
     note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -458,6 +463,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -484,7 +490,7 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 472
+    page: 12
     published_page: 472
     pdf_page_index: 11
     table: '2'
@@ -504,6 +510,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -530,7 +537,7 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 472
+    page: 12
     published_page: 472
     pdf_page_index: 11
     table: '2'
@@ -550,6 +557,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -576,7 +584,7 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 472
+    page: 12
     published_page: 472
     pdf_page_index: 11
     table: '2'
@@ -596,6 +604,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -622,9 +631,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 473
+    page: 12
     published_page: 473
-    pdf_page_index: 12
+    pdf_page_index: 11
     table: '3'
     note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -642,6 +651,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -668,9 +678,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 473
+    page: 12
     published_page: 473
-    pdf_page_index: 12
+    pdf_page_index: 11
     table: '3'
     note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -688,6 +698,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -714,9 +725,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 473
+    page: 12
     published_page: 473
-    pdf_page_index: 12
+    pdf_page_index: 11
     table: '3'
     note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc

@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-008-schaefer-fegley-2004
       role: pdf
@@ -36,24 +36,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
-    - asset_id: pdf:sf04-magma-companion-workbook
-      role: pdf
-      path: raw/sf04-magma-companion-workbook/sf04-magma-companion-workbook.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:sf04-magma-companion-workbook
-      role: pdftotext
-      path: text/sf04-magma-companion-workbook
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:sf04-magma-companion-workbook
-      role: table_csv
-      path: tables/sf04-magma-companion-workbook
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:sf04-magma-companion-workbook
       role: pdftotext
       path: unknown
@@ -109,6 +91,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j) over supported oxide components.
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -210,4 +193,4 @@ experiments:
   locator:
     table: '10'
     line_range: 649-661
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md

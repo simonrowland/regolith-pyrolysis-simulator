@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:schaefer-fegley-2011-vaporization-earth
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:schaefer-fegley-2011-vaporization-earth
-      role: table_csv
-      path: tables/schaefer-fegley-2011-vaporization-earth
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:schaefer-fegley-2011-vaporization-earth
       role: pdftotext
       path: unknown
@@ -228,7 +222,7 @@ context:
     method_class: model_derived
     evidence_class: model_derived
     value_status: derived
-    derivation: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
+    derivation_note: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
     rows:
     - field: starting_composition
       value_as_printed: 50% H2O + 50% CO2
@@ -306,7 +300,7 @@ context:
     method_class: model_derived
     evidence_class: model_derived
     value_status: derived
-    derivation: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
+    derivation_note: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
     rows:
     - field: gravity
       value_as_printed: 35.2 m s^-2

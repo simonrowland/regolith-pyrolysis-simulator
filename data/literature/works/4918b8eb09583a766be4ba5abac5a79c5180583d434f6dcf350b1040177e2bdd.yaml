@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:ta-shirai-2000-lpsc
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:ta-shirai-2000-lpsc
-      role: table_csv
-      path: tables/ta-shirai-2000-lpsc
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:ta-shirai-2000-lpsc
       role: pdftotext
       path: unknown
@@ -88,6 +82,7 @@ experiments:
               section: Experiments
               note: Printed 1300 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -216,6 +211,7 @@ experiments:
               section: Experiments
               note: Printed 1300 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -344,6 +340,7 @@ experiments:
               section: Experiments
               note: Printed 1300 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -471,6 +468,7 @@ experiments:
               section: Experiments
               note: Printed 1400 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -598,6 +596,7 @@ experiments:
               section: Experiments
               note: Printed 1400 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -725,6 +724,7 @@ experiments:
               section: Experiments
               note: Printed 1400 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -852,6 +852,7 @@ experiments:
               section: Experiments
               note: Printed 1400 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -947,6 +948,7 @@ experiments:
                 section: Experiments
                 note: Printed 1400 C; unit conversion only
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value
@@ -981,6 +983,7 @@ experiments:
                 section: Experiments
                 note: Printed 30 minutes; unit conversion only
           output_unit: s
+          references: []
     cooling_or_quench:
       state:
         tag: value

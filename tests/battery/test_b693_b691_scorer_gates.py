@@ -28,6 +28,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     UncertaintyKind,
+    ValueKind,
 )
 from simulator.battery.identity import quantity_token
 from simulator.battery.records import (
@@ -38,6 +39,7 @@ from simulator.battery.records import (
     DecisionBand,
     Execution,
     Located,
+    Locator,
     Notice,
     Residual,
     ResidualNumeric,
@@ -47,6 +49,8 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.score import (
+    ENGINE_CHANNELS,
+    SCORE_ENGINE_SET,
     EnginePrediction,
     ScoreContext,
     _ResidualRowsPayloadView,
@@ -54,11 +58,13 @@ from simulator.battery.score import (
     _render_score_report_from_payloads_legacy,
     comparison_candidates,
     compile_residual,
+    dumps_residual_line,
     headline_payload_records,
     headline_records,
     headline_rows,
     score_store,
 )
+from simulator.battery.validate import ValidationIssue, ValidationReport
 from tests.battery import factories as F
 
 
@@ -339,9 +345,190 @@ def test_pin_figure_only_rows_are_comparison_candidates() -> None:
     assert bench.cell_materials[0].state.value is CellMaterial.RE
 
 
-def test_pin_figure_only_scores_with_notice_and_printed_band() -> None:
+def test_quoted_attributed_rows_score_on_every_engine_with_class_notice() -> None:
+    rows, experiments, bench = _demaria_shape_figure_rows()
+    reference = replace(
+        rows[0],
+        evidence=replace(
+            rows[0].evidence,
+            class_=State.of(EvidenceClass.QUOTED_ATTRIBUTED),
+        ),
+    )
+    context = _demaria_context([reference], experiments, bench)
+
+    def predict(engine, observation, **kwargs):
+        return replace(
+            _predict(Decimal("1e-5"), observation.identity),
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+        )
+
+    residuals, _ = score_store(
+        context,
+        engines=SCORE_ENGINE_SET,
+        include_diagnostics=True,
+        predict=predict,
+    )
+    assert {Engine(row.key.rsplit("::", 1)[-1]) for row in residuals} == set(
+        SCORE_ENGINE_SET
+    )
+    assert all(row.numeric is not None or row.refusal is not None for row in residuals)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:quoted_attributed"
+            for notice in row.notices
+        )
+        for row in residuals
+    )
+    assert all(
+        row["n"] == 0
+        for row in headline_rows(
+            residuals,
+            context=context,
+            tier="measured",
+            engines=SCORE_ENGINE_SET,
+        )
+    )
+
+
+def test_hard_validation_issue_is_labelled_without_changing_scoring() -> None:
     rows, experiments, bench = _demaria_shape_figure_rows()
     reference = rows[0]
+    context = _demaria_context([reference], experiments, bench)
+    hard_report = ValidationReport(
+        (
+            ValidationIssue(
+                path=f"observation[{reference.observation_id}].derived_from",
+                reason=RefusalReason.CONDITIONAL_FIELD,
+                detail="derived observation requires derived_from",
+            ),
+        )
+    )
+    hard_context = replace(
+        context,
+        hard_issues_by_observation=hard_report.hard_issues_by_observation,
+    )
+    def predict(engine, observation, **kwargs):
+        return replace(
+            _predict(Decimal("1e-5"), observation.identity),
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+        )
+
+    hard_residuals, _ = score_store(
+        hard_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=False,
+        predict=predict,
+    )
+    plain_residuals, _ = score_store(
+        replace(hard_context, hard_issues_by_observation={}),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=False,
+        predict=predict,
+    )
+    assert len(hard_residuals) == len(plain_residuals) == 1
+    hard_residual = hard_residuals[0]
+    plain_residual = plain_residuals[0]
+    assert hard_residual.status is not ResidualStatus.REFUSED
+    assert hard_residual.numeric is not None
+    assert hard_residual.score_eligible == plain_residual.score_eligible
+    assert hard_residual.status is plain_residual.status
+    assert hard_residual.numeric == plain_residual.numeric
+    hard_headlines = headline_rows(
+        hard_residuals,
+        context=hard_context,
+        tier="all_numeric",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert next(
+        row for row in hard_headlines if row["rail"] == Rail.VAPOUR.value
+    )["n"] == 1
+    validation_notice = next(
+        notice
+        for notice in hard_residual.notices
+        if notice.kind is NoticeKind.VALIDATION_HARD_ISSUE_LABEL
+    )
+    assert validation_notice.reason == (
+        "hard_validation_issue:conditional_field:derived_from"
+    )
+    assert validation_notice.origin == reference.observation_id
+    serialized = dumps_residual_line(hard_residual)
+    assert '"kind":"validation_hard_issue_label"' in serialized
+
+    soft_report = ValidationReport(
+        (
+            ValidationIssue(
+                path=f"observation[{reference.observation_id}].identity",
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail="identity is incomplete",
+            ),
+        )
+    )
+    assert reference.observation_id not in soft_report.hard_issues_by_observation
+    soft_residuals, _ = score_store(
+        replace(
+            context,
+            hard_issues_by_observation=soft_report.hard_issues_by_observation,
+        ),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=False,
+        predict=predict,
+    )
+    assert len(soft_residuals) == 1
+    assert soft_residuals[0].numeric == plain_residual.numeric
+    assert all(
+        notice.kind is not NoticeKind.VALIDATION_HARD_ISSUE_LABEL
+        for notice in soft_residuals[0].notices
+    )
+
+
+def test_admitted_nonmeasured_row_without_value_keeps_typed_refusals() -> None:
+    rows, experiments, bench = _demaria_shape_figure_rows()
+    reference = replace(
+        rows[0],
+        value=Value(
+            kind=ValueKind.UNAVAILABLE,
+            unavailable_reason="not reported",
+        ),
+        evidence=replace(
+            rows[0].evidence,
+            class_=State.of(EvidenceClass.QUOTED_ATTRIBUTED),
+        ),
+    )
+    context = _demaria_context([reference], experiments, bench)
+
+    residuals, _ = score_store(
+        context,
+        engines=SCORE_ENGINE_SET,
+        include_diagnostics=True,
+        predict=lambda engine, observation, **kwargs: replace(
+            _predict(Decimal("1e-5"), observation.identity),
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+        ),
+    )
+    assert len(residuals) == len(SCORE_ENGINE_SET)
+    assert all(row.status is ResidualStatus.REFUSED for row in residuals)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:quoted_attributed"
+            for notice in row.notices
+        )
+        for row in residuals
+    )
+
+
+def test_pin_figure_only_scores_with_notice_and_printed_band() -> None:
+    rows, experiments, bench = _demaria_shape_figure_rows()
+    raw_uncertainty = dict(rows[0].uncertainty.verbatim)
+    raw_uncertainty["confidence_level"] = "one_sigma"
+    reference = replace(
+        rows[0],
+        uncertainty=replace(rows[0].uncertainty, verbatim=raw_uncertainty),
+    )
     context = _demaria_context([reference], experiments, bench)
     prediction = _predict(Decimal("1.5e-5"), reference.identity)
     residual, _ = compile_residual(
@@ -359,7 +546,13 @@ def test_pin_figure_only_scores_with_notice_and_printed_band() -> None:
     # Mapped dex=0.3 reading band must be taken from this row, not erased by
     # the catalogue-composition label.
     assert residual.numeric.decision_band is not None
-    assert residual.numeric.decision_band.value == Decimal("0.3")
+    # Synthetic fixture explicitly states one_sigma for this dex field.
+    # Its two-sided 95%
+    # normal quantile z=1.959963984540054 is defined at score.py:270-275;
+    # dex stays dex. Sanity: 0.3 -> 0.5879891953620162 dex.
+    assert residual.numeric.decision_band.value == (
+        Decimal("0.3") * Decimal("1.959963984540054")
+    )
     assert "source-printed" in residual.numeric.decision_band.rule
     assert residual.score_eligible is False
     assert any(
@@ -444,7 +637,8 @@ def test_pin_reactive_re_cell_implicit_predictor_keeps_notice(monkeypatch) -> No
     from tests.battery import test_silent_fills as sf
 
     sf._capture_cell(monkeypatch)
-    # Default _kems_partial has no printed fO2 → expect typed missing_fO2 refusal.
+    # Default _kems_partial has no printed fO2. An unmodelled Re cell cannot
+    # close, so the row stays a typed missing-fO2 refusal.
     observation, experiment = sf._kems_partial(cell_material=None)
     bench = sf._cell_material_bench((CellMaterial.RE,))
     experiment = replace(experiment, bench_id=bench.id)
@@ -467,6 +661,10 @@ def test_pin_reactive_re_cell_implicit_predictor_keeps_notice(monkeypatch) -> No
     if residual.status is ResidualStatus.REFUSED:
         detail = dict(residual.refusal.detail) if residual.refusal is not None else {}
         reason = str(detail.get("reason") or detail.get("missing_input") or "")
+        assert reason not in {
+            "oxygen_balance_effusion_unsupported_engine",
+            "reactive_cell_oxygen_reservoir",
+        }, detail
         assert "fO2" in reason or reason == "missing_fO2", detail
     else:
         assert residual.numeric is not None
@@ -740,6 +938,7 @@ def test_pin_figure_mapped_dex_uncertainty_is_read() -> None:
     rows, experiments, bench = _demaria_shape_figure_rows()
     figure = replace(
         rows[0],
+        locator=Locator(page=1, figure="2"),
         notices=(),
         identity=replace(
             rows[0].identity,
@@ -762,7 +961,16 @@ def test_pin_figure_mapped_dex_uncertainty_is_read() -> None:
     )
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
+    # The field name contains sigma, but this fixture has no stated level.
+    # q6 keeps the printed width and attaches the confidence notice.
     assert residual.numeric.decision_band.value == Decimal("0.3")
+    assert any(
+        notice.reason == "confidence_level_not_stated"
+        and "sigma_log10P_dex_per_point" in notice.band
+        and "printed_width=0.3" in notice.band
+        and '"figure": "2"' in notice.band
+        for notice in residual.notices
+    )
     assert "source-printed" in residual.numeric.decision_band.rule
 
 
@@ -770,7 +978,12 @@ def test_pin_catalogue_composition_does_not_erase_figure_reading_band() -> None:
     """Finding 3: catalogue label keeps figure out of certified but keeps band."""
     rows, experiments, bench = _demaria_shape_figure_rows()
     # rows[0] already has catalogue composition + mapped dex=0.3
-    reference = rows[0]
+    raw_uncertainty = dict(rows[0].uncertainty.verbatim)
+    raw_uncertainty["confidence_level"] = "one_sigma"
+    reference = replace(
+        rows[0],
+        uncertainty=replace(rows[0].uncertainty, verbatim=raw_uncertainty),
+    )
     context = _demaria_context([reference], experiments, bench)
     residual, _ = compile_residual(
         reference,
@@ -780,7 +993,13 @@ def test_pin_catalogue_composition_does_not_erase_figure_reading_band() -> None:
     )
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
-    assert residual.numeric.decision_band.value == Decimal("0.3")
+    # Synthetic fixture explicitly states one_sigma for this dex field. Its
+    # two-sided 95%
+    # normal quantile z=1.959963984540054 is defined at score.py:270-275;
+    # dex stays dex. Sanity: 0.3 -> 0.5879891953620162 dex.
+    assert residual.numeric.decision_band.value == (
+        Decimal("0.3") * Decimal("1.959963984540054")
+    )
     assert residual.score_eligible is False
     assert any(
         notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG

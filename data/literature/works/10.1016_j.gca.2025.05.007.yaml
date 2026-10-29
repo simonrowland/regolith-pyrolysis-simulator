@@ -9,20 +9,8 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
-    - asset_id: pdf:kems-140-heck-2025
-      role: pdf
-      path: raw/kems-140-heck-2025/kems-140-heck-2025.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:kems-140-heck-2025
-      role: pdftotext
-      path: text/kems-140-heck-2025
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
     - asset_id: tables:kems-140-heck-2025
       role: table_csv
       path: tables/kems-140-heck-2025
@@ -85,6 +73,7 @@ experiments:
               note: Printed powder mass est. (mg) column spans 15 to 50 mg across 81 runs; SI unit conversion only (mg to
                 kg).
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: unknown
@@ -124,6 +113,7 @@ experiments:
         - Printed footnote atm=atmospheric air; SI definition conversion only (1 atm = 101325 Pa). Numeral 101325 is not printed.
         parameters: []
         output_unit: as_published
+        references: []
     sweep_gas:
       state:
         tag: unknown

@@ -1204,7 +1204,7 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
-        note: XANES determination for VF271. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). The 1250 °C VF271 sample was partially crystallised and below the starting composition's liquidus (SI-3, PDF p. 9).
+        note: "XANES determination for VF271. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). The 1250 °C VF271 sample was partially crystallised and below the starting composition's liquidus (SI-3, PDF p. 9). Table S-3 (PDF p. 15, SI-9) prints 0.816 ± 0.022 (S-1: ±0.019); this is the same measurement and not a second observation."
       T_range_K:
       - 1523.15
       - 1523.15
@@ -1456,6 +1456,7 @@ species:
       values:
         method_class: measured_direct
         quantity: fe3_fe2_ratio
+        sample_id: 1800-30
         Fe3_over_FeT: 0.426
         reported_value: 0.426±0.018
         analytical_method: XANES
@@ -1480,6 +1481,7 @@ species:
       values:
         method_class: measured_direct
         quantity: fe3_fe2_ratio
+        sample_id: 1900-30
         Fe3_over_FeT: 0.389
         reported_value: 0.389±0.019
         analytical_method: XANES
@@ -1504,6 +1506,7 @@ species:
       values:
         method_class: measured_direct
         quantity: fe3_fe2_ratio
+        sample_id: 2000-30
         Fe3_over_FeT: 0.407
         reported_value: 0.407±0.031
         analytical_method: XANES
@@ -1528,6 +1531,7 @@ species:
       values:
         method_class: measured_direct
         quantity: fe3_fe2_ratio
+        sample_id: 2100-30
         Fe3_over_FeT: 0.306
         reported_value: 0.306±0.018
         analytical_method: XANES
@@ -1552,6 +1556,7 @@ species:
       values:
         method_class: measured_direct
         quantity: fe3_fe2_ratio
+        sample_id: 2000-10
         Fe3_over_FeT: 0.378
         reported_value: 0.378±0.015
         analytical_method: XANES
@@ -1576,6 +1581,7 @@ species:
       values:
         method_class: measured_direct
         quantity: fe3_fe2_ratio
+        sample_id: 2000-120
         Fe3_over_FeT: 0.378
         reported_value: 0.378±0.015
         analytical_method: XANES
@@ -1621,7 +1627,7 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
-          note: Table S-3 raw values and adjusted columns as printed; VF271 raw uncertainty differs from Table S-1 (±0.022 versus ±0.019). VF271 is partially crystallised and below its liquidus; run 2000-30 is anomalous and 2000-10 is the authors' 2000 °C anchor (SI-3, PDF p. 9).
+          note: "Raw series duplicates typed Table S-1 (11/12 identical; VF271 uncertainty differs and is noted on the S-1 row); adjusted columns are model_derived. VF271 is partially crystallised and below its liquidus; run 2000-30 is anomalous and 2000-10 is the authors' 2000 °C anchor (SI-3, PDF p. 9)."
         units: fraction (Fe3+/FeT)
         values:
           evidence_class: measured_tabulated
@@ -1711,7 +1717,7 @@ species:
           evidence_class: model_derived
           equation: Eq 7
           fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
-          derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+          derivation_note: Authors' published fit parameters for this equation; not measured Fe abundance.
           h_K: 4894.0
           h_uncertainty_K: 232.5
           c: -2.581
@@ -1730,7 +1736,7 @@ species:
           evidence_class: model_derived
           equation: Eq 8
           fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
-          derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+          derivation_note: Authors' published fit parameters for this equation; not measured Fe abundance.
           h_K: 5235.0
           h_uncertainty_K: 243.4
           c: -2.786
@@ -1751,7 +1757,7 @@ species:
           evidence_class: model_derived
           equation: Eq 9
           fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
-          derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+          derivation_note: Authors' published fit parameters for this equation; not measured Fe abundance.
           h_K: 4511.0
           h_uncertainty_K: 691.7
           c: -2.349

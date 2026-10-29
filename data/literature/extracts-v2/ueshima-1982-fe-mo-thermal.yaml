@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -92,6 +93,28 @@ observations:
     note: row=A4 point of Fe; column=reference transition and ΔT
   read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+        note: No pO2/fO2 printed
+    composition:
+      state:
+        tag: value
+        value:
+          basis: Fe pure standard
+          components:
+          - - Fe
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
     temperature_K:
       state:
         tag: value
@@ -126,6 +149,7 @@ observations:
               table: '2'
               note: row=A4 point of Fe; column=reference transition and ΔT
         output_unit: K
+        references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table2_fe_melting_standard
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::pure-metal-calibration-series
   identity:
@@ -140,6 +164,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -216,6 +241,28 @@ observations:
     note: row=melting point of Fe; column=reference transition and ΔT
   read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+        note: No pO2/fO2 printed
+    composition:
+      state:
+        tag: value
+        value:
+          basis: Fe pure standard
+          components:
+          - - Fe
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
     temperature_K:
       state:
         tag: value
@@ -250,6 +297,7 @@ observations:
               table: '2'
               note: row=melting point of Fe; column=reference transition and ΔT
         output_unit: K
+        references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::pure-metal-calibration-series
   identity:
@@ -264,6 +312,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -340,6 +389,28 @@ observations:
     note: row=melting point of Pd; column=reference transition and ΔT
   read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+        note: No pO2/fO2 printed
+    composition:
+      state:
+        tag: value
+        value:
+          basis: Pd pure standard
+          components:
+          - - Pd
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
     temperature_K:
       state:
         tag: value
@@ -374,6 +445,7 @@ observations:
               table: '2'
               note: row=melting point of Pd; column=reference transition and ΔT
         output_unit: K
+        references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1596.25:row=x1;-heat-158;-x_mo=0.250:h=d3b6bdb128e2
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -388,6 +460,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -499,6 +572,7 @@ observations:
               table: '4'
               note: row=x1; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -540,6 +614,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -550,6 +625,7 @@ observations:
           table: '4'
           note: row=x1; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1602.75:row=x1;-heat-156;-x_mo=0.340:h=bc55d94cb0f9
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -564,6 +640,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -675,6 +752,7 @@ observations:
               table: '4'
               note: row=x1; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -716,6 +794,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -726,6 +805,7 @@ observations:
           table: '4'
           note: row=x1; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1605.55:row=x1;-heat-13;-x_mo=0.430:h=90e8b03d40cd
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -740,6 +820,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -851,6 +932,7 @@ observations:
               table: '4'
               note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -892,6 +974,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -902,6 +985,7 @@ observations:
           table: '4'
           note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1608.95:row=x2;-heat-151;-x_mo=0.339:h=f89cce8beb27
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -916,6 +1000,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1027,6 +1112,7 @@ observations:
               table: '4'
               note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -1068,6 +1154,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -1078,6 +1165,7 @@ observations:
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1609.95:row=x1;-heat-13;-x_mo=0.430:h=90e8b03d40cd
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -1092,6 +1180,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1203,6 +1292,7 @@ observations:
               table: '4'
               note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -1244,6 +1334,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -1254,6 +1345,7 @@ observations:
           table: '4'
           note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1614.25:row=x1;-heat-151;-x_mo=0.339:h=80f23b98c695
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -1268,6 +1360,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1379,6 +1472,7 @@ observations:
               table: '4'
               note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -1420,6 +1514,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -1430,6 +1525,7 @@ observations:
           table: '4'
           note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1614.45:row=x1;-heat-151;-x_mo=0.339:h=80f23b98c695
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -1444,6 +1540,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1555,6 +1652,7 @@ observations:
               table: '4'
               note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -1596,6 +1694,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -1606,6 +1705,7 @@ observations:
           table: '4'
           note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1616.75:row=x1;-heat-158;-x_mo=0.250:h=935dcf1f29e0
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -1620,6 +1720,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1731,6 +1832,7 @@ observations:
               table: '4'
               note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -1772,6 +1874,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -1782,6 +1885,7 @@ observations:
           table: '4'
           note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1619.45:row=x1;-heat-158;-x_mo=0.250:h=935dcf1f29e0
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -1796,6 +1900,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1907,6 +2012,7 @@ observations:
               table: '4'
               note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -1948,6 +2054,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -1958,6 +2065,7 @@ observations:
           table: '4'
           note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1623.75:row=x2;-heat-158;-x_mo=0.250:h=a92311518f78
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -1972,6 +2080,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2083,6 +2192,7 @@ observations:
               table: '4'
               note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -2124,6 +2234,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -2134,6 +2245,7 @@ observations:
           table: '4'
           note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1628.25:row=x2;-heat-158;-x_mo=0.250:h=a92311518f78
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -2148,6 +2260,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2259,6 +2372,7 @@ observations:
               table: '4'
               note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -2300,6 +2414,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -2310,6 +2425,7 @@ observations:
           table: '4'
           note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1631.95:row=x1;-heat-151;-x_mo=0.339:h=80f23b98c695
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -2324,6 +2440,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2435,6 +2552,7 @@ observations:
               table: '4'
               note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -2476,6 +2594,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -2486,6 +2605,7 @@ observations:
           table: '4'
           note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1634.15:row=x1;-heat-13;-x_mo=0.430:h=a9c5eb74e3ca
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -2500,6 +2620,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2611,6 +2732,7 @@ observations:
               table: '4'
               note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -2652,6 +2774,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -2662,6 +2785,7 @@ observations:
           table: '4'
           note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1635.55:row=x1;-heat-13;-x_mo=0.430:h=a9c5eb74e3ca
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -2676,6 +2800,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2787,6 +2912,7 @@ observations:
               table: '4'
               note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -2828,6 +2954,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -2838,6 +2965,7 @@ observations:
           table: '4'
           note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1638.15:row=x2;-heat-156;-x_mo=0.340:h=47c2c6e04cbd
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -2852,6 +2980,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2963,6 +3092,7 @@ observations:
               table: '4'
               note: row=x2; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -3004,6 +3134,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -3014,6 +3145,7 @@ observations:
           table: '4'
           note: row=x2; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1647.15:row=x2;-heat-13;-x_mo=0.430:h=0043d2100142
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -3028,6 +3160,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3139,6 +3272,7 @@ observations:
               table: '4'
               note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -3180,6 +3314,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -3190,6 +3325,7 @@ observations:
           table: '4'
           note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1647.45:row=x1;-heat-151;-x_mo=0.339:h=3066a080b11c
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -3204,6 +3340,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3315,6 +3452,7 @@ observations:
               table: '4'
               note: row=x1; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -3356,6 +3494,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -3366,6 +3505,7 @@ observations:
           table: '4'
           note: row=x1; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1647.45:row=x2;-heat-151;-x_mo=0.339:h=f89cce8beb27
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -3380,6 +3520,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3491,6 +3632,7 @@ observations:
               table: '4'
               note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -3532,6 +3674,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -3542,6 +3685,7 @@ observations:
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1647.55:row=x1;-heat-156;-x_mo=0.340:h=09f6433ba963
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -3556,6 +3700,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3667,6 +3812,7 @@ observations:
               table: '4'
               note: row=x1; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -3708,6 +3854,7 @@ observations:
                 table: '4'
                 note: row=x1; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -3718,6 +3865,7 @@ observations:
           table: '4'
           note: row=x1; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1648.15:row=x2;-heat-148;-x_mo=0.427:h=6e48f723dd68
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -3732,6 +3880,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3843,6 +3992,7 @@ observations:
               table: '4'
               note: row=x2; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -3884,6 +4034,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -3894,6 +4045,7 @@ observations:
           table: '4'
           note: row=x2; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1648.75:row=x2;-heat-151;-x_mo=0.339:h=f89cce8beb27
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -3908,6 +4060,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4019,6 +4172,7 @@ observations:
               table: '4'
               note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -4060,6 +4214,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -4070,6 +4225,7 @@ observations:
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1651.85:row=x2;-heat-13;-x_mo=0.430:h=0043d2100142
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -4084,6 +4240,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4195,6 +4352,7 @@ observations:
               table: '4'
               note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -4236,6 +4394,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -4246,6 +4405,7 @@ observations:
           table: '4'
           note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1656.15:row=x2;-heat-148;-x_mo=0.427:h=e25cff818036
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -4260,6 +4420,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4371,6 +4532,7 @@ observations:
               table: '4'
               note: row=x2; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -4412,6 +4574,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -4422,6 +4585,7 @@ observations:
           table: '4'
           note: row=x2; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1660.65:row=x2;-heat-151;-x_mo=0.339:h=91c032efc893
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -4436,6 +4600,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4547,6 +4712,7 @@ observations:
               table: '4'
               note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -4588,6 +4754,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -4598,6 +4765,7 @@ observations:
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1661.85:row=x2;-heat-151;-x_mo=0.339:h=91c032efc893
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -4612,6 +4780,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4723,6 +4892,7 @@ observations:
               table: '4'
               note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -4764,6 +4934,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -4774,6 +4945,7 @@ observations:
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1664.05:row=x2;-heat-158;-x_mo=0.250:h=4e5fec24c4e3
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -4788,6 +4960,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4899,6 +5072,7 @@ observations:
               table: '4'
               note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -4940,6 +5114,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -4950,6 +5125,7 @@ observations:
           table: '4'
           note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1664.75:row=x2;-heat-156;-x_mo=0.340:h=558a72270904
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -4964,6 +5140,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5075,6 +5252,7 @@ observations:
               table: '4'
               note: row=x2; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -5116,6 +5294,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -5126,6 +5305,7 @@ observations:
           table: '4'
           note: row=x2; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1672.15:row=x2;-heat-13;-x_mo=0.430:h=22e3e6a79bcf
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -5140,6 +5320,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5251,6 +5432,7 @@ observations:
               table: '4'
               note: row=x2; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -5292,6 +5474,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -5302,6 +5485,7 @@ observations:
           table: '4'
           note: row=x2; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1673.05:row=x2;-heat-158;-x_mo=0.250:h=4e5fec24c4e3
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -5316,6 +5500,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5427,6 +5612,7 @@ observations:
               table: '4'
               note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -5468,6 +5654,7 @@ observations:
                 table: '4'
                 note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -5478,6 +5665,7 @@ observations:
           table: '4'
           note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1704.75:row=α-=-l-+-δ;-heat-151;-x_mo=0.339:h=25aeafd6b410
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -5492,6 +5680,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5603,6 +5792,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -5644,6 +5834,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -5654,6 +5845,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1718.25:row=α-=-l-+-δ;-heat-151;-x_mo=0.339:h=25aeafd6b410
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -5668,6 +5860,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5779,6 +5972,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -5820,6 +6014,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -5830,6 +6025,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1723.65:row=α-=-l-+-δ;-heat-156;-x_mo=0.340:h=5adcdda1687e
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -5844,6 +6040,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5955,6 +6152,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 3
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -5996,6 +6194,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 3
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -6006,6 +6205,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 3
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1723.85:row=α-=-l-+-δ;-heat-156;-x_mo=0.340:h=5adcdda1687e
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -6020,6 +6220,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6131,6 +6332,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -6172,6 +6374,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -6182,6 +6385,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1724.65:row=α-=-l-+-δ;-heat-151;-x_mo=0.339:h=afc3ade50b5f
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -6196,6 +6400,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6307,6 +6512,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -6348,6 +6554,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -6358,6 +6565,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1725.85:row=α-=-l-+-δ;-heat-156;-x_mo=0.340:h=5adcdda1687e
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -6372,6 +6580,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6483,6 +6692,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -6524,6 +6734,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -6534,6 +6745,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1725.85:row=α-=-l-+-δ;-heat-158;-x_mo=0.250:h=74e7adbbfcba
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -6548,6 +6760,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6659,6 +6872,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -6700,6 +6914,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -6710,6 +6925,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1726.15:row=α-=-l-+-δ;-heat-156;-x_mo=0.340:h=85470922e128
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -6724,6 +6940,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6835,6 +7052,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -6876,6 +7094,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -6886,6 +7105,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1727.85:row=α-=-l-+-δ;-heat-158;-x_mo=0.250:h=8fafc40e4280
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -6900,6 +7120,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7011,6 +7232,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -7052,6 +7274,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -7062,6 +7285,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1728.55:row=α-=-l-+-δ;-heat-158;-x_mo=0.250:h=74e7adbbfcba
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -7076,6 +7300,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7187,6 +7412,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -7228,6 +7454,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -7238,6 +7465,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1729.15:row=α-=-l-+-δ;-heat-156;-x_mo=0.340:h=85470922e128
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -7252,6 +7480,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7363,6 +7592,7 @@ observations:
               table: '4'
               note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -7404,6 +7634,7 @@ observations:
                 table: '4'
                 note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -7414,6 +7645,7 @@ observations:
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1752.15:row=δ-=-l-+-σ;-heat-156;-x_mo=0.340:h=e4c552fc74f5
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -7428,6 +7660,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7539,6 +7772,7 @@ observations:
               table: '4'
               note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -7580,6 +7814,7 @@ observations:
                 table: '4'
                 note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -7590,6 +7825,7 @@ observations:
           table: '4'
           note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1775.45:row=δ-=-l-+-σ;-heat-148;-x_mo=0.427:h=d0bc520a6b9e
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -7604,6 +7840,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7715,6 +7952,7 @@ observations:
               table: '4'
               note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -7756,6 +7994,7 @@ observations:
                 table: '4'
                 note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -7766,6 +8005,7 @@ observations:
           table: '4'
           note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1775.95:row=δ-=-l-+-σ;-heat-156;-x_mo=0.340:h=e70700c8c042
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -7780,6 +8020,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7891,6 +8132,7 @@ observations:
               table: '4'
               note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -7932,6 +8174,7 @@ observations:
                 table: '4'
                 note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -7942,6 +8185,7 @@ observations:
           table: '4'
           note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1777.65:row=δ-=-l-+-σ;-heat-156;-x_mo=0.340:h=e70700c8c042
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -7956,6 +8200,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8067,6 +8312,7 @@ observations:
               table: '4'
               note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -8108,6 +8354,7 @@ observations:
                 table: '4'
                 note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -8118,6 +8365,7 @@ observations:
           table: '4'
           note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1793.75:row=δ-=-l-+-σ;-heat-148;-x_mo=0.427:h=0d8ec1a84b6f
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -8132,6 +8380,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8243,6 +8492,7 @@ observations:
               table: '4'
               note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -8284,6 +8534,7 @@ observations:
                 table: '4'
                 note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -8294,6 +8545,7 @@ observations:
           table: '4'
           note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1825.75:row=σ-=-l-+-(mo);-heat-149;-x_mo=0.666:h=9f4a7ef604ea
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -8308,6 +8560,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8419,6 +8672,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -8460,6 +8714,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -8470,6 +8725,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1848.35:row=σ-=-l-+-(mo);-heat-149;-x_mo=0.666:h=9f4a7ef604ea
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -8484,6 +8740,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8595,6 +8852,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -8636,6 +8894,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -8646,6 +8905,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1869.85:row=σ-=-l-+-(mo);-heat-159;-x_mo=0.613:h=c34c6b5df9f7
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -8660,6 +8920,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8771,6 +9032,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 3
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -8812,6 +9074,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 3
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -8822,6 +9085,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 3
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1872.35:row=σ-=-l-+-(mo);-heat-148;-x_mo=0.427:h=48516ac9b63c
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -8836,6 +9100,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8947,6 +9212,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -8988,6 +9254,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -8998,6 +9265,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1872.65:row=σ-=-l-+-(mo);-heat-147;-x_mo=0.427:h=07e8e4f33b1e
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -9012,6 +9280,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9123,6 +9392,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -9164,6 +9434,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -9174,6 +9445,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1875.05:row=σ-=-l-+-(mo);-heat-159;-x_mo=0.613:h=c34c6b5df9f7
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -9188,6 +9460,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9299,6 +9572,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -9340,6 +9614,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -9350,6 +9625,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1877.65:row=σ-=-l-+-(mo);-heat-159;-x_mo=0.613:h=c34c6b5df9f7
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -9364,6 +9640,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9475,6 +9752,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -9516,6 +9794,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -9526,6 +9805,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1880.55:row=σ-=-l-+-(mo);-heat-149;-x_mo=0.666:h=a30181f58428
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -9540,6 +9820,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9651,6 +9932,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -9692,6 +9974,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -9702,6 +9985,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1883.05:row=σ-=-l-+-(mo);-heat-159;-x_mo=0.613:h=460a4479ce9b
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -9716,6 +10000,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9827,6 +10112,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 2
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -9868,6 +10154,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 2
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -9878,6 +10165,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 2
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1883.15:row=σ-=-l-+-(mo);-heat-147;-x_mo=0.427:h=fdbf750beaee
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -9892,6 +10180,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10003,6 +10292,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -10044,6 +10334,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -10054,6 +10345,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1883.65:row=σ-=-l-+-(mo);-heat-159;-x_mo=0.613:h=460a4479ce9b
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -10068,6 +10360,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10179,6 +10472,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 3
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -10220,6 +10514,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 3
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -10230,6 +10525,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 3
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1884.15:row=σ-=-l-+-(mo);-heat-159;-x_mo=0.613:h=460a4479ce9b
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -10244,6 +10540,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10355,6 +10652,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -10396,6 +10694,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -10406,6 +10705,7 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 1
     output_unit: K
+    references: []
 - observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis::T=1886.45:row=σ-=-l-+-(mo);-heat-148;-x_mo=0.427:h=cc8abecbb7f2
   experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   identity:
@@ -10420,6 +10720,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10531,6 +10832,7 @@ observations:
               table: '4'
               note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tc (°C), reading 1
         output_unit: K
+        references: []
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
@@ -10572,6 +10874,7 @@ observations:
                 table: '4'
                 note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tc (°C), reading 1
           output_unit: K
+          references: []
     - - factor
       - state:
           tag: value
@@ -10582,3 +10885,4 @@ observations:
           table: '4'
           note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tc (°C), reading 1
     output_unit: K
+    references: []

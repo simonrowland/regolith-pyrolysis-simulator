@@ -53,6 +53,10 @@ import math
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional
 
+from simulator.environment import (
+    controlled_background_partial_pressure,
+    cover_gas_partial_pressures,
+)
 from simulator.state import (
     GAS_CONSTANT,  # R: J/(mol·K)
     MOLAR_MASS,  # g/mol
@@ -95,6 +99,38 @@ DEFAULT_PIPE_M_AVG_KG_MOL = 0.040  # kg/mol — fallback mole-weighted pipe gas 
 # kg/s require P1=426.45 Pa against vacuum; the forward law returns
 # 0.003000 kg/s. Both capacity and pressure inversion use this one factor.
 COMPRESSIBLE_POISEUILLE_DENOMINATOR = 256.0  # dimensionless — integrated mean-pressure factor
+
+
+def gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
+    """Return the provisional N₂-like dynamic viscosity at temperature T_K."""
+    return 1.8e-5 * (T_K / 300.0) ** 0.7
+
+
+def compressible_poiseuille_mass_flow(
+    d: float,
+    L: float,
+    M_avg: float,
+    eta: float,
+    T_K: float,
+    p_upstream_Pa: float,
+    p_downstream_Pa: float,
+) -> float:
+    """Return compressible Poiseuille mass flow in kg/s."""
+    pressure_square_delta_Pa2 = max(
+        0.0,
+        p_upstream_Pa**2 - p_downstream_Pa**2,
+    )
+    numerator = math.pi * d**4 * M_avg * pressure_square_delta_Pa2
+    denominator = (
+        COMPRESSIBLE_POISEUILLE_DENOMINATOR
+        * eta
+        * L
+        * GAS_CONSTANT
+        * T_K
+    )
+    return numerator / denominator
+
+
 DEFAULT_INITIAL_THROAT_AREA_M2 = math.pi * 0.06**2  # m² — 12 cm diameter throat back-compat anchor
 DEFAULT_CONDENSER_STAGE_AREA_RATIOS = {
     'fe_stage1': 4.0,
@@ -1159,8 +1195,10 @@ class OverheadGasModel:
                 gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
 
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
-            gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
-                gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
+            for species, partial_mbar in cover_gas_partial_pressures(
+                melt.ambient_atmosphere, melt.p_total_mbar,
+            ).items():
+                gas.composition[species] = max(gas.composition.get(species, 0.0), partial_mbar)
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — inert-sweep total pressure floor
             # Kr audit 2026-07-25: key the sweep balance partial off the
@@ -1186,11 +1224,11 @@ class OverheadGasModel:
             if background_species and background_species.upper() != 'O2':
                 background_fraction = float(  # dimensionless — background gas mole fraction
                     getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
                 gas.composition[background_species] = max(  # mbar — background gas partial pressure
                     gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
+                    controlled_background_partial_pressure(
+                        melt.p_total_mbar, melt.pO2_mbar, background_fraction,
+                    ),  # mbar — background gas partial pressure share
                 )
 
         partial_pressure_sum_mbar = sum(  # mbar — sum of nonnegative reported partial pressures
@@ -1271,8 +1309,10 @@ class OverheadGasModel:
         atmosphere_name = getattr(melt.atmosphere, 'name', '')
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — CO2 total pressure floor
-            gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
-                gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
+            for species, partial_mbar in cover_gas_partial_pressures(
+                melt.ambient_atmosphere, melt.p_total_mbar,
+            ).items():
+                gas.composition[species] = max(gas.composition.get(species, 0.0), partial_mbar)
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — sweep total pressure floor
             # Kr audit 2026-07-25: same stamped-carrier fix as the
@@ -1317,11 +1357,11 @@ class OverheadGasModel:
             if background_species and background_species.upper() != 'O2':
                 background_fraction = float(  # dimensionless — background gas mole fraction
                     getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
                 gas.composition[background_species] = max(  # mbar — background gas partial pressure
                     gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
+                    controlled_background_partial_pressure(
+                        melt.p_total_mbar, melt.pO2_mbar, background_fraction,
+                    ),  # mbar — background gas partial pressure share
                 )
 
     @staticmethod
@@ -1524,23 +1564,19 @@ class OverheadGasModel:
         # constants reduce the result to kg/s.
         # sanity: P_down=0 preserves the legacy vacuum result; P_down>=P_up
         # yields zero forward capacity instead of imaginary/negative flow.
-        pressure_square_delta_Pa2 = max(
-            0.0,
-            p_upstream_Pa**2 - p_downstream_Pa**2,
-        )  # Pa² — compressible pressure-square driving term
-        numerator = math.pi * d**4 * M_avg * pressure_square_delta_Pa2
-        denominator = (
-            COMPRESSIBLE_POISEUILLE_DENOMINATOR
-            * eta
-            * L
-            * GAS_CONSTANT
-            * T_K
+        return compressible_poiseuille_mass_flow(
+            d,
+            L,
+            M_avg,
+            eta,
+            T_K,
+            p_upstream_Pa,
+            p_downstream_Pa,
         )
-        return numerator / denominator  # kg/s — capacity at allowed upstream pressure
 
     @staticmethod
     def _gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
-        return 1.8e-5 * (T_K / 300.0) ** 0.7  # Pa·s — 1.8e-5 Pa·s at 300 K, exponent dimensionless
+        return gas_dynamic_viscosity_Pa_s(T_K)
 
     def _vapor_pressure_mbar_from_flux(
         self,

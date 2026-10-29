@@ -18,6 +18,8 @@ let flueCompositionHours = [];
 let flueCompositionLastHour = null;
 
 socket.on('simulation_tick', (data) => {
+    if (typeof window.requireSimulationTickPayloadVersion === 'function'
+        && !window.requireSimulationTickPayloadVersion(data)) return;
     // Status bar
     const setEl = (id, text) => { const e = document.getElementById(id); if (e) e.textContent = text; };
     setEl('status-hour', 'Hour: ' + data.hour);
@@ -34,7 +36,9 @@ socket.on('simulation_tick', (data) => {
         ? 'Mars CO₂: ' + (data.p_total_mbar || 0).toFixed(1) + ' mbar'
         : data.atmosphere === 'HARD_VACUUM'
             ? 'Hard vacuum'
-            : (data.atmosphere || '—');
+            : data.atmosphere === 'ARGON_FLOW'
+                ? 'Argon flow'
+                : (data.atmosphere || '—');
     setEl('status-atmosphere', 'Atmosphere: ' + atmosphereLabel);
 
     // Temperature chart

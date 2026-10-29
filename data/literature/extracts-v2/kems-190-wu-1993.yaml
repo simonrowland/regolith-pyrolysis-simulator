@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -57,27 +58,16 @@ observations:
     note: Calculated ternary peritectic and phase compositions
   read_from: pdf:kems-190-wu-1993
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          FeO: '45'
-          MgO: '10.5'
-          SiO2: '44.5'
-      locator:
-        published_page: 34
-        paragraph: For the liquid phase
-        note: Calculated ternary peritectic and phase compositions
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - FeO
-            - '0.3848538815961595365026437593'
           - - MgO
             - '0.160071867048565403089413431'
+          - - FeO
+            - '0.3848538815961595365026437593'
           - - SiO2
             - '0.4550742513552750604079428094'
           amount_basis: mole_fraction
@@ -91,22 +81,6 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '45'
-            locator:
-              published_page: 34
-              paragraph: For the liquid phase
-              note: Calculated ternary peritectic and phase compositions
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 34
-              paragraph: For the liquid phase
-              note: Calculated ternary peritectic and phase compositions
         - - original_MgO_wt_pct
           - state:
               tag: value
@@ -119,6 +93,22 @@ observations:
           - state:
               tag: value
               value: '40.304'
+            locator:
+              published_page: 34
+              paragraph: For the liquid phase
+              note: Calculated ternary peritectic and phase compositions
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              published_page: 34
+              paragraph: For the liquid phase
+              note: Calculated ternary peritectic and phase compositions
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
             locator:
               published_page: 34
               paragraph: For the liquid phase
@@ -140,6 +130,18 @@ observations:
               paragraph: For the liquid phase
               note: Calculated ternary peritectic and phase compositions
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          FeO: '45'
+          MgO: '10.5'
+          SiO2: '44.5'
+      locator:
+        published_page: 34
+        paragraph: For the liquid phase
+        note: Calculated ternary peritectic and phase compositions
 - observation_id: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=0f8bd35e2a1f
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
@@ -154,6 +156,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -194,6 +197,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -234,6 +238,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -274,6 +279,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -314,6 +320,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -354,6 +361,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -394,6 +402,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -434,6 +443,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -474,27 +484,16 @@ observations:
     note: Reported ternary peritectic and phase compositions from reference 16
   read_from: pdf:kems-190-wu-1993
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          FeO: '46'
-          MgO: '9'
-          SiO2: '45'
-      locator:
-        published_page: 33
-        paragraph: The MgO-FeO-SiO2 System
-        note: Reported ternary peritectic and phase compositions from reference 16
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - FeO
-            - '0.3970598984393691890383011162'
           - - MgO
             - '0.1384787258634930830877771051'
+          - - FeO
+            - '0.3970598984393691890383011162'
           - - SiO2
             - '0.4644613756971377278739217787'
           amount_basis: mole_fraction
@@ -508,22 +507,6 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '46'
-            locator:
-              published_page: 33
-              paragraph: The MgO-FeO-SiO2 System
-              note: Reported ternary peritectic and phase compositions from reference 16
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 33
-              paragraph: The MgO-FeO-SiO2 System
-              note: Reported ternary peritectic and phase compositions from reference 16
         - - original_MgO_wt_pct
           - state:
               tag: value
@@ -536,6 +519,22 @@ observations:
           - state:
               tag: value
               value: '40.304'
+            locator:
+              published_page: 33
+              paragraph: The MgO-FeO-SiO2 System
+              note: Reported ternary peritectic and phase compositions from reference 16
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '46'
+            locator:
+              published_page: 33
+              paragraph: The MgO-FeO-SiO2 System
+              note: Reported ternary peritectic and phase compositions from reference 16
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
             locator:
               published_page: 33
               paragraph: The MgO-FeO-SiO2 System
@@ -557,6 +556,18 @@ observations:
               paragraph: The MgO-FeO-SiO2 System
               note: Reported ternary peritectic and phase compositions from reference 16
         output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          FeO: '46'
+          MgO: '9'
+          SiO2: '45'
+      locator:
+        published_page: 33
+        paragraph: The MgO-FeO-SiO2 System
+        note: Reported ternary peritectic and phase compositions from reference 16
 - observation_id: kems-190-wu-1993::wu_1993_table1_fe2sio4_optimized_thermochemistry::rows:row=fe2sio4(s):h=38f38f1fd33f
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
@@ -571,6 +582,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -612,6 +624,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -653,6 +666,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -694,6 +708,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -735,6 +750,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -776,6 +792,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -817,6 +834,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -858,6 +876,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -898,6 +917,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -938,6 +958,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -979,6 +1000,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1019,6 +1041,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1059,6 +1082,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1099,6 +1123,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1139,6 +1164,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1181,6 +1207,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1223,6 +1250,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1265,6 +1293,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1307,6 +1336,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1349,6 +1379,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1391,6 +1422,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1433,6 +1465,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1475,6 +1508,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1517,6 +1551,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1559,6 +1594,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1601,6 +1637,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1643,6 +1680,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1685,6 +1723,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1727,6 +1766,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1769,6 +1809,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1811,6 +1852,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1853,6 +1895,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1895,6 +1938,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1937,6 +1981,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1979,6 +2024,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2021,6 +2067,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2063,6 +2110,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2105,6 +2153,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2147,6 +2196,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2189,6 +2239,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2231,6 +2282,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2273,6 +2325,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2315,6 +2368,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2402,6 +2456,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2489,6 +2544,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2576,6 +2632,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2663,6 +2720,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2750,6 +2808,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2837,6 +2896,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2923,6 +2983,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3009,6 +3070,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3095,6 +3157,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3181,6 +3244,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3267,6 +3331,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

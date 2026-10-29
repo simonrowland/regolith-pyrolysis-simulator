@@ -1,0 +1,2983 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2014-sodium-silicate-model
+source:
+  citation: Shornikov, S. I. (2014). Thermodynamic Properties of Sodium-Silicate Melts. Experimental Geochemistry,
+    2, conference abstracts, pagination not confirmed.
+  year: 2014
+extraction:
+  method: Manual transcription checked against 250 dpi pdftoppm page images; OCR is a lead only. Supplied copy
+    prints pages 48–51; the adjacent sodium-germanate abstract beginning on page 51 is out of scope.
+  date: '2026-10-05'
+  worker: codex-resume-29267-1791197769
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Na2O_SiO2_melt
+  observation_id: shornikov_2014_table1_row_01
+  field: delta_H_kJ_per_mol
+  value: -127.13
+  locator:
+    published_page: 48
+    pdf_page_index: 0
+    table: '1'
+    note: row 1
+- species: Na2O
+  observation_id: shornikov_2014_table2_melting_na2o_01
+  field: value_K
+  value: 1405.0
+  locator:
+    published_page: 49
+    pdf_page_index: 1
+    table: '2'
+    note: row 1
+- species: Na2O
+  observation_id: shornikov_2014_table3_solid_na2o_01
+  field: delta_fG
+  value: -211.201
+  locator:
+    published_page: 49
+    pdf_page_index: 1
+    table: '3'
+    note: row 1
+species:
+  Na2O_SiO2_melt:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_bibliography_context
+      type: source_metadata_context
+      locator: {published_page: 51, pdf_page_index: 3, section: References, note: Left column; sodium-silicate source only}
+      units: bibliographic identifiers as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: printed_reference_metadata
+        references:
+        - "1. Bale et al. (2002). CALPHAD, vol. 26, no. 2, pp. 189–228."
+        - "2. Barin, I. (1995). Thermochemical data of pure substances. Weinheim: VCH, 2002 p."
+        - "3. Botvinkin, O. K. (1955). Physical chemistry of silicates. M.: Promstroyizdat, 288 p. [in Russian]."
+        - "4. Chase, M. W. (1998). NIST-JANAF Thermochemical Tables. J. Phys. Chem. Ref. Data, Monograph no. 9, p. 1–1951."
+        - "5. Glushko et al. (1978–1982). Thermodynamic properties of individual substances. M.: Nauka."
+        - "6. Kozhina, E. L., M. M. Shultz (2000). Silikaty, vol. 44, no. 3, pp. 91–97."
+        - "7. Richet, P., Y. Bottinga (1986). Rev. Geophys., vol. 24, no. 1, p.p. 1–25."
+        - "8. Richet et al. (1994). Earth Planet. Sci. Lett., vol. 121, no. 3–4, pp. 589–600."
+        - "9. Roth, W. A., H. Troitzsch (1949). Z. anorg. allg. Chem., vol. 260, no. 6, pp. 337–344."
+        - "10. Rudnyi et al. (1988). Russ. Phys. Chem. Glasses, vol. 14, no. 3, pp. 453–462."
+        - "11. Shakhmatkin, B. A., N. M. Vedishcheva (1994). J. Non-Cryst. Solids, vol. 171, no. 1, pp. 1–30."
+        - "12. Shornikov, S. I. (2005). Russ. Inorg. Mater., vol. 41, no. 12, pp. 1521–1533."
+        - "13. Shornikov, S. I. (2013). Experiment in Geosciences, vol. 19, no. 1, pp. 108–111."
+        - "14. Shultz, M. M., V. L. Stolyarova, G. G. Ivanov (1987). Russ. Phys. Chem. Glasses, vol. 13, no. 2, pp. 168–172."
+        - "15. Takahashi, K., T. Yoshio (1970). J. Ceram. Soc. Japan, vol. 78, no. 1, pp. 29–38."
+        - "16. Yamaguchi, S., A. Imai, K. S. Goto (1983). J. Japan. Inst. Metals, vol. 47, no. 9, pp. 736–742."
+        - "17. Zaitsev, A. I., N. E. Shelkova, B. M. Mogutnov (2000). Russ. Inorg. Mater., vol. 36, no. 6, pp. 647–662."
+        reference_9_spelling_note: 'Reference 9 on p. 51 prints H. Troitzsch; the Table 1 caption on p. 48 and row on p. 49 print Troizsch. Both source spellings are preserved in their respective contexts.'
+    - observation_id: shornikov_2014_publication_context
+      type: source_metadata_context
+      locator: {published_page: 49, pdf_page_index: 1, section: Footer, note: Same publication footer on page 51; embedded citation on page 48 differs}
+      units: publication identifiers as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: printed_publication_metadata
+        footer_as_printed: "Experiment in Geosciences 2014 Volume 20 N 1"
+        embedded_citation_as_printed: "Shornikov, S. I. (2014), Thermodynamic properties of sodium-silicate melts. Experimental Geochemistry Vol. 2, No."
+        note: The footer and embedded citation disagree; both are retained without editorial reconciliation.
+    - observation_id: shornikov_2014_table1_row_01
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 1
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 1
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: Na4SiO4
+        compound: Na4SiO4
+        T_range_as_printed: 800–1393
+        T_min_K: 800.0
+        T_max_K: 1393.0
+        delta_H_T_as_printed: −127.13±0.76
+        delta_H_kJ_per_mol: -127.13
+        delta_H_uncertainty_kJ_per_mol: 0.76
+        delta_S_T_as_printed: −9.05±0.71
+        delta_S_J_per_mol_K: -9.05
+        delta_S_uncertainty_J_per_mol_K: 0.71
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+    - observation_id: shornikov_2014_table1_row_02
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 2
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 2
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na4SiO4
+        T_range_as_printed: 800–1350
+        T_min_K: 800.0
+        T_max_K: 1350.0
+        delta_H_T_as_printed: −127.93±0.75
+        delta_H_kJ_per_mol: -127.93
+        delta_H_uncertainty_kJ_per_mol: 0.75
+        delta_S_T_as_printed: −9.00±0.71
+        delta_S_J_per_mol_K: -9.0
+        delta_S_uncertainty_J_per_mol_K: 0.71
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_03
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 3
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 3
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na4SiO4
+        T_range_as_printed: 942–1271
+        T_min_K: 942.0
+        T_max_K: 1271.0
+        delta_H_T_as_printed: −127.10±0.62
+        delta_H_kJ_per_mol: -127.1
+        delta_H_uncertainty_kJ_per_mol: 0.62
+        delta_S_T_as_printed: −6.90±0.60
+        delta_S_J_per_mol_K: -6.9
+        delta_S_uncertainty_J_per_mol_K: 0.6
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_04
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 4
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 4
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na4SiO4
+        T_range_as_printed: 1350–2000
+        T_min_K: 1350.0
+        T_max_K: 2000.0
+        delta_H_T_as_printed: −172.29±0.41
+        delta_H_kJ_per_mol: -172.29
+        delta_H_uncertainty_kJ_per_mol: 0.41
+        delta_S_T_as_printed: −41.40±0.24
+        delta_S_J_per_mol_K: -41.4
+        delta_S_uncertainty_J_per_mol_K: 0.24
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_05
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 5
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 5
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na4SiO4
+        T_range_as_printed: 1393–1600
+        T_min_K: 1393.0
+        T_max_K: 1600.0
+        delta_H_T_as_printed: −149.86±0.75
+        delta_H_kJ_per_mol: -149.86
+        delta_H_uncertainty_kJ_per_mol: 0.75
+        delta_S_T_as_printed: −26.05±0.50
+        delta_S_J_per_mol_K: -26.05
+        delta_S_uncertainty_J_per_mol_K: 0.5
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+    - observation_id: shornikov_2014_table1_row_06
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 6
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 6
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: Na6Si2O7
+        compound: Na6Si2O7
+        T_range_as_printed: 600–893
+        T_min_K: 600.0
+        T_max_K: 893.0
+        delta_H_T_as_printed: −112.10±0.12
+        delta_H_kJ_per_mol: -112.1
+        delta_H_uncertainty_kJ_per_mol: 0.12
+        delta_S_T_as_printed: −1.12±0.17
+        delta_S_J_per_mol_K: -1.12
+        delta_S_uncertainty_J_per_mol_K: 0.17
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+    - observation_id: shornikov_2014_table1_row_07
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 7
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 7
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si2O7
+        T_range_as_printed: 800–1387
+        T_min_K: 800.0
+        T_max_K: 1387.0
+        delta_H_T_as_printed: −119.90±0.57
+        delta_H_kJ_per_mol: -119.9
+        delta_H_uncertainty_kJ_per_mol: 0.57
+        delta_S_T_as_printed: −1.08±0.53
+        delta_S_J_per_mol_K: -1.08
+        delta_S_uncertainty_J_per_mol_K: 0.53
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_08
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 8
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 8
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si2O7
+        T_range_as_printed: 1068–1285
+        T_min_K: 1068.0
+        T_max_K: 1285.0
+        delta_H_T_as_printed: −110.50±0.58
+        delta_H_kJ_per_mol: -110.5
+        delta_H_uncertainty_kJ_per_mol: 0.58
+        delta_S_T_as_printed: 6.15±0.55
+        delta_S_J_per_mol_K: 6.15
+        delta_S_uncertainty_J_per_mol_K: 0.55
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_09
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 9
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 9
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si2O7
+        T_range_as_printed: 1273–1573
+        T_min_K: 1273.0
+        T_max_K: 1573.0
+        delta_H_T_as_printed: −122.75
+        delta_H_kJ_per_mol: -122.75
+        delta_H_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_T_as_printed: −6.44
+        delta_S_J_per_mol_K: -6.44
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Yamaguchi et al., 1983
+        attribution: Yamaguchi et al., 1983
+    - observation_id: shornikov_2014_table1_row_10
+      type: data_table_row
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        table: '1'
+        note: row 10
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 10
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si2O7
+        T_range_as_printed: 1387–2000
+        T_min_K: 1387.0
+        T_max_K: 2000.0
+        delta_H_T_as_printed: −159.47±0.38
+        delta_H_kJ_per_mol: -159.47
+        delta_H_uncertainty_kJ_per_mol: 0.38
+        delta_S_T_as_printed: −29.95±0.22
+        delta_S_J_per_mol_K: -29.95
+        delta_S_uncertainty_J_per_mol_K: 0.22
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_11
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 11
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 11
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si2O7
+        T_range_as_printed: 1423–1473
+        T_min_K: 1423.0
+        T_max_K: 1473.0
+        delta_H_T_as_printed: −130.54
+        delta_H_kJ_per_mol: -130.54
+        delta_H_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_T_as_printed: −8.30
+        delta_S_J_per_mol_K: -8.3
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_12
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 12
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 12
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: Na2SiO3
+        compound: Na2SiO3
+        T_range_as_printed: '350'
+        T_min_K: 350.0
+        T_max_K: 350.0
+        delta_H_T_as_printed: −112.51±1.26
+        delta_H_kJ_per_mol: -112.51
+        delta_H_uncertainty_kJ_per_mol: 1.26
+        delta_S_T_as_printed: –
+        delta_S_J_per_mol_K:
+          tag: unknown
+          reason: source cell is a printed dash
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Roth & Troizsch, 1949
+        attribution: Roth & Troizsch, 1949
+    - observation_id: shornikov_2014_table1_row_13
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 13
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 13
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 800–1362
+        T_min_K: 800.0
+        T_max_K: 1362.0
+        delta_H_T_as_printed: −118.17±0.34
+        delta_H_kJ_per_mol: -118.17
+        delta_H_uncertainty_kJ_per_mol: 0.34
+        delta_S_T_as_printed: −3.91±0.32
+        delta_S_J_per_mol_K: -3.91
+        delta_S_uncertainty_J_per_mol_K: 0.32
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+    - observation_id: shornikov_2014_table1_row_14
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 14
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 14
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 800–1362
+        T_min_K: 800.0
+        T_max_K: 1362.0
+        delta_H_T_as_printed: −117.77±0.23
+        delta_H_kJ_per_mol: -117.77
+        delta_H_uncertainty_kJ_per_mol: 0.23
+        delta_S_T_as_printed: −3.44±0.21
+        delta_S_J_per_mol_K: -3.44
+        delta_S_uncertainty_J_per_mol_K: 0.21
+        reference_as_printed: Chase, 1998
+        attribution: Chase, 1998
+    - observation_id: shornikov_2014_table1_row_15
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 15
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 15
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 800–1360
+        T_min_K: 800.0
+        T_max_K: 1360.0
+        delta_H_T_as_printed: −119.20±0.42
+        delta_H_kJ_per_mol: -119.2
+        delta_H_uncertainty_kJ_per_mol: 0.42
+        delta_S_T_as_printed: −5.42±0.40
+        delta_S_J_per_mol_K: -5.42
+        delta_S_uncertainty_J_per_mol_K: 0.4
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_16
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 16
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 16
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 953–1110
+        T_min_K: 953.0
+        T_max_K: 1110.0
+        delta_H_T_as_printed: −115.40±0.60
+        delta_H_kJ_per_mol: -115.4
+        delta_H_uncertainty_kJ_per_mol: 0.6
+        delta_S_T_as_printed: −2.30±0.60
+        delta_S_J_per_mol_K: -2.3
+        delta_S_uncertainty_J_per_mol_K: 0.6
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_17
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 17
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 17
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 1273–1573
+        T_min_K: 1273.0
+        T_max_K: 1573.0
+        delta_H_T_as_printed: −108.62
+        delta_H_kJ_per_mol: -108.62
+        delta_H_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_T_as_printed: −0.13
+        delta_S_J_per_mol_K: -0.13
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Yamaguchi et al., 1983
+        attribution: Yamaguchi et al., 1983
+    - observation_id: shornikov_2014_table1_row_18
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 18
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 18
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 1360–2000
+        T_min_K: 1360.0
+        T_max_K: 2000.0
+        delta_H_T_as_printed: −149.57±0.11
+        delta_H_kJ_per_mol: -149.57
+        delta_H_uncertainty_kJ_per_mol: 0.11
+        delta_S_T_as_printed: −27.61±0.06
+        delta_S_J_per_mol_K: -27.61
+        delta_S_uncertainty_J_per_mol_K: 0.06
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_19
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 19
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 19
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 1362–1600
+        T_min_K: 1362.0
+        T_max_K: 1600.0
+        delta_H_T_as_printed: −120.70±0.40
+        delta_H_kJ_per_mol: -120.7
+        delta_H_uncertainty_kJ_per_mol: 0.4
+        delta_S_T_as_printed: −5.63±0.27
+        delta_S_J_per_mol_K: -5.63
+        delta_S_uncertainty_J_per_mol_K: 0.27
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+    - observation_id: shornikov_2014_table1_row_20
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 20
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 20
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 1362–1600
+        T_min_K: 1362.0
+        T_max_K: 1600.0
+        delta_H_T_as_printed: −96.31±0.04
+        delta_H_kJ_per_mol: -96.31
+        delta_H_uncertainty_kJ_per_mol: 0.04
+        delta_S_T_as_printed: 12.04±0.03
+        delta_S_J_per_mol_K: 12.04
+        delta_S_uncertainty_J_per_mol_K: 0.03
+        reference_as_printed: Chase, 1998
+        attribution: Chase, 1998
+    - observation_id: shornikov_2014_table1_row_21
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 21
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 21
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 1362–1600
+        T_min_K: 1362.0
+        T_max_K: 1600.0
+        delta_H_T_as_printed: −89.40
+        delta_H_kJ_per_mol: -89.4
+        delta_H_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_T_as_printed: '16.79'
+        delta_S_J_per_mol_K: 16.79
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Shornikov, 2005
+        attribution: Shornikov, 2005
+    - observation_id: shornikov_2014_table1_row_22
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 22
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 22
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_range_as_printed: 1363–1719
+        T_min_K: 1363.0
+        T_max_K: 1719.0
+        delta_H_T_as_printed: −116.76±0.60
+        delta_H_kJ_per_mol: -116.76
+        delta_H_uncertainty_kJ_per_mol: 0.6
+        delta_S_T_as_printed: −4.26±0.60
+        delta_S_J_per_mol_K: -4.26
+        delta_S_uncertainty_J_per_mol_K: 0.6
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_23
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 23
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 23
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: Na2Si2O5
+        compound: Na2Si2O5
+        T_range_as_printed: 800–1147
+        T_min_K: 800.0
+        T_max_K: 1147.0
+        delta_H_T_as_printed: −76.27±0.26
+        delta_H_kJ_per_mol: -76.27
+        delta_H_uncertainty_kJ_per_mol: 0.26
+        delta_S_T_as_printed: 0.27±0.28
+        delta_S_J_per_mol_K: 0.27
+        delta_S_uncertainty_J_per_mol_K: 0.28
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+    - observation_id: shornikov_2014_table1_row_24
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 24
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 24
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_range_as_printed: 800–1141
+        T_min_K: 800.0
+        T_max_K: 1141.0
+        delta_H_T_as_printed: −77.16±0.28
+        delta_H_kJ_per_mol: -77.16
+        delta_H_uncertainty_kJ_per_mol: 0.28
+        delta_S_T_as_printed: 3.50±0.29
+        delta_S_J_per_mol_K: 3.5
+        delta_S_uncertainty_J_per_mol_K: 0.29
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_25
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 25
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 25
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_range_as_printed: 973–1078
+        T_min_K: 973.0
+        T_max_K: 1078.0
+        delta_H_T_as_printed: −75.66±0.72
+        delta_H_kJ_per_mol: -75.66
+        delta_H_uncertainty_kJ_per_mol: 0.72
+        delta_S_T_as_printed: 5.70±0.70
+        delta_S_J_per_mol_K: 5.7
+        delta_S_uncertainty_J_per_mol_K: 0.7
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_26
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 26
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 26
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_range_as_printed: 1147–1400
+        T_min_K: 1147.0
+        T_max_K: 1400.0
+        delta_H_T_as_printed: −64.77±0.35
+        delta_H_kJ_per_mol: -64.77
+        delta_H_uncertainty_kJ_per_mol: 0.35
+        delta_S_T_as_printed: 12.91±0.27
+        delta_S_J_per_mol_K: 12.91
+        delta_S_uncertainty_J_per_mol_K: 0.27
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+    - observation_id: shornikov_2014_table1_row_27
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 27
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 27
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_range_as_printed: 1147–1600
+        T_min_K: 1147.0
+        T_max_K: 1600.0
+        delta_H_T_as_printed: −61.09
+        delta_H_kJ_per_mol: -61.09
+        delta_H_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_T_as_printed: '16.66'
+        delta_S_J_per_mol_K: 16.66
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Shornikov, 2005
+        attribution: Shornikov, 2005
+    - observation_id: shornikov_2014_table1_row_28
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 28
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 28
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_range_as_printed: 1148–1719
+        T_min_K: 1148.0
+        T_max_K: 1719.0
+        delta_H_T_as_printed: −80.60±1.67
+        delta_H_kJ_per_mol: -80.6
+        delta_H_uncertainty_kJ_per_mol: 1.67
+        delta_S_T_as_printed: 2.46±0.70
+        delta_S_J_per_mol_K: 2.46
+        delta_S_uncertainty_J_per_mol_K: 0.7
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_29
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 29
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 29
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_range_as_printed: 1273–1573
+        T_min_K: 1273.0
+        T_max_K: 1573.0
+        delta_H_T_as_printed: −83.88
+        delta_H_kJ_per_mol: -83.88
+        delta_H_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_T_as_printed: '0.05'
+        delta_S_J_per_mol_K: 0.05
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Yamaguchi et al., 1983
+        attribution: Yamaguchi et al., 1983
+    - observation_id: shornikov_2014_table1_row_30
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 30
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 30
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_range_as_printed: 1400–2000
+        T_min_K: 1400.0
+        T_max_K: 2000.0
+        delta_H_T_as_printed: −92.97±0.07
+        delta_H_kJ_per_mol: -92.97
+        delta_H_uncertainty_kJ_per_mol: 0.07
+        delta_S_T_as_printed: −7.68±0.04
+        delta_S_J_per_mol_K: -7.68
+        delta_S_uncertainty_J_per_mol_K: 0.04
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_31
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 31
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 31
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: Na6Si8O19
+        compound: Na6Si8O19
+        T_range_as_printed: 973–1066
+        T_min_K: 973.0
+        T_max_K: 1066.0
+        delta_H_T_as_printed: −61.99±0.13
+        delta_H_kJ_per_mol: -61.99
+        delta_H_uncertainty_kJ_per_mol: 0.13
+        delta_S_T_as_printed: 3.97±0.13
+        delta_S_J_per_mol_K: 3.97
+        delta_S_uncertainty_J_per_mol_K: 0.13
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table1_row_32
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 32
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 32
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si8O19
+        T_range_as_printed: 974–1071
+        T_min_K: 974.0
+        T_max_K: 1071.0
+        delta_H_T_as_printed: −58.30±0.76
+        delta_H_kJ_per_mol: -58.3
+        delta_H_uncertainty_kJ_per_mol: 0.76
+        delta_S_T_as_printed: 6.70±0.70
+        delta_S_J_per_mol_K: 6.7
+        delta_S_uncertainty_J_per_mol_K: 0.7
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_33
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 33
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 33
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si8O19
+        T_range_as_printed: 1080–1719
+        T_min_K: 1080.0
+        T_max_K: 1719.0
+        delta_H_T_as_printed: −66.25±0.76
+        delta_H_kJ_per_mol: -66.25
+        delta_H_uncertainty_kJ_per_mol: 0.76
+        delta_S_T_as_printed: 2.79±0.70
+        delta_S_J_per_mol_K: 2.79
+        delta_S_uncertainty_J_per_mol_K: 0.7
+        reference_as_printed: Zaitsev et al., 2000
+        attribution: Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table1_row_34
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 34
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 34
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si8O19
+        T_range_as_printed: 1081–1600
+        T_min_K: 1081.0
+        T_max_K: 1600.0
+        delta_H_T_as_printed: −50.35
+        delta_H_kJ_per_mol: -50.35
+        delta_H_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_T_as_printed: '14.05'
+        delta_S_J_per_mol_K: 14.05
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Shornikov, 2005
+        attribution: Shornikov, 2005
+    - observation_id: shornikov_2014_table1_row_35
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 35
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 35
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si8O19
+        T_range_as_printed: 1273–1573
+        T_min_K: 1273.0
+        T_max_K: 1573.0
+        delta_H_T_as_printed: −71.72
+        delta_H_kJ_per_mol: -71.72
+        delta_H_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_T_as_printed: −0.35
+        delta_S_J_per_mol_K: -0.35
+        delta_S_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Yamaguchi et al., 1983
+        attribution: Yamaguchi et al., 1983
+    - observation_id: shornikov_2014_table1_row_36
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '1'
+        note: row 36
+      units: T in K; ΔH in kJ/mole; ΔS in J/(mole·K), as printed
+      values:
+        table: '1'
+        row: 36
+        method_class: quoted_attributed
+        quantity: formation_enthalpy_and_entropy_from_simple_oxides
+        compound_as_printed: – " –
+        compound: Na6Si8O19
+        T_range_as_printed: 1400–2000
+        T_min_K: 1400.0
+        T_max_K: 2000.0
+        delta_H_T_as_printed: −82.51±0.28
+        delta_H_kJ_per_mol: -82.51
+        delta_H_uncertainty_kJ_per_mol: 0.28
+        delta_S_T_as_printed: −11.30±0.17
+        delta_S_J_per_mol_K: -11.3
+        delta_S_uncertainty_J_per_mol_K: 0.17
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+    - observation_id: shornikov_2014_table2_row_01
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 1
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 1
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: Na2O
+        compound: Na2O
+        T_m_as_printed: 1405±2
+        value_K: 1405.0
+        T_m_uncertainty_K: 2.0
+        delta_H_m_as_printed: 36.00±4.00
+        delta_H_m_kJ_per_mol: 36.0
+        delta_H_m_uncertainty_kJ_per_mol: 4.0
+        delta_S_m_as_printed: 25.62±2.84
+        delta_S_m_J_per_mol_K: 25.62
+        delta_S_m_uncertainty_J_per_mol_K: 2.84
+        reference_as_printed: Glushko et al., 1978–1982
+        attribution: Glushko et al., 1978–1982
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_02
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 2
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 2
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2O
+        T_m_as_printed: 1405±1
+        value_K: 1405.0
+        T_m_uncertainty_K: 1.0
+        delta_H_m_as_printed: 33.94±1.50
+        delta_H_m_kJ_per_mol: 33.94
+        delta_H_m_uncertainty_kJ_per_mol: 1.5
+        delta_S_m_as_printed: 47.70±1.50
+        delta_S_m_J_per_mol_K: 47.7
+        delta_S_m_uncertainty_J_per_mol_K: 1.5
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_03
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 3
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 3
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2O
+        T_m_as_printed: 1405±1
+        value_K: 1405.0
+        T_m_uncertainty_K: 1.0
+        delta_H_m_as_printed: 47.70±2.00
+        delta_H_m_kJ_per_mol: 47.7
+        delta_H_m_uncertainty_kJ_per_mol: 2.0
+        delta_S_m_as_printed: 33.95±1.42
+        delta_S_m_J_per_mol_K: 33.95
+        delta_S_m_uncertainty_J_per_mol_K: 1.42
+        reference_as_printed: Chase, 1998
+        attribution: Chase, 1998
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_04
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 4
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 4
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: Na4SiO4
+        compound: Na4SiO4
+        T_m_as_printed: 1393±1
+        value_K: 1393.0
+        T_m_uncertainty_K: 1.0
+        delta_H_m_as_printed: 19.25±1.67
+        delta_H_m_kJ_per_mol: 19.25
+        delta_H_m_uncertainty_kJ_per_mol: 1.67
+        delta_S_m_as_printed: 13.82±1.20
+        delta_S_m_J_per_mol_K: 13.82
+        delta_S_m_uncertainty_J_per_mol_K: 1.2
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_05
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 5
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 5
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: Na6Si2O7
+        compound: Na6Si2O7
+        T_m_as_printed: '1387'
+        value_K: 1387.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: —
+        delta_H_m_kJ_per_mol:
+          tag: unknown
+          reason: source cell is a printed dash
+        delta_H_m_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_m_as_printed: —
+        delta_S_m_J_per_mol_K:
+          tag: unknown
+          reason: source cell is a printed dash
+        delta_S_m_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Bale et al., 2002
+        attribution: Bale et al., 2002
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_06
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 6
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 6
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: Na2SiO3
+        compound: Na2SiO3
+        T_m_as_printed: '1361'
+        value_K: 1361.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: '23.12'
+        delta_H_m_kJ_per_mol: 23.12
+        delta_H_m_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_m_as_printed: '16.99'
+        delta_S_m_J_per_mol_K: 16.99
+        delta_S_m_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Botvinkin, 1955
+        attribution: Botvinkin, 1955
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_07
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 7
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 7
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_m_as_printed: '1361'
+        value_K: 1361.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: '35.98'
+        delta_H_m_kJ_per_mol: 35.98
+        delta_H_m_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_m_as_printed: '26.43'
+        delta_S_m_J_per_mol_K: 26.43
+        delta_S_m_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Takahashi & Yoshio, 1970
+        attribution: Takahashi & Yoshio, 1970
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_08
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 8
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 8
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_m_as_printed: '1362'
+        value_K: 1362.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: 26.00±0.50
+        delta_H_m_kJ_per_mol: 26.0
+        delta_H_m_uncertainty_kJ_per_mol: 0.5
+        delta_S_m_as_printed: 19.09±0.38
+        delta_S_m_J_per_mol_K: 19.09
+        delta_S_m_uncertainty_J_per_mol_K: 0.38
+        reference_as_printed: Richet et al., 1994
+        attribution: Richet et al., 1994
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_09
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 9
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 9
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_m_as_printed: 1362±1
+        value_K: 1362.0
+        T_m_uncertainty_K: 1.0
+        delta_H_m_as_printed: 19.02±1.50
+        delta_H_m_kJ_per_mol: 19.02
+        delta_H_m_uncertainty_kJ_per_mol: 1.5
+        delta_S_m_as_printed: 25.90±1.20
+        delta_S_m_J_per_mol_K: 25.9
+        delta_S_m_uncertainty_J_per_mol_K: 1.2
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_10
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 10
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 10
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2SiO3
+        T_m_as_printed: 1362±1
+        value_K: 1362.0
+        T_m_uncertainty_K: 1.0
+        delta_H_m_as_printed: 25.90±2.10
+        delta_H_m_kJ_per_mol: 25.9
+        delta_H_m_uncertainty_kJ_per_mol: 2.1
+        delta_S_m_as_printed: 19.02±1.54
+        delta_S_m_J_per_mol_K: 19.02
+        delta_S_m_uncertainty_J_per_mol_K: 1.54
+        reference_as_printed: Chase, 1998
+        attribution: Chase, 1998
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_11
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 11
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 11
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: Na2Si2O5
+        compound: Na2Si2O5
+        T_m_as_printed: '1157'
+        value_K: 1157.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: '13.37'
+        delta_H_m_kJ_per_mol: 13.37
+        delta_H_m_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_m_as_printed: '11.56'
+        delta_S_m_J_per_mol_K: 11.56
+        delta_S_m_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Botvinkin, 1955
+        attribution: Botvinkin, 1955
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_12
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 12
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 12
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_m_as_printed: '1157'
+        value_K: 1157.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: '15.48'
+        delta_H_m_kJ_per_mol: 15.48
+        delta_H_m_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_m_as_printed: '13.38'
+        delta_S_m_J_per_mol_K: 13.38
+        delta_S_m_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Takahashi & Yoshio, 1970
+        attribution: Takahashi & Yoshio, 1970
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_13
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 13
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 13
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_m_as_printed: '1147'
+        value_K: 1147.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: 12.57±1.38
+        delta_H_m_kJ_per_mol: 12.57
+        delta_H_m_uncertainty_kJ_per_mol: 1.38
+        delta_S_m_as_printed: 10.96±1.20
+        delta_S_m_J_per_mol_K: 10.96
+        delta_S_m_uncertainty_J_per_mol_K: 1.2
+        reference_as_printed: Richet & Bottinga, 1986
+        attribution: Richet & Bottinga, 1986
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_14
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 14
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 14
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: Na2Si2O5
+        T_m_as_printed: '1147'
+        value_K: 1147.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: 10.34±1.50
+        delta_H_m_kJ_per_mol: 10.34
+        delta_H_m_uncertainty_kJ_per_mol: 1.5
+        delta_S_m_as_printed: 9.01±1.31
+        delta_S_m_J_per_mol_K: 9.01
+        delta_S_m_uncertainty_J_per_mol_K: 1.31
+        reference_as_printed: Barin, 1995
+        attribution: Barin, 1995
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_15
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 15; * dissociation temperature
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 15
+        method_class: quoted_attributed
+        quantity: dissociation_temperature_and_tabulated_enthalpy_entropy
+        property_kind: dissociation_temperature
+        compound_as_printed: Na6Si8O19
+        compound: Na6Si8O19
+        T_m_as_printed: 1081±10*
+        value_K: 1081.0
+        T_m_uncertainty_K: 10.0
+        delta_H_m_as_printed: '7.95'
+        delta_H_m_kJ_per_mol: 7.95
+        delta_H_m_uncertainty_kJ_per_mol:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_S_m_as_printed: '7.35'
+        delta_S_m_J_per_mol_K: 7.35
+        delta_S_m_uncertainty_J_per_mol_K:
+          tag: unknown
+          reason: uncertainty not printed
+        reference_as_printed: Shornikov, 2005
+        attribution: Shornikov, 2005
+        footnote_as_printed: '* dissociation temperature'
+    - observation_id: shornikov_2014_table2_row_16
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 16
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 16
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: SiO2
+        compound: SiO2
+        T_m_as_printed: 1996±5
+        value_K: 1996.0
+        T_m_uncertainty_K: 5.0
+        delta_H_m_as_printed: 9.80±0.50
+        delta_H_m_kJ_per_mol: 9.8
+        delta_H_m_uncertainty_kJ_per_mol: 0.5
+        delta_S_m_as_printed: 4.81±0.50
+        delta_S_m_J_per_mol_K: 4.81
+        delta_S_m_uncertainty_J_per_mol_K: 0.5
+        reference_as_printed: Glushko et al., 1978–1982
+        attribution: Glushko et al., 1978–1982
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_table2_row_17
+      type: data_table_row
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 17
+      units: T in K; ΔHm in kJ/mole; ΔSm in J/(mole·K), as printed
+      values:
+        table: '2'
+        row: 17
+        method_class: quoted_attributed
+        quantity: melting_temperature_and_melting_enthalpy_entropy
+        property_kind: melting_point
+        compound_as_printed: – " –
+        compound: SiO2
+        T_m_as_printed: '1996'
+        value_K: 1996.0
+        T_m_uncertainty_K:
+          tag: unknown
+          reason: uncertainty not printed
+        delta_H_m_as_printed: 9.57±0.50
+        delta_H_m_kJ_per_mol: 9.57
+        delta_H_m_uncertainty_kJ_per_mol: 0.5
+        delta_S_m_as_printed: 4.79±0.50
+        delta_S_m_J_per_mol_K: 4.79
+        delta_S_m_uncertainty_J_per_mol_K: 0.5
+        reference_as_printed: Barin et al., 1995
+        attribution: Barin et al., 1995
+        footnote_as_printed:
+          tag: unknown
+          reason: no footnote for this row
+    - observation_id: shornikov_2014_model_scope_and_experiment_facts
+      type: model_and_experiment_scope
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        note: Abstract and calculation description; page 50 conclusion
+      units: as printed
+      values:
+        method_class: model_derived
+        quantity: author_model_scope
+        system: Na2O–SiO2 melts
+        temperature_range_K:
+        - 900.0
+        - 1800.0
+        model: semi-empirical model within the theory of ideal associated solutions; simplified lattice model
+          with semi-phenomenological intermolecular-interaction parameters
+        parameter_basis: experimental and reference thermodynamic data
+        model_antecedent_as_printed: "The simplified lattice model, as before for the K2O–SiO2 systems [Shornikov, 2013], accounts for the intermolecular interactions using the semi-phenomenological parameters."
+        parameter_sources_as_printed: "Experimental [Kozhina & Shultz, 2000; Zaitsev et al., 2000] and reference [Glushko et al., 1978–1982; Barin et al., 1993; Chase, 1998] thermodynamic data, presented in the table 1 and 2."
+        equilibrium_solver: Gibbs energy minimization
+        initial_thermodynamic_data:
+          condensed_phases_total: 13
+          solid_phases: 7
+          liquid_phases: 6
+          gas_species: 14
+        author_experiment:
+          tag: not_applicable
+          reason: The source describes calculations and contains no new experimental procedure or run set.
+        cell_material:
+          tag: unknown
+          reason: No cell is reported for this calculation abstract.
+        liner_material:
+          tag: unknown
+          reason: No liner is reported for this calculation abstract.
+        orifice_diameter:
+          tag: unknown
+          reason: No effusion orifice is reported for this calculation abstract.
+        orifice_channel_length:
+          tag: unknown
+          reason: No effusion channel is reported for this calculation abstract.
+        pressure_calibration_method:
+          tag: unknown
+          reason: No new pressure measurement or intensity conversion is reported.
+        calibration_substance:
+          tag: unknown
+          reason: No new pressure measurement is reported.
+        ionization_cross_sections_and_source:
+          tag: unknown
+          reason: No new mass-spectrometric measurement is reported.
+        ionization_energy_eV:
+          tag: unknown
+          reason: No new mass-spectrometric measurement is reported.
+        multiplier_or_isotope_corrections:
+          tag: unknown
+          reason: No new mass-spectrometric measurement is reported.
+        temperature_measurement_and_calibration:
+          tag: unknown
+          reason: No experimental run or temperature instrument is reported.
+        temperature_uncertainty:
+          tag: unknown
+          reason: No experimental temperature uncertainty is reported.
+        background_pressure_Pa:
+          tag: unknown
+          reason: No experimental chamber or residual pressure is reported.
+        sample_preparation_and_starting_materials:
+          tag: unknown
+          reason: No sample preparation is reported for the calculation study.
+        sample_purity:
+          tag: unknown
+          reason: No sample purity is reported for the calculation study.
+        composition_as_prepared:
+          tag: unknown
+          reason: No experimental composition is reported; plotted composition axes are not digitized.
+        composition_after_runs:
+          tag: not_applicable
+          reason: The source reports no experimental runs.
+        uncertainty:
+          tag: unknown
+          reason: No uncertainty for the present model values is stated.
+    - observation_id: shornikov_2014_activity_definitions
+      type: activity_definition_context
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        figure: '2'
+        note: Figures 2 and 3 captions identify a(Na2O) and a(SiO2); no ion definition or standard state is
+          given.
+      units: dimensionless activity as labeled in figures
+      values:
+        method_class: figure_only
+        quantity: activity_definition_and_reference_state
+        activity_species:
+        - Na2O
+        - SiO2
+        activities_shown:
+        - a(Na2O)
+        - a(SiO2)
+        activity_ions:
+          Na2O:
+            tag: unknown
+            reason: No ion species or mass-to-charge assignment is stated in this abstract.
+          SiO2:
+            tag: unknown
+            reason: No ion species or mass-to-charge assignment is stated in this abstract.
+        standard_state:
+          Na2O:
+            tag: unknown
+            reason: The source does not state the activity standard state.
+          SiO2:
+            tag: unknown
+            reason: The source does not state the activity standard state.
+    - observation_id: shornikov_2014_prior_emf_comparator_conditions
+      type: comparison_method_context
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        figure: '2'
+        note: Figure 2 caption
+      units: temperature in K, as printed
+      values:
+        method_class: quoted_attributed
+        quantity: prior_experimental_comparator
+        method: emf_cell
+        temperature_K:
+        - 1273.0
+        - 1300.0
+        attribution: Yamaguchi et al., 1983; Kozhina & Shultz, 2000
+        measured_quantity: mixing energy plotted in Figure 2(b)
+        apparatus_details:
+          tag: unknown
+          reason: Not reported in this abstract for cited prior studies.
+        cell_material_and_liner:
+          tag: unknown
+          reason: Not reported in this abstract.
+        calibration_and_conversion:
+          tag: unknown
+          reason: Not reported in this abstract.
+        temperature_sensor_and_calibration:
+          tag: unknown
+          reason: Not reported in this abstract.
+        sample_composition_or_preparation:
+          tag: unknown
+          reason: Not reported in this abstract.
+    - observation_id: shornikov_2014_prior_kems_comparator_conditions
+      type: comparison_method_context
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        figure: '2'
+        note: Figure 2 caption
+      units: temperature in K, as printed
+      values:
+        method_class: quoted_attributed
+        quantity: prior_experimental_comparator
+        method: knudsen_effusion
+        temperature_K:
+        - 1293.0
+        - 1273.0
+        attribution: Shultz et al., 1987; Zaitsev et al., 2000
+        measured_quantity: mixing energy plotted in Figure 2(b)
+        apparatus_details:
+          tag: unknown
+          reason: Not reported in this abstract for cited prior studies.
+        cell_material_and_liner:
+          tag: unknown
+          reason: Not reported in this abstract.
+        orifice_geometry:
+          tag: unknown
+          reason: Not reported in this abstract.
+        calibration_and_intensity_conversion:
+          tag: unknown
+          reason: Not reported in this abstract.
+        ionization_energy_cross_sections_multipliers:
+          tag: unknown
+          reason: Not reported in this abstract.
+        temperature_sensor_and_calibration:
+          tag: unknown
+          reason: Not reported in this abstract.
+        background_pressure_Pa:
+          tag: unknown
+          reason: Not reported in this abstract.
+        sample_composition_or_preparation:
+          tag: unknown
+          reason: Not reported in this abstract.
+    - observation_id: shornikov_2014_prior_kems_activity_comparator_conditions
+      type: comparison_method_context
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        figure: '3'
+        note: Figure 3 caption
+      units: temperature in K, as printed
+      values:
+        method_class: quoted_attributed
+        quantity: prior_experimental_comparator
+        method: knudsen_effusion
+        temperature_K: 1473.0
+        attribution: Shultz et al., 1987; Rudnyi et al., 1988; Zaitsev et al., 2000
+        measured_quantity: Na2O and SiO2 activities plotted in Figure 3
+        apparatus_details:
+          tag: unknown
+          reason: Not reported in this abstract for cited prior studies.
+        cell_material_and_liner:
+          tag: unknown
+          reason: Not reported in this abstract.
+        orifice_geometry:
+          tag: unknown
+          reason: Not reported in this abstract.
+        calibration_and_intensity_conversion:
+          tag: unknown
+          reason: Not reported in this abstract.
+        ionization_energy_cross_sections_multipliers:
+          tag: unknown
+          reason: Not reported in this abstract.
+        temperature_sensor_and_calibration:
+          tag: unknown
+          reason: Not reported in this abstract.
+        background_pressure_Pa:
+          tag: unknown
+          reason: Not reported in this abstract.
+        sample_composition_or_preparation:
+          tag: unknown
+          reason: Not reported in this abstract.
+    - observation_id: shornikov_2014_qualifying_data_statements
+      type: data_qualification_context
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        note: Introduction paragraph, continued page 50 discussion and conclusion.
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: author_data_qualifications
+        contradictory_prior_properties: In spite of numerous investigations [Shakhmatkin & Vedishcheva, 1994],
+          the thermodynamic properties of these compounds are contradictory that was considered earlier [Shornikov,
+          2005].
+        discussion_model_agreement: According to fig. 2 and 3, the calculated values of oxide activities a(i)
+          and mixing energies (ΔG) of the Na2O–SiO2 melts are well correspond to the experimental data [Yamaguchi
+          et al., 1983; Rudnyi et al., 1988; Kozhina & Shultz, 2000; Zaitsev et al., 2000] and phase diagram
+          calculated by Zaitsev et al. [Zaitsev et al., 2000].
+        discussion_shultz_difference: The observed differences of data obtained by Shultz et al. [Shultz et
+          al., 1987] from the results of other experimental studies and the present study calculations, probably,
+          are caused by the systematic errors due to the partial oxygen determination needed for the sodium
+          oxide activity calculations.
+        conclusion_temperature_and_agreement: Thus, within the framework of the developed semi-empirical model
+          based on the theory of ideal associated solution, the thermodynamic properties of the Na2O–SiO2 melts
+          were calculated in the temperature range of 900–1800 K. The calculation results are corresponding
+          to available experimental data.
+        conclusion_use: They also can be used as for theoretical calculations of thermodynamic properties of
+          multicomponent melts containing this system compounds and in the practical purposes.
+        translation_note: The phrases “are well correspond”, “are corresponding”, and “as for ... in the practical
+          purposes” are retained as printed; the English translation is grammatically garbled.
+    - observation_id: shornikov_2014_figure_1_figure_only
+      type: figure_only
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        note: Figure 1 caption
+      units: as printed
+      values:
+        method_class: figure_only
+        quantity: figure_only_context
+        figure: '1'
+        description: Phase diagram attributed to Zaitsev et al. (2000); not digitized.
+        temperatures_K: []
+        attribution: Zaitsev et al., 2000
+        digitization:
+          tag: not_applicable
+          reason: No plotted curve or symbol values digitized.
+    - observation_id: shornikov_2014_figure_2_figure_only
+      type: figure_only
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        note: Figure 2 caption
+      units: as printed
+      values:
+        method_class: figure_only
+        quantity: figure_only_context
+        figure: '2'
+        description: 'Panel (a): calculated activities at 1173 K; panel (b): mixing energy at 1300 K, cited
+          results and present-study model line; not digitized.'
+        temperatures_K:
+        - 1173.0
+        - 1300.0
+        attribution: Yamaguchi et al., 1983; Kozhina & Shultz, 2000; Shultz et al., 1987; Zaitsev et al., 2000
+        digitization:
+          tag: not_applicable
+          reason: No plotted curve or symbol values digitized.
+    - observation_id: shornikov_2014_figure_3_figure_only
+      type: figure_only
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        note: Figure 3 caption
+      units: as printed
+      values:
+        method_class: figure_only
+        quantity: figure_only_context
+        figure: '3'
+        description: Na2O and SiO2 activities at 1473 K, cited KEMS data and present-study model lines; not
+          digitized.
+        temperatures_K:
+        - 1473.0
+        attribution: Shultz et al., 1987; Rudnyi et al., 1988; Zaitsev et al., 2000
+        digitization:
+          tag: not_applicable
+          reason: No plotted curve or symbol values digitized.
+  Na2O:
+    observations:
+    - observation_id: shornikov_2014_table2_melting_na2o_01
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 1
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1405.0
+        attribution: Glushko et al., 1978–1982
+        table: '2'
+        row: 1
+        T_m_as_printed: 1405±2
+        reference_as_printed: Glushko et al., 1978–1982
+      uncertainty:
+        reported_status: reported
+        value_K: 2.0
+    - observation_id: shornikov_2014_table2_melting_na2o_02
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 2
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1405.0
+        attribution: Barin, 1995
+        table: '2'
+        row: 2
+        T_m_as_printed: 1405±1
+        reference_as_printed: Barin, 1995
+      uncertainty:
+        reported_status: reported
+        value_K: 1.0
+    - observation_id: shornikov_2014_table2_melting_na2o_03
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 3
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1405.0
+        attribution: Chase, 1998
+        table: '2'
+        row: 3
+        T_m_as_printed: 1405±1
+        reference_as_printed: Chase, 1998
+      uncertainty:
+        reported_status: reported
+        value_K: 1.0
+    context:
+    - observation_id: shornikov_2014_table3_solid_na2o_01
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 1
+      T_K: 1500.0
+      phase: condensed_solid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -211.201
+        temperature_K: 1500.0
+        table: '3'
+        row: 1
+        phase_as_printed: Solid phases
+        species_as_printed: Na2O
+        delta_f_G_as_printed: −211.201
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table3_liquid_na2o_08
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 8
+      T_K: 1500.0
+      phase: condensed_liquid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -213.636
+        temperature_K: 1500.0
+        table: '3'
+        row: 8
+        phase_as_printed: Liquid phases
+        species_as_printed: Na2O
+        delta_f_G_as_printed: −213.636
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na4SiO4:
+    observations:
+    - observation_id: shornikov_2014_table2_melting_na4sio4_04
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 4
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1393.0
+        attribution: Barin, 1995
+        table: '2'
+        row: 4
+        T_m_as_printed: 1393±1
+        reference_as_printed: Barin, 1995
+      uncertainty:
+        reported_status: reported
+        value_K: 1.0
+    context:
+    - observation_id: shornikov_2014_table3_solid_na4sio4_02
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 2
+      T_K: 1500.0
+      phase: condensed_solid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -1422.361
+        temperature_K: 1500.0
+        table: '3'
+        row: 2
+        phase_as_printed: Solid phases
+        species_as_printed: Na4SiO4
+        delta_f_G_as_printed: −1422.361
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table3_liquid_na4sio4_09
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 9
+      T_K: 1500.0
+      phase: condensed_liquid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -1426.797
+        temperature_K: 1500.0
+        table: '3'
+        row: 9
+        phase_as_printed: Liquid phases
+        species_as_printed: Na4SiO4
+        delta_f_G_as_printed: −1426.797
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na6Si2O7:
+    observations:
+    - observation_id: shornikov_2014_table2_melting_na6si2o7_05
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 5
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1387.0
+        attribution: Bale et al., 2002
+        table: '2'
+        row: 5
+        T_m_as_printed: '1387'
+        reference_as_printed: Bale et al., 2002
+    context:
+    - observation_id: shornikov_2014_table3_solid_na6si2o7_03
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 3
+      T_K: 1500.0
+      phase: condensed_solid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -2531.645
+        temperature_K: 1500.0
+        table: '3'
+        row: 3
+        phase_as_printed: Solid phases
+        species_as_printed: Na6Si2O7
+        delta_f_G_as_printed: −2531.645
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table3_liquid_na6si2o7_10
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 10
+      T_K: 1500.0
+      phase: condensed_liquid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -2541.967
+        temperature_K: 1500.0
+        table: '3'
+        row: 10
+        phase_as_printed: Liquid phases
+        species_as_printed: Na6Si2O7
+        delta_f_G_as_printed: −2541.967
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na2SiO3:
+    observations:
+    - observation_id: shornikov_2014_table2_melting_na2sio3_06
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 6
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1361.0
+        attribution: Botvinkin, 1955
+        table: '2'
+        row: 6
+        T_m_as_printed: '1361'
+        reference_as_printed: Botvinkin, 1955
+    - observation_id: shornikov_2014_table2_melting_na2sio3_07
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 7
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1361.0
+        attribution: Takahashi & Yoshio, 1970
+        table: '2'
+        row: 7
+        T_m_as_printed: '1361'
+        reference_as_printed: Takahashi & Yoshio, 1970
+    - observation_id: shornikov_2014_table2_melting_na2sio3_08
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 8
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1362.0
+        attribution: Richet et al., 1994
+        table: '2'
+        row: 8
+        T_m_as_printed: '1362'
+        reference_as_printed: Richet et al., 1994
+    - observation_id: shornikov_2014_table2_melting_na2sio3_09
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 9
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1362.0
+        attribution: Barin, 1995
+        table: '2'
+        row: 9
+        T_m_as_printed: 1362±1
+        reference_as_printed: Barin, 1995
+      uncertainty:
+        reported_status: reported
+        value_K: 1.0
+    - observation_id: shornikov_2014_table2_melting_na2sio3_10
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 10
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1362.0
+        attribution: Chase, 1998
+        table: '2'
+        row: 10
+        T_m_as_printed: 1362±1
+        reference_as_printed: Chase, 1998
+      uncertainty:
+        reported_status: reported
+        value_K: 1.0
+    context:
+    - observation_id: shornikov_2014_table3_solid_na2sio3_04
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 4
+      T_K: 1500.0
+      phase: condensed_solid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -1084.809
+        temperature_K: 1500.0
+        table: '3'
+        row: 4
+        phase_as_printed: Solid phases
+        species_as_printed: Na2SiO3
+        delta_f_G_as_printed: −1084.809
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table3_liquid_na2sio3_11
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 11
+      T_K: 1500.0
+      phase: condensed_liquid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -1090.1
+        temperature_K: 1500.0
+        table: '3'
+        row: 11
+        phase_as_printed: Liquid phases
+        species_as_printed: Na2SiO3
+        delta_f_G_as_printed: −1090.100
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na2Si2O5:
+    observations:
+    - observation_id: shornikov_2014_table2_melting_na2si2o5_11
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 11
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1157.0
+        attribution: Botvinkin, 1955
+        table: '2'
+        row: 11
+        T_m_as_printed: '1157'
+        reference_as_printed: Botvinkin, 1955
+    - observation_id: shornikov_2014_table2_melting_na2si2o5_12
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 12
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1157.0
+        attribution: Takahashi & Yoshio, 1970
+        table: '2'
+        row: 12
+        T_m_as_printed: '1157'
+        reference_as_printed: Takahashi & Yoshio, 1970
+    - observation_id: shornikov_2014_table2_melting_na2si2o5_13
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 13
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1147.0
+        attribution: Richet & Bottinga, 1986
+        table: '2'
+        row: 13
+        T_m_as_printed: '1147'
+        reference_as_printed: Richet & Bottinga, 1986
+    - observation_id: shornikov_2014_table2_melting_na2si2o5_14
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 14
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1147.0
+        attribution: Barin, 1995
+        table: '2'
+        row: 14
+        T_m_as_printed: '1147'
+        reference_as_printed: Barin, 1995
+    context:
+    - observation_id: shornikov_2014_table3_solid_na2si2o5_05
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 5
+      T_K: 1500.0
+      phase: condensed_solid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -1763.247
+        temperature_K: 1500.0
+        table: '3'
+        row: 5
+        phase_as_printed: Solid phases
+        species_as_printed: Na2Si2O5
+        delta_f_G_as_printed: −1763.247
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table3_liquid_na2si2o5_12
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 12
+      T_K: 1500.0
+      phase: condensed_liquid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -1777.014
+        temperature_K: 1500.0
+        table: '3'
+        row: 12
+        phase_as_printed: Liquid phases
+        species_as_printed: Na2Si2O5
+        delta_f_G_as_printed: −1777.014
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na6Si8O19:
+    observations:
+    - observation_id: shornikov_2014_table2_melting_na6si8o19_15
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 15; * dissociation temperature
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: dissociation_temperature
+        value_K: 1081.0
+        attribution: Shornikov, 2005
+        table: '2'
+        row: 15
+        T_m_as_printed: 1081±10*
+        reference_as_printed: Shornikov, 2005
+      uncertainty:
+        reported_status: reported
+        value_K: 10.0
+    context:
+    - observation_id: shornikov_2014_table3_solid_na6si8o19_06
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 6
+      T_K: 1500.0
+      phase: condensed_solid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -6583.116
+        temperature_K: 1500.0
+        table: '3'
+        row: 6
+        phase_as_printed: Solid phases
+        species_as_printed: Na6Si8O19
+        delta_f_G_as_printed: −6583.116
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  SiO2:
+    observations:
+    - observation_id: shornikov_2014_table2_melting_sio2_16
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 16
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1996.0
+        attribution: Glushko et al., 1978–1982
+        table: '2'
+        row: 16
+        T_m_as_printed: 1996±5
+        reference_as_printed: Glushko et al., 1978–1982
+      uncertainty:
+        reported_status: reported
+        value_K: 5.0
+    - observation_id: shornikov_2014_table2_melting_sio2_17
+      type: transition_point
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '2'
+        note: row 17
+      units: K
+      phase: condensed_solid
+      values:
+        method_class: quoted_attributed
+        property_kind: melting_point
+        value_K: 1996.0
+        attribution: Barin et al., 1995
+        table: '2'
+        row: 17
+        T_m_as_printed: '1996'
+        reference_as_printed: Barin et al., 1995
+    context:
+    - observation_id: shornikov_2014_table3_solid_sio2_07
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 7
+      T_K: 1500.0
+      phase: condensed_solid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -649.708
+        temperature_K: 1500.0
+        table: '3'
+        row: 7
+        phase_as_printed: Solid phases
+        species_as_printed: SiO2
+        delta_f_G_as_printed: −649.708
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+    - observation_id: shornikov_2014_table3_liquid_sio2_13
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 13
+      T_K: 1500.0
+      phase: condensed_liquid
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: kJ/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -644.903
+        temperature_K: 1500.0
+        table: '3'
+        row: 13
+        phase_as_printed: Liquid phases
+        species_as_printed: SiO2
+        delta_f_G_as_printed: −644.903
+        units_as_printed: kJ/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_na_14
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 14
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -26.838
+        temperature_K: 1500.0
+        table: '3'
+        row: 14
+        phase_as_printed: Gas phase
+        species_as_printed: Na
+        delta_f_G_as_printed: −26.838
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na2:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_na2_15
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 15
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -7.696
+        temperature_K: 1500.0
+        table: '3'
+        row: 15
+        phase_as_printed: Gas phase
+        species_as_printed: Na2
+        delta_f_G_as_printed: −7.696
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  NaO:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_nao_16
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 16
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: 13.897
+        temperature_K: 1500.0
+        table: '3'
+        row: 16
+        phase_as_printed: Gas phase
+        species_as_printed: NaO
+        delta_f_G_as_printed: '13.897'
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na2O_gas:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_na2o_17
+      type: data_table_model_value
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        table: '3'
+        note: row 17
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -79.739
+        temperature_K: 1500.0
+        table: '3'
+        row: 17
+        phase_as_printed: Gas phase
+        species_as_printed: Na2O
+        delta_f_G_as_printed: −79.739
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Na2O2:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_na2o2_18
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 18
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -59.967
+        temperature_K: 1500.0
+        table: '3'
+        row: 18
+        phase_as_printed: Gas phase
+        species_as_printed: Na2O2
+        delta_f_G_as_printed: −59.967
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Si:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_si_19
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 19
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: 229.272
+        temperature_K: 1500.0
+        table: '3'
+        row: 19
+        phase_as_printed: Gas phase
+        species_as_printed: Si
+        delta_f_G_as_printed: '229.272'
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Si2:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_si2_20
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 20
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: 286.08
+        temperature_K: 1500.0
+        table: '3'
+        row: 20
+        phase_as_printed: Gas phase
+        species_as_printed: Si2
+        delta_f_G_as_printed: '286.080'
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Si3:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_si3_21
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 21
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: 332.834
+        temperature_K: 1500.0
+        table: '3'
+        row: 21
+        phase_as_printed: Gas phase
+        species_as_printed: Si3
+        delta_f_G_as_printed: '332.834'
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  SiO:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_sio_22
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 22
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -225.709
+        temperature_K: 1500.0
+        table: '3'
+        row: 22
+        phase_as_printed: Gas phase
+        species_as_printed: SiO
+        delta_f_G_as_printed: −225.709
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  SiO2_gas:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_sio2_23
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 23
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -324.873
+        temperature_K: 1500.0
+        table: '3'
+        row: 23
+        phase_as_printed: Gas phase
+        species_as_printed: SiO2
+        delta_f_G_as_printed: −324.873
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  Si2O2:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_si2o2_24
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 24
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: -620.459
+        temperature_K: 1500.0
+        table: '3'
+        row: 24
+        phase_as_printed: Gas phase
+        species_as_printed: Si2O2
+        delta_f_G_as_printed: −620.459
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  O:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_o_25
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 25
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: 154.92
+        temperature_K: 1500.0
+        table: '3'
+        row: 25
+        phase_as_printed: Gas phase
+        species_as_printed: O
+        delta_f_G_as_printed: '154.920'
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  O2:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_o2_26
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 26
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: 0.0
+        temperature_K: 1500.0
+        table: '3'
+        row: 26
+        phase_as_printed: Gas phase
+        species_as_printed: O2
+        delta_f_G_as_printed: '0.000'
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000
+  O3:
+    observations: []
+    context:
+    - observation_id: shornikov_2014_table3_vapor_o3_27
+      type: data_table_model_value
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        table: '3'
+        note: row 27
+      T_K: 1500.0
+      phase: gas
+      standard_state: Formation from elements, as stated in the table title; elemental reference conventions
+        are not expanded here.
+      units: J/mole
+      values:
+        method_class: model_derived
+        quantity: delta_fG
+        delta_fG: 243.15
+        temperature_K: 1500.0
+        table: '3'
+        row: 27
+        phase_as_printed: Gas phase
+        species_as_printed: O3
+        delta_f_G_as_printed: '243.150'
+        units_as_printed: J/mole
+        generator: Gibbs energy minimization using the semi-empirical ideal associated solutions model
+        input_data_sources_as_printed: Glushko et al., 1978–1982; Kozhina & Shultz, 2000; Zaitsev et al., 2000

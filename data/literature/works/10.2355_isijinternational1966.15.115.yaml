@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-088-ichise-1975
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-088-ichise-1975
-      role: table_csv
-      path: tables/kems-088-ichise-1975
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-088-ichise-1975
       role: pdftotext
       path: unknown
@@ -77,6 +71,7 @@ experiments:
               pdf_page_index: 2
               note: About 10 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -148,6 +143,7 @@ experiments:
               pdf_page_index: 2
               note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -209,6 +205,7 @@ experiments:
               pdf_page_index: 2
               note: About two hours; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational1966.15.115::experiment::fe-s-0p42-wtpct
   kind: literature
   method:
@@ -249,6 +246,7 @@ experiments:
               pdf_page_index: 2
               note: About 10 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -320,6 +318,7 @@ experiments:
               pdf_page_index: 2
               note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -381,6 +380,7 @@ experiments:
               pdf_page_index: 2
               note: About two hours; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational1966.15.115::experiment::fe-s-0p65-wtpct
   kind: literature
   method:
@@ -421,6 +421,7 @@ experiments:
               pdf_page_index: 2
               note: About 10 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -492,6 +493,7 @@ experiments:
               pdf_page_index: 2
               note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -553,6 +555,7 @@ experiments:
               pdf_page_index: 2
               note: About two hours; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational1966.15.115::experiment::fe-s-1p01-wtpct
   kind: literature
   method:
@@ -593,6 +596,7 @@ experiments:
               pdf_page_index: 2
               note: About 10 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -664,6 +668,7 @@ experiments:
               pdf_page_index: 2
               note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -725,6 +730,7 @@ experiments:
               pdf_page_index: 2
               note: About two hours; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational1966.15.115::experiment::fe-s-1p59-wtpct
   kind: literature
   method:
@@ -765,6 +771,7 @@ experiments:
               pdf_page_index: 2
               note: About 10 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -836,6 +843,7 @@ experiments:
               pdf_page_index: 2
               note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -897,6 +905,7 @@ experiments:
               pdf_page_index: 2
               note: About two hours; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational1966.15.115::experiment::fe-s-2p19-wtpct
   kind: literature
   method:
@@ -937,6 +946,7 @@ experiments:
               pdf_page_index: 2
               note: About 10 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1008,6 +1018,7 @@ experiments:
               pdf_page_index: 2
               note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -1069,6 +1080,7 @@ experiments:
               pdf_page_index: 2
               note: About two hours; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational1966.15.115::experiment::fe-s-3p37-wtpct
   kind: literature
   method:
@@ -1109,6 +1121,7 @@ experiments:
               pdf_page_index: 2
               note: About 10 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1180,6 +1193,7 @@ experiments:
               pdf_page_index: 2
               note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -1241,6 +1255,7 @@ experiments:
               pdf_page_index: 2
               note: About two hours; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational1966.15.115::experiment::fe-s-4p32-wtpct
   kind: literature
   method:
@@ -1281,6 +1296,7 @@ experiments:
               pdf_page_index: 2
               note: About 10 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1352,6 +1368,7 @@ experiments:
               pdf_page_index: 2
               note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -1413,6 +1430,7 @@ experiments:
               pdf_page_index: 2
               note: About two hours; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   kind: literature
   method:
@@ -1497,6 +1515,7 @@ experiments:
                 figure: '2'
                 note: lid callout 0.5 phi, 1.5 mm lid thickness
           output_unit: m
+          references: []
 benches:
 - id: 10.2355/isijinternational1966.15.115::bench::ichise-rm6k
   work_id: 10.2355/isijinternational1966.15.115

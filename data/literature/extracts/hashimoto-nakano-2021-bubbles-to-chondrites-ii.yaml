@@ -92,6 +92,15 @@ species:
           quantity: imposed_Cr_and_Mn_depletion_factors
           method_class: model_derived
           generator: authors_3_plus_2_component_numerical_fitting
+          derived_from:
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+          derivation:
+            inputs:
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+            relation: Cr and Mn depletion factors imposed on initial CI-silicate to fit bulk chondrite compositions with the authors' numerical model (section 3.1, p. 6; Table 2).
+            output_unit: dimensionless
           factors:
             Cr: {CV: 1.17, CM: 1, E: 0.55, CO: 0.95, LL: 0.8, H: 0.83, L: 0.78}
             Mn: {CV: 0.5, CM: 0.75, E: 0.46, CO: 0.65, LL: 0.72, H: 0.73, L: 0.74}
@@ -105,6 +114,17 @@ species:
           quantity: oxide_elements_entered_as_ghost_CAIs
           method_class: model_derived
           generator: authors_3_plus_2_component_numerical_fitting
+          derived_from:
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table2_depletion_factors
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+          derivation:
+            inputs:
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table2_depletion_factors
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+            relation: Added and renormalized ghost-CAI oxide compositions varied until the authors' model best fit bulk chondrite composition (section 2.2, pp. 3–4; section 3.2, pp. 8–9; Table 3).
+            output_unit: mol_pct
           rows:
             CO: {AlO1.5: 3.109, CaO: 2.234, TiO2: 0.091, MgO: 1.117, SiO2: 2.234}
             LL: {AlO1.5: 0.102, CaO: 0.073, TiO2: 0.028, MgO: null, SiO2: null}
@@ -121,6 +141,19 @@ species:
           quantity: fitted_vaporization_and_component_proportions
           method_class: model_derived
           generator: authors_3_plus_2_component_numerical_fitting
+          derived_from:
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table2_depletion_factors
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table3_ghost_cai_inputs
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+          derivation:
+            inputs:
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table2_depletion_factors
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table3_ghost_cai_inputs
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+            relation: Solve the authors' five-component numerical fit for vaporization degree, fs, fw, and component proportions after CAI correction (equation 1 and sections 2.1–2.3, pp. 2–5; Table 4, p. 10).
+            output_unit: VD_percent_and_molar_proportion
           rows:
             CV: {VD_pct: 32, fs: 0.03, fw: 0.1, Cdls: 0.84, Mtx: 0.11, CAIs: 0.0552, Ghost_CAIs: 0}
             CM: {VD_pct: 42, fs: 0.04, fw: 0.1, Cdls: 0.25, Mtx: 0.68, CAIs: 0.0741, Ghost_CAIs: 0}
@@ -139,6 +172,21 @@ species:
           quantity: fitted_component_molar_fractions
           method_class: model_derived
           generator: authors_3_plus_2_component_numerical_fitting
+          derived_from:
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table2_depletion_factors
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table3_ghost_cai_inputs
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table4_calculation_results
+            - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+          derivation:
+            inputs:
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table2_depletion_factors
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table3_ghost_cai_inputs
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table4_calculation_results
+              - hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+            relation: Solve the five-component linear system for component fractions using the fitted bulk and average-chondrule compositions (equation 1, section 2.1, p. 2; Table 5, p. 11).
+            output_unit: molar_fraction
           bulk_chondrite_total_1:
             CV: {F1: 0.521, F2: 0.367, F3: 0.040, F4: 0.027, F5: 0.045}
             CM: {F1: 0.126, F2: 0.200, F3: 0.001, F4: 0.584, F5: 0.089}

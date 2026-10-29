@@ -6,6 +6,7 @@ compilations-*, not source_id prefix markers (robie-/hemingway- miss those).
 
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -13,6 +14,7 @@ import yaml
 from simulator.battery.enums import (
     AdmissionStatus,
     EvidenceClass,
+    PerBasis,
     Phase,
     Quantity,
 )
@@ -34,6 +36,8 @@ from simulator.battery.score import (
     is_compilation_source,
     load_score_context,
 )
+from tests.battery import factories as F
+
 
 def test_nested_usgs_origin_is_compilation_without_marker_prefix() -> None:
     origin = "compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0001.yaml"
@@ -49,6 +53,33 @@ def test_flat_compilations_yaml_still_compiles() -> None:
 def test_non_compilation_origin_does_not_use_markers() -> None:
     # Origin present and not under compilations-* wins over source_id markers.
     assert is_compilation_source("janaf-4th", "kems_measurements.yaml") is False
+
+
+def test_compilation_assessed_extract_is_a_diagnostic_reference() -> None:
+    oid = "extract-study:record:cp"
+    observation = F.observation(
+        oid,
+        "extract-study:record",
+        Identity(
+            quantity=Quantity.CP,
+            species=Species("SiO2", Phase.CR),
+            per=State.of(PerBasis.MOL_SPECIES),
+            temperature_K=State.of(Decimal("298.15")),
+        ),
+        Decimal("44.6"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="extract-study",
+    )
+    origin = "extracts/extract-study.yaml"
+    context = ScoreContext(
+        works={},
+        experiments={},
+        observations={oid: observation},
+        origins={oid: origin},
+    )
+
+    assert is_compilation_source(observation.source_id, origin) is False
+    assert {obs.observation_id for obs in diagnostic_references(context)} == {oid}
 
 
 def test_load_score_context_recurses_nested_compilation_shards(

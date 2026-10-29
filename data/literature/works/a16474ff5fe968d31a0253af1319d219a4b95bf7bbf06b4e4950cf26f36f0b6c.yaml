@@ -1,0 +1,959 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  citation: Shornikov, S. I. (2019). Thermodynamics of evaporation of perovskite—the mineral of white inclusions of chondrites.
+    Experiment in Geosciences, 25(1), 38–40.
+  source_ids:
+  - shornikov-2019-perovskite-evaporation-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2019-perovskite-evaporation-thermodynamics
+      role: pdf
+      path: raw/shornikov-2019-perovskite-evaporation-thermodynamics/shornikov-2019-perovskite-evaporation-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 501b656c74542462ec0772492aa4d198f595f56ccbb2af6570beead3abc253aa
+    - asset_id: pdftotext:shornikov-2019-perovskite-evaporation-thermodynamics
+      role: pdftotext
+      path: text/shornikov-2019-perovskite-evaporation-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2019-perovskite-evaporation-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c::experiment::shornikov-2019-eg-fig2a-perovskite
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Knudsen effusion mass spectrometry. Partial pressures over perovskite from the Hertz-Knudsen equation,
+      Fig. 2a. The body prints 1791–2182 K.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  locator:
+    page: 2
+    published_page: 39
+    pdf_page_index: 1
+    figure: '2'
+    note: panel=a
+- experiment_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c::experiment::shornikov-2019-eg-fig2b-2300k
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Knudsen effusion mass spectrometry. Partial pressures over CaO–TiO2 melts at 2300 K, Fig. 2b.' is not
+      a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  locator:
+    page: 2
+    published_page: 39
+    pdf_page_index: 1
+    figure: '2'
+    note: panel=b
+- experiment_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c::experiment::shornikov-2019-eg-fig3a-2250k
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Activities in the CaO–TiO2 melt at 2250 K from the Lewis ratio, equations (8) and (9), and the Gibbs-Duhem
+      reduction in equations (10)–(13). Fig. 3a series 1, 2 and 4.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  locator:
+    page: 2
+    published_page: 39
+    pdf_page_index: 1
+    figure: '3'
+    note: panel=a
+context:
+- observation_id: shornikov_2019_eg_apparatus
+  type: apparatus
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 38
+  units: as printed
+  values:
+    method: Knudsen effusion mass spectrometry
+    container: molybdenum
+    perovskite_T_as_printed: 1791–2182 K
+    abstract_T_as_printed: 1700–2200 K
+    melts_T_as_printed: 2241–2441 K
+    note: The body prints 1791–2182 K. The abstract prints 1700–2200 K. Both are kept.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_apparatus
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaTiO3
+- observation_id: shornikov_2019_eg_cao_lewis_ratio
+  type: activity_reference
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    equation: '8'
+  units: dimensionless
+  values:
+    equation_as_printed: a_CaO = p_CaO / p°_CaO
+    lewis_sentence: 'Published page 39, above equations (8) and (9): "Values of oxide activities (a_i) in perovskite and in
+      the CaO–TiO2 melts were calculated on the Lewis ratio:" Equation (8) is printed a_CaO = p_CaO / p°_CaO. Equation (9)
+      is printed with a full stop after the numerator, a_TiO2 = p_TiO2. / p°_TiO2. The degree sign is on each denominator
+      only.'
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_cao_lewis_ratio
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO
+- observation_id: shornikov_2019_eg_fig1_gong
+  type: figure_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 38
+    figure: '1'
+  units: as printed
+  values:
+    reason_not_extracted: Fig. 1 is the CaO–TiO2 phase diagram of Gong et al. (2018), not this study.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig1_gong
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaTiO3
+- observation_id: shornikov_2019_eg_fig2a_markers_not_separated
+  type: figure_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '2'
+    panel: a
+  units: as printed
+  values:
+    stored_count: 79
+    refused:
+    - 'Red stroke left of x=1459, and between x=1628 and x=1771: red fraction at most 0.37, a line, not a disk.'
+    - No separate black core at x=1958 or x=2186. At x=1958 the black position sits on the green marker.
+    - Green core at y=2345 is above the top tick and outside the panel.
+    - The single blue disk at x=2186 continues the O2 series. No separate Ti core was stored there.
+    - Legend numerals and the panel label were not stored.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig2a_markers_not_separated
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaTiO3
+- observation_id: shornikov_2019_eg_fig3a_comparison_curves
+  type: figure_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: a
+  units: as printed
+  values:
+    not_this_study: Fig. 3a series 3 and 5 are the Banon et al. (1981) curves at 2150 K. They are unmarked comparison curves
+      and were not digitised. Dotted lines on Fig. 3b are the heterogeneous regions, not markers.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3a_comparison_curves
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaTiO3
+- observation_id: shornikov_2019_eg_fig3b_x35_51
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3365.1, 5142.9). Read Delta G^m = -39.59 ± 1.0 kJ/mol; TiO2 = 35.51 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-39.59'
+    x_TiO2_mol_pct: '35.51'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.355149'
+      CaO: '0.644851'
+    page_pixel_x: '3365.1'
+    page_pixel_y: '5142.9'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x35_51
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x42_82
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3484.0, 5270.0). Read Delta G^m = -44.49 ± 1.0 kJ/mol; TiO2 = 42.82 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-44.49'
+    x_TiO2_mol_pct: '42.82'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.428152'
+      CaO: '0.571848'
+    page_pixel_x: '3484.0'
+    page_pixel_y: '5270.0'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x42_82
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x48_13
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3570.6, 5348.1). Read Delta G^m = -47.49 ± 1.5 kJ/mol; TiO2 = 48.13 ± 1.5 mol%. Touching-pair half:
+      the centre is the black-pixel centroid on one side of the neck between two circles.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.5'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.5 kJ/mol and ±1.5 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-47.49'
+    x_TiO2_mol_pct: '48.13'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.481324'
+      CaO: '0.518676'
+    page_pixel_x: '3570.6'
+    page_pixel_y: '5348.1'
+    read_centre: half
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x48_13
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x50_20
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3604.2, 5354.9). Read Delta G^m = -47.75 ± 1.5 kJ/mol; TiO2 = 50.20 ± 1.5 mol%. Touching-pair half:
+      the centre is the black-pixel centroid on one side of the neck between two circles.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.5'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.5 kJ/mol and ±1.5 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-47.75'
+    x_TiO2_mol_pct: '50.20'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.501954'
+      CaO: '0.498046'
+    page_pixel_x: '3604.2'
+    page_pixel_y: '5354.9'
+    read_centre: half
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x50_20
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x53_56
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3659.0, 5348.5). Read Delta G^m = -47.51 ± 1.5 kJ/mol; TiO2 = 53.56 ± 1.5 mol%. Touching-pair half:
+      the centre is the black-pixel centroid on one side of the neck between two circles.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.5'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.5 kJ/mol and ±1.5 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-47.51'
+    x_TiO2_mol_pct: '53.56'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.535600'
+      CaO: '0.464400'
+    page_pixel_x: '3659.0'
+    page_pixel_y: '5348.5'
+    read_centre: half
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x53_56
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x55_63
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3692.7, 5337.9). Read Delta G^m = -47.10 ± 1.5 kJ/mol; TiO2 = 55.63 ± 1.5 mol%. Touching-pair half:
+      the centre is the black-pixel centroid on one side of the neck between two circles.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.5'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.5 kJ/mol and ±1.5 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-47.10'
+    x_TiO2_mol_pct: '55.63'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.556292'
+      CaO: '0.443708'
+    page_pixel_x: '3692.7'
+    page_pixel_y: '5337.9'
+    read_centre: half
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x55_63
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x59_25
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3751.7, 5288.7). Read Delta G^m = -45.21 ± 1.5 kJ/mol; TiO2 = 59.25 ± 1.5 mol%. Touching-pair half:
+      the centre is the black-pixel centroid on one side of the neck between two circles.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.5'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.5 kJ/mol and ±1.5 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-45.21'
+    x_TiO2_mol_pct: '59.25'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.592517'
+      CaO: '0.407483'
+    page_pixel_x: '3751.7'
+    page_pixel_y: '5288.7'
+    read_centre: half
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x59_25
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x61_30
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3785.1, 5265.8). Read Delta G^m = -44.32 ± 1.5 kJ/mol; TiO2 = 61.30 ± 1.5 mol%. Touching-pair half:
+      the centre is the black-pixel centroid on one side of the neck between two circles.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.5'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.5 kJ/mol and ±1.5 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-44.32'
+    x_TiO2_mol_pct: '61.30'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.613025'
+      CaO: '0.386975'
+    page_pixel_x: '3785.1'
+    page_pixel_y: '5265.8'
+    read_centre: half
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x61_30
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x66_50
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3869.8, 5166.6). Read Delta G^m = -40.51 ± 1.0 kJ/mol; TiO2 = 66.50 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-40.51'
+    x_TiO2_mol_pct: '66.50'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.665030'
+      CaO: '0.334970'
+    page_pixel_x: '3869.8'
+    page_pixel_y: '5166.6'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x66_50
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x69_57
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3919.7, 5084.7). Read Delta G^m = -37.35 ± 1.0 kJ/mol; TiO2 = 69.57 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-37.35'
+    x_TiO2_mol_pct: '69.57'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.695668'
+      CaO: '0.304332'
+    page_pixel_x: '3919.7'
+    page_pixel_y: '5084.7'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x69_57
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x73_25
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (3979.7, 5018.7). Read Delta G^m = -34.81 ± 1.0 kJ/mol; TiO2 = 73.25 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-34.81'
+    x_TiO2_mol_pct: '73.25'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.732507'
+      CaO: '0.267493'
+    page_pixel_x: '3979.7'
+    page_pixel_y: '5018.7'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x73_25
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x80_43
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (4096.6, 4819.6). Read Delta G^m = -27.15 ± 1.0 kJ/mol; TiO2 = 80.43 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-27.15'
+    x_TiO2_mol_pct: '80.43'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.804282'
+      CaO: '0.195718'
+    page_pixel_x: '4096.6'
+    page_pixel_y: '4819.6'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x80_43
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x86_64
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (4197.7, 4634.7). Read Delta G^m = -20.03 ± 1.0 kJ/mol; TiO2 = 86.64 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-20.03'
+    x_TiO2_mol_pct: '86.64'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.866357'
+      CaO: '0.133643'
+    page_pixel_x: '4197.7'
+    page_pixel_y: '4634.7'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x86_64
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x92_17
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (4287.8, 4440.9). Read Delta G^m = -12.57 ± 1.0 kJ/mol; TiO2 = 92.17 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-12.57'
+    x_TiO2_mol_pct: '92.17'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.921677'
+      CaO: '0.078323'
+    page_pixel_x: '4287.8'
+    page_pixel_y: '4440.9'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x92_17
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_fig3b_x94_33
+  type: figure_mixing_energy
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: b
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3b mixing-energy ticks, least-squares residual at most
+      0.02 kJ/mol: 0 at y=4114.0, -10 at y=4374.5, -20 at y=4633.5, -30 at y=4894.0, -40 at y=5153.5, and the x-axis at y=5413.0
+      is -50. Delta G^m = 158.3722 - 0.038493*y, 25.98 px per kJ/mol. TiO2 mol% ticks, residual at most 0.05 mol%: 0 at x=2787.0,
+      then every 10 mol% through 100 at x=4415.0. mol% = -171.0989 + 0.061399*x, 16.29 px per mol%. Series 1, black filled
+      circles, this study, CaO-TiO2 at 2300 K. Series 2-4 are other papers and were not read. 1 px is 0.038 kJ/mol and 0.061
+      mol%. Page pixel (4323.0, 4363.0). Read Delta G^m = -9.57 ± 1.0 kJ/mol; TiO2 = 94.33 ± 1.0 mol%. Isolated filled circle.
+      The disk-fit centre was checked on the contact sheet.'
+  units: kJ/mol
+  uncertainty:
+    value: '1.0'
+    unit: kJ/mol
+    basis: visual read uncertainty
+    confidence_level: not_stated
+    note: Read uncertainty is ±1.0 kJ/mol and ±1.0 mol% TiO2.
+  values:
+    quantity_as_printed: Delta G^m, kJ/mol
+    method_class: figure_only
+    T_K: '2300'
+    axis_delta_G_m_kJ_per_mol: '-9.57'
+    x_TiO2_mol_pct: '94.33'
+    composition_mol:
+      basis: printed_mole_fraction
+      TiO2: '0.943290'
+      CaO: '0.056710'
+    page_pixel_x: '4323.0'
+    page_pixel_y: '4363.0'
+    read_centre: isolated
+    attribution: Fig. 3 caption, series 1, CaO-TiO2 melts at 2300 K, present study.
+    schema_gap: The ordinate is the mixing energy Delta G^m in kJ/mol. Quantity has no mixing-energy token, so this digitised
+      reading stays in context and is not stored as delta_fG.
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_fig3b_x94_33
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaO-TiO2
+- observation_id: shornikov_2019_eg_headline_numbers_not_rescored
+  type: overlap_with_other_extracts
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 40
+    note: The same sentence prints formation enthalpy −39.88±0.54 kJ/mol, formation entropy 3.15±0.28 J/(mol K), and melting
+      enthalpy 47.61±1.84 kJ/mol at 2241±10 K. Shornikov 2019 Table 1 prints −39.98±0.54, not −39.88, for the 1791–2241 K
+      row, and the same 3.15±0.28. Table 2 prints the same melting figures. Those table cells are scored on shornikova-2019-perovskite-thermodynamics.
+      This note does not score them again. metsoc-2019-6005 also prints −39.88±0.54; that abstract is a different document.
+  units: kJ/mol and J/(mol K)
+  values:
+    delta_H_as_printed: −39.88±0.54 kJ/mol
+    delta_S_as_printed: 3.15±0.28 J/(mol×K)
+    delta_H_melt_as_printed: 47.61±1.84 kJ/mol at 2241±10 K
+    not_scored_because: already printed, with the 0.10 kJ/mol table difference, in the RJPC thermodynamics paper
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_headline_numbers_not_rescored
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaTiO3
+- observation_id: shornikov_2019_eg_not_the_lyul_abstract
+  type: page_scope
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 38
+    note: PDF page 1 opens with the end of a different Lyul/enstatite abstract. That text is not this paper and is not extracted.
+  units: as printed
+  values:
+    this_paper_starts: Shornikov S. I. Thermodynamics of evaporation of perovskite
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_not_the_lyul_abstract
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaTiO3
+- observation_id: shornikov_2019_eg_tio2_lewis_ratio
+  type: activity_reference
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    equation: '9'
+  units: dimensionless
+  values:
+    equation_as_printed: a_TiO2 = p_TiO2. / p°_TiO2
+    lewis_sentence: 'Published page 39, above equations (8) and (9): "Values of oxide activities (a_i) in perovskite and in
+      the CaO–TiO2 melts were calculated on the Lewis ratio:" Equation (8) is printed a_CaO = p_CaO / p°_CaO. Equation (9)
+      is printed with a full stop after the numerator, a_TiO2 = p_TiO2. / p°_TiO2. The degree sign is on each denominator
+      only.'
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_tio2_lewis_ratio
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: TiO2
+- observation_id: shornikov_2019_eg_vapour_reactions
+  type: vapour_species
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 38
+    equation: 1-7
+  units: as printed
+  values:
+    reactions_as_printed:
+    - '[CaO] = (CaO)'
+    - (CaO) = (Ca) + (O)
+    - '[TiO2] = (TiO2)'
+    - (TiO2) = (TiO) + (O)
+    - (TiO) = (Ti) + (O)
+    - 2(O) = (O2)
+    - '[CaTiO3] = (CaTiO3)'
+    partial_pressures: plotted in Fig. 2 and digitised there
+  context_id: shornikov-2019-perovskite-evaporation-thermodynamics::context::shornikov_2019_eg_vapour_reactions
+  work_id: a16474ff5fe968d31a0253af1319d219a4b95bf7bbf06b4e4950cf26f36f0b6c
+  source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+  species: CaTiO3

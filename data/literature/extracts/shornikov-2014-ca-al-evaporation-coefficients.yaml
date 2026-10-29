@@ -1,0 +1,407 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2014-ca-al-evaporation-coefficients
+source:
+  citation: "Shornikov, S. I. (2014). The Oxide Evaporation Coefficients in Ca–Al Inclusions. 77th Annual Meeting of the Meteoritical Society, abstract 5018."
+  year: 2014
+  corpus_asset: raw/shornikov-2014-ca-al-evaporation-coefficients/shornikov-2014-ca-al-evaporation-coefficients.pdf
+  corpus_sha256: 03e1d4e21a7752c999b56963e317aa07241b96f007994a36e854c8f4fa816b53
+extraction:
+  method: "Manual transcription from the one-page PDF, checked against its 300 dpi render. pdftotext was used as a lead only. The abstract has no data table or figure."
+  date: '2026-10-05'
+  worker: codex-resume-8059-1791204792
+review_status: draft
+fidelity_samples:
+  - species: CaO
+    observable: alpha
+    observation_id: shornikov_2014_cao_crystalline_alpha
+    field: alpha
+    value: 0.66
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Recommended coefficients, crystalline state"
+  - species: MgO
+    observable: alpha
+    observation_id: shornikov_2014_mgo_crystalline_alpha
+    field: alpha
+    value: 0.50
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Recommended coefficients, crystalline state"
+  - species: FeO
+    observable: alpha
+    observation_id: shornikov_2014_feo_crystalline_alpha
+    field: alpha
+    value: 1.00
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Recommended coefficients, crystalline state"
+  - species: Al2O3
+    observable: alpha
+    observation_id: shornikov_2014_al2o3_crystalline_alpha
+    field: alpha
+    value: 0.33
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Recommended coefficients, crystalline state"
+  - species: TiO2
+    observable: alpha
+    observation_id: shornikov_2014_tio2_crystalline_alpha
+    field: alpha
+    value: 0.23
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Recommended coefficients, crystalline state"
+  - species: SiO2
+    observable: alpha
+    observation_id: shornikov_2014_sio2_crystalline_alpha
+    field: alpha
+    value: 2.2e-2
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Recommended coefficients, crystalline state"
+  - species: SiO2
+    observable: alpha
+    observation_id: shornikov_2014_sio2_liquid_alpha
+    field: alpha
+    value: 1.0
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Liquid-state coefficients"
+  - species: FeO
+    observable: alpha
+    observation_id: shornikov_2014_feo_liquid_alpha
+    field: alpha
+    value: 1.0
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Liquid-state coefficients"
+  - species: Al2O3
+    observable: alpha
+    observation_id: shornikov_2014_al2o3_liquid_alpha
+    field: alpha
+    value: 1.0
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Liquid-state coefficients"
+  - species: CaO
+    observable: alpha
+    observation_id: shornikov_2014_cao_liquid_alpha_estimate
+    field: alpha
+    value: 1.0
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Liquid-state estimate"
+  - species: MgO
+    observable: alpha
+    observation_id: shornikov_2014_mgo_liquid_alpha_estimate
+    field: alpha
+    value: 1.0
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Liquid-state estimate"
+  - species: TiO2
+    observable: alpha
+    observation_id: shornikov_2014_tio2_liquid_alpha_estimate
+    field: alpha
+    value: 1.0
+    locator:
+      page: 1
+      pdf_page_index: 0
+      paragraph: "Liquid-state estimate"
+species:
+  CaO:
+    observations:
+      - observation_id: shornikov_2014_cao_crystalline_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Recommended coefficients, crystalline state"
+          note: "Recommended CaO coefficient; citation [5]."
+        phase: cr
+        polymorph_notes: "The source states the crystalline state but names no polymorph."
+        units: dimensionless
+        uncertainty:
+          note: "±0.15 as printed"
+        values:
+          alpha: 0.66
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) recommendation citing Sata T. et al. 1982. High Temp. – High Press. 14:399–408 [5]."
+      - observation_id: shornikov_2014_cao_liquid_alpha_estimate
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Liquid-state estimate"
+          note: "The author says there are strong reasons to assume this value."
+        phase: l
+        units: dimensionless
+        values:
+          alpha: 1.0
+          method_class: author_estimate
+          attribution: "Shornikov (2014)."
+    context:
+      - observation_id: shornikov_2014_scope_method_and_qualifications
+        type: thermodynamic_example
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Abstract paragraphs 1–4"
+          note: "Source-wide methodology and data qualifications in paragraphs 1–4."
+        units: as printed
+        values:
+          quantity: source_methodology_and_data_qualifications
+          method_class: quoted_unattributed
+          system: "CaO-MgO-FeO-Al2O3-TiO2-SiO2 in Ca-Al inclusions"
+          affiliation_as_printed:
+            statement: "S. I. Shornikov. RAS Vernadsky Institute of Geochemistry & Analytical Chemistry, Kosygin st., 19, Moscow, 119991, Russia. E-mail: sergey.shornikov@gmail.com."
+            locator:
+              page: 1
+              pdf_page_index: 0
+              paragraph: "Author and affiliation, below title"
+          supporting_references_as_printed:
+            - statement: "[1] Grossman L. et al. 2008. Geochim. Cosmochim. Acta 72:3001–3021."
+              locator: {page: 1, pdf_page_index: 0, section: References, note: "Reference [1]"}
+            - statement: "[2] Hirth J. P. & Pound G. M. 1963. Condensation and evaporation – nucleation and growth kinetics. 190 pp."
+              locator: {page: 1, pdf_page_index: 0, section: References, note: "Reference [2]"}
+            - statement: "[11] Shornikov S. I. & Yakovlev O. I. 2010. Abstract #1408. 41st Lunar & Planetary Science Conference."
+              locator: {page: 1, pdf_page_index: 0, section: References, note: "Reference [11]"}
+            - statement: "[12] Markova O. M. et al. 1986. Geokhimiya 11:1559–1569."
+              locator: {page: 1, pdf_page_index: 0, section: References, note: "Reference [12]"}
+            - statement: "[13] Hashimoto A. 1990. Nature 347:53–55."
+              locator: {page: 1, pdf_page_index: 0, section: References, note: "Reference [13]"}
+          no_source_experiment: "This abstract gives recommendations and discussion, not a new experimental run set; it reports no apparatus, cell or liner, orifice geometry, pressure calibration, ionization cross-sections, ionization energy, multiplier or isotope correction, temperature sensor or calibration, residual pressure, or sample preparation/composition."
+          methodological_statements:
+            - statement: "Evaporation and condensation processes play an important role in the formation of Ca-Al-inclusions [1] whose composition can be described in a chemical and phase state within the framework of the CaO-MgO-FeO-Al2O3-TiO2-SiO2 system."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 1"
+            - statement: "It is known [2] that there are no theoretical approaches that make it possible to precisely calculate αᵥ values."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 2"
+            - statement: "The assumption of the presence of an adsorbed layers characterized by activation energy is confirmed by experimental data on the evaporation of substance in the crystalline state and can be established according to Knudsen and to Langmuir."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 2"
+              transcription_note: "The printed wording ‘an adsorbed layers’ is grammatically garbled; retained verbatim."
+            - statement: "Proceeding from the same theoretical assumptions and the experimental data available, it is possible that in case of a liquid the activation energy is low and αᵥ is close to 1."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 2"
+            - statement: "A number of experimental approaches to the determination of αᵥ that correspond to various components of the gas phase over the substance under study are considered in [3, 4]."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 2"
+            - statement: "In the liquid state, αᵥ for SiO2 [4], FeO [9] and Al2O3 [10] are equal 1."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 3"
+            - statement: "On the basis of the evaporation theory there are strong reasons to assume that αᵥ for other oxides – CaO, MgO and TiO2 in the liquid state are also equal to 1."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 3"
+            - statement: "This assumption is confirmed by the thermodynamic calculations of changes in the composition of multicomponent oxide melts in the evaporation process [11], which match the experimental results [12]."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 3"
+            - statement: "Thus, there is no need to take αᵥ into account in calculating the evolution of the Ca-Al-inclusions melt composition at evaporation."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 3"
+            - statement: "Determination of the rate of nonequilibrium evaporation from an open surface [13] is very approximate."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 4"
+            - statement: "This is because there is an increase in the evaporation rate as a consequence of the reducing conditions for the samples caused by interaction with the crucible material, and a decrease in the evaporation rate of the samples caused by the effect of surface self-cooling at evaporation."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 4"
+            - statement: "An additional error can be introduced by uncontrollable change in the sample shape at evaporation."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 4"
+            - statement: "These reasons lead to underestimated αᵥ values."
+              locator:
+                page: 1
+                pdf_page_index: 0
+                paragraph: "Paragraph 4"
+
+  MgO:
+    observations:
+      - observation_id: shornikov_2014_mgo_crystalline_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Recommended coefficients, crystalline state"
+          note: "Recommended MgO coefficient; citation [6]."
+        phase: cr
+        polymorph_notes: "The source states the crystalline state but names no polymorph."
+        units: dimensionless
+        uncertainty:
+          note: "±0.20 as printed"
+        values:
+          alpha: 0.50
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) recommendation citing Lukin E. S. & Poluboyarinov D. N. 1964. Ogneupory 9:418–424 [6]."
+      - observation_id: shornikov_2014_mgo_liquid_alpha_estimate
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Liquid-state estimate"
+          note: "The author says there are strong reasons to assume this value."
+        phase: l
+        units: dimensionless
+        values:
+          alpha: 1.0
+          method_class: author_estimate
+          attribution: "Shornikov (2014)."
+  FeO:
+    observations:
+      - observation_id: shornikov_2014_feo_crystalline_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Recommended coefficients, crystalline state"
+          note: "Recommended FeO coefficient; citation [7]."
+        phase: cr
+        polymorph_notes: "The source states the crystalline state but names no polymorph."
+        units: dimensionless
+        uncertainty:
+          note: "±0.20 as printed"
+        values:
+          alpha: 1.00
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) recommendation citing Darken L. S. & Gurry R. W. 1946. J. Amer. Chem. Soc. 68:798–816 [7]."
+      - observation_id: shornikov_2014_feo_liquid_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Liquid-state coefficients"
+          note: "The author states the liquid FeO coefficient equals 1; citation [9]."
+        phase: l
+        units: dimensionless
+        values:
+          alpha: 1.0
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) citing Wang J. et al. 1994. 25th Lunar & Planetary Science Conference. pp. 1459–1460 [9]."
+  Al2O3:
+    observations:
+      - observation_id: shornikov_2014_al2o3_crystalline_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Recommended coefficients, crystalline state"
+          note: "Recommended Al2O3 coefficient; citation [8]."
+        phase: cr
+        polymorph_notes: "The source states the crystalline state but names no polymorph."
+        units: dimensionless
+        uncertainty:
+          note: "±0.02 as printed"
+        values:
+          alpha: 0.33
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) recommendation citing Fu C. M. & Burns R. P. 1976. High Temp. Sci. 8:53–363 [8]."
+      - observation_id: shornikov_2014_al2o3_liquid_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Liquid-state coefficients"
+          note: "The author states the liquid Al2O3 coefficient equals 1; citation [10]."
+        phase: l
+        units: dimensionless
+        values:
+          alpha: 1.0
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) citing Burns R. P. 1966. J. Chem. Phys. 44:3307–3319 [10]."
+  TiO2:
+    observations:
+      - observation_id: shornikov_2014_tio2_crystalline_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Recommended coefficients, crystalline state"
+          note: "Recommended TiO2 coefficient; citation [3]."
+        phase: cr
+        polymorph_notes: "The source states the crystalline state but names no polymorph."
+        units: dimensionless
+        uncertainty:
+          note: "±0.02 as printed"
+        values:
+          alpha: 0.23
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) recommendation citing Semenov G. A. 1969. Russ. Inorg. Mater. 5:67–70 [3]."
+      - observation_id: shornikov_2014_tio2_liquid_alpha_estimate
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Liquid-state estimate"
+          note: "The author says there are strong reasons to assume this value."
+        phase: l
+        units: dimensionless
+        values:
+          alpha: 1.0
+          method_class: author_estimate
+          attribution: "Shornikov (2014)."
+  SiO2:
+    observations:
+      - observation_id: shornikov_2014_sio2_crystalline_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Recommended coefficients, crystalline state"
+          note: "Printed as (2.2±0.3)·10^-2; citation [4]."
+        phase: cr
+        polymorph_notes: "The source states the crystalline state but names no polymorph."
+        units: dimensionless
+        uncertainty:
+          note: "±0.3 × 10^-2 as printed; complete printed form is (2.2±0.3)·10^-2"
+        values:
+          alpha: 2.2e-2
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) recommendation citing Shornikov S. I. et al. 1999. Russ. J. General Chem. 69:187–196 [4]."
+      - observation_id: shornikov_2014_sio2_liquid_alpha
+        type: alpha
+        locator:
+          page: 1
+          pdf_page_index: 0
+          paragraph: "Liquid-state coefficients"
+          note: "The author states the liquid SiO2 coefficient equals 1; citation [4]."
+        phase: l
+        units: dimensionless
+        values:
+          alpha: 1.0
+          method_class: quoted_attributed
+          attribution: "Shornikov (2014) citing Shornikov S. I. et al. 1999. Russ. J. General Chem. 69:187–196 [4]."

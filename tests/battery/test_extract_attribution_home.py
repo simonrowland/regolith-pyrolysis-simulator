@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, NoticeKind, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.test_migrate import _extract_observations, _migrate_real_extract
 
@@ -46,7 +46,6 @@ REPAIRED = {
     ("hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml", "hashimoto_2021_appendix_sample_provenance"): "Jarosewich (1990)",
     ("lpi-compendium-15013.yaml", "lpi_15013_carbon_and_nitrogen"): "Moore et al. 1973; Des Marais et al. 1973; Kothari and Goel 1972; Muller 1973",
     ("lpi-compendium-65701.yaml", "lpi_compendium_65701_attributed_trace_and_exposure_values"): "Moore et al. (1973); Kerridge et al. (1975); Cirlin and Housley (1981); Wrigley (1973); Walton et al. (1973); Graf (1993), from data by Butler et al. (1973)",
-    ("itoh-hino-banya-1998-spinel.yaml", "itoh_1998_quoted_prior_interaction_parameters"): "Mizin et al. (1983, ref 10) for e_Mg_Al_1873K; Sponseller and Flinn (1964, ref 11) for e_Ca_Al_1873K",
     ("tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml", "tachibana_1998_forsterite_prior_experiment_alpha_constraint"): "experiments [1-4]: Hashimoto (1990) [1]; Wang et al. (1993) [2]; Nagahara and Ozawa (1996) [3]; Tsuchiyama et al., in preparation [4]",
     # Stebbins, Carmichael & Weill 1983, printed p. 723: the Table 6 row labels and the Table 7
     # anorthite footnotes 3-4, hoisted in table order from the nested per-estimate sources.
@@ -54,11 +53,13 @@ REPAIRED = {
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_table_6_vitrification_quotes"): "Weill et al. (1980a); Waldbaum and Robie (1971); Hlabse and Kleppa (1968), Holm and Kleppa (1968); Kracek and Neuvonen (1952)",
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_table_6_vitrification_quotes"): "Waldbaum and Robie (1971); Tamman (1903)",
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_table_6_vitrification_quotes"): "Navrotsky et al. (1980)",
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_table_7_fusion_quotes"): "Weill et al. (1980b); Robie et al. (1978)",
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_table_7_fusion_quotes"): "Weill et al. (1980b)",
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_robie_table_7_fusion_quote"): "Robie et al. (1978)",
 }
 
 CONTEXT_REPAIRED = {
     ("lpi-compendium-15013.yaml", "lpi_15013_maturity_and_grain_size"): "Morris 1978 (for Is/FeO = 77)",
+    ("itoh-hino-banya-1998-spinel.yaml", "itoh_1998_quoted_prior_interaction_parameters"): "Mizin et al. (1983, ref 10) for e_Mg_Al_1873K; Sponseller and Flinn (1964, ref 11) for e_Ca_Al_1873K",
 }
 
 TURKDOGAN_REF2 = (
@@ -126,6 +127,15 @@ def test_page_repaired_name_reaches_evidence_attribution(tmp_path: Path, key, ex
         assert obs.evidence.attribution == expected
 
 
+def test_anorthite_table_7_fusion_quotes_keep_separate_printed_values() -> None:
+    name = "stebbins-carmichael-weill-1983.yaml"
+    weill = _extract_values(name, "stebbins_1983_anorthite_table_7_fusion_quotes")
+    robie = _extract_values(name, "stebbins_1983_anorthite_robie_table_7_fusion_quote")
+
+    assert weill["preferred_estimate"] == 32.4
+    assert robie["estimate_from_glass_Cp_only"] == 19.4
+
+
 @pytest.mark.parametrize(
     ("key", "expected"),
     sorted(CONTEXT_REPAIRED.items()),
@@ -180,7 +190,7 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
     expected = {
         "ammin_76_904_quoted_comparator_enthalpy_values": (
             "CaMgSi2O6",
-            None,
+            Quantity.ENTHALPY_OF_FUSION,
             ValueKind.UNAVAILABLE,
             "enthalpy_of_fusion_kJ_per_mol",
             138.1,  # Printed p. 909 / PDF p. 6: Stebbins et al. (1983), diopside.
@@ -192,7 +202,7 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         ),
         "ammin_76_904_quoted_richet_bottinga_diopside_fusion": (
             "CaMgSi2O6",
-            None,
+            Quantity.ENTHALPY_OF_FUSION,
             ValueKind.UNAVAILABLE,
             "enthalpy_of_fusion_kJ_per_mol",
             137.7,  # Printed p. 909 / PDF p. 6: Richet and Bottinga (1984), diopside.
@@ -204,7 +214,7 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         ),
         "ammin_76_904_quoted_ferrier_diopside_fusion": (
             "CaMgSi2O6",
-            None,
+            Quantity.ENTHALPY_OF_FUSION,
             ValueKind.UNAVAILABLE,
             "enthalpy_of_fusion_kJ_per_mol",
             128,  # Printed p. 909 / PDF p. 6: Ferrier (1968), diopside.
@@ -240,7 +250,7 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         ),
         "ammin_76_904_quoted_adamkovicova_wollastonite_fusion": (
             "CaSiO3",
-            None,
+            Quantity.ENTHALPY_OF_FUSION,
             ValueKind.UNAVAILABLE,
             "enthalpy_of_fusion_kJ_per_mol",
             57.3,  # Printed p. 911 / PDF p. 8: Adamkovicova et al. (1980), wollastonite.
@@ -294,11 +304,12 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
             assert observation.value.kind is ValueKind.UNAVAILABLE
 
 
-def test_lange_quoted_cp_points_do_not_enter_scorer_selection(tmp_path: Path) -> None:
-    from simulator.battery.enums import Engine
+def test_lange_quoted_cp_points_reach_scorer_with_notice(tmp_path: Path) -> None:
     from simulator.battery.score import (
+        SCORE_ENGINE_SET,
         ScoreContext,
         comparison_candidates,
+        headline_rows,
         score_store,
     )
 
@@ -328,15 +339,28 @@ def test_lange_quoted_cp_points_do_not_enter_scorer_selection(tmp_path: Path) ->
         and observation.value.kind is ValueKind.POINT
     ]
     assert sorted(observation.value.point for observation in available_cp) == [334, 353]
-    assert comparison_candidates(context) == ()
+    assert {row.observation_id for row in comparison_candidates(context)} == quote_ids
 
-    def unexpected_prediction(*args, **kwargs):
-        raise AssertionError("quoted references must be filtered before prediction")
-
-    residuals, selected = score_store(
+    residuals, _ = score_store(
         context,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
-        predict=unexpected_prediction,
+        engines=SCORE_ENGINE_SET,
     )
-    assert selected == {}
-    assert residuals == ()
+    assert len(residuals) == len(quote_ids) * len(SCORE_ENGINE_SET)
+    assert all(row.numeric is not None or row.refusal is not None for row in residuals)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:quoted_attributed"
+            for notice in row.notices
+        )
+        for row in residuals
+    )
+    assert all(
+        row["n"] == 0
+        for row in headline_rows(
+            residuals,
+            context=context,
+            tier="measured",
+            engines=SCORE_ENGINE_SET,
+        )
+    )

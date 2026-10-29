@@ -24,9 +24,10 @@ extraction:
     published p.292) and 200 dpi re-read of Figs 1–6 captions. Parent observation
     objects left bit-identical. Nine unquoted figure-only measured rows superseded
     with quoted class-tagged replacements. Table I cells unchanged.
+    validated in an internal review, 2026-09-06, deepening
   date: '2026-09-06'
   worker: DEEP-kems-093-piacente-1975
-  provenance_path: docs-private/research/2026-09-06-deepening/DEEP-kems-093-piacente-1975/kems-093-piacente-1975/
+  provenance_path: raw/kems-093-piacente-1975/kems-093-piacente-1975.pdf
 review_status: draft
 corrections:
   # Quote overlays for the nine unquoted measured figure-only rows. Parent
@@ -1254,8 +1255,9 @@ species:
       units: none
       values:
         quantity: proposed_vaporization_reaction
-        evidence_kind: model
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Mueller R. F., Geochim. Cosmochim. Acta 29 (1965), ref. 8 (as cited by Piacente et al. 1975)
         reaction_as_printed: "Fe2SiO4(s) ⇌ 2 Fe(s) + SiO2(s) + O2(g)"
         citation_in_source: Mueller R. F., Geochim. Cosmochim. Acta 29 (1965) [8]
         printed_quote: "Fe2SiO4(s) ⇌ 2 Fe(s) + SiO2(s) + O2(g)"
@@ -1268,7 +1270,6 @@ species:
         note: >-
           Cited scheme for pure/mixed fayalite, not a measured K of this work.
           Authors argue the Fo90Fa10 olivine follows the same mechanism.
-          Battery must refuse as model_output_not_measurement.
       uncertainty:
         note: not a measured equilibrium constant
 

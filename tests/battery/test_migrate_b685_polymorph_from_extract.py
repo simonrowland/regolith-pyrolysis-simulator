@@ -19,7 +19,9 @@ _REASON = "source does not state polymorph"
 def test_b685_typed_unknown_mapping_is_accepted() -> None:
     """Typed-unknown Mapping is State.unknown(reason), not an unrecognised blob."""
 
-    raw = polymorph_from_extract({"condensed_form": {"polymorph": dict(_TYPED_UNKNOWN)}})
+    raw = polymorph_from_extract(
+        {"condensed_form": {"polymorph": dict(_TYPED_UNKNOWN)}}, "SiO2"
+    )
     assert raw is not None
     assert raw.is_unknown
     assert raw.value is None
@@ -35,7 +37,9 @@ def test_b685_typed_unknown_mapping_is_accepted() -> None:
 
 
 def test_b685_typed_not_applicable_mapping_is_accepted_on_crystal() -> None:
-    raw = polymorph_from_extract({"condensed_form": {"polymorph": dict(_TYPED_NA)}})
+    raw = polymorph_from_extract(
+        {"condensed_form": {"polymorph": dict(_TYPED_NA)}}, "MgO"
+    )
     assert raw is not None
     assert raw.is_not_applicable
     assert raw.reason == "not crystal"
@@ -48,7 +52,8 @@ def test_b685_typed_not_applicable_mapping_is_accepted_on_crystal() -> None:
 
 def test_b685_typed_value_mapping_coerces_closed_token() -> None:
     raw = polymorph_from_extract(
-        {"condensed_form": {"polymorph": {"tag": "value", "value": "periclase"}}}
+        {"condensed_form": {"polymorph": {"tag": "value", "value": "periclase"}}},
+        "MgO",
     )
     assert raw is not None
     assert raw.is_value
@@ -63,7 +68,9 @@ def test_b685_typed_value_mapping_coerces_closed_token() -> None:
 def test_b685_closed_token_string_still_coerces() -> None:
     """Closed plain-string tokens are unchanged by the reader path."""
 
-    raw = polymorph_from_extract({"condensed_form": {"polymorph": "periclase"}})
+    raw = polymorph_from_extract(
+        {"condensed_form": {"polymorph": "periclase"}}, "MgO"
+    )
     assert raw is not None
     assert raw.is_value
     assert raw.value == "periclase"
@@ -76,7 +83,8 @@ def test_b685_closed_token_string_still_coerces() -> None:
 
 def test_b685_unrecognised_value_mapping_degrades() -> None:
     raw = polymorph_from_extract(
-        {"condensed_form": {"polymorph": {"tag": "value", "value": "not-a-real-form"}}}
+        {"condensed_form": {"polymorph": {"tag": "value", "value": "not-a-real-form"}}},
+        "MgO",
     )
     assert raw is not None
     assert raw.is_unknown
@@ -84,7 +92,9 @@ def test_b685_unrecognised_value_mapping_degrades() -> None:
 
 
 def test_b685_absent_or_empty_polymorph_returns_none() -> None:
-    assert polymorph_from_extract({}) is None
-    assert polymorph_from_extract({"condensed_form": {}}) is None
-    assert polymorph_from_extract({"condensed_form": {"polymorph": ""}}) is None
-    assert polymorph_from_extract({"condensed_form": {"polymorph": None}}) is None
+    assert polymorph_from_extract({}, "SiO2") is None
+    assert polymorph_from_extract({"condensed_form": {}}, "SiO2") is None
+    assert polymorph_from_extract({"condensed_form": {"polymorph": ""}}, "SiO2") is None
+    assert polymorph_from_extract(
+        {"condensed_form": {"polymorph": None}}, "SiO2"
+    ) is None

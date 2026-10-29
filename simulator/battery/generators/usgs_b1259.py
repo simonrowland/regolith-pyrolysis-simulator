@@ -38,6 +38,7 @@ from simulator.battery.generators.usgs_b1544 import (
 from simulator.battery.identity import (
     LN10,
     THERMOCHEMICAL_CALORIE_J,
+    _format_enthalpy_increment_subtype,
     atm_to_pa,
     log10K_from_delta_fG_kJ_mol,
 )
@@ -58,6 +59,7 @@ from simulator.battery.records import (
     State,
     Uncertainty,
     Value,
+    phase_token,
 )
 from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
 from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
@@ -1386,6 +1388,26 @@ def _element_reference_species(
     return make_species(formula, phase, polymorph_state, charge=0), atom_count
 
 
+def reference_enthalpy_zero_is_ideal_gas(formula: str) -> bool:
+    """True when B1259's 298.15 K elemental reference for this formula is the ideal gas.
+
+    H−H298 on that table then shares the JANAF ideal-gas zero. A
+    reference-state table that is crystal or liquid at 298.15 K keeps the
+    condensed zero at every higher temperature, including after it becomes gas.
+    `_element_reference_species` owns the phase at 298.15 K.
+    """
+
+    counts = _parse_counts(formula)
+    if counts is None or len(counts) != 1:
+        return False
+    symbol = next(iter(counts))
+    resolved = _element_reference_species(symbol, Decimal("298.15"))
+    if resolved is None:
+        return False
+    species, _atoms = resolved
+    return phase_token(species) is Phase.G and species.formula == formula
+
+
 def _formation_identity(
     product: Species, basis: str, temperature: Decimal
 ) -> tuple[Reaction, tuple[tuple[str, Species], ...]] | None:
@@ -1522,6 +1544,10 @@ def _observation(
         "temperature_K": State.of(temperature),
         "standard_pressure_Pa": State.of(STANDARD_PRESSURE_PA),
     }
+    if quantity is Quantity.H_MINUS_H298:
+        known["subtype"] = State.of(
+            _format_enthalpy_increment_subtype(REFERENCE_TEMPERATURE_K)
+        )
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
         known["reaction"], known["formation_elements"] = _basis_states(
             species, basis, temperature

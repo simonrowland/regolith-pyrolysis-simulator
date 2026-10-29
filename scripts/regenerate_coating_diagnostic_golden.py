@@ -10,8 +10,8 @@ test_coating_diagnostic_default_output_is_byte_identical_to_golden.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
-import json
 import re
 import sys
 from pathlib import Path
@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from simulator.runner import PyrolysisRun  # noqa: E402
+from tests.coating_golden import produce_coating_golden  # noqa: E402
 
 TEST_PATH = ROOT / "tests" / "test_coating_rate.py"
 PIN_RE = re.compile(
@@ -33,30 +33,13 @@ PIN_RE = re.compile(
 
 
 def produce_bytes() -> bytes:
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=24,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-15T00:00:00Z",
-            "kernel_commit_sha": "goal-18-fixture",
-        },
-    )
-    return (
-        json.dumps(
-            run.run(),
-            indent=2,
-            sort_keys=False,
-            allow_nan=False,
-        )
-        + "\n"
-    ).encode("utf-8")
+    return produce_coating_golden()[0]
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Check the pin without writing")
+    args = parser.parse_args()
     digest = hashlib.sha256(produce_bytes()).hexdigest()
     text = TEST_PATH.read_text(encoding="utf-8")
     match = PIN_RE.search(text)
@@ -66,13 +49,13 @@ def main() -> int:
         )
     old = match.group(2)
     new_text = PIN_RE.sub(rf"\g<1>{digest}\g<3>", text, count=1)
-    if new_text != text:
+    if not args.check and new_text != text:
         TEST_PATH.write_text(new_text, encoding="utf-8")
     print(f"coating_diagnostic_sha old={old}")
     print(f"coating_diagnostic_sha new={digest}")
     print(f"changed={'yes' if old != digest else 'no'}")
     print(TEST_PATH.relative_to(ROOT))
-    return 0
+    return int(args.check and old != digest)
 
 
 if __name__ == "__main__":

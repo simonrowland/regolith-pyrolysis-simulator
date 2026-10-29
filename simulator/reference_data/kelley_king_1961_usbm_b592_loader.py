@@ -218,6 +218,11 @@ def load_manifest(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = 
     return manifest
 
 
+def load_published_curves(root: Path = COMPILATION_ROOT) -> tuple[dict[str, Any], ...]:
+    """Load curated equation records kept separate from source cell records."""
+    return tuple(json.loads((root / "source/published-curves.json").read_text(encoding="utf-8")))
+
+
 def _numeric_cells(value: Any, *, source_row_index: int = -1):
     if isinstance(value, dict):
         row_index = int(value.get("source_row_index", source_row_index))

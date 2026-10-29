@@ -32,6 +32,7 @@ from simulator.backend_names import (
 )
 from simulator.cost_parameters import RECIPE_COST_PARAMETERS_KEY
 from simulator.campaigns import CampaignManager
+from simulator.config import _load_setpoints_file
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
@@ -273,6 +274,8 @@ class _StoredBackendResolutionCarrier:
 
 def _load_yaml(filename):
     path = DATA_DIR / filename
+    if filename == 'setpoints.yaml':
+        return _load_setpoints_file(path)
     if not path.exists():
         return {}
     with open(path) as f:
@@ -4126,9 +4129,12 @@ def load_recipe():
 def simulator():
     """Main simulator interface."""
     session.setdefault('ledger_client_id', os.urandom(16).hex())
+    from web.events import SIMULATION_TICK_PAYLOAD_VERSION
+
     feedstocks, debug_feedstocks = load_feedstock_groups()
     return render_template(
         'simulator.html',
+        simulation_tick_payload_version=SIMULATION_TICK_PAYLOAD_VERSION,
         feedstocks=feedstocks,
         mre_presets=_mre_preset_catalog_payload(),
         c4_operator_presets=_c4_operator_preset_payload(),
@@ -4201,6 +4207,23 @@ def ledger_account_pattern_api():
 @bp.route('/api/ledger/snapshot', methods=['GET'])
 def ledger_snapshot_api():
     return _ledger_get('snapshot')
+
+
+@bp.route('/api/simulation-history', methods=['GET'])
+def simulation_history_api():
+    """Fetch the active run's per-hour summary history on demand."""
+    client_id = str(session.get('ledger_client_id') or '')
+    if not client_id:
+        return _json_error(
+            'simulation history requires an initialized browser session', 400
+        )
+    try:
+        from web.events import read_simulation_history_for_client
+        return jsonify(read_simulation_history_for_client(client_id))
+    except LookupError as exc:
+        return _json_error(str(exc), 404)
+    except (TypeError, ValueError) as exc:
+        return _json_error(str(exc), 400)
 
 
 @bp.route('/api/ledger/views/<view_name>', methods=['GET'])

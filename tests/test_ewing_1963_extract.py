@@ -11,8 +11,8 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
 )
-from simulator.battery.migrate import Migrator
 from simulator.battery.score import ScoreContext, score_store
+from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,8 +24,7 @@ def _extract_document() -> dict:
 
 
 def test_ewing_figure_only_evidence_and_scoring_notice():
-    migrator = Migrator(root=ROOT)
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(ROOT, EXTRACT)
     migrator.finalize()
     result = migrator.result
     observations = tuple(result.observations.values())

@@ -37,6 +37,13 @@ source:
   url: "https://…"                       # optional
   version: null                          # database / edition version when applicable
   year: 2015                             # optional
+  method_uncertainty:                     # optional source-level method uncertainty
+    value: 0.10
+    meaning: one_sigma                    # one_sigma | two_sigma | range_half_width
+    quantity: activity                    # Quantity enum value
+    basis: log10_dex                      # log10_dex | absolute | relative_percent
+    quantity_basis: "log10 activity in dex" # printed description, retained verbatim
+    locator: { page: 12, note: "Quoted sentence from the source, retained verbatim." }
 extraction:
   method: manual_from_draft              # required free text
   date: "2026-08-01"                     # ISO YYYY-MM-DD required
@@ -62,6 +69,15 @@ fidelity_samples:
   #   locator: { record: costa_jacobson_2015_fe_olivine_kems }
 species: {}                              # map: canonical U0 / manifest id → species block
 ```
+
+`source.method_uncertainty` applies only to rows from this source that do not
+state their own uncertainty. `quantity` is a `Quantity` enum value and selects
+the only rows the field can band. `basis` records the printed width basis:
+`log10_dex`, `absolute`, or `relative_percent`. `meaning` records the printed
+convention; `quantity_basis` retains the printed description without being
+matched to infer a quantity or unit. `locator.page` and `locator.note` give the
+page and exact quoted sentence. No value or meaning is inferred when this field
+is absent.
 
 ### `review_status`
 
@@ -123,6 +139,35 @@ A parameterized checked-in test
 resolves every sample against the extract and asserts equality. Mutating a
 pinned extract value in memory must go RED.
 
+### Valence ratios from printed mass-fraction pairs
+
+Keep both source cells as printed in `values.points`, including their printed
+column labels and units. The migrator may emit a separate `valence_ratio`
+observation whose `identity.valence_basis` records the ratio and its printed
+input form:
+
+```yaml
+valence_basis:
+  numerator_oxidation_states: [3]
+  denominator_kind: total_element
+  denominator_oxidation_state: null
+  value_form: fraction
+  printed_form: mass_fraction_pair
+  mass_fraction_basis: [element, element]
+```
+
+`mass_fraction_basis` names the numerator and denominator bases in order. Use
+`element` when the printed values are element-equivalent, or the explicit
+printed formula (such as `Fe2O3`) when the source gives an oxide basis. The
+migrator reduces each cell to moles of the named element using its molar mass
+and cation count per formula unit, then forms the identity's valence ratio.
+The two stored source-cell observations must both appear in `derived_from` and
+the derivation's `inputs`; retain both printed values with their locators in
+the derivation parameters. A stoichiometric re-expression of measured cells is
+`measured_reduced`; if either input is estimated, use the weaker input's class.
+Propagate uncertainty only when the source prints per-cell uncertainty;
+otherwise leave the uncertainty band absent.
+
 **YAML alias note:** sample `value:` must be an **independent literal**, never a
 YAML alias (`*id`) into the observation body at the root or any nested depth.
 The validator recursively refuses shared mutable mapping/sequence identity — a
@@ -174,12 +219,74 @@ species:
         units: dimensionless                        # required when values present
         uncertainty:                                # FIRST-CLASS (owner 2026-08-02)
           note: "high-side of measured D(Fe+) band"
+          confidence_level: one_sigma              # optional; default not_stated; source-stated level only
           alpha_range: [0.011, 0.02]                # retain stated uncertainty verbatim
         values: { alpha: 0.02 }                     # VERBATIM; no fitted coefficients
         equipment: {}                               # optional; see equipment metadata
 ```
 
 ## Observation types
+
+### Derived observation lineage
+
+`model_derived` and `measured_reduced` observations require a derivation
+recording the stated method; the observation's required `locator` locates that
+method. They also require `derived_from`, except that either evidence class may
+declare that the source does not print the raw inputs. A `measured_reduced`
+declaration needs its own source locator:
+
+```yaml
+locator: {page: 164, section: '3.3'}
+derivation:
+  relation: "calculated from measured quantities"
+  output_unit: dimensionless
+  raw_inputs:
+    state: {tag: value, value: not_printed}
+    locator: {page: 164, section: '3.3'}
+```
+
+When the source does not print raw inputs, omit `inputs` entirely. The paper
+is never an input, and no invented observation may stand in for the unprinted
+inputs. For `model_derived`, the derivation must also carry its method as a
+located `method` field whose value describes the printed calculation. Its
+locator identifies the printed equation and physical page, and `references`
+is a typed list naming at least one compiled reference used. For example:
+
+```yaml
+derivation:
+  relation: "author calculation using the printed equilibrium equation"
+  output_unit: Pa
+  method:
+    state: {tag: value, value: "Eqs. (7)–(9) calculate K_ref from unprinted ion-current ratios"}
+    locator:
+      page: 19
+      equation: "7–9"
+  references:
+    - "Gurvich K°(T)"
+    - "Mann cross-sections"
+  raw_inputs:
+    state: {tag: value, value: not_printed}
+    locator:
+      page: 19
+      equation: "7–9"
+      note: "The row-wise ion currents are not printed."
+```
+
+`raw_inputs` is a typed status with its own source locator. `not_printed` is
+valid for `measured_reduced`, and for `model_derived` only when a nonempty
+method with an equation and physical-page locator and at least one named
+compiled reference is supplied. It cannot appear with derivation `inputs` or
+observation `derived_from`. A model-derived method locator does not replace
+the observation's required method locator. A located `not_printed` declaration
+that meets those conditions supplies lineage, so `derived_from` is not
+required. `printed_unresolved` does not supply lineage.
+
+`printed_unresolved` means every derivation input was printed prose and none
+of it resolves to a record id or asset. `inputs` is then empty. The verbatim
+text stays on the conditional-field issue and the migration-queue entry. The
+status is located by the derivation's locator or the row's locator. It is not
+complete lineage. When some inputs resolve, those ids stay in `inputs` and
+`raw_inputs` stays absent.
 
 Exactly one of:
 
@@ -200,7 +307,23 @@ Exactly one of:
 | `phase_transition` | Calorimetrically resolved transition temperatures/intervals and scan-condition series (DSC/DTA peaks, crystallization-on-cooling). Distinct from `transition_point`: those are thermodynamic fixed points, these are method-conditioned measurements |
 | `gas_speciation` | Vapour/atmosphere/condensate composition: which gas-bearing species, how much, as published |
 | `sulfur_solubility_and_sulfate_capacity_series` | Measured sulfur solubility / sulfate capacity series, including ratio-conditioned variants |
+| `chloride_capacity` | Printed log10 chloride-capacity series with its defining equation |
 | `composition_series` | Measured composition series across runs/samples (per-sample rows as payload) |
+| `equilibrium_phase_composition` | Measured composition of an equilibrium gas or condensed phase at stated temperature and conditions; preserve the printed basis on `values.basis_as_published` and identify the phase on the row |
+| `distribution_ratio` | Printed distribution ratio between coexisting phases, with its numerator and denominator phase/component convention stated on the row |
+
+The battery quantity token `equilibrium_phase_composition` uses
+`units: subtype_defined`: units and basis are those printed (for example,
+O/Fe atom ratio, wt% O, or x in Fe(1-x)O). Migration stores that printed
+basis as the quantity subtype. No conversion between composition bases is
+implicit. For gas-phase ratios, state numerator and denominator species in the
+printed basis and retain coexisting phases in `point_conditions`. Until an engine predicts this quantity, scoring retains the row and
+returns the typed `quantity_not_predicted` refusal.
+
+For `equilibrium_phase_composition` component amounts printed in mass ppm,
+store the value unchanged with subtype `element_ppm_by_mass`. Phase-assemblage
+engines report wt%; scoring converts the reference transiently using
+`wt_percent = ppm / 10^4` (1 ppm = 1e-6 mass fraction = 1e-4 wt%).
 
 **Verbatim only.** Extracts store published numbers (and arithmetic that merely
 converts units with the conversion shown). No Antoine/refit coefficients invented
@@ -276,6 +399,66 @@ Rules:
 - Pointer / bound-not-point / competing-observation rows must carry explicit
   structured content (e.g. `semantics: bound_not_point_ordering`,
   `semantics: competing_observation_do_not_average`).
+- A scalar `values` payload or `values.points[]` row for `activity` or
+  `activity_coefficient` may declare `printed_form: log10 | neg_log10 | ln`.
+  The selected scalar is converted to its linear activity; the migrated
+  observation provenance retains the printed number as `printed_value` and the
+  token as `printed_form`. A printed ± width on a base-10 log is retained in
+  `log10_dex`; for `ln`, divide the printed width by `ln(10)` to express it in
+  dex. The uncertainty width stays in log space. An unrecognized `printed_form`
+  is refused as a typed unavailable value and added to the migration queue; it
+  is never interpreted as one of the supported logarithms.
+
+#### Printed oxygen condition source
+
+An observation may identify the printed O/O2 observation used for its oxygen
+condition with `values.oxygen_partial_pressure.source_observation_id`:
+
+```yaml
+values:
+  oxygen_partial_pressure:
+    value: 1.24e-8
+    units: atm
+    locator: {published_page: 1295, table: '3', note: row 1}
+    source_observation_id: shornikov_2020_table3_o2_partial_pressure_2278k
+```
+
+The optional field is a nonempty string naming a migrated O or O2
+partial-pressure observation in the **same source**. Local observation IDs
+and fully qualified `<source_id>::<observation_id>` IDs are accepted.
+Migration validates the reference after all observations in the extract have
+been emitted, qualifies it, and appends it to the stamped condition's existing
+`Located.inference.inputs`, preserving pressure conversion metadata. An invalid
+reference produces a typed `referential_integrity` issue and no source link.
+The printed node must be the condition actually stamped on that observation.
+
+Omission or null preserves the existing unlinked provenance. Never infer this
+field from matching pressures, species names, or locator notes. A condition
+may explicitly name its own O2 observation; scoring then excludes that input
+as `used_as_scoring_condition`. Other sample species using that same condition
+remain scoring targets.
+
+### Observation point conditions
+
+An observation may carry `point_conditions` alongside its identity and value.
+Each entry uses the Located `{state, locator}` form. Quench statements are
+closed typed values and require their own source locator:
+
+```yaml
+point_conditions:
+  quench_state:
+    state: {tag: value, value: asserted_preserved} # or asserted_altered / not_stated
+    locator: {page: 12, table: '3'}
+  quench_direction:
+    state: {tag: value, value: oxidising}
+    locator: {page: 12, paragraph: 'The glass aliquot was quenched in air'}
+```
+
+`quench_state` records what the source says about preservation during quench;
+omission is reported by the scorer as `not_stated`. `quench_direction` is
+optional and records only a source-stated direction. For Cr glass valence
+fractions, an oxidising direction is reported as a notice and does not gate
+scoring.
 
 ### Uncertainty (first-class)
 
@@ -285,6 +468,12 @@ envelopes / ranges / ± terms. `tools/extract_merge.py` **propagates** uncertain
 into the by-species view (`observation.uncertainty`, group
 `winner_uncertainty`, group `uncertainties[]`) so catalog fits inherit an error
 budget input.
+
+An uncertainty mapping may include `confidence_level`, which records only a
+level explicitly stated by the source: `one_sigma`, `two_sigma`, `ci95`, or
+`not_stated`. Omission defaults to `not_stated`; a field name such as `sigma`
+does not establish a confidence level. Keep the source locator on the enclosing
+observation.
 
 ## Locators (per observation AND per equipment field)
 
@@ -301,6 +490,26 @@ zero-based PDF page index (the first PDF page is 0). `published_page` is the
 folio printed on the page; it may be absent, Roman-numeral, or non-numeric.
 Example: a figure on the 12th PDF page with printed folio 7 has `page: 12`,
 `pdf_page_index: 11`, and `published_page: 7`.
+
+When the source PDF is absent from the corpus, a locator whose physical page
+could not be verified because no corpus PDF exists at either the extract's `source_id`
+or `source.corpus_source_id` may carry the typed verification field
+`page_verification: unverified_pdf_absent`. This is verification metadata, not a
+location key; the validator counts it as a notice and rejects it when either PDF exists.
+This typed reason is reported as a notice and exempts that locator from the
+`page == pdf_page_index + 1` check only while both corpus PDF paths are absent.
+
+For a table that continues from a captioned page onto a page containing cited
+data, set `table_caption_page` to the one-based physical page containing the
+caption/label. The locator's `page` and `pdf_page_index` identify the page
+containing the cited data, and `table_caption_page` must be an integer earlier
+than `page`. This verification metadata is not a location key. The label test
+checks the caption on `table_caption_page` and the cited data cell on `page`.
+
+For a continued table whose label appears on the immediately preceding
+physical page, set `table_continued: true`. The locator's `page` and
+`pdf_page_index` still identify the page containing the cited data; the label
+test checks the label on `page - 1` and the cited data cell on `page`.
 
 Every **observation** requires a `locator`.  
 Every **equipment-metadata field** that is present requires its **own** `locator`
@@ -418,6 +627,24 @@ at `pressure_environment.pumping.base_pressure_Pa`; it is not run pressure.
 `pressure_environment.sweep_gas.state.value` uses the battery `SweepGas`
 field list below. The migrator and per-file validator share its parser and
 store validation rules. Existing single-species records serialize unchanged.
+
+An optional `fO2_control.gas_ratio` preserves a printed gas ratio without
+deriving oxygen fugacity:
+
+```yaml
+fO2_control:
+  channel: {tag: value, value: gas_mix}
+  gas_ratio:
+    numerator_species: CO2
+    denominator_species: CO
+    value: {state: {tag: value, value: 1.4}, locator: {published_page: 800, table: I}}
+    basis: mole
+```
+
+`value` is a Located printed scalar, and `basis` is exactly `volume`, `mole`,
+or `partial_pressure`; `buffer` remains the source's verbatim printed description for buffer
+systems. A commanded pure-O2 atmosphere uses `channel: gas_mix` and the
+printed `oxygen_partial_pressure_Pa` instead of `gas_ratio`.
 
 | SweepGas field | Meaning |
 |---|---|

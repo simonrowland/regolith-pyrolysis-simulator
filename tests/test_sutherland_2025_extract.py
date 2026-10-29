@@ -6,7 +6,8 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Quantity
-from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT
+from tests.battery.factories import migrate_one_extract
 
 
 def test_interval_mass_loss_stays_out_of_endpoint_observations(
@@ -26,8 +27,9 @@ def test_interval_mass_loss_stays_out_of_endpoint_observations(
     }
 
     def mass_loss_count(extract: Path) -> int:
-        migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
-        migrator._migrate_extract(extract)
+        migrator = migrate_one_extract(
+            REPO_ROOT, extract, index=None, aliases={}
+        )
         migrator.finalize()
         return sum(
             obs.identity.quantity.is_value

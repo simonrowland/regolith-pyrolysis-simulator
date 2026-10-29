@@ -42,6 +42,21 @@ def polys():
     return load_buffer_polynomials()
 
 
+def test_buffer_polynomial_source_values_are_pinned_before_loader_reuse(polys):
+    assert set(polys) == {"H2", "H2O", "O2", "CO", "CO2"}
+    expected_g_over_rt_at_1800_K = {
+        "H2": -19.146927915267394,
+        "H2O": -43.17527179699285,
+        "O2": -28.395985043436767,
+        "CO": -34.735642461966705,
+        "CO2": -57.42413742412673,
+    }
+    for species, expected in expected_g_over_rt_at_1800_K.items():
+        assert polys[species].evaluate(1800.0).g_over_RT == pytest.approx(
+            expected, rel=0.0, abs=1e-12
+        )
+
+
 # --------------------------------------------------------------------------
 # PHYSICS -- external references. These can actually fail.
 # --------------------------------------------------------------------------

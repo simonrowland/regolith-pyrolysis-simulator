@@ -80,12 +80,12 @@ values:
         corpus: "bibliography record only; no local primary corpus harvested"
         lacks: "CMS melt primary, not the chosen lunar-analog ferrobasalt anchor; DOI not verified in references.yaml"
       - ref: REF-051
-        note: "Plante/Hastie 1981 primary behind the Sossi & Fegley 2018 Table 2 KO0.5 activity-coefficient range."
-        locus: "NBS Special Publication 561:265-281; Sossi & Fegley 2018 Table 2 carries the KO0.5 row as 6.3e-5-7.1e-4 at 1573 K"
+        note: "Plante 1979 primary behind the Sossi & Fegley 2018 Table 2 KO0.5 activity-coefficient range."
+        locus: "NBS Special Publication 561, Vol. 1, pp. 265-281; Sossi & Fegley 2018 Table 2 carries the KO0.5 row as 6.3e-5-7.1e-4 at 1573 K"
         value: "KO0.5 6.3e-5-7.1e-4 @1573 K"
-        url: ""
-        corpus: "bibliography record only; no local primary corpus harvested"
-        lacks: "comparison K-bearing silicate system, not the chosen Apollo 12022 lunar-basalt KEMS anchor; DOI not verified in references.yaml"
+        url: "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication561v1.pdf"
+        corpus: "Primary chapter record: data/literature/works/10.6028_nbs.sp.561v1.yaml; structured extraction: data/literature/extracts/kems-042-plante-1979.yaml"
+        lacks: "comparison K-bearing silicate system, not the chosen Apollo 12022 lunar-basalt KEMS anchor; the volume DOI does not identify a separate chapter DOI"
       - ref: REF-049
         note: "DeMaria et al. 1971 Apollo 12022 KEMS; bibliography record is REF-049, DOI blank, ADS bibcode tracked in references.yaml."
         locus: "Fig 1 (p_Na vs 1/T), Fig 2 (p_K vs 1/T); Proc. 2nd Lunar Sci. Conf., vol. 2, pp. 1367-1380"   # exact page/URL: verify (t-106)

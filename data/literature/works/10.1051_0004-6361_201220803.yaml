@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-011-wetzel-gail-2013
       role: pdf
@@ -38,22 +38,10 @@ work:
         reason: INDEX does not give an unmatched-layer asset
     - asset_id: pdf:wetzel-gail-2013-sio-arrhenius
       role: pdf
-      path: raw/wetzel-gail-2013-sio-arrhenius/wetzel-gail-2013-sio-arrhenius.pdf
+      path: raw/kems-011-wetzel-gail-2013/kems-011-wetzel-gail-2013.pdf
       sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:wetzel-gail-2013-sio-arrhenius
-      role: pdftotext
-      path: text/wetzel-gail-2013-sio-arrhenius
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:wetzel-gail-2013-sio-arrhenius
-      role: table_csv
-      path: tables/wetzel-gail-2013-sio-arrhenius
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
+        tag: value
+        value: e4cfdd959dfed9f911cc6afc8a0dc8cdad009f31771596e28834eacf032ccf6b
     - asset_id: unknown:wetzel-gail-2013-sio-arrhenius
       role: pdftotext
       path: unknown
@@ -145,6 +133,7 @@ experiments:
                 section: '2.1'
                 note: UHV base pressure <10^-10 mbar; unit conversion only
           output_unit: Pa
+          references: []
   work_id: 10.1051/0004-6361/201220803
   locator:
     page: 2
@@ -157,7 +146,7 @@ experiments:
         value: Ta Knudsen cell (source); UHV film growth
       locator:
         paragraph: Ta Knudsen cell
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
     geometry:
       orifice_diameter_m:
         state:
@@ -228,6 +217,7 @@ experiments:
                 section: '2.4'
                 note: Printed 100 min per anneal; unit conversion only
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -268,7 +258,7 @@ experiments:
     equation: '8'
     line_range: 317-329
     note: particle-growth equation; authors call alpha(T) a growth coefficient
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
 benches:
 - id: 10.1051/0004-6361/201220803::bench::wetzel-uhv-film-apparatus
   work_id: 10.1051/0004-6361/201220803

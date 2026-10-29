@@ -21,20 +21,24 @@ without spinning up a child process.
 
 from __future__ import annotations
 
+import hashlib
 from collections import defaultdict
+from dataclasses import replace
 import json
 import subprocess
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 
+from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting import AccountingQueries, AtomLedger
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.yield_disposition import OriginUnresolvedError
 from simulator.accounting.run_artifact import build_run_artifact
-from simulator.chemistry.kernel import ProviderUnavailableError
+from simulator.chemistry.kernel import ChemistryIntent, ProviderUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
 from simulator.condensation import CondensationModel
@@ -47,7 +51,11 @@ from simulator.optimize.recipe import (
     RecipeSchema,
 )
 from simulator.run_executor import RunExecutor, _json_safe
-from simulator.state import CampaignPhase, HourSnapshot
+from simulator.state import (
+    CampaignPhase,
+    HourSnapshot,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
+)
 from simulator.runner import (
     EngineBugAbort,
     NOT_APPLICABLE_UNTIL_P0,
@@ -61,6 +69,7 @@ from simulator.runner import (
     _melt_redox_gate_floor_fallback_engagement,
     _runner_failure_result,
     _status_with_mass_balance_invariant,
+    build_sio_yield_report,
     _vapor_pressure_source_report,
 )
 from simulator.condensation import (
@@ -82,6 +91,25 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures" / "runner"
 # ``tests/test_mass_balance.py``; surfacing the same number here means a
 # runner change that opens a balance gap fails fast against the goldens.
 MASS_BALANCE_MAX_PCT = 5e-12
+
+# Golden pins for all evaporation flux maps emitted during each shipped runner
+# scenario and the ledger-facing product outputs. These are captured separately
+# from the runner JSON because its public envelope does not include raw flux maps.
+SCENARIO_FLUX_LEDGER_PINS = {
+    "lunar_mare_low_ti_C0_24h": {
+        # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
+        "flux_maps_sha256": "6f6b8e6f2137ffb369ec3079cd7305324325713cad87be2e6d609fe9911b6267",
+        "ledger_sha256": "fabe87d7c89cd5622ab3b77734e2ef1f307f3b7af48e5175723c14d93a4dea3e",
+    },
+    "mars_basalt_C2A_12h": {
+        "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
+        "ledger_sha256": "3cef2f00197f17daeaebfc535f79ae2bed243fca379203c2fd65b92ab3c1b25d",
+    },
+    "ci_carbonaceous_chondrite_C2B_12h": {
+        "flux_maps_sha256": "d827049039f82a8b65a9b0f52e637cf3bc5d1e0dec7d6198edf901a5e3dcae7d",
+        "ledger_sha256": "fe7c19dbc6195a7f115e8cac385d539f84cf0a3670c35415ee058a5f41a56348",
+    },
+}
 
 
 def test_json_safe_nonfinite_numbers_export_null():
@@ -209,8 +237,10 @@ def test_completed_run_preserves_success_when_product_classification_raises(
 
     assert payload["status"] == "ok"
     assert payload["product_classification"] == {
-        "classification": {},
-        "markdown": "",
+        "status": "unavailable",
+        "section": "product_classification",
+        "exception_type": "RuntimeError",
+        "reason": "injected product-classification failure",
     }
 
 
@@ -237,7 +267,12 @@ def test_completed_run_preserves_success_when_terminal_taxonomy_raises(
     payload = run._run_session(session)
 
     assert payload["status"] == "ok"
-    assert payload["terminal_product_taxonomy"] is None
+    assert payload["terminal_product_taxonomy"] == {
+        "status": "unavailable",
+        "section": "terminal_product_taxonomy",
+        "exception_type": "RuntimeError",
+        "reason": "injected terminal-taxonomy failure",
+    }
 
 
 def test_completed_run_preserves_success_when_yield_disposition_raises(
@@ -263,8 +298,159 @@ def test_completed_run_preserves_success_when_yield_disposition_raises(
     payload = run._run_session(session)
 
     assert payload["status"] == "ok"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "OriginUnresolvedError",
+        "reason": "injected yield-disposition refusal",
+    }
     assert payload["terminal_product_taxonomy"] is not None
+
+
+def test_completed_run_preserves_success_when_stage_purity_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_stage_purity_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected stage-purity failure")
+
+    monkeypatch.setattr(
+        "simulator.runner.stage_purity_report",
+        raise_stage_purity_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["stage_purity_report"] == {
+        "status": "unavailable",
+        "section": "stage_purity_report",
+        "exception_type": "RuntimeError",
+        "reason": "injected stage-purity failure",
+    }
+
+
+def test_completed_run_marks_final_unavailable_when_ledger_projection_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_ledger_projection_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected ledger projection failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._final_state_from_ledger",
+        raise_ledger_projection_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["final_state"] == {
+        "status": "unavailable",
+        "section": "final_state",
+        "exception_type": "RuntimeError",
+        "reason": "injected ledger projection failure",
+    }
+    assert payload["final"] == {
+        "status": "unavailable",
+        "section": "final",
+        "exception_type": "RuntimeError",
+        "reason": (
+            "upstream section final_state unavailable: "
+            "injected ledger projection failure"
+        ),
+    }
+
+
+def test_sio_yield_report_propagates_unavailable_final_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.runner import build_sio_yield_report
+
+    def raise_ledger_projection_error(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("injected SiO ledger projection failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._final_state_from_ledger",
+        raise_ledger_projection_error,
+    )
+
+    report, diagnostics = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti",
+        hours=1,
+        include_diagnostics=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+
+    assert report["status"] == "unavailable"
+    assert report["section"] == "sio_yield_report"
+    assert report["exception_type"] == "RuntimeError"
+    assert "final_state" in report["reason"]
+    assert "wall_deposit_kg" not in report
+    assert diagnostics["status"] == "unavailable"
+    assert diagnostics["section"] == "sio_yield_report.diagnostics"
+    assert "final_state" in diagnostics["reason"]
+    assert "closure_error_pct" not in diagnostics
+
+
+def test_completed_run_reports_unresolved_wall_species_without_aborting(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import runner as runner_module
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    species = "unregistered-wall-species"
+    original_final_state = runner_module._final_state_from_ledger
+
+    def add_unresolved_deposit(sim):
+        state = original_final_state(sim)
+        state[f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}review_input"] = {
+            species: 0.25,
+        }
+        return state
+
+    monkeypatch.setattr(
+        runner_module,
+        "_final_state_from_ledger",
+        add_unresolved_deposit,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert species not in payload["final"]["wall_deposit_by_species_kg"]
+    assert payload["run_metadata"]["refusal_diagnostic"][
+        "wall_deposit_report"
+    ] == {
+        "status": "refused",
+        "reason": "unknown_species_formula",
+        "unresolved_wall_deposit_species": [
+            {"species": species, "mol": 0.25},
+        ],
+    }
 
 
 def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
@@ -622,11 +808,14 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "fe_redox_split",
     "stage_3_capture",
     "redox_source_breakdown",
+    "oxygen_reservoir",
+    "high_t_melt_activity",
     "mass_balance_error_category",
     "reduced_real_cache_state",
     "c2a_staged_gas",
     "metal_phase_stratification",
     "condensation_refusals_by_species",
+    "high_t_melt_activity",
 })
 
 VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({
@@ -694,8 +883,8 @@ SCENARIOS = [
 ]
 
 
-def _run_scenario(scenario: dict) -> dict:
-    """Run a scenario and return the resulting JSON document.
+def _run_scenario(scenario: dict, *, capture: bool = False):
+    """Run once; optionally return raw flux and ledger preimages with the payload.
 
     Run metadata overrides pin started_at_utc + kernel_commit_sha to
     fixture-stable values so a fresh machine reproduces the goldens
@@ -714,7 +903,39 @@ def _run_scenario(scenario: dict) -> dict:
             "kernel_commit_sha": "goal-18-fixture",
         },
     )
-    return run.run()
+    if not capture:
+        return run.run()
+
+    flux_maps = []
+    dispatch = BuiltinEvaporationFluxProvider.dispatch
+
+    def capture_flux_maps(provider, request):
+        result = dispatch(provider, request)
+        flux_maps.append((result.diagnostic or {}).get("evaporation_flux_kg_hr"))
+        return result
+
+    with patch.object(BuiltinEvaporationFluxProvider, "dispatch", capture_flux_maps):
+        payload = run.run()
+    ledger_output = {
+        "product_ledger_kg_at_hour": [
+            row.get("product_ledger_kg_at_hour", {})
+            for row in payload["per_hour_summary"]
+        ],
+        "final_state": payload["final_state"],
+    }
+    return payload, {"flux_maps": flux_maps, "ledger_output": ledger_output}
+
+
+def _flux_ledger_pins(capture: dict) -> dict[str, str]:
+    def canonical_json(value):
+        return json.dumps(
+            value, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode("utf-8")
+
+    return {
+        "flux_maps_sha256": hashlib.sha256(canonical_json(capture["flux_maps"])).hexdigest(),
+        "ledger_sha256": hashlib.sha256(canonical_json(capture["ledger_output"])).hexdigest(),
+    }
 
 
 def test_o2_bubbler_engine_evidence_uses_effective_zero_override():
@@ -1537,7 +1758,7 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
-def test_runner_golden_fixture_matches(scenario, isolated_engine_config):
+def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     """A live run must reproduce the committed golden fixture exactly."""
 
     # lunar_mare_low_ti_C0_24h.json + mars_basalt_C2A_12h.json: regenerated
@@ -1547,9 +1768,8 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config):
     # after repair: melt_redox_gate_floor_fallback_engagement = {engaged:
     # false, total_count: 0}. ci_carbonaceous_chondrite_C2B_12h.json was
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
-    fixture_path = FIXTURES_DIR / scenario["fixture"]
-    expected = json.loads(fixture_path.read_text())
-    actual = _run_scenario(scenario)
+    actual, capture, expected_text = runner_golden_loader(scenario)
+    expected = json.loads(expected_text)
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
@@ -1559,23 +1779,24 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config):
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
+    assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
 
 
 def test_runner_golden_output_ignores_host_binding_receipts(
+    tmp_path,
     monkeypatch,
-    isolated_engine_config,
 ):
-    from simulator import engine_binding_admission, engine_local_config
+    import simulator.engine_local_config as engine_config
+    from simulator import engine_binding_admission
 
-    host_config_path = isolated_engine_config
+    host_config_path = tmp_path / "host" / "engines" / "engines.local.toml"
     host_config_path.parent.mkdir(parents=True, exist_ok=True)
-    if not host_config_path.exists():
-        host_config_path.write_text("", encoding="utf-8")
     monkeypatch.setattr(
-        engine_local_config,
-        "repo_root",
-        lambda: host_config_path.parent.parent,
+        engine_config,
+        "config_path",
+        lambda: host_config_path,
     )
+    host_config_path.write_text("", encoding="utf-8")
     host_receipt_path = host_config_path.with_name(
         engine_binding_admission.RECEIPT_FILENAME
     )
@@ -2129,8 +2350,8 @@ def test_runner_records_operator_decision_in_shadow_trace():
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
         # Long enough to traverse C0 -> C0B -> C2 fork.  500h is well
-        # past the C0 endpoint (which fires around T~950C, ~18h on the
-        # default ramp) so the decision pause is reached.
+        # past the C0 endpoint (temperature hold near 950 C on the default
+        # ramp) so the decision pause is reached.
         hours=500,
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
@@ -2243,22 +2464,24 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     sim.melt.temperature_C = 1600.0
     sim.melt.target_temperature_C = 1600.0
     curve_calls = 0
+    from simulator.engine_binding_admission import write_gate_curve_memo_record
 
     def fail_to_floor_then_recover():
         nonlocal curve_calls
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError("runner poison authority probe")
-        return {
+        curve = {
             "source": "test_recovered_real_curve",
             "solidus_T_C": 1000.0,
             "liquidus_T_C": 1700.0,
             "path": ((1000.0, 0.0), (1700.0, 1.0)),
         }
+        return write_gate_curve_memo_record(sim, curve)
 
     monkeypatch.setattr(
         sim,
-        "_freeze_gate_curve",
+        "_freeze_gate_curve_record",
         fail_to_floor_then_recover,
     )
     monkeypatch.setattr(sim, "_update_temperature", lambda: None)
@@ -2306,6 +2529,147 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     assert type(replay_error.value) is PoisonedHourError
     assert len(observed_errors) == 2
     assert observed_errors[-1] is replay_error.value
+
+
+@pytest.fixture
+def successful_short_run_for_reporting_failure():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "reporting-failure-smoke",
+        },
+    )
+    session = run._start_session()
+    run._apply_lab_area_bridge(session.simulator, run._lab_area_bridge())
+    run._apply_sio_pre_run_controls(session.simulator)
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status not in {"failed", "refused"}
+    return run, execution
+
+
+def _build_completed_report_without_propagated_lookup_error(builder):
+    try:
+        return builder()
+    except LookupError as exc:
+        pytest.fail(f"completed-run reporting exception propagated: {exc}")
+
+
+@pytest.mark.parametrize(
+    ("target", "report_key", "section"),
+    [
+        (
+            "reduced_real_cache",
+            "reduced_real_cache",
+            "run_metadata.reduced_real_cache",
+        ),
+        (
+            "_alpha_authority_status_by_species_engaged",
+            "alpha_authority_status_by_species",
+            "run_metadata.alpha_authority_status_by_species",
+        ),
+        (
+            "_last_c3_na_hold_adjustment",
+            "c3_na_hold_adjustment",
+            "run_metadata.c3_na_hold_adjustment",
+        ),
+    ],
+    ids=("reduced-real-cache", "alpha-authority-status", "c3-na-hold-adjustment"),
+)
+def test_runner_completed_run_records_serialization_failure(
+    target,
+    report_key,
+    section,
+    successful_short_run_for_reporting_failure,
+    monkeypatch,
+):
+    class SerializationPoison(dict):
+        def items(self):
+            raise LookupError("report serialization unavailable")
+
+    run, execution = successful_short_run_for_reporting_failure
+    poisoned_value = SerializationPoison({"marker": True})
+    if target == "reduced_real_cache":
+        execution = replace(execution, reduced_real_cache=poisoned_value)
+    else:
+        monkeypatch.setattr(
+            execution.simulator,
+            target,
+            {"poison": poisoned_value},
+            raising=False,
+        )
+
+    payload = _build_completed_report_without_propagated_lookup_error(
+        lambda: run._build_output(execution)
+    )
+
+    assert payload["status"] == execution.status
+    assert payload["run_metadata"][report_key] == {
+        "status": "unavailable",
+        "section": section,
+        "exception_type": "LookupError",
+        "reason": "report serialization unavailable",
+    }
+
+
+def test_runner_completed_run_records_alkali_credit_failure(
+    successful_short_run_for_reporting_failure,
+    monkeypatch,
+):
+    run, execution = successful_short_run_for_reporting_failure
+
+    def raise_alkali_credit():
+        raise LookupError("alkali credit unavailable")
+
+    monkeypatch.setattr(
+        execution.simulator,
+        "_c3_alkali_credit_outstanding_kg_by_species",
+        raise_alkali_credit,
+    )
+
+    payload = _build_completed_report_without_propagated_lookup_error(
+        lambda: run._build_output(execution)
+    )
+
+    assert payload["status"] == execution.status
+    assert payload["run_metadata"][
+        "c3_alkali_credit_outstanding_kg_by_species"
+    ] == {
+        "status": "unavailable",
+        "section": "run_metadata.c3_alkali_credit_outstanding_kg_by_species",
+        "exception_type": "LookupError",
+        "reason": "alkali credit unavailable",
+    }
+
+
+def test_sio_yield_report_records_silica_fume_stage_failure(monkeypatch):
+    def raise_silica_fume(_sim):
+        raise LookupError("silica fume stage unavailable")
+
+    monkeypatch.setattr(
+        "simulator.runner._stage_silica_fume_kg",
+        raise_silica_fume,
+    )
+
+    report = _build_completed_report_without_propagated_lookup_error(
+        lambda: build_sio_yield_report(
+            feedstock_id="lunar_mare_low_ti",
+            hours=1,
+            allow_unmeasured_alpha_fallback=True,
+        )
+    )
+
+    assert report["sio_to_silica_fume_kg"] == {
+        "status": "unavailable",
+        "section": "sio_yield_report.sio_to_silica_fume_kg",
+        "exception_type": "LookupError",
+        "reason": "silica fume stage unavailable",
+    }
 
 
 def test_runner_preserves_primary_failure_when_poison_enrichment_fails(
@@ -2398,12 +2762,85 @@ def test_runner_failure_preserves_primary_when_yield_disposition_raises(
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    completed_hours = payload["run_metadata"]["hours_completed"]
+    assert completed_hours["status"] == "unavailable"
+    assert completed_hours["section"] == "run_metadata.hours_completed"
+    assert completed_hours["exception_type"] == "AttributeError"
+    assert "melt" in completed_hours["reason"]
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "OriginUnresolvedError",
+        "reason": "secondary disposition failure",
+    }
     assert "primary execution failure" in payload["error_message"]
     assert payload["error_message"].splitlines()[-1] == (
         "yield disposition unavailable: OriginUnresolvedError: "
         "secondary disposition failure"
     )
+
+
+def test_runner_failure_records_unavailable_engine_lookup():
+    class RaisingRegistryKernel:
+        @property
+        def registry(self):
+            raise AttributeError("engine registry unavailable")
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+    execution = SimpleNamespace(
+        status="failed",
+        reason="primary_failure",
+        error_message="primary execution failure",
+        envelope_detail_unavailable="",
+        per_hour=(),
+        shadow_trace=(),
+        simulator=SimpleNamespace(
+            atom_ledger=AtomLedger(),
+            _chem_kernel=RaisingRegistryKernel(),
+        ),
+        refusal_diagnostic={},
+        backend_status="unavailable",
+        backend_authoritative=False,
+        reduced_real_cache={},
+        campaigns_elapsed=0.0,
+    )
+
+    payload = run._minimal_failure_output(execution)
+
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "primary_failure"
+    assert payload["error_message"].startswith("primary execution failure")
+    assert payload["run_metadata"]["engines_used"] == {
+        "status": "unavailable",
+        "section": "run_metadata.engines_used",
+        "exception_type": "AttributeError",
+        "reason": "engine registry unavailable",
+    }
+
+
+def test_engines_used_treats_kernel_without_registry_as_empty() -> None:
+    class KernelWithoutRegistry:
+        pass
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+
+    engines_used = run._engines_used(
+        SimpleNamespace(_chem_kernel=KernelWithoutRegistry())
+    )
+
+    assert engines_used == {
+        "active": {},
+        "requested": {},
+        "registry": {},
+    }
 
 
 def test_runner_failure_preserves_primary_when_yield_disposition_serialization_raises(
@@ -2442,7 +2879,12 @@ def test_runner_failure_preserves_primary_when_yield_disposition_serialization_r
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "LookupError",
+        "reason": "disposition serialization unavailable",
+    }
     assert payload["error_message"].splitlines() == [
         "primary execution failure",
         (
@@ -2485,7 +2927,24 @@ def test_runner_failure_preserves_primary_when_atom_ledger_lookup_raises() -> No
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "LookupError",
+        "reason": "ledger unavailable",
+    }
+    assert payload["final_state"] == {
+        "status": "unavailable",
+        "section": "final_state",
+        "exception_type": "LookupError",
+        "reason": "ledger unavailable",
+    }
+    assert payload["final"] == {
+        "status": "unavailable",
+        "section": "final",
+        "exception_type": "LookupError",
+        "reason": "upstream section final_state unavailable: ledger unavailable",
+    }
     assert payload["error_message"].splitlines() == [
         "primary execution failure",
         "envelope detail unavailable: RuntimeError: primary detail failure",
@@ -2930,14 +3389,12 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
 
 
 @pytest.mark.parametrize(
-    ("backend_name", "expected_notice"),
-    (("alphamelts", True), ("thermoengine", True), ("internal-analytical", False)),
+    "backend_name", ("alphamelts", "thermoengine", "internal-analytical"),
 )
 def test_runner_provenance_flags_diagnostic_freeze_gate_authority(
     backend_name: str,
-    expected_notice: bool,
 ) -> None:
-    """Capability provenance works without starting an optional engine."""
+    """The declared gate is independent of the diagnostic melt backend."""
 
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
@@ -2954,19 +3411,16 @@ def test_runner_provenance_flags_diagnostic_freeze_gate_authority(
     engines_used = run_metadata["engines_used"]
     assert "notices" not in engines_used
 
-    notice = run_metadata.get("diagnostic_gate_authority_notice")
-    if expected_notice:
-        assert notice is not None
-        assert notice["intent"] == "gate_liquid_fraction"
-        assert notice["provider_id"] == "alphamelts-diagnostic"
-        assert notice["authority_scope"] == "dispatch_only"
-        assert notice["ledger_transition_authority"] is False
-        report = payload["product_classification"]
-        assert report["diagnostic_gate_authority_notice"] == notice
-        assert "Diagnostic freeze-gate authority" in report["markdown"]
-        assert "Reported numbers are unchanged." in report["markdown"]
-    else:
-        assert notice is None
-        assert "diagnostic_gate_authority_notice" not in payload[
-            "product_classification"
-        ]
+    assert run_metadata["liquid_fraction_provider"] == "magemin"
+    assert sim._chem_registry.authoritative_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ) is None
+    profile = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ).capability_profile()
+    assert profile.provider_id == "magemin-shadow"
+    assert not profile.may_emit_ledger_transition(ChemistryIntent.GATE_LIQUID_FRACTION)
+    assert "diagnostic_gate_authority_notice" not in run_metadata
+    report = payload["product_classification"]
+    assert "diagnostic_gate_authority_notice" not in report
+    assert "Diagnostic freeze-gate authority" not in report["markdown"]

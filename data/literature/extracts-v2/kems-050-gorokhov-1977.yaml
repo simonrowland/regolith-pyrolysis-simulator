@@ -50,7 +50,7 @@ observations:
       '
     source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
     record: '[77ГОР/ГУС]'
-  read_from: pdf:kems-050-gorokhov-1977
+  read_from: pdftotext:kems-050-gorokhov-1977
 - observation_id: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_second_law
   experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::kems-050-gorokhov-1977
   identity:
@@ -89,9 +89,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Gorokhov, Gusarov et al. (1977), Report 43-77 [77ГОР/ГУС], as reprocessed in Table Cr.T3
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -105,7 +105,7 @@ observations:
       '
     source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
     record: '[77ГОР/ГУС]'
-  read_from: pdf:kems-050-gorokhov-1977
+  read_from: pdftotext:kems-050-gorokhov-1977
 - observation_id: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_third_law_d0
   experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::kems-050-gorokhov-1977
   identity:
@@ -170,4 +170,4 @@ observations:
       '
     source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
     record: '[77ГОР/ГУС]'
-  read_from: pdf:kems-050-gorokhov-1977
+  read_from: pdftotext:kems-050-gorokhov-1977

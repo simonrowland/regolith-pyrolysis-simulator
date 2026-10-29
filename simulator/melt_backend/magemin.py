@@ -94,8 +94,10 @@ library is called.
 from __future__ import annotations
 
 import builtins
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
 import fcntl
+import json
 import math
 import os
 import re
@@ -106,9 +108,10 @@ import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
@@ -167,6 +170,11 @@ from simulator.feedstock_composition import iron_oxide_values, total_fe
 # when the hard wall fires. 15.0 s gives ~8x headroom over the measured p99
 # while staying well inside the 60.0 s finder aggregate budget below.
 MAGEMIN_WARM_CALL_TIMEOUT_S = 15.0
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS = 8192
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES = 16
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS = 64
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
 # 2026-07-23 B1 gate-2 (same drift class as the call wall above): the warm
 # liquidus-finder aggregate budget raised 15.0 -> 60.0 s. Measured full
 # freeze-gate curve scans under the same 6-way + full-gate load: p50 =
@@ -292,6 +300,7 @@ def _handle_magemin_subprocess_request(backend, request, _errlog):
         pressure_kbar=request['pressure_kbar'],
         fO2_log=request['fO2_log'],
         call_timeout_s=request.get('call_timeout_s'),
+        capture_native_activities=bool(request.get('capture_native_activities')),
     )
 
 
@@ -342,9 +351,16 @@ class _MAGEMinModeVectorMassDeficit(RuntimeError):
 class _MAGEMinEngineCallError(RuntimeError):
     """An exception raised by a MAGEMin engine call, with its source type."""
 
-    def __init__(self, exception_type: str, message: str) -> None:
+    def __init__(
+        self,
+        exception_type: str,
+        message: str,
+        *,
+        failure_disposition: Optional[str] = None,
+    ) -> None:
         self.exception_type = exception_type
         self.engine_message = message
+        self.failure_disposition = failure_disposition
         super().__init__(f'{exception_type}: {message}')
 
 
@@ -780,10 +796,102 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
         polymorph='sillimanite',
         bulk_wt_pct={'SiO2': 37.0780, 'Al2O3': 62.9220},
     ),
+    # (a) rows the ig accessor can reach. wt% are the ds636 Comp vector
+    # (TC_endmembers.c arr_em_db_tc_ds636) times oxide_info molar masses
+    # (TC_init_database.c: SiO2 60.08, Al2O3 101.96, CaO 56.08, MgO 40.30,
+    # Na2O 61.98, TiO2 79.88), 4 d.p. half-up. Comp atom count equals the
+    # literature formula, so formula_divisor is 1. Hosts are igneous_db
+    # pure phases (TC_init_database.c) or a G_SS_ig_* EM_tmp symbol
+    # (tc_gss_function.c). A ds636 name that is neither is not entered.
+    # gr/py: half-up sums to 99.9999 / 100.0001; the 0.0001 wt% remainder
+    # is on the oxide with the largest |remainder| (CaO, MgO).
+    'an': _MAGEMinPurePhaseSpec(
+        host_phase='fsp',
+        endmember='an',
+        formula='CaAl2Si2O8',
+        formula_basis='per 1 mol CaAl2Si2O8 (ds636 Comp line 10283, atoms 13)',
+        formula_divisor=1.0,
+        polymorph='anorthite',
+        bulk_wt_pct={'SiO2': 43.1919, 'Al2O3': 36.6499, 'CaO': 20.1582},
+    ),
+    'ru': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='ru',
+        formula='TiO2',
+        formula_basis='per 1 mol TiO2 (ds636 Comp line 10539, atoms 3)',
+        formula_divisor=1.0,
+        # igneous_db lists ru and does not name it. Unset, so rutile and
+        # anatase stay unresolved.
+        polymorph='',
+        bulk_wt_pct={'SiO2': 1.0e-6, 'TiO2': 100.0},
+    ),
+    'sph': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='sph',
+        formula='CaTiSiO5',
+        formula_basis='per 1 mol CaTiSiO5 (ds636 Comp line 9603, atoms 8)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 30.6468, 'CaO': 28.6064, 'TiO2': 40.7468},
+    ),
+    'cats': _MAGEMinPurePhaseSpec(
+        host_phase='cpx',
+        endmember='cats',
+        formula='CaAl2SiO6',
+        formula_basis='per 1 mol CaAl2SiO6 (ds636 Comp line 9747, atoms 10)',
+        formula_divisor=1.0,
+        # Holland–Powell name on this endmember. Not ca_al_pyroxene.
+        polymorph='ca_tschermak_pyroxene',
+        bulk_wt_pct={'SiO2': 27.5445, 'Al2O3': 46.7449, 'CaO': 25.7106},
+    ),
+    'gr': _MAGEMinPurePhaseSpec(
+        host_phase='g',
+        endmember='gr',
+        formula='Ca3Al2Si3O12',
+        formula_basis='per 1 mol Ca3Al2Si3O12 (ds636 Comp line 9251, atoms 20)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 40.0142, 'Al2O3': 22.6356, 'CaO': 37.3502},
+    ),
+    'py': _MAGEMinPurePhaseSpec(
+        host_phase='g',
+        endmember='py',
+        formula='Mg3Al2Si3O12',
+        formula_basis='per 1 mol Mg3Al2Si3O12 (ds636 Comp line 9227, atoms 20)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 44.7135, 'Al2O3': 25.2940, 'MgO': 29.9925},
+    ),
+    'jd': _MAGEMinPurePhaseSpec(
+        host_phase='cpx',
+        endmember='jd',
+        formula='NaAlSi2O6',
+        formula_basis='per 1 mol NaAlSi2O6 (ds636 Comp line 9715, atoms 10)',
+        formula_divisor=1.0,
+        polymorph='jadeite',
+        bulk_wt_pct={'SiO2': 59.4469, 'Al2O3': 25.2214, 'Na2O': 15.3317},
+    ),
+    'mont': _MAGEMinPurePhaseSpec(
+        host_phase='ol',
+        endmember='mont',
+        formula='CaMgSiO4',
+        formula_basis='per 1 mol CaMgSiO4 (ds636 Comp line 9091, atoms 7)',
+        formula_divisor=1.0,
+        polymorph='',
+        bulk_wt_pct={'SiO2': 38.3996, 'CaO': 35.8430, 'MgO': 25.7574},
+    ),
 }
 
+# Decimal shape is the printed gbase/factor. nan/inf must reach the
+# finiteness gate; a decimal-only match dropped those pure-phase tokens
+# before any diagnostic existed. Case follows the engine's own spelling.
+# The sign stays inside the capture. An outer \+? used to eat the factor's
+# leading plus, so the recorded raw token for '+nan' was 'nan'.
+_MAGEMIN_GBASE_TOKEN = r'[+-]?(?:\d+\.\d+|nan|inf)'
 _MAGEMIN_PP_GBASE_RE = re.compile(
-    r'^\s*([A-Za-z0-9_]+):\s+(-?\d+\.\d+)\s+\+?(-?\d+\.\d+)\s*$'
+    rf'^\s*([A-Za-z0-9_]+):\s+({_MAGEMIN_GBASE_TOKEN})\s+'
+    rf'({_MAGEMIN_GBASE_TOKEN})\s*$',
+    re.IGNORECASE,
 )
 _MAGEMIN_SS_BLOCK_RE = re.compile(r'^\s*([a-z][a-z0-9]*):\s*$')
 _MAGEMIN_STATUS_RE = re.compile(
@@ -792,25 +900,113 @@ _MAGEMIN_STATUS_RE = re.compile(
 )
 
 
-def _finite_gbase_token(token: str, *, context: str) -> float:
-    """float() plus a finiteness gate: engine output never carries NaN/inf."""
+@dataclass(frozen=True)
+class _GbaseNonFinite:
+    """One non-finite Verb=1 gbase token, with the raw text the engine printed."""
+
+    phase: str
+    field: str
+    raw_token: str
+    context: str
+
+
+def _nonfinite_gbase_message(context: str, token: str) -> str:
+    return (
+        f'MAGEMin gbase table value for {context} is not finite: '
+        f'{token!r}; refusing engine output'
+    )
+
+
+_UNRELATED_GBASE_NONFINITE_PREFIX = (
+    'ignored non-finite MAGEMin gbase value in an unrequested phase: '
+)
+
+
+def _unrelated_gbase_nonfinite_note(fault: _GbaseNonFinite) -> str:
+    return (
+        f'{_UNRELATED_GBASE_NONFINITE_PREFIX}'
+        f'phase {fault.phase}, field {fault.field}, '
+        f'raw token {fault.raw_token!r}'
+    )
+
+
+def _unrelated_gbase_nonfinite_notes(warnings: Sequence[str]) -> Tuple[str, ...]:
+    """Sentences this parser recorded for a phase the read did not request."""
+    return tuple(
+        item
+        for item in warnings
+        if item.startswith(_UNRELATED_GBASE_NONFINITE_PREFIX)
+    )
+
+
+_UNRELATED_GBASE_FIELDS_RE = re.compile(
+    r'^phase (?P<phase>\S+), field (?P<field>\S+), '
+    r"raw token '(?P<raw>[^']*)'$"
+)
+
+
+def _unrelated_gbase_nonfinite_fields(
+    text: str,
+) -> Optional[Tuple[str, str, str]]:
+    """(phase, field, raw token) from one diagnostic sentence.
+
+    The raw token is the engine's printed spelling, sign included.
+    """
+    if not text.startswith(_UNRELATED_GBASE_NONFINITE_PREFIX):
+        return None
+    match = _UNRELATED_GBASE_FIELDS_RE.match(
+        text[len(_UNRELATED_GBASE_NONFINITE_PREFIX):]
+    )
+    if match is None:
+        return None
+    return match.group('phase'), match.group('field'), match.group('raw')
+
+
+def _read_gbase_token(
+    token: str,
+    *,
+    context: str,
+    phase: str,
+    field: str,
+    nonfinite: Optional[List[_GbaseNonFinite]],
+) -> Optional[float]:
+    """Parse one gbase token.
+
+    An unscoped parse (``nonfinite is None``) refuses any non-finite token.
+    A scoped parse records it and returns None so the caller can keep the
+    rest of the table. ``float()`` ValueError still propagates.
+    """
     value = float(token)
-    if not math.isfinite(value):
-        raise PurePhaseAccessError(
-            f'MAGEMin gbase table value for {context} is not finite: '
-            f'{token!r}; refusing engine output'
+    if math.isfinite(value):
+        return value
+    if nonfinite is None:
+        raise PurePhaseAccessError(_nonfinite_gbase_message(context, token))
+    nonfinite.append(
+        _GbaseNonFinite(
+            phase=phase,
+            field=field,
+            raw_token=token,
+            context=context,
         )
-    return value
+    )
+    return None
 
 
 def _parse_magemin_gbase_tables(
     stdout: str,
+    nonfinite: Optional[List[_GbaseNonFinite]] = None,
 ) -> Tuple[Dict[str, Tuple[float, float]], Dict[str, Dict[str, float]]]:
     """Parse the Verb=1 pre-minimisation gbase table.
 
     Returns ({pp_name: (gbase_kJ_per_mol_formula, factor)},
              {ss_host: {endmember: gbase_kJ_per_mol_formula}}).
     First occurrence wins; the table is printed once before levelling.
+    With ``nonfinite`` omitted, any non-finite token refuses the table.
+    With a list, those tokens are recorded and omitted from the numeric
+    maps so a later selector can refuse only the phase it asked for.
+    A short solution row is still not a complete endmember vector: its
+    finite tokens are kept only when the row also carries a non-finite
+    token that had to be read. An all-finite short row stays dropped.
     """
     pp: Dict[str, Tuple[float, float]] = {}
     ss: Dict[str, Dict[str, float]] = {}
@@ -818,12 +1014,25 @@ def _parse_magemin_gbase_tables(
     for i, line in enumerate(lines):
         m = _MAGEMIN_PP_GBASE_RE.match(line)
         if m:
-            pp.setdefault(m.group(1), (
-                _finite_gbase_token(m.group(2), context=m.group(1)),
-                _finite_gbase_token(
-                    m.group(3), context=f'{m.group(1)} factor'
-                ),
-            ))
+            name = m.group(1)
+            if name in pp:
+                continue
+            gbase = _read_gbase_token(
+                m.group(2),
+                context=name,
+                phase=name,
+                field='gbase',
+                nonfinite=nonfinite,
+            )
+            factor = _read_gbase_token(
+                m.group(3),
+                context=f'{name} factor',
+                phase=name,
+                field='factor',
+                nonfinite=nonfinite,
+            )
+            if gbase is not None and factor is not None:
+                pp[name] = (gbase, factor)
             continue
         m = _MAGEMIN_SS_BLOCK_RE.match(line)
         if (
@@ -832,18 +1041,33 @@ def _parse_magemin_gbase_tables(
             and lines[i + 1].strip().startswith('----')
             and m.group(1) not in ss
         ):
+            host = m.group(1)
             names = lines[i + 2].split()
+            raws = lines[i + 3].split()
+            # zip ignores trailing raw tokens. A short row used to be
+            # skipped before those tokens were read, so a nan on it never
+            # reached the gate. Read the paired tokens first.
+            parsed: Dict[str, float] = {}
+            block_faults: List[_GbaseNonFinite] = []
             try:
-                values = [
-                    _finite_gbase_token(
-                        v, context=f'{m.group(1)}:{name}'
+                for endmember, raw in zip(names, raws):
+                    value = _read_gbase_token(
+                        raw,
+                        context=f'{host}:{endmember}',
+                        phase=host,
+                        field=endmember,
+                        nonfinite=block_faults if nonfinite is not None else None,
                     )
-                    for name, v in zip(names, lines[i + 3].split())
-                ]
+                    if value is not None:
+                        parsed[endmember] = value
             except ValueError:
                 continue
-            if len(names) == len(values):
-                ss[m.group(1)] = dict(zip(names, values))
+            if nonfinite is not None:
+                nonfinite.extend(block_faults)
+            short = len(raws) < len(names)
+            if short and not block_faults:
+                continue
+            ss[host] = parsed
     return pp, ss
 
 
@@ -901,11 +1125,42 @@ def _check_magemin_solver_status(stdout: str, warnings: List[str]) -> None:
         warnings.append(message)
 
 
+def _gbase_fault_is_requested(
+    spec: _MAGEMinPurePhaseSpec,
+    fault: _GbaseNonFinite,
+) -> bool:
+    """True when the non-finite token is a value of the phase being read."""
+    if spec.host_phase is None:
+        return fault.phase == spec.endmember
+    return fault.phase == spec.host_phase and fault.field == spec.endmember
+
+
 def _magemin_endmember_gbase_kJ(
-    spec: _MAGEMinPurePhaseSpec, stdout: str
+    spec: _MAGEMinPurePhaseSpec,
+    stdout: str,
+    notes: Optional[List[str]] = None,
 ) -> float:
-    """Endmember gbase in kJ per engine formula unit at the probe's (T, P)."""
-    pp_gbase, ss_endmember_gbase = _parse_magemin_gbase_tables(stdout)
+    """Endmember gbase in kJ per engine formula unit at the probe's (T, P).
+
+    A non-finite token on another phase is recorded on ``notes`` and does
+    not refuse this read. The requested phase's own token still refuses
+    with the same text as an unscoped table parse. Mode-vector and SYS
+    totals are not read here.
+    """
+    nonfinite: List[_GbaseNonFinite] = []
+    pp_gbase, ss_endmember_gbase = _parse_magemin_gbase_tables(
+        stdout, nonfinite=nonfinite
+    )
+    for fault in nonfinite:
+        if _gbase_fault_is_requested(spec, fault):
+            raise PurePhaseAccessError(
+                _nonfinite_gbase_message(fault.context, fault.raw_token)
+            )
+    if notes is not None:
+        for fault in nonfinite:
+            message = _unrelated_gbase_nonfinite_note(fault)
+            if message not in notes:
+                notes.append(message)
     if spec.host_phase is None:
         entry = pp_gbase.get(spec.endmember)
         g_kJ = entry[0] if entry is not None else None
@@ -1036,13 +1291,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
 
     real_backend_family = RealBackendFamily.MAGEMIN
+    _DEFAULT_DATABASE = 'ig'
 
     name = 'magemin'
 
     def __init__(self) -> None:
         self._available: bool = False
         self._config: Dict[str, Any] = {}
-        self._database: str = 'ig'
+        self._database: str = self._DEFAULT_DATABASE
         # 'subprocess' | 'pymagemin' | 'ctypes' | 'julia'
         self._bridge: Optional[str] = None
         self._magemin_module: Optional[Any] = None
@@ -1071,17 +1327,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         self._last_error = None
         self._config = dict(config or {})
 
-        self._database = str(self._config.get('database') or 'ig')
+        self._database = str(
+            self._config.get('database') or self._DEFAULT_DATABASE
+        )
 
-        explicit_path = self._config.get('binary_path')
-        if explicit_path:
-            binary_path = self._locate_binary(explicit_path)
-        else:
-            from simulator.engine_local_config import configured_magemin_binary_path
-
-            binary_path = configured_magemin_binary_path()
-            if binary_path is None:
-                binary_path = self._locate_binary(None)
+        binary_path = self._resolve_binary_path()
         if binary_path is None:
             self._warn(
                 'MAGEMin binary not found in engines/magemin or PATH; '
@@ -1125,9 +1375,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     raise ValueError(f'MAGEMin {field_name} must be numeric')
             warm_timeout_s = float(raw_warm_timeout_s)
             pool_size = int(raw_pool_size)
+            startup_timeout_s = float(raw_startup_timeout_s)
             if not math.isfinite(warm_timeout_s) or warm_timeout_s <= 0.0:
                 raise ValueError(
                     'MAGEMin warm_call_timeout_s must be finite and positive'
+                )
+            if (
+                not math.isfinite(startup_timeout_s)
+                or startup_timeout_s <= 0.0
+            ):
+                raise ValueError(
+                    'MAGEMin worker_startup_timeout_s must be finite and positive'
                 )
             if pool_size <= 0:
                 raise ValueError('MAGEMin warm_pool_size must be positive')
@@ -1142,7 +1400,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._database,
                         self._config,
                     ),
-                    startup_timeout_s=float(raw_startup_timeout_s),
+                    startup_timeout_s=startup_timeout_s,
                     call_timeout_s=warm_timeout_s,
                     diagnostic_log_path=diagnostic_path.with_name(
                         f'{diagnostic_path.stem}-{index}{diagnostic_path.suffix}'
@@ -1215,6 +1473,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         species_formula_registry: Optional[Mapping[str, Any]] = None,
         call_timeout_s: Optional[float] = None,
         projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
+        native_activity_formula: Optional[str] = None,
     ) -> EquilibriumResult:
         """
         Minimize Gibbs energy via MAGEMin.
@@ -1401,6 +1660,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
+                capture_native_activities=native_activity_formula is not None,
+                composition_mol=composition_mol,
             )
         except EngineWorkerTimeout:
             # A hang is a control-plane event, not an equilibrium refusal.
@@ -1417,6 +1678,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_failure_exception': exc.exception_type,
                 'backend_failure_message': exc.engine_message,
             })
+            if exc.failure_disposition is not None:
+                failure_diagnostics['backend_failure_disposition'] = (
+                    exc.failure_disposition
+                )
             if isinstance(exc, _MAGEMinDeclaredInputError):
                 failure_diagnostics['reason'] = 'invalid_input'
             return EquilibriumResult(
@@ -1530,6 +1795,65 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     warnings=[*all_warnings, message],
                     diagnostics=result_diagnostics,
                 )
+        native_activities: Dict[str, float] = {}
+        if native_activity_formula is not None:
+            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+            native = raw.get('native_activities') if isinstance(raw, Mapping) else None
+            solver_status = raw.get('solver_status') if isinstance(raw, Mapping) else None
+            raw_activity = (
+                native.get(native_activity_formula)
+                if isinstance(native, Mapping)
+                else None
+            )
+            result_diagnostics.update({
+                'magemin_native_formula': native_activity_formula,
+                'magemin_solver_status': solver_status,
+                'magemin_native_phase': (
+                    raw.get('native_phase') if isinstance(raw, Mapping) else None
+                ),
+                'magemin_native_mode': (
+                    raw.get('native_mode') if isinstance(raw, Mapping) else None
+                ),
+                'magemin_iterations': (
+                    raw.get('iterations') if isinstance(raw, Mapping) else None
+                ),
+            })
+            try:
+                activity_value = float(raw_activity)
+            except (TypeError, ValueError, OverflowError):
+                activity_value = math.nan
+            if (
+                native_activity_formula not in MAGEMIN_NATIVE_MELT_ACTIVITIES
+                or solver_status not in {0, 1, 2}
+                or not math.isfinite(activity_value)
+                or activity_value <= 0.0
+            ):
+                result_diagnostics.update({
+                    'backend_status': 'not_converged',
+                    'backend_status_reason': 'engine_not_converged',
+                    'magemin_native_activity_invalid': True,
+                })
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=result_fO2_log,
+                    status='not_converged',
+                    warnings=[
+                        *all_warnings,
+                        'MAGEMin native activity unavailable or solver failed: '
+                        f'formula={native_activity_formula}, status={solver_status}, '
+                        f'activity={raw_activity!r}',
+                    ],
+                    diagnostics=result_diagnostics,
+                )
+            for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
+                try:
+                    value = float(native.get(formula))
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if math.isfinite(value) and value > 0.0:
+                    native_activities[formula] = value
         (
             phases_present,
             phase_masses_kg,
@@ -1546,6 +1870,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             phase_compositions=phase_compositions,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_composition_wt_pct,
+            activity_coefficients=native_activities,
             status=result_status,
             warnings=all_warnings,
             diagnostics=result_diagnostics,
@@ -1723,6 +2048,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 ),
             )
             diagnostics['projected_liquidus_status'] = projected.status
+            diagnostics['projected_liquidus_diagnostics'] = dict(
+                projected.diagnostics or {}
+            )
             diagnostics['composition_projected_notice'] = notice
             if (
                 projected.status == 'ok'
@@ -1750,6 +2078,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             warnings_out = [
                 *warnings_out,
+                *projected.warnings,
                 (
                     'composition_projected bulk has no projected liquidus; '
                     f'status={projected.status}'
@@ -1809,6 +2138,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         return None
 
+    def _resolve_binary_path(self) -> Optional[Path]:
+        explicit_path = self._config.get('binary_path')
+        if explicit_path:
+            return self._locate_binary(explicit_path)
+
+        from simulator.engine_local_config import configured_magemin_binary_path
+
+        binary_path = configured_magemin_binary_path()
+        if binary_path is None:
+            binary_path = self._locate_binary(None)
+        return binary_path
+
     def get_engine_version(self) -> str:
         from simulator.engine_local_config import (
             cache_version_for,
@@ -1819,13 +2160,19 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if config_version is not None:
             return config_version
 
-        if self._binary_path is None:
+        binary_path = self._binary_path or self._resolve_binary_path()
+        if binary_path is None:
             return 'unavailable'
-        binary_path = self._binary_path.resolve()
+        resolved_binary_path = binary_path.resolve()
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
                 result = subprocess.run(
-                    [str(binary_path), '--version', '--db', self._database],
+                    [
+                        str(resolved_binary_path),
+                        '--version',
+                        '--db',
+                        self._database,
+                    ],
                     cwd=tmpdir,
                     capture_output=True,
                     text=True,
@@ -1835,9 +2182,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if result.returncode == 0 and lines:
                 legacy = lines[0].strip()
             else:
-                legacy = f'MAGEMin subprocess ({self._binary_path})'
+                legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         except (OSError, subprocess.TimeoutExpired):
-            legacy = f'MAGEMin subprocess ({self._binary_path})'
+            legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '
@@ -2080,6 +2427,204 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         """Convert pressure from GPa to kilobar.  1 GPa = 10 kbar."""
         return float(pressure_GPa) * 10.0
 
+    def _magemin_timeout_diagnostic_detail(
+        self,
+        *,
+        bulk_projection: _MAGEMinBulkProjection,
+        composition_mol: Optional[Mapping[str, float]],
+        temperature_C: float,
+        pressure_bar: float,
+        pressure_kbar: float,
+        fO2_log: float,
+    ) -> str:
+        """Return a bounded record of the exact timed-out MAGEMin request."""
+        args, buffer_name, buffer_n, _buffer_warnings = (
+            self._build_magemin_subprocess_args(
+                bulk_projection=bulk_projection,
+                temperature_C=temperature_C,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
+            )
+        )
+        payload = {
+            'composition_mol': composition_mol or {},
+            'composition_wt_pct': bulk_projection.composition_wt_pct,
+            'projected_bulk_vector_wt_pct': bulk_projection.vector,
+            'oxide_names': bulk_projection.order,
+            'temperature_C': temperature_C,
+            'pressure_bar': pressure_bar,
+            'pressure_kbar': pressure_kbar,
+            'fO2_log': fO2_log,
+            'buffer': buffer_name,
+            'buffer_n': buffer_n,
+            'database': self._database,
+            'argv': args,
+        }
+        return self._encode_magemin_timeout_diagnostic(payload)
+
+    def _magemin_timeout_diagnostic_detail_safely(
+        self,
+        *,
+        bulk_projection: _MAGEMinBulkProjection,
+        composition_mol: Optional[Mapping[str, float]],
+        temperature_C: float,
+        pressure_bar: float,
+        pressure_kbar: float,
+        fO2_log: float,
+    ) -> str:
+        try:
+            return self._magemin_timeout_diagnostic_detail(
+                bulk_projection=bulk_projection,
+                composition_mol=composition_mol,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
+            )
+        except Exception as exc:
+            try:
+                return self._encode_magemin_timeout_diagnostic({
+                    'diagnostic_capture_error': type(exc).__name__,
+                    'composition_mol': composition_mol or {},
+                    'composition_wt_pct': bulk_projection.composition_wt_pct,
+                    'projected_bulk_vector_wt_pct': bulk_projection.vector,
+                    'oxide_names': bulk_projection.order,
+                    'temperature_C': temperature_C,
+                    'pressure_bar': pressure_bar,
+                    'pressure_kbar': pressure_kbar,
+                    'fO2_log': fO2_log,
+                    'buffer': None,
+                    'buffer_n': None,
+                    'database': self._database,
+                    'argv': [],
+                    'argv_truncated': True,
+                })
+            except Exception:
+                return '{"diagnostic_capture_error":"capture_failed"}'
+
+    @staticmethod
+    def _encode_magemin_timeout_diagnostic(
+        payload: Dict[str, Any],
+    ) -> str:
+        """Encode one fixed-shape request record under the log-line cap."""
+
+        def text(value: Any, limit: int) -> tuple[str, bool]:
+            rendered = str(value)
+            if len(rendered) <= limit:
+                return rendered, False
+            return rendered[:limit - 14] + '...[truncated]', True
+
+        def value(raw: Any) -> tuple[Any, bool]:
+            if raw is None:
+                return None, False
+            try:
+                number = float(raw)
+            except (TypeError, ValueError):
+                return text(raw, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS)
+            return (number, False) if math.isfinite(number) else (str(number), False)
+
+        def entries(raw: Any) -> tuple[list[list[Any]], bool]:
+            if not isinstance(raw, Mapping):
+                return [], bool(raw)
+            ordered = sorted(raw.items(), key=lambda pair: str(pair[0]))
+            truncated = len(ordered) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+            bounded = []
+            for name, raw_value in ordered[
+                :_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+            ]:
+                safe_name, name_cut = text(
+                    name,
+                    _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS,
+                )
+                safe_value, value_cut = value(raw_value)
+                bounded.append([safe_name, safe_value])
+                truncated = truncated or name_cut or value_cut
+            return bounded, truncated
+
+        mol, mol_truncated = entries(payload.get('composition_mol') or {})
+        wt_pct, wt_pct_truncated = entries(
+            payload.get('composition_wt_pct') or {}
+        )
+        vectors = payload.get('projected_bulk_vector_wt_pct', ())
+        vectors = vectors if isinstance(vectors, (list, tuple)) else ()
+        vector_truncated = len(vectors) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+        vector = [
+            value(item)[0]
+            for item in vectors[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        names = payload.get('oxide_names', ())
+        names = names if isinstance(names, (list, tuple)) else ()
+        argv = payload.get('argv', ())
+        argv = argv if isinstance(argv, (list, tuple)) else ()
+        oxide_names = [
+            text(item, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS)[0]
+            for item in names[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        argv_out = [
+            text(item, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS)[0]
+            for item in argv[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        database, database_cut = text(
+            payload.get('database', ''),
+            _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS,
+        )
+        buffer = payload.get('buffer')
+        if buffer is not None:
+            buffer = text(buffer, 48)[0]
+
+        # The fixed entry and string caps keep this record below 8 KiB even
+        # when a configured path, database name, or input mapping is huge.
+        record = {
+            'composition_mol': mol,
+            'composition_mol_truncated': mol_truncated,
+            'composition_wt_pct': dict(wt_pct),
+            'composition_wt_pct_truncated': wt_pct_truncated,
+            'projected_bulk_vector_wt_pct': vector,
+            'projected_bulk_vector_truncated': vector_truncated,
+            'oxide_names': oxide_names,
+            'temperature_C': value(payload.get('temperature_C'))[0],
+            'pressure_bar': value(payload.get('pressure_bar'))[0],
+            'pressure_kbar': value(payload.get('pressure_kbar'))[0],
+            'fO2_log': value(payload.get('fO2_log'))[0],
+            'buffer': buffer,
+            'buffer_n': value(payload.get('buffer_n'))[0],
+            'database': database,
+            'database_truncated': database_cut,
+            'argv': argv_out,
+            'argv_truncated': (
+                len(argv) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+                or bool(payload.get('argv_truncated'))
+                or database_cut
+                or any(
+                    len(str(item)) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS
+                    for item in argv
+                )
+            ),
+        }
+        if payload.get('diagnostic_capture_error'):
+            record['diagnostic_capture_error'] = str(
+                payload['diagnostic_capture_error']
+            )[:64]
+        detail = json.dumps(
+            record,
+            ensure_ascii=True,
+            allow_nan=False,
+            separators=(',', ':'),
+            sort_keys=True,
+        )
+        if len(detail) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS:
+            raise ValueError('bounded MAGEMin timeout record exceeded its cap')
+        return detail
+
+    @staticmethod
+    def _attach_magemin_timeout_diagnostic(
+        timeout: EngineWorkerTimeout,
+        detail: str,
+    ) -> EngineWorkerTimeout:
+        timeout.diagnostic_detail = detail
+        timeout.args = (f'{timeout}; MAGEMin request: {detail}',)
+        return timeout
+
     def _call_magemin(
         self,
         bulk_projection: _MAGEMinBulkProjection,
@@ -2087,6 +2632,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_bar: float,
         fO2_log: float,
         call_timeout_s: Optional[float] = None,
+        capture_native_activities: bool = False,
+        composition_mol: Optional[Mapping[str, float]] = None,
     ) -> Any:
         """
         Invoke MAGEMin via whichever bridge ``initialize`` selected.
@@ -2219,7 +2766,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'python_bridge="julia"'
             )
 
-        if self._bridge == 'subprocess':
+        if self._bridge == 'subprocess' or capture_native_activities:
             if self._subprocess_pool is not None:
                 timeout_s = (
                     float(self._config.get(
@@ -2235,18 +2782,89 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         float(call_timeout_s),
                     )
                 )
+                startup_timeout_s = float(self._config.get(
+                    'worker_startup_timeout_s', 30.0
+                ))
+                future_timeout_s = WarmEngineWorker._caller_future_timeout_s(
+                    timeout_s,
+                    startup_timeout_s,
+                )
+                if call_timeout_s is not None:
+                    future_timeout_s = min(
+                        future_timeout_s,
+                        float(call_timeout_s),
+                    )
                 try:
                     future = self._subprocess_pool.submit({
                         'bulk_projection': bulk_projection,
                         'temperature_C': temperature_C,
                         'pressure_kbar': pressure_kbar,
                         'fO2_log': fO2_log,
-                        # Let the pool's typed hard wall fire first. The inner
-                        # subprocess timeout is only a secondary containment
-                        # wall for platforms without process-group cleanup.
+                        # The pool's job wall starts after worker startup;
+                        # Future.result below also bounds queue/startup waits.
+                        # This subprocess wall is secondary containment for
+                        # platforms without process-group cleanup.
                         'call_timeout_s': timeout_s + 0.5,
+                        'capture_native_activities': capture_native_activities,
                     }, timeout_s=timeout_s)
-                    return future.result()
+                    try:
+                        return future.result(timeout=future_timeout_s)
+                    except EngineWorkerTimeout as timeout:
+                        diagnostic_detail = (
+                            self._magemin_timeout_diagnostic_detail_safely(
+                                bulk_projection=bulk_projection,
+                                composition_mol=composition_mol,
+                                temperature_C=temperature_C,
+                                pressure_bar=pressure_bar,
+                                pressure_kbar=pressure_kbar,
+                                fO2_log=fO2_log,
+                            )
+                        )
+                        self._subprocess_pool._abort_request(
+                            future,
+                            diagnostic_detail=diagnostic_detail,
+                        )
+                        self._attach_magemin_timeout_diagnostic(
+                            timeout,
+                            diagnostic_detail,
+                        )
+                        raise
+                    except FutureTimeoutError as exc:
+                        future.cancel()
+                        diagnostic_detail = (
+                            self._magemin_timeout_diagnostic_detail_safely(
+                                bulk_projection=bulk_projection,
+                                composition_mol=composition_mol,
+                                temperature_C=temperature_C,
+                                pressure_bar=pressure_bar,
+                                pressure_kbar=pressure_kbar,
+                                fO2_log=fO2_log,
+                            )
+                        )
+                        self._subprocess_pool._abort_request(
+                            future,
+                            diagnostic_detail=diagnostic_detail,
+                        )
+                        timeout = EngineWorkerTimeout(
+                            'MAGEMin subprocess pool',
+                            future_timeout_s,
+                            phase='job',
+                        )
+                        self._attach_magemin_timeout_diagnostic(
+                            timeout,
+                            diagnostic_detail,
+                        )
+                        raise timeout from exc
+                    except (
+                        OSError,
+                        subprocess.SubprocessError,
+                        MemoryError,
+                    ) as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__,
+                            f'MAGEMin warm worker could not be started: {exc}',
+                            failure_disposition='environment',
+                        ) from exc
                 except EngineWorkerTimeout:
                     raise
                 except (
@@ -2274,7 +2892,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             == _MAGEMinEngineLifecycleError.__name__
                             else _MAGEMinEngineCallError
                         )
-                        raise error_type(exception_type, engine_message) from exc
+                        raise error_type(
+                            exception_type,
+                            engine_message,
+                            failure_disposition=exc.failure_disposition,
+                        ) from exc
 
                     remote_exception = getattr(builtins, exc.exc_name, None)
                     remote_message = (
@@ -2305,6 +2927,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
+                capture_native_activities=capture_native_activities,
             )
 
         raise RuntimeError(
@@ -2355,9 +2978,41 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 subprocess_exc.exception_type,
                 f'{message}; subprocess retry failed: '
                 f'{subprocess_exc.engine_message}',
+                failure_disposition=subprocess_exc.failure_disposition,
             ) from subprocess_exc
         warnings_out = tuple(raw.get('buffer_warnings') or ())
         return {**raw, 'buffer_warnings': (message, *warnings_out)}
+
+    def _build_magemin_subprocess_args(
+        self,
+        *,
+        bulk_projection: _MAGEMinBulkProjection,
+        temperature_C: float,
+        pressure_kbar: float,
+        fO2_log: float,
+    ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
+        """Build the canonical MAGEMin argv and resolved buffer values."""
+        if self._binary_path is None:
+            raise RuntimeError('MAGEMin subprocess bridge has no binary path')
+        binary_path = self._binary_path.resolve()
+        buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
+            temperature_C=temperature_C,
+            fO2_log=fO2_log,
+        )
+        args = [
+            str(binary_path),
+            '--Verb=0',
+            f'--db={self._database}',
+            f'--Temp={temperature_C:.6f}',
+            f'--Pres={pressure_kbar:.6f}',
+            '--sys_in=wt',
+            '--Bulk=' + ','.join(
+                f'{value:.6f}' for value in bulk_projection.vector
+            ),
+            f'--buffer={buffer_name}',
+            f'--buffer_n={buffer_n:.6f}',
+        ]
+        return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
     def _call_magemin_subprocess(
         self,
@@ -2367,6 +3022,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_kbar: float,
         fO2_log: float,
         call_timeout_s: Optional[float] = None,
+        capture_native_activities: bool = False,
     ) -> Dict[str, Any]:
         """
         Drive the compiled MAGEMin binary for one single-point call.
@@ -2390,14 +3046,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         unparseable stdout — the explicit fail signal ``equilibrate()``
         converts into an empty result + warning.
         """
-        if self._binary_path is None:
-            raise RuntimeError('MAGEMin subprocess bridge has no binary path')
-
-        binary_path = self._binary_path.resolve()
-
-        bulk = bulk_projection.vector
-        buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
-            temperature_C=temperature_C, fO2_log=fO2_log,
+        args, buffer_name, buffer_n, buffer_warnings = (
+            self._build_magemin_subprocess_args(
+                bulk_projection=bulk_projection,
+                temperature_C=temperature_C,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
+            )
         )
         solved_fO2_log: Optional[float]
         if buffer_name == 'qfm':
@@ -2429,18 +3084,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status_reason': 'clamped_operating_point',
             })
 
-        args = [
-            str(binary_path),
-            '--Verb=0',
-            f'--db={self._database}',
-            f'--Temp={temperature_C:.6f}',
-            f'--Pres={pressure_kbar:.6f}',
-            '--sys_in=wt',
-            '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk),
-            f'--buffer={buffer_name}',
-            f'--buffer_n={buffer_n:.6f}',
-        ]
-
+        if capture_native_activities:
+            # Same argv owner as the Verb=0 golden. Native activities only
+            # raise verbosity and request the matlab dump the parser reads.
+            args = [
+                '--Verb=1' if item == '--Verb=0' else item
+                for item in args
+            ]
+            args.append('--out_matlab=1')
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s
@@ -2455,6 +3106,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             timeout_s = min(configured_timeout_s, remaining)
         call_started = time.monotonic()
+        matlab_text = ''
         with _magemin_subprocess_slot(timeout_s):
             remaining_timeout_s = timeout_s - max(
                 0.0, time.monotonic() - call_started
@@ -2477,13 +3129,28 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 except subprocess.TimeoutExpired as exc:
                     raise _MAGEMinEngineCallError(
                         type(exc).__name__, f'MAGEMin binary timed out after '
-                        f'{timeout_s:g}s'
+                        f'{timeout_s:g}s',
+                        failure_disposition='environment',
+                    ) from exc
+                except (subprocess.SubprocessError, MemoryError) as exc:
+                    raise _MAGEMinEngineCallError(
+                        type(exc).__name__,
+                        f'MAGEMin binary launch failed: {exc}',
+                        failure_disposition='environment',
                     ) from exc
                 except OSError as exc:
                     raise _MAGEMinEngineCallError(
                         type(exc).__name__,
                         f'MAGEMin binary could not be executed: {exc}',
+                        failure_disposition='environment',
                     ) from exc
+                if capture_native_activities:
+                    matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
+                    matlab_text = (
+                        matlab_path.read_text()
+                        if matlab_path.exists()
+                        else ''
+                    )
 
         if completed.returncode != 0:
             stderr = (completed.stderr or '').strip()
@@ -2493,8 +3160,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'{stderr or "no stderr"}',
             )
 
+        stdout_metadata: Dict[str, Any] = {}
         try:
-            phases = self._parse_subprocess_stdout(completed.stdout or '')
+            if capture_native_activities:
+                phases = self._parse_subprocess_stdout(
+                    completed.stdout or '', metadata=stdout_metadata
+                )
+            else:
+                phases = self._parse_subprocess_stdout(completed.stdout or '')
         except _MAGEMinModeVectorMassDeficit as exc:
             return {
                 'mode_vector_mass_deficit': {
@@ -2515,11 +3188,30 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             _raise_magemin_output_invalid(
                 'MAGEMin binary produced no parseable Phase/Mode block'
             )
-        return {
+        result = {
             'phases': phases,
             'buffer_warnings': buffer_warnings,
             'operating_point_diagnostics': operating_point_diagnostics,
         }
+        if capture_native_activities:
+            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+            native_fields = self._parse_subprocess_native_activities(matlab_text)
+            result.update({
+                'native_activities': {
+                    formula: native_fields[field]
+                    for formula, (field, _polymorph)
+                    in MAGEMIN_NATIVE_MELT_ACTIVITIES.items()
+                    if field in native_fields
+                },
+                'solver_status': stdout_metadata.get('solver_status'),
+                'native_phase': stdout_metadata.get('phase_names'),
+                'native_mode': stdout_metadata.get('mode_fractions'),
+                'iterations': self._parse_subprocess_iterations(
+                    completed.stdout or ''
+                ),
+            })
+        return result
 
     def _build_ig_bulk_vector(
         self, composition_wt_pct: Mapping[str, float]
@@ -2653,17 +3345,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:
-        """
-        Absolute log10(fO2) of the QFM buffer at ``temperature_C``.
-
-        O'Neill (1987) formulation: ``logfO2_QFM = 8.58 - 25050 / T_K``.
-        Kept in sync with ``sulfsat.py::_qfm_logfo2_oneill`` for engine-aligned
-        buffer reporting only. NOTE (b-094): the Jugo-2010 S6+/ST path no
-        longer uses this fit — Jugo deltaQFM is referenced to Frost (1991)
-        per PySulfSat's own requirement.
-        """
+        """Convert Celsius to Kelvin and evaluate the O'Neill QFM fit."""
         T_K = float(temperature_C) + 273.15
-        return 8.58 - 25050.0 / T_K
+        return oneill_qfm_log10_fO2_bar(T_K)
 
     def _resolve_buffer(
         self, *, temperature_C: float, fO2_log: float,
@@ -2741,7 +3425,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         return 'qfm', buffer_n, warnings_out
 
     @staticmethod
-    def _parse_subprocess_stdout(stdout: str) -> Dict[str, Dict[str, float]]:
+    def _parse_subprocess_stdout(
+        stdout: str, *, metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Dict[str, float]]:
         """
         Parse the compact MAGEMin ``--Verb=0`` ``Phase :`` / ``Mode :``
         block.
@@ -2776,6 +3462,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if not names or len(names) != len(values):
             return {}
 
+        if metadata is not None:
+            metadata['phase_names'] = tuple(names)
+            metadata['solver_status'] = _parse_magemin_solver_status(stdout)
+            metadata['mode_fractions'] = {
+                name: float(raw) for name, raw in zip(names, values)
+            }
+
         parsed_modes: list[tuple[str, float]] = []
         for name, raw in zip(names, values):
             try:
@@ -2808,8 +3501,33 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 continue  # buffer control row, not a phase
             if fraction <= 0.0:
                 continue
-            phases[name] = {'mass_kg': fraction}
+            # MAGEMin can emit multiple phase instances with one name; retain
+            # their combined system mass fraction instead of the last row.
+            phases.setdefault(name, {'mass_kg': 0.0})['mass_kg'] += fraction
         return phases
+
+    @staticmethod
+    def _parse_subprocess_native_activities(matlab_text: str) -> Dict[str, float]:
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        parsed: Dict[str, float] = {}
+        for field, _polymorph in MAGEMIN_NATIVE_MELT_ACTIVITIES.values():
+            match = re.search(
+                rf'^\s*{re.escape(field)}\s+([^\s,;]+)',
+                matlab_text,
+                re.MULTILINE,
+            )
+            if match is not None:
+                try:
+                    parsed[field] = float(match.group(1))
+                except ValueError:
+                    parsed[field] = math.nan
+        return parsed
+
+    @staticmethod
+    def _parse_subprocess_iterations(stdout: str) -> Optional[int]:
+        matches = re.findall(r'\((\d+) iterations,', stdout)
+        return int(matches[-1]) if matches else None
 
     # ------------------------------------------------------------------
     # Pure-phase standard-state properties (diagnostic accessor)
@@ -2842,8 +3560,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         ``phase_id`` is an ig-database symbol: ``fo`` (olivine endmember),
         ``per`` (ferropericlase endmember), ``en`` (orthopyroxene endmember,
-        Mg2Si2O6 basis), or the pure phases ``q`` / ``crst`` / ``trd`` /
-        ``cor`` / ``and`` / ``ky`` / ``sill``. There is no plain spinel id.
+        Mg2Si2O6 basis), the pure phases ``q`` / ``crst`` / ``trd`` /
+        ``cor`` / ``and`` / ``ky`` / ``sill`` / ``ru`` / ``sph``, or the
+        solution endmembers ``an`` (fsp), ``cats`` / ``jd`` (cpx),
+        ``gr`` / ``py`` (g), and ``mont`` (ol). There is no plain spinel id.
         Cold subprocess: same binary and slot discipline as the production
         subprocess bridge; equilibrate() is untouched.
         """
@@ -2896,7 +3616,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
             _assert_magemin_bulk_echo(spec.bulk_wt_pct, matlab_text)
             _check_magemin_solver_status(stdout, notes)
-            g_kJ = _magemin_endmember_gbase_kJ(spec, stdout)
+            g_kJ = _magemin_endmember_gbase_kJ(spec, stdout, notes)
             return g_kJ * 1000.0 / spec.formula_divisor, notes
 
         delta = _MAGEMIN_FD_DELTA_K

@@ -3,15 +3,14 @@ from pathlib import Path
 import pytest
 
 from simulator.battery.enums import EvidenceClass, Quantity
-from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 
 
 EXTRACT = Path("data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml")
 
 
 def test_wadhwa_redox_source_facts_survive_production_migration():
-    migrator = Migrator(Path.cwd(), index={}, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(Path.cwd(), EXTRACT, index={}, aliases={})
     migrator.finalize()
     result = migrator.result
 
@@ -78,8 +77,9 @@ def test_wadhwa_ureilite_attribution_mutation_turns_migration_check_red(tmp_path
     mutated_extract = tmp_path / EXTRACT.name
     mutated_extract.write_text(mutated)
 
-    migrator = Migrator(Path.cwd(), index={}, aliases={})
-    migrator._migrate_extract(mutated_extract)
+    migrator = migrate_one_extract(
+        Path.cwd(), mutated_extract, index={}, aliases={}
+    )
     migrator.finalize()
     migrated = sorted(
         (

@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -48,6 +49,20 @@ observations:
     section: Results and discussion
     note: 'Printed: corresponds to an apparent activation energy of evaporation Ea =580 kJ/mole'
   read_from: pdf:ta-mendybaev-2002-lpsc
+  derived_from:
+  - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+  - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+  - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+  derivation:
+    relation: Apparent evaporation activation energy corresponding to the printed 1.0 mm loop weight-loss rates at 1800, 1700,
+      and 1600 C; p. 2, Results and discussion
+    inputs:
+    - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+    - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+    - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+    parameters: []
+    output_unit: kJ/mol
+    references: []
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_mg_isotope_alpha_vacuum
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
   identity:
@@ -62,6 +77,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -104,6 +120,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -159,6 +176,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -214,6 +232,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -266,6 +285,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

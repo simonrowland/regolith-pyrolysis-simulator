@@ -1,0 +1,245 @@
+schema_version: literature_extract.v1
+source_id: beerkens-2003-sulfate-decomposition-na2o-activity
+source:
+  citation: >-
+    Beerkens, R. G. C. (2003). "Sulfate Decomposition and Sodium Oxide Activity in Soda–Lime–Silica Glass Melts," Journal of the American Ceramic Society 86(11), 1893–1899.
+  doi: 10.1111/j.1151-2916.2003.tb03578.x
+  year: 2003
+extraction:
+  method: >-
+    Born-digital pdftotext-layout reading with PDF-render verification of the tables and figure inventories. Table I reports measured total sulfur solubility at sodium-sulfate-gall saturation, and Table II reports sulfite solubility, but neither has a matching scalar quantity token in this seat. Figures 1–6 are recorded with no digitised points. The author-reported approximate Na2O activity at 1673 K is derived from Kpc, the sulfate-saturation result, and gas pressures; the necessary Kpc input is plotted or represented by a fit without a registered table asset, so it is retained in context pending the required TABLE_CSV lineage.
+  date: '2026-10-20'
+  worker: fam35-1021
+review_status: draft
+species:
+  S:
+    observations: []
+    context:
+      - observation_id: beerkens_2003_table_i_sulfur_saturation_context
+        type: table_context
+        locator:
+          source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+          page: 3
+          published_page: 1895
+          pdf_page_index: 2
+          table: 'I'
+          note: >-
+            Six table rows were checked against the page render; the 1573 K model-glass cell and 1723 K float-glass cell are blank, not zero. Maximum total sulfur solubility, expressed as dissolved S in mol/m3: 1573 K model blank, float 0.69; 1623 K model 0.68, float 0.63; 1673 K model 0.66, float 0.635; 1698 K model blank, float 0.63; 1723 K model 0.67, float blank. The model glass is 74 wt% SiO2, 16 wt% Na2O, 10 wt% CaO. The float glass is 72.2 wt% SiO2, 13.4 wt% Na2O, 9.5 wt% CaO, 2.2 wt% MgO, 1.5 wt% Al2O3, 0.9 wt% K2O. Measured after isothermal furnace treatment with excess sodium sulfate, equilibrium with a pure sodium sulfate gall; total dissolved sulfur by XRF. Candidate tokens checked: concentration_series and equilibrium_phase_composition; neither stores a measured total sulfur solubility scalar in mol/m3.
+        units: mol/m3 dissolved S
+        values:
+          quantity: maximum_sulfur_solubility_at_sodium_sulfate_gall_saturation
+          method_class: measured_direct
+          rows:
+            - {temperature_K: 1573, model_glass_mol_m3: unknown, float_glass_mol_m3: 0.69}
+            - {temperature_K: 1623, model_glass_mol_m3: 0.68, float_glass_mol_m3: 0.63}
+            - {temperature_K: 1673, model_glass_mol_m3: 0.66, float_glass_mol_m3: 0.635}
+            - {temperature_K: 1698, model_glass_mol_m3: unknown, float_glass_mol_m3: 0.63}
+            - {temperature_K: 1723, model_glass_mol_m3: 0.67, float_glass_mol_m3: unknown}
+          omitted_cells: blank in printed Table I; never interpreted as zero
+      - observation_id: beerkens_2003_table_ii_sulfite_solubility_context
+        type: table_context
+        locator:
+          source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+          page: 6
+          published_page: 1898
+          pdf_page_index: 5
+          table: 'II'
+          note: >-
+            All five temperature rows checked against the page render. Candidate token checked: sulfur_solubility_and_sulfate_capacity_series, but this is a record type rather than a scalar Quantity token and cannot express L_SO2^c in mol/(m3 bar). The additional minimum Budd-curve values are author-reported comparisons, not this study's measurements.
+        units: mol/(m3 bar) SO2
+        values:
+          quantity: sulfite_solubility_at_one_bar_sulfur_dioxide
+          method_class: measured_reduced
+          solubility_symbol: L_SO2_c
+          rows:
+            - {temperature_K: 1573, float_glass: 9.8, model_glass: 26, minimum_budd_curve_model_glass: unknown}
+            - {temperature_K: 1623, float_glass: 8.3, model_glass: 22, minimum_budd_curve_model_glass: unknown}
+            - {temperature_K: 1673, float_glass: 7.1, model_glass: 18, minimum_budd_curve_model_glass: '14–18'}
+            - {temperature_K: 1723, float_glass: 6.14, model_glass: 15.7, minimum_budd_curve_model_glass: unknown}
+            - {temperature_K: 1773, float_glass: 5.4, model_glass: 13, minimum_budd_curve_model_glass: 8}
+          method: >-
+            Derived as Kcon/Kpc from the square-wave voltammetry peak and fining sulfur-retention measurements. The quoted minimum Budd-curve values are for the model glass.
+      - observation_id: beerkens_2003_figure_1_sulfur_retention
+        type: figure_record
+        locator: {source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf, page: 4, published_page: 1896, pdf_page_index: 3, figure: '1'}
+        panel: whole_figure
+        attribution: present study
+        units: wt% SO3 as printed; log10(p(O2)/bar)
+        values:
+          quantity: unavailable
+          schema_gap: The store has no token for total residual sulfur concentration versus redox state.
+          candidate_tokens: [concentration_series, sulfur_solubility_and_sulfate_capacity_series]
+          species: S
+          phase: soda–lime–silica glass melt; product analyzed after quench
+          temperature_as_printed: Tmax 1673 K or 1773 K; redox-state p(O2) measured at 1673 K
+          composition_as_printed: 9.8 wt% CaO; Na2O 16 wt% or about 13.8 wt%; SiO2 balance
+          axes_as_printed: {x: 'redox state log10(p(O2)/bar), measured at 1673 K', y: 'residual sulfur expressed as wt% SO3'}
+          caption: Total residual sulfur content in soda–lime–silica melts with 9.8 wt% CaO after fining at Tmax, depending on the redox state of the melt (p(O2)).
+          series:
+            - {name: 'Tmax 1673 K, 16 wt% Na2O', marker: filled diamond, marker_count: 15, evidence_class: measured_direct}
+            - {name: 'Tmax 1673 K, 13.8 wt% Na2O', marker: open square, marker_count: 9, evidence_class: measured_direct}
+            - {name: 'Tmax 1773 K, 16 wt% Na2O', marker: filled circle, marker_count: 8, evidence_class: measured_direct}
+          digitisation: deferred to a figure pass
+      - observation_id: beerkens_2003_figure_2_sulfate_sulfite_equilibrium
+        type: figure_record
+        locator: {source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf, page: 4, published_page: 1896, pdf_page_index: 3, figure: '2'}
+        panel: whole_figure
+        attribution: present study and cited literature as identified in the legend
+        units: dimensionless Kcon; reciprocal temperature K−1
+        values:
+          quantity: unavailable
+          schema_gap: No equilibrium-constant token represents the sulfate–sulfite Kcon quantity.
+          candidate_tokens: [activity, log10_K_star]
+          species: S
+          phase: soda–lime–silica glass melt
+          temperature_as_printed: temperature axis spans the plotted measurements
+          composition_as_printed: float glass and model soda–lime–silica (74–16–10 wt% SiO2–Na2O–CaO)
+          axes_as_printed: {x: 'reciprocal temperature K−1', y: 'Ln Kcon/bar^(1/2)'}
+          caption: Equilibrium constant (Kcon) for sulfate–sulfite in float and model soda–lime–silica glass melts.
+          series:
+            - {name: float glass, marker: open diamond, marker_count: 9, evidence_class: measured_reduced}
+            - {name: model soda–lime–silica, marker: solid curve, marker_count: 0, evidence_class: model_derived}
+            - {name: model soda–lime–silica, marker: open triangle, marker_count: 0, evidence_class: quoted_attributed}
+            - {name: model II soda–lime–silica, marker: thin curve, marker_count: 0, evidence_class: quoted_attributed}
+          digitisation: deferred to a figure pass
+      - observation_id: beerkens_2003_figure_3_sulfate_decomposition_equilibrium
+        type: figure_record
+        locator: {source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf, page: 5, published_page: 1897, pdf_page_index: 4, figure: '3'}
+        panel: whole_figure
+        attribution: present study and Papadopoulos [11]
+        units: ln(Kpc/bar^(1/2)); reciprocal temperature K−1
+        values:
+          quantity: unavailable
+          schema_gap: No equilibrium-constant token represents Kpc.
+          candidate_tokens: [activity, log10_K_star]
+          species: S
+          phase: soda–lime–silica glass melt
+          temperature_as_printed: temperature axis spans the plotted measurements
+          composition_as_printed: float glass; lime-rich glasses from Papadopoulos; model glass SiO2–Na2O–CaO 74–16–10 wt%
+          axes_as_printed: {x: 'reciprocal temperature K−1', y: 'Ln Kpc/bar^(1/2)'}
+          caption: Sulfate decomposition equilibrium constants Kpc for float glass, lime-rich glasses measured by Papadopoulos, and model soda–lime–silica.
+          series:
+            - {name: float glass, marker: filled circle, marker_count: 9, evidence_class: measured_reduced}
+            - {name: lime-rich glasses, marker: open triangle, marker_count: 9, evidence_class: quoted_attributed}
+            - {name: model soda–lime–silica, marker: open square, marker_count: 10, evidence_class: measured_reduced}
+          digitisation: deferred to a figure pass
+      - observation_id: beerkens_2003_figure_4_sulfite_solubility
+        type: figure_record
+        locator: {source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf, page: 5, published_page: 1897, pdf_page_index: 4, figure: '4'}
+        panel: whole_figure
+        attribution: present study
+        units: mol/(m3 bar) SO2
+        values:
+          quantity: unavailable
+          schema_gap: The store has no scalar sulfite-solubility token.
+          candidate_tokens: [sulfur_solubility_and_sulfate_capacity_series, concentration_series]
+          species: S
+          phase: soda–lime–silica glass melt
+          temperature_as_printed: 1550–1850 K axis range
+          composition_as_printed: float glass and model glass (74 wt% SiO2, 10 wt% CaO, 16 wt% Na2O)
+          axes_as_printed: {x: 'temperature K', y: 'SO2 solubility in mol/(m3 bar)'}
+          caption: Sulfite solubility at 1-bar SO2 in soda–lime–silica melts.
+          series:
+            - {name: float glass, marker: solid curve, marker_count: 0, evidence_class: measured_reduced}
+            - {name: model glass, marker: dashed curve, marker_count: 0, evidence_class: measured_reduced}
+          digitisation: deferred to a figure pass
+      - observation_id: beerkens_2003_figure_5_sodium_oxide_activity
+        type: figure_record
+        locator: {source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf, page: 6, published_page: 1898, pdf_page_index: 5, figure: '5'}
+        panel: whole_figure
+        attribution: present study and references 15–20 as distinguished in the legend
+        units: dimensionless Na2O activity
+        values:
+          quantity: activity
+          species: Na2O
+          phase: soda–lime–silica glass melt
+          temperature_as_printed: about 1600–1800 K; plotted axis 1550–1850 K
+          standard_state: pure liquid Na2O at the same temperature; ideal gas standard is 1 bar. The Na2O reference is liquid throughout the plotted range.
+          axes_as_printed: {x: 'temperature K', y: 'chemical activity Na2O in melt'}
+          caption: Sodium oxide activity measured in this study and compared with literature values for soda–lime–silica glass melts.
+          series:
+            - {name: 'this study, float glass', marker: filled diamond, marker_count: 6, evidence_class: measured_reduced}
+            - {name: 'this study, model glass', marker: open square, marker_count: 5, evidence_class: measured_reduced}
+            - {name: 'float-glass extrapolation [19]', marker: filled triangle, marker_count: 5, evidence_class: quoted_attributed}
+            - {name: 'new model [15]', marker: x, marker_count: 5, evidence_class: model_derived}
+            - {name: 'Sanders and Haller [16]', marker: asterisk, marker_count: 5, evidence_class: quoted_attributed}
+            - {name: 'Sanders and Schaeffer [17]', marker: filled circle, marker_count: 1, evidence_class: quoted_attributed}
+            - {name: 'container glass, Argent et al. [20]', marker: plus, marker_count: 5, evidence_class: quoted_attributed}
+          digitisation: deferred to a figure pass
+      - observation_id: beerkens_2003_figure_6_total_fining_gas_pressure
+        type: figure_record
+        locator: {source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf, page: 6, published_page: 1898, pdf_page_index: 5, figure: '6'}
+        panel: whole_figure
+        attribution: author-calculated curves
+        units: bar total fining gas pressure
+        values:
+          quantity: unavailable
+          schema_gap: The plotted total pressure combines gas species and has no fitting scalar quantity token.
+          candidate_tokens: [partial_pressure, equilibrium_phase_composition]
+          species: [SO2, O2]
+          phase: gas in bubbles over dry oxidized molten float glass
+          temperature_as_printed: 1550–1850 K axis range
+          composition_as_printed: float glass, three sulfate concentration levels
+          axes_as_printed: {x: 'temperature K', y: 'total pressure fining gas bar'}
+          caption: Total fining gas pressure in dry-oxidized molten float glass melt due to decomposition of sulfate for three different sulfate concentration levels.
+          series:
+            - {name: 0.25 wt% SO3, marker: solid curve, marker_count: 0, evidence_class: model_derived}
+            - {name: 0.5 wt% SO3, marker: dashed curve, marker_count: 0, evidence_class: model_derived}
+            - {name: 0.75 wt% SO3, marker: short-dashed curve, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+  Na2O:
+    observations: []
+    context:
+      - observation_id: beerkens_2003_sodium_oxide_activity_1673K_context
+        type: derived_value_context
+        locator:
+          source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+          page: 6
+          published_page: 1898
+          pdf_page_index: 5
+          note: >-
+            The text prints about 1.7×10^-8 for the float-glass Na2O activity at 1673 K. It is derived using Ka, a(Na2SO4)=1, p(SO2)=0.666 bar, and p(O2)=0.33 bar; the derivation also depends on the Kpc determination. Candidate token: activity. Kpc values are figure data or temperature fits rather than stored rows; no corpus TABLE_CSV asset exists for the inputs. Retained pending the required TABLE_CSV lineage (controller t-1382). The paper estimates a maximum error of 30–40% for the derived activity.
+        units: dimensionless activity
+        values:
+          quantity: sodium_oxide_activity
+          method_class: measured_reduced
+          formula: Na2O
+          temperature_K: 1673
+          value_as_published: about 1.7 × 10^-8
+          inputs_as_published:
+            sodium_sulfate_activity: 1
+            sulfur_dioxide_partial_pressure_bar: 0.666
+            oxygen_partial_pressure_bar: 0.33
+            equilibrium_constant: Ka from Eq. (3); Kpc determination as described in the paper
+          standard_state: >-
+            Pure liquid sodium oxide at the experiment temperature; the paper defines oxide and sulfate activities relative to pure phases at the same temperature. At 1673 K, pure Na2O is liquid above the JANAF Na-012 alpha-to-liquid transition at 1405.2 K (inferred stable phase).
+          standard_state_inferred: true
+          standard_state_basis: JANAF Na-012, alpha-to-liquid transition at 1405.2 K; 1673 K is above the pure oxide melting transition.
+          derivation_pending: corpus TABLE_CSV asset (controller, t-1382)
+      - observation_id: beerkens_2003_activity_and_equilibrium_fits_context
+        type: model_parameters
+        locator:
+          source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+          page: 5
+          published_page: 1897
+          pdf_page_index: 4
+          note: >-
+            Author-reported temperature relations; the article also gives the measured activity ranges in Figure 5. Candidate tokens checked: activity_coefficient_temperature_fit does not fit these activities, and log10_K_star does not fit Kcon/Kpc; these are not activity-coefficient or equilibrium-constant K* parameters.
+        units: T in K; pressures in bar; concentrations mol/m3
+        values:
+          quantity: author_reported_temperature_relations
+          method_class: model_derived
+          sodium_oxide_activity_model_glass: 'exp(-43552/T + 8.33)'
+          sodium_oxide_activity_float_glass: 'exp(-46000/T + 9.50)'
+          Kcon_model_glass: 'exp(-25479/T + 11.319)'
+          Kpc_model_glass: 'exp(-35064/T + 14.15)'
+          Kcon_float_glass: 'exp(-24752/T + 10.423)'
+          Kpc_float_glass: 'exp(-32616/T + 13.17)'
+          sulfite_solubility_model_glass: 'exp(9585/T - 2.94)'
+          sulfite_solubility_float_glass: 'exp(7864/T - 2.73)'
+          reaction_enthalpy_kJ_mol:
+            model_glass: 291.5
+            float_glass: 271.2
+          total_fining_pressure_examples:
+            - {sulfate_wt_percent_SO3: 0.25, onset_temperature_K: 'above 1780'}
+            - {sulfate_wt_percent_SO3: 0.5, onset_temperature_K: 1710}

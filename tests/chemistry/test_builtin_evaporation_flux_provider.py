@@ -817,6 +817,52 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
 
 
 @pytest.mark.xdist_group("serial")
+def test_provider_traces_subthreshold_flux_without_adding_it_to_flux_map():
+    species = "K2O_gas"
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"K2O": 10.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            "vapour_batch_flux_pressures_Pa": {
+                species: 2.341423426915613e-14,
+            },
+            "overhead_partials_Pa": {},
+            "overhead_pressure_pa": 0.0,
+            "molar_mass_kg_mol": {species: 0.094196},
+            "stoich_by_species": {
+                species: {
+                    "parent_oxide": "K2O",
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                },
+            },
+            "available_oxide_kg": {species: 10.0},
+            "melt_surface_area_m2": 1.0,
+            "stir_factor": 1.0,
+            "alpha": {species: 1.0},
+            "evaporation_series_resistance": {
+                "gas_resistance_enabled": False,
+                "melt_resistance_enabled": False,
+            },
+        },
+    )
+
+    result = BuiltinEvaporationFluxProvider().dispatch(request)
+
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    trace = result.diagnostic["below_threshold_evaporation_flux"]
+    assert trace["threshold_kg_hr"] == 1e-12
+    assert trace["fluxes_kg_hr"][species] == pytest.approx(8.5e-14, rel=1e-12)
+
+
+@pytest.mark.xdist_group("serial")
 def test_provider_skips_species_without_grounded_molar_mass():
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
@@ -1067,6 +1113,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
     ],
 )
 # gate-2: short-run shadow parity exceeded 300 s under 3-chain slot contention.
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(900)
 def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
@@ -1118,6 +1165,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     steps = 0
     worst_delta_kg_hr = 0.0
     refused_reference_species_seen: set[str] = set()
+    c0b_refused_reference_species_seen: set[str] = set()
     proxy_accounted_species_seen: set[str] = set()
     while not sim.is_complete() and steps < 60:
         if sim.paused_for_decision:
@@ -1129,6 +1177,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
             continue
         sim.step()
         steps += 1
+        sampled_campaign = sim.melt.campaign
 
         T_C = sim.melt.temperature_C
         if T_C + 273.15 < 400:
@@ -1146,17 +1195,21 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         refused_reference_species = set(reference_flux) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
         # in 1a6ad25, made batch eligibility authoritative.
-        # 2026-08-05 phosphorus carrier activation 7e6bebc adds a C0b cleanup
-        # stage whose declared predicate admits only P2O5-sourced carriers. The
-        # legacy math helper has no stage predicate, so typed non-P refusals are
-        # outside wiring parity. MC-4A makes CrO2 executable, so at C0b it follows
-        # that same typed predicate refusal instead of missing a channel contract.
+        # C0 retains phosphorus and uses the ordinary evaporation stage, so
+        # stage0-only carriers can be refused before C0B begins. The C0B-only
+        # reason check below applies only when that cleanup campaign is sampled;
+        # the legacy math helper has no stage predicate, so typed refusals stay
+        # outside wiring parity in every campaign. MC-4A makes CrO2 executable,
+        # so at C0B it follows that typed predicate refusal rather than missing
+        # a channel contract.
         for species in refused_reference_species:
             refusal = refusals[species]
             assert refusal["refusal_code"] == "inapplicable_by_declared_predicate"
-            assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (
-                refusal["extra"]["detail"]
-            )
+            if sampled_campaign is CampaignPhase.C0B:
+                c0b_refused_reference_species_seen.add(species)
+                assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (
+                    refusal["extra"]["detail"]
+                )
         refused_reference_species_seen.update(refused_reference_species)
 
         # b-314: tier-2 ``broad_proxy_not_intrinsic`` rows no longer satisfy
@@ -1211,7 +1264,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
 
     assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
     if feedstock_key in {"lunar_mare_low_ti", "s_type_asteroid_silicate"}:
-        assert "CrO2" in refused_reference_species_seen
+        assert "CrO2" in c0b_refused_reference_species_seen
         # b-314: whenever CrO2 carries a flux pressure outside the C0b
         # predicate refusal, it must be visibly accounted by the restored
         # SC-67 surface (missing_alpha or the marked prototype fallback) —

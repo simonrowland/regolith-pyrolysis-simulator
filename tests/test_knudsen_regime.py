@@ -81,6 +81,89 @@ def test_pressure_band_min_knudsen_order_matches_hand_literal():
     assert 6.0e-4 < expected_knudsen < 8.0e-4
 
 
+def test_condensation_mean_free_path_output_grid_matches_transport_owner_bit_for_bit():
+    pressures_pa = (1.0, 1000.0)
+    temperatures_K = (300.0, 1773.15)
+    expected_hex = {
+        "He": (
+            ("0x1.d56d7bbeb626ap-7", "0x1.5ad1abf3cbcaap-4"),
+            ("0x1.e0b1a5a078fc9p-17", "0x1.6324871e82dbcp-14"),
+        ),
+        "N2": (
+            ("0x1.a78e0bc6766f7p-8", "0x1.38ed792e00af8p-5"),
+            ("0x1.b1b85dfa5469ep-18", "0x1.407019c8b4ed1p-15"),
+        ),
+        "Ar": (
+            ("0x1.e6fe23fb3f8eep-8", "0x1.67cbdbb41af94p-5"),
+            ("0x1.f2ae395332bf6p-18", "0x1.706e72626971fp-15"),
+        ),
+        "Kr": (
+            ("0x1.c9588ffedb357p-8", "0x1.51e4954404ddcp-5"),
+            ("0x1.d4527ef8af515p-18", "0x1.5a0098d91b82dp-15"),
+        ),
+        "CO2": (
+            ("0x1.895ffe541cfa2p-8", "0x1.22a15e8255fc1p-5"),
+            ("0x1.92d0e3aa19939p-18", "0x1.299b008576c4bp-15"),
+        ),
+        "O2": (
+            ("0x1.fc4a582e18f44p-8", "0x1.778803bd93d00p-5"),
+            ("0x1.043ea3eea4541p-17", "0x1.808b476a10312p-15"),
+        ),
+    }
+
+    assert set(expected_hex) == set(condensation_module.CARRIER_GAS_PROPERTIES)
+    for carrier_gas, properties in condensation_module.CARRIER_GAS_PROPERTIES.items():
+        for pressure_index, pressure_pa in enumerate(pressures_pa):
+            for temperature_index, temperature_K in enumerate(temperatures_K):
+                expected = expected_hex[carrier_gas][pressure_index][temperature_index]
+                actual = condensation_module._mean_free_path_m(
+                    pressure_pa,
+                    temperature_K,
+                    carrier_gas=carrier_gas,
+                )
+                owner = transport_regime_module.single_species_mean_free_path_m(
+                    pressure_pa,
+                    temperature_K,
+                    properties.collision_diameter_m,
+                )
+
+                assert actual.hex() == expected
+                assert owner.hex() == expected
+
+
+def test_condensation_mean_free_path_edge_guards_keep_their_existing_results():
+    assert condensation_module._mean_free_path_m(-1.0, 300.0) == math.inf
+    assert condensation_module._mean_free_path_m(0.0, 300.0) == math.inf
+    assert condensation_module._mean_free_path_m(1.0, -1.0) == 0.0
+    assert condensation_module._mean_free_path_m(1.0, 0.0) == 0.0
+    assert condensation_module._mean_free_path_m(
+        1.0,
+        300.0,
+        molecular_diameter_m=0.0,
+    ) == 0.0
+
+
+def test_condensation_pressure_floor_output_grid_is_bit_pinned():
+    expected_hex = {
+        "He": "0x1.1a3df6ef66d89p+6",
+        "N2": "0x1.fd52833b8a730p+4",
+        "Ar": "0x1.24cd9120e748dp+5",
+        "Kr": "0x1.12fa5ace5aa08p+5",
+        "CO2": "0x1.d907fa7d77f30p+4",
+        "O2": "0x1.319bb0609c9f9p+5",
+    }
+
+    assert set(expected_hex) == set(condensation_module.CARRIER_GAS_PROPERTIES)
+    for carrier_gas in condensation_module.CARRIER_GAS_PROPERTIES:
+        result = condensation_module.minimum_pressure_mbar_for_knudsen(
+            gas_temperature_C=1500.0,
+            pipe_diameter_m=0.12,
+            carrier_gas=carrier_gas,
+            knudsen_ceiling=0.01,
+        )
+        assert result["minimum_pressure_pa"].hex() == expected_hex[carrier_gas]
+
+
 @pytest.mark.parametrize("campaign_name", ["C4", "C6"])
 def test_continuum_pressure_bounds_are_derived_from_operating_point(campaign_name):
     setpoints = yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text())

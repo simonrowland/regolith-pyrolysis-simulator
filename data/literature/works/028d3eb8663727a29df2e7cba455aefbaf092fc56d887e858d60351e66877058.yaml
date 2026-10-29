@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-018-stolyarova-2012
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-018-stolyarova-2012
-      role: table_csv
-      path: tables/kems-018-stolyarova-2012
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-018-stolyarova-2012
       role: pdftotext
       path: unknown
@@ -67,4 +61,4 @@ experiments:
   locator:
     table: '1'
     paragraph: Composition of vapour over ternary ionic silicate systems studied
-    source_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
+    source_path: text/kems-018-stolyarova-2012/mineru/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md

@@ -9,26 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:ohta-1996-cao-mgo-al2o3-activities
       role: pdf
       path: raw/ohta-1996-cao-mgo-al2o3-activities/ohta-1996-cao-mgo-al2o3-activities.pdf
       sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
+        tag: value
+        value: bcc5467a47d9bc6e84a58ad30e62e2dabd72e349d9e61af4f0458ce8aa8b31e9
     - asset_id: pdftotext:ohta-1996-cao-mgo-al2o3-activities
       role: pdftotext
       path: text/ohta-1996-cao-mgo-al2o3-activities
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:ohta-1996-cao-mgo-al2o3-activities
-      role: table_csv
-      path: tables/ohta-1996-cao-mgo-al2o3-activities
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:ohta-1996-cao-mgo-al2o3-activities
       role: pdftotext
       path: unknown
@@ -66,9 +60,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/isijinternational.36.983
   locator:
-    page: 983
+    page: 1
     published_page: 983
-    pdf_page_index: 1
+    pdf_page_index: 0
     paragraph: After equilibration, the crucible was taken out of the furnace and quenched rapidly in a He gas stream, followed
       by water quenching.
     section: Experimental
@@ -238,7 +232,7 @@ context:
   type: method
   locator:
     published_page: 983
-    pdf_page_index: 1
+    pdf_page_index: 0
     section: Synopsis / Introduction
   units: K; mass%
   values:

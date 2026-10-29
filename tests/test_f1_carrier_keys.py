@@ -175,37 +175,40 @@ def _magemin_domain_status(
 ) -> tuple[str, list[str]]:
     """Verdict-(b) domain probe — honest status, no renormalization."""
     backend = MAGEMinBackend()
-    init_ok = backend.initialize(
-        {"python_bridge": "subprocess"} if subprocess_only else {}
-    )
-    if not init_ok:
-        return "backend_unavailable", ["MAGEMin subprocess binary not located"]
-
-    oxide_sum = sum(float(v) for v in oxide_wt_pct.values())
-    if oxide_sum <= 1e-12:
-        return "empty_oxide_vector", ["post-Stage-0 melt oxide vector is empty"]
-
-    notes = [
-        f"oxide vector sum {oxide_sum:.6f} wt% — passed unnormalized (verdict-b discipline)"
-    ]
     try:
-        projection = backend._build_db_bulk_projection(dict(oxide_wt_pct))
-    except MeltCompositionError as exc:
-        return "bulk_projection_failed", notes + [str(exc)]
+        init_ok = backend.initialize(
+            {"python_bridge": "subprocess"} if subprocess_only else {}
+        )
+        if not init_ok:
+            return "backend_unavailable", ["MAGEMin subprocess binary not located"]
 
-    result = backend.equilibrate(
-        temperature_C=1200.0,
-        pressure_bar=0.006,
-        fO2_log=-2.0,
-        composition_kg={
-            oxide: float(wt) for oxide, wt in oxide_wt_pct.items()
-        },
-        species_formula_registry=PyrolysisSimulator._load_species_formula_registry(),
-    )
-    status = str(result.status or "unknown")
-    notes.extend(projection.warnings)
-    notes.extend(result.warnings or [])
-    return status, notes
+        oxide_sum = sum(float(v) for v in oxide_wt_pct.values())
+        if oxide_sum <= 1e-12:
+            return "empty_oxide_vector", ["post-Stage-0 melt oxide vector is empty"]
+
+        notes = [
+            f"oxide vector sum {oxide_sum:.6f} wt% — passed unnormalized (verdict-b discipline)"
+        ]
+        try:
+            projection = backend._build_db_bulk_projection(dict(oxide_wt_pct))
+        except MeltCompositionError as exc:
+            return "bulk_projection_failed", notes + [str(exc)]
+
+        result = backend.equilibrate(
+            temperature_C=1200.0,
+            pressure_bar=0.006,
+            fO2_log=-2.0,
+            composition_kg={
+                oxide: float(wt) for oxide, wt in oxide_wt_pct.items()
+            },
+            species_formula_registry=PyrolysisSimulator._load_species_formula_registry(),
+        )
+        status = str(result.status or "unknown")
+        notes.extend(projection.warnings)
+        notes.extend(result.warnings or [])
+        return status, notes
+    finally:
+        backend.close()
 
 
 @pytest.fixture(scope="module")

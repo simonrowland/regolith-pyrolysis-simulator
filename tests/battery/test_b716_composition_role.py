@@ -1,4 +1,4 @@
-"""b-716: composition role on the existing ``Composition.proxy_flag``.
+"""b-716: printed composition context and catalogue composition roles.
 
 Pins, committed before the reader change:
 
@@ -8,6 +8,8 @@ Pins, committed before the reader change:
   ``point_conditions.composition``;
 * the existing catalogue ``proxy_flag`` paths (the four ``proxy_flag`` hits
   under ``tests/``) keep their token and their catalogue notice;
+* a per-run composition marked as initial-charge-only is unknown, while its
+  printed map remains available as context;
 * identity drops the fixed-valence fO2 omission for any non-None
   ``proxy_flag``.
 """
@@ -18,10 +20,11 @@ from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
-from simulator.battery.enums import AmountBasis, NoticeKind
+from simulator.battery.enums import AmountBasis, NoticeKind, RefusalReason
 from simulator.battery.identity import _composition_is_fixed_valence
 from simulator.battery.migrate import (
     _catalogue_composition_located_from_values,
+    REPO_ROOT,
     migrate,
     sample_from_equipment,
 )
@@ -101,18 +104,26 @@ def _assert_dual_promotion(conditions) -> Composition:
     return composition
 
 
+def _assert_initial_charge_is_context(conditions):
+    printed = conditions["printed_composition"]
+    assert isinstance(printed, Located) and printed.state.is_value
+    typed = conditions["composition"]
+    assert isinstance(typed, Located) and typed.state.is_unknown
+    assert "missing input" in typed.state.reason
+    assert "per-run composition is not published" in typed.state.reason
+    return typed.state
+
+
 def test_undeclared_point_oxide_map_dual_promotes_without_proxy_flag(tmp_path) -> None:
     composition = _assert_dual_promotion(_fixture_points(tmp_path))
     assert composition.proxy_flag is None
 
 
-def test_declared_initial_charge_point_map_is_stamped_and_kept(tmp_path) -> None:
+def test_declared_initial_charge_point_map_is_context_only(tmp_path) -> None:
     conditions = _fixture_points(
         tmp_path, {"composition_role": INITIAL_CHARGE_ONLY}
     )
-    # Option (a): still on both melt channels, now carrying the role.
-    composition = _assert_dual_promotion(conditions)
-    assert composition.proxy_flag == INITIAL_CHARGE_ONLY
+    _assert_initial_charge_is_context(conditions)
 
 
 def test_located_composition_role_declaration_is_read(tmp_path) -> None:
@@ -126,7 +137,7 @@ def test_located_composition_role_declaration_is_read(tmp_path) -> None:
             }
         },
     )
-    assert _assert_dual_promotion(conditions).proxy_flag == INITIAL_CHARGE_ONLY
+    _assert_initial_charge_is_context(conditions)
 
 
 def test_unknown_composition_role_is_queued_not_stamped(tmp_path) -> None:
@@ -143,12 +154,119 @@ def test_unknown_composition_role_is_queued_not_stamped(tmp_path) -> None:
     )
 
 
-def test_markova_1983_initial_sample_points_are_stamped(tmp_path) -> None:
+def test_unknown_values_composition_role_is_queued_for_plante_row(tmp_path) -> None:
+    import yaml
+
+    source = "kems-042-plante-1979.yaml"
+    document = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / source).read_text(
+            encoding="utf-8"
+        )
+    )
+    row_id = "plante1979_table2_s1104_r001_quoted"
+    values = next(
+        observation["values"]
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        if observation.get("observation_id") == row_id
+    )
+    values["composition_role"] = "not_a_role"
+
+    result = _migrate_real_extract(tmp_path, source, extract_doc=document)
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id.endswith(row_id)
+    )
+
+    assert "composition" not in (observation.point_conditions or {})
+    assert any(
+        entry.observation_id == observation.observation_id
+        and "composition_role 'not_a_role' is not one of" in entry.why
+        for entry in result.queue
+    )
+
+
+def test_unknown_basu_feo_row_role_is_queued_without_composition(tmp_path) -> None:
+    """A refused role on Basu Table II solution 1 stays untyped.
+
+    The Plante quoted row repeats the declared sample map, so it never
+    reaches the observation-attach fallback. This row prints its own slag
+    analysis. Dropping ``and not composition_role_refusal`` stamps a
+    mole-fraction composition (proxy None) and keeps the queue entry.
+    """
+
+    import yaml
+
+    source = "basu-2008-feo-steelmaking.yaml"
+    document = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / source).read_text(
+            encoding="utf-8"
+        )
+    )
+    row_id = "basu_2008_tii_s01_a_feo_1873k"
+    values = next(
+        observation["values"]
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        if observation.get("observation_id") == row_id
+    )
+    values["composition_role"] = "not_a_role"
+
+    result = _migrate_real_extract(tmp_path, source, extract_doc=document)
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id.endswith(row_id)
+    )
+    point = observation.point_conditions or {}
+    assert "composition" not in point
+    assert any(
+        entry.observation_id == observation.observation_id
+        and "composition_role 'not_a_role' is not one of" in entry.why
+        for entry in result.queue
+    )
+
+
+def test_unknown_hastie_values_composition_role_is_queued_once(tmp_path) -> None:
+    import yaml
+
+    source = "kems-020-hastie-1981-nbsir.yaml"
+    document = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / source).read_text(
+            encoding="utf-8"
+        )
+    )
+    row_id = "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
+    values = next(
+        observation["values"]
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        if observation.get("observation_id") == row_id
+    )
+    values["composition_role"] = "not_a_role"
+
+    result = _migrate_real_extract(tmp_path, source, extract_doc=document)
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if f"::{row_id}::T=" in observation_id
+    )
+    entries = [
+        entry
+        for entry in result.queue
+        if entry.observation_id == observation.observation_id
+        and "composition_role 'not_a_role' is not one of" in entry.why
+    ]
+    assert len(entries) == 1
+
+
+def test_markova_1983_initial_sample_points_remain_context_only(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-025-markova-1983.yaml")
     points = _point_compositions(result, "kems-025-markova-1983::")
     assert len(points) == 25
-    flags = {_assert_dual_promotion(conditions).proxy_flag for _, conditions in points}
-    assert flags == {INITIAL_CHARGE_ONLY}
+    for _, conditions in points:
+        _assert_initial_charge_is_context(conditions)
 
 
 # Hastie Table 2 (NBSIR 81-2279) point ids on green 61ec839da. Footnote a says
@@ -171,7 +289,7 @@ _HASTIE_ILLITE_IDS = {
 }
 
 
-def test_hastie_1981_table2_only_depleted_slag_maps_are_stamped(tmp_path) -> None:
+def test_hastie_1981_table2_depleted_slag_maps_remain_context_only(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-020-hastie-1981-nbsir.yaml")
     points = dict(
         _point_compositions(
@@ -180,17 +298,13 @@ def test_hastie_1981_table2_only_depleted_slag_maps_are_stamped(tmp_path) -> Non
     )
     # Ids are unchanged by the row-level declaration (series_row_extra skip).
     assert set(points) == _HASTIE_SLAG_INITIAL_CHARGE_IDS | _HASTIE_ILLITE_IDS
-    flags = {
-        obs_id: _assert_dual_promotion(conditions).proxy_flag
-        for obs_id, conditions in points.items()
-    }
     for obs_id in _HASTIE_SLAG_INITIAL_CHARGE_IDS:
-        assert flags[obs_id] == INITIAL_CHARGE_ONLY, obs_id
+        _assert_initial_charge_is_context(points[obs_id])
     for obs_id in _HASTIE_ILLITE_IDS:
         composition = points[obs_id]["composition"].state.value
         # x(K2O) for the printed 7.4 wt% illite analysis.
         assert abs(float(dict(composition.components)["K2O"]) - 0.055513) < 1e-6
-        assert flags[obs_id] is None, obs_id
+        assert composition.proxy_flag is None, obs_id
 
 
 def test_composition_role_does_not_rename_a_series_row() -> None:
@@ -279,13 +393,18 @@ def test_identity_fixed_valence_requires_no_proxy_flag() -> None:
 # --- score: residual stratum for a stamped point composition --------------
 
 
-def _stamped_point_residual():
+def _initial_charge_missing_input_residual():
     from simulator.battery.enums import Engine, EvidenceClass
     from simulator.battery.score import compile_residual
     from tests.battery.test_score import _context, _predict
 
     experiment = F.kems_experiment()
     identity = F.activity_identity()
+    reason = (
+        "missing input: per-run composition is not published; the printed "
+        "initial charge is retained as sample context only"
+    )
+    identity = replace(identity, composition=State.unknown(reason))
     reference = F.observation(
         "initial-charge-point",
         experiment.experiment_id,
@@ -297,7 +416,7 @@ def _stamped_point_residual():
     reference = replace(
         reference,
         point_conditions={
-            "composition": Located(State.of(_composition(INITIAL_CHARGE_ONLY)))
+            "composition": Located(State.unknown(reason))
         },
     )
     context = _context(F.work(), experiment, reference, review="reviewed")
@@ -310,24 +429,9 @@ def _stamped_point_residual():
     return residual
 
 
-def test_stamped_point_composition_is_predicted_and_flagged() -> None:
-    from simulator.battery.score import (
-        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
-        flagged_strata,
-    )
-
-    residual = _stamped_point_residual()
-    # Predict-and-flag: the number is kept, the row leaves the headline.
-    assert residual.numeric is not None
-    assert residual.score_eligible is False
-    assert "not_flagged_stratum" in residual.exclusions
-    role_notices = [
-        notice
-        for notice in residual.notices
-        if "composition_role=initial_charge_only" in notice.reason
-    ]
-    assert len(role_notices) == 1
-    assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
-    assert flagged_strata(residual.notices) == (
-        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
-    )
+def test_initial_charge_point_composition_is_a_typed_missing_input() -> None:
+    residual = _initial_charge_missing_input_residual()
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["fields"] == ["composition"]

@@ -35,6 +35,7 @@ def _put_cache_row(
     *,
     tag: str,
     artifact: str = "freeze_gate_curve",
+    complete_replay_vector: bool = False,
 ) -> dict:
     key = {
         "artifact": artifact,
@@ -44,6 +45,24 @@ def _put_cache_row(
         "schema_version": "test",
         "tag": tag,
     }
+    if complete_replay_vector:
+        key.update(
+            {
+                "namespace_id": "test:freeze_gate_curve",
+                "vapor_pressure_provider_selection": "test-vapor-pressure",
+                "sulfur_side": {
+                    "S_input_ppm": 0.0,
+                    "inventory": {"salt_phase": {}, "sulfide_matte": {}},
+                    "sulfsat_available": False,
+                    "sulfsat_provider_selection": "test-sulfur",
+                },
+                "model": {
+                    "model": "test-model",
+                    "mode": "test",
+                    "magemin_database": None,
+                },
+            }
+        )
     payload = {"curve": {"status": "in_range", "tag": tag}}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
@@ -135,7 +154,11 @@ def _db_bytes(path: Path) -> int:
 def test_read_only_base_attach_exact_hit(tmp_path: Path) -> None:
     base = tmp_path / "base.sqlite"
     shard = tmp_path / "shard.sqlite"
-    key = _put_cache_row(base, tag="from-base")
+    key = _put_cache_row(
+        base,
+        tag="from-base",
+        complete_replay_vector=True,
+    )
     PT1PersistentEquilibriumStore(shard)
 
     store = PT0DeterminismStore(

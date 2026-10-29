@@ -53,11 +53,21 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.backends import (
     BackendSelectionPolicy,
 )
-from simulator.config import ConfigBundle, load_config_bundle
+from simulator.config import (
+    ConfigBundle,
+    _load_setpoints_file,
+    load_config_bundle,
+)
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import iron_oxide_values
-from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
-from simulator.accounting import AccountingQueries
+from simulator.campaigns import (
+    CampaignManager,
+    CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
+    c0_exit_run_notice,
+)
+from simulator.accounting import AccountingQueries, UnknownSpeciesError
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
@@ -70,6 +80,7 @@ from simulator.accounting.yield_disposition import (
     ledger_snapshots_from_sim,
 )
 from simulator.chemistry.kernel import (
+    CHEMISTRY_KERNEL_RUN_INPUT_KEYS,
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
 )
@@ -78,6 +89,7 @@ from simulator.core import (
     CampaignPhase,
     DEGRADED_PATH_ENGAGEMENT_KEYS,
     PyrolysisSimulator,
+    read_high_t_melt_activity_fallback_notice,
 )
 from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
@@ -197,7 +209,7 @@ SIO_WALL_SWEEP_DEFAULT_PO2_MODES: tuple[str, ...] = (
     "no_suppress",
     "o2_1mbar",
 )
-_SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = frozenset({OXYGEN_SINK_CHANNEL_MODE_KEY})
+_SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = CHEMISTRY_KERNEL_RUN_INPUT_KEYS
 SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
     "no_suppress": {
         "label": "C2A no-suppress SiO extraction",
@@ -853,8 +865,8 @@ def _deep_merge_setpoints(
         )
         if extra_keys:
             raise RunnerError(
-                "setpoints_patch may only contain diagnostic "
-                f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY}; "
+                "setpoints_patch may only contain "
+                f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY} or liquid_fraction_provider; "
                 "use fallback flags instead"
             )
         try:
@@ -1085,7 +1097,11 @@ class PyrolysisRun:
             session = SimSession()
             try:
                 session.start(self._session_config())
-            except CampaignPressureSetpointRefusal as exc:
+            except (
+                CampaignPressureSetpointRefusal,
+                CampaignSetpointMissingRefusal,
+                EvaporationFluxRefusal,
+            ) as exc:
                 execution = RunExecutor().execute_session(
                     session,
                     hours=int(self.hours),
@@ -1208,8 +1224,8 @@ class PyrolysisRun:
             )
             if extra_keys:
                 raise RunnerError(
-                    "PyrolysisRun.chemistry_kernel only accepts diagnostic "
-                    f"{OXYGEN_SINK_CHANNEL_MODE_KEY}"
+                    "PyrolysisRun.chemistry_kernel only accepts "
+                    f"{OXYGEN_SINK_CHANNEL_MODE_KEY} or liquid_fraction_provider"
                 )
             setpoints = _deep_merge_setpoints(
                 setpoints,
@@ -1304,7 +1320,10 @@ class PyrolysisRun:
 
     def _load_setpoints(self) -> dict:
         path = self.setpoints_path or (DATA_DIR / "setpoints.yaml")
-        return _load_yaml(path)
+        try:
+            return _load_setpoints_file(path)
+        except FileNotFoundError as exc:
+            raise RunnerError(str(exc)) from exc
 
     def _load_vapor_pressures(self) -> dict:
         path = self.vapor_pressures_path or (DATA_DIR / "vapor_pressures.yaml")
@@ -1372,7 +1391,10 @@ class PyrolysisRun:
             "kernel_commit_sha", _resolve_kernel_commit_sha()
         )
 
-        engines_used = self._engines_used(sim)
+        engines_used = _safe_failure_value(
+            lambda: _json_safe(self._engines_used(sim)),
+            section="run_metadata.engines_used",
+        )
         session_config = getattr(execution.session, "_config", None)
         if session_config is None:
             raise RuntimeError("run execution session missing config")
@@ -1383,7 +1405,7 @@ class PyrolysisRun:
             "feedstock_id": self.feedstock_id,
             "campaign": self.campaign,
             "hours_requested": int(self.hours),
-            "hours_completed": int(sim.melt.hour),
+            "hours_completed": _execution_hours_completed(execution),
             "mass_kg": float(self.mass_kg),
             "additives_kg": {
                 k: float(v) for k, v in sorted(applied_additives_kg.items())
@@ -1392,6 +1414,7 @@ class PyrolysisRun:
             "backend": self.backend_name,
             "started_at_utc": started_at_utc,
             "engines_used": engines_used,
+            "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
         c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
@@ -1400,14 +1423,19 @@ class PyrolysisRun:
         c3_credit_drawn_kg = dict(
             getattr(sim, "_c3_alkali_credit_drawn_kg_by_species", {}) or {}
         )
-        c3_credit_outstanding_kg = (
-            sim._c3_alkali_credit_outstanding_kg_by_species()
+        c3_credit_outstanding_kg = _safe_failure_value(
+            lambda: sim._c3_alkali_credit_outstanding_kg_by_species(),
+            section=(
+                "run_metadata.c3_alkali_credit_outstanding_kg_by_species"
+            ),
         )
-        c3_credit_species = (
-            set(c3_credit_dose_kg)
-            | set(c3_credit_drawn_kg)
-            | set(c3_credit_outstanding_kg)
+        c3_credit_outstanding_unavailable = (
+            isinstance(c3_credit_outstanding_kg, Mapping)
+            and c3_credit_outstanding_kg.get("status") == "unavailable"
         )
+        c3_credit_species = set(c3_credit_dose_kg) | set(c3_credit_drawn_kg)
+        if not c3_credit_outstanding_unavailable:
+            c3_credit_species |= set(c3_credit_outstanding_kg)
         if c3_credit_species:
             ordered_species = sorted(c3_credit_species)
             run_metadata["c3_alkali_credit_dose_kg_by_species"] = {
@@ -1418,23 +1446,48 @@ class PyrolysisRun:
                 species: float(c3_credit_drawn_kg.get(species, 0.0))
                 for species in ordered_species
             }
-            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = {
-                species: float(c3_credit_outstanding_kg.get(species, 0.0))
-                for species in ordered_species
-            }
-        if execution.reduced_real_cache:
-            run_metadata["reduced_real_cache"] = _json_safe(
-                execution.reduced_real_cache
+            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = (
+                c3_credit_outstanding_kg
+                if c3_credit_outstanding_unavailable
+                else {
+                    species: float(
+                        c3_credit_outstanding_kg.get(species, 0.0)
+                    )
+                    for species in ordered_species
+                }
             )
-        lab_area_bridge = self._lab_area_bridge()
+        elif c3_credit_outstanding_unavailable:
+            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = (
+                c3_credit_outstanding_kg
+            )
+        if execution.reduced_real_cache:
+            run_metadata["reduced_real_cache"] = _safe_failure_value(
+                lambda: _json_safe(execution.reduced_real_cache),
+                section="run_metadata.reduced_real_cache",
+            )
+        lab_area_bridge = _safe_failure_value(
+            lambda: _json_safe(self._lab_area_bridge()),
+            section="run_metadata.lab_area_bridge",
+        )
         if lab_area_bridge:
-            run_metadata.update(_json_safe(lab_area_bridge))
+            if (
+                isinstance(lab_area_bridge, Mapping)
+                and lab_area_bridge.get("status") == "unavailable"
+                and lab_area_bridge.get("section")
+                == "run_metadata.lab_area_bridge"
+            ):
+                run_metadata["lab_area_bridge"] = lab_area_bridge
+            else:
+                run_metadata.update(lab_area_bridge)
         # Anything left in metadata_overrides is propagated verbatim --
         # callers can stuff extra provenance (CI run id, etc.) without
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
-        run_metadata["campaigns_elapsed"] = float(execution.campaigns_elapsed)
+        run_metadata["campaigns_elapsed"] = _safe_failure_value(
+            lambda: float(execution.campaigns_elapsed),
+            section="run_metadata.campaigns_elapsed",
+        )
         run_metadata.update(
             {
                 "backend_status": str(execution.backend_status),
@@ -1447,6 +1500,8 @@ class PyrolysisRun:
         _attach_sulfur_saturation_notice(run_metadata, sim)
         _attach_rump_expectation_notice(run_metadata, sim)
         _attach_composition_projected_liquidus_notice(run_metadata, sim)
+        _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
+        _attach_c0_exit_notice(run_metadata, sim)
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -1455,48 +1510,84 @@ class PyrolysisRun:
             )
         )
 
-        final_state = _final_state_from_ledger(sim)
-        refusal_diagnostic = dict(execution.refusal_diagnostic or {})
+        final_state = _safe_failure_value(
+            lambda: _json_safe(_final_state_from_ledger(sim)),
+            section="final_state",
+        )
+        refusal_diagnostic = _safe_failure_value(
+            lambda: _json_safe(dict(execution.refusal_diagnostic or {})),
+            section="run_metadata.refusal_diagnostic",
+        )
         if refusal_diagnostic:
-            run_metadata["refusal_diagnostic"] = _json_safe(
+            run_metadata["refusal_diagnostic"] = refusal_diagnostic
+        knudsen_diagnostic = _safe_failure_value(
+            lambda: _json_safe(
+                dict(
+                    refusal_diagnostic
+                    if execution.reason == KNUDSEN_REFUSAL_REASON
+                    else _knudsen_regime_diagnostic_from_sim(sim)
+                )
+            ),
+            section="run_metadata.knudsen_regime_diagnostic",
+            upstream=(
                 refusal_diagnostic
-            )
-        knudsen_diagnostic = dict(
-            refusal_diagnostic
-            if execution.reason == KNUDSEN_REFUSAL_REASON
-            else _knudsen_regime_diagnostic_from_sim(sim)
+                if execution.reason == KNUDSEN_REFUSAL_REASON
+                else None
+            ),
         )
         if knudsen_diagnostic:
-            run_metadata["knudsen_regime_diagnostic"] = _json_safe(
-                knudsen_diagnostic)
-        run_metadata["pressure_coating_pareto_diagnostic"] = _json_safe(
-            pressure_coating_pareto_diagnostic(sim, execution.per_hour)
+            run_metadata["knudsen_regime_diagnostic"] = knudsen_diagnostic
+        run_metadata["pressure_coating_pareto_diagnostic"] = _safe_failure_value(
+            lambda: _json_safe(
+                pressure_coating_pareto_diagnostic(sim, execution.per_hour)
+            ),
+            section="run_metadata.pressure_coating_pareto_diagnostic",
         )
-        alpha_authority_status_by_species = dict(
-            getattr(sim, "_alpha_authority_status_by_species_engaged", {}) or {}
+        alpha_authority_status_by_species = _safe_failure_value(
+            lambda: _json_safe(
+                dict(
+                    getattr(
+                        sim,
+                        "_alpha_authority_status_by_species_engaged",
+                        {},
+                    )
+                    or {}
+                )
+            ),
+            section="run_metadata.alpha_authority_status_by_species",
         )
         if alpha_authority_status_by_species:
-            run_metadata["alpha_authority_status_by_species"] = _json_safe(
+            run_metadata["alpha_authority_status_by_species"] = (
                 alpha_authority_status_by_species
             )
-        c3_na_hold_adjustment = dict(
-            getattr(sim, "_last_c3_na_hold_adjustment", {}) or {}
+        c3_na_hold_adjustment = _safe_failure_value(
+            lambda: _json_safe(
+                dict(getattr(sim, "_last_c3_na_hold_adjustment", {}) or {})
+            ),
+            section="run_metadata.c3_na_hold_adjustment",
         )
         if c3_na_hold_adjustment:
-            run_metadata["c3_na_hold_adjustment"] = _json_safe(
-                c3_na_hold_adjustment
-            )
-        cost_rollup_diagnostic = build_cost_rollup_diagnostic(
-            cost_ledger=sim.cost_ledger,
-            per_hour=execution.per_hour,
-            products_kg=sim.product_ledger(),
-            pumping_context=pumping_context_from_sim(sim, execution.snapshots),
-            snapshots=execution.snapshots,
+            run_metadata["c3_na_hold_adjustment"] = c3_na_hold_adjustment
+        cost_rollup_diagnostic = _safe_failure_value(
+            lambda: _json_safe(
+                {
+                    **build_cost_rollup_diagnostic(
+                        cost_ledger=sim.cost_ledger,
+                        per_hour=execution.per_hour,
+                        products_kg=sim.product_ledger(),
+                        pumping_context=pumping_context_from_sim(
+                            sim, execution.snapshots
+                        ),
+                        snapshots=execution.snapshots,
+                    ),
+                    "price_basis": (
+                        "legacy_placeholder_awaiting_owner_ratification"
+                    ),
+                }
+            ),
+            section="run_metadata.cost_rollup_diagnostic",
         )
-        cost_rollup_diagnostic["price_basis"] = (
-            "legacy_placeholder_awaiting_owner_ratification"
-        )
-        run_metadata["cost_rollup_diagnostic"] = _json_safe(cost_rollup_diagnostic)
+        run_metadata["cost_rollup_diagnostic"] = cost_rollup_diagnostic
         sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])
 
         # Liner-life temperature-ceiling diagnostic (b-107 / t-478 wire):
@@ -1517,7 +1608,7 @@ class PyrolysisRun:
             or ""
         ).strip()
         if furnace_material_id:
-            try:
+            def build_liner_life_diagnostic() -> dict[str, Any]:
                 # Melt pO2 is stored in mbar; the liner-life evaluator takes bar.
                 # Premise: 1 mbar = 1e-3 bar. Algebra: bar = mbar * 1e-3.
                 # Unit check: mbar * (bar/1000 mbar) = bar. Sanity: 1 mbar -> 0.001 bar.
@@ -1536,15 +1627,16 @@ class PyrolysisRun:
                 )
                 if not math.isfinite(hot_hours) or hot_hours <= 0.0:
                     hot_hours = 10.0
-                run_metadata["liner_life_diagnostic"] = _json_safe(
-                    build_liner_life_run_diagnostic(
-                        material_id=furnace_material_id,
-                        hot_hours_per_run=hot_hours,
-                        pO2_bar=diagnostic_pO2_bar,
-                    )
+                return build_liner_life_run_diagnostic(
+                    material_id=furnace_material_id,
+                    hot_hours_per_run=hot_hours,
+                    pO2_bar=diagnostic_pO2_bar,
                 )
-            except Exception:  # noqa: BLE001 -- instrument-only; never abort the run
-                run_metadata["liner_life_diagnostic"] = {
+
+            run_metadata["liner_life_diagnostic"] = _safe_failure_value(
+                lambda: _json_safe(build_liner_life_diagnostic()),
+                section="run_metadata.liner_life_diagnostic",
+                failure_record={
                     "status": "failed",
                     "authority": "diagnostic_only",
                     "level": "info",
@@ -1554,7 +1646,8 @@ class PyrolysisRun:
                     "refusal": {
                         "reason": "liner_life_diagnostic_attachment_failed",
                     },
-                }
+                },
+            )
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
         # ``status='refused'`` returned by the C3 K-shuttle / Na-shuttle
@@ -1564,155 +1657,239 @@ class PyrolysisRun:
         # thermodynamic gate rejected -- silently dropping the dispatch
         # used to leave the run looking ``ok``/`partial`` with the C3
         # cleanup quietly missing.  Empty list when no refusals.
-        shuttle_refusal_history = list(
-            getattr(sim, "_shuttle_refusal_history", []) or [])
-        melt_redox_gate_floor_fallback_engagement = (
-            _melt_redox_gate_floor_fallback_engagement(sim)
+        shuttle_refusal_history = _safe_failure_value(
+            lambda: _json_safe(_shuttle_refusal_history_report(sim)),
+            section="shuttle_refusal_history",
         )
-        degraded_path_engagement = _degraded_path_engagement(sim)
-        pO2_enforcement_by_hour = [
-            dict(row["pO2_enforcement"])
-            for row in execution.per_hour
-            if isinstance(row, Mapping) and isinstance(row.get("pO2_enforcement"), Mapping)
-        ]
+        melt_redox_gate_floor_fallback_engagement = (
+            _safe_failure_value(
+                lambda: _json_safe(
+                    _melt_redox_gate_floor_fallback_engagement(sim)
+                ),
+                section="melt_redox_gate_floor_fallback_engagement",
+            )
+        )
+        degraded_path_engagement = _safe_failure_value(
+            lambda: _json_safe(_degraded_path_engagement(sim)),
+            section="degraded_path_engagement",
+        )
+        pO2_enforcement_by_hour = _safe_failure_value(
+            lambda: _execution_pO2_enforcement_by_hour(execution),
+            section="pO2_enforcement_by_hour",
+        )
         status, reason, error_message = _status_with_mass_balance_invariant(
             execution,
             strict_result_contract=self.strict_result_contract,
         )
 
-        final_summary = _final_summary_report(final_state, execution)
-        per_hour_summary = list(execution.per_hour)
+        unresolved_wall_deposit_species_mol: dict[str, float] = {}
+        final_summary = _safe_failure_value(
+            lambda: _json_safe(
+                _final_summary_report(
+                    final_state,
+                    execution,
+                    sim.species_formula_registry,
+                    unresolved_wall_deposit_species_mol,
+                )
+            ),
+            section="final",
+            upstream=final_state,
+        )
+        _attach_wall_deposit_report_refusal(
+            run_metadata,
+            unresolved_wall_deposit_species_mol,
+        )
+        per_hour_summary = _safe_failure_value(
+            lambda: _json_safe(list(execution.per_hour)),
+            section="per_hour_summary",
+        )
         if self.include_wall_deposit_rate_diagnostics:
-            snapshots = tuple(execution.snapshots)
-            per_hour_summary = [
-                _with_wall_deposit_rate_diagnostics(
-                    row,
-                    snapshots[index],
-                    dt_h=float(snapshots[index].duration_h),
+            def build_wall_deposit_rate_report() -> dict[str, Any]:
+                snapshots = tuple(execution.snapshots)
+                rows = [
+                    _with_wall_deposit_rate_diagnostics(
+                        row,
+                        snapshots[index],
+                        dt_h=float(snapshots[index].duration_h),
+                    )
+                    if index < len(snapshots)
+                    else dict(row)
+                    for index, row in enumerate(execution.per_hour)
+                ]
+                duration_h = sum(float(item.duration_h) for item in snapshots)
+                execution_delta = _sum_wall_deposit_deltas(snapshots)
+                execution_nested = _nested_species_kg_from_segment_species(
+                    execution_delta
                 )
-                if index < len(snapshots)
-                else dict(row)
-                for index, row in enumerate(execution.per_hour)
-            ]
-            duration_h = sum(float(item.duration_h) for item in snapshots)
-            execution_delta = _sum_wall_deposit_deltas(snapshots)
-            execution_nested = _nested_species_kg_from_segment_species(
-                execution_delta
-            )
-            committed_rate = {}
-            if duration_h > 0.0:
-                committed_rate, _ = _wall_deposit_rate_from_delta(
-                    execution_nested,
-                    dt_h=duration_h,
+                committed_rate = {}
+                if duration_h > 0.0:
+                    committed_rate, _ = _wall_deposit_rate_from_delta(
+                        execution_nested,
+                        dt_h=duration_h,
+                    )
+                campaign_equivalents = max(
+                    0.0,
+                    float(execution.campaigns_elapsed)
+                    - float(execution.campaigns_elapsed_start),
                 )
-            final_summary["wall_deposition_rate_committed"] = {
-                "source": "committed_ledger_delta_divided_by_explicit_dt",
-                "dt_h": duration_h,
-                "by_segment_species": committed_rate,
-            }
-            campaign_equivalents = max(
-                0.0,
-                float(execution.campaigns_elapsed)
-                - float(execution.campaigns_elapsed_start),
+                per_campaign_delta = {
+                    key: amount / campaign_equivalents
+                    for key, amount in execution_delta.items()
+                } if campaign_equivalents > 0.0 else {}
+                cumulative = execution.trace.wall_deposit_by_segment_species_kg
+                existing_before = {
+                    key: max(0.0, float(amount) - execution_delta.get(key, 0.0))
+                    for key, amount in cumulative.items()
+                }
+                lifespan = _wall_fouling_lifespan_report(
+                    per_campaign_by_segment_species_kg=(
+                        _nested_species_kg_from_segment_species(per_campaign_delta)
+                    ),
+                    existing_by_segment_species_kg=(
+                        _nested_species_kg_from_segment_species(existing_before)
+                    ),
+                )
+                summary = final_summary
+                if not (
+                    isinstance(summary, Mapping)
+                    and summary.get("status") == "unavailable"
+                ):
+                    summary = dict(summary)
+                    summary["wall_deposition_rate_committed"] = {
+                        "source": "committed_ledger_delta_divided_by_explicit_dt",
+                        "dt_h": duration_h,
+                        "by_segment_species": committed_rate,
+                    }
+                    summary["wall_fouling_lifespan"] = {
+                        **lifespan,
+                        "campaign_equivalents_observed": campaign_equivalents,
+                    }
+                return {"final": summary, "per_hour_summary": rows}
+
+            wall_deposit_report = _safe_failure_value(
+                lambda: _json_safe(build_wall_deposit_rate_report()),
+                section="final",
             )
-            per_campaign_delta = {
-                key: amount / campaign_equivalents
-                for key, amount in execution_delta.items()
-            } if campaign_equivalents > 0.0 else {}
-            cumulative = execution.trace.wall_deposit_by_segment_species_kg
-            existing_before = {
-                key: max(0.0, float(amount) - execution_delta.get(key, 0.0))
-                for key, amount in cumulative.items()
-            }
-            lifespan = _wall_fouling_lifespan_report(
-                per_campaign_by_segment_species_kg=(
-                    _nested_species_kg_from_segment_species(per_campaign_delta)
-                ),
-                existing_by_segment_species_kg=(
-                    _nested_species_kg_from_segment_species(existing_before)
-                ),
-            )
-            final_summary["wall_fouling_lifespan"] = {
-                **lifespan,
-                "campaign_equivalents_observed": campaign_equivalents,
-            }
+            if (
+                isinstance(wall_deposit_report, Mapping)
+                and wall_deposit_report.get("status") == "unavailable"
+            ):
+                final_summary = wall_deposit_report
+            else:
+                final_summary = wall_deposit_report["final"]
+                per_hour_summary = wall_deposit_report["per_hour_summary"]
 
         payload = {
             "schema_version": RUNNER_SCHEMA_VERSION,
             "run_metadata": run_metadata,
             "final_state": final_state,
             "final": final_summary,
-            "yield_disposition": _json_safe(
-                _safe_failure_value(
-                    lambda: build_yield_disposition(
+            "yield_disposition": _safe_failure_value(
+                lambda: _json_safe(
+                    build_yield_disposition(
                         sim,
                         ledger_snapshots_from_sim(sim),
-                    ),
-                    None,
+                    )
                 ),
+                section="yield_disposition",
             ),
-            "product_classification": _json_safe(
-                _safe_failure_value(
-                    lambda: _product_classification_report(
+            "product_classification": _safe_failure_value(
+                lambda: _json_safe(
+                    _product_classification_report(
                         sim,
                         feedstock_id=self.feedstock_id,
                         campaign=self.campaign,
-                    ),
-                    {"classification": {}, "markdown": ""},
+                    )
                 ),
+                section="product_classification",
             ),
-            "terminal_product_taxonomy": _json_safe(
-                _safe_failure_value(
-                    lambda: _terminal_product_taxonomy_report(
+            "terminal_product_taxonomy": _safe_failure_value(
+                lambda: _json_safe(
+                    _terminal_product_taxonomy_report(
                         sim,
                         feedstock_id=self.feedstock_id,
-                    ),
-                    None,
+                    )
                 ),
+                section="terminal_product_taxonomy",
             ),
-            "thermal_train_report": _json_safe(
-                _safe_failure_value(
-                    lambda: _thermal_train_report(sim),
-                    {},
-                ),
+            "thermal_train_report": _safe_failure_value(
+                lambda: _json_safe(_thermal_train_report(sim)),
+                section="thermal_train_report",
             ),
-            "stage_purity_report": stage_purity_report(sim.train),
-            "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
-            "vapour_rail_instrumentation": _json_safe(
-                _vapour_rail_instrumentation_report(sim)
+            "stage_purity_report": _safe_failure_value(
+                lambda: _json_safe(stage_purity_report(sim.train)),
+                section="stage_purity_report",
             ),
-            "condensation_refusals_by_species": _json_safe(
-                _condensation_refusals_report(sim)
+            "vapor_pressure_source_report": _safe_failure_value(
+                lambda: _json_safe(_vapor_pressure_source_report(sim)),
+                section="vapor_pressure_source_report",
             ),
-            "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
-            "c7_product_report": _json_safe(_c7_product_report(sim)),
-            "c7_refusal_diagnostic": _json_safe(_c7_refusal_diagnostic(sim)),
+            "vapour_rail_instrumentation": _safe_failure_value(
+                lambda: _json_safe(_vapour_rail_instrumentation_report(sim)),
+                section="vapour_rail_instrumentation",
+            ),
+            "condensation_refusals_by_species": _safe_failure_value(
+                lambda: _json_safe(_condensation_refusals_report(sim)),
+                section="condensation_refusals_by_species",
+            ),
+            "shuttle_refusal_history": shuttle_refusal_history,
+            "c7_product_report": _safe_failure_value(
+                lambda: _json_safe(_c7_product_report(sim)),
+                section="c7_product_report",
+            ),
+            "c7_refusal_diagnostic": _safe_failure_value(
+                lambda: _json_safe(_c7_refusal_diagnostic(sim)),
+                section="c7_refusal_diagnostic",
+            ),
             "degraded_path_engagement": degraded_path_engagement,
             "melt_redox_gate_floor_fallback_engagement": (
                 melt_redox_gate_floor_fallback_engagement
             ),
-            "pO2_enforcement_by_hour": _json_safe(pO2_enforcement_by_hour),
+            "pO2_enforcement_by_hour": pO2_enforcement_by_hour,
             "per_hour_summary": per_hour_summary,
-            "shadow_trace": list(execution.shadow_trace),
+            "shadow_trace": _safe_failure_value(
+                lambda: _execution_shadow_trace(execution),
+                section="shadow_trace",
+            ),
             "status": status,
             "reason": reason,
             "error_message": error_message,
         }
-        c0_char_diagnostic = _c0_char_diagnostic(
-            sim,
-            execution.snapshots,
-            feedstock_id=self.feedstock_id,
+        c0_char_diagnostic = _safe_failure_value(
+            lambda: _json_safe(
+                _c0_char_diagnostic(
+                    sim,
+                    execution.snapshots,
+                    feedstock_id=self.feedstock_id,
+                )
+            ),
+            section="run_metadata.c0_char_diagnostic",
         )
         if c0_char_diagnostic:
-            run_metadata["c0_char_diagnostic"] = _json_safe(
-                c0_char_diagnostic
+            run_metadata["c0_char_diagnostic"] = c0_char_diagnostic
+        organics_source = _safe_failure_value(
+            lambda: _json_safe(getattr(sim, "_last_organics_source", None) or {}),
+            section="run_metadata.organics_source",
+        )
+        if (
+            isinstance(organics_source, Mapping)
+            and organics_source.get("status") == "unavailable"
+        ):
+            run_metadata["organics_source"] = organics_source
+            run_metadata["organics_evolved_gas"] = (
+                _unavailable_report_from_upstream(
+                    organics_source,
+                    section="run_metadata.organics_evolved_gas",
+                )
             )
-        organics_source = getattr(sim, "_last_organics_source", None) or {}
-        if organics_source:
-            run_metadata["organics_evolved_gas"] = _json_safe(
-                organics_source.get("evolved_gas_combined") or {}
+        elif organics_source:
+            run_metadata["organics_evolved_gas"] = _safe_failure_value(
+                lambda: _json_safe(
+                    organics_source.get("evolved_gas_combined") or {}
+                ),
+                section="run_metadata.organics_evolved_gas",
             )
-            run_metadata["organics_source"] = _json_safe(organics_source)
+            run_metadata["organics_source"] = organics_source
         return payload
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:
@@ -1738,11 +1915,12 @@ class PyrolysisRun:
         kernel = getattr(sim, "_chem_kernel", None)
         if kernel is None:
             return {"active": {}, "requested": echoed, "registry": {}}
-        try:
-            registry = kernel.registry
-        except AttributeError:
+        if "registry" not in dir(type(kernel)):
+            # Production ChemistryKernel declares this property; simple
+            # kernel shims without the capability API retain an empty summary.
             capability = {}
         else:
+            registry = kernel.registry
             capability = registry.capability_summary()
         internal_intents = {"backend_equilibrium"}
         if not getattr(sim, "_c7_product_report", None):
@@ -1769,14 +1947,10 @@ class PyrolysisRun:
         self,
         execution: RunExecution,
     ) -> dict[str, object]:
-        try:
-            return self._engines_used(execution.simulator)
-        except Exception:  # noqa: BLE001 -- failure envelopes must survive
-            return {
-                "active": {},
-                "requested": {k: v for k, v in self.engines.items()},
-                "registry": {},
-            }
+        return _safe_failure_value(
+            lambda: self._engines_used(execution.simulator),
+            section="run_metadata.engines_used",
+        )
 
     def _requests_o2_bubbler_runtime(self, sim: PyrolysisSimulator) -> bool:
         manager = getattr(sim, "campaign_mgr", None)
@@ -2368,6 +2542,28 @@ def _redox_source_breakdown_observables(snapshot: HourSnapshot) -> dict[str, Any
     return {"redox_source_breakdown": _json_safe(summary)}
 
 
+def _oxygen_reservoir_exchange_observables(
+    snapshot: HourSnapshot,
+) -> dict[str, Any]:
+    reservoir = getattr(snapshot, "oxygen_reservoir", {}) or {}
+    if not isinstance(reservoir, Mapping) or not (
+        reservoir.get("exchange_clamped")
+        or getattr(snapshot, "liquid_fraction_gate", None)
+    ):
+        return {}
+    exchange = {
+        "exchange_o2_mol": reservoir.get("exchange_o2_mol", 0.0),
+        "exchange_unbacked_o2_mol": reservoir.get(
+            "exchange_unbacked_o2_mol", 0.0
+        ),
+        "exchange_direction": reservoir.get("exchange_direction", ""),
+        "exchange_clamped": reservoir.get("exchange_clamped", False),
+    }
+    if snapshot.liquid_fraction_gate:
+        exchange['liquid_fraction_gate'] = snapshot.liquid_fraction_gate
+    return {"oxygen_reservoir": _json_safe(exchange)}
+
+
 def _mre_uncertified_yield_observables(snapshot: HourSnapshot) -> dict[str, Any]:
     summary = dict(getattr(snapshot, "mre_uncertified_yield", {}) or {})
     if not summary:
@@ -2652,6 +2848,7 @@ def build_per_hour_summary(
         **_knudsen_regime_observables(snapshot),
         **_evap_plane_selectivity_observables(snapshot),
         **_redox_source_breakdown_observables(snapshot),
+        **_oxygen_reservoir_exchange_observables(snapshot),
         **_mre_uncertified_yield_observables(snapshot),
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
@@ -3329,14 +3526,21 @@ def _stage_silica_fume_kg(sim: PyrolysisSimulator) -> dict[str, float]:
 def _kg_by_species_from_mol_state(
     state: Mapping[str, Mapping[str, float]],
     account: str,
+    species_formula_registry: Mapping[str, Any] | None,
+    unresolved_species_mol_by_species: dict[str, float],
 ) -> dict[str, float]:
     species_mol = state.get(account, {})
     kg_by_species: dict[str, float] = {}
     for species, mol in sorted(species_mol.items()):
-        molar_mass_g_mol = MOLAR_MASS.get(species)
-        if molar_mass_g_mol is None:
+        mol_value = float(mol)
+        try:
+            formula = resolve_species_formula(species, species_formula_registry)
+        except UnknownSpeciesError:
+            unresolved_species_mol_by_species[species] = (
+                unresolved_species_mol_by_species.get(species, 0.0) + mol_value
+            )
             continue
-        kg = float(mol) * (molar_mass_g_mol / 1000.0)
+        kg = mol_value * formula.molar_mass_kg_per_mol()
         if abs(kg) > 1e-12:
             kg_by_species[species] = _clean_report_float(kg)
     return kg_by_species
@@ -3344,9 +3548,14 @@ def _kg_by_species_from_mol_state(
 
 def _wall_deposit_report_kg(
     state: Mapping[str, Mapping[str, float]],
+    species_formula_registry: Mapping[str, Any] | None,
+    unresolved_species_mol_by_species: dict[str, float],
 ) -> dict[str, float]:
     wall_deposit_kg = _kg_by_species_from_mol_state(
-        state, WALL_DEPOSIT_ACCOUNT,
+        state,
+        WALL_DEPOSIT_ACCOUNT,
+        species_formula_registry,
+        unresolved_species_mol_by_species,
     )
     segment_accounts = sorted(
         account
@@ -3355,7 +3564,10 @@ def _wall_deposit_report_kg(
     )
     for account in segment_accounts:
         for species, kg in _kg_by_species_from_mol_state(
-            state, account,
+            state,
+            account,
+            species_formula_registry,
+            unresolved_species_mol_by_species,
         ).items():
             wall_deposit_kg[species] = wall_deposit_kg.get(species, 0.0) + kg
     for species in SIO_WALL_DEPOSIT_SPECIES:
@@ -3364,6 +3576,36 @@ def _wall_deposit_report_kg(
         species: wall_deposit_kg[species]
         for species in sorted(wall_deposit_kg)
     }
+
+
+def _wall_deposit_report_refusal(
+    unresolved_species_mol_by_species: Mapping[str, float],
+) -> dict[str, Any] | None:
+    if not unresolved_species_mol_by_species:
+        return None
+    return {
+        "status": "refused",
+        "reason": "unknown_species_formula",
+        "unresolved_wall_deposit_species": [
+            {
+                "species": species,
+                "mol": float(mol),
+            }
+            for species, mol in sorted(unresolved_species_mol_by_species.items())
+        ],
+    }
+
+
+def _attach_wall_deposit_report_refusal(
+    run_metadata: dict[str, Any],
+    unresolved_species_mol_by_species: Mapping[str, float],
+) -> None:
+    refusal = _wall_deposit_report_refusal(unresolved_species_mol_by_species)
+    if refusal is None:
+        return
+    refusal_diagnostic = dict(run_metadata.get("refusal_diagnostic") or {})
+    refusal_diagnostic["wall_deposit_report"] = refusal
+    run_metadata["refusal_diagnostic"] = _json_safe(refusal_diagnostic)
 
 
 def _wall_deposit_mol_by_species(
@@ -3405,9 +3647,15 @@ def _sio_wall_terminal_mol(wall_deposit: Mapping[str, float]) -> float:
 def _final_summary_report(
     final_state: Mapping[str, Mapping[str, float]],
     execution: RunExecution,
+    species_formula_registry: Mapping[str, Any] | None,
+    unresolved_species_mol_by_species: dict[str, float],
 ) -> dict[str, Any]:
     return {
-        "wall_deposit_by_species_kg": _wall_deposit_report_kg(final_state),
+        "wall_deposit_by_species_kg": _wall_deposit_report_kg(
+            final_state,
+            species_formula_registry,
+            unresolved_species_mol_by_species,
+        ),
         "deposit_by_surface_species_kg": _nested_species_kg_from_segment_species(
             execution.trace.wall_deposit_by_segment_species_kg,
         ),
@@ -3425,13 +3673,28 @@ def _engine_commissioning_notice(sim: Any) -> dict[str, Any] | None:
     return dict(notice)
 
 
+def _attach_run_metadata_report(
+    run_metadata: dict[str, Any],
+    key: str,
+    builder: Any,
+) -> None:
+    report = _safe_failure_value(
+        lambda: _json_safe(builder()),
+        section=f"run_metadata.{key}",
+    )
+    if report:
+        run_metadata[key] = report
+
+
 def _attach_engine_commissioning_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _engine_commissioning_notice(sim)
-    if notice:
-        run_metadata["engine_commissioning_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "engine_commissioning_notice",
+        lambda: _engine_commissioning_notice(sim),
+    )
 
 
 def _attach_engine_binding_admission_notice(
@@ -3440,9 +3703,11 @@ def _attach_engine_binding_admission_notice(
 ) -> None:
     from simulator.engine_binding_admission import binding_admission_run_notice
 
-    notice = binding_admission_run_notice(sim)
-    if notice:
-        run_metadata["engine_binding_admission_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "engine_binding_admission_notice",
+        lambda: binding_admission_run_notice(sim),
+    )
 
 
 def _diagnostic_gate_authority_notice(sim: Any) -> dict[str, Any] | None:
@@ -3459,9 +3724,11 @@ def _attach_diagnostic_gate_authority_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _diagnostic_gate_authority_notice(sim)
-    if notice:
-        run_metadata["diagnostic_gate_authority_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "diagnostic_gate_authority_notice",
+        lambda: _diagnostic_gate_authority_notice(sim),
+    )
 
 
 def _sulfur_saturation_notice(sim: Any) -> dict[str, Any] | None:
@@ -3478,9 +3745,11 @@ def _attach_sulfur_saturation_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _sulfur_saturation_notice(sim)
-    if notice:
-        run_metadata["sulfur_saturation_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "sulfur_saturation_notice",
+        lambda: _sulfur_saturation_notice(sim),
+    )
 
 
 def _rump_expectation_notice(sim: Any) -> dict[str, Any] | None:
@@ -3497,9 +3766,11 @@ def _attach_rump_expectation_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _rump_expectation_notice(sim)
-    if notice:
-        run_metadata["rump_expectation_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "rump_expectation_notice",
+        lambda: _rump_expectation_notice(sim),
+    )
 
 
 def _composition_projected_liquidus_notice(sim: Any) -> dict[str, Any] | None:
@@ -3518,11 +3789,34 @@ def _attach_composition_projected_liquidus_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _composition_projected_liquidus_notice(sim)
+    _attach_run_metadata_report(
+        run_metadata,
+        "composition_projected_liquidus_notice",
+        lambda: _composition_projected_liquidus_notice(sim),
+    )
+
+
+def _attach_high_t_melt_activity_fallback_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    _attach_run_metadata_report(
+        run_metadata,
+        "high_t_melt_activity_fallback_notice",
+        lambda: read_high_t_melt_activity_fallback_notice(sim),
+    )
+
+
+def _attach_c0_exit_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    """Copy the computed C0 exit record onto run provenance."""
+    if sim is None:
+        return
+    notice = c0_exit_run_notice(sim)
     if notice:
-        run_metadata["composition_projected_liquidus_notice"] = _json_safe(
-            notice
-        )
+        run_metadata["c0_exit"] = _json_safe(notice)
 
 
 def _engine_commissioning_sentence(notice: Mapping[str, Any]) -> str:
@@ -3559,6 +3853,65 @@ def _diagnostic_gate_authority_sentence(notice: Mapping[str, Any]) -> str:
         f"**Diagnostic freeze-gate authority**: provider `{provider_id}` is "
         f"authoritative for `{intent}` dispatch but has no ledger-transition "
         "authority. Reported numbers are unchanged."
+    )
+
+
+def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
+    reason = str(notice.get("reason") or "openimcc_evaluation_refused")
+    campaign = notice.get("campaign")
+    campaigns = notice.get("campaigns")
+    if campaign:
+        campaign_text = f"campaign `{campaign}`"
+    elif isinstance(campaigns, (list, tuple)) and campaigns:
+        campaign_text = f"campaigns `{', '.join(map(str, campaigns))}`"
+    else:
+        campaign_text = "campaign `unspecified`"
+    items = [
+        item for item in notice.get("notices", ())
+        if isinstance(item, Mapping)
+    ]
+    first_order = any(
+        item.get("method") == "extrapolated_first_order_ln_gamma"
+        for item in items
+    )
+    bridged = any(
+        item.get("method") == "same_composition_T_bridge" for item in items
+    )
+    projected = any(
+        item.get("method") == "projected_composition_solve" for item in items
+    )
+    frozen = any(
+        item.get("flag") == "extrapolation_capped_frozen" for item in items
+    )
+    continued = any(
+        item.get("code") == "hold_last_certified_effective_gamma"
+        for item in items
+    )
+    if projected:
+        prediction = "projected-composition extrapolated predictions"
+        if bridged:
+            prediction += ", with a temperature bridge on the projected composition"
+    elif bridged:
+        prediction = "same-composition temperature-bridge predictions"
+        if first_order or frozen:
+            prediction += (
+                ", with a capped ln-gamma continuation where the bridge had no points"
+            )
+    elif first_order or frozen:
+        prediction = "first-order ln-gamma extrapolated predictions"
+        if frozen:
+            prediction += ", frozen past a species cap"
+    elif continued:
+        prediction = "held effective-gamma/table extrapolated predictions"
+    else:
+        prediction = "a constant-gamma extrapolated prediction"
+    return (
+        f"**High-temperature melt activity**: OpenIMCC refusal `{reason}` "
+        f"used {prediction} for "
+        f"{notice.get('affected_tick_count', 0)} tick(s) and "
+        f"{notice.get('affected_parent_count', 0)} parent oxide(s), "
+        f"{campaign_text}, hours {notice.get('first_hour')}-"
+        f"{notice.get('last_hour')}."
     )
 
 
@@ -3608,6 +3961,14 @@ def _product_classification_report(
     if notice:
         report["engine_commissioning_notice"] = _json_safe(notice)
         sentences.append(_engine_commissioning_sentence(notice))
+    high_t_activity_notice = read_high_t_melt_activity_fallback_notice(sim)
+    if high_t_activity_notice:
+        report["high_t_melt_activity_fallback_notice"] = _json_safe(
+            high_t_activity_notice
+        )
+        sentences.append(
+            _high_t_melt_activity_fallback_sentence(high_t_activity_notice)
+        )
     diagnostic_notice = _diagnostic_gate_authority_notice(sim)
     if diagnostic_notice:
         report["diagnostic_gate_authority_notice"] = _json_safe(
@@ -4134,6 +4495,23 @@ def build_sio_yield_report(
         raise RunnerError(str(result.get("error_message", "SiO run failed")))
 
     final_state = result.get("final_state", {})
+    if (
+        isinstance(final_state, Mapping)
+        and final_state.get("status") == "unavailable"
+    ):
+        report = _unavailable_report_from_upstream(
+            final_state,
+            section="sio_yield_report",
+        )
+        if include_diagnostics:
+            return (
+                report,
+                _unavailable_report_from_upstream(
+                    report,
+                    section="sio_yield_report.diagnostics",
+                ),
+            )
+        return report
     cleaned_melt = final_state.get("process.cleaned_melt", {})
     condensation_train = final_state.get("process.condensation_train", {})
     wall_deposit = _wall_deposit_mol_by_species(final_state)
@@ -4183,15 +4561,20 @@ def build_sio_yield_report(
     sio_evolved_kg = sio_evaporated_mol * sio_molar_mass_kg_mol
     sio_yield_pct = sio_evolved_kg / mass_kg * 100.0
 
-    sio_to_silica_fume_kg = _stage_silica_fume_kg(sim)
     reported_stage_numbers = set(SIO_YIELD_STAGE_KEYS)
-    downstream_sio2_kg = sum(
-        stage.collected_kg.get("SiO2", 0.0)
-        for stage in sim.train.stages
-        if stage.stage_number not in reported_stage_numbers
-    )
-    sio_to_silica_fume_kg["terminal_offgas_escape"] = _clean_report_float(
-        downstream_sio2_kg + sio_escape_mol * sio_molar_mass_kg_mol
+    sio_to_silica_fume_kg = _safe_failure_value(
+        lambda: {
+            **_stage_silica_fume_kg(sim),
+            "terminal_offgas_escape": _clean_report_float(
+                sum(
+                    stage.collected_kg.get("SiO2", 0.0)
+                    for stage in sim.train.stages
+                    if stage.stage_number not in reported_stage_numbers
+                )
+                + sio_escape_mol * sio_molar_mass_kg_mol
+            ),
+        },
+        section="sio_yield_report.sio_to_silica_fume_kg",
     )
     condensation_model = sim.condensation_model
     sticking_notice = dict(
@@ -4201,7 +4584,12 @@ def build_sio_yield_report(
             {},
         ) or {}
     )
-    wall_deposit_kg = _wall_deposit_report_kg(final_state)
+    unresolved_wall_deposit_species_mol: dict[str, float] = {}
+    wall_deposit_kg = _wall_deposit_report_kg(
+        final_state,
+        sim.species_formula_registry,
+        unresolved_wall_deposit_species_mol,
+    )
     wall_fouling = _wall_fouling_report(
         wall_deposit_kg,
         wall_deposit_by_segment_species=(
@@ -4209,6 +4597,31 @@ def build_sio_yield_report(
         ),
         alpha_notice=sticking_notice,
     )
+    wall_deposit_refusal = _wall_deposit_report_refusal(
+        unresolved_wall_deposit_species_mol
+    )
+    if wall_deposit_refusal is not None:
+        unresolved_items = wall_deposit_refusal[
+            "unresolved_wall_deposit_species"
+        ]
+        unresolved_summary = ", ".join(
+            f"{item['species']}={item['mol']} mol" for item in unresolved_items
+        )
+        wall_fouling["status"] = "warning"
+        wall_fouling["output_status"] = "refused"
+        wall_fouling["authoritative"] = False
+        wall_fouling["authoritative_for_resinter"] = False
+        wall_fouling["verdict_authoritative"] = False
+        wall_fouling["verdict"] = "non-authoritative"
+        wall_fouling["status_reason"] = "; ".join(
+            part
+            for part in (
+                str(wall_fouling.get("status_reason") or ""),
+                f"wall-deposit mass projection refused: {unresolved_summary}; "
+                "unknown species formula",
+            )
+            if part
+        )
 
     report = {
         "feedstock_id": feedstock_id,
@@ -4288,6 +4701,10 @@ def build_sio_yield_report(
             diagnostics["wall_sticking_alpha_provenance_notice"] = (
                 sticking_notice
             )
+        if wall_deposit_refusal is not None:
+            diagnostics["refusal_diagnostic"] = {
+                "wall_deposit_report": wall_deposit_refusal,
+            }
         geometry_notice = dict(
             getattr(
                 condensation_model,
@@ -4368,15 +4785,22 @@ def _sio_tsweep_row(
     diagnostics: Mapping[str, float],
     mass_kg: float,
 ) -> dict[str, Any]:
-    stage3_silica_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "stage_3_sio_zone_product", 0.0
-        )
+    sio_to_silica_fume_kg = report.get("sio_to_silica_fume_kg", {})
+    stage3_silica_kg = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("stage_3_sio_zone_product", 0.0))
+        ),
+        section="sio_tsweep.stage3_silica_kg",
+        upstream=sio_to_silica_fume_kg,
     )
-    terminal_offgas_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "terminal_offgas_escape", 0.0
-        )
+    terminal_offgas_escape_pct = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("terminal_offgas_escape", 0.0))
+            / float(mass_kg)
+            * 100.0
+        ),
+        section="sio_tsweep.terminal_offgas_escape_pct",
+        upstream=sio_to_silica_fume_kg,
     )
     return {
         "cell_id": cell_id,
@@ -4386,10 +4810,8 @@ def _sio_tsweep_row(
         "sio_yield_pct_of_feedstock": _clean_report_float(
             float(report["sio_yield_pct_of_feedstock"])
         ),
-        "terminal_offgas_escape_pct": _clean_report_float(
-            terminal_offgas_kg / float(mass_kg) * 100.0
-        ),
-        "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
+        "terminal_offgas_escape_pct": terminal_offgas_escape_pct,
+        "stage3_silica_kg": stage3_silica_kg,
         "mass_balance_err_pct": _clean_report_float(
             abs(
                 _required_mass_balance_value(
@@ -4432,6 +4854,11 @@ def _recommend_sio_tsweep_rows(
 
 
 def _sio_tsweep_table(rows: list[Mapping[str, Any]]) -> str:
+    def format_metric(value: Any) -> str:
+        if isinstance(value, Mapping) and value.get("status") == "unavailable":
+            return "unavailable"
+        return f"{float(value):.12g}"
+
     headers = (
         "rank",
         "cell_id",
@@ -4455,8 +4882,8 @@ def _sio_tsweep_table(rows: list[Mapping[str, Any]]) -> str:
             f"{float(row['T_hold_C']):g}",
             f"{float(row['ramp_C_per_hr']):g}",
             f"{float(row['sio_yield_pct_of_feedstock']):.12g}",
-            f"{float(row['terminal_offgas_escape_pct']):.12g}",
-            f"{float(row['stage3_silica_kg']):.12g}",
+            format_metric(row["terminal_offgas_escape_pct"]),
+            format_metric(row["stage3_silica_kg"]),
             f"{float(row['mass_balance_err_pct']):.12g}",
         ]
         lines.append("| " + " | ".join(values) + " |")
@@ -4722,10 +5149,13 @@ def _sio_wall_sweep_row(
     wall_deposit = report.get("wall_deposit_kg", {})
     sio_wall_kg = float(wall_deposit.get("SiO", 0.0))
     total_wall_kg = sum(float(value) for value in wall_deposit.values())
-    stage3_silica_kg = float(
-        report.get("sio_to_silica_fume_kg", {}).get(
-            "stage_3_sio_zone_product", 0.0
-        )
+    sio_to_silica_fume_kg = report.get("sio_to_silica_fume_kg", {})
+    stage3_silica_kg = _safe_failure_value(
+        lambda: _clean_report_float(
+            float(sio_to_silica_fume_kg.get("stage_3_sio_zone_product", 0.0))
+        ),
+        section="sio_wall_sweep.stage3_silica_kg",
+        upstream=sio_to_silica_fume_kg,
     )
     return {
         "cell_id": cell_id,
@@ -4744,7 +5174,7 @@ def _sio_wall_sweep_row(
         ),
         "sio_wall_deposit_kg": _clean_report_float(sio_wall_kg),
         "total_wall_deposit_kg": _clean_report_float(total_wall_kg),
-        "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
+        "stage3_silica_kg": stage3_silica_kg,
         "sio_evolved_kg": _clean_report_float(float(report["sio_evolved_kg"])),
         "sio_yield_pct_of_feedstock": _clean_report_float(
             float(report["sio_yield_pct_of_feedstock"])
@@ -5100,20 +5530,65 @@ def _parse_runtime_campaign_overrides_json(
     return parsed
 
 
-def _safe_failure_value(builder: Any, default: Any) -> Any:
+def _safe_failure_value(
+    builder: Any,
+    *,
+    section: str,
+    upstream: Any = None,
+    failure_record: Mapping[str, Any] | None = None,
+) -> Any:
+    if (
+        isinstance(upstream, Mapping)
+        and upstream.get("status") == "unavailable"
+    ):
+        return _unavailable_report_from_upstream(upstream, section=section)
     try:
         return builder()
-    except Exception:  # noqa: BLE001 -- failure reporting must survive
-        return default
+    except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
+        failure = _safe_exception_text(exc)
+        _, separator, message = failure.partition(": ")
+        failure_details = {
+            "section": section,
+            "exception_type": type(exc).__name__,
+            "reason": message if separator else failure,
+        }
+        if failure_record is not None:
+            return {**dict(failure_record), **failure_details}
+        return {"status": "unavailable", **failure_details}
 
 
-def _execution_hours_completed(execution: RunExecution | None) -> int:
+def _unavailable_report_from_upstream(
+    upstream: Mapping[str, Any],
+    *,
+    section: str,
+) -> dict[str, str]:
+    upstream_section = str(upstream.get("section") or "unknown")
+    upstream_exception = str(
+        upstream.get("exception_type") or "UpstreamReportUnavailable"
+    )
+    upstream_reason = str(upstream.get("reason") or "no reason provided")
+    return {
+        "status": "unavailable",
+        "section": section,
+        "exception_type": upstream_exception,
+        "reason": (
+            f"upstream section {upstream_section} unavailable: "
+            f"{upstream_reason}"
+        ),
+    }
+
+
+def _execution_hours_completed(execution: RunExecution | None) -> Any:
     if execution is None:
         return 0
     return _safe_failure_value(
-        lambda: int(getattr(execution.simulator.melt, "hour", 0)),
-        0,
+        lambda: int(execution.simulator.melt.hour),
+        section="run_metadata.hours_completed",
     )
+
+
+def _shuttle_refusal_history_report(sim: Any) -> list[Any]:
+    return list(sim._shuttle_refusal_history)
 
 
 def _execution_per_hour_summary(execution: RunExecution | None) -> list[Any]:
@@ -5195,16 +5670,19 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
-    run_metadata["campaigns_elapsed"] = _json_safe(
-        float(
-            getattr(
-                execution,
-                "campaigns_elapsed",
-                overrides.get("campaigns_elapsed", 1.0),
+    run_metadata["campaigns_elapsed"] = _safe_failure_value(
+        lambda: _json_safe(
+            float(
+                getattr(
+                    execution,
+                    "campaigns_elapsed",
+                    overrides.get("campaigns_elapsed", 1.0),
+                )
+                if execution is not None
+                else overrides.get("campaigns_elapsed", 1.0)
             )
-            if execution is not None
-            else overrides.get("campaigns_elapsed", 1.0)
-        )
+        ),
+        section="run_metadata.campaigns_elapsed",
     )
     run_metadata.update(
         canonicalize_fidelity_emission(
@@ -5213,18 +5691,21 @@ def _runner_failure_result(
             backend_authoritative=backend_authoritative,
         )
     )
-    refusal_diagnostic = (
-        dict(getattr(execution, "refusal_diagnostic", {}) or {})
-        if execution is not None
-        else {}
+    refusal_diagnostic = _safe_failure_value(
+        lambda: _json_safe(
+            dict(getattr(execution, "refusal_diagnostic", {}) or {})
+            if execution is not None
+            else {}
+        ),
+        section="run_metadata.refusal_diagnostic",
     )
     if refusal_diagnostic:
-        run_metadata["refusal_diagnostic"] = _json_safe(
-            refusal_diagnostic
-        )
+        run_metadata["refusal_diagnostic"] = refusal_diagnostic
         if str(reason or "") == KNUDSEN_REFUSAL_REASON:
-            run_metadata["knudsen_regime_diagnostic"] = _json_safe(
-                refusal_diagnostic
+            run_metadata["knudsen_regime_diagnostic"] = _safe_failure_value(
+                lambda: _json_safe(dict(refusal_diagnostic)),
+                section="run_metadata.knudsen_regime_diagnostic",
+                upstream=refusal_diagnostic,
             )
     sim = getattr(execution, "simulator", None) if execution is not None else None
     _attach_engine_commissioning_notice(run_metadata, sim)
@@ -5233,8 +5714,13 @@ def _runner_failure_result(
     _attach_sulfur_saturation_notice(run_metadata, sim)
     _attach_rump_expectation_notice(run_metadata, sim)
     _attach_composition_projected_liquidus_notice(run_metadata, sim)
+    _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
+    _attach_c0_exit_notice(run_metadata, sim)
     final_state = (
-        _safe_failure_value(lambda: _final_state_from_ledger(sim), {})
+        _safe_failure_value(
+            lambda: _json_safe(_final_state_from_ledger(sim)),
+            section="final_state",
+        )
         if sim is not None
         else {}
     )
@@ -5244,35 +5730,53 @@ def _runner_failure_result(
         "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
     }
     if sim is not None:
+        unresolved_wall_deposit_species_mol: dict[str, float] = {}
         final = _safe_failure_value(
-            lambda: _final_summary_report(final_state, execution),
-            final,
+            lambda: _json_safe(
+                _final_summary_report(
+                    final_state,
+                    execution,
+                    sim.species_formula_registry,
+                    unresolved_wall_deposit_species_mol,
+                )
+            ),
+            section="final",
+            upstream=final_state,
+        )
+        _attach_wall_deposit_report_refusal(
+            run_metadata,
+            unresolved_wall_deposit_species_mol,
         )
     stage_report = (
-        _safe_failure_value(lambda: stage_purity_report(sim.train), {})
+        _safe_failure_value(
+            lambda: _json_safe(stage_purity_report(sim.train)),
+            section="stage_purity_report",
+        )
         if sim is not None
         else {}
     )
     vapor_report = (
         _safe_failure_value(
-            lambda: _vapor_pressure_source_report(sim),
-            _empty_vapor_pressure_source_report(),
+            lambda: _json_safe(_vapor_pressure_source_report(sim)),
+            section="vapor_pressure_source_report",
         )
         if sim is not None
         else _empty_vapor_pressure_source_report()
     )
     degraded_path_engagement = (
         _safe_failure_value(
-            lambda: _degraded_path_engagement(sim),
-            _empty_degraded_path_engagement(),
+            lambda: _json_safe(_degraded_path_engagement(sim)),
+            section="degraded_path_engagement",
         )
         if sim is not None
         else _empty_degraded_path_engagement()
     )
     melt_redox_gate_floor_fallback_engagement = (
         _safe_failure_value(
-            lambda: _melt_redox_gate_floor_fallback_engagement(sim),
-            _empty_melt_redox_gate_floor_fallback_engagement(),
+            lambda: _json_safe(
+                _melt_redox_gate_floor_fallback_engagement(sim)
+            ),
+            section="melt_redox_gate_floor_fallback_engagement",
         )
         if sim is not None
         else _empty_melt_redox_gate_floor_fallback_engagement()
@@ -5285,73 +5789,83 @@ def _runner_failure_result(
     payload = {
         "schema_version": RUNNER_SCHEMA_VERSION,
         "run_metadata": run_metadata,
-        "final_state": _json_safe(final_state),
-        "final": _json_safe(final),
+        "final_state": final_state,
+        "final": final,
         "yield_disposition": None,
-        "product_classification": _json_safe(
+        "product_classification": (
             _safe_failure_value(
-                lambda: _product_classification_report(
-                    sim,
-                    feedstock_id=feedstock_id,
-                    campaign=campaign,
+                lambda: _json_safe(
+                    _product_classification_report(
+                        sim,
+                        feedstock_id=feedstock_id,
+                        campaign=campaign,
+                    )
                 ),
-                {"classification": {}, "markdown": ""},
+                section="product_classification",
             )
             if sim is not None
             else {"classification": {}, "markdown": ""}
         ),
-        "terminal_product_taxonomy": _json_safe(
+        "terminal_product_taxonomy": (
             _safe_failure_value(
-                lambda: _terminal_product_taxonomy_report(
-                    sim,
-                    feedstock_id=feedstock_id,
+                lambda: _json_safe(
+                    _terminal_product_taxonomy_report(
+                        sim,
+                        feedstock_id=feedstock_id,
+                    )
                 ),
-                None,
+                section="terminal_product_taxonomy",
             )
             if sim is not None
             else None
         ),
-        "thermal_train_report": _json_safe(
+        "thermal_train_report": (
             _safe_failure_value(
-                lambda: _thermal_train_report(sim),
-                {},
+                lambda: _json_safe(_thermal_train_report(sim)),
+                section="thermal_train_report",
             )
             if sim is not None
             else {}
         ),
-        "stage_purity_report": _json_safe(stage_report),
-        "vapor_pressure_source_report": _json_safe(vapor_report),
-        "vapour_rail_instrumentation": _json_safe(
+        "stage_purity_report": stage_report,
+        "vapor_pressure_source_report": vapor_report,
+        "vapour_rail_instrumentation": (
             _safe_failure_value(
-                lambda: _vapour_rail_instrumentation_report(sim),
-                {},
+                lambda: _json_safe(_vapour_rail_instrumentation_report(sim)),
+                section="vapour_rail_instrumentation",
             )
             if sim is not None
             else {}
         ),
-        "condensation_refusals_by_species": _json_safe(
+        "condensation_refusals_by_species": (
             _safe_failure_value(
-                lambda: _condensation_refusals_report(sim),
-                {},
+                lambda: _json_safe(_condensation_refusals_report(sim)),
+                section="condensation_refusals_by_species",
             )
             if sim is not None
             else {}
         ),
-        "shuttle_refusal_history": _json_safe(
+        "shuttle_refusal_history": (
             _safe_failure_value(
-                lambda: list(getattr(sim, "_shuttle_refusal_history", []) or []),
-                [],
+                lambda: _json_safe(_shuttle_refusal_history_report(sim)),
+                section="shuttle_refusal_history",
             )
             if sim is not None
             else []
         ),
-        "c7_product_report": _json_safe(
-            _safe_failure_value(lambda: _c7_product_report(sim), {})
+        "c7_product_report": (
+            _safe_failure_value(
+                lambda: _json_safe(_c7_product_report(sim)),
+                section="c7_product_report",
+            )
             if sim is not None
             else {}
         ),
-        "c7_refusal_diagnostic": _json_safe(
-            _safe_failure_value(lambda: _c7_refusal_diagnostic(sim), {})
+        "c7_refusal_diagnostic": (
+            _safe_failure_value(
+                lambda: _json_safe(_c7_refusal_diagnostic(sim)),
+                section="c7_refusal_diagnostic",
+            )
             if sim is not None
             else {}
         ),
@@ -5359,25 +5873,43 @@ def _runner_failure_result(
         "melt_redox_gate_floor_fallback_engagement": (
             melt_redox_gate_floor_fallback_engagement
         ),
-        "pO2_enforcement_by_hour": _execution_pO2_enforcement_by_hour(execution),
-        "per_hour_summary": _execution_per_hour_summary(execution),
-        "shadow_trace": _execution_shadow_trace(execution),
+        "pO2_enforcement_by_hour": _safe_failure_value(
+            lambda: _execution_pO2_enforcement_by_hour(execution),
+            section="pO2_enforcement_by_hour",
+        ),
+        "per_hour_summary": _safe_failure_value(
+            lambda: _execution_per_hour_summary(execution),
+            section="per_hour_summary",
+        ),
+        "shadow_trace": _safe_failure_value(
+            lambda: _execution_shadow_trace(execution),
+            section="shadow_trace",
+        ),
         "status": status,
         "reason": reason,
         "error_message": error_message,
     }
     if sim is not None:
-        try:
-            payload["yield_disposition"] = _json_safe(
+        yield_disposition = _safe_failure_value(
+            lambda: _json_safe(
                 build_yield_disposition(
                     sim,
                     ledger_snapshots_from_sim(sim),
                 )
-            )
-        except Exception as exc:  # noqa: BLE001 -- failure envelope must survive
+            ),
+            section="yield_disposition",
+        )
+        payload["yield_disposition"] = yield_disposition
+        if (
+            isinstance(yield_disposition, Mapping)
+            and yield_disposition.get("status") == "unavailable"
+            and yield_disposition.get("section") == "yield_disposition"
+        ):
             payload["error_message"] = (
                 f"{payload['error_message']}\n"
-                f"yield disposition unavailable: {_safe_exception_text(exc)}"
+                "yield disposition unavailable: "
+                f"{yield_disposition['exception_type']}: "
+                f"{yield_disposition['reason']}"
             )
     return payload
 

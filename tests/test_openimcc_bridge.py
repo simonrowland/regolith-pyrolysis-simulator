@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import json
+import math
 from dataclasses import replace
 from pathlib import Path
 import subprocess
@@ -18,17 +19,22 @@ from simulator.melt_backend.openimcc_bridge import (
     OpenImccBridgeResult,
     OpenImccUnavailableError,
     OPENIMCC_PARENT_OXIDES,
+    _temperature_domain_K,
     _load_pack,
     _pack_digest,
     _cleaned_melt_projection,
     evaluate as bridge_evaluate,
     evaluate_cleaned_melt,
+    imported_openimcc_commit,
 )
 from simulator.state import MOLAR_MASS
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 GREEN_ACTIVITY_FIXTURE = REPO_ROOT / "tests/fixtures/imcc_green_d9bd25f0b_activities.json"
+GREEN_ACTIVITY_BOUNDS_FIXTURE = (
+    REPO_ROOT / "tests/fixtures/imcc_green_d9bd25f0b_activity_bounds.json"
+)
 PACKS = ("published-core", "published-ext")
 TEMPERATURES_K = (1700.0, 1950.0, 2200.0, 2500.0, 3000.0)
 
@@ -98,6 +104,46 @@ def _openimcc_or_skip():
             "checkout's src/ directory on PYTHONPATH before running the parity check"
         ),
     )
+
+
+def test_default_pack_temperature_domain_matches_bridge_owner() -> None:
+    _openimcc_or_skip()
+    domains = _load_pack("default").kernel_datapack.domains
+    assert set(domains) == {_temperature_domain_K()}
+
+
+def _load_activity_bounds() -> dict[tuple[str, str, float], dict]:
+    fixture = json.loads("\n".join(
+        line for line in GREEN_ACTIVITY_BOUNDS_FIXTURE.read_text().splitlines()
+        if not line.startswith("#")
+    ))
+    assert fixture["schema"] == "imcc-green-activity-bounds.v1"
+    assert fixture["openimcc_commit"] == "e1423d82237486f58dc8ffbb1f8c295f54f169c0"
+    assert fixture["generator"] == "tests/helpers/generate_openimcc_activity_bounds.py"
+    return {
+        (row["pack"], row["composition"], float(row["temperature_K"])): row
+        for row in fixture["rows"]
+    }
+
+
+def _activity_bounds_for_row(row, bounds_by_key) -> dict:
+    key = (row["pack"], row["composition"], float(row["temperature_K"]))
+    return bounds_by_key[key]
+
+
+def _assert_activity_parity(actual, row, log_bounds) -> None:
+    for name, value in actual.items():
+        expected = float.fromhex(row["activities_hex"][name])
+        if expected == 0.0:
+            assert float(value) == expected, f"{row['composition']} {name}"
+            continue
+        observed = abs(math.log(float(value) / expected))
+        bound = log_bounds["parent_bounds"][name]["total_log_activity_bound"]
+        assert observed <= bound, (
+            f"{row['composition']} {row['temperature_K']} K {name}: "
+            f"observed |delta ln(activity)|={observed:.6g}, "
+            f"frozen-oracle bound={bound:.6g}"
+        )
 
 
 @pytest.mark.parametrize(
@@ -333,6 +379,8 @@ def test_missing_openimcc_is_a_typed_refusal(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.setattr(bridge, "_openimcc", None)
     monkeypatch.setattr(bridge, "_OPENIMCC_IMPORT_ERROR", ModuleNotFoundError("openimcc"))
 
+    assert bridge._temperature_domain_K() == bridge._UNAVAILABLE_TEMPERATURE_DOMAIN_K
+
     with pytest.raises(OpenImccUnavailableError) as exc_info:
         bridge_evaluate(composition_mol={"SiO2": 1.0}, temperature_K=2200.0)
 
@@ -424,6 +472,7 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
         "published-ext": "ext-v4",
     }[pack_name]
     rows = [row for row in fixture["rows"] if row["pack"] == fixture_pack_name]
+    bounds_by_key = _load_activity_bounds()
     assert len(rows) >= 20
     assert len({row["composition"] for row in rows}) >= 5
     assert len({row["temperature_K"] for row in rows}) >= 4
@@ -437,7 +486,9 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
             "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
         ) + (("S", "P2O5") if pack_name == "published-ext" else ())
         assert tuple(bridge_result.parent_oxides) == expected_parent_oxides
-        assert {name: float(value).hex() for name, value in actual.items()} == row["activities_hex"]
+        _assert_activity_parity(
+            actual, row, _activity_bounds_for_row(row, bounds_by_key)
+        )
         expected_labels = row["labels_legacy"]
         labels = bridge_result.labels
         assert dict(labels.coverage) == expected_labels["coverage"]
@@ -452,9 +503,32 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
         assert {key: identity[key] for key in expected_identity} == expected_identity
 
 
+def test_openimcc_activity_parity_fails_when_ln_k_is_scaled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _openimcc_or_skip()
+    import openimcc.kernel as kernel_module
+    original = kernel_module.active_residual_jacobian
+
+    def scale_ln_k(
+        y, x_target, nu, ln_k, stoichiometric_totals, xp=kernel_module.np
+    ):
+        return original(
+            y,
+            x_target,
+            nu,
+            ln_k * (1.0 + 1.0e-9),
+            stoichiometric_totals,
+            xp,
+        )
+
+    monkeypatch.setattr(kernel_module, "active_residual_jacobian", scale_ln_k)
+    with pytest.raises(AssertionError, match="frozen-oracle bound"):
+        test_openimcc_parent_activity_parity("published-core")
+
+
 def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     _openimcc_or_skip()
-    from dataclasses import replace
     import openimcc
     from openimcc import label_research_datapack
 
@@ -469,11 +543,11 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     baseline = openimcc.evaluate(
         composition, row["temperature_K"], pack, basis_type=basis_type
     )
-    baseline_hex = {
-        str(name): float(value).hex()
-        for name, value in zip(baseline.parent_oxides, baseline.parent_activity, strict=True)
-    }
-    assert baseline_hex == row["activities_hex"]
+    log_bounds = _activity_bounds_for_row(row, _load_activity_bounds())
+    baseline_activities = dict(
+        zip(baseline.parent_oxides, baseline.parent_activity, strict=True)
+    )
+    _assert_activity_parity(baseline_activities, row, log_bounds)
     kernel = replace(pack.kernel_datapack, A=pack.kernel_datapack.A.copy())
     kernel.A[0] += 0.01
     mutated_pack = label_research_datapack(
@@ -482,22 +556,33 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     mutated = openimcc.evaluate(
         composition, row["temperature_K"], mutated_pack, basis_type=basis_type
     )
-    mutated_hex = {
-        str(name): float(value).hex()
-        for name, value in zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
+    mutated_activities = dict(
+        zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
+    )
+    mutation_ratios = {
+        name: abs(
+            math.log(
+                float(mutated_activities[name])
+                / float.fromhex(row["activities_hex"][name])
+            )
+        ) / terms["total_log_activity_bound"]
+        for name, terms in log_bounds["parent_bounds"].items()
     }
-    assert mutated_hex != row["activities_hex"]
+    assert max(mutation_ratios.values()) > 1.0e6, (
+        "in-memory coefficient mutation stayed inside the frozen-oracle "
+        f"parity bounds: {mutation_ratios}"
+    )
 
 
 def test_pack_digest_preserves_the_published_binding_value() -> None:
     _openimcc_or_skip()
-    expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    expected = "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c"
     assert _pack_digest(_load_pack("published-core")) == expected
 
 
 def test_pack_digest_uses_ext_binding_digest() -> None:
     _openimcc_or_skip()
-    expected = "4cbec2ee85cd95314a5f62f5ce4e00cbe660935bde12df3a7e5daa425612ad03"
+    expected = "de51a9bcf52724fd4b06e9cb639779f31189d86ecf304073fd72fc3019f29770"
     assert _pack_digest(_load_pack("published-ext")) == expected
 
 
@@ -1001,6 +1086,265 @@ def test_recorded_openimcc_pin_matches_pyproject_extra() -> None:
     )
     extra = pyproject["project"]["optional-dependencies"]["imcc"]
     assert extra == [OPENIMCC_RECORDED_PIN]
+
+
+def test_imported_openimcc_commit_comes_from_its_distribution(monkeypatch, tmp_path) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "site-packages/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    commit = "a" * 40
+
+    class Distribution:
+        files = [Path("openimcc/__init__.py")]
+
+        @staticmethod
+        def locate_file(entry):
+            return tmp_path / "site-packages" / entry
+
+        @staticmethod
+        def read_text(name):
+            assert name == "direct_url.json"
+            return json.dumps({"vcs_info": {"commit_id": commit}})
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(
+        openimcc_bridge.metadata, "distribution", lambda _name: Distribution()
+    )
+
+    assert imported_openimcc_commit() == commit
+
+
+def test_imported_openimcc_commit_uses_source_checkout_without_dist_info(
+    monkeypatch, tmp_path
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+    import subprocess
+
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "checkout/src/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    checkout = tmp_path / "checkout"
+    subprocess.run(
+        ["git", "-C", str(checkout), "init"], check=True, capture_output=True
+    )
+    subprocess.run(
+        ["git", "-C", str(checkout), "add", "src/openimcc/__init__.py"],
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(checkout),
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.invalid",
+            "commit",
+            "-m",
+            "source checkout",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    commit = subprocess.run(
+        ["git", "-C", str(checkout), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+    def no_distribution(_name):
+        raise PackageNotFoundError("openimcc")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
+    assert imported_openimcc_commit() == commit
+
+
+def test_imported_openimcc_commit_is_unverified_without_distribution_or_git(
+    monkeypatch, tmp_path
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "loose/openimcc.py"
+    module_file.parent.mkdir()
+    module_file.touch()
+
+    def no_distribution(_name):
+        raise PackageNotFoundError("openimcc")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
+    monkeypatch.setattr(
+        openimcc_bridge.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("no git checkout should be queried"),
+    )
+
+    assert imported_openimcc_commit() is None
+
+
+def test_imported_openimcc_commit_requires_tracked_source_in_enclosing_repo(
+    monkeypatch, tmp_path
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+    from subprocess import CalledProcessError
+
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "project/vendor/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    (tmp_path / "project/.git").mkdir()
+
+    def no_distribution(_name):
+        raise PackageNotFoundError("openimcc")
+
+    def git(args, **_kwargs):
+        if args[3] == "ls-files":
+            raise CalledProcessError(1, args)
+        return SimpleNamespace(stdout="f" * 40 + "\n")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
+    monkeypatch.setattr(openimcc_bridge.subprocess, "run", git)
+
+    assert imported_openimcc_commit() is None
+
+
+def test_imported_openimcc_commit_rejects_untracked_wheel_in_project_venv(
+    monkeypatch, tmp_path
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = (
+        tmp_path / "project/.venv/lib/python/site-packages/openimcc/__init__.py"
+    )
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    (tmp_path / "project/.git").mkdir()
+
+    def no_distribution(_name):
+        raise PackageNotFoundError("openimcc")
+
+    def git(args, **_kwargs):
+        return SimpleNamespace(stdout="f" * 40 + "\n")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
+    monkeypatch.setattr(openimcc_bridge.subprocess, "run", git)
+
+    assert imported_openimcc_commit() is None
+
+
+def test_imported_openimcc_commit_ignores_shadowed_distribution(monkeypatch, tmp_path) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "checkout/src/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    (tmp_path / "checkout/.git").mkdir()
+    stale_file = tmp_path / "site-packages/openimcc/__init__.py"
+    stale_file.parent.mkdir(parents=True)
+    stale_file.touch()
+    stale_commit = "c" * 40
+    checkout_commit = "d" * 40
+
+    class StaleDistribution:
+        files = [Path("openimcc/__init__.py")]
+
+        @staticmethod
+        def locate_file(entry):
+            return tmp_path / "site-packages" / entry
+
+        @staticmethod
+        def read_text(_name):
+            return json.dumps({"vcs_info": {"commit_id": stale_commit}})
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(
+        openimcc_bridge.metadata, "distribution", lambda _name: StaleDistribution()
+    )
+    monkeypatch.setattr(
+        openimcc_bridge.subprocess,
+        "run",
+        lambda args, **_kwargs: SimpleNamespace(stdout=f"{checkout_commit}\n"),
+    )
+
+    assert imported_openimcc_commit() == checkout_commit
+
+
+def test_imported_openimcc_commit_mismatch_fails_the_pin_guard(monkeypatch, tmp_path) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "site-packages/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    installed = "e" * 40
+
+    class Distribution:
+        files = [Path("openimcc/__init__.py")]
+
+        @staticmethod
+        def locate_file(entry):
+            return tmp_path / "site-packages" / entry
+
+        @staticmethod
+        def read_text(_name):
+            return json.dumps({"vcs_info": {"commit_id": installed}})
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(
+        openimcc_bridge.metadata, "distribution", lambda _name: Distribution()
+    )
+    pinned = openimcc_bridge.OPENIMCC_RECORDED_PIN.rsplit("@", 1)[-1]
+    remedy = f"install --no-deps {openimcc_bridge.OPENIMCC_RECORDED_PIN!r}"
+    with pytest.raises(AssertionError, match="installed vs pinned"):
+        assert imported_openimcc_commit() == pinned, (
+            f"installed vs pinned: {installed} != {pinned}; remedy: {remedy}"
+        )
+
+
+def test_imported_openimcc_commit_matches_recorded_pin_when_importable() -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    if openimcc_bridge._openimcc is None:
+        pytest.skip("openimcc is an optional dependency")
+    installed = imported_openimcc_commit()
+    pinned = openimcc_bridge.OPENIMCC_RECORDED_PIN.rsplit("@", 1)[-1]
+    assert installed is not None, (
+        "installed openimcc commit is unverified; remedy: install "
+        f"--no-deps {openimcc_bridge.OPENIMCC_RECORDED_PIN!r}"
+    )
+    assert installed == pinned, (
+        f"installed openimcc commit {installed} does not match pinned commit "
+        f"{pinned}; remedy: install --no-deps "
+        f"{openimcc_bridge.OPENIMCC_RECORDED_PIN!r}"
+    )
 
 
 def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:

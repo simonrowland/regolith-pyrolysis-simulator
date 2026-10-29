@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-037-richter-2002
       role: pdf
@@ -86,6 +86,7 @@ experiments:
               section: 5.1 Starting Materials
               note: 5-70 mg; converted to kg
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -112,6 +113,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -219,6 +221,7 @@ experiments:
               table: '1'
               note: 15-300 min per run; converted to s
         output_unit: s
+        references: []
 - experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::b-133-evaporation
   kind: literature
   method:
@@ -268,6 +271,7 @@ experiments:
               section: 5.1 Starting Materials
               note: 5-70 mg; converted to kg
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -294,6 +298,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -401,6 +406,7 @@ experiments:
               table: '1'
               note: 15-300 min per run; converted to s
         output_unit: s
+        references: []
 - experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::bcai-evaporation
   kind: literature
   method:
@@ -450,6 +456,7 @@ experiments:
               section: 5.1 Starting Materials
               note: 5-70 mg; converted to kg
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -476,6 +483,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -515,40 +523,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: false
+        tag: unknown
+        reason: not_published
       locator:
-        paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
-        line_range: 194-196
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-      inference:
-        relation: bar_to_Pa
-        inputs:
-        - P_Pa = P_bar × 1e5
-        - original_unit=bar
-        - as_published=1e-09 bar
-        - printed=vacuum_bar
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000000001'
-            locator:
-              paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
-              line_range: 194-196
-              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-        - - factor
-          - state:
-              tag: value
-              value: '100000'
-            locator:
-              paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
-              line_range: 194-196
-              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-        output_unit: Pa
+        page: 525
+        table: '1'
+        note: Vacuum, hydrogen, and gas-mixing rows have distinct pressures; no single series pressure assigned
     sweep_gas:
       state:
         tag: unknown
@@ -611,64 +591,7 @@ experiments:
               table: '1'
               note: 15-300 min per run; converted to s
         output_unit: s
-- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::kems-037-richter-2002
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '18.7'
-          approximate: false
-      locator:
-        table: '1'
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-      inference:
-        relation: bar_to_Pa
-        inputs:
-        - P_Pa = P_bar × 1e5
-        - original_unit=bar
-        - as_published=0.000187 bar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000187'
-            locator:
-              table: '1'
-              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-        - - factor
-          - state:
-              tag: value
-              value: '100000'
-            locator:
-              table: '1'
-              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
-  locator:
-    table: '1'
-    paragraph: Avg.area (cm2) and γ_Mg per run
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        references: []
 benches:
 - id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
   work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
@@ -696,3 +619,5176 @@ benches:
       page: 525
       section: 5.2 Experimental Procedure
   other_facts: []
+context:
+- observation_id: richter_2002_mg_cai_langmuir_gamma_fit
+  type: figure_fit_record
+  locator:
+    page: 5
+    published_page: 525
+    figure: '12'
+    note: paragraph states gamma_Mg=0.04 chosen so the calculated curve passes through average BCAI Mg evaporation rate
+  units: dimensionless
+  values:
+    quantity_as_printed: fitted apparent evaporation coefficient gamma_Mg
+    value_as_printed: '0.04'
+    schema_gap: Model/fit output; gamma is chosen to make the calculated curve pass through the BCAI average. Retained as
+      context, not a scored point.
+    model_dependence: Grossman et al. thermodynamic model and Eq. 1
+  context_id: kems-037-richter-2002::context::richter_2002_mg_cai_langmuir_gamma_fit
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-113-10
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-113-10
+    note: J_Mg printed molar flux
+  T_C: '1700'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1973.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-10
+        note: 1700 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-10
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-10
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '12.67'
+          - - SiO2
+            - '47.89'
+          - - CaO
+            - '19.66'
+          - - Al2O3
+            - '19.78'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '1.66e-08'
+    gas_species: Mg(g)
+    sample: B-113-10
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-113-10
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-113-8
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-113-8
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-8
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-8
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '12.67'
+          - - SiO2
+            - '47.89'
+          - - CaO
+            - '19.66'
+          - - Al2O3
+            - '19.78'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '5.74e-08'
+    gas_species: Mg(g)
+    sample: B-113-8
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-113-8
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-113-9
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-113-9
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-9
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-9
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '12.67'
+          - - SiO2
+            - '47.89'
+          - - CaO
+            - '19.66'
+          - - Al2O3
+            - '19.78'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '9.24e-08'
+    gas_species: Mg(g)
+    sample: B-113-9
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-113-9
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-133-11
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-11
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-11
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-11
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-11
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '9.14e-08'
+    gas_species: Mg(g)
+    sample: B-133-11
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-133-11
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-133-12
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-12
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-12
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-12
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-12
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '6.78e-08'
+    gas_species: Mg(g)
+    sample: B-133-12
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-133-12
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-133-13
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-13
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-13
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-13
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-13
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '7.73e-08'
+    gas_species: Mg(g)
+    sample: B-133-13
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-133-13
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-133-15
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-15
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-15
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-15
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-15
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '8.28e-08'
+    gas_species: Mg(g)
+    sample: B-133-15
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-133-15
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-133-16
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-16
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-16
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-16
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-16
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '8.65e-08'
+    gas_species: Mg(g)
+    sample: B-133-16
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-133-16
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-133-17
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-17
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-17
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-17
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-17
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '3.71e-08'
+    gas_species: Mg(g)
+    sample: B-133-17
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-133-17
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_b-133-19
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-19
+    note: J_Mg printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-19
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-19
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-19
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.84e-08'
+    gas_species: Mg(g)
+    sample: B-133-19
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_b-133-19
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_bcai-m1
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-m1
+    note: J_Mg printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m1
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m1
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m1
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.1e-08'
+    gas_species: Mg(g)
+    sample: BCAI-m1
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_bcai-m1
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_bcai-m2
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-m2
+    note: J_Mg printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m2
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m2
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.34e-08'
+    gas_species: Mg(g)
+    sample: BCAI-m2
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_bcai-m2
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_bcai-s1
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-s1
+    note: J_Mg printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s1
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s1
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s1
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '3.12e-08'
+    gas_species: Mg(g)
+    sample: BCAI-s1
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_bcai-s1
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_bcai-s3
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-s3
+    note: J_Mg printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s3
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s3
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '3.51e-08'
+    gas_species: Mg(g)
+    sample: BCAI-s3
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_bcai-s3
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_bcai-ss1
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-ss1
+    note: J_Mg printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss1
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss1
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss1
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '4.12e-08'
+    gas_species: Mg(g)
+    sample: BCAI-ss1
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_bcai-ss1
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_mg_flux_bcai-ss2
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-ss2
+    note: J_Mg printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss2
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss2
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '3.68e-08'
+    gas_species: Mg(g)
+    sample: BCAI-ss2
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_mg_flux_bcai-ss2
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_per_run_gamma_context
+  type: derived_gamma_table_context
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    note: Per-run Mg and SiO evaporation coefficients and Table 1 run conditions.
+  schema_gap: t-1382
+  units: gamma is dimensionless; T_C is °C; point_conditions retain their stated units.
+  note: Richter's own per-run reductions are retained in context until the companion TABLE_CSV asset is seated and the values
+    can be typed with measured lineage.
+  values:
+    per_run_avg_area_cm2:
+      source_observation_ids:
+      - richter_2002_mg_table1_per_run_areas_b1
+      - richter_2002_sio_table1_per_run_areas_b1
+      values_by_run:
+        B-133-11: '0.12'
+        B-133-12: '0.14'
+        B-133-13: '0.15'
+        B-133-15: '0.19'
+        B-133-16: '0.13'
+        B-133-17: '0.19'
+        B-133-19: '0.26'
+        B-113-8: '0.161'
+        B-113-9: '0.135'
+        B-113-10: '0.131'
+        BCAI-ss1: '0.0672'
+        BCAI-ss2: '0.0621'
+        BCAI-s1: '0.168'
+        BCAI-s3: '0.134'
+        BCAI-m1: '0.407'
+        BCAI-m2: '0.425'
+    rows:
+    - source_observation_id: richter_2002_sio_cai_langmuir_gamma
+      element: SiO
+      values:
+        model_dependence: See this context record's per-run rows; the coefficients are reductions using Eq. (1) and Grossman
+          et al. saturation vapor pressures.
+        note: Matrix summary retained for existing evaporation-class evidence references.
+    - source_observation_id: richter_2002_mg_cai_langmuir_gamma
+      element: Mg
+      values:
+        model_dependence: See this context record's per-run rows; the coefficients are reductions using Eq. (1) and Grossman
+          et al. saturation vapor pressures.
+        note: Matrix summary retained for existing evaporation-class evidence references.
+    - source_observation_id: richter_2002_table1_mg_gamma_b-133-11
+      element: Mg
+      table_csv_row: 2
+      run_id: B-133-11
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-11
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.21'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-133-11
+      element: SiO
+      table_csv_row: 2
+      run_id: B-133-11
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-11
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.2'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-133-12
+      element: Mg
+      table_csv_row: 3
+      run_id: B-133-12
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-12
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-12
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-12
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-12
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.17'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-133-12
+      element: SiO
+      table_csv_row: 3
+      run_id: B-133-12
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-12
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-12
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-12
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-12
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.17'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-133-13
+      element: Mg
+      table_csv_row: 4
+      run_id: B-133-13
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-13
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.18'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-133-13
+      element: SiO
+      table_csv_row: 4
+      run_id: B-133-13
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-13
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.18'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-133-15
+      element: Mg
+      table_csv_row: 5
+      run_id: B-133-15
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-15
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.21'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-133-15
+      element: SiO
+      table_csv_row: 5
+      run_id: B-133-15
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-15
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.2'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-133-16
+      element: Mg
+      table_csv_row: 6
+      run_id: B-133-16
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-16
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.22'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-133-16
+      element: SiO
+      table_csv_row: 6
+      run_id: B-133-16
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-16
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.2'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-133-17
+      element: Mg
+      table_csv_row: 7
+      run_id: B-133-17
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-17
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.12'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-133-17
+      element: SiO
+      table_csv_row: 7
+      run_id: B-133-17
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-17
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.13'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-133-19
+      element: Mg
+      table_csv_row: 8
+      run_id: B-133-19
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-19
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.1'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-133-19
+      element: SiO
+      table_csv_row: 8
+      run_id: B-133-19
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-19
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.11'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-113-8
+      element: Mg
+      table_csv_row: 12
+      run_id: B-113-8
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-8
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.15'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-113-8
+      element: SiO
+      table_csv_row: 12
+      run_id: B-113-8
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-8
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.14'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-113-9
+      element: Mg
+      table_csv_row: 13
+      run_id: B-113-9
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-9
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.24'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-113-9
+      element: SiO
+      table_csv_row: 13
+      run_id: B-113-9
+      T_C: '1800'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-9
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.15'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_b-113-10
+      element: Mg
+      table_csv_row: 14
+      run_id: B-113-10
+      T_C: '1700'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-10
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+            note: 1700 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.18'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_b-113-10
+      element: SiO
+      table_csv_row: 14
+      run_id: B-113-10
+      T_C: '1700'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-10
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+            note: 1700 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.14'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_bcai-ss1
+      element: Mg
+      table_csv_row: 16
+      run_id: BCAI-ss1
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss1
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.051'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_bcai-ss1
+      element: SiO
+      table_csv_row: 16
+      run_id: BCAI-ss1
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss1
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.058'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_bcai-ss2
+      element: Mg
+      table_csv_row: 17
+      run_id: BCAI-ss2
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss2
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.047'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_bcai-ss2
+      element: SiO
+      table_csv_row: 17
+      run_id: BCAI-ss2
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss2
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.068'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_bcai-s1
+      element: Mg
+      table_csv_row: 18
+      run_id: BCAI-s1
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s1
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.039'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_bcai-s1
+      element: SiO
+      table_csv_row: 18
+      run_id: BCAI-s1
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s1
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.048'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_bcai-s3
+      element: Mg
+      table_csv_row: 19
+      run_id: BCAI-s3
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s3
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.048'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_bcai-s3
+      element: SiO
+      table_csv_row: 19
+      run_id: BCAI-s3
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s3
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.069'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_bcai-m1
+      element: Mg
+      table_csv_row: 20
+      run_id: BCAI-m1
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m1
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.026'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_bcai-m1
+      element: SiO
+      table_csv_row: 20
+      run_id: BCAI-m1
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m1
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.049'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_mg_gamma_bcai-m2
+      element: Mg
+      table_csv_row: 21
+      run_id: BCAI-m2
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m2
+        note: gamma_Mg printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.029'
+        gas_species: Mg(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+    - source_observation_id: richter_2002_table1_sio_gamma_bcai-m2
+      element: SiO
+      table_csv_row: 21
+      run_id: BCAI-m2
+      T_C: '1500'
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m2
+        note: gamma_SiO printed coefficient
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+        vapor pressure uses the Grossman et al. thermodynamic model.
+      derivation:
+        relation: Hertz-Knudsen equation (1)
+        quote: J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)
+        inputs:
+        - the printed areal flux J_i in Table 1
+        - saturation vapor pressure from the Grossman et al. thermodynamic model
+        output: dimensionless evaporation coefficient gamma
+        locator:
+          page: 3
+          published_page: 523
+          equation: '1'
+      values:
+        quantity: evaporation_coefficient_alpha
+        alpha: '0.05'
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        model_dependence: The printed gamma is reduced from the areal flux using the Hertz-Knudsen equation; the equilibrium
+          vapor pressure uses the Grossman et al. thermodynamic model.
+        system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_per_run_gamma_context
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: Mg
+- observation_id: richter_2002_table1_sio_flux_b-113-10
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-113-10
+    note: J_Si printed molar flux
+  T_C: '1700'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1973.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-10
+        note: 1700 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-10
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-10
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '12.67'
+          - - SiO2
+            - '47.89'
+          - - CaO
+            - '19.66'
+          - - Al2O3
+            - '19.78'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '4.24e-08'
+    gas_species: SiO(g)
+    sample: B-113-10
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-113-10
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-113-8
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-113-8
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-8
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-8
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '12.67'
+          - - SiO2
+            - '47.89'
+          - - CaO
+            - '19.66'
+          - - Al2O3
+            - '19.78'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.06e-07'
+    gas_species: SiO(g)
+    sample: B-113-8
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-113-8
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-113-9
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-113-9
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-9
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-9
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '12.67'
+          - - SiO2
+            - '47.89'
+          - - CaO
+            - '19.66'
+          - - Al2O3
+            - '19.78'
+      locator:
+        page: 5
+        table: '1'
+        row: B-113-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.14e-07'
+    gas_species: SiO(g)
+    sample: B-113-9
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-113-9
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-133-11
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-11
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-11
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-11
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-11
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '1.88e-07'
+    gas_species: SiO(g)
+    sample: B-133-11
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-133-11
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-133-12
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-12
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-12
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-12
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-12
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.03e-07'
+    gas_species: SiO(g)
+    sample: B-133-12
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-133-12
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-133-13
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-13
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-13
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-13
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-13
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '1.56e-07'
+    gas_species: SiO(g)
+    sample: B-133-13
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-133-13
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-133-15
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-15
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-15
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-15
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-15
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '1.64e-07'
+    gas_species: SiO(g)
+    sample: B-133-15
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-133-15
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-133-16
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-16
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-16
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-16
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-16
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '1.66e-07'
+    gas_species: SiO(g)
+    sample: B-133-16
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-133-16
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-133-17
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-17
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-17
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-17
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-17
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '1.82e-07'
+    gas_species: SiO(g)
+    sample: B-133-17
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-133-17
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_b-133-19
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: B-133-19
+    note: J_Si printed molar flux
+  T_C: '1800'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-19
+        note: 1800 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: reported only as <1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-19
+        note: vacuum, P < 1e-9 bar
+    atmosphere:
+      state:
+        tag: value
+        value: vacuum, P < 1e-9 bar
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-19
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '11.94'
+          - - SiO2
+            - '46.04'
+          - - CaO
+            - '22.64'
+          - - Al2O3
+            - '19.3'
+      locator:
+        page: 5
+        table: '1'
+        row: B-133-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '1.97e-07'
+    gas_species: SiO(g)
+    sample: B-133-19
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_b-133-19
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_bcai-m1
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-m1
+    note: J_Si printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m1
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m1
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m1
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.3e-08'
+    gas_species: SiO(g)
+    sample: BCAI-m1
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_bcai-m1
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_bcai-m2
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-m2
+    note: J_Si printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m2
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m2
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-m2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.13e-08'
+    gas_species: SiO(g)
+    sample: BCAI-m2
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_bcai-m2
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_bcai-s1
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-s1
+    note: J_Si printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s1
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s1
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s1
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.1e-08'
+    gas_species: SiO(g)
+    sample: BCAI-s1
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_bcai-s1
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_bcai-s3
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-s3
+    note: J_Si printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s3
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s3
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-s3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.67e-08'
+    gas_species: SiO(g)
+    sample: BCAI-s3
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_bcai-s3
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_bcai-ss1
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-ss1
+    note: J_Si printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss1
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss1
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss1
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.7e-08'
+    gas_species: SiO(g)
+    sample: BCAI-ss1
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_bcai-ss1
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO
+- observation_id: richter_2002_table1_sio_flux_bcai-ss2
+  type: printed_areal_flux_context
+  reason_not_typed_as_evaporation_rate: Printed areal molar flux; EVAPORATION_RATE is a total rate in kg_per_s. Table 1 reports
+    average area separately; no total kg_per_s rate is derived here.
+  locator:
+    page: 5
+    published_page: 525
+    table: '1'
+    row: BCAI-ss2
+    note: J_Si printed molar flux
+  T_C: '1500'
+  phase: l
+  standard_state: Langmuir evaporation flux as printed in Table 1
+  regime: langmuir_free_evaporation
+  units: mol cm^-2 s^-1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss2
+        note: 1500 °C as printed
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss2
+        note: 1.87e-4 bar H2
+    atmosphere:
+      state:
+        tag: value
+        value: hydrogen, 1.87e-4 bar
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-ss2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '17.84'
+          - - SiO2
+            - '37.04'
+          - - CaO
+            - '24.61'
+          - - Al2O3
+            - '20.51'
+      locator:
+        page: 5
+        table: '1'
+        row: BCAI-0
+        note: starting composition as printed in Table 1
+  values:
+    quantity: printed_areal_molar_flux
+    method_class: measured_direct
+    evidence_class: measured_direct
+    value_as_printed: '2.73e-08'
+    gas_species: SiO(g)
+    sample: BCAI-ss2
+    system_note: Type-B CAI-like starting melt; sample family and composition are printed in Table 1
+  context_id: kems-037-richter-2002::context::richter_2002_table1_sio_flux_bcai-ss2
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  source_id: kems-037-richter-2002
+  species: SiO

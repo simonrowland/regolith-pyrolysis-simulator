@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-038-matchett-2006
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-038-matchett-2006
-      role: table_csv
-      path: tables/kems-038-matchett-2006
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-038-matchett-2006
       role: pdftotext
       path: unknown
@@ -137,7 +131,7 @@ experiments:
   locator:
     page: 18
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+    source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
 benches:
 - id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::bench::goddard-fresnel-vacuum-pyrolysis
   work_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d

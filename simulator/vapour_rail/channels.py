@@ -55,7 +55,7 @@ Ownership invariants (design §3) — hard boundaries:
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
@@ -831,19 +831,57 @@ class ReactionThermoInputs:
 # ---------------------------------------------------------------------------
 
 
-def clamp_physical_pO2_bar(pO2_bar: float) -> float:
-    """Physical melt/transport pO2 envelope (b-148)."""
+def validate_physical_pO2_bar(pO2_bar: float) -> float:
+    """Admit the actual finite-positive oxygen scalar for O2 evaluation."""
 
     if not is_declared_real_scalar(pO2_bar, allow_numeric_str=True):
         raise TypeError("pO2_bar must be numeric")
     oxygen = float(pO2_bar)
     if not math.isfinite(oxygen) or oxygen <= 0.0:
         raise ValueError(f"pO2_bar must be finite and positive; got {pO2_bar!r}")
-    if oxygen < MELT_DISSOCIATION_PO2_MIN_BAR:
-        return MELT_DISSOCIATION_PO2_MIN_BAR
-    if oxygen > MELT_DISSOCIATION_PO2_MAX_BAR:
-        return MELT_DISSOCIATION_PO2_MAX_BAR
+    notice = _pO2_evaluation_notice(oxygen)
+    if notice is not None:
+        import warnings
+
+        warnings.warn(str(notice), UserWarning, stacklevel=2)
     return oxygen
+
+
+def _pO2_evaluation_notice(oxygen: float) -> dict[str, Any] | None:
+    # The stated evaluator band limits evidence, not the supplied oxygen.
+    # Mass action uses p/p_ref (bar/bar): a decade in p changes log10(P)
+    # by the reaction exponent. Projecting to either edge would erase that
+    # dependence outside the band; at either edge this remains continuous.
+    if not MELT_DISSOCIATION_PO2_MIN_BAR <= oxygen <= MELT_DISSOCIATION_PO2_MAX_BAR:
+        return {
+            "reason": "pO2_outside_evaluator_band",
+            "authority_level": "extrapolated",
+            "certified_band": {
+                "pO2_bar": (
+                    MELT_DISSOCIATION_PO2_MIN_BAR,
+                    MELT_DISSOCIATION_PO2_MAX_BAR,
+                )
+            },
+            "pO2_bar_used": oxygen,
+            "was_clamped": False,
+        }
+    return None
+
+
+def _log_oxygen_ratio(
+    oxygen: float, reference: float, *, base10: bool = False,
+) -> float:
+    """Log of a positive bar/bar ratio without losing finite oxygen to division."""
+
+    logarithm = math.log10 if base10 else math.log
+    ratio = oxygen / reference
+    # Keep existing IEEE results whenever the ratio is representable. Otherwise
+    # log(p/p_ref) = log(p)-log(p_ref); both logs remain finite for positive
+    # finite inputs even if their dimensionless quotient under/overflows.
+    return (
+        logarithm(ratio) if 0.0 < ratio < math.inf
+        else logarithm(oxygen) - logarithm(reference)
+    )
 
 
 def o2_potential_from_pO2_bar(
@@ -857,19 +895,19 @@ def o2_potential_from_pO2_bar(
 ) -> GasChannelPotential:
     """Wrap a legacy scalar pO2 into the typed O2 channel (1-bar standard state).
 
-    The channel stores ``reduced_potential_ln = ln(p_clamped / 1 bar)`` against
+    The channel stores ``reduced_potential_ln = ln(p / 1 bar)`` against
     the design's 1-bar ideal-gas standard state.  The legacy
     ``pO2_reference_bar`` is retained on the potential so the evaluator can
     apply the bit-identical ratio form
 
-        e · log10(p_clamped / p_ref)
+        e · log10(p / p_ref)
 
     which is algebraically identical to the rebased composition
 
-        e · log10(p_clamped / 1) − e · log10(p_ref / 1)
+        e · log10(p / 1) − e · log10(p_ref / 1)
 
-    (design §7.2).  Using the ratio form preserves IEEE identity with the
-    pre-t-571 evaluator for every catalog row.
+    (design §7.2). Within the stated evaluator band, the ratio form preserves
+    IEEE identity with the pre-t-571 evaluator for every catalog row.
     """
 
     if reaction_plane not in REACTION_PLANES:
@@ -902,35 +940,21 @@ def o2_potential_from_pO2_bar(
         owner_id="legacy_pO2_adapter",
         source_kind=SOURCE_KIND_LEGACY_SCALAR_ADAPTER,
     )
-    oxygen = clamp_physical_pO2_bar(pO2_bar)
+    oxygen = validate_physical_pO2_bar(pO2_bar)
     # 1-bar ideal-gas standard state: (μ-μ0)/(R T) = ln(f / 1 bar).
     reduced = math.log(oxygen / 1.0)
     delta_mu = GAS_CONSTANT * temperature_K * reduced
     receipt: dict[str, Any] = {
         "kind": "legacy_pO2_bar",
         "pO2_bar_input": float(pO2_bar),
+        # Historical receipt key retained; the value is now the actual input.
         "pO2_bar_clamped": oxygen,
         "pO2_reference_bar": p_ref,
         "standard_state_bar": 1.0,
     }
-    if oxygen == MELT_DISSOCIATION_PO2_MIN_BAR and float(pO2_bar) < MELT_DISSOCIATION_PO2_MIN_BAR:
-        from engines.builtin.vapor_pressure import (
-            MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
-            MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
-        )
-
-        receipt["extrapolation_notice"] = {
-            "reason": MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
-            "authority_level": "extrapolated",
-            "certified_band": {
-                "pO2_bar": (
-                    MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
-                    MELT_DISSOCIATION_PO2_MAX_BAR,
-                )
-            },
-            "pO2_bar_used": oxygen,
-            "was_clamped": True,
-        }
+    notice = _pO2_evaluation_notice(oxygen)
+    if notice is not None:
+        receipt["extrapolation_notice"] = notice
     return GasChannelPotential(
         channel_id=CHANNEL_O2,
         gas_formula="O2",
@@ -1006,8 +1030,8 @@ def channel_log10_contribution(
         if p_ref is None:
             p_ref = 1.0
         # Exact pre-t-571 expression.
-        return float(term.derived_exponent) * math.log10(
-            float(potential.legacy_pO2_bar) / float(p_ref)
+        return float(term.derived_exponent) * _log_oxygen_ratio(
+            float(potential.legacy_pO2_bar), float(p_ref), base10=True
         )
 
     if potential.reduced_potential_ln is None:
@@ -1025,7 +1049,7 @@ def channel_linear_mass_action_factor(
     term: CompiledReactionTerm,
     potential: GasChannelPotential,
 ) -> float:
-    """Linear-space mass-action factor ``(f_clamped / f_ref) ** e``.
+    """Linear-space mass-action factor ``(f / f_ref) ** e``.
 
     Migration aid for the legacy linear-space composers in
     ``engines/builtin/vapor_pressure.py`` (design §12 Phase 1): those rails
@@ -1037,12 +1061,11 @@ def channel_linear_mass_action_factor(
         factor = (legacy_pO2_bar / legacy_pO2_reference_bar) ** e
 
     Derivation: premise — the legacy rail computes
-    ``P_eq = P_ref · a^ea · (p_clamped / p_ref)^e`` with
-    ``p_clamped = min(max(pO2, MIN), MAX)``; ``legacy_pO2_bar`` on the
-    potential is exactly that clamped value (``clamp_physical_pO2_bar``) and
-    ``term.derived_exponent = -(-e)/1 = e`` bit-for-bit, so the factor is
-    identical to the pre-migration expression for every input.  Units:
-    bar/bar is dimensionless.
+    ``P_eq = P_ref · a^ea · (p / p_ref)^e``. ``legacy_pO2_bar`` on the
+    potential is the validated input, and ``term.derived_exponent = -(-e)/1
+    = e`` bit-for-bit. Units: bar/bar is dimensionless. Within the stated
+    evaluator band this is identical to the pre-migration expression; beyond
+    it the actual oxygen is used and the potential carries a domain notice.
 
     Fail-closed: only the O2 channel carried by the legacy scalar adapter is
     linear-composable; every other channel / source kind must use the
@@ -1076,10 +1099,13 @@ def channel_linear_mass_action_factor(
             f"source_kind={potential.source_kind}"
         )
     # Exact pre-t-571 linear expression (bit-identity bar).
-    return (
-        float(potential.legacy_pO2_bar)
-        / float(potential.legacy_pO2_reference_bar)
-    ) ** float(term.derived_exponent)
+    oxygen = float(potential.legacy_pO2_bar)
+    reference = float(potential.legacy_pO2_reference_bar)
+    ratio = oxygen / reference
+    exponent = float(term.derived_exponent)
+    if 0.0 < ratio < math.inf:
+        return ratio ** exponent
+    return math.exp(exponent * _log_oxygen_ratio(oxygen, reference))
 
 
 # ---------------------------------------------------------------------------
@@ -1449,29 +1475,13 @@ def attempt_channel_composition(
                 )
             )
         ):
-            return ChannelCompositionRefusal(
-                carrier=carrier,
-                element=element,
-                disposition=REFUSAL_CARBON_SIDE_OWNER_MISSING,
-                missing_channels=(),
-                missing_melt_owners=(),
-                detail=(
-                    f"carrier {carrier}: carbon-side owner missing "
-                    "(not a gas channel in t-571)"
-                ),
-                ledger_missing=missing_text,
-                pathway=pathway,
-            )
-        return ChannelCompositionRefusal(
+            disposition = REFUSAL_CARBON_SIDE_OWNER_MISSING
+        else:
+            disposition = REFUSAL_MISSING_CHANNEL_INPUT
+        return _empty_channel_composition_refusal(
             carrier=carrier,
             element=element,
-            disposition=REFUSAL_MISSING_CHANNEL_INPUT,
-            missing_channels=(),
-            missing_melt_owners=(),
-            detail=(
-                f"carrier {carrier}: NEEDS-CHANNEL but no channel requirement "
-                "could be inferred; balanced reaction still required"
-            ),
+            disposition=disposition,
             ledger_missing=missing_text,
             pathway=pathway,
         )
@@ -1518,17 +1528,45 @@ def attempt_channel_composition(
     return MappingProxyType(resolved)
 
 
+def _empty_channel_composition_refusal(
+    *,
+    carrier: str,
+    element: str | None,
+    disposition: str,
+    ledger_missing: str | None,
+    pathway: str | None,
+) -> ChannelCompositionRefusal:
+    """Build the typed refusal used when no channel is required."""
+
+    if disposition == REFUSAL_CARBON_SIDE_OWNER_MISSING:
+        detail = (
+            f"carrier {carrier}: carbon-side owner missing "
+            "(not a gas channel in t-571)"
+        )
+    else:
+        detail = (
+            f"carrier {carrier}: NEEDS-CHANNEL but no channel requirement "
+            "could be inferred; balanced reaction still required"
+        )
+    return ChannelCompositionRefusal(
+        carrier=carrier,
+        element=element,
+        disposition=disposition,
+        missing_channels=(),
+        missing_melt_owners=(),
+        detail=detail,
+        ledger_missing=ledger_missing,
+        pathway=pathway,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Coverage-ledger consumption of typed NEEDS-CHANNEL reasons
 # ---------------------------------------------------------------------------
 
-_PATHWAY_RE = re.compile(r"pathway=([a-z0-9_]+)")
-_NEEDS_CHANNEL_PREFIX = re.compile(r"^NEEDS-CHANNEL\b")
-
-
 @dataclass(frozen=True)
 class TypedGapReason:
-    """Coverage-ledger row projected onto the t-571 channel vocabulary."""
+    """Typed coverage verdict projected onto the t-571 channel vocabulary."""
 
     element: str
     carrier: str
@@ -1540,39 +1578,33 @@ class TypedGapReason:
 
 
 def parse_needs_channel_entry(entry: Mapping[str, Any]) -> TypedGapReason | None:
-    """Project one coverage-gap entry into a typed channel reason, or None."""
+    """Read one typed NEEDS-CHANNEL verdict; prose is retained for display."""
 
     missing = str(entry.get("missing") or "")
-    if not _NEEDS_CHANNEL_PREFIX.search(missing):
+    if entry.get("verdict") != "NEEDS-CHANNEL":
         return None
     element = str(entry.get("element") or "")
     carrier = str(entry.get("carrier") or "")
-    pathway_match = _PATHWAY_RE.search(missing)
-    pathway = pathway_match.group(1) if pathway_match else None
-    required = infer_required_channels_from_carrier(
-        carrier, pathway=pathway, missing_text=missing
-    )
+    raw_pathway = entry.get("pathway")
+    if raw_pathway is not None and not isinstance(raw_pathway, str):
+        raise TypeError("coverage verdict pathway must be a string or null")
+    pathway = raw_pathway
+    raw_required = entry.get("required_channels")
+    if not isinstance(raw_required, (list, tuple)) or any(
+        not isinstance(channel_id, str) for channel_id in raw_required
+    ):
+        raise TypeError("NEEDS-CHANNEL required_channels must be a string list")
+    required = tuple(raw_required)
+    if len(required) != len(set(required)):
+        raise ValueError("NEEDS-CHANNEL required_channels must be unique")
+    disposition = entry.get("refusal_code")
+    if not isinstance(disposition, str) or not disposition:
+        raise TypeError("NEEDS-CHANNEL refusal_code must be a non-empty string")
     melt_owners: list[str] = []
     for channel_id in required:
         entry_reg = CHANNEL_REGISTRY.get(channel_id)
         if entry_reg and entry_reg.missing_melt_owner_code:
             melt_owners.append(entry_reg.missing_melt_owner_code)
-    if any(
-        CHANNEL_REGISTRY[c].missing_melt_owner_code == "halide_reservoir_owner_missing"
-        for c in required
-        if c in CHANNEL_REGISTRY
-    ):
-        disposition = REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING
-    elif any(
-        CHANNEL_REGISTRY[c].missing_melt_owner_code == "sulfur_reservoir_owner_missing"
-        for c in required
-        if c in CHANNEL_REGISTRY
-    ):
-        disposition = REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING
-    elif required:
-        disposition = REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING
-    else:
-        disposition = REFUSAL_MISSING_CHANNEL_INPUT
     return TypedGapReason(
         element=element,
         carrier=carrier,
@@ -1582,6 +1614,40 @@ def parse_needs_channel_entry(entry: Mapping[str, Any]) -> TypedGapReason | None
         disposition=disposition,
         raw_missing=missing,
     )
+
+
+def _compose_typed_gap_entry(
+    entry: Mapping[str, Any],
+) -> ChannelCompositionRefusal | Mapping[str, GasChannelPotential] | None:
+    """Resolve typed coverage inputs and carry ``missing`` as display text."""
+
+    typed = parse_needs_channel_entry(entry)
+    if typed is None:
+        return None
+    if not typed.required_channels:
+        result = _empty_channel_composition_refusal(
+            carrier=typed.carrier,
+            element=typed.element,
+            disposition=typed.disposition,
+            ledger_missing=typed.raw_missing,
+            pathway=typed.pathway,
+        )
+        return result
+
+    result = attempt_channel_composition(
+        carrier=typed.carrier,
+        element=typed.element,
+        pathway=typed.pathway,
+        required_channels=typed.required_channels,
+    )
+    if isinstance(result, ChannelCompositionRefusal):
+        if result.disposition != typed.disposition:
+            raise ValueError(
+                f"{typed.carrier}: typed disposition {typed.disposition!r} "
+                f"does not match channel resolution {result.disposition!r}"
+            )
+        return replace(result, ledger_missing=typed.raw_missing)
+    return result
 
 
 def load_typed_needs_channel_reasons(
@@ -1623,7 +1689,7 @@ def reconstruct_878_pathway_cohort(
     *,
     gaps_path: str | Path | None = None,
 ) -> Mapping[str, Any]:
-    """Reproduce the design §2.2 878-row pathway cohort from the free-text ledger.
+    """Reproduce the design §2.2 878-row cohort from typed ledger verdicts.
 
     Returns counts by pathway label plus the total.  The 878 figure is the
     sum of these disjoint pathway labels (not a per-channel count).
@@ -1656,42 +1722,23 @@ def reconstruct_878_pathway_cohort(
         "related_binary_condensed",
     )
     counts: dict[str, int] = {label: 0 for label in pathway_labels}
-    # halide_condensed_family rows in the 878 use the ratio-mismatch prose,
-    # not every halide_condensed_family COMPOSABLE-NOW row.
+    # Only the typed NEEDS-CHANNEL verdict contributes the halide ratio subset;
+    # COMPOSABLE-NOW rows in that pathway do not.
     halide_ratio_mismatch = 0
     for entry in entries:
-        missing = str(entry.get("missing") or "")
-        if not _NEEDS_CHANNEL_PREFIX.search(missing):
-            # No-op.  Absence of a leading NEEDS-CHANNEL prefix does not
-            # skip the row and does not, by itself, admit it.  Counting
-            # below still requires a pathway= token, then the per-label
-            # filters in this loop.
-            pass
-        pathway_match = _PATHWAY_RE.search(missing)
-        if pathway_match is None:
+        pathway = entry.get("pathway")
+        if not isinstance(pathway, str):
             continue
-        pathway = pathway_match.group(1)
+        verdict = entry.get("verdict")
         if pathway == "halide_condensed_family":
-            # Design §2.2: the "changed total-halogen ratio only" subset
-            # (107).  Counted when the free-text contains "NEEDS-CHANNEL"
-            # or "ratio mismatch" (the prefix itself is not required).
-            if "NEEDS-CHANNEL" in missing or "ratio mismatch" in missing:
+            if verdict == "NEEDS-CHANNEL":
                 counts["halide_condensed_family"] += 1
                 halide_ratio_mismatch += 1
             continue
-        if pathway in counts:
-            if "NEEDS-CHANNEL" in missing or pathway in {
-                "parent_oxide_x_halogen_exchange",
-                "element_condensed_x_halogen_exchange",
-                "catalog_base_x_halogen_exchange",
-                "base_x_hydrogen_exchange",
-                "related_binary_condensed",
-            }:
-                # related_binary_condensed: counted whenever the pathway
-                # token is present.  The other four labels in this set:
-                # counted only when "NEEDS-CHANNEL" is in the free-text.
-                if "NEEDS-CHANNEL" in missing or pathway == "related_binary_condensed":
-                    counts[pathway] += 1
+        if pathway in counts and (
+            verdict == "NEEDS-CHANNEL" or pathway == "related_binary_condensed"
+        ):
+            counts[pathway] += 1
 
     total = sum(counts.values())
     return MappingProxyType(
@@ -1798,7 +1845,7 @@ __all__ = [
     "REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING",
     "REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING",
     "REFUSAL_CARBON_SIDE_OWNER_MISSING",
-    "clamp_physical_pO2_bar",
+    "validate_physical_pO2_bar",
     "o2_potential_from_pO2_bar",
     "channel_log10_contribution",
     "channel_linear_mass_action_factor",

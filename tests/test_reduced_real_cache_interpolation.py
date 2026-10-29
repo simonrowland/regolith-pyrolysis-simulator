@@ -170,6 +170,18 @@ def test_greedy_nn_prefers_along_trajectory_neighbors() -> None:
     assert [neighbor["label"] for neighbor in neighbors] == ["same-near", "same-far"]
 
 
+def test_interpolation_refuses_dependency_vector_mismatch() -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    candidate_key = copy.deepcopy(query)
+    candidate_key["model"]["model"] = "other-binding"
+    candidate = _candidate(
+        candidate_key,
+        _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0),
+    )
+
+    assert rci.greedy_nearest_neighbors(query, [candidate]) == []
+
+
 def test_linear_interpolation_brackets_temperature() -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1400.0)
@@ -394,6 +406,169 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert payload["equilibrium_result"]["liquid_fraction"] == pytest.approx(0.705)
     assert payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"] == pytest.approx(7.025)
     assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
+    assert "requested_fO2_log" not in payload["equilibrium_result"]
+    assert "printed_fO2_echo_log" not in payload["equilibrium_result"]
+
+
+def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    query["controls"]["log_fO2"] = -9.0
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1499.0)
+    low["controls"]["log_fO2"] = -9.0001
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1501.0)
+    high["controls"]["log_fO2"] = -8.9999
+
+    low_payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+    low_payload["equilibrium_result"].update(
+        requested_fO2_log=-9.0001,
+        printed_fO2_echo_log=-9.0,
+        diagnostics={
+            "requested_fO2_log": -9.0001,
+            "printed_fO2_echo_log": -9.0,
+        },
+    )
+    high_payload = _interpolation_payload(liquid_fraction=0.71, sio_pa=7.05)
+    high_payload["equilibrium_result"].update(
+        requested_fO2_log=-8.9999,
+        printed_fO2_echo_log=-9.0,
+        diagnostics={
+            "requested_fO2_log": -8.9999,
+            "printed_fO2_echo_log": -9.0,
+        },
+    )
+
+    attempt = rci.attempt_cached_interpolation(
+        query,
+        [_candidate(low, low_payload), _candidate(high, high_payload)],
+    )
+
+    assert attempt is not None
+    assert attempt["weight_info"]["weights"] == pytest.approx([0.5, 0.5])
+    interpolated_result = attempt["payload"]["equilibrium_result"]
+    assert interpolated_result["fO2_log"] == pytest.approx(-9.0)
+    assert interpolated_result["requested_fO2_log"] == pytest.approx(-9.0)
+    assert interpolated_result["printed_fO2_echo_log"] is None
+    assert interpolated_result["diagnostics"]["requested_fO2_log"] == pytest.approx(-9.0)
+    assert interpolated_result["diagnostics"]["printed_fO2_echo_log"] is None
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "interpolated-requested-fo2.sqlite",
+    )
+    store.last_cache_state = "cached_interpolated"
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(
+            fO2_log=-8.0,
+            melt_fO2_log=-8.0,
+        ),
+    )
+    replayed = store._equilibrium_from_payload(sim, attempt["payload"])
+
+    assert replayed.fO2_log == pytest.approx(-9.0)
+    assert replayed.requested_fO2_log == pytest.approx(-9.0)
+    assert replayed.printed_fO2_echo_log is None
+    assert replayed.diagnostics["requested_fO2_log"] == pytest.approx(-9.0)
+    assert replayed.diagnostics["printed_fO2_echo_log"] is None
+    assert sim.melt.fO2_log == pytest.approx(-9.0)
+    assert sim.melt.melt_fO2_log == pytest.approx(-9.0)
+
+
+@pytest.mark.parametrize(
+    ("backend_family", "backend_name", "backend_class", "evidence_class", "backend_diagnostics"),
+    [
+        (
+            "thermoengine",
+            "ThermoEngineBackend",
+            "simulator.melt_backend.thermoengine.ThermoEngineBackend",
+            "melts",
+            {"fO2_transport": "thermoengine_oxygen_root"},
+        ),
+        (
+            "magemin",
+            "MAGEMinBackend",
+            "simulator.melt_backend.magemin.MAGEMinBackend",
+            "magemin",
+            {
+                "applied_fO2_buffer": "mw",
+                "applied_fO2_buffer_n": 0.0,
+                "fO2_clamped": False,
+                "authoritative_for_requested_conditions": True,
+                "authoritative_for_solved_conditions": True,
+            },
+        ),
+    ],
+)
+def test_cached_interpolation_preserves_legacy_engine_fo2_diagnostics(
+    tmp_path: Path,
+    backend_family: str,
+    backend_name: str,
+    backend_class: str,
+    evidence_class: str,
+    backend_diagnostics: dict[str, object],
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    query["controls"]["log_fO2"] = -9.0
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1499.0)
+    low["controls"]["log_fO2"] = -9.0001
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1501.0)
+    high["controls"]["log_fO2"] = -8.9999
+    backend = {
+        "backend_name": backend_name,
+        "backend_class": backend_class,
+        "backend_version": "test-v1",
+    }
+    for key in (query, low, high):
+        key["backend"] = copy.deepcopy(backend)
+
+    candidates = []
+    for key, requested_fO2_log in ((low, -9.0001), (high, -8.9999)):
+        payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+        payload["authority"]["backend_family"] = backend_family
+        payload["authority"]["backend"] = copy.deepcopy(backend)
+        payload["authority"]["evidence_class"] = evidence_class
+        result = payload["equilibrium_result"]
+        result["temperature_C"] = key["controls"]["T_K"] - 273.15
+        result["fO2_log"] = -9.0000000005
+        result["diagnostics"] = {
+            **backend_diagnostics,
+            "requested_fO2_log": requested_fO2_log,
+            "solved_fO2_log": -9.0000000005,
+        }
+        candidates.append(_candidate(key, payload))
+
+    attempt = rci.attempt_cached_interpolation(query, candidates)
+
+    assert attempt is not None
+    assert attempt["weight_info"]["mode"] == "along_trajectory_T"
+    assert attempt["weight_info"]["weights"] == pytest.approx([0.5, 0.5])
+    interpolated_result = attempt["payload"]["equilibrium_result"]
+    assert interpolated_result["fO2_log"] == -9.0000000005
+    assert "requested_fO2_log" not in interpolated_result
+    assert "printed_fO2_echo_log" not in interpolated_result
+    assert interpolated_result["diagnostics"] == attempt["neighbors"][0]["payload"][
+        "equilibrium_result"
+    ]["diagnostics"]
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / f"interpolated-{backend_family}-fo2.sqlite",
+    )
+    store.last_cache_state = "cached_interpolated"
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(
+            fO2_log=-8.0,
+            melt_fO2_log=-8.0,
+        ),
+    )
+    replayed = store._equilibrium_from_payload(sim, attempt["payload"])
+
+    assert replayed.requested_fO2_log is None
+    assert replayed.fO2_log == interpolated_result["fO2_log"]
+    assert sim.melt.fO2_log == interpolated_result["fO2_log"]
+    assert sim.melt.melt_fO2_log == interpolated_result["fO2_log"]
+    assert sim.melt.fO2_log != query["controls"]["log_fO2"]
 
 
 def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) -> None:
@@ -403,10 +578,19 @@ def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) ->
     db_path = tmp_path / "interpolation-repair-notices.sqlite"
     notices_by_hash = {
         hashlib.sha256(canonical_json_bytes(low)).hexdigest(): {
-            "kind": "low_neighbor_repair"
+            "type": "typed_notice",
+            "kind": "freeze_gate_curve_point_repaired",
+            "site": "SR18",
+            "temperature_C": 1490.0,
+            "raw_fraction": -0.2,
+            "action": "clamp_fraction",
         },
         hashlib.sha256(canonical_json_bytes(high)).hexdigest(): {
-            "kind": "high_neighbor_repair"
+            "type": "typed_notice",
+            "kind": "freeze_gate_curve_source_replaced",
+            "site": "SR19",
+            "failed_source": "gate_liquid_fraction",
+            "replacement_source": "liquidus_solidus:backend",
         },
     }
     _put_interpolation_row(db_path, low, liquid_fraction=0.7, sio_pa=7.0)
@@ -448,6 +632,66 @@ def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) ->
             "cache_state": "cached_interpolated",
         },
     ]
+
+
+def test_interpolation_candidates_refuse_corrupt_replay_scope(
+    tmp_path: Path,
+) -> None:
+    key = _interpolation_key("stored", feo_fraction=0.20, temperature_K=1500.0)
+    db_path = tmp_path / "corrupt-scope.sqlite"
+    _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
+    corrupt_scope = "0" * 64
+
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET replay_scope_sha256 = ?",
+            (corrupt_scope,),
+        )
+
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="exact key replay scope mismatch",
+    ):
+        store.list_interpolation_candidates(
+            artifact="equilibrium_post_record",
+            replay_scope_sha256=corrupt_scope,
+        )
+
+
+def test_interpolation_refuses_attached_base_dependency_vector_mismatch(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1510.0)
+    high["model"]["model"] = "other-binding"
+    local_db = tmp_path / "local-binding.sqlite"
+    base_db = tmp_path / "attached-other-binding.sqlite"
+    _put_interpolation_row(local_db, low, liquid_fraction=0.7, sio_pa=7.0)
+    _put_interpolation_row(base_db, high, liquid_fraction=0.71, sio_pa=7.05)
+
+    with sqlite3.connect(base_db) as conn:
+        stored_scope = conn.execute(
+            f"SELECT replay_scope_sha256 FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+    assert stored_scope == rci.replay_scope_for_interpolation(high)
+    assert stored_scope != rci.replay_scope_for_interpolation(query)
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=local_db,
+        read_only_base_db_path=base_db,
+    )
+    payload = store._lookup_optional(
+        "equilibrium_post_record",
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
+    )
+
+    assert payload is None
+    assert store.hits == 0
 
 
 def test_interpolation_unions_known_notice_with_legacy_attached_base(

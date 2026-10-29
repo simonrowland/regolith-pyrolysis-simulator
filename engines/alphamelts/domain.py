@@ -478,6 +478,7 @@ MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS: Dict[str, Tuple[str, ...]] = {
 MELTS_PARENT_OXIDE_NOT_ENDMEMBER = (
     'typed-refusal:melts_endmember_not_parent_oxide'
 )
+_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX = 'AlphaMELTS provider omitted'
 
 
 def canonical_melt_oxide_activity_name(name: object) -> str | None:
@@ -515,7 +516,38 @@ def canonical_oxide_activity_map(values: Mapping[str, object] | None) -> dict[st
     oxide activity and is omitted. The first positive value for an oxide wins.
     """
 
+    activities, _notices = _canonical_oxide_activity_map_with_notices(values)
+    return activities
+
+
+def _canonical_oxide_activity_map_with_notices(
+    values: Mapping[str, object] | None,
+) -> tuple[dict[str, float], tuple[str, ...]]:
+    """Project oxide activities and describe values omitted from the map."""
+
+    return _canonical_oxide_value_map_with_notices(
+        values,
+        field="diagnostic_oxide_activities",
+        phase="liquid",
+    )
+
+
+def _canonical_oxide_value_map_with_notices(
+    values: Mapping[str, object] | None,
+    *,
+    field: str,
+    phase: str,
+) -> tuple[dict[str, float], tuple[str, ...]]:
+    """Project canonical oxide values and describe values omitted from the map.
+
+    The map remains numerically identical to :func:`canonical_oxide_activity_map`.
+    Notices follow the AlphaMELTS/MAGEMin provider warning convention so a
+    projection can surface an invalid value without changing the values
+    retained for downstream consumers. ``field`` and ``phase`` identify the
+    source map in the warning.
+    """
     activities: dict[str, float] = {}
+    notices: list[str] = []
     for raw_name, raw_value in dict(values or {}).items():
         oxide = canonical_melt_oxide_activity_name(raw_name)
         if oxide is None:
@@ -523,10 +555,21 @@ def canonical_oxide_activity_map(values: Mapping[str, object] | None) -> dict[st
         try:
             value = float(raw_value)
         except (TypeError, ValueError):
+            reason = 'nonnumeric'
+        else:
+            if math.isfinite(value):
+                reason = 'nonpositive' if value <= 0.0 else ''
+            else:
+                reason = 'nonfinite'
+        if reason:
+            notices.append(
+                f'{_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX} '
+                f'{reason} {field} field '
+                f'{str(raw_name)!r} for phase {phase}: {raw_value!r}'
+            )
             continue
-        if value > 0.0 and math.isfinite(value):
-            activities.setdefault(oxide, value)
-    return activities
+        activities.setdefault(oxide, value)
+    return activities, tuple(notices)
 
 
 def melts_endmember_to_parent_oxide_activity(

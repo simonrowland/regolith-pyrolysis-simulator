@@ -381,40 +381,42 @@ def test_knudsen_engine_point_keeps_source_grounded_row_pressure() -> None:
         assert payload["pressure_bar"] == expected_bar
 
 
-def test_langmuir_free_evaporation_still_inherits_experiment_total(
+def test_langmuir_free_evaporation_keeps_printed_row_pressure(
     tmp_path: Path,
 ) -> None:
-    """CORRECT langmuir control (Fedkin 2006): identity inheritance unchanged."""
+    """Restored Fig. 4 Yu rows retain their printed row pressure.
+
+    The Hashimoto chamber pressure stays on the Table 3 equipment context
+    (1.3e-8 bar); it is not promoted to these observation identities.
+    """
 
     result = _migrate_real_extract(tmp_path, "kems-005-fedkin-2006.yaml")
-    expected = Decimal("0.001300000")
-    inherited = []
-    for experiment_id, experiment in result.experiments.items():
-        if not (
-            experiment.method.is_value
-            and experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
-        ):
-            continue
-        total = experiment.pressure_environment.total_pressure_Pa
-        if not total.state.is_value:
-            continue
-        value = total.state.value
-        if not (isinstance(value, Value) and value.kind is ValueKind.POINT):
-            continue
-        if value.point != expected:
-            continue
-        for observation in result.observations.values():
-            if observation.experiment_id != experiment_id:
-                continue
-            identity_pressure = observation.identity.total_pressure_Pa
-            if (
-                identity_pressure is not None
-                and identity_pressure.is_value
-                and identity_pressure.value == expected
-            ):
-                inherited.append(observation.observation_id)
-                break
-    assert inherited, "expected at least one langmuir observation to inherit experiment total"
+    assert len(result.observations) == 2
+    assert len(result.experiments) == 1
+    assert {
+        row.identity.species.formula: row.value.point
+        for row in result.observations.values()
+    } == {"Na": Decimal("0.26"), "K": Decimal("0.13")}
+    for row in result.observations.values():
+        assert row.identity.total_pressure_Pa is not None
+        assert row.identity.total_pressure_Pa.is_unknown
+        point_pressure = row.point_conditions["total_pressure_Pa"]
+        assert point_pressure.state.is_value
+        assert point_pressure.state.value.point == Decimal("1.0")
+        assert point_pressure.locator is not None
+    table3 = next(
+        context
+        for records in result.context_by_work.values()
+        for context in records
+        if context.get("source_id") == "kems-005-fedkin-2006"
+        and context.get("table") == "3"
+    )
+    assert table3["type"] == "evaporation_coefficient_table_context"
+    chamber = table3["equipment"]["chamber_pressure_bar"]
+    assert Decimal(str(chamber["value"])) == Decimal("1.3e-8")
+    fe = next(row for row in table3["values"] if row["element"] == "Fe")
+    fe_1973 = next(item for item in fe["temperature_values"] if item["T_K"] == 1973.0)
+    assert Decimal(str(fe_1973["alpha"])) == Decimal("0.23")
 
 
 def test_transpiration_still_inherits_experiment_total(tmp_path: Path) -> None:
@@ -454,15 +456,17 @@ def test_transpiration_still_inherits_experiment_total(tmp_path: Path) -> None:
 
 
 def test_knudsen_chamber_vacuum_not_commanded_oxygen_for_melt_activity() -> None:
-    """P1 pin (r2): Knudsen chamber background must not become commanded sample oxygen.
+    """Knudsen chamber background is excluded; open sample fO2 is borrowed.
 
     Film: FeO–SiO2 liquid activity, no stated sample oxygen, chamber total
-    0.0001 Pa with a during-run vacuum locator. Pre-fix tip supplies
-    fO2_log=-9 via vacuum_total_pressure_upper_bound → melt-activity payload →
-    Po2Request(mode='commanded'). That route must close for closed-token
-    knudsen_effusion; chamber evidence stays on the pressure_boundary waypoint.
+    0.0001 Pa with a during-run vacuum locator. Chamber pressure stays on the
+    pressure_boundary waypoint. This activity has no effusion closure: it is
+    not a vapour quantity and its bench records no cell material. Under d-180,
+    the open sample therefore receives numeric tier-4 intrinsic fO2.
     """
 
+    from simulator.battery.enums import Quantity
+    from simulator.battery.fo2_ladder import resolve_row_fo2
     from simulator.battery.generators.bench import (
         activity_request_for_engine,
         melt_activity_requests,
@@ -517,27 +521,48 @@ def test_knudsen_chamber_vacuum_not_commanded_oxygen_for_melt_activity() -> None
     )
     assert oxygen.selected is None or oxygen.selected.route != "vacuum_total_pressure_upper_bound"
 
+    assert bench.cell_materials is None
     inputs = collect_consumer_inputs(experiment, bench, observation)
-    melt = list(melt_activity_requests(inputs))
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=observation.identity.composition.value,
+        quantity=Quantity.ACTIVITY,
+    )
+    assert resolved is not None
+    assert resolved.tier == 4
+    assert resolved.route == "intrinsic_melt_fO2"
+    assert resolved.borrowed is True
+    melt = list(
+        melt_activity_requests(
+            inputs,
+            experiment=experiment,
+            bench=bench,
+            observation=observation,
+        )
+    )
     commanded = [
         item.payload
         for item in melt
         if item.payload is not None and "fO2_log" in item.payload
     ]
-    assert not commanded, (
-        "melt-activity payload carried commanded fO2_log from knudsen chamber "
-        f"vacuum bound: {[item.get('fO2_log') for item in commanded]!r}"
-    )
+    assert commanded
+    assert all(item["fO2_log"] == resolved.log10_fO2_bar for item in commanded)
+    assert all(item["fO2_tier"] == 4 for item in commanded)
+    assert all(item["fO2_route"] == "intrinsic_melt_fO2" for item in commanded)
+    assert all(item["fO2_borrowed"] is True for item in commanded)
     openimcc = activity_request_for_engine(experiment, observation, "openimcc")
     assert openimcc is not None
-    assert openimcc.payload is None or "fO2_log" not in openimcc.payload
+    assert openimcc.payload is not None
+    assert openimcc.payload["fO2_log"] == resolved.log10_fO2_bar
 
 
 def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     """Controls: non-Knudsen vacuum bound still works; Knudsen row oxygen preserved."""
 
     from simulator.battery.generators.bench import melt_activity_requests
-    from simulator.battery.waypoints import oxygen_condition
+    from simulator.battery.waypoints import ReadinessStatus, oxygen_condition
     from tests.battery.test_melt_activity_requirements import _case, _composition
 
     # Non-Knudsen (langmuir): chamber vacuum upper bound remains a usable oxygen route.
@@ -569,7 +594,18 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     assert selected.route == "vacuum_total_pressure_upper_bound"
     assert selected.value.point == Decimal("-9")
     melt = melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
-    assert all(item.payload is not None and item.payload.get("fO2_log") == -9.0 for item in melt)
+    applicable = [
+        item for item in melt
+        if item.readiness.status is not ReadinessStatus.NOT_APPLICABLE
+    ]
+    assert applicable
+    assert all(
+        item.payload is not None and item.payload.get("fO2_log") == -9.0
+        for item in applicable
+    )
+    magemin = next(item for item in melt if item.readiness.engine == "magemin")
+    assert magemin.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert magemin.payload is None
 
     # Knudsen with source-grounded printed sample oxygen still commands fO2_log.
     knudsen, bench_k, obs_k = _case(
@@ -591,4 +627,15 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     assert selected_k is not None
     assert selected_k.route == "observation_fO2_log"
     melt_k = melt_activity_requests(collect_consumer_inputs(knudsen, bench_k, obs_k))
-    assert all(item.payload is not None and item.payload.get("fO2_log") == -7.0 for item in melt_k)
+    applicable_k = [
+        item for item in melt_k
+        if item.readiness.status is not ReadinessStatus.NOT_APPLICABLE
+    ]
+    assert applicable_k
+    assert all(
+        item.payload is not None and item.payload.get("fO2_log") == -7.0
+        for item in applicable_k
+    )
+    magemin_k = next(item for item in melt_k if item.readiness.engine == "magemin")
+    assert magemin_k.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert magemin_k.payload is None

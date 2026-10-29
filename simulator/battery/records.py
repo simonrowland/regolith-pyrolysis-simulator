@@ -32,6 +32,8 @@ from simulator.battery.enums import (
     AmountBasis,
     AssetRole,
     Authority,
+    BoundDirection,
+    BoundInclusivity,
     BenchAbsenceReason,
     BenchIdentityBasis,
     CellMaterial,
@@ -40,12 +42,17 @@ from simulator.battery.enums import (
     ExecutionState,
     ExperimentKind,
     FO2Channel,
+    Fo2Mode,
     MethodToken,
     MetricOperation,
     NoticeKind,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     Quantity,
+    QuenchDirection,
+    QuenchState,
+    RawInputStatus,
     Rail,
     ReferenceStateConvention,
     RefusalReason,
@@ -56,6 +63,7 @@ from simulator.battery.enums import (
     UncertaintyKind,
     ValueKind,
 )
+from simulator.battery.polymorph_dictionary import polymorph_matches_formula
 from simulator.state_types import State
 
 T = TypeVar("T")
@@ -64,6 +72,9 @@ _LOCATOR_KEYS = (
     "page",
     "published_page",
     "pdf_page_index",
+    "page_verification",
+    "table_caption_page",
+    "table_continued",
     "table",
     "figure",
     "paragraph",
@@ -121,6 +132,9 @@ class Locator:
     page: str | int | None = None
     published_page: str | int | None = None
     pdf_page_index: int | None = None
+    page_verification: str | None = None
+    table_caption_page: int | None = None
+    table_continued: bool | None = None
     table: str | None = None
     figure: str | None = None
     paragraph: str | None = None
@@ -134,9 +148,21 @@ class Locator:
     def __post_init__(self) -> None:
         if not self.has_location():
             raise ValueError("Locator requires at least one nonempty location key")
+        if self.table_caption_page is not None:
+            if type(self.table_caption_page) is not int:
+                raise TypeError("table_caption_page must be an integer physical page")
+            if not isinstance(self.page, int) or self.table_caption_page >= self.page:
+                raise ValueError("table_caption_page must be earlier than the data page")
+        if self.table_continued is not None:
+            if type(self.table_continued) is not bool:
+                raise TypeError("table_continued must be a boolean")
+            if self.table_continued and not isinstance(self.page, int):
+                raise ValueError("table_continued requires a physical data page")
 
     def has_location(self) -> bool:
         for name in _LOCATOR_KEYS:
+            if name in {"page_verification", "table_caption_page", "table_continued"}:
+                continue
             raw = getattr(self, name)
             if raw is None:
                 continue
@@ -151,6 +177,30 @@ class Located(Generic[T]):
     state: State[T]
     locator: Locator | None = None
     inference: Derivation | None = None
+
+
+def _typed_quench_condition(
+    value: object,
+    *,
+    key: str,
+    token_type: type[QuenchState] | type[QuenchDirection],
+) -> Located[Any]:
+    if not isinstance(value, Located) or not isinstance(value.state, State):
+        raise TypeError(f"Observation.point_conditions.{key} must be a Located State")
+    if value.locator is None:
+        raise ValueError(f"Observation.point_conditions.{key} requires a source locator")
+    if not value.state.is_value:
+        raise ValueError(f"Observation.point_conditions.{key} must be a typed value")
+    try:
+        token = token_type(value.state.value)
+    except (TypeError, ValueError) as exc:
+        choices = ", ".join(item.value for item in token_type)
+        raise ValueError(
+            f"Observation.point_conditions.{key} must be one of: {choices}"
+        ) from exc
+    return Located(
+        State.of(token), locator=value.locator, inference=value.inference
+    )
 
 
 _CHARGE_SUFFIX_RE = re.compile(r"([+-])$")
@@ -182,9 +232,9 @@ def _coerce_polymorph_state(polymorph: State[object] | None) -> State[Polymorph]
     try:
         token = _coerce_polymorph_value(polymorph.value)
     except ValueError:
-        from simulator.battery.polymorph_dictionary import unrecognised_polymorph_reason
+        from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
 
-        return State.unknown(unrecognised_polymorph_reason(polymorph.value))
+        return unrecognised_polymorph_state(polymorph.value)
     return State.of(token)
 
 
@@ -239,7 +289,30 @@ class Species:
             raise ValueError(
                 f"Species.phase must be a closed Phase token, not {phase.value!r}"
             )
-        object.__setattr__(self, "polymorph", _coerce_polymorph_state(self.polymorph))
+        polymorph = _coerce_polymorph_state(self.polymorph)
+        if (
+            polymorph is not None
+            and polymorph.is_value
+            and not polymorph_matches_formula(self.formula, polymorph.value)
+        ):
+            from simulator.battery.polymorph_dictionary import contradicting_polymorph_state
+
+            polymorph = contradicting_polymorph_state(
+                polymorph.value.value, self.formula
+            )
+        elif (
+            polymorph is not None
+            and polymorph.is_unknown
+            and polymorph.rejection_kind is None
+        ):
+            # New in-memory unknowns without a specific rejection came from an
+            # omitted polymorph; legacy persisted rejections are classified by
+            # the polymorph loader before they reach Species.
+            polymorph = State.unknown(
+                polymorph.reason or "source does not state polymorph",
+                rejection_kind=PolymorphRejectionKind.OMITTED,
+            )
+        object.__setattr__(self, "polymorph", polymorph)
 
 
 def phase_token(species: Species) -> Phase | None:
@@ -283,6 +356,7 @@ def charge_value(species: Species) -> int | None:
 class ReactionTerm:
     species: Species
     coefficient: Fraction
+    standard_state: State[StandardState] | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "coefficient", as_fraction(self.coefficient))
@@ -377,18 +451,95 @@ class Derivation:
     # pure-substance reference and engine_point does not apply. Absent means
     # not declared — never a stamped false.
     pure_substance_reference: bool | None = None
+    raw_inputs: Located[RawInputStatus] | None = None
+    method: Located[str] | None = None
+    references: tuple[str, ...] = ()
+
+    @property
+    def declares_unprinted_raw_inputs(self) -> bool:
+        raw_inputs = self.raw_inputs
+        return (
+            raw_inputs is not None
+            and raw_inputs.state.is_value
+            and raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+        )
+
+    @property
+    def has_located_unprinted_raw_inputs(self) -> bool:
+        return (
+            self.declares_unprinted_raw_inputs
+            and self.raw_inputs is not None
+            and self.raw_inputs.locator is not None
+        )
+
+    @property
+    def declares_unresolved_printed_inputs(self) -> bool:
+        raw_inputs = self.raw_inputs
+        return (
+            raw_inputs is not None
+            and raw_inputs.state.is_value
+            and raw_inputs.state.value is RawInputStatus.PRINTED_UNRESOLVED
+        )
+
+    @property
+    def has_located_unresolved_printed_inputs(self) -> bool:
+        """Located printed prose. Not complete lineage for scoring."""
+
+        return (
+            self.declares_unresolved_printed_inputs
+            and self.raw_inputs is not None
+            and self.raw_inputs.locator is not None
+        )
+
+    @property
+    def has_located_method(self) -> bool:
+        locator = self.method.locator if self.method is not None else None
+        page = locator.page if locator is not None else None
+        has_physical_page = (
+            isinstance(page, int) and not isinstance(page, bool) and page > 0
+        ) or (isinstance(page, str) and bool(page.strip()))
+        return (
+            self.method is not None
+            and self.method.state.is_value
+            and isinstance(self.method.state.value, str)
+            and bool(self.method.state.value.strip())
+            and locator is not None
+            and has_physical_page
+            and isinstance(locator.equation, str)
+            and bool(locator.equation.strip())
+        )
+
+    @property
+    def has_named_references(self) -> bool:
+        return bool(self.references) and all(
+            isinstance(reference, str) and bool(reference.strip())
+            for reference in self.references
+        )
 
     def __post_init__(self) -> None:
         if not self.relation:
             raise ValueError("Derivation.relation is required")
-        if not self.inputs:
-            raise ValueError("Derivation.inputs is required")
         if not self.output_unit:
             raise ValueError("Derivation.output_unit is required")
         if self.pure_substance_reference is not None and not isinstance(
             self.pure_substance_reference, bool
         ):
             raise TypeError("Derivation.pure_substance_reference must be bool or absent")
+        if self.method is not None and (
+            not isinstance(self.method, Located)
+            or not isinstance(self.method.state, State)
+        ):
+            raise TypeError("Derivation.method must be a Located string or absent")
+        if (
+            self.method is not None
+            and self.method.state.is_value
+            and not isinstance(self.method.state.value, str)
+        ):
+            raise TypeError("Derivation.method value must be a string")
+        if not isinstance(self.references, tuple) or any(
+            not isinstance(reference, str) for reference in self.references
+        ):
+            raise TypeError("Derivation.references must be a tuple of strings")
 
 
 @dataclass(frozen=True)
@@ -405,12 +556,15 @@ class Notice:
     dropped_mass_fraction: Decimal | None = None
     authority: Authority | None = None
     certification: str | None = None
+    fo2_mode: Fo2Mode | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
-            # FIGURE_ONLY may label a row whose quantity is still unknown
-            # (typed quantity_unknown refusal); empty is allowed only there.
-            if self.kind is not NoticeKind.FIGURE_ONLY:
+            # These row labels may survive a typed quantity_unknown refusal.
+            if self.kind not in {
+                NoticeKind.FIGURE_ONLY,
+                NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
+            }:
                 raise ValueError("Notice.affected_quantities is required")
         if not self.reason:
             raise ValueError("Notice.reason is required")
@@ -450,7 +604,12 @@ def _is_source_internally_inconsistent(
 _VALUE_PAYLOAD = {
     ValueKind.POINT: ("point",),
     ValueKind.SERIES: ("series",),
-    ValueKind.BOUND: ("bound_operator", "bound_value"),
+    ValueKind.BOUND: (
+        "bound_operator",
+        "bound_value",
+        "bound_direction",
+        "bound_inclusivity",
+    ),
     ValueKind.INTERVAL: ("interval_low", "interval_high"),
     ValueKind.ORDERING: ("ordering",),
     ValueKind.CATEGORICAL: ("categorical",),
@@ -465,6 +624,32 @@ _VALUE_PAYLOAD = {
 _VALUE_PAYLOAD_FIELDS = frozenset(
     name for names in _VALUE_PAYLOAD.values() for name in names
 )
+_NUMERIC_VALUE_KINDS = frozenset(
+    {
+        ValueKind.POINT,
+        ValueKind.SERIES,
+        ValueKind.BOUND,
+        ValueKind.INTERVAL,
+        ValueKind.RELATIVE_SERIES,
+    }
+)
+
+_BOUND_OPERATOR_SEMANTICS = {
+    ">": (BoundDirection.LOWER, BoundInclusivity.EXCLUDED),
+    ">=": (BoundDirection.LOWER, BoundInclusivity.INCLUDED),
+    "≥": (BoundDirection.LOWER, BoundInclusivity.INCLUDED),
+    "<": (BoundDirection.UPPER, BoundInclusivity.EXCLUDED),
+    "<=": (BoundDirection.UPPER, BoundInclusivity.INCLUDED),
+    "≤": (BoundDirection.UPPER, BoundInclusivity.INCLUDED),
+}
+
+
+def _bound_operator_semantics(
+    operator: str | None,
+) -> tuple[BoundDirection, BoundInclusivity] | None:
+    """Typed meaning of comparator bounds, shared by record and source readers."""
+
+    return _BOUND_OPERATOR_SEMANTICS.get(operator) if operator is not None else None
 
 
 def _require_finite(name: str, value: Decimal) -> None:
@@ -481,6 +666,8 @@ class Value:
     series: tuple[tuple[Decimal, Decimal], ...] | None = None
     bound_operator: str | None = None
     bound_value: Decimal | None = None
+    bound_direction: BoundDirection | None = None
+    bound_inclusivity: BoundInclusivity | None = None
     interval_low: Decimal | None = None
     interval_high: Decimal | None = None
     ordering: tuple[str, ...] | None = None
@@ -518,8 +705,41 @@ class Value:
                 _require_finite("Value.series value", val)
             object.__setattr__(self, "series", series)
         elif kind is ValueKind.BOUND:
-            if self.bound_operator is None or self.bound_value is None:
-                raise ValueError("Value.bound requires operator and value")
+            if self.bound_operator is None and self.bound_direction is None:
+                raise ValueError("Value.bound requires operator or direction")
+            if self.bound_direction is not None:
+                object.__setattr__(
+                    self, "bound_direction", BoundDirection(self.bound_direction)
+                )
+                if self.bound_inclusivity is None:
+                    raise ValueError(
+                        "direction-only Value.bound requires inclusivity"
+                    )
+            if self.bound_inclusivity is not None:
+                object.__setattr__(
+                    self,
+                    "bound_inclusivity",
+                    BoundInclusivity(self.bound_inclusivity),
+                )
+                if self.bound_direction is None:
+                    raise ValueError(
+                        "Value.bound inclusivity requires direction"
+                    )
+            operator_semantics = _bound_operator_semantics(self.bound_operator)
+            if self.bound_direction is not None and self.bound_operator is not None:
+                if operator_semantics is None:
+                    raise ValueError(
+                        "Value.bound operator is unsupported with direction metadata"
+                    )
+                if operator_semantics != (
+                    self.bound_direction,
+                    self.bound_inclusivity,
+                ):
+                    raise ValueError(
+                        "Value.bound operator conflicts with direction or inclusivity"
+                    )
+            if self.bound_value is None:
+                raise ValueError("Value.bound requires value")
             bound = as_decimal(self.bound_value)
             _require_finite("Value.bound_value", bound)
             object.__setattr__(self, "bound_value", bound)
@@ -558,6 +778,10 @@ class Value:
     @classmethod
     def point_of(cls, value: object) -> "Value":
         return cls(ValueKind.POINT, point=as_decimal(value))
+
+
+def _value_has_numeric_value(value: Value) -> bool:
+    return value.kind in _NUMERIC_VALUE_KINDS
 
 
 def _located_value(value: Located[Value] | Located[Decimal] | None) -> Located[Value] | None:
@@ -620,6 +844,7 @@ class Uncertainty:
     value: Decimal | tuple[Decimal, Decimal] | None = None
     basis: str | None = None
     derivation: Derivation | None = None
+    locator: Locator | None = None
 
     def __post_init__(self) -> None:
         if self.kind is UncertaintyKind.PRINTED and self.verbatim is None:
@@ -634,6 +859,19 @@ class Uncertainty:
             )
         elif self.value is not None:
             object.__setattr__(self, "value", as_decimal(self.value))
+
+
+@dataclass(frozen=True)
+class SourceMethodUncertainty:
+    value: Decimal
+    meaning: str
+    quantity: Quantity
+    basis: str
+    quantity_basis: str
+    locator: Locator
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "value", as_decimal(self.value))
 
 
 @dataclass(frozen=True)
@@ -669,6 +907,7 @@ class Work:
     source_ids: tuple[str, ...]
     source_files: SourceFiles
     doi: str | None = None
+    source_method_uncertainties: Mapping[str, SourceMethodUncertainty] | None = None
 
     def __post_init__(self) -> None:
         if not self.work_id:
@@ -677,6 +916,12 @@ class Work:
             raise ValueError("Work.citation is required")
         if not self.source_ids:
             raise ValueError("Work.source_ids is required")
+        uncertainties = dict(self.source_method_uncertainties or {})
+        if not set(uncertainties).issubset(self.source_ids):
+            raise ValueError("source method uncertainty must name a source_id on the Work")
+        object.__setattr__(
+            self, "source_method_uncertainties", uncertainties or None
+        )
 
 
 @dataclass(frozen=True)
@@ -901,10 +1146,28 @@ class ThermalSchedule:
 
 
 @dataclass(frozen=True)
+class GasRatio:
+    numerator_species: str
+    denominator_species: str
+    value: Located[Value]
+    basis: str
+
+    def __post_init__(self) -> None:
+        if not self.numerator_species.strip() or not self.denominator_species.strip():
+            raise ValueError("gas ratio species must be nonempty")
+        if self.numerator_species == self.denominator_species:
+            raise ValueError("gas ratio species must differ")
+        if self.basis not in {"volume", "mole", "partial_pressure"}:
+            raise ValueError("gas ratio basis must be volume, mole, or partial_pressure")
+        object.__setattr__(self, "value", _located_value(self.value))
+
+
+@dataclass(frozen=True)
 class FO2Control:
     channel: State[FO2Channel]
     buffer: Located[str] | None = None
     oxygen_partial_pressure_Pa: Located[Value] | None = None
+    gas_ratio: GasRatio | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1067,6 +1330,17 @@ class Observation:
             raise ValueError("Observation.observation_id is required")
         if not self.experiment_id:
             raise ValueError("Observation.experiment_id is required")
+        if self.point_conditions is not None:
+            point_conditions = dict(self.point_conditions)
+            for key, token_type in (
+                ("quench_state", QuenchState),
+                ("quench_direction", QuenchDirection),
+            ):
+                if key in point_conditions:
+                    point_conditions[key] = _typed_quench_condition(
+                        point_conditions[key], key=key, token_type=token_type
+                    )
+            object.__setattr__(self, "point_conditions", point_conditions)
         if self.certified_band is not None:
             object.__setattr__(
                 self,
@@ -1076,6 +1350,18 @@ class Observation:
                     for k, (lo, hi) in self.certified_band.items()
                 },
             )
+
+    @property
+    def quench_state(self) -> QuenchState:
+        condition = (self.point_conditions or {}).get("quench_state")
+        if condition is None:
+            return QuenchState.NOT_STATED
+        return condition.state.value
+
+    @property
+    def quench_direction(self) -> QuenchDirection | None:
+        condition = (self.point_conditions or {}).get("quench_direction")
+        return None if condition is None else condition.state.value
 
 
 @dataclass(frozen=True)
@@ -1097,11 +1383,20 @@ class DecisionBand:
     value: Decimal
     unit: str
     rule: str
+    band_basis: str = "derived_scatter"
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "value", as_decimal(self.value))
         if not self.unit or not self.rule:
             raise ValueError("DecisionBand requires unit and rule")
+        if self.band_basis not in {
+            "row_printed",
+            "source_method",
+            "fusion_combined_row_printed",
+            "fusion_combined_source_method",
+            "derived_scatter",
+        }:
+            raise ValueError(f"unsupported DecisionBand.band_basis {self.band_basis!r}")
 
 
 @dataclass(frozen=True)
@@ -1141,6 +1436,8 @@ class Residual:
     candidate_request: CandidateRequest | None = None
     numeric: ResidualNumeric | None = None
     refusal: ResidualRefusal | None = None
+    quench_state: QuenchState | None = None
+    fo2_mode: Fo2Mode | None = None
 
     def __post_init__(self) -> None:
         if not self.key:
@@ -1169,6 +1466,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.band,
                 notice.dropped,
                 notice.dropped_mass_fraction,
+                notice.fo2_mode,
             )
             if fingerprint in seen:
                 continue

@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -77,8 +77,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 63
+        pdf_page_index: 69
+        table: b1259-ht-0038-sulfur-reference-state
+        note: as_published='22.432'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
+        record: b1259-ht-0038-sulfur-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -108,6 +121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -126,8 +140,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -183,8 +197,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 63
+        pdf_page_index: 69
+        table: b1259-ht-0038-sulfur-reference-state
+        note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
+        record: b1259-ht-0038-sulfur-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -214,6 +241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=368.54:col=H_minus_H298:name=sulfur-(reference-state):v=3b2e3d421a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -232,8 +260,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -289,8 +317,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 63
+        pdf_page_index: 69
+        table: b1259-ht-0038-sulfur-reference-state
+        note: as_published='.490'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
+        record: b1259-ht-0038-sulfur-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -320,6 +361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=368.54:col=H_minus_H298:name=sulfur-(reference-state):v=f7364e8964
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -338,8 +380,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -395,8 +437,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 63
+        pdf_page_index: 69
+        table: b1259-ht-0038-sulfur-reference-state
+        note: as_published='.394'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
+        record: b1259-ht-0038-sulfur-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -426,6 +481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=388.36:col=H_minus_H298:name=sulfur-(reference-state):v=99b96f7993
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -444,8 +500,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -501,8 +557,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 63
+        pdf_page_index: 69
+        table: b1259-ht-0038-sulfur-reference-state
+        note: as_published='.609'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
+        record: b1259-ht-0038-sulfur-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -532,6 +601,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=388.36:col=H_minus_H298:name=sulfur-(reference-state):v=a69cc55526
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -550,8 +620,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -607,8 +677,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 63
+        pdf_page_index: 69
+        table: b1259-ht-0038-sulfur-reference-state
+        note: as_published='1.019'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
+        record: b1259-ht-0038-sulfur-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -638,6 +721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=717.75:col=H_minus_H298:name=sulfur-(reference-state):v=e630967ad7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -656,8 +740,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -713,8 +797,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 63
+        pdf_page_index: 69
+        table: b1259-ht-0038-sulfur-reference-state
+        note: as_published='3.842'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
+        record: b1259-ht-0038-sulfur-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -744,6 +841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=717.75:col=H_minus_H298:name=sulfur-(reference-state):v=fe119ce5b5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -762,8 +860,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -819,8 +917,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 63
+        pdf_page_index: 69
+        table: b1259-ht-0038-sulfur-reference-state
+        note: as_published='17.171'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
+        record: b1259-ht-0038-sulfur-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -850,6 +961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=1900:col=entropy:name=sulfur-(reference-state):v=011e33eb0f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -969,6 +1081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=298.15:col=entropy:name=sulfur-(reference-state):v=3b3ee5e319
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -1088,6 +1201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=368.54:col=entropy:name=sulfur-(reference-state):v=4f2fcfd86f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -1207,6 +1321,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=368.54:col=entropy:name=sulfur-(reference-state):v=80899d7d0a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -1326,6 +1441,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=388.36:col=entropy:name=sulfur-(reference-state):v=16ec53c422
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -1445,6 +1561,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=388.36:col=entropy:name=sulfur-(reference-state):v=afb6ce1241
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -1564,6 +1681,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=717.75:col=entropy:name=sulfur-(reference-state):v=89a392ebb4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -1683,6 +1801,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=717.75:col=entropy:name=sulfur-(reference-state):v=cf9b8be9fc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -1802,6 +1921,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -1961,6 +2081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -2120,6 +2241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -2279,6 +2401,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -2438,6 +2561,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -2597,6 +2721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -2756,6 +2881,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -2915,6 +3041,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -3074,6 +3201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -3233,6 +3361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -3392,6 +3521,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -3551,6 +3681,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -3710,6 +3841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=368.54:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -3819,6 +3951,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=388.36:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -3928,6 +4061,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -4087,6 +4221,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -4246,6 +4381,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -4405,6 +4541,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -4564,6 +4701,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=717.75:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -4673,6 +4811,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -4832,6 +4971,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -4991,6 +5131,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -5150,6 +5291,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -5309,6 +5451,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -5468,6 +5611,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -5627,6 +5771,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -5786,6 +5931,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -5945,6 +6091,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -6104,6 +6251,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -6263,6 +6411,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -6422,6 +6571,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -6581,6 +6731,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -6740,6 +6891,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -6899,6 +7051,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=368.54:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -7008,6 +7161,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=388.36:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -7117,6 +7271,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -7276,6 +7431,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -7435,6 +7591,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -7594,6 +7751,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -7753,6 +7911,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=717.75:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -7862,6 +8021,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -8021,6 +8181,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -8180,6 +8341,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -8330,6 +8492,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -8480,6 +8643,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -8630,6 +8794,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -8780,6 +8945,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -8930,6 +9096,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -9080,6 +9247,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -9230,6 +9398,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -9380,6 +9549,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=sulfur-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -9530,6 +9700,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=sulfur-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -9680,6 +9851,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=368.54:col=log_Kf:name=sulfur-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -9780,6 +9952,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=388.36:col=log_Kf:name=sulfur-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -9880,6 +10053,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -10030,6 +10204,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -10180,6 +10355,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -10330,6 +10506,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -10480,6 +10657,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=717.75:col=log_Kf:name=sulfur-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -10580,6 +10758,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -10730,6 +10909,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=sulfur-(reference-state):v=b6589fc6ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
@@ -10880,3 +11060,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []

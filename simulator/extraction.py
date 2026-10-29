@@ -6,7 +6,13 @@ import math
 import warnings
 from typing import Any, Dict, Mapping
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _antoine_skip_reason_for_refusal,
+    _append_antoine_skip_notice,
+    _read_antoine_coefficients,
+)
 import simulator.mre_ladder as mre_ladder
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
@@ -3310,6 +3316,17 @@ class ExtractionMixin:
         cfg.update(dict(ovr))
         return cfg
 
+    def _c7_hold_temperature_C(self, cfg: dict) -> float:
+        setpoint_target, _ramp = self.campaign_mgr.get_temp_target(
+            CampaignPhase.C7_CA_ALUMINOTHERMIC,
+            getattr(self.melt, 'campaign_hour', 0),
+            self.melt,
+        )
+        return self._c7_float(
+            cfg.get('hold_temp_C', cfg.get('default_hold_T_C')),
+            setpoint_target,
+        )
+
     @staticmethod
     def _c7_bool(value, default: bool = False) -> bool:
         if value is None:
@@ -3484,8 +3501,7 @@ class ExtractionMixin:
         cold_skull_safe = self._c7_float(
             cfg.get('c7_cold_skull_safe_stir_factor'), 6.0)
         applied_stir = min(clamped_stir, max(0.0, cold_skull_safe))
-        hold_temp_C = self._c7_float(
-            cfg.get('hold_temp_C', cfg.get('default_hold_T_C')), 1200.0)
+        hold_temp_C = self._c7_hold_temperature_C(cfg)
         hold_temp_K = hold_temp_C + 273.15
         p_total_raw = cfg.get('p_total_mbar')
         if p_total_raw is None:
@@ -3525,11 +3541,10 @@ class ExtractionMixin:
         alpha_entry = dict(ca_entry.get('evaporation_alpha') or {})
         _alpha_raw = alpha_entry.get('value')
         ca_alpha = self._c7_float(_alpha_raw, 0.0)
-        p_sat_pa = 0.0
-        # b-149 instance 6 (C7 Ca): missing evaporation_alpha / Antoine
-        # previously became ca_alpha=0 / p_sat=0 via _c7_float default and
-        # exception fall-through — silent zero flux. Keep the zeros; emit
-        # typed notes so the missing-coefficient class is visible.
+        p_sat_pa: float
+        # b-149 instance 6 (C7 Ca): a missing evaporation_alpha still uses
+        # _c7_float's zero fallback with a typed note. Antoine refusal below
+        # omits Ca from transport instead of supplying a pressure.
         from simulator.silent_zero import (
             CATEGORY_REFUSE,
             ZeroBecause,
@@ -3597,46 +3612,42 @@ class ExtractionMixin:
                     detail=_n['detail'],
                     doctrine_category=CATEGORY_REFUSE,
                 )
-        if antoine:
-            try:
-                p_sat_pa = 10.0 ** _antoine_log10_pressure(
-                    float(antoine.get('A', 0.0)),
-                    float(antoine.get('B', 0.0)),
-                    float(antoine.get('C', 0.0)),
-                    hold_temp_K,
+        antoine_notices: list[str] = []
+        antoine_notice_keys: set[tuple[str, str, str]] = set()
+        try:
+            A, B, C = _read_antoine_coefficients(antoine)
+            p_sat_pa = 10.0 ** _antoine_log10_pressure(
+                A,
+                B,
+                C,
+                hold_temp_K,
+            )
+        except (OverflowError, TypeError, ValueError, ZeroDivisionError) as exc:
+            if isinstance(exc, _AntoineCoefficientRefusal):
+                refusal = (
+                    f'{exc.input_category}_antoine_coefficient_{exc.coefficient}'
                 )
-            except (OverflowError, TypeError, ValueError, ZeroDivisionError):
-                p_sat_pa = 0.0
-                _n = note_dict(
-                    ZeroBecause.MISSING_THERMO,
-                    site='extraction.c7_ca',
-                    species='Ca',
-                    field='pure_component_antoine',
-                    detail=(
-                        'Antoine evaluation raised; p_sat_pa forced to 0.0 '
-                        f'(antoine={antoine!r}). Category-1 missing thermo.'
-                    ),
-                    doctrine_category=CATEGORY_REFUSE,
-                )
-                _c7_sz_notes.append(_n)
-                record_on_host(
-                    self,
-                    ZeroBecause.MISSING_THERMO,
-                    site='extraction.c7_ca',
-                    species='Ca',
-                    field='pure_component_antoine',
-                    detail=_n['detail'],
-                    doctrine_category=CATEGORY_REFUSE,
-                )
-        else:
+                notice_reason = _antoine_skip_reason_for_refusal(exc)
+            else:
+                refusal = 'invalid_antoine_evaluation'
+                notice_reason = refusal
+            _append_antoine_skip_notice(
+                antoine_notices,
+                antoine_notice_keys,
+                antoine,
+                species='Ca',
+                site='extraction.c7_ca',
+                temperature_K=hold_temp_K,
+                reason=notice_reason,
+            )
             _n = note_dict(
                 ZeroBecause.MISSING_THERMO,
                 site='extraction.c7_ca',
                 species='Ca',
                 field='pure_component_antoine',
                 detail=(
-                    'pure_component_antoine missing for Ca; p_sat_pa=0.0. '
-                    'Category-1 missing thermo.'
+                    f'Antoine refusal ({refusal}); Ca omitted from C7 '
+                    'transport evaluation. Category-1 missing thermo.'
                 ),
                 doctrine_category=CATEGORY_REFUSE,
             )
@@ -3650,6 +3661,25 @@ class ExtractionMixin:
                 detail=_n['detail'],
                 doctrine_category=CATEGORY_REFUSE,
             )
+            self._last_c7_ca_silent_zero_notes = {
+                'silent_zero_notes': [dict(n) for n in _c7_sz_notes],
+            }
+            diagnostic = {
+                'r_transport': 0.0,
+                'transport_ca_mol': 0.0,
+                'c7_ca_alpha_intrinsic': ca_alpha,
+                'c7_transport_refusal': refusal,
+                'notices': antoine_notices,
+            }
+            # Keep the legacy empty-record sentinel only when no coefficients
+            # were supplied; a partial record has no resolved saturation P.
+            if not antoine:
+                diagnostic['c7_ca_p_sat_pa'] = 0.0
+            if _c7_sz_notes:
+                diagnostic['silent_zero_notes'] = [
+                    dict(n) for n in _c7_sz_notes
+                ]
+            return 0.0, diagnostic
         # SC-50: per-call replace keeps this bounded (``_last_`` semantics,
         # matching the other ``_last_*`` diagnostics); the named read surface
         # is the returned diagnostic below, which the caller folds into
@@ -3967,8 +3997,7 @@ class ExtractionMixin:
             'extent_fraction': extent_fraction,
             'allow_partial_extent': self._c7_bool(
                 cfg.get('allow_partial_extent'), True),
-            'hold_temp_C': self._c7_float(
-                cfg.get('hold_temp_C', cfg.get('default_hold_T_C')), 1200.0),
+            'hold_temp_C': self._c7_hold_temperature_C(cfg),
             'p_total_mbar': self._c7_float(p_total_raw, self.melt.p_total_mbar),
             'pO2_mbar': self._c7_float(pO2_raw, self.melt.pO2_mbar),
             'active_ca_condensation_route': self._c7_bool(

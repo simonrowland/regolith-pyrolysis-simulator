@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:ta-badro-2021
       role: pdf
@@ -24,12 +24,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:ta-badro-2021
-      role: table_csv
-      path: tables/ta-badro-2021
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:ta-badro-2021
       role: pdftotext
       path: unknown
@@ -79,6 +73,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -146,6 +141,7 @@ experiments:
               section: Abstract
               note: Printed 1 atm; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -226,6 +222,7 @@ experiments:
               section: Abstract
               source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
         output_unit: Pa
+        references: []
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -288,6 +285,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -355,6 +353,7 @@ experiments:
               section: Abstract
               note: Printed 1 atm; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -435,6 +434,7 @@ experiments:
               section: Abstract
               source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
         output_unit: Pa
+        references: []
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -487,6 +487,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -554,6 +555,7 @@ experiments:
               section: Abstract
               note: Printed 1 atm; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -634,6 +636,7 @@ experiments:
               section: Abstract
               source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
         output_unit: Pa
+        references: []
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -686,6 +689,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -753,6 +757,7 @@ experiments:
               section: Abstract
               note: Printed 1 atm; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -833,6 +838,7 @@ experiments:
               section: Abstract
               source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
         output_unit: Pa
+        references: []
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -885,6 +891,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -952,6 +959,7 @@ experiments:
               section: Abstract
               note: Printed 1 atm; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -1032,6 +1040,7 @@ experiments:
               section: Abstract
               source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
         output_unit: Pa
+        references: []
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -1084,6 +1093,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1151,6 +1161,7 @@ experiments:
               section: Abstract
               note: Printed 1 atm; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -1231,6 +1242,7 @@ experiments:
               section: Abstract
               source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
         output_unit: Pa
+        references: []
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -1283,6 +1295,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1350,6 +1363,7 @@ experiments:
               section: Abstract
               note: Printed 1 atm; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -1430,6 +1444,7 @@ experiments:
               section: Abstract
               source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
         output_unit: Pa
+        references: []
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:

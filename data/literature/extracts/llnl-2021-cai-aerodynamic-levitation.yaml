@@ -39,6 +39,18 @@ experiments:
         tag: value
         value: {MgO: '12', SiO2: '46', Al2O3: '19', CaO: '23'}
       locator: {table: '1', note: Starting CAI-like composition for aerodynamic levitation runs (Ryerson et al. 2022)}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - [MgO, '12']
+          - [SiO2, '46']
+          - [Al2O3, '19']
+          - [CaO, '23']
+      locator: {table: '1', note: Starting CAI-like composition for aerodynamic levitation runs (Ryerson et al. 2022)}
 species:
   B_type_CAI:
     observations:

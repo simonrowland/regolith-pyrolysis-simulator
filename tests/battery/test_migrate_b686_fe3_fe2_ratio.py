@@ -19,14 +19,20 @@ from __future__ import annotations
 import copy
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
+from simulator.battery.enums import (
+    EvidenceClass,
+    IdentityEqualKind,
+    Quantity,
+    ValueKind,
+)
+from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
-    Migrator,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     fe3_fe2_ratio_reduction,
@@ -35,6 +41,7 @@ from simulator.battery.migrate import (
     select_declared_source,
 )
 from simulator.battery.records import Evidence, Locator, State
+from tests.battery.factories import migrate_one_extract
 
 REPO = Path(__file__).resolve().parents[2]
 AITHALA = REPO / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
@@ -64,29 +71,69 @@ PREFIX = "aithala-2026-magmatic-iron-redox-to-2100c::"
 
 
 def _migrate(path: Path):
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(root=REPO, path=path)
     migrator.finalize()
     return migrator.result
 
 
-def _aithala_fe_rows():
-    result = _migrate(AITHALA)
+def _aithala_fe_rows(result):
     return {
         oid[len(PREFIX):]: obs
         for oid, obs in result.observations.items()
-        if oid[len(PREFIX):] in AITHALA_S1_FE3_OVER_FET
+        if oid.startswith(PREFIX)
+        and oid[len(PREFIX):] in AITHALA_S1_FE3_OVER_FET
+    }
+
+
+AITHALA_S3_ROW_TO_S1 = {
+    "VF271": "aithala_2026_vf271_xanes",
+    "VF267": "aithala_2026_vf267_moessbauer",
+    "VF231": "aithala_2026_vf231_moessbauer",
+    "VF268": "aithala_2026_vf268_moessbauer",
+    "VF270": "aithala_2026_vf270_moessbauer",
+    "VF274": "aithala_2026_vf274_moessbauer",
+    "1800-30": "aithala_2026_1800_30_xanes",
+    "1900-30": "aithala_2026_1900_30_xanes",
+    "2000-30": "aithala_2026_2000_30_xanes",
+    "2100-30": "aithala_2026_2100_30_xanes",
+    "2000-10": "aithala_2026_2000_10_xanes",
+    "2000-120": "aithala_2026_2000_120_xanes",
+}
+
+
+def _aithala_s3_raw_exact_matches(doc: dict[str, Any]) -> set[str]:
+    s1 = {
+        row["observation_id"]: row
+        for row in doc["species"]["Fe"]["observations"]
+    }
+    s3 = next(
+        row
+        for row in doc["species"]["Fe"]["context"]
+        if row.get("observation_id") == "aithala_2026_table_s3_raw_series"
+    )
+    return {
+        row["ID"]
+        for row in s3["values"]["rows"]
+        if row["Fe3+/FeT raw"]
+        == s1[AITHALA_S3_ROW_TO_S1[row["ID"]]]["values"]["reported_value"]
     }
 
 
 def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
     # b-686 change. Pin (006e13b70): quantity unknown ("unsupported quantity
     # 'Fe3+/FeT'"), value UNAVAILABLE, evidence measured_direct.
-    rows = _aithala_fe_rows()
+    result = _migrate(AITHALA)
+    rows = _aithala_fe_rows(result)
     assert set(rows) == set(AITHALA_S1_FE3_OVER_FET)
+    asset_ids = {
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    }
     for oid, obs in rows.items():
         r = Decimal(AITHALA_S1_FE3_OVER_FET[oid])
         assert obs.identity.quantity.value is Quantity.FE3_FE2_RATIO, oid
+        assert obs.identity.species.formula == "Fe", oid
         assert obs.value.kind is ValueKind.POINT, oid
         assert obs.value.point == r / (1 - r), oid
         assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED, oid
@@ -97,6 +144,14 @@ def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
         assert name == "original_Fe3_over_FeT", oid
         assert printed.state.value == r, oid
         assert printed.locator.table == "S-1", oid
+        assert obs.identity.temperature_K.is_value, oid
+        assert obs.derived_from == obs.derivation.inputs, oid
+        assert obs.derived_from and set(obs.derived_from).issubset(asset_ids), oid
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path.startswith(f"observation[{obs.observation_id}].")
+        ], oid
 
 
 def test_aithala_s3_recalculated_rows_are_not_declared_fe3_fe2_ratio() -> None:
@@ -124,6 +179,35 @@ def test_aithala_s3_recalculated_rows_are_not_declared_fe3_fe2_ratio() -> None:
     assert labels.count(("concentration_series", "fe3_fe2_ratio")) == 16
     assert labels.count(("recalculation_table", "Fe3+/FeT")) == 20
     assert len(labels) == 36
+    s3 = next(
+        row
+        for row in doc["species"]["Fe"]["context"]
+        if row.get("observation_id") == "aithala_2026_table_s3_raw_series"
+    )
+    assert "11/12 identical" in s3["locator"]["note"]
+    vf271_note = doc["species"]["Fe"]["observations"][0]["locator"]["note"]
+    assert "0.816 ± 0.022 (S-1: ±0.019)" in vf271_note
+    raw_by_id = {row["ID"]: row["Fe3+/FeT raw"] for row in s3["values"]["rows"]}
+    assert raw_by_id["VF267"] == "0.736±0.023"
+    assert raw_by_id["VF231"] == "0.716±0.023"
+    assert raw_by_id["1800-30"] == "0.426±0.018"
+    exact_matches = _aithala_s3_raw_exact_matches(doc)
+    assert len(exact_matches) == 11
+    assert {"VF267", "VF231", "1800-30"}.issubset(exact_matches)
+    assert "VF271" not in exact_matches
+
+    mutated = copy.deepcopy(doc)
+    mutated_s3 = next(
+        row
+        for row in mutated["species"]["Fe"]["context"]
+        if row.get("observation_id") == "aithala_2026_table_s3_raw_series"
+    )
+    mutated_vf267 = next(
+        row for row in mutated_s3["values"]["rows"] if row["ID"] == "VF267"
+    )
+    mutated_vf267["Fe3+/FeT raw"] = "0.737±0.023"
+    assert "VF267" not in _aithala_s3_raw_exact_matches(mutated)
+
     result = _migrate(AITHALA)
     ratio_rows = [
         oid for oid, obs in result.observations.items()
@@ -148,6 +232,26 @@ def _fixture_extract(tmp_path: Path, rows: list[dict]) -> Path:
     out = tmp_path / AITHALA.name
     out.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True), encoding="utf-8")
     return out
+
+
+def _ferric_fraction_row(
+    observation_id: str, method_class: str, *, series: bool
+) -> dict[str, Any]:
+    values: dict[str, Any] = {
+        "method_class": method_class,
+        "quantity": "fe3_fe2_ratio",
+    }
+    if series:
+        values["series"] = [
+            {"temperature_K": 1523.15, "Fe3_over_FeT": 0.5},
+            {"temperature_K": 1573.15, "Fe3_over_FeT": 0.25},
+        ]
+    else:
+        values["Fe3_over_FeT"] = "0.72"
+    row: dict[str, Any] = {"observation_id": observation_id, "values": values}
+    if series:
+        row["T_range_K"] = None
+    return row
 
 
 def test_migrator_reduces_kress_wt_pct_row(tmp_path: Path) -> None:
@@ -184,18 +288,542 @@ def test_migrator_reduces_ferric_fraction_series_points(tmp_path: Path) -> None:
             ],
         },
     }])
+    result = _migrate(path)
     points = {
-        oid: obs for oid, obs in _migrate(path).observations.items()
+        oid: obs for oid, obs in result.observations.items()
         if oid.startswith(PREFIX + "fixture_series::")
     }
+    assert len(points) == 2
     assert sorted(obs.value.point for obs in points.values()) == [
         Decimal("0.25") / Decimal("0.75"), Decimal(1)
     ]
+    asset_ids = {
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    }
     for obs in points.values():
         assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert obs.derivation.relation == FERRIC_FRACTION_RELATION
         (name, _), = obs.derivation.parameters
         assert name == "original_Fe3_over_FeT"
+        assert obs.derived_from
+        assert obs.derived_from == obs.derivation.inputs
+        assert set(obs.derived_from).issubset(asset_ids)
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path.startswith(f"observation[{obs.observation_id}].")
+        ]
+
+
+def test_migrated_ferric_fraction_has_resolvable_lineage_and_derivation(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_lineage",
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "Fe3_over_FeT": "0.72",
+        },
+    }])
+    result = _migrate(path)
+    obs = result.observations[PREFIX + "fixture_lineage"]
+    assert obs.value.point == Decimal("2.571428571428571428571428571")
+    assert obs.derivation is not None
+    assert obs.derivation.relation == FERRIC_FRACTION_RELATION
+    assert obs.derived_from == obs.derivation.inputs
+    assert set(obs.derived_from).issubset({
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    })
+    assert not [
+        issue for issue in result.validation.hard_issues
+        if issue.reason.value == "conditional_field"
+        and issue.path.startswith(f"observation[{obs.observation_id}].")
+    ]
+
+
+@pytest.mark.parametrize("method_class", ["model_derived", "measured_reduced"])
+@pytest.mark.parametrize("series", [False, True], ids=["scalar", "series"])
+def test_already_derived_ferric_fraction_keeps_missing_lineage_diagnostic(
+    tmp_path: Path, method_class: str, series: bool
+) -> None:
+    child_id = f"fixture_{method_class}_{'series' if series else 'scalar'}"
+    path = _fixture_extract(
+        tmp_path,
+        [_ferric_fraction_row(child_id, method_class, series=series)],
+    )
+    result = _migrate(path)
+    child_prefix = PREFIX + child_id
+    observations = [
+        obs for oid, obs in result.observations.items()
+        if oid == child_prefix or oid.startswith(child_prefix + "::")
+    ]
+    assert len(observations) == (2 if series else 1)
+    for obs in observations:
+        assert obs.derived_from is None
+        assert any(
+            issue.reason.value == "conditional_field"
+            and issue.path == f"observation[{obs.observation_id}].derived_from"
+            for issue in result.validation.hard_issues
+        )
+
+
+@pytest.mark.parametrize("method_class", ["model_derived", "measured_reduced"])
+@pytest.mark.parametrize("series", [False, True], ids=["scalar", "series"])
+def test_already_derived_ferric_fraction_preserves_author_inputs(
+    tmp_path: Path, method_class: str, series: bool
+) -> None:
+    parent_id = "fixture_parent"
+    child_id = f"fixture_{method_class}_{'series' if series else 'scalar'}"
+    parent = {
+        "observation_id": parent_id,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "fe3_fe2_ratio": "1",
+        },
+    }
+    child = _ferric_fraction_row(child_id, method_class, series=series)
+    child["derived_from"] = [parent_id]
+    child["derivation"] = {
+        "relation": "author reduction from the parent observation",
+        "inputs": [parent_id],
+        "output_unit": "dimensionless",
+    }
+    path = _fixture_extract(tmp_path, [parent, child])
+    result = _migrate(path)
+    child_prefix = PREFIX + child_id
+    observations = [
+        obs for oid, obs in result.observations.items()
+        if oid == child_prefix or oid.startswith(child_prefix + "::")
+    ]
+    assert len(observations) == (2 if series else 1)
+    expected_parent = (PREFIX + parent_id,)
+    for obs in observations:
+        assert obs.derived_from == expected_parent
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == expected_parent
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path == f"observation[{obs.observation_id}].derived_from"
+        ]
+
+
+def test_migrator_refuses_ferric_fraction_one_without_infinity(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_no_fe2",
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "Fe3_over_FeT": "1",
+        },
+    }])
+    obs = _migrate(path).observations[PREFIX + "fixture_no_fe2"]
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert "undefined" in obs.value.unavailable_reason
+    assert obs.value.point is None
+
+
+def test_redox_row_log_overrides_series_oxygen_and_inherits_when_absent(
+    tmp_path: Path,
+) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_row_log",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "admission_status": "admitted",
+            "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
+            "series": [
+                {"T_C": 1250, "Fe3_over_FeT": 0.5},
+                {"T_C": 1260, "Fe3_over_FeT": 0.25, "log10_fO2": -8},
+            ],
+        },
+    }])
+    rows = [
+        obs
+        for obs in _migrate(path).observations.values()
+        if "fixture_row_log::" in obs.observation_id
+    ]
+    assert len(rows) == 2
+    assert rows[0].identity.fO2_Pa.value == Decimal("0.01")
+    assert rows[1].identity.fO2_Pa.value == Decimal("0.001")
+
+
+def test_valence_rows_stamp_printed_po2_and_absolute_log(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [
+        {
+            "observation_id": "fixture_valence_po2_1",
+            "experiment": "aithala-2026-vf271",
+            "T_range_K": None,
+            "phase": "glass",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": "average_oxidation_state",
+                "admission_status": "admitted",
+                "series": [{
+                    "T_C": 1250,
+                    "value": "2.5",
+                    "oxygen_partial_pressure": {"value": "1e-8", "units": "atm"},
+                }],
+            },
+        },
+        {
+            "observation_id": "fixture_valence_po2_2",
+            "experiment": "aithala-2026-vf271",
+            "T_range_K": None,
+            "phase": "glass",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": "average_oxidation_state",
+                "admission_status": "admitted",
+                "series": [{
+                    "T_C": 1250,
+                    "value": "2.5",
+                    "oxygen_partial_pressure": {"value": "1e-9", "units": "atm"},
+                }],
+            },
+        },
+        {
+            "observation_id": "fixture_valence_log",
+            "experiment": "aithala-2026-vf271",
+            "T_range_K": None,
+            "phase": "glass",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": "average_oxidation_state",
+                "admission_status": "admitted",
+                "series": [{
+                    "T_C": 1250,
+                    "value": "2.5",
+                    "log_fO2": {"value": "-8", "units": "log10(atm)"},
+                }],
+            },
+        },
+        {
+            "observation_id": "fixture_valence_delta_iw",
+            "experiment": "aithala-2026-vf271",
+            "T_range_K": None,
+            "phase": "glass",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": "average_oxidation_state",
+                "admission_status": "admitted",
+                "series": [{
+                    "T_C": 1250,
+                    "value": "2.5",
+                    "log_fO2": {"value": "-1", "units": "log10(IW)"},
+                    "point_conditions": {
+                        "fO2_control": {
+                            "state": {"tag": "value", "value": "delta-IW"},
+                            "locator": {"published_page": 1},
+                        }
+                    },
+                }],
+            },
+        },
+    ])
+    result = _migrate(path)
+    rows = {
+        obs.observation_id.split("::", 1)[1].split("::", 1)[0]: obs
+        for obs in result.observations.values()
+        if "fixture_valence_" in obs.observation_id
+    }
+
+    first = rows["fixture_valence_po2_1"]
+    second = rows["fixture_valence_po2_2"]
+    logged = rows["fixture_valence_log"]
+    delta_iw = rows["fixture_valence_delta_iw"]
+    assert first.identity.quantity.value is Quantity.VALENCE_RATIO
+    assert first.identity.fO2_Pa.value == Decimal("0.00101325")
+    assert first.point_conditions["fO2_Pa"].state.value.point == Decimal("0.00101325")
+    assert second.identity.fO2_Pa.value == Decimal("0.000101325")
+    assert logged.identity.fO2_Pa.value == Decimal("0.00101325")
+    outcome = identity_equal(first.identity, second.identity)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert "fO2_Pa" in outcome.fields
+    assert delta_iw.identity.fO2_Pa.is_unknown
+    assert "buffer-relative fO2" in delta_iw.identity.fO2_Pa.reason
+    assert "delta-IW" in delta_iw.identity.fO2_Pa.reason
+    assert delta_iw.point_conditions["fO2_control"].state.value == "delta-IW"
+
+
+def test_valence_rows_stamp_printed_pressure_and_keep_missing_unknown(
+    tmp_path: Path,
+) -> None:
+    source_experiment = "aithala-2026-vf271"
+    fixture_experiment = "aithala-2026-vf271-no-pressure-fixture"
+    base_point = {
+        "T_C": 1250,
+        "value": "2.5",
+        "log_fO2": {"value": "-8", "units": "log10(bar)"},
+        "composition_mol": {"SiO2": "0.5", "MgO": "0.5"},
+    }
+    rows = []
+    for suffix, pressure in (
+        ("1gpa", "1000000000"),
+        ("2gpa", "2000000000"),
+        ("no_pressure", None),
+    ):
+        point = copy.deepcopy(base_point)
+        if pressure is not None:
+            point["point_conditions"] = {
+                "total_pressure_Pa": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"kind": "point", "point": pressure},
+                    },
+                    "locator": {"page": 13, "table": "3"},
+                }
+            }
+        rows.append(
+            {
+                "observation_id": f"fixture_valence_pressure_{suffix}",
+                "experiment": fixture_experiment,
+                "T_range_K": None,
+                "phase": "glass",
+                "values": {
+                    "method_class": "measured_direct",
+                    "quantity": "average_oxidation_state",
+                    "admission_status": "admitted",
+                    "series": [point],
+                },
+            }
+        )
+
+    path = _fixture_extract(tmp_path, rows)
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    fixture = copy.deepcopy(
+        next(
+            experiment
+            for experiment in document["experiments"]
+            if experiment["experiment_id"] == source_experiment
+        )
+    )
+    fixture["experiment_id"] = fixture_experiment
+    fixture["pressure_environment"]["total_pressure_Pa"]["state"] = {
+        "tag": "unknown",
+        "reason": "not_published",
+    }
+    document["experiments"].append(fixture)
+    path.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+    migrated = _migrate(path)
+    stamped = {
+        observation.observation_id.split("::", 2)[1]: observation
+        for observation in migrated.observations.values()
+        if "fixture_valence_pressure_" in observation.observation_id
+    }
+    one_gpa = stamped["fixture_valence_pressure_1gpa"]
+    two_gpa = stamped["fixture_valence_pressure_2gpa"]
+    no_pressure = stamped["fixture_valence_pressure_no_pressure"]
+
+    assert len(stamped) == 3
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == Decimal("1523.15")
+        for observation in stamped.values()
+    )
+    assert one_gpa.identity.quantity.value is Quantity.VALENCE_RATIO
+    assert one_gpa.identity.total_pressure_Pa.is_value
+    assert one_gpa.identity.total_pressure_Pa.value == Decimal("1000000000")
+    pressure_condition = one_gpa.point_conditions["total_pressure_Pa"]
+    assert pressure_condition.state.value.kind is ValueKind.POINT
+    assert pressure_condition.state.value.point == Decimal("1000000000")
+    assert pressure_condition.locator is not None
+    assert pressure_condition.locator.table == "3"
+    assert two_gpa.identity.total_pressure_Pa.is_value
+    assert two_gpa.identity.total_pressure_Pa.value == Decimal("2000000000")
+    assert one_gpa.identity.composition is not None
+    assert one_gpa.identity.composition.is_value
+    assert dict(one_gpa.identity.composition.value.components) == {
+        "SiO2": Decimal("0.5"),
+        "MgO": Decimal("0.5"),
+    }
+    composition_condition = one_gpa.point_conditions["composition"]
+    assert composition_condition.state == one_gpa.identity.composition
+    pressure_difference = identity_equal(one_gpa.identity, two_gpa.identity)
+    assert pressure_difference.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert "total_pressure_Pa" in pressure_difference.fields
+    assert no_pressure.identity.total_pressure_Pa.is_unknown
+    assert no_pressure.identity.total_pressure_Pa.reason == (
+        "no total_pressure_Pa mapped from source"
+    )
+
+
+def test_fe_ratio_identity_uses_printed_absolute_po2(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_fe_row_po2",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "admission_status": "admitted",
+            "series": [{
+                "T_C": 1250,
+                "Fe3_over_FeT": 0.5,
+                "oxygen_partial_pressure": {"value": "1e-8", "units": "atm"},
+            }],
+        },
+    }])
+    obs = next(
+        obs for obs in _migrate(path).observations.values()
+        if "fixture_fe_row_po2::" in obs.observation_id
+    )
+
+    assert obs.identity.quantity.value is Quantity.FE3_FE2_RATIO
+    assert obs.identity.fO2_Pa.value == Decimal("0.00101325")
+
+
+@pytest.mark.parametrize(
+    "row_fields,expected",
+    [
+        ({"log_fO2": {"value": -8, "units": "log10(bar)"}}, Decimal("0.001")),
+        ({"log_fO2": {"value": -8, "units": "log10(atm)"}}, Decimal("0.00101325")),
+    ],
+)
+def test_redox_row_log_identity_uses_declared_pressure_frame(
+    tmp_path: Path, row_fields: dict, expected: Decimal
+) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_row_log_frame",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "admission_status": "admitted",
+            "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
+            "series": [{"T_C": 1250, "Fe3_over_FeT": 0.5, **row_fields}],
+        },
+    }])
+    rows = [
+        obs for obs in _migrate(path).observations.values()
+        if "fixture_row_log_frame::" in obs.observation_id
+    ]
+    assert len(rows) == 1
+    assert rows[0].identity.fO2_Pa.value == expected
+
+
+@pytest.mark.parametrize("with_series_pressure", [False, True])
+@pytest.mark.parametrize(
+    "typed_log",
+    [
+        "-8",
+        {"kind": "point", "point": "-8"},
+    ],
+    ids=["typed-scalar", "typed-point-value"],
+)
+def test_absolute_typed_row_log_overrides_series_oxygen(
+    tmp_path: Path, with_series_pressure: bool, typed_log: object
+) -> None:
+    values = {
+        "method_class": "measured_direct",
+        "quantity": "fe3_fe2_ratio",
+        "admission_status": "admitted",
+        "series": [{
+            "T_C": 1250,
+            "Fe3_over_FeT": 0.5,
+            "point_conditions": {
+                "fO2_log": {
+                    "state": {"tag": "value", "value": typed_log},
+                    "locator": {"published_page": 1},
+                }
+            },
+        }],
+    }
+    if with_series_pressure:
+        values["oxygen_partial_pressure"] = {"value": "1e-7", "units": "bar"}
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_typed_row_log",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": values,
+    }])
+    rows = [
+        obs for obs in _migrate(path).observations.values()
+        if "fixture_typed_row_log::" in obs.observation_id
+    ]
+    assert len(rows) == 1
+    obs = rows[0]
+    assert obs.identity.temperature_K.value == Decimal("1523.15")
+    assert obs.identity.fO2_Pa.value == Decimal("0.001")
+    located = obs.point_conditions["fO2_log"]
+    assert located.locator is not None
+    assert located.locator.published_page == 1
+    if isinstance(typed_log, str):
+        assert located.state.value == Decimal("-8")
+    else:
+        assert located.state.value.kind is ValueKind.POINT
+        assert located.state.value.point == Decimal("-8")
+
+
+@pytest.mark.parametrize(
+    "row_fields",
+    [
+        {
+            "point_conditions": {
+                "fO2_log": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "kind": "bound",
+                            "bound_operator": "<",
+                            "bound_value": "-8",
+                        },
+                    },
+                    "locator": {"published_page": 1},
+                }
+            }
+        },
+        {
+            "point_conditions": {
+                "fO2_log": {
+                    "state": {"tag": "value", "value": "-8"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "oxygen_buffer_as_published": "IW",
+        },
+        {"log_fO2": {"value": -2, "units": "log10(IW)"}},
+        {"log_fO2": {"value": -8, "units": "log10(Pa)"}},
+        {"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"},
+    ],
+)
+def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
+    tmp_path: Path, row_fields: dict
+) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_bounded_row",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "admission_status": "admitted",
+            "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
+            "series": [{
+                "T_C": 1250,
+                "Fe3_over_FeT": 0.5,
+                **row_fields,
+            }],
+        },
+    }])
+    rows = [
+        obs for obs in _migrate(path).observations.values()
+        if "fixture_bounded_row::" in obs.observation_id
+    ]
+    assert len(rows) == 1
+    assert rows[0].identity.fO2_Pa.is_unknown
 
 
 def test_declared_ratio_from_ferric_fraction_is_r_over_one_minus_r() -> None:

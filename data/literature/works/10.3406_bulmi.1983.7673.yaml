@@ -9,20 +9,8 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
-    - asset_id: pdf:kems-103-fraser-1983
-      role: pdf
-      path: raw/kems-103-fraser-1983/kems-103-fraser-1983.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:kems-103-fraser-1983
-      role: pdftotext
-      path: text/kems-103-fraser-1983
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
     - asset_id: tables:kems-103-fraser-1983
       role: table_csv
       path: tables/kems-103-fraser-1983
@@ -82,6 +70,7 @@ experiments:
               paragraph: experimental
               note: Mo Knudsen cells, effusion orifice, ionization voltage, sample mass
         output_unit: kg
+        references: []
   conditions:
     temperature_K:
       state:
@@ -148,6 +137,7 @@ experiments:
                 paragraph: experimental
                 note: 0.3 mm diameter effusion holes drilled in the centres
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -174,6 +164,7 @@ experiments:
                 paragraph: experimental
                 note: 0.3 mm diameter effusion holes drilled in the centres
           output_unit: m
+          references: []
     ionization:
       electron_energy_eV:
         state:
@@ -200,6 +191,7 @@ experiments:
                 paragraph: experimental
                 note: Mo Knudsen cells, effusion orifice, ionization voltage, sample mass
           output_unit: '1'
+          references: []
     temperature_measurement:
       thermocouples:
         state:

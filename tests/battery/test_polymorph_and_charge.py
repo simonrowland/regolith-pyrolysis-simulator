@@ -471,6 +471,36 @@ def test_tridymite_is_a_closed_polymorph_token() -> None:
     assert coerce_polymorph_token("tridymite") is Polymorph.TRIDYMITE
 
 
+def test_pseudowollastonite_token_matches_thermoengine_pwo() -> None:
+    """The closed token is ThermoEngine's pWo label, not cyclowollastonite."""
+
+    from engines.alphamelts.thermoengine import _TE_PURE_PHASE_POLYMORPH
+
+    assert POLYMORPH_ALIASES["pseudowollastonite"] is Polymorph.PSEUDOWOLLASTONITE
+    assert Polymorph.PSEUDOWOLLASTONITE.value == _TE_PURE_PHASE_POLYMORPH["pWo"]
+    assert POLYMORPH_ALIASES["cyclowollastonite (pseudowollastonite)"] is (
+        Polymorph.CYCLOWOLLASTONITE
+    )
+
+
+def test_named_polymorph_tokens_require_their_mineral_formula() -> None:
+    clinoenstatite = Species(
+        "MgSiO3", Phase.CR, State.of(Polymorph.CLINOENSTATITE)
+    )
+    assert clinoenstatite.polymorph.is_value
+    assert clinoenstatite.polymorph.value is Polymorph.CLINOENSTATITE
+
+    malformed = Species("MgSiO", Phase.CR, State.of(Polymorph.CLINOENSTATITE))
+    assert malformed.polymorph.is_unknown
+    assert "MgSiO" in (malformed.polymorph.reason or "")
+
+    diopside = Species(
+        "CaMg(SiO3)2", Phase.CR, State.of(Polymorph.DIOPSIDE)
+    )
+    assert diopside.polymorph.is_value
+    assert diopside.polymorph.value is Polymorph.DIOPSIDE
+
+
 def test_neutral_charge_is_zero_value_not_unknown() -> None:
     species = Species("O2", Phase.G)
     assert species.charge is not None

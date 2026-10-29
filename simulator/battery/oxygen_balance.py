@@ -5,23 +5,94 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from typing import Literal
 
 from scipy.optimize import brentq
 
-from simulator.battery.enums import Engine, NoticeKind
-from simulator.battery.records import Notice
+from simulator.battery.enums import CellMaterial, Engine, NoticeKind
+from simulator.battery.records import Located, Notice
 from simulator.physical_constants import GAS_CONSTANT
 
 IMCC_ENGINES: frozenset[Engine] = frozenset({Engine.OPENIMCC})
 OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
-    {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+    {
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
+    }
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
+OxygenBalanceBracketBoundary = Literal["lower", "upper"]
 _OXYGEN_GAS_ALPHA = 1.0
 _OXYGEN_GAS_ALPHA_SOURCE = (
     "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
     "absolute oxygen-gas alpha is not measured"
 )
+_MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
+
+
+def _cell_material_class(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> str:
+    if not materials:
+        return "unknown"
+    values: list[CellMaterial] = []
+    for material in materials:
+        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
+            return "unknown"
+        values.append(material.state.value)
+    if any(
+        material in {
+            CellMaterial.W,
+            CellMaterial.MO,
+            CellMaterial.TA,
+            CellMaterial.NB,
+            CellMaterial.C_GRAPHITE,
+            CellMaterial.RE,
+        }
+        for material in values
+    ):
+        return "reactive"
+    if all(material in {CellMaterial.PT, CellMaterial.IR} for material in values):
+        return "inert"
+    return "not_inert"
+
+
+def _uniform_modelled_reactive_cell(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> str | None:
+    """W or Mo when every typed entry is that same modelled reservoir metal."""
+
+    if not materials:
+        return None
+    values: list[CellMaterial] = []
+    for material in materials:
+        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
+            return None
+        values.append(material.state.value)
+    if not values:
+        return None
+    metal = values[0]
+    if metal not in _MODELLED_REACTIVE_CELL:
+        return None
+    if any(item is not metal for item in values):
+        return None
+    return metal.value
+
+
+def _cell_oxygen_class(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> tuple[str, str | None]:
+    """Return material class and the modeled W/Mo oxygen reservoir, if any."""
+
+    material_class = _cell_material_class(materials)
+    modelled = (
+        _uniform_modelled_reactive_cell(materials)
+        if material_class == "reactive"
+        else None
+    )
+    return material_class, modelled
 
 
 @dataclass(frozen=True)
@@ -41,6 +112,7 @@ class _VacuumOxygenChannel:
 @dataclass(frozen=True)
 class _VacuumOxygenBalance:
     pO2_bar: float
+    bracket_boundary: OxygenBalanceBracketBoundary | None
     pressures_Pa: Mapping[str, float]
     channel_fluxes_mol_m2_s: Mapping[str, float]
     oxygen_atom_flux_mol_m2_s: float
@@ -49,12 +121,19 @@ class _VacuumOxygenBalance:
     alpha_sources: Mapping[str, str]
 
 
+def _net_evaporation_pressure_Pa(pressure_Pa: float, background_pressure_Pa: float) -> float:
+    """HKL driving pressure; zero background preserves the vacuum expression."""
+    return max(0.0, pressure_Pa - background_pressure_Pa)
+
+
 def _solve_vacuum_oxygen_balance(
     pressure_model: Callable[[float], Mapping[str, float]],
     channels: Sequence[_VacuumOxygenChannel],
     *,
     temperature_K: float,
+    background_pressure_Pa: float = 0.0,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
+    on_accepted_evaluation: Callable[[float], None] | None = None,
 ) -> _VacuumOxygenBalance:
     """Solve an alpha-weighted, engine-supplied vacuum pressure model.
 
@@ -82,6 +161,8 @@ def _solve_vacuum_oxygen_balance(
     temperature = float(temperature_K)
     if not math.isfinite(temperature) or temperature <= 0.0:
         raise ValueError("temperature_K must be finite and positive")
+    if not math.isfinite(background_pressure_Pa) or background_pressure_Pa < 0.0:
+        raise ValueError("background_pressure_Pa must be finite and nonnegative")
     low, high = bracket_log10_pO2_bar
     if not (math.isfinite(low) and math.isfinite(high) and low < high <= 0.0):
         raise ValueError("pO2 bracket must be finite, increasing, and at most 1 bar")
@@ -127,8 +208,20 @@ def _solve_vacuum_oxygen_balance(
     if not active_channels or not strictly_monotone:
         raise ValueError("oxygen-balance flux is not strictly monotone for active channels")
 
-    def evaluate(logp: float) -> tuple[float, dict[str, float], float, float]:
-        model_pressures = pressure_model(logp)
+    def molar_flux(channel: _VacuumOxygenChannel, pressure: float) -> float:
+        # Only the flux uses the bulk-partial ceiling. Keep equilibrium Peq
+        # untouched for the power-law validation and thermodynamic root axis.
+        drive = (_net_evaporation_pressure_Pa(pressure, background_pressure_Pa)
+                 if background_pressure_Pa else pressure)
+        return channel.alpha * drive / math.sqrt(
+            2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
+        )
+
+    def evaluate(
+        logp: float, model_pressures: Mapping[str, float] | None = None,
+    ) -> tuple[float, dict[str, float], float, float]:
+        if model_pressures is None:
+            model_pressures = pressure_model(logp)
         if not isinstance(model_pressures, Mapping):
             raise ValueError("pressure model must return a species-to-Pa mapping")
         pressures: dict[str, float] = {}
@@ -146,23 +239,43 @@ def _solve_vacuum_oxygen_balance(
                     f"pressure model returned invalid {channel.species!r} pressure"
                 )
             pressures[channel.species] = pressure
-            molar_flux = channel.alpha * pressure / math.sqrt(
-                2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
-            )
-            oxygen_flux += channel.oxygen_atoms * molar_flux
-            parent_flux += channel.parent_oxygen_demand * molar_flux
+            flux = molar_flux(channel, pressure)
+            oxygen_flux += channel.oxygen_atoms * flux
+            parent_flux += channel.parent_oxygen_demand * flux
         return oxygen_flux - parent_flux, pressures, oxygen_flux, parent_flux
 
     f_low = evaluate(low)[0]
     f_high = evaluate(high)[0]
-    if f_low == 0.0:
+    bracket_boundary: OxygenBalanceBracketBoundary | None = None
+    parent_channels = [channel for channel in active_channels if channel.parent_oxygen_demand > 0.0]
+    zero_oxygen_boundary = background_pressure_Pa == 0.0 and all(
+        channel.oxygen_atoms >= channel.parent_oxygen_demand and channel.pO2_exponent >= 0.0
+        and (channel.oxygen_atoms == channel.parent_oxygen_demand or channel.pO2_exponent > 0.0)
+        for channel in parent_channels
+    ) and all(
+        channel.pO2_exponent > 0.0
+        for channel in active_channels if channel.parent_oxygen_demand == 0.0
+    )
+    if zero_oxygen_boundary:
+        # Without an oxygen supplier the root is pO2=0. Neutral oxide gases
+        # retain their pressures; oxygen-consuming gases and free O/O2 vanish.
+        # Validate every exponent at a finite anchor before taking the limit.
         root = low
+    elif f_low == 0.0:
+        root = low
+        bracket_boundary = "lower"
     elif f_high == 0.0:
         root = high
-    elif f_low * f_high > 0.0:
-        raise ValueError(
-            "vacuum oxygen balance has no root in the declared pO2 bracket"
-        )
+        bracket_boundary = "upper"
+    elif f_low > 0.0 and f_high > 0.0:
+        # The residual is oxygen flux minus parent-oxygen demand and increases
+        # with pO2. Positive values at both endpoints put the root below the
+        # bracket (for example, a root at -40 gives positive residuals at -30
+        # and 0), so only this same-sign case holds the lower floor.
+        root = low
+        bracket_boundary = "lower"
+    elif f_low < 0.0 and f_high < 0.0:
+        raise ValueError("vacuum oxygen balance has no root in the declared pO2 bracket")
     else:
         root = brentq(
             lambda value: evaluate(value)[0],
@@ -174,37 +287,47 @@ def _solve_vacuum_oxygen_balance(
         )
 
     residual, pressures, oxygen_flux, parent_flux = evaluate(root)
-    lower_pressures = evaluate(root - 0.1)[1]
-    upper_pressures = evaluate(root + 0.1)[1]
-    for channel in active_channels:
-        pressure = pressures[channel.species]
-        if pressure <= 1.0e-300:
-            continue
-        lower_pressure = lower_pressures[channel.species]
-        upper_pressure = upper_pressures[channel.species]
-        if lower_pressure <= 0.0 or upper_pressure <= 0.0:
-            raise ValueError(
-                f"pressure law for {channel.species!r} is not positive around the root"
-            )
-        observed_exponent = (
-            math.log10(upper_pressure) - math.log10(lower_pressure)
-        ) / 0.2
-        if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
-            raise ValueError(
-                f"pressure law exponent mismatch for {channel.species!r}: "
-                f"declared {channel.pO2_exponent}, observed {observed_exponent}"
-            )
+    if bracket_boundary != "lower":
+        probe_low = max(low, root - 0.1)
+        probe_high = root + 0.1
+        lower_pressures = evaluate(probe_low)[1]
+        upper_pressures = evaluate(root + 0.1)[1]
+        for channel in active_channels:
+            pressure = pressures[channel.species]
+            if pressure <= 1.0e-300:
+                continue
+            lower_pressure = lower_pressures[channel.species]
+            upper_pressure = upper_pressures[channel.species]
+            if lower_pressure <= 0.0 or upper_pressure <= 0.0:
+                raise ValueError(
+                    f"pressure law for {channel.species!r} is not positive around the root"
+                )
+            observed_exponent = (
+                math.log10(upper_pressure) - math.log10(lower_pressure)
+            ) / (probe_high - probe_low)
+            if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
+                raise ValueError(
+                    f"pressure law exponent mismatch for {channel.species!r}: "
+                    f"declared {channel.pO2_exponent}, observed {observed_exponent}"
+                )
+    if on_accepted_evaluation is not None:
+        on_accepted_evaluation(root)
 
+    if zero_oxygen_boundary:
+        residual, pressures, oxygen_flux, parent_flux = evaluate(root, {
+            channel.species: (
+                0.0 if channel.pO2_exponent > 0.0 else pressures[channel.species]
+            )
+            for channel in active_channels
+        })
     relative_residual = abs(residual) / max(oxygen_flux, parent_flux, 1.0e-300)
     fluxes = {
-        channel.species: channel.alpha * pressures[channel.species]
-        / math.sqrt(
-            2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
-        )
+        channel.species: molar_flux(channel, pressures[channel.species])
         for channel in active_channels
     }
     return _VacuumOxygenBalance(
-        pO2_bar=10.0**root,
+        pO2_bar=0.0 if zero_oxygen_boundary else 10.0**root,
+        bracket_boundary=bracket_boundary,
         pressures_Pa=pressures,
         channel_fluxes_mol_m2_s=fluxes,
         oxygen_atom_flux_mol_m2_s=oxygen_flux,

@@ -25,6 +25,7 @@ import traceback
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.config import _load_setpoints_file
 
 AUTHORITIES = ("certified", "bridge", "extrapolated", "refused")
 # Production adapters never query engine intent-and-condition certification.
@@ -74,7 +75,7 @@ def normalize_uncertainty(value):
         return {"status": "missing", "source_value": value}
     if not any(finite(v) or isinstance(v, (list, dict)) and bool(v) for v in value.values()):
         return {"status": "missing", "source_value": value}
-    return {"status": "reported", **value}
+    return {**value, "status": "reported"}
 
 
 def envelope(*, dataset_id, observation_id, species, observable, units,
@@ -313,8 +314,11 @@ def extract_rows():
 def vp_rows():
     from tests.chemistry import test_corpus_anchored_parity as c
     from tests.chemistry.corpus_fixtures import grid_25_anchors
-    data = [load_cached_safe_yaml((ROOT / "data" / f).read_text()) for f in
-            ("vapor_pressures.yaml", "setpoints.yaml", "feedstocks.yaml")]
+    data = [
+        load_cached_safe_yaml((ROOT / "data" / "vapor_pressures.yaml").read_text()),
+        _load_setpoints_file(ROOT / "data" / "setpoints.yaml"),
+        load_cached_safe_yaml((ROOT / "data" / "feedstocks.yaml").read_text()),
+    ]
     anchors = grid_25_anchors()
     # Historical §25 residual report is the VapoRock peer. ThermoEngine/VapoRock
     # is host-optional; if that peer cannot initialize, score the same 30 cells

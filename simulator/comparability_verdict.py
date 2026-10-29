@@ -6,8 +6,10 @@ because the only available verdict was a boolean and ``False`` was reserved for 
 *known* mismatch. An unknown basis therefore had to borrow ``True``, and an
 untyped row became indistinguishable from a verified-compatible one.
 
-    b-190  ``rail_system_class_comparability`` returns ``(True, None, None)`` for
-           an observation with no ``system_class`` -- untyped reads as comparable.
+    b-190  ``rail_system_class_comparability`` originally returned
+           ``(True, None, None)`` for an observation with no ``system_class``;
+           the α gate now refuses this case while retaining an undeterminable
+           diagnostic verdict.
     b-205  the melt-activity bench scores measurements against engines whose
            ``activity_standard_state`` is ``None`` -- 402 of 402 points for
            imcc-published and imcc-ext -- with no record that the basis was
@@ -21,9 +23,9 @@ boolean destroys that distinction, which is the whole point of the third state.
     An absent declaration on EITHER side yields ``undeterminable``.
     Only two present declarations can produce ``match`` or ``mismatch``.
 
-DIAGNOSTIC ONLY (owner ruling 2026-08-18). These verdicts are reported and
-counted. Nothing refuses on them. Instrument before gate: a gating decision needs
-the counts first, and the counts do not exist until this ships.
+These verdicts report whether the evidence is a match, a mismatch, or absent.
+The vocabulary does not decide gate policy: callers may refuse a pin when
+evidence is undeterminable while keeping the missing-evidence count visible.
 """
 
 from __future__ import annotations

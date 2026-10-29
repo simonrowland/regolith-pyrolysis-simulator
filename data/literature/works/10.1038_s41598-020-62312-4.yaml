@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:engelschion-2020-eac1a-simulant
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:engelschion-2020-eac1a-simulant
-      role: table_csv
-      path: tables/engelschion-2020-eac1a-simulant
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:engelschion-2020-eac1a-simulant
       role: pdftotext
       path: unknown
@@ -178,6 +172,7 @@ benches:
                 section: DSC
                 note: 5 mm diameter crucibles; unit conversion only
           output_unit: m
+          references: []
       height_m:
         state:
           tag: value
@@ -212,6 +207,7 @@ benches:
                 section: DSC
                 note: 5 mm high crucibles; unit conversion only
           output_unit: m
+          references: []
   detector:
     state:
       tag: value

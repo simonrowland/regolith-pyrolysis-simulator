@@ -315,7 +315,10 @@ def test_r2_f2_all_numeric_has_full_engine_rail_grid_and_prints_zero_rows(tmp_pa
     for writer in ("typed", "stream"):
         b_lines = _b_section(out["md"][writer]).splitlines()
         assert any(
-            line.startswith("| vapour | internal-analytical | 1 | 0 | 1 |") for line in b_lines
+            line.startswith(
+                "| vapour | internal-analytical | — | 1 | 0 | 1 |"
+            )
+            for line in b_lines
         ), writer
         assert not any("| openimcc |" in line for line in b_lines), writer
     # Certified membership inside A is B's own decision, per engine.
@@ -449,11 +452,15 @@ def test_r2_f4_residue_element_ppm_figure_band_follows_identity_metric(tmp_path)
     assert residual.numeric.operation is MetricOperation.DEX
     assert residual.numeric.value == Decimal("0.3010299956639812")
     assert residual.numeric.decision_band is not None
+    # d-128 keeps an unstated printed width as printed and flags confidence.
     assert residual.numeric.decision_band.value == Decimal("0.3")
     assert residual.numeric.decision_band.unit == "dimensionless"
     assert residual.status is not ResidualStatus.NO_BAND
     assert residual.score_eligible is False
     assert any(n.kind is NoticeKind.FIGURE_ONLY for n in residual.notices)
+    assert any(
+        n.reason == "confidence_level_not_stated" for n in residual.notices
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -602,13 +609,27 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         OPENIMCC, observation, experiment=F.tabulation_experiment(), isolated=False
     )
     general_outcome = _oxygen_outcome(general, seen)
-    assert reactive_outcome == general_outcome
     assert any(
         n.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED for n in on_reactive_knudsen.notices
     )
     assert not any(n.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED for n in general.notices)
+    if case == "p_partial_no_o2":
+        # The Re cell cannot close, so it does not take the effusion closure
+        # and it does not borrow the melt's intrinsic fO2. The carrier-free
+        # tabulation of the same melt is the congruent closure.
+        assert (
+            reactive_outcome[0],
+            reactive_outcome[1].get("reason"),
+            reactive_outcome[2],
+        ) == ("identity_incomplete", "missing_fO2", None)
+        assert general_outcome[2] == "oxygen_balance_effusion"
+        assert any(
+            notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+            for notice in general.notices
+        )
+        return
+    assert reactive_outcome == general_outcome
     expected = {
-        "p_partial_no_o2": ("identity_incomplete", "missing_fO2", None),
         "p_partial_printed_o2": ("unsupported", None, "commanded"),
         "p_sat_pure_reservoir": ("unsupported", None, "not_an_input"),
     }[case]

@@ -950,3 +950,28 @@ def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
     assert sim._last_nominal_ramp == pytest.approx(100.0)
     assert sim._last_actual_ramp < sim._last_nominal_ramp
     assert "pipe saturated" in sim._last_throttle_reason
+
+
+def test_sc333_equipment_overhead_pipe_transport_numeric_pins():
+    """Pin the pre-refactor viscosity and design-point conductance outputs."""
+    viscosity_grid = (
+        (300.0, "0x1.2dfd694ccab3fp-16"),
+        (1773.15, "0x1.05dc30ea78e3ep-14"),
+    )
+    for temperature_K, expected_hex in viscosity_grid:
+        actual = OverheadGasModel._gas_dynamic_viscosity_Pa_s(temperature_K)
+        assert actual.hex() == expected_hex
+
+    equipment_conductance = EquipmentDesigner({}).size_collection_pipe(
+        0.010,
+        10.0,
+    ).conductance_kg_s
+    overhead_conductance = OverheadGasModel({})._pipe_conductance(
+        1000.0,
+        1500.0,
+    )
+    expected_conductance_hex = "0x1.c4f75c42aeb21p-4"
+
+    assert equipment_conductance.hex() == expected_conductance_hex
+    assert overhead_conductance.hex() == expected_conductance_hex
+    assert equipment_conductance == overhead_conductance

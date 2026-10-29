@@ -38,6 +38,8 @@ Usage::
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
+from functools import lru_cache
 import math
 import re
 import subprocess
@@ -68,6 +70,21 @@ FIDELITY_GRADUATION_LEDGER_SCHEMA = (
 )
 LAB_PARAMETER_VOCABULARY_PATH = ROOT / "data" / "literature" / "lab_parameter_vocabulary.yaml"
 
+
+@lru_cache(maxsize=512)
+def _load_extract_yaml_cached(path: str, mtime_ns: int, size: int) -> Any:
+    return yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+
+
+def load_extract_yaml(path: Path) -> Any:
+    """Load YAML with an in-process cache invalidated by file stat changes."""
+    resolved = path.resolve()
+    metadata = resolved.stat()
+    parsed = _load_extract_yaml_cached(
+        str(resolved), metadata.st_mtime_ns, metadata.st_size
+    )
+    return deepcopy(parsed)
+
 # Scored physics series. The first six are read by the rail/scoring machinery;
 # the d-032 additions (owner ruling 2026-09-21) are physics quantities the rail
 # could score, admitted from the invented-type cleanup with near-spellings
@@ -93,11 +110,15 @@ OBSERVATION_TYPES = frozenset(
         "phase_transition",
         "gas_speciation",
         "sulfur_solubility_and_sulfate_capacity_series",
+        "chloride_capacity",
         "composition_series",
+        "equilibrium_phase_composition",
+        "distribution_ratio",
     }
 )
 
 REVIEW_STATUSES = frozenset({"draft", "reviewed", "rejected"})
+CONFIDENCE_LEVELS = frozenset({"one_sigma", "two_sigma", "ci95", "not_stated"})
 
 def equipment_fields_from_vocabulary(
     path: Path = LAB_PARAMETER_VOCABULARY_PATH,
@@ -172,6 +193,10 @@ PATH_VALUE_KEYS = frozenset(
         "table_provenance_root",
         "chapter_pdf",
         "corpus_asset",
+        "provenance_file",
+        "audit_file",
+        "audit_files",
+        "calibration_audit",
     }
 )
 
@@ -180,17 +205,17 @@ def _is_absolute_path(value: Any) -> bool:
     return isinstance(value, str) and bool(_ABS_PATH_RE.match(value))
 
 
-def _walk_absolute_path_values(
+def _walk_path_values(
     node: Any, *, path: str = ""
 ) -> list[tuple[str, str, str]]:
-    """Return (key, dotted-path, value) for absolute PATH_VALUE_KEYS hits.
+    """Return (key, dotted-path, value) for PATH_VALUE_KEYS strings.
 
     Walks the *parsed* document, so a quoted scalar and a YAML alias
     (``source_path: *scan``) count exactly like an unquoted scalar, and an
     anchor reused N times yields N hits (one per place a consumer reads it).
-    A path key's value may be a string (checked), a list (each string element
-    checked, e.g. ``corpus_tables: [tables/x/t1.csv, ...]``; other elements
-    walked), or a mapping (walked, e.g. the ``transcription`` page/table dict).
+    A path key's value may be a string, a list (each string element checked,
+    e.g. ``corpus_tables: [tables/x/t1.csv, ...]``), or a mapping (walked,
+    e.g. the ``transcription`` page/table dict).
     """
     hits: list[tuple[str, str, str]] = []
     if isinstance(node, Mapping):
@@ -198,18 +223,24 @@ def _walk_absolute_path_values(
             key_s = str(key)
             child = f"{path}.{key_s}" if path else key_s
             if key_s in PATH_VALUE_KEYS:
-                if _is_absolute_path(value):
+                if isinstance(value, str):
                     hits.append((key_s, child, value))
-                    continue
-                if isinstance(value, (list, tuple)):
+                elif isinstance(value, (list, tuple)):
                     for i, item in enumerate(value):
-                        if _is_absolute_path(item):
+                        if isinstance(item, str):
                             hits.append((key_s, f"{child}[{i}]", item))
-            hits.extend(_walk_absolute_path_values(value, path=child))
+            hits.extend(_walk_path_values(value, path=child))
     elif isinstance(node, (list, tuple)):
         for i, item in enumerate(node):
-            hits.extend(_walk_absolute_path_values(item, path=f"{path}[{i}]"))
+            hits.extend(_walk_path_values(item, path=f"{path}[{i}]"))
     return hits
+
+
+def _walk_absolute_path_values(
+    node: Any, *, path: str = ""
+) -> list[tuple[str, str, str]]:
+    """Return absolute strings found under the owning PATH_VALUE_KEYS set."""
+    return [hit for hit in _walk_path_values(node, path=path) if _is_absolute_path(hit[2])]
 
 
 def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
@@ -229,6 +260,52 @@ def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
             f"{label}: {where[0]} must be repository-relative "
             f"(absolute/machine-local path refused): {value!r}{more}"
         )
+    return errors
+
+
+def _private_path_value_errors(doc: Any, label: str) -> list[str]:
+    """Refuse repository-private paths under every path-valued extract key."""
+    hits = [hit for hit in _walk_path_values(doc) if hit[2].startswith("docs-private/")]
+    by_value: dict[tuple[str, str], list[str]] = {}
+    for key, dotted, value in hits:
+        by_value.setdefault((key, value), []).append(dotted)
+    errors: list[str] = []
+    for (key, value), where in by_value.items():
+        more = f" (+{len(where) - 1} more via YAML aliases/repeats)" if len(where) > 1 else ""
+        errors.append(
+            f"{label}: {where[0]} must be repository-portable "
+            f"(docs-private path refused for {key}): {value!r}{more}"
+        )
+    return errors
+
+
+def _docs_private_prose_errors(doc: Any, label: str) -> list[str]:
+    """Refuse private-workspace references in extract prose, not path fields."""
+    errors: list[str] = []
+
+    def walk(node: Any, field_path: str = "") -> None:
+        if isinstance(node, Mapping):
+            for key, value in node.items():
+                key_s = str(key)
+                child_path = f"{field_path}.{key_s}" if field_path else key_s
+                if key_s in PATH_VALUE_KEYS and isinstance(value, str):
+                    continue
+                if key_s in PATH_VALUE_KEYS and isinstance(value, (list, tuple)):
+                    for index, item in enumerate(value):
+                        if not isinstance(item, str):
+                            walk(item, f"{child_path}[{index}]")
+                    continue
+                walk(value, child_path)
+        elif isinstance(node, (list, tuple)):
+            for index, value in enumerate(node):
+                walk(value, f"{field_path}[{index}]")
+        elif isinstance(node, str) and "docs-private" in node:
+            errors.append(
+                f"{label}:{field_path}: [docs-private-prose] private path reference "
+                "is forbidden in prose"
+            )
+
+    walk(doc)
     return errors
 
 
@@ -614,11 +691,11 @@ def _values_equal(
 
 
 def _path_is_observation_evidence(path: str) -> bool:
-    """True when a path-based sample pins observation values or equipment.
+    """True when a path-based sample pins observation or context evidence.
 
     Required shape::
 
-        species.<id>.observations[<obs_id|index>].(values|equipment)[....]
+        species.<id>.(observations|context)[<id|index>].(values|equipment)[....]
     """
     if not path or not isinstance(path, str):
         return False
@@ -628,7 +705,11 @@ def _path_is_observation_evidence(path: str) -> bool:
     if parts[0] != "species":
         return False
     obs_seg = _PATH_SEGMENT_RE.match(parts[2])
-    if not obs_seg or obs_seg.group(1) != "observations" or obs_seg.group(2) is None:
+    if (
+        not obs_seg
+        or obs_seg.group(1) not in ("observations", "context")
+        or obs_seg.group(2) is None
+    ):
         return False
     leaf_seg = _PATH_SEGMENT_RE.match(parts[3])
     if not leaf_seg:
@@ -1161,6 +1242,31 @@ def _check_equipment(
             )
 
 
+def _check_uncertainty(uncertainty: Any, path: str, errors: list[str]) -> None:
+    if uncertainty is None:
+        return
+    if isinstance(uncertainty, Mapping):
+        level = uncertainty.get("confidence_level")
+        if "confidence_level" in uncertainty and (
+            not isinstance(level, str) or level not in CONFIDENCE_LEVELS
+        ):
+            errors.append(
+                f"{path}.uncertainty.confidence_level: must be one of {sorted(CONFIDENCE_LEVELS)}"
+            )
+        if not _has_payload_leaf(uncertainty):
+            # Allow {} only when no uncertainty was stated; null-only mappings
+            # are migrator artifacts.
+            if any(v is None for v in uncertainty.values()) and not _has_payload_leaf(
+                {k: v for k, v in uncertainty.items() if v is not None}
+            ):
+                errors.append(
+                    f"{path}: uncertainty mapping is null-only "
+                    f"(omit the key if no uncertainty was stated, or retain verbatim text)"
+                )
+    elif isinstance(uncertainty, str) and not uncertainty.strip():
+        errors.append(f"{path}: uncertainty string must be non-empty when present")
+
+
 def _check_observation(
     obs: Any,
     path: str,
@@ -1217,20 +1323,7 @@ def _check_observation(
             errors.append(f"{path}: units required when values are present")
 
     # Uncertainty is first-class: if present, must not be a bare null sink.
-    unc = obs.get("uncertainty")
-    if unc is not None:
-        if isinstance(unc, Mapping) and not _has_payload_leaf(unc):
-            # Allow {} only when no uncertainty was stated; prefer omission.
-            # A mapping whose only leaves are null is a migrator artifact.
-            if any(v is None for v in unc.values()) and not _has_payload_leaf(
-                {k: v for k, v in unc.items() if v is not None}
-            ):
-                errors.append(
-                    f"{path}: uncertainty mapping is null-only "
-                    f"(omit the key if no uncertainty was stated, or retain verbatim text)"
-                )
-        elif isinstance(unc, str) and not unc.strip():
-            errors.append(f"{path}: uncertainty string must be non-empty when present")
+    _check_uncertainty(obs.get("uncertainty"), path, errors)
 
     tr = obs.get("T_range_K")
     if tr is not None:
@@ -1314,18 +1407,7 @@ def _check_context_row(
         if not row.get("units"):
             errors.append(f"{path}: units required when values are present")
 
-    unc = row.get("uncertainty")
-    if unc is not None:
-        if isinstance(unc, Mapping) and not _has_payload_leaf(unc):
-            if any(v is None for v in unc.values()) and not _has_payload_leaf(
-                {k: v for k, v in unc.items() if v is not None}
-            ):
-                errors.append(
-                    f"{path}: uncertainty mapping is null-only "
-                    f"(omit the key if no uncertainty was stated, or retain verbatim text)"
-                )
-        elif isinstance(unc, str) and not unc.strip():
-            errors.append(f"{path}: uncertainty string must be non-empty when present")
+    _check_uncertainty(row.get("uncertainty"), path, errors)
 
     tr = row.get("T_range_K")
     if tr is not None:
@@ -1365,8 +1447,9 @@ def _check_fidelity_sample_shape(
     """Validate one fidelity sample's structure (path-based or structured).
 
     When ``enforce_observation_paths`` is True (non-allowlisted / new extracts),
-    path-based samples must pin under ``species.*.observations[...].(values|equipment)``
-    so metadata-only paths cannot satisfy the gate.
+        path-based samples must pin under
+        ``species.*.(observations|context)[...].(values|equipment)`` so
+        metadata-only paths cannot satisfy the gate.
     """
     path_keys, structured_keys = _sample_addressing_keys(sample)
     path = sample.get(path_keys[0]) if len(path_keys) == 1 else None
@@ -1389,8 +1472,8 @@ def _check_fidelity_sample_shape(
         if not _path_is_observation_evidence(str(path)):
             errors.append(
                 f"{sp}: path-based fidelity sample on new extracts must pin "
-                f"observation evidence "
-                f"(species.*.observations[id].(values|equipment)...); "
+                f"observation or context evidence "
+                f"(species.*.(observations|context)[id].(values|equipment)...); "
                 f"got path={path!r} (metadata-only paths refused)"
             )
     if "value" not in sample and "draft_value" not in sample:
@@ -1542,6 +1625,43 @@ def _check_sweep_gases(doc: Mapping[str, Any], label: str, errors: list[str]) ->
             errors.append(f"{path}: invalid sweep gas: {exc}")
 
 
+def _check_gas_ratios(doc: Mapping[str, Any], label: str, errors: list[str]) -> None:
+    from simulator.battery.migrate import _located_from_plain, _value_or_point_from_plain
+    from simulator.battery.records import GasRatio
+
+    experiments = doc.get("experiments", ())
+    if isinstance(experiments, Mapping):
+        experiments = experiments.values()
+    elif not isinstance(experiments, (list, tuple)):
+        return
+    for i, experiment in enumerate(experiments):
+        if not isinstance(experiment, Mapping):
+            continue
+        control = experiment.get("fO2_control")
+        if not isinstance(control, Mapping) or control.get("gas_ratio") is None:
+            continue
+        path = f"{label}:experiments[{i}].fO2_control.gas_ratio"
+        ratio = control["gas_ratio"]
+        try:
+            if not isinstance(ratio, Mapping):
+                raise ValueError("must be a mapping")
+            numerator = ratio.get("numerator_species")
+            denominator = ratio.get("denominator_species")
+            if not isinstance(numerator, str) or not isinstance(denominator, str):
+                raise ValueError("ratio species must be text")
+            located = _located_from_plain(ratio["value"], _value_or_point_from_plain)
+            GasRatio(
+                numerator_species=numerator,
+                denominator_species=denominator,
+                value=located,
+                basis=ratio.get("basis"),
+            )
+            if located.state.is_value and located.locator is None:
+                errors.append(f"{path}.value: empirical Located value requires a locator")
+        except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
+            errors.append(f"{path}: invalid gas ratio: {exc}")
+
+
 def validate_extract_document(
     doc: Any,
     *,
@@ -1568,6 +1688,8 @@ def validate_extract_document(
 
     if not isinstance(doc, Mapping):
         return [f"{label}: root must be a mapping"]
+
+    errors.extend(_docs_private_prose_errors(doc, label))
 
     for key_path in iter_unsupported_context_container_paths(doc):
         rendered_path = ".".join(key_path)
@@ -1615,6 +1737,7 @@ def validate_extract_document(
     # extraction.provenance_path. b-713 replaced a line-regex count ceiling
     # that missed quoted scalars and YAML aliases.
     errors.extend(_absolute_path_value_errors(doc, label))
+    errors.extend(_private_path_value_errors(doc, label))
 
     review = doc.get("review_status")
     if review not in REVIEW_STATUSES:
@@ -1664,6 +1787,7 @@ def validate_extract_document(
                         _check_context_row(row, f"{spath}.context[{i}]", errors, seen)
 
     _check_sweep_gases(doc, label, errors)
+    _check_gas_ratios(doc, label, errors)
 
     # ENFORCED_FOR_NEW: require samples unless source_id is pre-policy allowlisted.
     is_pre_policy = False
@@ -1689,13 +1813,14 @@ def validate_extract_file(
     check_fidelity_match: bool = False,
 ) -> list[str]:
     try:
-        text = path.read_text(encoding="utf-8")
-        doc = yaml.safe_load(text)
+        doc = load_extract_yaml(path)
     except Exception as exc:  # noqa: BLE001 — surface parse failures as validation errors
         return [f"{path}: failed to load YAML: {exc}"]
     if isinstance(doc, Mapping) and doc.get("schema_version") == TABLE_SCHEMA_VERSION:
         errors: list[str] = []
+        errors.extend(_docs_private_prose_errors(doc, str(path)))
         errors.extend(_absolute_path_value_errors(doc, str(path)))
+        errors.extend(_private_path_value_errors(doc, str(path)))
         source_id = doc.get("source_id")
         if not isinstance(source_id, str) or not source_id:
             return [f"{path}: companion table source_id is required"]
@@ -1720,7 +1845,7 @@ def validate_extract_file(
             return errors
 
         try:
-            parent_doc = yaml.safe_load(parent_path.read_text(encoding="utf-8"))
+            parent_doc = load_extract_yaml(parent_path)
         except Exception as exc:  # noqa: BLE001 — surface parent parse failures
             errors.append(f"{parent_path}: failed to load YAML: {exc}")
             return errors

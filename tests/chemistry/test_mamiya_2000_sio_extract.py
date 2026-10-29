@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 from simulator.yaml_cache import load_cached_safe_yaml
 
 EXTRACT = (
@@ -114,8 +114,7 @@ def test_mamiya_context_numbers_match_the_transcription() -> None:
         "mamiya_2000_cristobalite_htxrd_transition_bracket"
     ]["locator"]
 
-    migrator = Migrator(root=EXTRACT.parents[3])
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(EXTRACT.parents[3], EXTRACT)
     lifted = next(
         row
         for context_rows in migrator.result.context_by_work.values()

@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-119-furukawa-1975
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-119-furukawa-1975
-      role: table_csv
-      path: tables/kems-119-furukawa-1975
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-119-furukawa-1975
       role: pdftotext
       path: unknown
@@ -52,7 +46,7 @@ experiments:
           interval_high: '0.003'
           approximate: false
       locator:
-        page: 15
+        page: 5
         published_page: 3053
         pdf_page_index: 4
         section: '3.2'
@@ -70,7 +64,7 @@ experiments:
         tag: value
         value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
       locator:
-        page: 15
+        page: 5
         published_page: 3053
         pdf_page_index: 4
         section: '3.2'
@@ -152,6 +146,7 @@ experiments:
               note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
                 Pa'
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -190,7 +185,7 @@ experiments:
           radius 200 mm).
       locator:
         published_page: 3051
-        pdf_page_index: 2
+        pdf_page_index: 1
         figure: '1'
         section: '3.1'
         note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
@@ -200,18 +195,18 @@ experiments:
           tag: unknown
           reason: not_published
         locator:
-          page: 13
+          page: 2
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: '3.1'
       orifice_channel_length_m:
         state:
           tag: unknown
           reason: not_published
         locator:
-          page: 13
+          page: 2
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: '3.1'
   fO2_control:
     channel:
@@ -261,7 +256,7 @@ experiments:
           interval_high: '0.003'
           approximate: false
       locator:
-        page: 15
+        page: 5
         published_page: 3053
         pdf_page_index: 4
         section: '3.2'
@@ -280,7 +275,7 @@ experiments:
         tag: value
         value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
       locator:
-        page: 15
+        page: 5
         published_page: 3053
         pdf_page_index: 4
         section: '3.2'
@@ -361,6 +356,7 @@ experiments:
               note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
                 Pa'
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -400,7 +396,7 @@ experiments:
           radius 200 mm).
       locator:
         published_page: 3051
-        pdf_page_index: 2
+        pdf_page_index: 1
         figure: '1'
         section: '3.1'
         note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
@@ -410,18 +406,18 @@ experiments:
           tag: unknown
           reason: not_published
         locator:
-          page: 13
+          page: 2
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: '3.1'
       orifice_channel_length_m:
         state:
           tag: unknown
           reason: not_published
         locator:
-          page: 13
+          page: 2
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: '3.1'
   fO2_control:
     channel:
@@ -471,7 +467,7 @@ experiments:
           interval_high: '0.003'
           approximate: false
       locator:
-        page: 15
+        page: 5
         published_page: 3053
         pdf_page_index: 4
         section: '3.2'
@@ -490,7 +486,7 @@ experiments:
         tag: value
         value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
       locator:
-        page: 15
+        page: 5
         published_page: 3053
         pdf_page_index: 4
         section: '3.2'
@@ -571,6 +567,7 @@ experiments:
               note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
                 Pa'
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -607,18 +604,18 @@ experiments:
           tag: unknown
           reason: not_published
         locator:
-          page: 13
+          page: 2
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: '3.1'
       orifice_channel_length_m:
         state:
           tag: unknown
           reason: not_published
         locator:
-          page: 13
+          page: 2
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: '3.1'
   fO2_control:
     channel:
@@ -681,6 +678,7 @@ experiments:
               section: '4.2'
               note: About 4 h overall for the reported scan protocol; not a hold at each temperature. Unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   kind: literature
   method:
@@ -711,7 +709,7 @@ experiments:
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
     published_page: 3051
-    pdf_page_index: 2
+    pdf_page_index: 1
     figure: '1'
     section: '3.1'
     note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
@@ -726,7 +724,7 @@ experiments:
           radius 200 mm).
       locator:
         published_page: 3051
-        pdf_page_index: 2
+        pdf_page_index: 1
         figure: '1'
         section: '3.1'
         note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
@@ -737,7 +735,7 @@ experiments:
           value: two pairs Pt-30%Rh / Pt-6%Rh on the susceptor top and bottom
         locator:
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           figure: '1'
           section: '3.1'
           note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
@@ -747,7 +745,7 @@ experiments:
           value: Pt-Rh tips evaporate in vacuum near 1600 C within hours; tip recut each run
         locator:
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           figure: '1'
           section: '3.1'
           note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
@@ -761,44 +759,44 @@ benches:
       tag: value
       value: Knudsen-cell mass spectrometer
     locator:
-      page: 13
+      page: 2
       published_page: 3051
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '3.1'
   method:
     state:
       tag: value
       value: Knudsen effusion mass spectrometry
     locator:
-      page: 13
+      page: 2
       published_page: 3051
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '3.1'
   cell_material_and_liner:
     state:
       tag: value
       value: High-purity alumina SSA-S; tantalum susceptor
     locator:
-      page: 13
+      page: 2
       published_page: 3051
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '3.1'
   cell_materials:
   - state:
       tag: value
       value: Al2O3
     locator:
-      page: 13
+      page: 2
       published_page: 3051
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '3.1'
   - state:
       tag: value
       value: Ta
     locator:
-      page: 13
+      page: 2
       published_page: 3051
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '3.1'
   geometry:
     cell_internal_dimensions:
@@ -810,9 +808,9 @@ benches:
             point: '0.009'
             approximate: false
         locator:
-          page: 13
+          page: 2
           published_page: 3051
-          pdf_page_index: 2
+          pdf_page_index: 1
           section: '3.1'
       height_m:
         state:
@@ -828,9 +826,9 @@ benches:
       tag: value
       value: Hitachi RM-6K; magnetic scanning, single focusing, 90 degree analyser, radius 200 mm
     locator:
-      page: 13
+      page: 2
       published_page: 3051
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '3.1'
   temperature_measurement:
     sensor:
@@ -838,7 +836,7 @@ benches:
         tag: value
         value: Two Pt-30%Rh/Pt-6%Rh thermocouple pairs at upper and lower susceptor
       locator:
-        page: 14
+        page: 4
         published_page: 3052
         pdf_page_index: 3
         section: '3.1'
@@ -848,7 +846,7 @@ benches:
         tag: value
         value: Pure-Fe solidification onset after supercooling detected by ion intensity; details in reference 16
       locator:
-        page: 15
+        page: 5
         published_page: 3053
         pdf_page_index: 4
         section: '3.2'
@@ -866,9 +864,9 @@ benches:
       tag: value
       value: Electron bombardment; upper and lower tungsten ring filaments
     locator:
-      page: 13
+      page: 2
       published_page: 3051
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '3.1'
   other_facts:
   - name: cell_body_height
@@ -880,9 +878,9 @@ benches:
           point: '12'
           approximate: false
       locator:
-        page: 13
+        page: 2
         published_page: 3051
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: '3.1'
     unit: mm
   - name: temperature_fluctuation_magnitude_during_ion_ratio_measurements
@@ -909,9 +907,9 @@ benches:
           point: '11'
           approximate: false
       locator:
-        page: 13
+        page: 2
         published_page: 3051
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: '3.1'
     unit: mm
   - name: offered_orifice_diameters_not_run_assignments

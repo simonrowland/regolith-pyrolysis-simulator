@@ -30,9 +30,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _antoine_skip_reason_for_refusal,
+    _read_antoine_coefficients,
+)
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
-from simulator.alpha_kinetics import ALPHA_AUTHORITY_STATUS_FIELD
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    _evaluate_extracted_arrhenius_alpha,
+)
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.comparability_verdict import verdict_from_membership
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -474,7 +482,8 @@ _EVIDENCE_VOCABULARY = {
         "proxy", "qualitative_comparison", "second_law_kems", "third_law_kems",
     })},
     "admission_status": {**_MARKER_REFUSALS, **dict.fromkeys({
-        "bound_not_point", "equipment_metadata", "note_parent_unaltered", "true_absence",
+        "admitted", "bound_not_point", "equipment_metadata", "note_parent_unaltered",
+        "true_absence",
     })},
     "status": {**_MARKER_REFUSALS, **dict.fromkeys({
         "CONTESTED", "not_observed", "pointer_or_anchor_without_numeric_points",
@@ -600,7 +609,8 @@ def load_adopted_observations(
     raw_observations = {
         (str(entry.get("source_id") or ""), str(species), str(row.get("observation_id") or "")): row
         for entry in extracts
-        for species, block in (entry.get("species") or {}).items()
+        if isinstance(entry.get("species"), Mapping)
+        for species, block in entry["species"].items()
         for row in block.get("observations") or []
     }
     # IDs are source-wide: replacement edges can cross species. Removing
@@ -971,18 +981,32 @@ def _literature_pressure_points(
     source_form = str(
         values.get("runtime_form") or values.get("source_form") or obs.units or ""
     )
-    has_A = isinstance(coef, Mapping) and (
-        coef.get("A") is not None or coef.get("A_Pa") is not None
+    coefficient_values = coef if isinstance(coef, Mapping) else {}
+    has_antoine_coefficients = any(
+        key in coefficient_values for key in ("A", "A_Pa", "B", "C")
     )
-    if has_A and coef.get("B") is not None:  # type: ignore[union-attr]
+    declares_antoine_form = "A" in source_form and "B" in source_form
+    if has_antoine_coefficients or declares_antoine_form:
+        # In literature extracts, None marks an unreported coefficient. Keep
+        # those keys absent so the shared reader can apply the declared form.
+        record = {"runtime_form": source_form}
+        for name, value in (
+            ("A", coefficient_values.get("A_Pa", coefficient_values.get("A"))),
+            ("B", coefficient_values.get("B")),
+            ("C", coefficient_values.get("C")),
+        ):
+            if value is not None:
+                record[name] = value
         try:
-            A = float(coef.get("A_Pa", coef.get("A")))  # type: ignore[union-attr]
-            B = float(coef["B"])  # type: ignore[index]
-            C = float(coef.get("C") or 0.0)  # type: ignore[union-attr]
-        except (TypeError, ValueError):
-            return None, "coefficients_not_numeric", drops
+            A, B, C = _read_antoine_coefficients(record)
+        except _AntoineCoefficientRefusal as exc:
+            return None, _antoine_skip_reason_for_refusal(exc), drops
         # Prefer runtime_coefficients which already convert to Pa.
-        use_pa = "A_Pa" in coef or "P_Pa" in source_form or "log10(P_Pa)" in source_form
+        use_pa = (
+            "A_Pa" in coefficient_values
+            or "P_Pa" in source_form
+            or "log10(P_Pa)" in source_form
+        )
         use_bar = (not use_pa) and ("P_bar" in source_form or "log10(P_bar)" in source_form)
         use_mmhg = (not use_pa) and (
             "mmHg" in source_form or "P_mmHg" in source_form or "mm Hg" in source_form
@@ -1018,7 +1042,7 @@ def _literature_pressure_points(
                 )
                 continue
             log10_p = _antoine_log10_pressure(A, B, C, T)
-            if use_pa or "A_Pa" in coef:
+            if use_pa or "A_Pa" in coefficient_values:
                 P = 10.0**log10_p
             elif use_bar:
                 P = (10.0**log10_p) * 1.0e5
@@ -1180,24 +1204,7 @@ def _literature_alpha_points(
         out = []
         for idx, T_K in enumerate(temperatures):
             try:
-                if alpha_form.get("A") is not None and alpha_form.get("B_K") is not None:
-                    alpha = float(alpha_form["A"]) * math.exp(
-                        -float(alpha_form["B_K"]) / T_K
-                    )
-                    sigma = None
-                else:
-                    prefactor = float(
-                        alpha_form.get("gamma_o", alpha_form.get("c0"))
-                    )
-                    activation = float(alpha_form["E_J_per_mol"])
-                    gas_constant = float(alpha_form.get("R_J_per_mol_K") or 8.314462618)
-                    alpha = prefactor * math.exp(-activation / (gas_constant * T_K))
-                    sigma_E = alpha_form.get("E_uncertainty_J_per_mol")
-                    sigma = (
-                        abs(alpha) * float(sigma_E) / (gas_constant * T_K)
-                        if sigma_E is not None
-                        else None
-                    )
+                alpha, sigma = _evaluate_extracted_arrhenius_alpha(alpha_form, T_K)
             except (KeyError, TypeError, ValueError, OverflowError):
                 return None, "alpha_form_not_evaluable", drops
             out.append(
@@ -1623,7 +1630,7 @@ def _engine_melt_psat_pa(
     )
     cache_key = (
         round(float(T_K), 6),
-        round(float(pO2_bar), 12),
+        float(pO2_bar),
         tuple(sorted((str(k), round(float(v), 12)) for k, v in account.items())),
     )
     cached_surface = _MELT_PSAT_CACHE.get(cache_key)
@@ -1636,9 +1643,11 @@ def _engine_melt_psat_pa(
                 species_formula_registry={},
             ),
             temperature_C=float(T_K) - 273.15,
-            pressure_bar=max(float(pO2_bar), 1.0e-30),
-            fO2_log=math.log10(max(float(pO2_bar), 1.0e-30)),
-            control_inputs={"pO2_bar": float(pO2_bar)},
+            pressure_bar=float(pO2_bar),
+            fO2_log=math.log10(float(pO2_bar)),
+            control_inputs={
+                "pO2_bar": float(pO2_bar), "pO2_admission": "observation",
+            },
         )
         try:
             result = provider.dispatch(request)
@@ -1801,13 +1810,14 @@ def _invert_antoine_temperature_K(
     """
 
     try:
-        A = float(coeff["A"])
-        B = float(coeff["B"])
-        C = float(coeff.get("C") or 0.0)
+        A, B, C = _read_antoine_coefficients(coeff)
+    except _AntoineCoefficientRefusal as exc:
+        return None, _antoine_skip_reason_for_refusal(exc)
+    try:
         pressure = float(pressure_pa)
-    except (KeyError, TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None, "antoine_coefficients_not_numeric"
-    if not all(math.isfinite(v) for v in (A, B, C, pressure)):
+    if not math.isfinite(pressure):
         return None, "antoine_coefficients_non_finite"
     if pressure <= 0.0:
         return None, "target_pressure_non_positive"
@@ -2382,9 +2392,7 @@ def rail_system_class_comparability(
 
     system_class = observation_system_class(obs)
     if system_class is None:
-        # Untyped and uninferable: leave scorable. Silent exclusion of
-        # unknown rows would hide coverage drift; typed class is preferred.
-        return True, None, None
+        return False, None, "missing_system_classification"
     if system_class in RAIL_COMPARABLE_SYSTEM_CLASSES:
         return True, system_class, None
     if system_class in RAIL_INCOMPARABLE_SYSTEM_CLASSES:
@@ -2404,18 +2412,14 @@ def rail_system_class_comparability(
 def rail_system_class_verdict(obs: AdoptedObservation) -> str:
     """Three-value class-comparability verdict (b-190). DIAGNOSTIC ONLY.
 
-    ``rail_system_class_comparability`` must keep returning ``True`` for an
-    untyped observation -- silently excluding unknown rows would hide coverage
-    drift, which is worse than scoring them. But ``True`` there means "not
-    excluded", NOT "verified comparable", and nothing downstream could tell the
-    two apart. This function draws that distinction without moving the boolean:
+    This preserves whether the class is known even though the α gate refuses
+    untyped observations as pin-bearing. The verdict distinguishes:
 
         typed and rail-comparable    -> match
         typed and not rail-comparable -> mismatch
         untyped / uninferable         -> undeterminable
 
-    Nothing refuses on this verdict; it is recorded so the untyped population is
-    countable. Owner ruling 2026-08-18: third state, no gate.
+    The verdict remains recorded so unknown-class refusals stay countable.
     """
 
     return verdict_from_membership(
@@ -2932,8 +2936,7 @@ def rail_alpha_comparability(
     runtime: dict[str, Any] = {
         "system_class": system_class,
         "rail_system_class_comparable": class_ok,
-        # b-190: `class_ok` is True both for a verified-comparable class and for
-        # an untyped one. The verdict separates them without changing the gate.
+        # Keep the evidence state visible alongside the fail-closed class gate.
         "rail_system_class_verdict": rail_system_class_verdict(obs),
         "condensed_form_state": form_state,
         "rail_condensed_form_comparable": form_ok,
@@ -4952,7 +4955,20 @@ def coverage_summary(
                 evaluation.skip_reason
                 or "typed-refusal:missing_capability:comparison_not_produced"
             ]
-        primary_reason = None if comparable else reasons[0]
+        if comparable:
+            primary_reason = None
+        else:
+            typed_refusal = evaluation.skip_reason
+            if not (typed_refusal or "").startswith(_TYPED_SKIP_PREFIX):
+                typed_refusal = next(
+                    (
+                        reason
+                        for reason in reasons
+                        if reason.startswith(_TYPED_SKIP_PREFIX)
+                    ),
+                    None,
+                )
+            primary_reason = typed_refusal or reasons[0]
         entries.append(
             {
                 "source": evaluation.observation.source_id,

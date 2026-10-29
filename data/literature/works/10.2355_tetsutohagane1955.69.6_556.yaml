@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:kems-200-ueshima-1983
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-200-ueshima-1983
-      role: table_csv
-      path: tables/kems-200-ueshima-1983
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-200-ueshima-1983
       role: pdftotext
       path: unknown
@@ -86,6 +80,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -220,6 +215,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -373,6 +369,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -422,6 +419,7 @@ experiments:
         - values.rows[SH 1].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -533,6 +531,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -582,6 +581,7 @@ experiments:
         - values.rows[SH 10].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -693,6 +693,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -742,6 +743,7 @@ experiments:
         - values.rows[SH 11].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -853,6 +855,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -902,6 +905,7 @@ experiments:
         - values.rows[SH 12].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1013,6 +1017,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1062,6 +1067,7 @@ experiments:
         - values.rows[SH 13].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1173,6 +1179,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1222,6 +1229,7 @@ experiments:
         - values.rows[SH 14].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1333,6 +1341,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1382,6 +1391,7 @@ experiments:
         - values.rows[SH 15].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1493,6 +1503,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1542,6 +1553,7 @@ experiments:
         - values.rows[SH 16].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1653,6 +1665,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1702,6 +1715,7 @@ experiments:
         - values.rows[SH 17].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1813,6 +1827,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -1862,6 +1877,7 @@ experiments:
         - values.rows[SH 18].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1973,6 +1989,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -2022,6 +2039,7 @@ experiments:
         - values.rows[SH 19].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2133,6 +2151,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -2182,6 +2201,7 @@ experiments:
         - values.rows[SH 2].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2293,6 +2313,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -2342,6 +2363,7 @@ experiments:
         - values.rows[SH 20].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2453,6 +2475,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -2502,6 +2525,7 @@ experiments:
         - values.rows[SH 21].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2613,6 +2637,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -2662,6 +2687,7 @@ experiments:
         - values.rows[SH 23].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2773,6 +2799,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -2822,6 +2849,7 @@ experiments:
         - values.rows[SH 24].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2933,6 +2961,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -2982,6 +3011,7 @@ experiments:
         - values.rows[SH 25].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -3093,6 +3123,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -3142,6 +3173,7 @@ experiments:
         - values.rows[SH 26].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -3253,6 +3285,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -3277,6 +3310,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -3309,6 +3343,7 @@ experiments:
         - values.rows[SH 27].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -3420,6 +3455,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -3444,6 +3480,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -3476,6 +3513,7 @@ experiments:
         - values.rows[SH 28].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -3587,6 +3625,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -3636,6 +3675,7 @@ experiments:
         - values.rows[SH 29].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -3747,6 +3787,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -3796,6 +3837,7 @@ experiments:
         - values.rows[SH 3].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -3907,6 +3949,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -3956,6 +3999,7 @@ experiments:
         - values.rows[SH 30].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -4067,6 +4111,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -4116,6 +4161,7 @@ experiments:
         - values.rows[SH 31].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -4227,6 +4273,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -4251,6 +4298,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -4283,6 +4331,7 @@ experiments:
         - values.rows[SH 37].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -4394,6 +4443,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -4418,6 +4468,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -4450,6 +4501,7 @@ experiments:
         - values.rows[SH 38].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -4561,6 +4613,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -4610,6 +4663,7 @@ experiments:
         - values.rows[SH 48].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -4721,6 +4775,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -4745,6 +4800,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -4777,6 +4833,7 @@ experiments:
         - values.rows[SH 49].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -4888,6 +4945,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -4937,6 +4995,7 @@ experiments:
         - values.rows[SH 5].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -5048,6 +5107,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -5072,6 +5132,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -5104,6 +5165,7 @@ experiments:
         - values.rows[SH 51].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -5215,6 +5277,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -5239,6 +5302,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -5271,6 +5335,7 @@ experiments:
         - values.rows[SH 52].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -5382,6 +5447,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -5406,6 +5472,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -5438,6 +5505,7 @@ experiments:
         - values.rows[SH 53].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -5549,6 +5617,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -5573,6 +5642,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -5605,6 +5675,7 @@ experiments:
         - values.rows[SH 54].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -5716,6 +5787,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -5740,6 +5812,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -5772,6 +5845,7 @@ experiments:
         - values.rows[SH 55].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -5883,6 +5957,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -5907,6 +5982,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -5939,6 +6015,7 @@ experiments:
         - values.rows[SH 56].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -6050,6 +6127,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -6099,6 +6177,7 @@ experiments:
         - values.rows[SH 57].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -6210,6 +6289,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -6234,6 +6314,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -6266,6 +6347,7 @@ experiments:
         - values.rows[SH 59].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -6377,6 +6459,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -6426,6 +6509,7 @@ experiments:
         - values.rows[SH 6].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -6537,6 +6621,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -6586,6 +6671,7 @@ experiments:
         - values.rows[SH 60].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -6697,6 +6783,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -6746,6 +6833,7 @@ experiments:
         - values.rows[SH 7].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -6857,6 +6945,7 @@ experiments:
               pdf_page_index: 1
               note: About 1-2 g granular alloy; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -6906,6 +6995,7 @@ experiments:
         - values.rows[SH 8].T_C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:

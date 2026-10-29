@@ -59,6 +59,7 @@ provenance:
   - data/literature/extracts/kems-050-gorokhov-1977.yaml
   - data/literature/extracts/kems-051-allibert-1981.yaml
   - data/literature/extracts/kems-053-stolyarova-1991.yaml
+  - data/literature/extracts/kems-055-kambayashi-1983.yaml
   - data/literature/extracts/kems-057-kambayashi-1985.yaml
   - data/literature/extracts/kems-058-ohara-1987.yaml
   - data/literature/extracts/kems-066-ichise-1977.yaml
@@ -93,6 +94,10 @@ provenance:
   - data/literature/extracts/kems-198-ichise-ueshima-1989.yaml
   - data/literature/extracts/kems-200-ueshima-1983.yaml
   - data/literature/extracts/kems-201-ichise-1986.yaml
+  - data/literature/extracts/kems-212-schneider-1980-nbsir-80-2059.yaml
+  - data/literature/extracts/kems-213-schneider-1980-nbsir-80-2139.yaml
+  - data/literature/extracts/kems-214-hastie-1980-nbsir-80-2178.yaml
+  - data/literature/extracts/kems-218-schneider-1981-nbsir-81-2306.yaml
   - data/literature/extracts/kems-ms2000-044.yaml
   catalog: data/vapor_pressures.yaml
   lane_b_full_cea_census:
@@ -1151,6 +1156,7 @@ pairs:
   - kems-023-demaria-1973
   - kems-025-markova-1983
   - kems-028-yakovlev-1984
+  - kems-029-yakovlev-shornikov-2011
   - kems-097-ikeda-1978
   - nasa_cea_extract
   - vapor_pressures_catalog
@@ -1159,6 +1165,7 @@ pairs:
   - kems-023-demaria-1973:Al
   - kems-025-markova-1983:Al
   - kems-028-yakovlev-1984:Al
+  - kems-029-yakovlev-shornikov-2011:Al
   - kems-097-ikeda-1978:Al
   - nasa_cea_extract:AL
   - vapor_pressures_catalog:Al
@@ -7866,6 +7873,7 @@ pairs:
   - kems-023-demaria-1973
   - kems-025-markova-1983
   - kems-028-yakovlev-1984
+  - kems-029-yakovlev-shornikov-2011
   - kems-031-halwax-2024
   - kems-053-stolyarova-1991
   - nasa_cea_extract
@@ -7875,7 +7883,10 @@ pairs:
   - kems-023-demaria-1973:Ca
   - kems-025-markova-1983:Ca
   - kems-028-yakovlev-1984:Ca
+  - kems-029-yakovlev-shornikov-2011:Ca
+  - kems-031-halwax-2024:Ca
   - kems-031-halwax-2024:CaO
+  - kems-031-halwax-2024:MgO
   - kems-053-stolyarova-1991:Ca
   - nasa_cea_extract:Ca
   - vapor_pressures_catalog:Ca
@@ -14590,6 +14601,7 @@ pairs:
   - kems-025-markova-1983
   - kems-026-markova-1984
   - kems-028-yakovlev-1984
+  - kems-029-yakovlev-shornikov-2011
   - kems-049-kato-1993-ms-review
   - kems-057-kambayashi-1985
   - kems-093-piacente-1975
@@ -14604,6 +14616,7 @@ pairs:
   - kems-025-markova-1983:Fe
   - kems-026-markova-1984:Fe
   - kems-028-yakovlev-1984:Fe
+  - kems-029-yakovlev-shornikov-2011:Fe
   - kems-049-kato-1993-ms-review:Fe
   - kems-057-kambayashi-1985:Fe
   - kems-093-piacente-1975:Fe
@@ -18073,9 +18086,11 @@ pairs:
     H: 2.0
     O: 1.0
   sources:
+  - kems-214-hastie-1980-nbsir-80-2178
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
+  - kems-214-hastie-1980-nbsir-80-2178:H2O
   - nasa_cea_extract:H2O
   - vapor_pressures_catalog:H2O
   catalog_family_ids:
@@ -18785,8 +18800,10 @@ pairs:
     Mg: 1.0
     O: 1.0
   sources:
+  - kems-214-hastie-1980-nbsir-80-2178
   - nasa_cea_extract
   source_species_ids:
+  - kems-214-hastie-1980-nbsir-80-2178:MgOH
   - nasa_cea_extract:MgOH
   catalog_family_ids: []
   catalog_species_ids: []
@@ -20713,16 +20730,16 @@ pairs:
   - kems-022-demaria-1971
   - kems-023-demaria-1973
   - kems-025-markova-1983
-  - kems-026-markova-1984
   - kems-028-yakovlev-1984
+  - kems-029-yakovlev-shornikov-2011
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
   - kems-022-demaria-1971:K
   - kems-023-demaria-1973:K
   - kems-025-markova-1983:K
-  - kems-026-markova-1984:K
   - kems-028-yakovlev-1984:K
+  - kems-029-yakovlev-shornikov-2011:K
   - nasa_cea_extract:K
   - vapor_pressures_catalog:K
   catalog_family_ids:
@@ -21616,10 +21633,12 @@ pairs:
   - kems-025-markova-1983
   - kems-026-markova-1984
   - kems-028-yakovlev-1984
+  - kems-029-yakovlev-shornikov-2011
   - kems-031-halwax-2024
   - kems-093-piacente-1975
   - kems-114-nichols-1995
   - kems-133-costa-2017
+  - kems-214-hastie-1980-nbsir-80-2178
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
@@ -21629,10 +21648,13 @@ pairs:
   - kems-025-markova-1983:Mg
   - kems-026-markova-1984:Mg
   - kems-028-yakovlev-1984:Mg
+  - kems-029-yakovlev-shornikov-2011:Mg
+  - kems-031-halwax-2024:Mg
   - kems-031-halwax-2024:MgO
   - kems-093-piacente-1975:Mg
   - kems-114-nichols-1995:Mg
   - kems-133-costa-2017:Mg
+  - kems-214-hastie-1980-nbsir-80-2178:Mg
   - nasa_cea_extract:Mg
   - vapor_pressures_catalog:Mg
   catalog_family_ids:
@@ -21858,8 +21880,10 @@ pairs:
     Mg: 1.0
     O: 1.0
   sources:
+  - kems-214-hastie-1980-nbsir-80-2178
   - nasa_cea_extract
   source_species_ids:
+  - kems-214-hastie-1980-nbsir-80-2178:MgOH
   - nasa_cea_extract:MgOH
   catalog_family_ids: []
   catalog_species_ids: []
@@ -27374,6 +27398,7 @@ pairs:
   - kems-023-demaria-1973
   - kems-025-markova-1983
   - kems-028-yakovlev-1984
+  - kems-029-yakovlev-shornikov-2011
   - nasa_cea_extract
   - vapor_pressures_catalog
   source_species_ids:
@@ -27381,6 +27406,7 @@ pairs:
   - kems-023-demaria-1973:TiO
   - kems-025-markova-1983:TiO
   - kems-028-yakovlev-1984:TiO
+  - kems-029-yakovlev-shornikov-2011:TiO
   - nasa_cea_extract:TiO
   - vapor_pressures_catalog:TiO
   catalog_family_ids:

@@ -1,0 +1,103 @@
+source_id: barcza-1979-mn-slag-metal-equilibrium
+source:
+  citation: 'Barcza, N. A. (1979). Slag-metal equilibrium in the production of low-carbon ferromanganese. Journal of the South African Institute of Mining and Metallurgy, May 1979, 269-279.'
+extraction:
+  method: mineru_table_draft emit for Table V; all flagged cells checked against 600 dpi page renders
+  date: '2026-10-22'
+  worker: fam47-1022
+review_status: draft
+tables:
+  - page: 10
+    table_index: 5
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    unit: wt_percent
+    evidence_class: measured_direct
+    phase: l
+    experiment: table-v-1500c
+    regime: static_equilibrium
+    published_page: 278
+    rows: [2, 3, 4, 5, 7, 8, 9]
+    temperature:
+      as_printed: 1500
+      unit: C
+      column_header: furnace temperature 1500°C (printed in text above Table V)
+    value_pairs:
+      - species_column: 2
+        value_column: 3
+        phase: l
+    render_verified:
+      - {row: 2, column: 3, text: '14,3'}
+      - {row: 4, column: 3, text: '4,0'}
+      - {row: 5, column: 3, text: '33,5'}
+      - {row: 7, column: 3, text: '84,5'}
+      - {row: 8, column: 3, text: '7,5'}
+      - {row: 9, column: 3, text: '8,0'}
+  - page: 10
+    table_index: 5
+    type: activity
+    quantity: activity
+    unit: dimensionless
+    evidence_class: quoted_attributed
+    phase: l
+    experiment: table-v-1500c
+    regime: static_equilibrium
+    published_page: 278
+    rows: [2]
+    values:
+      - column: 4
+        species: MnO
+        attribution: Reference 13 (Riboud and Muan, 1963)
+    render_verified:
+      - {row: 2, column: 4, text: '0,14'}
+  - page: 10
+    table_index: 5
+    type: activity
+    quantity: activity
+    unit: dimensionless
+    evidence_class: quoted_attributed
+    phase: l
+    experiment: table-v-1500c
+    regime: static_equilibrium
+    published_page: 278
+    rows: [5]
+    values:
+      - column: 4
+        species: SiO2
+        attribution: Reference 21 (Sharma and Richardson, 1955)
+    render_verified:
+      - {row: 5, column: 4, text: '0,10'}
+  - page: 10
+    table_index: 5
+    type: activity
+    quantity: activity
+    unit: dimensionless
+    evidence_class: quoted_attributed
+    phase: l
+    experiment: table-v-1500c
+    regime: static_equilibrium
+    published_page: 278
+    rows: [7]
+    values:
+      - column: 4
+        species: Mn
+        attribution: Reference 22 (Ohtani, 1959)
+    render_verified:
+      - {row: 7, column: 4, text: '0,85'}
+  - page: 10
+    table_index: 5
+    type: activity
+    quantity: activity
+    unit: dimensionless
+    evidence_class: quoted_attributed
+    phase: l
+    experiment: table-v-1500c
+    regime: static_equilibrium
+    published_page: 278
+    rows: [9]
+    values:
+      - column: 4
+        species: Si
+        attribution: Reference 23 (Rawling and Elliot, 1965)
+    render_verified:
+      - {row: 9, column: 4, text: '0,05'}

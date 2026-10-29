@@ -9,14 +9,14 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:aithala-2026-magmatic-iron-redox-to-2100c
       role: pdf
       path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
       sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
+        tag: value
+        value: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
     - asset_id: pdftotext:aithala-2026-magmatic-iron-redox-to-2100c
       role: pdftotext
       path: text/aithala-2026-magmatic-iron-redox-to-2100c
@@ -110,6 +110,7 @@ experiments:
               section: Table S-1
               note: Printed 1800 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -300,6 +301,7 @@ experiments:
               section: Table S-1
               note: Printed 1900 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -490,6 +492,7 @@ experiments:
               section: Table S-1
               note: Printed 2000 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -680,6 +683,7 @@ experiments:
               section: Table S-1
               note: Printed 2000 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -870,6 +874,7 @@ experiments:
               section: Table S-1
               note: Printed 2000 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -1060,6 +1065,7 @@ experiments:
               section: Table S-1
               note: Printed 2100 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -1263,6 +1269,7 @@ experiments:
               section: Table S-1
               note: Printed 1365 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -1458,6 +1465,7 @@ experiments:
               section: Table S-1
               note: Printed 1300 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -1653,6 +1661,7 @@ experiments:
               section: Table S-1
               note: Printed 1400 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -1848,6 +1857,7 @@ experiments:
               section: Table S-1
               note: Printed 1450 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -2043,6 +2053,7 @@ experiments:
               section: Table S-1
               note: Printed 1250 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -2238,6 +2249,7 @@ experiments:
               section: Table S-1
               note: Printed 1500 °C; converted with K = °C + 273.15.
         output_unit: K
+        references: []
     temperature_uncertainty_K:
       state:
         tag: unknown
@@ -3210,7 +3222,7 @@ context:
     evidence_class: model_derived
     equation: Eq 7
     fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
-    derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+    derivation_note: Authors' published fit parameters for this equation; not measured Fe abundance.
     h_K: '4894'
     h_uncertainty_K: '232.5'
     c: '-2.581'
@@ -3233,7 +3245,7 @@ context:
     evidence_class: model_derived
     equation: Eq 8
     fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
-    derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+    derivation_note: Authors' published fit parameters for this equation; not measured Fe abundance.
     h_K: '5235'
     h_uncertainty_K: '243.4'
     c: '-2.786'
@@ -3258,7 +3270,7 @@ context:
     evidence_class: model_derived
     equation: Eq 9
     fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
-    derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+    derivation_note: Authors' published fit parameters for this equation; not measured Fe abundance.
     h_K: '4511'
     h_uncertainty_K: '691.7'
     c: '-2.349'
@@ -3336,9 +3348,9 @@ context:
     page: 15
     table: S-3
     published_page: SI-9
-    note: Table S-3 raw values and adjusted columns as printed; VF271 raw uncertainty differs from Table S-1 (±0.022 versus
-      ±0.019). VF271 is partially crystallised and below its liquidus; run 2000-30 is anomalous and 2000-10 is the authors'
-      2000 °C anchor (SI-3, PDF p. 9).
+    note: Raw series duplicates typed Table S-1 (11/12 identical; VF271 uncertainty differs and is noted on the S-1 row);
+      adjusted columns are model_derived. VF271 is partially crystallised and below its liquidus; run 2000-30 is anomalous
+      and 2000-10 is the authors' 2000 °C anchor (SI-3, PDF p. 9).
   units: fraction (Fe3+/FeT)
   values:
     evidence_class: measured_tabulated

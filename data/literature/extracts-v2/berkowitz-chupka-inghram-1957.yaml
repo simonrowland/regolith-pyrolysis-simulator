@@ -87,7 +87,7 @@ observations:
   locator:
     note: BIC57_VO_absolute_points
     record: BIC57_VO_absolute_points
-  read_from: pdf:berkowitz-chupka-inghram-1957
+  read_from: unknown:berkowitz-chupka-inghram-1957
   point_conditions:
     temperature_K:
       state:
@@ -99,9 +99,10 @@ observations:
   derivation:
     relation: identity:Pa
     inputs:
-    - pdf:berkowitz-chupka-inghram-1957
+    - unknown:berkowitz-chupka-inghram-1957
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points::T=1876:h=0ec759b19020
   experiment_id: a734f2ca0b8622e2c393530f6af3dfbbcaab75e5bb36250cc4a43e48ebd81db9::berkowitz-chupka-inghram-1957
   identity:
@@ -187,7 +188,7 @@ observations:
   locator:
     note: BIC57_VO_absolute_points
     record: BIC57_VO_absolute_points
-  read_from: pdf:berkowitz-chupka-inghram-1957
+  read_from: unknown:berkowitz-chupka-inghram-1957
   point_conditions:
     temperature_K:
       state:
@@ -199,6 +200,7 @@ observations:
   derivation:
     relation: identity:Pa
     inputs:
-    - pdf:berkowitz-chupka-inghram-1957
+    - unknown:berkowitz-chupka-inghram-1957
     parameters: []
     output_unit: Pa
+    references: []

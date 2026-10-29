@@ -53,7 +53,7 @@ from simulator.melt_backend.melt_envelope import (
     consume_melt_extrapolation_envelope,
     melt_extrapolation_diagnostic,
 )
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import is_declared_real_scalar, is_finite
 
 
 _INTENTS = frozenset({ChemistryIntent.VAPOR_PRESSURE})
@@ -75,19 +75,8 @@ class VapoRockProvider(ChemistryProvider):
             of returning a result -- silent fallback is forbidden, the
             kernel handles fallback opt-in at the dispatch layer.
         vapor_pressure_data: Optional ``data/vapor_pressures.yaml``
-            payload.  When supplied the provider filters the VapoRock
-            output to active species the YAML declares (the universe
-            the simulator's downstream ``EVAPORATION_FLUX`` step is
-            wired to consume); without this filter VapoRock's broader
-            ~30-species output (``O2``, ``Si2``, ``Al2O2``, etc.) would
-            crash the downstream stoichiometry validator.  Rows marked
-            ``consumer_status: inactive`` are excluded from the VapoRock
-            consumer surface. Goal #10 hard-constraint binds this: the
-            authority swap must keep mass balance at 0.000%.
-            When omitted, no filtering happens and the full VapoRock
-            output is returned -- appropriate for tests that operate
-            below the simulator (the vapor-pressure dict alone is
-            harmless when no evaporation step consumes it).
+            payload. Retained for compatibility with simulator wiring;
+            it does not filter diagnostic full-speciation output.
     """
 
     name = 'vaporock'
@@ -107,15 +96,6 @@ class VapoRockProvider(ChemistryProvider):
         # first dispatch probes availability; if the probe fails the
         # provider raises ``ProviderUnavailableError`` cleanly.
         self._backend_initialised: bool = backend is not None
-        # Set of vapor-species names the simulator knows how to
-        # consume downstream.  Computed lazily from the YAML so an
-        # empty payload yields no filter (the full VapoRock output
-        # passes through -- used by adapter-level tests that do not
-        # exercise EVAPORATION_FLUX).
-        self._allowed_species: frozenset[str] = self._build_allowed_species(
-            vapor_pressure_data
-        )
-
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
             provider_id=self.PROVIDER_ID,
@@ -201,13 +181,39 @@ class VapoRockProvider(ChemistryProvider):
         # rather than re-raising -- the only legitimate raise on the
         # provider surface is the up-front ``ProviderUnavailableError``
         # above when the library itself is missing.
-        equilibrium = self._run_backend(
-            backend,
-            request,
-            composition_mol_by_account=composition_mol_by_account,
-            species_formula_registry=species_registry,
-            fO2_log_resolved=fO2_log_resolved,
-        )
+        backend_failure_warning = None
+        try:
+            equilibrium = self._run_backend(
+                backend,
+                request,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+                fO2_log_resolved=fO2_log_resolved,
+            )
+        except Exception as exc:  # noqa: BLE001 - keep shadow failures diagnostic
+            if isinstance(exc, TimeoutError):
+                timeout_s = getattr(exc, 'timeout_s', None)
+                if (
+                    timeout_s is None
+                    and getattr(backend, '_warm_worker_enabled', False)
+                ):
+                    timeout_s = getattr(backend, '_warm_call_timeout_s', None)
+                timeout_detail = ' (timeout value unavailable)'
+                if timeout_s is not None:
+                    try:
+                        timeout_detail = f' after {float(timeout_s):g}s'
+                    except (TypeError, ValueError):
+                        timeout_detail = f' after {timeout_s!r}'
+                backend_failure_warning = (
+                    f'VapoRock backend call timed out{timeout_detail}: '
+                    f'{type(exc).__name__}: {exc}'
+                )
+            else:
+                backend_failure_warning = (
+                    'VapoRock backend call failed: '
+                    f'{type(exc).__name__}: {exc}'
+                )
+            equilibrium = None
         melt_envelope = consume_melt_extrapolation_envelope(
             melt_diagnostic,
             temperature_K=temperature_K,
@@ -218,8 +224,8 @@ class VapoRockProvider(ChemistryProvider):
             pO2_bar=pO2_bar,
             mode=self._mode_label(backend),
             engine_version=self._engine_version(backend),
-            allowed_species=self._allowed_species,
             melt_envelope=melt_envelope,
+            backend_failure_warning=backend_failure_warning,
         )
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -307,7 +313,7 @@ class VapoRockProvider(ChemistryProvider):
             self.DECLARED_ACCOUNT: {
                 str(sp): float(mol)
                 for sp, mol in species_mol.items()
-                if _is_finite(mol) and float(mol) > 0.0
+                if is_finite(mol) and float(mol) > 0.0
             }
         }
 
@@ -380,33 +386,30 @@ class VapoRockProvider(ChemistryProvider):
 
         The adapter handles its own library-boundary catches and
         surfaces failure via ``EquilibriumResult.status`` /
-        ``warnings``; we wrap one final broad except as a safety net
-        for unexpected exceptions.  Returns the adapter's
-        :class:`EquilibriumResult` or ``None`` on catastrophic failure.
+        ``warnings``. Unexpected exceptions propagate to :meth:`dispatch`,
+        which converts them to a warning instead of silently returning an
+        empty result.
         """
-        try:
-            controls = request.control_inputs or {}
-            liquid_fraction = None
-            if controls.get('liquid_fraction') is not None:
-                try:
-                    if not is_declared_real_scalar(
-                        controls['liquid_fraction'],
-                        allow_numeric_str=True,
-                    ):
-                        raise TypeError
-                    liquid_fraction = float(controls['liquid_fraction'])
-                except (TypeError, ValueError):
-                    liquid_fraction = None
-            return backend.equilibrate(
-                temperature_C=float(request.temperature_C),
-                pressure_bar=float(request.pressure_bar),
-                fO2_log=fO2_log_resolved,
-                composition_mol_by_account=composition_mol_by_account,
-                species_formula_registry=species_formula_registry,
-                liquid_fraction=liquid_fraction,
-            )
-        except Exception:  # noqa: BLE001 - library-boundary catch
-            return None
+        controls = request.control_inputs or {}
+        liquid_fraction = None
+        if controls.get('liquid_fraction') is not None:
+            try:
+                if not is_declared_real_scalar(
+                    controls['liquid_fraction'],
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError
+                liquid_fraction = float(controls['liquid_fraction'])
+            except (TypeError, ValueError):
+                liquid_fraction = None
+        return backend.equilibrate(
+            temperature_C=float(request.temperature_C),
+            pressure_bar=float(request.pressure_bar),
+            fO2_log=fO2_log_resolved,
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_formula_registry,
+            liquid_fraction=liquid_fraction,
+        )
 
     @staticmethod
     def _project_equilibrium(
@@ -415,18 +418,16 @@ class VapoRockProvider(ChemistryProvider):
         pO2_bar: float,
         mode: str,
         engine_version: str,
-        allowed_species: frozenset[str],
         melt_envelope: MeltExtrapolationEnvelope,
+        backend_failure_warning: Optional[str] = None,
     ) -> VapoRockDiagnostics:
         """Convert an adapter :class:`EquilibriumResult` into VapoRock diagnostics.
 
         Mirrors the MAGEMin shadow's projection.  Missing or empty
         results surface as ``backend_status='unavailable'``.
 
-        ``allowed_species`` is retained in the signature for callers
-        that share construction code with the builtin provider. VapoRock
-        no longer exports a filtered authoritative pressure dict; every
-        finite non-negative pressure (including proven-empty 0 Pa
+        VapoRock does not export a filtered authoritative pressure dict;
+        every finite non-negative pressure (including proven-empty 0 Pa
         inventory zeros) stays under ``vaporock_full_speciation_Pa``.
         """
         envelope_fields = asdict(melt_envelope)
@@ -437,6 +438,10 @@ class VapoRockProvider(ChemistryProvider):
                 mode=mode,
                 engine_version=engine_version,
                 backend_status='unavailable',
+                backend_warnings=(
+                    backend_failure_warning
+                    or 'VapoRock backend returned no equilibrium result.',
+                ),
             )
         raw_vapor = dict(
             getattr(equilibrium, 'vapor_pressures_Pa', {}) or {}
@@ -449,13 +454,16 @@ class VapoRockProvider(ChemistryProvider):
             ) or {}
         )
         vaporock_full_speciation_Pa: dict[str, float] = {}
+        rejected_pressure_count = 0
         for species, value in raw_full_speciation.items():
-            if not _is_finite(value):
+            if not is_finite(value):
+                rejected_pressure_count += 1
                 continue
             pressure = float(value)
             if pressure >= 0.0:
                 vaporock_full_speciation_Pa[str(species)] = pressure
-        del allowed_species
+            else:
+                rejected_pressure_count += 1
         vapor_pressures_Pa: dict[str, float] = {}
         warnings = tuple(
             str(w) for w in (getattr(equilibrium, 'warnings', ()) or ())
@@ -463,6 +471,31 @@ class VapoRockProvider(ChemistryProvider):
         backend_status = str(
             getattr(equilibrium, 'status', None) or 'unavailable'
         )
+        if not vaporock_full_speciation_Pa and not warnings:
+            backend_diagnostics = getattr(equilibrium, 'diagnostics', None)
+            empty_cause = None
+            if isinstance(backend_diagnostics, Mapping):
+                empty_cause = (
+                    backend_diagnostics.get('empty_speciation_cause')
+                    or backend_diagnostics.get('backend_status_reason')
+                )
+            if rejected_pressure_count:
+                reason = (
+                    'VapoRock provider discarded '
+                    f'{rejected_pressure_count} non-finite or negative vapor '
+                    'pressure value(s); no usable speciation remains.'
+                )
+            elif empty_cause:
+                reason = (
+                    'VapoRock returned no vapor speciation: backend reason '
+                    f'{empty_cause}.'
+                )
+            else:
+                reason = (
+                    'VapoRock returned empty vapor speciation '
+                    f'(backend_status={backend_status}).'
+                )
+            warnings = (reason,)
         # Validate the ENGINE-OUTCOME token here, because it never reaches the
         # DTO's own validation the way the other providers' tokens do.
         #
@@ -500,66 +533,6 @@ class VapoRockProvider(ChemistryProvider):
         )
 
     @staticmethod
-    def _build_allowed_species(
-        vapor_pressure_data: Optional[Mapping[str, Any]],
-    ) -> frozenset[str]:
-        """Compute the allowed-vapor-species filter from the YAML payload.
-
-        Returns ``frozenset()`` (empty / disabled filter) when the
-        payload is missing or carries no ``metals`` / ``oxide_vapors``
-        sections.
-
-        Otherwise returns the active species set the builtin Antoine
-        path actually emits: the intersection of the YAML ``metals``
-        section with the
-        :data:`engines.builtin.vapor_pressure._ELLINGHAM_THERMO` table
-        (the builtin only computes a vapor pressure for metals that
-        also have an Ellingham entry), plus the active YAML
-        ``oxide_vapors`` section. Rows explicitly marked
-        ``consumer_status: inactive`` are excluded; missing status is
-        active.
-
-        Goal #10 hard constraint binds this: the authority swap must
-        not change the species set the downstream
-        ``EVAPORATION_FLUX`` / ``EVAPORATION_TRANSITION`` pipeline
-        sees.  VapoRock's broader ~30-species output is a richer
-        chemistry surface than the simulator's downstream is wired
-        for; pinning the filter to the builtin's effective output
-        keeps mass balance closed at 0.000% while still letting
-        VapoRock be the canonical source for the species both
-        engines compute.  Future work can widen this set per-species
-        as the downstream stoichiometry validators learn the new
-        species.
-        """
-        if not vapor_pressure_data:
-            return frozenset()
-        # Lazy import: the builtin module re-enters this engine at
-        # package-init under some test orderings (the cycle
-        # documented in engines/builtin/__init__.py).  Deferring the
-        # import to first-call keeps the module pair importable in
-        # any order.
-        from engines.builtin.vapor_pressure import _ELLINGHAM_THERMO
-
-        def active_species(section: Mapping[str, Any]) -> frozenset[str]:
-            names: set[str] = set()
-            for species, row in section.items():
-                status = ''
-                if isinstance(row, Mapping):
-                    status = str(row.get('consumer_status') or '').lower()
-                if status == 'inactive':
-                    continue
-                names.add(str(species))
-            return frozenset(names)
-
-        metals = dict(vapor_pressure_data.get('metals', {}) or {})
-        oxide_vapors = dict(vapor_pressure_data.get('oxide_vapors', {}) or {})
-        ellingham_metals = frozenset(_ELLINGHAM_THERMO.keys())
-        return (
-            (active_species(metals) & ellingham_metals)
-            | active_species(oxide_vapors)
-        )
-
-    @staticmethod
     def _mode_label(backend: Any) -> str:
         """Report which VapoRock entry point answered (best-effort)."""
         if backend is None:
@@ -579,18 +552,6 @@ class VapoRockProvider(ChemistryProvider):
             except Exception:  # noqa: BLE001
                 return 'unavailable'
         return 'unavailable'
-
-
-def _is_finite(value: Any) -> bool:
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return False
-    if numeric != numeric:
-        return False
-    if numeric in (float('inf'), float('-inf')):
-        return False
-    return True
 
 
 __all__ = ('VapoRockProvider',)

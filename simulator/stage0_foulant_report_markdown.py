@@ -49,8 +49,8 @@ def _format_value(value: Any) -> str:
 def _format_residual_interval(interval: Any) -> str:
     if not isinstance(interval, Mapping):
         return "none"
-    low = _format_kg(interval.get("low_kg", 0.0))
-    high = _format_kg(interval.get("high_kg", 0.0))
+    low = _format_kg(interval.get("low_kg"))
+    high = _format_kg(interval.get("high_kg"))
     reasons = interval.get("reasons") or ()
     if reasons:
         return f"{low}-{high} kg ({', '.join(str(r) for r in reasons)})"

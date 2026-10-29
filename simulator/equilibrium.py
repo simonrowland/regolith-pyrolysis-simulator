@@ -6,7 +6,15 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _is_missing_antoine_intercept,
+    _antoine_skip_reason_for_refusal,
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
@@ -25,7 +33,14 @@ from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     kress91_furnace_activity_pressure_bar,
 )
-from simulator.environment import vacuum_floor_bar_for_environment
+from simulator.environment import (
+    controlled_background_partial_pressure,
+    cover_gas_partial_pressures,
+    normalize_body_name,
+    oxygen_numerical_floor_bar_for_body,
+    vacuum_floor_bar_for_environment,
+)
+from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, Atmosphere
@@ -103,6 +118,7 @@ class EquilibriumMixin:
         )
 
     def _vacuum_floor_bar(self) -> float:
+        """Total-pressure feasibility limit; never an oxygen partial pressure."""
         ambient_pressure_bar = (
             float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0)
             / 1000.0
@@ -113,6 +129,49 @@ class EquilibriumMixin:
                 ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
             ),
         )
+
+    def _oxygen_numerical_floor_bar(self) -> float:
+        return oxygen_numerical_floor_bar_for_body(getattr(self.melt, 'body', ''))
+
+    def _headspace_equilibrated_pO2_bar(self, ledger_pO2_bar: float) -> float:
+        """Add declared cover-gas oxygen and solve its coupled CO2 equilibrium."""
+        self._headspace_co2_dissociation_diagnostic = {}
+        mode = str(getattr(self.melt.atmosphere, 'name', '') or '')
+        if mode in {'PN2_SWEEP', 'ARGON_FLOW'}:
+            declaration = str(getattr(self.melt, 'background_gas_species', '') or '')
+            declaration = declaration or ('Ar' if mode == 'ARGON_FLOW' else 'N2')
+            total_bar = float(self.melt.p_total_mbar) / 1000.0
+        elif mode == 'CO2_BACKPRESSURE':
+            declaration = str(getattr(self.melt, 'ambient_atmosphere', '') or '')
+            total_bar = float(self.melt.p_total_mbar) / 1000.0
+        elif self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+            # These modes explicitly command an O2 partial, not a pure-O2
+            # total. Their setpoint has already been applied by the caller.
+            # Lab schedules can additionally declare a CO2 background fraction.
+            declaration = str(getattr(self.melt, 'background_gas_species', '') or '')
+            if not declaration or declaration.upper() == 'O2':
+                return float(ledger_pO2_bar)
+            total_bar = controlled_background_partial_pressure(
+                float(self.melt.p_total_mbar), float(self.melt.pO2_mbar),
+                float(self.melt.background_gas_mole_fraction),
+            ) / 1000.0
+        else:
+            declaration = str(getattr(self.melt, 'ambient_atmosphere', '') or '')
+            total_bar = float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0) / 1000.0
+            if normalize_body_name(getattr(self.melt, 'body', '')) == 'mars':
+                total_bar = max(total_bar, self._vacuum_floor_bar())
+        partials = cover_gas_partial_pressures(declaration, total_bar)
+        oxygen_bar = float(ledger_pO2_bar) + partials.get('O2', 0.0)
+        co2_bar = partials.get('CO2', 0.0)
+        if co2_bar <= 0.0:
+            return oxygen_bar
+        # Same gas-temperature owner as ledger nRT/V and transport conductance:
+        # configured melt/lumped model plus the headspace temperature offset.
+        diagnostic = co2_dissociation_partials_bar(
+            self._headspace_temperature_K(), co2_bar, oxygen_bar,
+        )
+        self._headspace_co2_dissociation_diagnostic = diagnostic
+        return float(diagnostic['p_O2_bar'])
 
     def _commanded_pO2_bar(self) -> float:
         """
@@ -134,7 +193,7 @@ class EquilibriumMixin:
             carried O₂ above the environmental floor still controls
             equilibrium. It does not collapse to the vacuum floor for the
             whole campaign.
-          - A hard numerical floor (``self._vacuum_floor_bar()``) guards the
+          - A hard numerical floor (``self._oxygen_numerical_floor_bar()``) guards the
             1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
 
         With finite headspace enabled, melt-offgas O₂ remains in
@@ -162,7 +221,7 @@ class EquilibriumMixin:
             # floor alone.
             if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-            return max(pO2_bar, self._vacuum_floor_bar())
+            return max(self._headspace_equilibrated_pO2_bar(pO2_bar), self._oxygen_numerical_floor_bar())
 
         upstream_partials = getattr(
             self,
@@ -175,7 +234,7 @@ class EquilibriumMixin:
         )
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-        return max(pO2_bar, self._vacuum_floor_bar())
+        return max(self._headspace_equilibrated_pO2_bar(pO2_bar), self._oxygen_numerical_floor_bar())
 
     def _headspace_transport_pO2_bar(self) -> float:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
@@ -187,7 +246,7 @@ class EquilibriumMixin:
                 or 0.0
             )
             if pO2_bar > 0.0:
-                return max(pO2_bar, self._vacuum_floor_bar())
+                return max(pO2_bar, self._oxygen_numerical_floor_bar())
         return self._commanded_pO2_bar()
 
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
@@ -308,8 +367,8 @@ class EquilibriumMixin:
         SiO vapor uses a separate equilibrium pathway because it
         evaporates as an oxide gas (SiO₂ → SiO + ½O₂), not as a
         metal. The Antoine row is the reference pressure; a √pO₂
-        suppression is applied only above the row's pO₂ reference
-        (see the oxide-vapor loop).  [THERMO-8]
+        factor continues on both sides of the row's pO₂ reference
+        (see the shared SiO pressure owner).  [THERMO-8]
         """
         from simulator.melt_backend.base import EquilibriumResult
         from engines.builtin.vapor_pressure import (
@@ -324,6 +383,7 @@ class EquilibriumMixin:
             _metadata_value,
             _o2_channel_term_and_potential,
             _pow10_pressure_or_raise,
+            _raise_invalid_antoine_coefficient,
             _range_tuple,
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
@@ -380,12 +440,10 @@ class EquilibriumMixin:
         ellingham_extrapolations = {}
         vapor_pressure_authority_limits = {}
         warnings = []
-        # b-149 instance 3: typed notes on the `_sz_omit` paths in this
-        # method (missing activity, activity-threshold skip, P <= 1e-15 Pa).
-        # Those omissions keep status='ok' with a note. Other continues in
-        # this method (inactive row, missing parent, A<=0, oxide-vapor
-        # outside valid_range_K) still omit without a note.
+        antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
+        # Typed notes accompany species omissions on this status='ok' path.
         from simulator.silent_zero import (
+            CATEGORY_MARK,
             CATEGORY_PROVEN_ZERO,
             CATEGORY_REFUSE,
             ZeroBecause,
@@ -462,6 +520,21 @@ class EquilibriumMixin:
                 category=CATEGORY_PROVEN_ZERO,
             )
 
+        def _sz_missing_antoine_intercept(
+            species_id: str,
+            reason: str,
+        ) -> None:
+            _sz_omit(
+                species_id,
+                ZeroBecause.MISSING_COEFFICIENT,
+                field='antoine.A',
+                detail=(
+                    f'{reason}; species omitted from '
+                    'vapor_pressures_Pa while status=ok'
+                ),
+                category=CATEGORY_REFUSE,
+            )
+
         pseudo_warning_seen = getattr(
             self,
             '_pseudo_vapor_pressure_warning_seen',
@@ -479,7 +552,7 @@ class EquilibriumMixin:
         # coupled but distinct channels: Fe redox reads the melt reservoir;
         # SiO suppression reads the headspace reservoir.
         pO2_bar = self._headspace_transport_pO2_bar()
-        vacuum_floor_bar = self._vacuum_floor_bar()
+        vacuum_floor_bar = self._oxygen_numerical_floor_bar()
         reservoir = getattr(self.melt, "oxygen_reservoir", None)
         intrinsic_fO2_value = getattr(
             reservoir, "melt_intrinsic_fO2_log", None
@@ -554,12 +627,42 @@ class EquilibriumMixin:
             n_M, n_ox = ellingham_stoichiometry(species)
             sp_data = metals_data.get(species, {})
             if not sp_data:
+                _sz_omit(
+                    species,
+                    ZeroBecause.MISSING_THERMO,
+                    field='metal_row',
+                    detail=(
+                        'metal species row is missing or empty; species '
+                        'omitted from vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
                 continue
             if str(sp_data.get('consumer_status', '')).lower() == 'inactive':
+                _sz_omit(
+                    species,
+                    ZeroBecause.REFUSED_UPSTREAM,
+                    field='consumer_status',
+                    detail=(
+                        "consumer_status='inactive'; species omitted from "
+                        "vapor_pressures_Pa while status=ok"
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
                 continue
 
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
+                _sz_omit(
+                    species,
+                    ZeroBecause.MISSING_THERMO,
+                    field='parent_oxide',
+                    detail=(
+                        'metal row has no parent_oxide; species omitted from '
+                        'vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
                 continue
 
             # --- Pressure reference rail ---
@@ -630,12 +733,20 @@ class EquilibriumMixin:
                     coefficient_block,
                     temperature_K=T_K,
                 ):
-                    warnings.append(
+                    omission_notice = (
                         "non_certifying_vapor_pressure_fallback_omitted: "
                         f"species={species} "
                         f"fit_target={FIT_TARGET_PSEUDO_VAPOROCK} "
                         f"residual_dex={_metadata_value(sp_data, 'residual_dex')} "
                         f"confidence_tier={_metadata_value(sp_data, 'confidence_tier')}"
+                    )
+                    warnings.append(omission_notice)
+                    _sz_omit(
+                        species,
+                        ZeroBecause.REFUSED_UPSTREAM,
+                        field='valid_range_K',
+                        detail=omission_notice,
+                        category=CATEGORY_REFUSE,
                     )
                     continue
                 if bool(sp_data.get("interval_required")):
@@ -644,11 +755,30 @@ class EquilibriumMixin:
                         sp_data,
                         coefficient_block,
                     )
-                A = antoine.get('A', 0)
-                B = antoine.get('B', 0)
-                C = antoine.get('C', 0)
-                if P_reference_Pa is None and not (A > 0 and T_K > 300):
-                    continue
+                if P_reference_Pa is None:
+                    try:
+                        A, B, C = _read_antoine_coefficients(antoine)
+                    except _AntoineCoefficientRefusal as exc:
+                        if not _is_missing_antoine_intercept(exc):
+                            _raise_invalid_antoine_coefficient(
+                                exc,
+                                species=species,
+                                field="P_reference_Antoine_Pa",
+                            )
+                        reason = _antoine_skip_reason_for_refusal(exc)
+                        _append_antoine_skip_notice(
+                            warnings,
+                            antoine_skip_notice_keys,
+                            antoine,
+                            species=species,
+                            site="equilibrium.internal_analytical.metal_antoine",
+                            temperature_K=T_K,
+                            reason=reason,
+                        )
+                        _sz_missing_antoine_intercept(species, reason)
+                        continue
+                    if T_K <= 300.0:
+                        continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
                 )
@@ -685,13 +815,21 @@ class EquilibriumMixin:
                     and len(certified_range) == 2
                     and T_K < float(certified_range[0])
                 ):
-                    warnings.append(
+                    omission_notice = (
                         "metal_vapor_pressure_out_of_source_certified_range: "
                         f"species={species} consumer=legacy_condensed_rail "
                         f"temperature_K={T_K:.3f} "
                         "source_certified_range_K="
                         f"[{float(certified_range[0]):g}, "
                         f"{float(certified_range[1]):g}]"
+                    )
+                    warnings.append(omission_notice)
+                    _sz_omit(
+                        species,
+                        ZeroBecause.REFUSED_UPSTREAM,
+                        field='source_certified_range_K',
+                        detail=omission_notice,
+                        category=CATEGORY_REFUSE,
                     )
                     continue
                 if reconstructed_vapor_limit is None:
@@ -800,10 +938,33 @@ class EquilibriumMixin:
             liquid_rxn = liquid_rxn_early
             if liquid_rxn is not None and fit_target != FIT_TARGET_STANDARD_REACTION:
                 antoine_liq = liquid_rxn.get("antoine", {}) or {}
-                A_l = float(antoine_liq.get("A", 0.0) or 0.0)
-                B_l = float(antoine_liq.get("B", 0.0) or 0.0)
-                C_l = float(antoine_liq.get("C", 0.0) or 0.0)
-                if not (A_l > 0.0 and T_K > 300.0):
+                try:
+                    A_l, B_l, C_l = _read_antoine_coefficients(antoine_liq)
+                except _AntoineCoefficientRefusal as exc:
+                    if not _is_missing_antoine_intercept(exc):
+                        _raise_invalid_antoine_coefficient(
+                            exc,
+                            species=species,
+                            field=(
+                                "P_reference_liquid_oxide_standard_reaction_Pa"
+                            ),
+                        )
+                    reason = _antoine_skip_reason_for_refusal(exc)
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine_liq,
+                        species=species,
+                        site=(
+                            "equilibrium.internal_analytical."
+                            "liquid_oxide_antoine"
+                        ),
+                        temperature_K=T_K,
+                        reason=reason,
+                    )
+                    _sz_missing_antoine_intercept(species, reason)
+                    continue
+                if T_K <= 300.0:
                     continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
@@ -887,10 +1048,30 @@ class EquilibriumMixin:
             gas_rail_rxn = gas_rail_rxn_early
             if gas_standard_rail and gas_rail_rxn is not None:
                 antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
-                A_g = float(antoine_gas.get("A", 0.0) or 0.0)
-                B_g = float(antoine_gas.get("B", 0.0) or 0.0)
-                C_g = float(antoine_gas.get("C", 0.0) or 0.0)
-                if not (A_g > 0.0 and T_K > 300.0):
+                try:
+                    A_g, B_g, C_g = _read_antoine_coefficients(antoine_gas)
+                except _AntoineCoefficientRefusal as exc:
+                    if not _is_missing_antoine_intercept(exc):
+                        _raise_invalid_antoine_coefficient(
+                            exc,
+                            species=species,
+                            field=(
+                                "P_reference_gas_rail_standard_reaction_Pa"
+                            ),
+                        )
+                    reason = _antoine_skip_reason_for_refusal(exc)
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine_gas,
+                        species=species,
+                        site="equilibrium.internal_analytical.gas_rail_antoine",
+                        temperature_K=T_K,
+                        reason=reason,
+                    )
+                    _sz_missing_antoine_intercept(species, reason)
+                    continue
+                if T_K <= 300.0:
                     continue
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
@@ -1125,6 +1306,17 @@ class EquilibriumMixin:
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:
+                _sz_omit(
+                    species,
+                    ZeroBecause.PROVEN_BELOW_THRESHOLD,
+                    field='metal_activity_numerator',
+                    detail=(
+                        f'metal activity numerator={numerator!r} <= 0; no '
+                        'positive metal activity is available, so the species '
+                        'is omitted from vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_PROVEN_ZERO,
+                )
                 continue
 
             metal_activity_root = numerator ** (1.0 / n_M)
@@ -1234,12 +1426,33 @@ class EquilibriumMixin:
 
         for name, data in oxide_vapors_data.items():
             antoine = data.get('antoine', {})
-            A = antoine.get('A', 0)
-            B = antoine.get('B', 0)
-            C = antoine.get('C', 0)
+            try:
+                A, B, C = _read_antoine_coefficients(antoine)
+            except _AntoineCoefficientRefusal as exc:
+                if not _is_missing_antoine_intercept(exc):
+                    _raise_invalid_antoine_coefficient(
+                        exc,
+                        species=str(name),
+                        field="P_sat",
+                    )
+                reason = _antoine_skip_reason_for_refusal(exc)
+                _append_antoine_skip_notice(
+                    warnings,
+                    antoine_skip_notice_keys,
+                    antoine,
+                    species=name,
+                    site=(
+                        "equilibrium.internal_analytical."
+                        "oxide_vapor_antoine"
+                    ),
+                    temperature_K=T_K,
+                    reason=reason,
+                )
+                _sz_missing_antoine_intercept(str(name), reason)
+                continue
             valid = data.get('valid_range_K', [0, 9999])
 
-            if A > 0 and valid[0] <= T_K <= valid[1]:
+            if valid[0] <= T_K <= valid[1]:
                 log_P = _antoine_log10_pressure(A, B, C, T_K)
                 P_sat = _pow10_pressure_or_raise(
                     log_P,
@@ -1247,8 +1460,17 @@ class EquilibriumMixin:
                     field="P_sat",
                 )
             else:
-                # Out-of-range or A <= 0: omit without a silent-zero note
-                # on this path (the `_sz_omit` helpers are not called).
+                _sz_omit(
+                    str(name),
+                    ZeroBecause.OUT_OF_DOMAIN_MARKED,
+                    field='valid_range_K',
+                    detail=(
+                        f'temperature_K={T_K!r} is outside valid_range_K '
+                        f'[{valid[0]!r}, {valid[1]!r}]; species omitted from '
+                        'vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_MARK,
+                )
                 continue
 
             parent_oxide = data.get('parent_oxide', '')
@@ -1289,19 +1511,8 @@ class EquilibriumMixin:
                     field="P_sat_pO2",
                 )
 
-            # SiO pO2 correction is piecewise around the calibration
-            # reference, not a global 1/sqrt(pO2) law.
-            # Premise: SiO2(melt) → SiO(g) + 1/2 O2(g) has
-            #   K = p_SiO * pO2^{1/2} / a_SiO2  (reduced pressures).
-            # Algebra: p_SiO = K a_SiO2 / sqrt(pO2). Relative to the
-            # fitted reference p_ref:
-            #   P = P_ref * sqrt(p_ref / pO2)   when pO2 > p_ref.
-            # Unit check: p_ref/pO2 is bar/bar, dimensionless.
-            # Sanity: 100× higher pO2 above p_ref cuts p_SiO by 10.
-            # At pO2 <= p_ref this branch does not run, so p_SiO stays
-            # at the reference-calibrated value (no 1/sqrt enhancement).
-            # Body vacuum floors below p_ref therefore do not retune
-            # the SiO fit; they also do not raise p_SiO.
+            # The declared reaction reference stays fixed as environmental
+            # oxygen changes; the shared pressure owner continues both sides.
             sio_reference_bar = vacuum_floor_bar
             if name == 'SiO':
                 sio_reference_bar = max(
@@ -1311,9 +1522,10 @@ class EquilibriumMixin:
             if (
                 name == 'SiO'
                 and not pO2_exponent
-                and pO2_bar > sio_reference_bar
             ):
-                suppression = math.sqrt(sio_reference_bar / pO2_bar)
+                from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
+
+                suppression = _sio_oxygen_pressure_factor(pO2_bar, sio_reference_bar)
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,
@@ -1360,10 +1572,8 @@ class EquilibriumMixin:
                 consumer='legacy-equilibrium-fallback',
             ),
         }
-        # b-149: merge notes collected on the `_sz_omit` paths. This
-        # completed path sets status='ok'; invalid T/P already returned
-        # out_of_domain above. Oxide-vapor valid_range_K misses remain
-        # un-noted on this path.
+        # This completed path sets status='ok'; invalid T/P already returned
+        # out_of_domain above. Merge every typed omission note into its result.
         if silent_zero_notes:
             merge_notes_into_mapping(_eq_diagnostics, silent_zero_notes)
         return EquilibriumResult(
@@ -1381,7 +1591,10 @@ class EquilibriumMixin:
             },
             activity_coefficients=activities,
             fO2_log=intrinsic_fO2_log,
-            warnings=warnings,
+            warnings=_antoine_skip_notices_for_omitted_species(
+                warnings,
+                vapor_pressures,
+            ),
             status='ok',
             diagnostics=_eq_diagnostics,
         )

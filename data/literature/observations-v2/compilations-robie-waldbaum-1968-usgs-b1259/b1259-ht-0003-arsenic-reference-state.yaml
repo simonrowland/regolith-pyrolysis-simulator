@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -77,8 +77,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='12.014'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -108,6 +121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=arsenic-(reference-state):v=60523f0dfe
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -126,8 +140,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -183,8 +197,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='12.506'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -214,6 +241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=arsenic-(reference-state):v=2537eba07a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -232,8 +260,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -289,8 +317,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='12.999'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -320,6 +361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=arsenic-(reference-state):v=4d413fc065
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -338,8 +380,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -395,8 +437,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='13.492'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -426,6 +481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=arsenic-(reference-state):v=7d9ddd5bf3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -444,8 +500,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -501,8 +557,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='13.985'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -532,6 +601,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=arsenic-(reference-state):v=3eadbfbaa8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -550,8 +620,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -607,8 +677,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='14.478'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -638,6 +721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=arsenic-(reference-state):v=077a987206
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -656,8 +740,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -713,8 +797,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='14.972'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -744,6 +841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=arsenic-(reference-state):v=7053db6b70
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -762,8 +860,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -819,8 +917,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='15.467'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -850,6 +961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=arsenic-(reference-state):v=8a9b7b8e4c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -868,8 +980,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -925,8 +1037,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='15.962'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -956,6 +1081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=arsenic-(reference-state):v=0f01c7b3ff
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -974,8 +1100,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1031,8 +1157,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='16.457'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1062,6 +1201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=arsenic-(reference-state):v=2c7b53382f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1080,8 +1220,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1137,8 +1277,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='16.952'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1168,6 +1321,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1186,8 +1340,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1243,8 +1397,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1274,6 +1441,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=arsenic-(reference-state):v=ea45d6c6d7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1292,8 +1460,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1349,8 +1517,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='0.614'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1380,6 +1561,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=arsenic-(reference-state):v=fcb9d14aff
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1398,8 +1580,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1455,8 +1637,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='1.239'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1486,6 +1681,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=arsenic-(reference-state):v=49ef927e43
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1504,8 +1700,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1561,8 +1757,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='1.880'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1592,6 +1801,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=arsenic-(reference-state):v=ebae1a9e00
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1610,8 +1820,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1667,8 +1877,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='2.541'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1698,6 +1921,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=arsenic-(reference-state):v=f0f0927afc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1716,8 +1940,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1773,8 +1997,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='3.229'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1804,6 +2041,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=885:col=H_minus_H298:name=arsenic-(reference-state):v=356ad3cf74
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1822,8 +2060,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1879,8 +2117,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='3.837'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1910,6 +2161,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=885:col=H_minus_H298:name=arsenic-(reference-state):v=f6b28143ec
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -1928,8 +2180,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1985,8 +2237,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='11.448'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2016,6 +2281,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=arsenic-(reference-state):v=b5aa23694a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -2034,8 +2300,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -2091,8 +2357,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 28
+        pdf_page_index: 34
+        table: b1259-ht-0003-arsenic-reference-state
+        note: as_published='11.522'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
+        record: b1259-ht-0003-arsenic-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2122,6 +2401,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1000:col=entropy:name=arsenic-(reference-state):v=cfb3ea862f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -2241,6 +2521,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1200:col=entropy:name=arsenic-(reference-state):v=2b896d6893
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -2360,6 +2641,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1300:col=entropy:name=arsenic-(reference-state):v=c6f373b1a1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -2479,6 +2761,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1400:col=entropy:name=arsenic-(reference-state):v=3637609ff5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -2598,6 +2881,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1500:col=entropy:name=arsenic-(reference-state):v=a042a7e8c8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -2717,6 +3001,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1600:col=entropy:name=arsenic-(reference-state):v=2b42c3f80c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -2836,6 +3121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1700:col=entropy:name=arsenic-(reference-state):v=f58632c19c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -2955,6 +3241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1800:col=entropy:name=arsenic-(reference-state):v=a06e9bef82
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -3074,6 +3361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=1900:col=entropy:name=arsenic-(reference-state):v=beaef7eb6f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -3193,6 +3481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=2000:col=entropy:name=arsenic-(reference-state):v=a7e4a7b2f3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -3312,6 +3601,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=298.15:col=entropy:name=arsenic-(reference-state):v=2cf70f3ae9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -3431,6 +3721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=400:col=entropy:name=arsenic-(reference-state):v=1108f8458e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -3550,6 +3841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=500:col=entropy:name=arsenic-(reference-state):v=a13d1449f8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -3669,6 +3961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=600:col=entropy:name=arsenic-(reference-state):v=bff5d2896c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -3788,6 +4081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=800:col=entropy:name=arsenic-(reference-state):v=bc3bd8e414
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -3907,6 +4201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=885:col=entropy:name=arsenic-(reference-state):v=07a569a1ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -4026,6 +4321,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=885:col=entropy:name=arsenic-(reference-state):v=47de6e7c42
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -4145,6 +4441,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:S:shared:T=900:col=entropy:name=arsenic-(reference-state):v=78142b6074
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -4264,6 +4561,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -4423,6 +4721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -4582,6 +4881,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -4741,6 +5041,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -4900,6 +5201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -5059,6 +5361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -5218,6 +5521,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -5377,6 +5681,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -5536,6 +5841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -5695,6 +6001,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -5854,6 +6161,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -6013,6 +6321,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -6172,6 +6481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -6331,6 +6641,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -6490,6 +6801,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -6649,6 +6961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -6808,6 +7121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -6967,6 +7281,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=885:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -7076,6 +7391,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -7235,6 +7551,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -7394,6 +7711,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -7553,6 +7871,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -7712,6 +8031,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -7871,6 +8191,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -8030,6 +8351,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -8189,6 +8511,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -8348,6 +8671,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -8507,6 +8831,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -8666,6 +8991,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -8825,6 +9151,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -8984,6 +9311,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -9143,6 +9471,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -9302,6 +9631,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -9461,6 +9791,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -9620,6 +9951,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -9779,6 +10111,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -9938,6 +10271,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=885:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -10047,6 +10381,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=arsenic-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -10206,6 +10541,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -10356,6 +10692,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -10506,6 +10843,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -10656,6 +10994,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -10806,6 +11145,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -10956,6 +11296,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -11106,6 +11447,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -11256,6 +11598,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -11406,6 +11749,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -11556,6 +11900,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -11706,6 +12051,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -11856,6 +12202,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -12006,6 +12353,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -12156,6 +12504,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -12306,6 +12655,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -12456,6 +12806,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -12606,6 +12957,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -12756,6 +13108,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=885:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -12856,6 +13209,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=arsenic-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0003-arsenic-reference-state:tabulation
   identity:
@@ -13006,3 +13360,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []

@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -58,6 +59,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -109,9 +111,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      gas_species, total_loss_wt_pct, as_printed, table_caption_as_printed, thermal_program_on_table, omitted, T_conversion_note'
+    kind: point
+    point: '0.0012'
     approximate: false
   uncertainty:
     kind: printed
@@ -126,9 +127,14 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_co2_total_loss_wt_pct
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 11
@@ -150,6 +156,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -192,6 +199,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -243,9 +251,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      gas_species, total_loss_wt_pct, as_printed, table_caption_as_printed, thermal_program_on_table, omitted, T_conversion_note'
+    kind: point
+    point: '0.0016'
     approximate: false
   uncertainty:
     kind: printed
@@ -260,9 +267,14 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_h2o_total_loss_wt_pct
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 11
@@ -284,6 +296,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -329,6 +342,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -374,6 +388,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -419,6 +434,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -464,6 +480,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -515,10 +532,9 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      hold_C_as_printed, T_K, T_conversion, atmosphere_as_printed, hold_time_hr, mass_loss_wt_pct_range, as_printed, quote,
-      preceding_ramp_as_printed, figure_curve'
+    kind: interval
+    interval_low: '0.0045'
+    interval_high: '0.005'
     approximate: false
   uncertainty:
     kind: printed
@@ -531,9 +547,14 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_arh2_750C_2hr_hold_mass_loss
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 8
@@ -563,6 +584,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -604,6 +626,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -645,6 +668,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -686,6 +710,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -725,6 +750,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -776,9 +802,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      gas_species, total_loss_wt_pct, as_printed, table_caption_as_printed, thermal_program_on_table, omitted, T_conversion_note'
+    kind: point
+    point: '0.00079'
     approximate: false
   uncertainty:
     kind: printed
@@ -793,9 +818,14 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_so2_total_loss_wt_pct
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 11
@@ -817,6 +847,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -857,6 +888,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -909,6 +941,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

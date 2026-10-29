@@ -1,0 +1,3254 @@
+schema_version: literature_extract.v1
+source_id: shimaoka-nakamura-1989-nipr2-252
+source:
+  citation: Shimaoka, T. & Nakamura, N. (1989), “Vaporization of sodium from a partially molten chondritic material,”
+    Proc. NIPR Symp. Antarct. Meteorites 2, 252–267.
+  year: 1989
+extraction:
+  method: All 16 source pages rendered at 220 dpi and visually reviewed. Tables 1–3 transcribed from page images;
+    OCR used only as a lead. Figures 2–5 retained as figure-only context without digitization.
+  date: '2026-10-05'
+  worker: codex
+  provenance_path: raw/shimaoka-nakamura-1989-nipr2-252/shimaoka-nakamura-1989-nipr2-252.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Na
+  observable: concentration_series
+  observation_id: shimaoka_1989_table2_run_37_a
+  field: residue_ppm
+  value: 450.0
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+- species: Na
+  observable: method
+  observation_id: shimaoka_1989_table1_starting_material_assays
+  field: rows
+  value:
+  - analyte: Na
+    replicate_or_statistic: replicate_1
+    A_fine_wt_pct: 0.676
+    B_coarse_wt_pct: 0.588
+  - analyte: Na
+    replicate_or_statistic: replicate_2
+    A_fine_wt_pct: 0.655
+    B_coarse_wt_pct: 0.576
+  - analyte: Na
+    replicate_or_statistic: replicate_3
+    A_fine_wt_pct: 0.705
+    B_coarse_wt_pct: 0.594
+  - analyte: Na
+    replicate_or_statistic: replicate_4
+    A_fine_wt_pct: 0.665
+  - analyte: Na
+    replicate_or_statistic: mean
+    A_fine_wt_pct: 0.675
+    B_coarse_wt_pct: 0.586
+  - analyte: Na
+    replicate_or_statistic: standard_deviation
+    A_fine_wt_pct: 0.021
+    B_coarse_wt_pct: 0.009
+  - analyte: Ca
+    replicate_or_statistic: replicate_1
+    A_fine_wt_pct: 1.36
+    B_coarse_wt_pct: 1.23
+  - analyte: Ca
+    replicate_or_statistic: replicate_2
+    A_fine_wt_pct: 1.37
+    B_coarse_wt_pct: 1.27
+  - analyte: Ca
+    replicate_or_statistic: replicate_3
+    A_fine_wt_pct: 1.35
+  - analyte: Mg
+    replicate_or_statistic: replicate_1
+    A_fine_wt_pct: 15.2
+    B_coarse_wt_pct: 16.4
+  - analyte: Mg
+    replicate_or_statistic: replicate_2
+    A_fine_wt_pct: 15.3
+    B_coarse_wt_pct: 15.2
+  - analyte: Mg
+    replicate_or_statistic: replicate_3
+    A_fine_wt_pct: 15.2
+  - analyte: Fe
+    replicate_or_statistic: replicate_1
+    A_fine_wt_pct: 15.5
+    B_coarse_wt_pct: 11.9
+  - analyte: Fe
+    replicate_or_statistic: replicate_2
+    A_fine_wt_pct: 15.2
+    B_coarse_wt_pct: 13.2
+  locator:
+    published_page: 256
+    pdf_page_index: 4
+    table: '1'
+- species: Na
+  observable: method
+  observation_id: shimaoka_1989_table3_author_calculated_rates
+  field: rows
+  value:
+  - f_assumed_effective_partial_melt_area_fraction: 1.0
+    T_C: 1200.0
+    Na_vaporization_rate_cm3_min_cm2: 1.0e-05
+    derived_from: &id001
+    - shimaoka_1989_table2_run_37_a
+    - shimaoka_1989_table2_run_35_a
+    - shimaoka_1989_table2_run_51_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id001
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=1; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 1.0
+    T_C: 1250.0
+    Na_vaporization_rate_cm3_min_cm2: 3.0e-05
+    derived_from: &id002
+    - shimaoka_1989_table2_run_53_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id002
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=1; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 1.0
+    T_C: 1300.0
+    Na_vaporization_rate_cm3_min_cm2: 0.0001
+    derived_from: &id003
+    - shimaoka_1989_table2_run_29_a
+    - shimaoka_1989_table2_run_30_a
+    - shimaoka_1989_table2_run_28_a
+    - shimaoka_1989_table2_run_32_a
+    - shimaoka_1989_table2_run_42_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id003
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=1; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 1.0
+    T_C: 1400.0
+    Na_vaporization_rate_cm3_min_cm2: 0.00066
+    derived_from: &id004
+    - shimaoka_1989_table2_run_41_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id004
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=1; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.2
+    T_C: 1200.0
+    Na_vaporization_rate_cm3_min_cm2: 5.2e-05
+    derived_from: &id005
+    - shimaoka_1989_table2_run_37_a
+    - shimaoka_1989_table2_run_35_a
+    - shimaoka_1989_table2_run_51_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id005
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.2; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.2
+    T_C: 1250.0
+    Na_vaporization_rate_cm3_min_cm2: 0.00015
+    derived_from: &id006
+    - shimaoka_1989_table2_run_53_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id006
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.2; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.2
+    T_C: 1300.0
+    Na_vaporization_rate_cm3_min_cm2: 0.0005
+    derived_from: &id007
+    - shimaoka_1989_table2_run_29_a
+    - shimaoka_1989_table2_run_30_a
+    - shimaoka_1989_table2_run_28_a
+    - shimaoka_1989_table2_run_32_a
+    - shimaoka_1989_table2_run_42_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id007
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.2; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.2
+    T_C: 1400.0
+    Na_vaporization_rate_cm3_min_cm2: 0.0033
+    derived_from: &id008
+    - shimaoka_1989_table2_run_41_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id008
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.2; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.1
+    T_C: 1200.0
+    Na_vaporization_rate_cm3_min_cm2: 0.00011
+    derived_from: &id009
+    - shimaoka_1989_table2_run_37_a
+    - shimaoka_1989_table2_run_35_a
+    - shimaoka_1989_table2_run_51_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id009
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.1; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.1
+    T_C: 1250.0
+    Na_vaporization_rate_cm3_min_cm2: 0.0003
+    derived_from: &id010
+    - shimaoka_1989_table2_run_53_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id010
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.1; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.1
+    T_C: 1300.0
+    Na_vaporization_rate_cm3_min_cm2: 0.001
+    derived_from: &id011
+    - shimaoka_1989_table2_run_29_a
+    - shimaoka_1989_table2_run_30_a
+    - shimaoka_1989_table2_run_28_a
+    - shimaoka_1989_table2_run_32_a
+    - shimaoka_1989_table2_run_42_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id011
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.1; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.1
+    T_C: 1400.0
+    Na_vaporization_rate_cm3_min_cm2: 0.0066
+    derived_from: &id012
+    - shimaoka_1989_table2_run_41_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id012
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.1; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.05
+    T_C: 1200.0
+    Na_vaporization_rate_cm3_min_cm2: 0.00021
+    derived_from: &id013
+    - shimaoka_1989_table2_run_37_a
+    - shimaoka_1989_table2_run_35_a
+    - shimaoka_1989_table2_run_51_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id013
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.05; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.05
+    T_C: 1250.0
+    Na_vaporization_rate_cm3_min_cm2: 0.0006
+    derived_from: &id014
+    - shimaoka_1989_table2_run_53_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id014
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.05; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.05
+    T_C: 1300.0
+    Na_vaporization_rate_cm3_min_cm2: 0.002
+    derived_from: &id015
+    - shimaoka_1989_table2_run_29_a
+    - shimaoka_1989_table2_run_30_a
+    - shimaoka_1989_table2_run_28_a
+    - shimaoka_1989_table2_run_32_a
+    - shimaoka_1989_table2_run_42_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id015
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.05; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  - f_assumed_effective_partial_melt_area_fraction: 0.05
+    T_C: 1400.0
+    Na_vaporization_rate_cm3_min_cm2: 0.013
+    derived_from: &id016
+    - shimaoka_1989_table2_run_41_b
+    derivation:
+      relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+      inputs: *id016
+      output_unit: cm³/min cm² as printed
+    locator:
+      published_page: 263
+      pdf_page_index: 11
+      table: '3'
+      note: Printed row f=0.05; Table 3.
+    method_class: model_derived
+    attribution: Calculated by the authors using equation (4).
+  locator:
+    published_page: 263
+    pdf_page_index: 11
+    table: '3'
+benches:
+- id: ta-vaporization-furnace
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Evacuated-chamber resistance-heating vaporization apparatus with open tantalum crucible
+    locator: &id017
+      published_page: 253
+      pdf_page_index: 1
+      section: 2.1 Apparatus
+  method:
+    state:
+      tag: value
+      value: Heating and vaporization in a vacuum chamber; the authors do not name a Langmuir method
+    locator: *id017
+  cell_materials:
+  - state:
+      tag: value
+      value: Ta
+    locator: *id017
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Disposable tantalum-sheet sample crucible, 0.1 mm thick; tantalum holder, heater and thermal shields;
+        no liner stated
+    locator: *id017
+  geometry:
+    sample_crucible_diameter_mm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7'
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        note: Printed crucible dimensions φ=7×10 mm; this preserves diameter only.
+    sample_crucible_height_mm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        note: Printed crucible dimensions φ=7×10 mm; interpreted as diameter × height.
+  heating_method:
+    state:
+      tag: value
+      value: Tantalum resistance heater
+    locator: *id017
+  pumping_type:
+    state:
+      tag: value
+      value: Shimazu TMP-150 turbo molecular pump and Shimazu MCD-160FA rotary pump
+    locator: *id017
+  gauges:
+    pressure:
+      state:
+        tag: value
+        value: ANELVA MIG-820 ionization gauge
+      locator: *id017
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: W95Re5–W75Re25 (W-5%Re/W-25%Re) thermocouple monitoring the crucible
+      locator: *id017
+  temperature_calibration:
+    reference:
+      state:
+        tag: value
+        value: Pure gold melting point, 1064°C, in vacuo
+      locator: *id017
+  other_facts:
+  - name: sample_crucible_diameter
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7'
+      locator: *id017
+  - name: sample_crucible_length
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator: *id017
+  - name: sample_crucible_wall_thickness
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+      locator: *id017
+  - name: mass_spectrometric_intensity_to_pressure_calibration
+    unit: not_applicable
+    value:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        note: No mass spectrometer, ion current or vapor-pressure measurement is reported.
+  - name: mass_spectrometric_ionization_energy
+    unit: eV
+    value:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id017
+  - name: mass_spectrometric_multiplier_or_isotope_correction
+    unit: not_applicable
+    value:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id017
+  - name: sample_crucible_orifice
+    unit: not_applicable
+    value:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        note: Open crucible; no effusion orifice or channel is described.
+  - name: chamber_schematic_width
+    unit: cm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        figure: '1'
+        note: Dimension labelled on schematic; figure geometry is illustrative.
+  - name: chamber_schematic_height
+    unit: cm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        figure: '1'
+        note: Dimension labelled on schematic; figure geometry is illustrative.
+  - name: heater_schematic_length
+    unit: cm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7'
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        figure: '1'
+        note: Dimension labelled on schematic; figure geometry is illustrative.
+  - name: estimated_temperature_precision
+    unit: °C
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        note: Printed estimated precision ±3°C; numeric magnitude 3°C.
+  - name: normal_pump_down_pressure
+    unit: torr
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: 1e-6
+          interval_high: 5e-6
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+        note: Gauge normally pumping down to 1–5×10⁻⁶ torr before adjustment.
+  - name: atomic_absorption_calibration_standard_or_curve
+    unit: not_published
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.3 Analysis
+        note: Atomic absorption is named; standards, calibration curve and calibration procedure are not stated.
+experiments:
+- experiment_id: sample-A-series
+  bench_id: ta-vaporization-furnace
+  method: langmuir_free_evaporation
+  locator:
+    published_page: 254
+    pdf_page_index: 2
+    section: 2.2 Sample and heating procedures
+    note: Open crucible in evacuated chamber; method token is an apparatus-based classification. Authors use “vaporization”
+      and do not explicitly name Langmuir evaporation.
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00005'
+          approximate: true
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+        note: About 50 mg; unit conversion only.
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite, metal-removed, sample A, fine, φ<10 µm
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+    pretreatment:
+      state:
+        tag: value
+        value: 10 g meteorite crushed and sieved; A is <10 µm powder; B is 50–90 µm fraction; metal particles removed
+          magnetically during preparation; troilite not intentionally separated but partly removed; aliquot carefully
+          mixed; crucible baked 2–3 h at 1500°C; sample degassed below 900°C for about 2 h before heating.
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+    characterization:
+      state:
+        tag: value
+        value: No sample purity reported; fine metal particles may remain in silicate grains. Starting material
+          assays are transcribed in Table 1.
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 253
+          pdf_page_index: 1
+          section: 2.1 Apparatus
+          note: Open crucible, not an effusion cell.
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 253
+          pdf_page_index: 1
+          section: 2.1 Apparatus
+          note: Open crucible, not an effusion cell.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00102658'
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+        note: 7.7×10⁻⁶ torr in heating chamber; SI conversion only.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+        note: Evacuated chamber; no sweep gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Temperature varies by run; exact °C values are on each observation and in CSV.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Ramp at 29°C/min from below 900°C to 1150–1450°C; hold 1–160 min; power off for quench.
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+        note: Hold durations are individual values in Table 2; ramp and total run durations are not tabulated per
+          row.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Power off; cooling rate 440–700°C/min
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+- experiment_id: sample-B-series
+  bench_id: ta-vaporization-furnace
+  method: langmuir_free_evaporation
+  locator:
+    published_page: 254
+    pdf_page_index: 2
+    section: 2.2 Sample and heating procedures
+    note: Open crucible in evacuated chamber; method token is an apparatus-based classification. Authors use “vaporization”
+      and do not explicitly name Langmuir evaporation.
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00005'
+          approximate: true
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+        note: About 50 mg; unit conversion only.
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite, metal-removed, sample B, coarse, φ=50–90 µm
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+    pretreatment:
+      state:
+        tag: value
+        value: 10 g meteorite crushed and sieved; A is <10 µm powder; B is 50–90 µm fraction; metal particles removed
+          magnetically during preparation; troilite not intentionally separated but partly removed; aliquot carefully
+          mixed; crucible baked 2–3 h at 1500°C; sample degassed below 900°C for about 2 h before heating.
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+    characterization:
+      state:
+        tag: value
+        value: No sample purity reported; fine metal particles may remain in silicate grains. Starting material
+          assays are transcribed in Table 1.
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 253
+          pdf_page_index: 1
+          section: 2.1 Apparatus
+          note: Open crucible, not an effusion cell.
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 253
+          pdf_page_index: 1
+          section: 2.1 Apparatus
+          note: Open crucible, not an effusion cell.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00102658'
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+        note: 7.7×10⁻⁶ torr in heating chamber; SI conversion only.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+        note: Evacuated chamber; no sweep gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Temperature varies by run; exact °C values are on each observation and in CSV.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Ramp at 29°C/min from below 900°C to 1150–1450°C; hold 1–160 min; power off for quench.
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+        note: Hold durations are individual values in Table 2; ramp and total run durations are not tabulated per
+          row.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Power off; cooling rate 440–700°C/min
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.2 Sample and heating procedures
+species:
+  Na:
+    observations:
+    - observation_id: shimaoka_1989_table2_run_37_a
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 37 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-A-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample A (fine <10 µm)
+        run_no: 37
+        duration_min: 70.0
+        weight_loss_pct: 3.0
+        holes_pct: 31.1
+        total_surface_area_cm2: 6.16
+        outside_charge_surface_area_cm2: 0.25
+        degree_partial_melting_pct: 11.7
+        residue_ppm: 450.0
+        T_C: 1200.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_35_a
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 35 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-A-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample A (fine <10 µm)
+        run_no: 35
+        duration_min: 160.0
+        weight_loss_pct: 3.3
+        holes_pct: 33.2
+        total_surface_area_cm2: 5.5
+        outside_charge_surface_area_cm2: 0.27
+        degree_partial_melting_pct: 13.0
+        residue_ppm: 129.0
+        T_C: 1200.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_29_a
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 29 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-A-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample A (fine <10 µm)
+        run_no: 29
+        duration_min: 40.0
+        weight_loss_pct: 2.8
+        holes_pct: 6.5
+        total_surface_area_cm2: 2.4
+        outside_charge_surface_area_cm2: 0.3
+        degree_partial_melting_pct: 25.2
+        residue_ppm: 1170.0
+        T_C: 1300.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_30_a
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 30 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-A-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample A (fine <10 µm)
+        run_no: 30
+        duration_min: 56.0
+        weight_loss_pct: 3.0
+        holes_pct: 11.8
+        total_surface_area_cm2: 2.59
+        outside_charge_surface_area_cm2: 0.26
+        degree_partial_melting_pct: 22.1
+        residue_ppm: 87.0
+        T_C: 1300.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_28_a
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 28 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-A-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample A (fine <10 µm)
+        run_no: 28
+        duration_min: 80.0
+        weight_loss_pct: 3.3
+        holes_pct: 10.2
+        total_surface_area_cm2: 2.78
+        outside_charge_surface_area_cm2: 0.29
+        degree_partial_melting_pct: 31.1
+        residue_ppm: 98.0
+        T_C: 1300.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_27_a
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 27 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-A-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample A (fine <10 µm)
+        run_no: 27
+        duration_min: 120.0
+        weight_loss_pct: 3.3
+        holes_pct: 11.0
+        total_surface_area_cm2: 4.28
+        outside_charge_surface_area_cm2: 0.34
+        degree_partial_melting_pct: 22.3
+        residue_ppm: 462.0
+        T_C: 1300.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_32_a
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 32 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-A-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample A (fine <10 µm)
+        run_no: 32
+        duration_min: 138.0
+        weight_loss_pct: 3.8
+        holes_pct: 9.7
+        total_surface_area_cm2: 2.49
+        outside_charge_surface_area_cm2: 0.26
+        degree_partial_melting_pct: 24.2
+        residue_ppm: 6.0
+        T_C: 1300.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+      reason: 'source_internally_inconsistent: Table 2 prints 6 ppm for run 32A, while §3.4 prose states 5 ppm;
+        both values are retained at their respective locators.'
+    - observation_id: shimaoka_1989_table2_run_31_a
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 31 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-A-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample A (fine <10 µm)
+        run_no: 31
+        duration_min: 160.0
+        weight_loss_pct: 3.6
+        holes_pct: 8.8
+        total_surface_area_cm2: 2.57
+        outside_charge_surface_area_cm2: 0.27
+        degree_partial_melting_pct: 32.3
+        residue_ppm: 109.0
+        T_C: 1300.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_51_b
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 51 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-B-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample B (coarse 50–90 µm)
+        run_no: 51
+        duration_min: 30.0
+        weight_loss_pct: 1.9
+        holes_pct: 41.6
+        total_surface_area_cm2: 3.24
+        outside_charge_surface_area_cm2: 0.2
+        degree_partial_melting_pct: 18.5
+        residue_ppm: 2360.0
+        T_C: 1200.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_53_b
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 53 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-B-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample B (coarse 50–90 µm)
+        run_no: 53
+        duration_min: 30.0
+        weight_loss_pct: 1.8
+        holes_pct: 58.5
+        total_surface_area_cm2: 3.59
+        outside_charge_surface_area_cm2: 0.19
+        degree_partial_melting_pct: 10.9
+        residue_ppm: 354.0
+        T_C: 1250.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_42_b
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 42 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-B-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample B (coarse 50–90 µm)
+        run_no: 42
+        duration_min: 20.0
+        weight_loss_pct: 2.0
+        holes_pct: 56.5
+        total_surface_area_cm2: 5.25
+        outside_charge_surface_area_cm2: 0.21
+        degree_partial_melting_pct: 32.3
+        residue_ppm: 1120.0
+        T_C: 1300.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    - observation_id: shimaoka_1989_table2_run_41_b
+      type: concentration_series
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 41 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      phase: quenched_partial_melt_run_product
+      regime: vacuum_vaporization
+      units: °C, min, wt%, cm², ppm as printed
+      experiment: sample-B-series
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_tabulated
+        standard_state: Bulk Na concentration in blank-corrected quenched run product measured by atomic absorption;
+          not an oxide activity or vapor pressure.
+        material: Etter L5 sample B (coarse 50–90 µm)
+        run_no: 41
+        duration_min: 2.0
+        weight_loss_pct: 1.9
+        holes_pct: 13.5
+        total_surface_area_cm2: 1.41
+        outside_charge_surface_area_cm2: 0.2
+        degree_partial_melting_pct: 33.6
+        residue_ppm: 65.0
+        T_C: 1400.0
+      uncertainty:
+        note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies
+          especially large uncertainty or rejection for runs 32A, 27A and 31A.
+    context:
+    - observation_id: shimaoka_1989_table1_starting_material_assays
+      type: method
+      locator:
+        published_page: 256
+        pdf_page_index: 4
+        table: '1'
+      units: wt% elemental Na, Ca, Mg, Fe as printed
+      values:
+        quantity: starting_material_composition_assays
+        method_class: measured_tabulated
+        rows:
+        - analyte: Na
+          replicate_or_statistic: replicate_1
+          A_fine_wt_pct: 0.676
+          B_coarse_wt_pct: 0.588
+        - analyte: Na
+          replicate_or_statistic: replicate_2
+          A_fine_wt_pct: 0.655
+          B_coarse_wt_pct: 0.576
+        - analyte: Na
+          replicate_or_statistic: replicate_3
+          A_fine_wt_pct: 0.705
+          B_coarse_wt_pct: 0.594
+        - analyte: Na
+          replicate_or_statistic: replicate_4
+          A_fine_wt_pct: 0.665
+        - analyte: Na
+          replicate_or_statistic: mean
+          A_fine_wt_pct: 0.675
+          B_coarse_wt_pct: 0.586
+        - analyte: Na
+          replicate_or_statistic: standard_deviation
+          A_fine_wt_pct: 0.021
+          B_coarse_wt_pct: 0.009
+        - analyte: Ca
+          replicate_or_statistic: replicate_1
+          A_fine_wt_pct: 1.36
+          B_coarse_wt_pct: 1.23
+        - analyte: Ca
+          replicate_or_statistic: replicate_2
+          A_fine_wt_pct: 1.37
+          B_coarse_wt_pct: 1.27
+        - analyte: Ca
+          replicate_or_statistic: replicate_3
+          A_fine_wt_pct: 1.35
+        - analyte: Mg
+          replicate_or_statistic: replicate_1
+          A_fine_wt_pct: 15.2
+          B_coarse_wt_pct: 16.4
+        - analyte: Mg
+          replicate_or_statistic: replicate_2
+          A_fine_wt_pct: 15.3
+          B_coarse_wt_pct: 15.2
+        - analyte: Mg
+          replicate_or_statistic: replicate_3
+          A_fine_wt_pct: 15.2
+        - analyte: Fe
+          replicate_or_statistic: replicate_1
+          A_fine_wt_pct: 15.5
+          B_coarse_wt_pct: 11.9
+        - analyte: Fe
+          replicate_or_statistic: replicate_2
+          A_fine_wt_pct: 15.2
+          B_coarse_wt_pct: 13.2
+        note: Na mean and standard deviation rows retained separately; missing B replicate cells remain absent.
+          Starting materials were made from metal-removed Etter L5 chondrite.
+    - observation_id: shimaoka_1989_table1_etter_mineral_chemistry
+      type: method
+      locator:
+        published_page: 256
+        pdf_page_index: 4
+        table: '1'
+      units: wt% oxide form as printed
+      values:
+        quantity: Etter_L5_measured_mineral_composition
+        method_class: measured_tabulated
+        rows:
+        - oxide_or_component: SiO2
+          plagioclase_wt_pct: 66.2
+          glassy_material_wt_pct: 58.7
+          alkali_feldspar_wt_pct: 68.4
+        - oxide_or_component: TiO2
+          plagioclase_wt_pct: 0.0
+          glassy_material_wt_pct: 0.0
+          alkali_feldspar_wt_pct: 0.0
+        - oxide_or_component: Al2O3
+          plagioclase_wt_pct: 21.0
+          glassy_material_wt_pct: 19.4
+          alkali_feldspar_wt_pct: 21.0
+        - oxide_or_component: Cr2O3
+          plagioclase_wt_pct: 0.0
+          glassy_material_wt_pct: 0.0
+          alkali_feldspar_wt_pct: 0.1
+        - oxide_or_component: CaO
+          plagioclase_wt_pct: 2.4
+          glassy_material_wt_pct: 3.5
+          alkali_feldspar_wt_pct: 0.2
+        - oxide_or_component: FeO
+          plagioclase_wt_pct: 0.3
+          glassy_material_wt_pct: 8.5
+          alkali_feldspar_wt_pct: 0.4
+        - oxide_or_component: MgO
+          plagioclase_wt_pct: 0.1
+          glassy_material_wt_pct: 0.6
+          alkali_feldspar_wt_pct: 0.0
+        - oxide_or_component: MnO
+          plagioclase_wt_pct: 0.0
+          glassy_material_wt_pct: 0.0
+          alkali_feldspar_wt_pct: 0.0
+        - oxide_or_component: K2O
+          plagioclase_wt_pct: 0.2
+          glassy_material_wt_pct: 0.3
+          alkali_feldspar_wt_pct: 3.9
+        - oxide_or_component: Na2O
+          plagioclase_wt_pct: 9.7
+          glassy_material_wt_pct: 7.4
+          alkali_feldspar_wt_pct: 5.8
+        - oxide_or_component: FeS
+        - oxide_or_component: H2O+C
+        - oxide_or_component: Total
+          plagioclase_wt_pct: 99.9
+          glassy_material_wt_pct: 98.4
+          alkali_feldspar_wt_pct: 99.8
+        note: Measured mineral columns only. Glassy material considered to be microcrystalline plagioclase/metal
+          aggregates; compositions expressed as oxide form (footnote *2). Printed mineral blanks remain absent.
+    - observation_id: shimaoka_1989_table1_rubin_bulk_composition
+      type: method
+      locator:
+        published_page: 256
+        pdf_page_index: 4
+        table: '1'
+        note: Bulk column, footnote *3.
+      units: wt% as printed
+      values:
+        quantity: Etter_L5_metal_subtracted_bulk_composition
+        method_class: quoted_attributed
+        attribution: 'Rubin et al. (1983), Table 1 footnote *3: Metal-subtracted composition (adjusted to
+          100%) reported for the Etter (L5) chondrite.'
+        rows:
+        - oxide_or_component: SiO2
+          metal_subtracted_bulk_wt_pct: 42.2
+        - oxide_or_component: TiO2
+          metal_subtracted_bulk_wt_pct: 0.1
+        - oxide_or_component: Al2O3
+          metal_subtracted_bulk_wt_pct: 2.4
+        - oxide_or_component: Cr2O3
+          metal_subtracted_bulk_wt_pct: 0.6
+        - oxide_or_component: CaO
+          metal_subtracted_bulk_wt_pct: 2.0
+        - oxide_or_component: FeO
+          metal_subtracted_bulk_wt_pct: 17.6
+        - oxide_or_component: MgO
+          metal_subtracted_bulk_wt_pct: 26.6
+        - oxide_or_component: MnO
+          metal_subtracted_bulk_wt_pct: 0.3
+        - oxide_or_component: K2O
+          metal_subtracted_bulk_wt_pct: 0.1
+        - oxide_or_component: Na2O
+          metal_subtracted_bulk_wt_pct: 0.9
+        - oxide_or_component: FeS
+          metal_subtracted_bulk_wt_pct: 6.1
+        - oxide_or_component: H2O+C
+          metal_subtracted_bulk_wt_pct: 1.1
+        - oxide_or_component: Total
+          metal_subtracted_bulk_wt_pct: 100.0
+    - observation_id: shimaoka_1989_analytical_methods
+      type: method
+      locator:
+        published_page: 254
+        pdf_page_index: 2
+        section: 2.3 Analysis
+      units: as printed
+      values:
+        quantity: run_product_sodium_analysis
+        sample_fragment_preparation: Agate mortar; powdered aliquot 15–40 mg weighed into Teflon bomb; HF-HClO4
+          decomposition; HCl dissolution.
+        measurement_method: Atomic absorption spectroscopy, Terashima (1970), Japan Jarrell-Ash AA-780.
+        procedural_blank_with_decomposition_bomb_ug: 0.72
+        procedural_blank_without_decomposition_bomb_ug: 0.63
+        blank_contribution_starting_material: <1%
+        blank_contribution_run_product_high_Na: 10% for >500 ppm
+        blank_contribution_run_product_low_Na: 10–30% for <50 ppm
+        precision: Low-Na run-product analytical precision strongly depends on blank correction; fortuitous errors
+          cannot be excluded.
+    - observation_id: shimaoka_1989_no_activity_or_vapor_pressure_measurements
+      type: method
+      locator:
+        published_page: 261
+        pdf_page_index: 9
+        section: 4. Discussion
+      units: as printed
+      values:
+        quantity: measurement_scope
+        note: No oxide activities, activity coefficients, ion currents, or partial pressures are reported. No activity
+          ions or condensed-phase activity standard state apply. Sodium vaporization rates are authors’ calculations
+          from blank-corrected residue concentrations and assumptions.
+    - observation_id: shimaoka_1989_figure_2_only
+      type: method
+      locator:
+        published_page: 257
+        pdf_page_index: 5
+        figure: '2'
+      units: not_digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: SEM back-scattered electron images of four run-product textures; no numeric digitization.
+    - observation_id: shimaoka_1989_figure_3_only
+      type: method
+      locator:
+        published_page: 261
+        pdf_page_index: 9
+        figure: '3'
+      units: not_digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: Relative Na concentration in heated samples versus starting materials as a function of duration;
+          curve only.
+    - observation_id: shimaoka_1989_figure_4_only
+      type: method
+      locator:
+        published_page: 261
+        pdf_page_index: 9
+        figure: '4'
+      units: not_digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: Relative Na concentration corrected for holes and partial melts versus duration; curve only.
+    - observation_id: shimaoka_1989_figure_5_only
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        figure: '5'
+      units: not_digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: Arrhenius plot of Na vaporization rates from this work and Tsuchiyama et al. (1981); curve
+          only.
+    - observation_id: shimaoka_1989_qualifier_01
+      type: method
+      locator:
+        published_page: 252
+        pdf_page_index: 0
+        section: Abstract
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The rates of vaporizations for sodium were estimated for partial melts (degree of melting=11–34%)
+          at 1200–1400°C.
+    - observation_id: shimaoka_1989_qualifier_02
+      type: method
+      locator:
+        published_page: 252
+        pdf_page_index: 0
+        section: Abstract
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Differences in the vaporization rates for the partially molten charges obtained from different starting
+          materials were not detected clearly at the same temperatures.
+    - observation_id: shimaoka_1989_qualifier_03
+      type: method
+      locator:
+        published_page: 252
+        pdf_page_index: 0
+        section: Abstract
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Systematically different trends of sodium vaporization rate are found between those obtained in this
+          work and those previously reported for total melts (at 1450–1600°C) from similar starting materials (Tsuchiyama
+          et al., 1981).
+    - observation_id: shimaoka_1989_qualifier_04
+      type: method
+      locator:
+        published_page: 252
+        pdf_page_index: 0
+        section: Abstract
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: It appears that the vaporization mechanism of Na is basically the same in the temperature range from
+          1200 to 1600°C for partially to completely molten charges.
+    - observation_id: shimaoka_1989_qualifier_05
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3.1 Starting material
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Standard deviations of Na concentrations in bulk samples are 3% for sample A and 1.5% for sample
+          B.
+    - observation_id: shimaoka_1989_qualifier_06
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3.1 Starting material
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Differences of 6–8% in Na concentrations exist among small (3 mg) and larger (30 mg) samples but
+          differences more than 10% were not detected among them.
+    - observation_id: shimaoka_1989_qualifier_07
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3.1 Starting material
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: All the Na concentrations obtained for the coarse-grained sample B are systematically lower by 10%
+          from those in sample A.
+    - observation_id: shimaoka_1989_qualifier_08
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3.1 Starting material
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Ca, Mg, and Fe are distributed homogeneously in both starting materials, and sample A is higher in
+          Ca by 9% and lower in Mg by 8% than sample B.
+    - observation_id: shimaoka_1989_qualifier_09
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3.1 Starting material
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Na-carrying phases are distributed homogeneously in both starting materials at least for samples
+          of more than 30-mg size, and a minor fraction of alkali-rich phases was lost from sample B during the
+          sample preparation (possibly in the mesh-sorting process).
+    - observation_id: shimaoka_1989_qualifier_10
+      type: method
+      locator:
+        published_page: 256
+        pdf_page_index: 4
+        section: 3.1 Starting material
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The plagioclase contents are calculated to be 11.1% and 9.6% for starting materials A and B, respectively.
+    - observation_id: shimaoka_1989_qualifier_11
+      type: method
+      locator:
+        published_page: 256
+        pdf_page_index: 4
+        section: 3.1 Starting material
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The troilite contents in starting materials were not accurately determined in this work but were
+          roughly estimated to be 3% and 0.8% for samples A and B, respectively.
+    - observation_id: shimaoka_1989_qualifier_12
+      type: method
+      locator:
+        published_page: 256
+        pdf_page_index: 4
+        section: 3.1 Starting material
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Chemical and mineral compositions of two starting materials with different grain-sizes are sufficiently
+          homogeneous, and minor but significant differences, particularly in plagioclase and troilite contents,
+          exist between them.
+    - observation_id: shimaoka_1989_qualifier_13
+      type: method
+      locator:
+        published_page: 257
+        pdf_page_index: 5
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: All run products contain abundant holes (10–60% in area).
+    - observation_id: shimaoka_1989_qualifier_14
+      type: method
+      locator:
+        published_page: 257
+        pdf_page_index: 5
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Run products of the coarse-grained starting material B have more abundant holes compared with those
+          of the fine-grained starting material A at same temperatures, and, in general, heated samples obtained
+          at higher temperatures have less abundant holes.
+    - observation_id: shimaoka_1989_qualifier_15
+      type: method
+      locator:
+        published_page: 257
+        pdf_page_index: 5
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: It is likely that most holes were not formed by vesiculation of heated samples but represent open
+          spaces unfilled with partial melts.
+    - observation_id: shimaoka_1989_qualifier_16
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The cooling rate (600°C/min) in this work has not been fast enough to quench all the partial melts.
+    - observation_id: shimaoka_1989_qualifier_17
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The Fa contents of overgrowth olivine grains are 31–35% for heated samples at 1200–1400°C and are
+          systematically higher than those of adjacent olivines (Fa=18–29%).
+    - observation_id: shimaoka_1989_qualifier_18
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The possible local heterogeneities of chemical compositions of glass materials were also examined
+          by SEM-EDS but were not detected clearly, suggesting that melts had been sufficiently homogenized except
+          for very narrow areas.
+    - observation_id: shimaoka_1989_qualifier_19
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The areal proportions of overgrowth rim materials estimated from back-scattered images correspond
+          to 20–50% of total amounts of glass and rim materials.
+    - observation_id: shimaoka_1989_qualifier_20
+      type: method
+      locator:
+        published_page: 259
+        pdf_page_index: 7
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Because of heterogeneous distributions of holes and rim materials, estimated proportions of holes
+          and degrees of partial melting mentioned above may contain considerably large uncertainties (20–30%).
+    - observation_id: shimaoka_1989_qualifier_21
+      type: method
+      locator:
+        published_page: 259
+        pdf_page_index: 7
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The troilite grains were scarce in run products from the coarse-grained starting material B at all
+          temperatures and also rare in run products from the fine-grained starting material A at 1150 and 1200°C,
+          but instead metal grains poor in nickel were occasionally encountered.
+    - observation_id: shimaoka_1989_qualifier_22
+      type: method
+      locator:
+        published_page: 259
+        pdf_page_index: 7
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Except for these run products, run products at 1300°C from sample A contain much more abundant troilite
+          grains and less abundant metal grains.
+    - observation_id: shimaoka_1989_qualifier_23
+      type: method
+      locator:
+        published_page: 259
+        pdf_page_index: 7
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The presence of more abundant troilite in sample A heated at the higher temperature (1300°C) than
+          1200°C and 1150°C appeared misleading but was confirmed for several run products.
+    - observation_id: shimaoka_1989_qualifier_24
+      type: method
+      locator:
+        published_page: 259
+        pdf_page_index: 7
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Partial melting of silicate grains and decomposition of troilite occurred during the heating at 1150–1400°C.
+    - observation_id: shimaoka_1989_qualifier_25
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.3 Chemical composition of partial melts
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The Fo contents (%) in olivine grains range from 72 for 1200°C to 80±2 for 1400°C and are homogeneous
+          at given temperatures. Most pyroxene grains are low-Ca orthopyroxene with compositions of Fs21–27.
+    - observation_id: shimaoka_1989_qualifier_26
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.3 Chemical composition of partial melts
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Interstitial glass materials are normally poor in sulfur (almost below the detection limit of SEM-EDS)
+          but run products from samples A heated at 1300°C have systematically higher sulfur contents (0.2–0.3 wt%).
+    - observation_id: shimaoka_1989_qualifier_27
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.3 Chemical composition of partial melts
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Chemical compositions of partial melts are systematically fractionated with heating temperature.
+    - observation_id: shimaoka_1989_qualifier_28
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.3 Chemical composition of partial melts
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: At temperatures above 1200°C plagioclase was completely exhausted and significant amounts of olivine
+          and pyroxene melted.
+    - observation_id: shimaoka_1989_qualifier_29
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Except for two samples (27A and 31A), the Na concentrations in run products decrease with an increase
+          of heating duration.
+    - observation_id: shimaoka_1989_qualifier_30
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Because of a large blank contribution (~70%), concentration of Na in 32A (5 ppm) contains large uncertainties
+          and is thus the lower limit of atomic absorption analyses in this work.
+    - observation_id: shimaoka_1989_qualifier_31
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The expected total amount of Na in 31A (sample weight used for analysis=11 mg) from the general trend
+          of samples heated at 1300°C is calculated to be 0.0008 µg which is far below the limit of our analytical
+          capability.
+    - observation_id: shimaoka_1989_qualifier_32
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The blank value of 0.72 µg corresponds to 65 ppm for 31A and thus the observed value of 100 ppm is
+          even higher than expected from contamination. In view of potential variations of blank during analytical
+          processes, the observed high value is not acceptable as a true one.
+    - observation_id: shimaoka_1989_qualifier_33
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The Na concentration (460 ppm) in 27A is about several orders of magnitude larger than the expected
+          value (7 ppm).
+    - observation_id: shimaoka_1989_qualifier_34
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: This too high Na concentration is not explained solely as due to blank effect, even if variability
+          of blank is considered.
+    - observation_id: shimaoka_1989_qualifier_35
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: We have not repeated heating experiments to confirm the above observation. Hence, we can not rule
+          out a possibility that the observed high Na content in 27A was caused by an extreme heterogeneity in the
+          run product.
+    - observation_id: shimaoka_1989_qualifier_36
+      type: method
+      locator:
+        published_page: 261
+        pdf_page_index: 9
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The Na data obtained for these two samples (27A and 31A) are not considered to represent concentrations
+          in samples heated at 1300°C for longer duration.
+    - observation_id: shimaoka_1989_qualifier_37
+      type: method
+      locator:
+        published_page: 261
+        pdf_page_index: 9
+        section: 3.4 Concentration of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The too much depletion of Na data point of 1250°C compared with data points of 1300°C appears unusual
+          but is found to be reasonable if surface areas and degrees of partial melting of charges are corrected
+          (see Fig. 4).
+    - observation_id: shimaoka_1989_qualifier_38
+      type: method
+      locator:
+        published_page: 262
+        pdf_page_index: 10
+        section: 4.1 Vaporization rate of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The meaning of the calculated rates using the above equation is solely dependent on the validity
+          of the above-mentioned assumptions.
+    - observation_id: shimaoka_1989_qualifier_40
+      type: method
+      locator:
+        published_page: 262
+        pdf_page_index: 10
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The upper limit of total sodium contents in mineral phases is calculated to be 5% of all sodium in
+          charges.
+    - observation_id: shimaoka_1989_qualifier_41
+      type: method
+      locator:
+        published_page: 262
+        pdf_page_index: 10
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The assumption (1) is considered to be valid, although this was examined for run products from samples
+          B at 1150, 1250, and 1400°C.
+    - observation_id: shimaoka_1989_qualifier_42
+      type: method
+      locator:
+        published_page: 262
+        pdf_page_index: 10
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Proportions of holes, total surface areas and degrees of partial melting are roughly constant at
+          given temperatures.
+    - observation_id: shimaoka_1989_qualifier_43
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The f values are estimated to be significantly smaller than unity but were not estimated in this
+          work.
+    - observation_id: shimaoka_1989_qualifier_44
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The weight loss during vaporization is 1.8–3.8% of total charge. Since volatile components of 1.1%
+          are considered to have been lost before partial melting, the net weight loss during melting is estimated
+          to be 0.7–2.7%.
+    - observation_id: shimaoka_1989_qualifier_46
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Volume changes of partial melts during vaporization are calculated to be 7% or smaller (the density
+          of partial melt is assumed to be 2.5 g/cm³).
+    - observation_id: shimaoka_1989_qualifier_47
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Uncorrected data points (typically data point of 1250°C) in Fig. 3 show unusual variations, the distribution
+          of data points after correction for melt volumes and total surface areas is now appropriate and shows
+          more clear linear trends in Fig. 4.
+    - observation_id: shimaoka_1989_qualifier_48
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Systematic differences in data distributions between starting materials of different grain sizes
+          are not clearly recognized here.
+    - observation_id: shimaoka_1989_qualifier_49
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        section: 4.2 Application of vaporization equation
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: In spite of relatively large uncertainties of surface areas and melt volumes, the expected linear
+          trends are obtained at 1200 and 1300°C in Fig. 4.
+    - observation_id: shimaoka_1989_qualifier_50
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Each heating experiment at 1250 and 1400°C was performed only for one heating duration and thus the
+          vaporization rate calculated from each one data point is of only tentative significance.
+    - observation_id: shimaoka_1989_qualifier_51
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: This value is significantly larger than that (2.6×10⁻⁴) obtained by Tsuchiyama et al. (1981) for
+          sample 1 (1456°C, log[fO₂]=−9.2).
+    - observation_id: shimaoka_1989_qualifier_52
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The extrapolated value of 1.4×10⁻²/f at 1586°C is even higher than that (8.8×10⁻³) obtained by the
+          same authors for sample 2 at the same temperature (log[fO₂]=−9.2).
+    - observation_id: shimaoka_1989_qualifier_53
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Depending on the f value, the calculated rates for the present experiments substantially shift to
+          much higher.
+    - observation_id: shimaoka_1989_qualifier_54
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The oxygen partial pressures are estimated to be 10⁻¹³ at 1200°C and 10⁻¹¹ atm at 1400°C (Johnson, 1986).
+    - observation_id: shimaoka_1989_qualifier_55
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: If the Ta-materials work as the Ta-Ta₂O₅ buffer, then the oxygen partial pressures are calculated
+          to be 10⁻²⁰ at 1200°C and 10⁻¹⁷ atm at 1400°C.
+    - observation_id: shimaoka_1989_qualifier_56
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: If this is the case, the oxygen partial pressures in these experiments are estimated to be a few
+          to several orders of magnitude smaller than that in Tsuchiyama et al. (1981), which is relatively consistent
+          with the higher vaporization rates of Na obtained in this work.
+    - observation_id: shimaoka_1989_qualifier_57
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: In view of systematically high vaporization rates observed in this work, the reaction which controlled
+          the oxygen partial pressure may have prevailed quite consistently through all the heating experiments.
+    - observation_id: shimaoka_1989_qualifier_58
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: We also noted systematically fractionated chemical compositions of partial melts produced at different
+          temperatures, but did not detect chemical effects on vaporization rates clearly.
+    - observation_id: shimaoka_1989_qualifier_59
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Because of incomplete experimental data obtained in this work, vaporization rates of sodium estimated
+          here include relatively large uncertainties and may need further evaluation.
+    - observation_id: shimaoka_1989_qualifier_60
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The present data analysis, however, suggested that the vaporization rates of sodium obtained in this
+          work in the lower temperature range (1200–1400°C) seem to be consistent with those by Tsuchiyama et al.
+          (1981) at higher temperatures (1450–1600°C).
+    - observation_id: shimaoka_1989_qualifier_61
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The vaporization mechanism of Na is basically the same for the partially to totally molten charges
+          of chondritic materials in the temperature range from 1150 to 1600°C.
+    - observation_id: shimaoka_1989_table2_method_footnotes
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+      units: as printed
+      values:
+        quantity: table_2_definitions
+        weight_loss_definition: 100×{1−(wt. of run product)/(wt. of starting material)}
+        holes: Areal proportion to total charge determined by online computer image reader from back-scattered electron
+          images.
+        outside_charge_surface_area: Calculated from charge weights.
+        degree_partial_melting: Estimated from combined proportion of glass and overgrowth rim material to total
+          charge.
+    - observation_id: shimaoka_1989_applicability
+      type: method
+      locator:
+        published_page: 253
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+      units: as printed
+      values:
+        quantity: apparatus_and_calibration_scope
+        no_ionization_pressure_calibration: No mass spectrometric ion current or pressure calibration is reported;
+          rates are estimated later from residue Na concentrations.
+        no_activity_standard_state: No activity or activity coefficient is reported; therefore no activity-defining
+          ion or pure-oxide standard state applies.
+    - observation_id: shimaoka_1989_intro_retention_and_ratios
+      type: method
+      locator:
+        published_page: 252
+        pdf_page_index: 0
+        section: 1. Introduction
+      units: as printed
+      values:
+        quantity: introduction_comparative_claims
+        quote: In spite of high volatilities of alkali metals at chondrule melting temperatures, many chondrules
+          from carbonaceous and unequilibrated ordinary chondrites have retained the volatile elements at the CI-chondritic
+          level or higher (Osborn et al., 1974; Gooding, 1982, Grossman and Wasson, 1982) and show the fractionated
+          Na/K ratios relative to the CI-chondrite (Grossman and Wasson, 1983) or an unfractionated Rb/K ratio in
+          some cases (Misawa and Nakamura, 1988a, b).
+    - observation_id: shimaoka_1989_prior_vaporization_atmospheric_conditions
+      type: method
+      locator:
+        published_page: 252
+        pdf_page_index: 0
+        section: 1. Introduction
+      units: °C and atmosphere as printed
+      values:
+        quantity: prior_work_conditions
+        quote: Tsuchiyama et al. (1981) performed a vaporization experiment of sodium on silicate materials with
+          chondrule compositions in the temperature range of 1450–1600°C under the atmospheric pressure with different
+          oxygen fugacities.
+    - observation_id: shimaoka_1989_epma_sem_operating_conditions
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3. Results
+      units: as printed
+      values:
+        quantity: analysis_instrument_conditions
+        instruments: JEOL JCXA-733; HITACHI-S530 with HORIBA-EMAX220; JEOL JSM-T220A with LINK OX-200J.
+        quote: They were operated at an accelerating voltage of 15–20 kV and a beam current of 1.5–12 nA.
+        accelerating_voltage_kV:
+        - 15
+        - 20
+        beam_current_nA:
+        - 1.5
+        - 12
+    - observation_id: shimaoka_1989_normative_etter_mineral_abundances
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3.1 Starting material
+      units: wt% as printed
+      values:
+        quantity: Etter_L5_normative_mineral_abundances
+        olivine_Fa35_wt_pct: 52.1
+        hypersthene_Fs33_wt_pct: 24.8
+        diopside_En33_Fs16_Wo52_wt_pct: 4.8
+        plagioclase_An25_wt_pct: 10.4
+        troilite_wt_pct: 6.2
+        note: Normative abundances excluding metal; calculated from Rubin et al. (1983) bulk chemical composition.
+    - observation_id: shimaoka_1989_starting_material_assay_sample_sizes
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3.1 Starting material
+      units: mg as printed
+      values:
+        quantity: starting_material_analytical_sample_sizes
+        splits_per_starting_material: three to four
+        quote: Analyses were carried out using mostly 20–30 mg size with one exception of analysis for 3.5 mg-size
+          sample.
+        usual_sample_mass_mg:
+        - 20
+        - 30
+        exceptional_sample_mass_mg: 3.5
+    - observation_id: shimaoka_1989_rim_width_and_melt_fraction
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        section: 3.2 Melting textures
+      units: µm and percent as printed
+      values:
+        quantity: overgrowth_rim_measurements
+        rim_width_unit: µm
+        rim_width_by_temperature_C:
+          '1150': 0.9±0.3
+          '1200': 1.0±0.3
+          '1250': 1.1±0.3
+          '1300': 1.2±0.3
+          '1400': 1.4±0.3
+        overgrowth_rim_fraction_of_glass_plus_rim_pct:
+        - 20
+        - 50
+    - observation_id: shimaoka_1989_degree_of_melting_ranges
+      type: method
+      locator:
+        published_page: 259
+        pdf_page_index: 7
+        section: 3.2 Melting textures
+      units: °C and percent as printed
+      values:
+        quantity: partial_melting_degree_ranges
+        degree_of_melting_by_temperature_C:
+          '1150': '11'
+          '1200': 12–19
+          '1300': 20–32
+          '1400': '34'
+        uncertainty_note: The authors caution the estimates may contain 20–30% uncertainty due to heterogeneous
+          holes and rim distributions.
+    - observation_id: shimaoka_1989_partial_melt_oxide_composition_ranges
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.3 Chemical composition of partial melts
+      units: wt% as printed
+      values:
+        quantity: partial_melt_composition_ranges
+        SiO2_wt_pct: 45–50
+        Al2O3_wt_pct: 9–5
+        CaO_wt_pct: 7–5
+        FeO_wt_pct: 15–25
+        MgO_wt_pct: 15–17
+        note: The printed Al2O3 and CaO ranges descend as “9–5” and “7–5”; transcribed verbatim.
+    - observation_id: shimaoka_1989_mineral_partition_coefficients
+      type: method
+      locator:
+        published_page: 262
+        pdf_page_index: 10
+        section: 4.2 Application of vaporization equation
+      units: dimensionless as printed
+      values:
+        quantity: sodium_solid_liquid_partition_coefficients
+        method_class: quoted_attributed
+        attribution: Matsui et al. (1977), as cited on p. 262.
+        quote: The equilibrium solid/liquid partition coefficients of Na for natural rock-forming minerals are less
+          than 0.01 for olivine, 0.08 for orthopyroxene, 0.27 for clinopyroxene and 1.2 for plagioclase.
+        olivine_upper_bound: 0.01
+        orthopyroxene: 0.08
+        clinopyroxene: 0.27
+        plagioclase: 1.2
+    - observation_id: shimaoka_1989_t3_extrapolated_comparison_values
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: cm³/(min·cm²) as printed
+      values:
+        quantity: extrapolated_vaporization_rates
+        rate_at_1456C_as_function_of_f: 1.8×10⁻³/f
+        comparison_Tsuchiyama_sample1_1456C: 2.6×10⁻⁴
+        rate_at_1586C_as_function_of_f: 1.4×10⁻²/f
+        comparison_Tsuchiyama_sample2_1586C: 8.8×10⁻³
+        log_fO2_for_both_comparisons: -9.2
+        note: Extrapolated author rates depend on assumed f; literature values attributed to Tsuchiyama et al. (1981).
+    - observation_id: shimaoka_1989_oxygen_pressure_residual_air_conversion
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: atm as printed
+      values:
+        quantity: oxygen_pressure_estimates
+        quote: The total pressure of 7.7×10⁻⁶ torr corresponds to 2×10⁻⁹ atm, if all the residual gas in the chamber
+          is assumed to be air.
+        total_pressure_torr: 7.7e-06
+        air_assumed_printed_correspondence_atm: 2.0e-09
+        note: The printed correspondence is retained literally. In this oxygen-pressure discussion it is ambiguous as a total-pressure conversion; it is not a measured chamber oxygen pressure.
+    - observation_id: shimaoka_1989_table_prose_na_discrepancies
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.4 Concentration of Na
+      units: ppm as printed
+      values:
+        quantity: Table_2_vs_prose_values
+        run_27A_table2_ppm: 462
+        run_27A_prose_ppm: 460
+        run_31A_table2_ppm: 109
+        run_31A_prose_observed_ppm: 100
+        run_32A_table2_ppm: 6
+        run_32A_prose_ppm: 5
+        note: Retain each value at its own locator. Run 32A is marked source_internally_inconsistent on its observation.
+    - observation_id: shimaoka_1989_f_effective_area_assumption
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        section: 4.2 Application of vaporization equation
+      units: fraction as printed
+      values:
+        quantity: effective_surface_area_fraction_assumption
+        quote: From back-scattered electron images of heated samples, the f values are estimated to be significantly
+          smaller than unity but were not estimated in this work.
+        f_numeric_value: not estimated
+    - observation_id: shimaoka_1989_table2_missing_values
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+      units: as printed
+      values:
+        quantity: Table_2_printed_blank_cells
+        note: Na is blank for runs 52B, 38B, 39B, 40B, 44B and 43B; other printed blanks remain empty in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+          Not reported is not zero.
+    - observation_id: shimaoka_1989_discussion_qualifier_01
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        section: 3.2 Melting textures
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The estimated solidus temperature of 1100°C for an L-chondritic material including troilite (Takahashi,
+          1983) suggests that partial melting was occurring during the heating.
+    - observation_id: shimaoka_1989_discussion_qualifier_03
+      type: method
+      locator:
+        published_page: 260
+        pdf_page_index: 8
+        section: 3.3 Chemical composition of partial melts
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The composition range of partial melts is 45–50 wt% SiO₂, 9–5 wt% Al₂O₃, 7–5 wt% CaO, 15–25 wt% FeO
+          and 15–17 wt% MgO.
+    - observation_id: shimaoka_1989_discussion_qualifier_07
+      type: method
+      locator:
+        published_page: 261
+        pdf_page_index: 9
+        section: 4.1 Vaporization rate of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The rate of Na vaporization is proportional to the surface area of the partial melt useful for vaporization,
+          S, and to the concentration of Na in the partial melts, Cₚ.
+    - observation_id: shimaoka_1989_discussion_qualifier_08
+      type: method
+      locator:
+        published_page: 262
+        pdf_page_index: 10
+        section: 4.1 Vaporization rate of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: For application of eq. (3) to the present experiments the following three assumptions must be appropriate;
+          during the vaporization of sodium (1) all sodium contained in bulk sample is located in the partial melts,
+          (2) surface area of partial melt is constant and (3) volume of partial melt is constant.
+    - observation_id: shimaoka_1989_discussion_qualifier_12
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Tsuchiyama et al. (1981) obtained the vaporization rates at the atmospheric pressure which is much
+          higher than the total pressure (7.7×10⁻⁶ torr) at which the present experiments were carried out.
+    - observation_id: shimaoka_1989_discussion_qualifier_13
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: In general, the vaporization rates are considered to be enlarged at more reduced pressures.
+    - observation_id: shimaoka_1989_discussion_qualifier_14
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The oxygen partial pressure within the heating chamber in this work is considered to be controlled
+          by 1) residual air, 2) released gas from partial melts, 3) Fe–FeO buffer of charges and 4) Ta–Ta₂O₅ buffer
+          of Ta-crucible, Ta-heater and Ta-tube.
+    - observation_id: shimaoka_1989_discussion_qualifier_15
+      type: method
+      locator:
+        published_page: 264
+        pdf_page_index: 12
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Decomposition of silicate and sulfide melts may yield oxygen and sulfur, respectively.
+    - observation_id: shimaoka_1989_discussion_qualifier_16
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: If the released gasses from partial melts are the main components which controlled the vaporization
+          rates, the smooth variation of the observed vaporization rates in Fig. 4 is rather difficult to understand,
+          which is in turn suggesting that the factor 2) is not too much important.
+    - observation_id: shimaoka_1989_discussion_qualifier_17
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The gas in the chamber directly contacted with partial melts, olivine, pyroxene and minor Fe metal/sulfide.
+          Then, the reaction of Fe with mafic minerals may work as an oxygen buffer.
+    - observation_id: shimaoka_1989_discussion_qualifier_18
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Thus, a role of sulfur produced by decomposition of troilite may not be important. The most important
+          reactions may be that of the partially molten charges themselves and/or Ta–Ta₂O₅ buffer.
+    - observation_id: shimaoka_1989_discussion_qualifier_19
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The chemical compositions of partial melts obtained in this work are significantly different from
+          bulk compositions of total melts examined by Tsuchiyama et al. (1981). Particularly, the differences in
+          Al and Ca are worth noting.
+    - observation_id: shimaoka_1989_discussion_qualifier_20
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: These authors recognized significantly large differences in vaporization rates for starting materials
+          with different chemical compositions but they did not clarify the cause.
+    - observation_id: shimaoka_1989_discussion_qualifier_21
+      type: method
+      locator:
+        published_page: 265
+        pdf_page_index: 13
+        section: 4.3 Vaporization rates of Na
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Therefore, we can not rule out a possibility that the systematically higher vaporization rates obtained
+          in this experiment were partly due to fractionated chemical compositions of partial melts.
+    - observation_id: shimaoka_1989_abstract_conditions
+      type: method
+      locator:
+        published_page: 252
+        pdf_page_index: 0
+        section: Abstract
+      units: °C, torr, min as printed
+      values:
+        quantity: abstract_experiment_conditions
+        temperature_C:
+        - 1150
+        - 1450
+        total_pressure_torr_as_printed: 8.0e-06
+        heating_duration_max_min: 160
+        degree_of_melting_pct:
+        - 11
+        - 34
+        rate_calculation_temperature_C:
+        - 1200
+        - 1400
+        note: Abstract-rounded pressure retained separately from the methods value 7.7×10⁻⁶ torr.
+    - observation_id: shimaoka_1989_table2_complete_transcription
+      type: method
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+      units: °C, min, %, cm², ppm as printed
+      values:
+        quantity: complete_Table_2_measured_run_rows
+        method_class: measured_tabulated
+        rows:
+        - run_no: 37
+          starting_material: A
+          T_C: 1200.0
+          duration_min: 70.0
+          weight_loss_pct: 3.0
+          holes_pct: 31.1
+          total_surface_area_cm2: 6.16
+          outside_charge_surface_area_cm2: 0.25
+          degree_partial_melting_pct: 11.7
+          Na_ppm: 450.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 37 row; blanks preserved by omission.
+        - run_no: 35
+          starting_material: A
+          T_C: 1200.0
+          duration_min: 160.0
+          weight_loss_pct: 3.3
+          holes_pct: 33.2
+          total_surface_area_cm2: 5.5
+          outside_charge_surface_area_cm2: 0.27
+          degree_partial_melting_pct: 13.0
+          Na_ppm: 129.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 35 row; blanks preserved by omission.
+        - run_no: 29
+          starting_material: A
+          T_C: 1300.0
+          duration_min: 40.0
+          weight_loss_pct: 2.8
+          holes_pct: 6.5
+          total_surface_area_cm2: 2.4
+          outside_charge_surface_area_cm2: 0.3
+          degree_partial_melting_pct: 25.2
+          Na_ppm: 1170.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 29 row; blanks preserved by omission.
+        - run_no: 30
+          starting_material: A
+          T_C: 1300.0
+          duration_min: 56.0
+          weight_loss_pct: 3.0
+          holes_pct: 11.8
+          total_surface_area_cm2: 2.59
+          outside_charge_surface_area_cm2: 0.26
+          degree_partial_melting_pct: 22.1
+          Na_ppm: 87.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 30 row; blanks preserved by omission.
+        - run_no: 28
+          starting_material: A
+          T_C: 1300.0
+          duration_min: 80.0
+          weight_loss_pct: 3.3
+          holes_pct: 10.2
+          total_surface_area_cm2: 2.78
+          outside_charge_surface_area_cm2: 0.29
+          degree_partial_melting_pct: 31.1
+          Na_ppm: 98.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 28 row; blanks preserved by omission.
+        - run_no: 27
+          starting_material: A
+          T_C: 1300.0
+          duration_min: 120.0
+          weight_loss_pct: 3.3
+          holes_pct: 11.0
+          total_surface_area_cm2: 4.28
+          outside_charge_surface_area_cm2: 0.34
+          degree_partial_melting_pct: 22.3
+          Na_ppm: 462.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 27 row; blanks preserved by omission.
+        - run_no: 32
+          starting_material: A
+          T_C: 1300.0
+          duration_min: 138.0
+          weight_loss_pct: 3.8
+          holes_pct: 9.7
+          total_surface_area_cm2: 2.49
+          outside_charge_surface_area_cm2: 0.26
+          degree_partial_melting_pct: 24.2
+          Na_ppm: 6.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 32 row; blanks preserved by omission.
+        - run_no: 31
+          starting_material: A
+          T_C: 1300.0
+          duration_min: 160.0
+          weight_loss_pct: 3.6
+          holes_pct: 8.8
+          total_surface_area_cm2: 2.57
+          outside_charge_surface_area_cm2: 0.27
+          degree_partial_melting_pct: 32.3
+          Na_ppm: 109.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 31 row; blanks preserved by omission.
+        - run_no: 52
+          starting_material: B
+          T_C: 1150.0
+          duration_min: 60.0
+          weight_loss_pct: 1.8
+          holes_pct: 41.0
+          total_surface_area_cm2: 4.09
+          outside_charge_surface_area_cm2: 0.2
+          degree_partial_melting_pct: 11.8
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 52 row; blanks preserved by omission.
+        - run_no: 51
+          starting_material: B
+          T_C: 1200.0
+          duration_min: 30.0
+          weight_loss_pct: 1.9
+          holes_pct: 41.6
+          total_surface_area_cm2: 3.24
+          outside_charge_surface_area_cm2: 0.2
+          degree_partial_melting_pct: 18.5
+          Na_ppm: 2360.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 51 row; blanks preserved by omission.
+        - run_no: 53
+          starting_material: B
+          T_C: 1250.0
+          duration_min: 30.0
+          weight_loss_pct: 1.8
+          holes_pct: 58.5
+          total_surface_area_cm2: 3.59
+          outside_charge_surface_area_cm2: 0.19
+          degree_partial_melting_pct: 10.9
+          Na_ppm: 354.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 53 row; blanks preserved by omission.
+        - run_no: 42
+          starting_material: B
+          T_C: 1300.0
+          duration_min: 20.0
+          weight_loss_pct: 2.0
+          holes_pct: 56.5
+          total_surface_area_cm2: 5.25
+          outside_charge_surface_area_cm2: 0.21
+          degree_partial_melting_pct: 32.3
+          Na_ppm: 1120.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 42 row; blanks preserved by omission.
+        - run_no: 38
+          starting_material: B
+          T_C: 1300.0
+          duration_min: 40.0
+          weight_loss_pct: 2.0
+          holes_pct: 27.3
+          total_surface_area_cm2: 2.26
+          outside_charge_surface_area_cm2: 0.21
+          degree_partial_melting_pct: 17.2
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 38 row; blanks preserved by omission.
+        - run_no: 39
+          starting_material: B
+          T_C: 1400.0
+          duration_min: 10.0
+          weight_loss_pct: 2.8
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 39 row; blanks preserved by omission.
+        - run_no: 40
+          starting_material: B
+          T_C: 1400.0
+          duration_min: 5.0
+          weight_loss_pct: 2.3
+          total_surface_area_cm2: 1.51
+          outside_charge_surface_area_cm2: 0.21
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 40 row; blanks preserved by omission.
+        - run_no: 41
+          starting_material: B
+          T_C: 1400.0
+          duration_min: 2.0
+          weight_loss_pct: 1.9
+          holes_pct: 13.5
+          total_surface_area_cm2: 1.41
+          outside_charge_surface_area_cm2: 0.2
+          degree_partial_melting_pct: 33.6
+          Na_ppm: 65.0
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 41 row; blanks preserved by omission.
+        - run_no: 44
+          starting_material: B
+          T_C: 1410.0
+          duration_min: 2.0
+          weight_loss_pct: 2.5
+          total_surface_area_cm2: 1.25
+          outside_charge_surface_area_cm2: 0.21
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 44 row; blanks preserved by omission.
+        - run_no: 43
+          starting_material: B
+          T_C: 1450.0
+          duration_min: 1.0
+          total_surface_area_cm2: 0.31
+          outside_charge_surface_area_cm2: 0.19
+          locator:
+            published_page: 258
+            pdf_page_index: 6
+            table: '2'
+            note: Run 43 row; blanks preserved by omission.
+        note: All 18 rows; numeric and text cells are duplicated from the canonical CSV so all fields survive migrated-context
+          serialization. Source blank cells remain omitted, never zero.
+    - observation_id: shimaoka_1989_table3_author_calculated_rates
+      type: method
+      locator:
+        published_page: 263
+        pdf_page_index: 11
+        table: '3'
+      units: cm³/min cm² as printed
+      values:
+        quantity: author_calculated_Na_vaporization_rate_table
+        method_class: model_derived
+        rows:
+        - f_assumed_effective_partial_melt_area_fraction: 1.0
+          T_C: 1200.0
+          Na_vaporization_rate_cm3_min_cm2: 1.0e-05
+          derived_from: &id018
+          - shimaoka_1989_table2_run_37_a
+          - shimaoka_1989_table2_run_35_a
+          - shimaoka_1989_table2_run_51_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id018
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=1; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 1.0
+          T_C: 1250.0
+          Na_vaporization_rate_cm3_min_cm2: 3.0e-05
+          derived_from: &id019
+          - shimaoka_1989_table2_run_53_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id019
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=1; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 1.0
+          T_C: 1300.0
+          Na_vaporization_rate_cm3_min_cm2: 0.0001
+          derived_from: &id020
+          - shimaoka_1989_table2_run_29_a
+          - shimaoka_1989_table2_run_30_a
+          - shimaoka_1989_table2_run_28_a
+          - shimaoka_1989_table2_run_32_a
+          - shimaoka_1989_table2_run_42_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id020
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=1; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 1.0
+          T_C: 1400.0
+          Na_vaporization_rate_cm3_min_cm2: 0.00066
+          derived_from: &id021
+          - shimaoka_1989_table2_run_41_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id021
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=1; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.2
+          T_C: 1200.0
+          Na_vaporization_rate_cm3_min_cm2: 5.2e-05
+          derived_from: &id022
+          - shimaoka_1989_table2_run_37_a
+          - shimaoka_1989_table2_run_35_a
+          - shimaoka_1989_table2_run_51_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id022
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.2; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.2
+          T_C: 1250.0
+          Na_vaporization_rate_cm3_min_cm2: 0.00015
+          derived_from: &id023
+          - shimaoka_1989_table2_run_53_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id023
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.2; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.2
+          T_C: 1300.0
+          Na_vaporization_rate_cm3_min_cm2: 0.0005
+          derived_from: &id024
+          - shimaoka_1989_table2_run_29_a
+          - shimaoka_1989_table2_run_30_a
+          - shimaoka_1989_table2_run_28_a
+          - shimaoka_1989_table2_run_32_a
+          - shimaoka_1989_table2_run_42_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id024
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.2; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.2
+          T_C: 1400.0
+          Na_vaporization_rate_cm3_min_cm2: 0.0033
+          derived_from: &id025
+          - shimaoka_1989_table2_run_41_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id025
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.2; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.1
+          T_C: 1200.0
+          Na_vaporization_rate_cm3_min_cm2: 0.00011
+          derived_from: &id026
+          - shimaoka_1989_table2_run_37_a
+          - shimaoka_1989_table2_run_35_a
+          - shimaoka_1989_table2_run_51_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id026
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.1; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.1
+          T_C: 1250.0
+          Na_vaporization_rate_cm3_min_cm2: 0.0003
+          derived_from: &id027
+          - shimaoka_1989_table2_run_53_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id027
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.1; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.1
+          T_C: 1300.0
+          Na_vaporization_rate_cm3_min_cm2: 0.001
+          derived_from: &id028
+          - shimaoka_1989_table2_run_29_a
+          - shimaoka_1989_table2_run_30_a
+          - shimaoka_1989_table2_run_28_a
+          - shimaoka_1989_table2_run_32_a
+          - shimaoka_1989_table2_run_42_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id028
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.1; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.1
+          T_C: 1400.0
+          Na_vaporization_rate_cm3_min_cm2: 0.0066
+          derived_from: &id029
+          - shimaoka_1989_table2_run_41_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id029
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.1; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.05
+          T_C: 1200.0
+          Na_vaporization_rate_cm3_min_cm2: 0.00021
+          derived_from: &id030
+          - shimaoka_1989_table2_run_37_a
+          - shimaoka_1989_table2_run_35_a
+          - shimaoka_1989_table2_run_51_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id030
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.05; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.05
+          T_C: 1250.0
+          Na_vaporization_rate_cm3_min_cm2: 0.0006
+          derived_from: &id031
+          - shimaoka_1989_table2_run_53_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id031
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.05; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.05
+          T_C: 1300.0
+          Na_vaporization_rate_cm3_min_cm2: 0.002
+          derived_from: &id032
+          - shimaoka_1989_table2_run_29_a
+          - shimaoka_1989_table2_run_30_a
+          - shimaoka_1989_table2_run_28_a
+          - shimaoka_1989_table2_run_32_a
+          - shimaoka_1989_table2_run_42_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id032
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.05; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        - f_assumed_effective_partial_melt_area_fraction: 0.05
+          T_C: 1400.0
+          Na_vaporization_rate_cm3_min_cm2: 0.013
+          derived_from: &id033
+          - shimaoka_1989_table2_run_41_b
+          derivation:
+            relation: author_calculation_from_corrected_Na_residue_concentration_trends_using_equation_4
+            inputs: *id033
+            output_unit: cm³/min cm² as printed
+          locator:
+            published_page: 263
+            pdf_page_index: 11
+            table: '3'
+            note: Printed row f=0.05; Table 3.
+          method_class: model_derived
+          attribution: Calculated by the authors using equation (4).
+        attribution: Calculated by the authors using equation (4).
+        note: The f values are assumed effective melt-surface fractions, explicitly unestimated in the paper. Kept
+          as located context because the current typed evaporation-rate unit is dimensionally incompatible with
+          the printed surface-normalized volumetric rate.
+    - observation_id: shimaoka_1989_qualifier_mean_Na_against_Rubin
+      type: method
+      locator:
+        published_page: 255
+        pdf_page_index: 3
+        section: 3.1 Starting material
+      units: wt% as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The mean Na concentration (0.675%) in the fine-grained starting material A is in agreement with that
+          (Na=0.68% in silicate fraction) reported by Rubin et al. (1983).
+    - observation_id: shimaoka_1989_holder_dimensions
+      type: apparatus
+      locator: {published_page: 253, pdf_page_index: 1, section: 2.1 Apparatus}
+      units: mm
+      values:
+        quantity: tantalum_holder_dimensions
+        diameter_mm: 8
+        length_mm: 60
+        description: Ta-holder (φ=8×60 mm) supporting the sample crucible.
+    - observation_id: shimaoka_1989_failed_high_temperature_trials
+      type: method
+      locator: {published_page: 254, pdf_page_index: 2, section: 2.2 Sample and heating procedures}
+      units: °C
+      values:
+        quantity: source_qualifying_statement
+        quote: >-
+          Upon melting of the powdered samples at higher temperatures above 1300°C for fine-grained sample A
+          or above 1400°C for coarse-grained sample B, the vesiculation occurs almost disruptively, and the
+          sample crucibles were broken up. Despite several trials, heating experiments at such higher
+          temperatures were not successful in this work. Although run product B heated at 1450°C was barely
+          recovered but was not analyzed for Na because of the limited sample size.
+    - observation_id: shimaoka_1989_volume_estimation
+      type: method
+      locator: {published_page: 255, pdf_page_index: 3, section: 2.3 Analysis}
+      units: g/cm³
+      values:
+        quantity: sample_volume_estimation
+        assumed_density_g_cm3: 3.3
+        description: Total volumes of heated samples without holes estimated by dividing total sample weights by the assumed density.
+    - observation_id: shimaoka_1989_identified_alkali_phases
+      type: method
+      locator: {published_page: 255, pdf_page_index: 3, section: 3.1 Starting material}
+      units: composition labels as printed
+      values:
+        quantity: SEM_EDS_identified_phases
+        description: Plagioclase (An13), alkali-feldspar (Ab69Or31) and occasionally Fe-rich glassy materials, possibly microcrystalline plagioclase and metal aggregates.
+    - observation_id: shimaoka_1989_rounded_starting_A_iron
+      type: method
+      locator: {published_page: 256, pdf_page_index: 4, section: 3.1 Starting material}
+      units: percent as printed
+      values:
+        quantity: starting_material_iron
+        description: Higher Fe content (15%) in sample A obtained by atomic absorption; this rounded prose value is distinct from Table 1 assays.
+    - observation_id: shimaoka_1989_hole_surface_estimation
+      type: method
+      locator:
+        published_page: 257
+        pdf_page_index: 5
+        section: 3.2 Melting textures
+        note: Sentence continues on p. 258, PDF index 6.
+      units: surface geometry as printed
+      values:
+        quantity: surface_area_estimation
+        description: Hole surface areas assumed to be the square of edge length estimated from SEM back-scattered images. Melt surface proportions could not be estimated confidently and were used as a parameter in equation (4).
+    - observation_id: shimaoka_1989_outside_surface_estimation
+      type: method
+      locator: {published_page: 258, pdf_page_index: 6, section: 3.2 Melting textures}
+      units: g/cm³
+      values:
+        quantity: outside_surface_area_estimation
+        description: Outside heated-sample area estimated as one half of the surface area of an assumed sphere with density 3.3 g/cm³.
+    - observation_id: shimaoka_1989_low_melt_degree
+      type: method
+      locator: {published_page: 259, pdf_page_index: 7, section: 3.2 Melting textures}
+      units: percent and °C as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: Because of a low degree of melting (<20%) at temperatures below 1300°C the interstitial spaces were not filled perfectly with the melt.
+    - observation_id: shimaoka_1989_prior_high_pressure_sulfur
+      type: method
+      locator: {published_page: 260, pdf_page_index: 8, section: 3.3 Chemical composition of partial melts}
+      units: wt%
+      values:
+        quantity: prior_work_sulfur_content
+        method_class: quoted_attributed
+        attribution: Takahashi (1983), as cited on p. 260.
+        description: About 0.2 wt% sulfur expected in partial melts formed after extensive melting of L-chondrite at high pressures.
+    - observation_id: shimaoka_1989_sodium_variability_and_no_duplicates
+      type: method
+      locator: {published_page: 260, pdf_page_index: 8, section: 3.4 Concentration of Na}
+      units: percent as printed
+      values:
+        quantity: source_qualifying_statement
+        description: Starting-material A/B Na concentration variations quite limited, up to 20%. Because of limited size and too low Na concentration, duplicate analyses of run products were not carried out.
+    - observation_id: shimaoka_1989_orthopyroxene_bound
+      type: method
+      locator: {published_page: 262, pdf_page_index: 10, section: 4.2 Application of vaporization equation}
+      units: percent as printed
+      values:
+        quantity: source_qualifying_statement
+        description: All run products consist mainly of glass and olivine with less abundant (<20%) orthopyroxene; plagioclase completely exhausted to melt phase.
+    - observation_id: shimaoka_1989_equation_1
+      type: method
+      locator: {published_page: 261, pdf_page_index: 9, section: 4.1 Vaporization rate of Na, equation: '1'}
+      units: as printed
+      values:
+        quantity: vaporization_equation
+        relation: dM_p/dt = −kSC_p = −kS(M_p/V_p)
+        definitions: M_p is Na amount in partial melt; V_p is partial-melt volume; S is useful partial-melt surface; C_p is partial-melt Na concentration. k depends on temperature, total pressure, oxygen partial pressure and composition (definition continues on p. 262).
+    - observation_id: shimaoka_1989_equations_2_3
+      type: method
+      locator: {published_page: 262, pdf_page_index: 10, section: 4.1 Vaporization rate of Na}
+      units: as printed
+      values:
+        quantity: integrated_vaporization_equations
+        equation_2: ∫[M₀→M] dM/M = −∫[0→t] kS/V_p dt
+        intermediate_identity: ∫[M₀→M] dM/M = ln(M/M₀) = ln(C/C₀)
+        equation_3: ln(C/C₀) = −k(S/V_p)t
+        definitions: M(M₀) and C(C₀) are bulk-charge Na amount and concentration at duration t (or at t=0), respectively. Assumes all Na in partial melts and constant partial-melt surface and volume.
+    - observation_id: shimaoka_1989_equation_4_and_regression
+      type: method
+      locator: {published_page: 263, pdf_page_index: 11, section: 4.2 and 4.3, equation: '4'}
+      units: as printed
+      values:
+        quantity: author_rate_calculation
+        surface_relation: S = f·S_tot = const. (f = const.)
+        equation_4: ln(C/C₀) = −k(f·S_tot/V_p)t
+        regression: Combined A/B run-product data at 1200 and 1300°C; regression line assumed to pass through the origin. At 1250 and 1400°C only one heating duration was used and each single-point rate has only tentative significance.
+    - observation_id: shimaoka_1989_figure_2_caption_conditions
+      type: method
+      locator: {published_page: 257, pdf_page_index: 5, figure: '2'}
+      units: °C, min, µm as printed
+      values:
+        quantity: figure_caption_conditions
+        method_class: figure_only
+        description: Panel a, A at 1200°C for 160 min; b, A at 1300°C for 160 min; c, B at 1300°C for 40 min; d, A at 1300°C. Scale bars a–c 100 µm, d 10 µm; no digitization.
+    - observation_id: shimaoka_1989_reference_numeric_context_266
+      type: method
+      locator: {published_page: 266, pdf_page_index: 14, section: References and acknowledgments}
+      units: bibliographic identifiers as printed
+      values:
+        quantity: administrative_and_reference_context
+        description: >-
+          Grant No. 6311003. De Maria 1971, Apollo 12, proceedings 2nd, 1367–1380;
+          Gibson/Hubbard 1972, proceedings 3rd, 2003–2014; Gooding 1982, 61–87;
+          Gooding/Muenow 1977, 12, 401–408; Grossman/Wasson 1982, 46, 1081–1099;
+          1983, 47, 759–771; 1985, 49, 925–939; Hashimoto 1979, 43, 13–21;
+          Ikramuddin 1977, meteorites V, ten trace elements, Tieschitz H3, 400–1000°C, 41, 1247–1256;
+          Johnson 1986, five primitive chondrites, 50, 1497–1502; King 1982, proceedings 13th,
+          J. Geophys. Res. Suppl. 55, A429–434; Kreutzberger 1986, 50, 91–98;
+          Masuda/Tanaka 1979, 14, 13–28; Matsui 1977, 100, 315–324;
+          Misawa/Nakamura 1988a, Allende CV3, 52, 1699–1710; 1988b, Felix CO3,
+          proceedings 1, 215–223; Notsu 1978, 42, 903–907; Osborn 1974 (continues p. 267).
+    - observation_id: shimaoka_1989_reference_numeric_context_267
+      type: method
+      locator: {published_page: 267, pdf_page_index: 15, section: References}
+      units: bibliographic identifiers and dates as printed
+      values:
+        quantity: administrative_and_reference_context
+        description: >-
+          Osborn 1974 (starts p. 266), 38, 1359–1378; Rubin 1983, 18, 179–196;
+          Takahashi 1983, Yamato L3 Y-74191, up to 30 kbar, Special Issue 30, 168–180;
+          Terashima 1970, 21, 693–707; Tsuchiyama 1981, 45, 1357–1367;
+          Wendlandt 1982, 67, 877–885. Received September 22, 1988;
+          revised manuscript received May 19, 1989.

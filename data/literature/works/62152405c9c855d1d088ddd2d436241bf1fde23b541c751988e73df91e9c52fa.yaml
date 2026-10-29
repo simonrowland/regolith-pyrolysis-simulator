@@ -9,14 +9,14 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:gornerup-1996-cao-corner-liquidus
       role: pdf
       path: raw/gornerup-1996-cao-corner-liquidus/gornerup-1996-cao-corner-liquidus.pdf
       sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
+        tag: value
+        value: 32751b05dd111df2f13bc0ac3e212418630ca4e4236b7398a0bb24027db4793b
     - asset_id: pdftotext:gornerup-1996-cao-corner-liquidus
       role: pdftotext
       path: text/gornerup-1996-cao-corner-liquidus
@@ -133,6 +133,7 @@ experiments:
               table: '1'
               note: Printed 1600 °C; converted T_K = T_C + 273.15.
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -243,6 +244,7 @@ experiments:
                 table: '1'
                 note: Printed 1600 °C; converted T_K = T_C + 273.15.
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value
@@ -371,6 +373,7 @@ experiments:
               table: '1'
               note: Printed 1650 °C; converted T_K = T_C + 273.15.
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -481,6 +484,7 @@ experiments:
                 table: '1'
                 note: Printed 1650 °C; converted T_K = T_C + 273.15.
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value
@@ -609,6 +613,7 @@ experiments:
               table: '1'
               note: Printed 1700 °C; converted T_K = T_C + 273.15.
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -719,6 +724,7 @@ experiments:
                 table: '1'
                 note: Printed 1700 °C; converted T_K = T_C + 273.15.
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value
@@ -847,6 +853,7 @@ experiments:
               table: '1'
               note: Printed 1750 °C; converted T_K = T_C + 273.15.
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -957,6 +964,7 @@ experiments:
                 table: '1'
                 note: Printed 1750 °C; converted T_K = T_C + 273.15.
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value

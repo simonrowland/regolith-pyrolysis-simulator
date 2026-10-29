@@ -1,6 +1,5 @@
 import copy
 import json
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -11,6 +10,7 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.accounting.ledger import LedgerTransition
+from simulator.accounting.lots import MaterialLot
 from simulator.cost_energy import (
     ELECTRICAL_USD_PER_KWH,
     FURNACE_USD_PER_H,
@@ -20,14 +20,17 @@ from simulator.cost_energy import (
     owner_ratify_cost_placeholders,
     unavailable_reason_of,
 )
-from simulator.cost_ledger import CostImportContext, CostLedger, CostVector
+from simulator.cost_ledger import (
+    VECTOR_TOLERANCE,
+    CostImportContext,
+    CostLedger,
+    CostVector,
+)
 from simulator.cost_ledger import build_cost_rollup_diagnostic, run_pumping_input_cost
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.runner import PyrolysisRun
 
 
-ROOT = Path(__file__).resolve().parent.parent
 MASS_BALANCE_HARD_GATE_PCT = 5.0e-12
 
 
@@ -85,6 +88,38 @@ def test_computed_energy_and_non_electrical_cost_controls(intent, diagnostic, en
     assert result is not None
     assert result.processing_cost_added.electrical_kWh == pytest.approx(energy)
     assert ledger.summary()["warnings"] == []
+
+
+def test_sub_tolerance_reagent_debit_is_below_cost_input_floor():
+    tiny_kg = 3.226e-13
+    ledger = CostLedger()
+    transition = LedgerTransition(
+        "tiny_reagent_cost_floor",
+        debits=(
+            MaterialLot("process.reagent_inventory", {"Si": tiny_kg}),
+            MaterialLot("process.cleaned_melt", {"Fe": 1.0}),
+        ),
+        credits=(
+            MaterialLot(
+                "process.metal_phase",
+                {"Fe": 1.0, "Si": tiny_kg},
+            ),
+        ),
+    )
+
+    result = ledger.observe_transition(
+        intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        transition=transition,
+        strict=True,
+    )
+
+    assert result is None
+    warnings = ledger.summary()["warnings"]
+    assert len(warnings) == 1
+    assert "cost_debit_below_quantity_floor" in warnings[0]
+    assert "skipped_keys=1" in warnings[0]
+    assert f"total_kg={tiny_kg:.12g}" in warnings[0]
+    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in warnings[0]
 
 
 def test_cost_ledger_mass_allocates_normal_coproducts_by_product_mass():
@@ -594,29 +629,15 @@ def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
 
 
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
-    isolated_engine_config,
+    runner_golden_loader,
 ):
     # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
     # train13 adjudication; prior value was generated against the
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=24,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-15T00:00:00Z",
-            "kernel_commit_sha": "goal-18-fixture",
-        },
-    )
+    from tests.test_runner_smoke import SCENARIOS
 
-    actual = run.run()
-    expected = json.loads(
-        (ROOT / "tests" / "fixtures" / "runner" / "lunar_mare_low_ti_C0_24h.json")
-        .read_text(encoding="utf-8")
-    )
+    actual, _, expected_text = runner_golden_loader(SCENARIOS[0])
+    expected = json.loads(expected_text)
     assert "cost_rollup_diagnostic" in actual["run_metadata"]
     assert actual["run_metadata"]["cost_rollup_diagnostic"]["price_basis"] == (
         "legacy_placeholder_awaiting_owner_ratification"

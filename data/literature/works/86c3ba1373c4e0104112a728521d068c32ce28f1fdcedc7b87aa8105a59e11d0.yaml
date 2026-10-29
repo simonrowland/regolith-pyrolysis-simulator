@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:mendybaev-2021-cai-low-pressure-h2-evap
       role: pdf
@@ -24,12 +24,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:mendybaev-2021-cai-low-pressure-h2-evap
-      role: table_csv
-      path: tables/mendybaev-2021-cai-low-pressure-h2-evap
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:mendybaev-2021-cai-low-pressure-h2-evap
       role: pdftotext
       path: unknown
@@ -82,6 +76,7 @@ experiments:
               published_page: 5
               note: 10-40 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -108,6 +103,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -152,6 +148,7 @@ experiments:
               published_page: 8
               note: 1600 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -184,6 +181,7 @@ experiments:
               published_page: 8
               note: ~2x10^-4 bar H2; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -252,6 +250,7 @@ experiments:
               published_page: 5
               note: 10-40 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -278,6 +277,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -322,6 +322,7 @@ experiments:
               published_page: 8
               note: 1600 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -354,6 +355,7 @@ experiments:
               published_page: 8
               note: ~2x10^-5 bar H2; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -422,6 +424,7 @@ experiments:
               published_page: 5
               note: 10-40 mg; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -448,6 +451,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -492,6 +496,7 @@ experiments:
               published_page: 7
               note: 1600 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -524,6 +529,7 @@ experiments:
               published_page: 7
               note: ~10^-7 bar; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable

@@ -1023,6 +1023,58 @@ def test_furnace_amortization_cost_trades_continuously_against_yield() -> None:
     )[0]
 
 
+def test_refused_wall_evidence_is_unavailable_not_zero_cost() -> None:
+    authority_summary = objective_module._coating_authority_summary({
+        "output_status": "status_bearing",
+        "status_reason": "carrier wall partial refused",
+        "code": "wall_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["Na"],
+    })
+    params = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=10.0,
+        min_fouling_penalty=1.0,
+    )
+    cost_summary = objective_module._furnace_amortization_summary(
+        SimpleNamespace(
+            record=SimpleNamespace(
+                cost_rollup={
+                    "run_input_cost": {
+                        "owner_ratify_money_projection": 20.0,
+                    }
+                }
+            )
+        ),
+        math.inf,
+        has_positive_fouling=False,
+        cost_parameters=params,
+        coating_status=authority_summary["coating_status"],
+        coating_status_reason=authority_summary["coating_status_reason"],
+    )
+    summary = {**authority_summary, **cost_summary}
+
+    assert summary["coating_status"] == "unavailable"
+    assert summary["coating_authoritative"] is False
+    assert summary["furnace_amortization_status"] == "unavailable"
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
+    assert summary["furnace_amortization_batch_cost_equivalents"] is None
+    with pytest.raises(ObjectiveComputationError, match="furnace amortization unavailable"):
+        cost_adjusted_objective_scores(
+            {"oxygen_kg": 1.0, "energy_kWh": 1.0},
+            DEFINITIONS,
+            product_summary=summary,
+        )
+
+
 def test_furnace_amortization_clean_recipe_skips_missing_lifetime() -> None:
     assert furnace_amortization_cost_per_run(
         20.0, None, 0.0, 1.0, has_positive_fouling=False
@@ -1299,6 +1351,48 @@ def test_furnace_amortization_none_reaches_summary_as_infinite_lifetime() -> Non
             20.0, 0.0, 500.0, 1.0, has_positive_fouling=True
         )
     )
+
+
+def test_ungrounded_resinter_lifetime_returns_typed_amortization_status(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
+    campaigns_to_resinter = objective_module._campaigns_to_resinter(
+        {("hot_duct", "Rb"): 1.66e-4}
+    )
+    assert campaigns_to_resinter == "resinter_threshold_kg / 0.000166"
+    params = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=500.0,
+        min_fouling_penalty=1.0,
+    )
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            cost_rollup={
+                "run_input_cost": {"owner_ratify_money_projection": 20.0}
+            }
+        )
+    )
+
+    summary = objective_module._furnace_amortization_summary(
+        sim,
+        campaigns_to_resinter,
+        has_positive_fouling=True,
+        cost_parameters=params,
+    )
+
+    assert summary["furnace_amortization_status"] == "resinter_threshold_ungrounded"
+    assert summary["furnace_amortization_batch_cost_equivalents"] == 0.0
+    assert summary["campaigns_to_resinter"] == campaigns_to_resinter
 
 
 def test_instant_death_furnace_cost_stays_finite_through_pareto_scoring() -> None:
@@ -1888,6 +1982,9 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     refusal_sim, refusal_missing_by_hour = _sso2_sim_alpha_fallback_disabled(
         hours=3
     )
+    refusal_sim.setpoints.setdefault("chemistry_kernel", {})[
+        "unmeasured_alpha_fallback_species"
+    ] = ["CrO2"]
     refusal_missing = {}
     for hourly in refusal_missing_by_hour:
         refusal_missing.update(hourly)
@@ -1909,6 +2006,44 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
         "engaged_species": [],
         "total_engagement_count": 0,
     }
+
+
+def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
+    from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
+
+    generic_sim = SimpleNamespace(
+        setpoints={
+            "chemistry_kernel": {"allow_unmeasured_alpha_fallback": True}
+        },
+        _unmeasured_alpha_fallback_species_engaged=("Al2", "CrO"),
+        _degraded_path_engagement_summary=lambda: {
+            "unmeasured_alpha_evaporation_fallback": {"total_count": 7}
+        },
+    )
+
+    assert _unmeasured_alpha_fallback_notice(generic_sim) == {
+        "severity": "warning",
+        "status": "not_engaged",
+        "policy": "alpha=1.0 prototype fallback",
+        "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
+        "permitted_species": ["CrO2"],
+        "engaged_species": [],
+        "total_engagement_count": 0,
+    }
+
+    scoped_sim = SimpleNamespace(
+        setpoints={
+            "chemistry_kernel": {
+                "unmeasured_alpha_fallback_species": ["CrO2"]
+            }
+        },
+        _unmeasured_alpha_fallback_species_engaged=("CrO",),
+        _degraded_path_engagement_summary=lambda: {
+            "unmeasured_alpha_evaporation_fallback": {"total_count": 1}
+        },
+    )
+    with pytest.raises(RuntimeError, match="escaped its trace-species scope: CrO"):
+        _unmeasured_alpha_fallback_notice(scoped_sim)
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:
@@ -1940,6 +2075,34 @@ def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:
     assert evidence["fe_tap"]["SiO_Si_impurity_wt_pct"] == pytest.approx(0.2 / 7.2 * 100.0)
     assert "chunk 3b" in evidence["reader_handoff_chunk3b"]
     assert "Stage 3 Fe contamination" in SSO2_CHUNK3B_READER_HANDOFF
+
+
+def test_sso2_reader_fails_on_runtime_silica_exposure_finding() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 10.0},
+        ledger=_FakeSso2Ledger({
+            "terminal.drain_tap_material": {"Fe": 7.0},
+            "process.metal_phase": {"Fe": 3.0},
+        }),
+    )
+    execution.trace.coating_diagnostics = {
+        "silica_exposed_to_alkali_findings": [{
+            "key": "silica_exposed_to_alkali",
+            "stage_number": 3,
+            "species": "Na",
+        }],
+    }
+
+    evidence = sso2_owner_recipe_evidence(execution)
+    score, reader = sso2_owner_recipe_objective_reader(execution)
+
+    assert evidence["wall_coating"]["feasible"] is False
+    assert evidence["wall_coating"]["coating_verdict"] == "violated"
+    assert evidence["wall_coating"]["coating_violation_reasons"][0]["reason"] == (
+        "silica_exposed_to_alkali"
+    )
+    assert score == pytest.approx(0.0)
+    assert reader["status"] == "wall_coating_failed"
 
 
 def test_sso2_evidence_empty_fe_tap_account_fails_closed_without_zero_alias() -> None:
@@ -2276,6 +2439,24 @@ def test_product_summary_includes_input_output_yield_table_and_mass_closure() ->
     assert "product_summary.target_species_yield_report" in target_yield["consumer"]
     assert target_yield["targets"]["K"]["status"] == "not-applicable"
     assert target_yield["targets"]["Fe"]["yield_fraction"] is not None
+
+
+def test_product_summary_preserves_high_t_melt_activity_notice() -> None:
+    notice = {
+        "kind": "high_t_melt_activity_fallback",
+        "authority": "extrapolated",
+        "reason": "imcc_nonconvergence",
+        "campaigns": ["C2A", "C4"],
+    }
+    sim = _FakeProductSim()
+    sim.high_t_melt_activity_run_notice = lambda: notice
+
+    summary = product_summary(
+        SimpleNamespace(simulator=sim, trace=None),
+        {"feedstock": "lunar_mare_low_ti"},
+    )
+
+    assert summary["high_t_melt_activity_fallback_notice"] == notice
 
 
 def test_unclassified_product_mass_makes_yield_table_inconclusive() -> None:

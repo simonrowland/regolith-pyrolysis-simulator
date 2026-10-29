@@ -53,14 +53,19 @@ campaigns:
   # - C6: Mg-thermite target is Ca/REE terminal slag after Al extraction.
 
   # --------------------------------------------------------------------------
-  # C0 -- Vacuum Bakeoff & Volatile Recovery
+  # C0 -- Dry Inert Bakeoff & Volatile Recovery
   # --------------------------------------------------------------------------
   C0:
-    label: "Vacuum Bakeoff & Volatile Recovery"
+    label: "Dry Inert Bakeoff & Volatile Recovery"
     temp_range_C: [20, 950]
-    dT_dt_C_per_hr: 50
-    atmosphere: "hard_vacuum"
-    pO2_mbar: null                       # deep vacuum
+    # Owner d-240's provisional ramp; release curves remain uncertified
+    # (t-1417), and no furnace heating-power model bounds this rate.
+    dT_dt_C_per_hr: 200
+    carrier_gas: "Ar"
+    p_total_mbar_default: 1.0
+    pO2_mbar_default: 0.0
+    # Owner d-244 purity limit over each C0 hold.
+    alkali_retention_budget_fraction: 1.0e-3
     target_species: ["H2O", "CO2", "S2", "CHNOPS"]
     products:
       volatiles:
@@ -70,19 +75,14 @@ campaigns:
         mass_kg: 5.0                     # nanophase Fe0, magnetic separation, zero energy
         note: "nanophase Fe0, magnetic separation, zero energy"
     endpoint:
-      type: "ir_signal_decay"
-      threshold: 0.05
+      type: "computed_alkali_and_evacuation_exit"
     max_hold_hr: 25
-    soft_endpoint:
-      type: "temperature_min_after_min_hold"
-      min_hold_hr: 10
-      temperature_min_C: 940
     termination_class: "C"
     duration_h: "included_in_ramp"
     notes: >
-      Volatile release complete by ~700 C; alkali onset >900 C
-      (thermally separated). Native Fe separated magnetically at
-      zero additional energy cost.
+      Dry 1 mbar Ar cover; the computed Na+K purity threshold and gas
+      evacuation bound define this predict-and-flag exit. Unreleased
+      cryo-train species remain flagged for later collection or cleanup.
 
   # --------------------------------------------------------------------------
   # C0b -- Standardised P-Cleanup (mild oxidative hold)
@@ -154,7 +154,7 @@ campaigns:
       sensors: >
         Stage 0 hot-duct IR: Na 589 nm early, Fe 370 nm mid,
         SiO 230 nm UV dominant >1400 C; plus upstream pressure
-      induction_stirring: "continuous 4-8x acceleration + 50-80 C cycling"
+      induction_stirring: "unsourced engineering placeholder: 4-8x stirring band and 50-80 C cycling; no coil, field, or flow correlation (b-1015); t-1440 replaces these proxies with species-specific liquid-transfer resistance"
     products:
       Na:
         mass_g: [2300, 4000]
@@ -1149,11 +1149,14 @@ condensation_train:
 
     stage_6_turbine_compressor:
       label: "Turbine-Compressor (Pressure Regulator)"
+      temp_range_C: [50, 200]
       function: "pressure regulator + first-stage O2 compression"
       control: "turbine speed sets upstream pO2; IR feedback loop"
 
     stage_7_accumulator:
       label: "O2 Accumulator"
+      # Runtime outlet-monitor band, not the downstream oxygen storage temperature.
+      temp_range_C: [20, 50]
       storage: "compressed O2 gas at ~3 bar"
       compression_energy_kWh_per_t: [15, 30]
 
@@ -1272,7 +1275,9 @@ endpoint_criteria:
     IR spectroscopy (Stage 0 hot-duct sapphire window)
     + pressure stabilisation + cumulative mass loss.
     Model-predictive or PID with IR + pressure feedback;
-    induction stirring ensures surface renewal.
+    induction stirring surface-renewal assumption (unsourced engineering
+    placeholder; b-1015; t-1440 replaces it with species-specific
+    liquid-transfer resistance).
 
   species_lines:
     Na:
@@ -1313,7 +1318,7 @@ endpoint_criteria:
   control:
     method: "Model-predictive or PID"
     feedback: ["IR_spectroscopy", "pressure"]
-    surface_renewal: "induction stirring (4-8x rate acceleration)"
+    surface_renewal: "unsourced engineering placeholder: induction stirring band 4-8x; no coil, field, or flow correlation (b-1015); t-1440 replaces this proxy with species-specific liquid-transfer resistance"
 
 
 # ============================================================================
@@ -1382,9 +1387,13 @@ furnace:
     function: "drain/injection dual-purpose"
 
   induction_stirring:
+    # The 4-8 ranges below and the 10x frozen-skull ceiling in
+    # simulator/state.py are unsourced engineering placeholders with no
+    # coil, field, or flow correlation (b-1015). Task t-1440 replaces
+    # these proxies with species-specific liquid-transfer resistance.
     rate_acceleration_factor: [4, 8]
     thermal_cycling_C: [50, 80]
-    note: "continuous; ensures surface renewal for evaporation kinetics"
+    note: "unsourced engineering placeholder: continuous surface renewal assumption (b-1015); t-1440 replaces it with species-specific liquid-transfer resistance"
 
   metal_phase_stratification:
     mode: "diagnostic_only_instrument_before_gate"
@@ -1681,8 +1690,11 @@ kinetic_parameters:
   SiO2_strip_duration_h: [4, 8]         # for 50% SiO2 removal (Path A)
 
   induction_stirring:
+    # Unsourced engineering placeholders with no coil, field, or flow
+    # correlation (b-1015); t-1440 replaces these proxies with
+    # species-specific liquid-transfer resistance.
     acceleration_factor: [4, 8]          # vs static melts
-    thermal_cycling_C: [50, 80]          # continuous surface renewal
+    thermal_cycling_C: [50, 80]          # assumed continuous surface renewal
 
   condensation_boiling_points_C:
     K_bp: 759
@@ -1943,6 +1955,8 @@ freeze_gate:
 # to fail-loud on. Engine policy stays strict; this section makes operational
 # overrides explicit + auditable in one place.
 chemistry_kernel:
+  # Fixed run input: analytical explicitly selects the qualified Kress91 floor.
+  liquid_fraction_provider: magemin
   # V1e-impl TIER-3 fail-loud (engine policy: refuse if a species without
   # measured evaporation_alpha is sampled). Cr, CrO2, and Mn currently lack
   # measured α in the literature (audit artifacts:

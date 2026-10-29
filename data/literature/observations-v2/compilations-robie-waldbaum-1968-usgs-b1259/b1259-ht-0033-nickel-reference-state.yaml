@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -77,8 +77,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='5.215'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -108,6 +121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=nickel-(reference-state):v=50a75f4423:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -126,8 +140,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -183,8 +197,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='6.014'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -214,6 +241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=nickel-(reference-state):v=7b6db27b5a:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -232,8 +260,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -289,8 +317,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='6.836'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -320,6 +361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=nickel-(reference-state):v=c4e6849b6c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -338,8 +380,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -395,8 +437,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='7.680'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -426,6 +481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=nickel-(reference-state):v=76e7062589:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -444,8 +500,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -501,8 +557,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='8.539'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -532,6 +601,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=nickel-(reference-state):v=3c07f02228:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -550,8 +620,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -607,8 +677,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='9.404'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -638,6 +721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=nickel-(reference-state):v=53ee402e07:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -656,8 +740,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -713,8 +797,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='10.269'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -744,6 +841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=nickel-(reference-state):v=0b7c2c6e5c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -762,8 +860,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -819,8 +917,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='11.134'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -850,6 +961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1726:col=H_minus_H298:name=nickel-(reference-state):v=5d41c78126:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -868,8 +980,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -925,8 +1037,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='11.359'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -956,6 +1081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1726:col=H_minus_H298:name=nickel-(reference-state):v=a8c8f73dd8:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -974,8 +1100,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1031,8 +1157,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='15.535'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1062,6 +1201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=nickel-(reference-state):v=78e65b6c2f:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1080,8 +1220,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1137,8 +1277,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='16.296'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1168,6 +1321,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=nickel-(reference-state):v=717c5b4b4b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1186,8 +1340,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1243,8 +1397,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='17.326'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1274,6 +1441,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=nickel-(reference-state):v=c4b8c1c835:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1292,8 +1460,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1349,8 +1517,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='18.356'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1380,6 +1561,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1398,8 +1580,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1455,8 +1637,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1486,6 +1681,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=nickel-(reference-state):v=046c9e5dea:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1504,8 +1700,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1561,8 +1757,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='0.666'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1592,6 +1801,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=nickel-(reference-state):v=4f69140d64:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1610,8 +1820,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1667,8 +1877,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='1.373'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1698,6 +1921,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=nickel-(reference-state):v=29223daac7:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1716,8 +1940,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1773,8 +1997,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='2.155'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1804,6 +2041,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=631:col=H_minus_H298:name=nickel-(reference-state):v=13aee2b611:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1822,8 +2060,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1879,8 +2117,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='2.423'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1910,6 +2161,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=nickel-(reference-state):v=ff877d7ac3:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -1928,8 +2180,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1985,8 +2237,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='2.945'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2016,6 +2281,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=nickel-(reference-state):v=e733c688d7:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -2034,8 +2300,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -2091,8 +2357,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='3.685'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2122,6 +2401,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=nickel-(reference-state):v=bebe01b727:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -2140,8 +2420,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -2197,8 +2477,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 58
+        pdf_page_index: 64
+        table: b1259-ht-0033-nickel-reference-state
+        note: as_published='4.439'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
+        record: b1259-ht-0033-nickel-reference-state
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2228,6 +2521,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1000:col=entropy:name=nickel-(reference-state):v=d925c178f9:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -2347,6 +2641,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1100:col=entropy:name=nickel-(reference-state):v=8a6d77ba6c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -2466,6 +2761,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1200:col=entropy:name=nickel-(reference-state):v=2b3f1c33a9:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -2585,6 +2881,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1300:col=entropy:name=nickel-(reference-state):v=6956899ac8:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -2704,6 +3001,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1400:col=entropy:name=nickel-(reference-state):v=812fe7bf82:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -2823,6 +3121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1500:col=entropy:name=nickel-(reference-state):v=7cbd05028c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -2942,6 +3241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1600:col=entropy:name=nickel-(reference-state):v=f8e131d558:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -3061,6 +3361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1700:col=entropy:name=nickel-(reference-state):v=015cc2ff8a:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -3180,6 +3481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1726:col=entropy:name=nickel-(reference-state):v=74d6b9aa7e:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -3299,6 +3601,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1726:col=entropy:name=nickel-(reference-state):v=81a9b6d933:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -3418,6 +3721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1800:col=entropy:name=nickel-(reference-state):v=dd09361c9b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -3537,6 +3841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1900:col=entropy:name=nickel-(reference-state):v=b15600eb24:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -3656,6 +3961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=2000:col=entropy:name=nickel-(reference-state):v=83df054a57:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -3775,6 +4081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=298.15:col=entropy:name=nickel-(reference-state):v=0258151fe6:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -3894,6 +4201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=400:col=entropy:name=nickel-(reference-state):v=ff196d03b3:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -4013,6 +4321,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=500:col=entropy:name=nickel-(reference-state):v=5cf49cae2e:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -4132,6 +4441,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=600:col=entropy:name=nickel-(reference-state):v=bd151f935f:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -4251,6 +4561,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=631:col=entropy:name=nickel-(reference-state):v=803fb1fb90:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -4370,6 +4681,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=700:col=entropy:name=nickel-(reference-state):v=2bbbeaff86:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -4489,6 +4801,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=800:col=entropy:name=nickel-(reference-state):v=89c8a38036:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -4608,6 +4921,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=900:col=entropy:name=nickel-(reference-state):v=0e364b3032:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -4727,6 +5041,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -4888,6 +5203,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -5049,6 +5365,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -5210,6 +5527,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -5371,6 +5689,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -5532,6 +5851,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -5693,6 +6013,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -5854,6 +6175,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -6015,6 +6337,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1726:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -6125,6 +6448,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -6286,6 +6610,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -6447,6 +6772,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -6608,6 +6934,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -6769,6 +7096,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -6930,6 +7258,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -7091,6 +7420,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -7252,6 +7582,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=631:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -7362,6 +7693,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -7523,6 +7855,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -7684,6 +8017,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -7845,6 +8179,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -8006,6 +8341,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -8167,6 +8503,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -8328,6 +8665,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -8489,6 +8827,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -8650,6 +8989,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -8811,6 +9151,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -8972,6 +9313,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -9133,6 +9475,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1726:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -9243,6 +9586,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -9404,6 +9748,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -9565,6 +9910,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -9726,6 +10072,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -9887,6 +10234,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -10048,6 +10396,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -10209,6 +10558,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -10370,6 +10720,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=631:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -10480,6 +10831,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -10641,6 +10993,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -10802,6 +11155,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -10963,6 +11317,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -11115,6 +11470,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -11267,6 +11623,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -11419,6 +11776,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -11571,6 +11929,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -11723,6 +12082,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -11875,6 +12235,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -12027,6 +12388,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -12179,6 +12541,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1726:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -12280,6 +12643,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -12432,6 +12796,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -12584,6 +12949,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -12736,6 +13102,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -12888,6 +13255,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -13040,6 +13408,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -13192,6 +13561,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -13344,6 +13714,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=631:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -13445,6 +13816,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -13597,6 +13969,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -13749,6 +14122,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
@@ -13901,3 +14275,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
     parameters: []
     output_unit: dimensionless
+    references: []

@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -77,8 +77,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='11.650'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -108,6 +121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1100:col=H_minus_H298:name=rutile:v=998377c789:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -126,8 +140,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -183,8 +197,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='13.420'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -214,6 +241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1200:col=H_minus_H298:name=rutile:v=feae411630:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -232,8 +260,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -289,8 +317,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='15.200'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -320,6 +361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1300:col=H_minus_H298:name=rutile:v=61302c494c:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -338,8 +380,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -395,8 +437,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='17.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -426,6 +481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1400:col=H_minus_H298:name=rutile:v=27e7234be8:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -444,8 +500,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -501,8 +557,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='18.820'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -532,6 +601,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1500:col=H_minus_H298:name=rutile:v=5487cea7e1:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -550,8 +620,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -607,8 +677,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='20.660'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -638,6 +721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1600:col=H_minus_H298:name=rutile:v=8ff4d991b8:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -656,8 +740,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -713,8 +797,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='22.530'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -744,6 +841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1700:col=H_minus_H298:name=rutile:v=63e047722a:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -762,8 +860,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -819,8 +917,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='24.420'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -850,6 +961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1800:col=H_minus_H298:name=rutile:v=324be623b5:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -868,8 +980,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -925,8 +1037,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='26.340'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -956,6 +1081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=1900:col=H_minus_H298:name=rutile:v=93d7ff2718:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -974,8 +1100,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1031,8 +1157,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='28.280'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1062,6 +1201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=2000:col=H_minus_H298:name=rutile:v=12cabff7c5:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -1080,8 +1220,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1137,8 +1277,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='30.250'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1168,6 +1321,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=rutile:v=900e6181ee:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -1186,8 +1340,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1243,8 +1397,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1274,6 +1441,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=400:col=H_minus_H298:name=rutile:v=776173f4c7:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -1292,8 +1460,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1349,8 +1517,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='1.540'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1380,6 +1561,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=500:col=H_minus_H298:name=rutile:v=24ddc30464:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -1398,8 +1580,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1455,8 +1637,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='3.100'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1486,6 +1681,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=600:col=H_minus_H298:name=rutile:v=f05e7c3b6e:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -1504,8 +1700,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1561,8 +1757,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='4.735'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1592,6 +1801,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=700:col=H_minus_H298:name=rutile:v=5ca92b7abe:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -1610,8 +1820,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1667,8 +1877,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='6.440'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1698,6 +1921,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=800:col=H_minus_H298:name=rutile:v=73af937a27:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -1716,8 +1940,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1773,8 +1997,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='8.160'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1804,6 +2041,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:H_minus_H298:shared:T=900:col=H_minus_H298:name=rutile:v=f2c9146a5c:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -1822,8 +2060,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -1879,8 +2117,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 146
+        pdf_page_index: 152
+        table: b1259-ht-0121-rutile
+        note: as_published='9.900'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
+        record: b1259-ht-0121-rutile
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1910,6 +2161,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1000:col=entropy:name=rutile:v=44a3221107:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2029,6 +2281,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1100:col=entropy:name=rutile:v=f8e9d256e8:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2148,6 +2401,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1200:col=entropy:name=rutile:v=4b409a2d56:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2267,6 +2521,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1300:col=entropy:name=rutile:v=9d2f40a3c1:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2386,6 +2641,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1400:col=entropy:name=rutile:v=8bd142c55f:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2505,6 +2761,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1500:col=entropy:name=rutile:v=209164177d:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2624,6 +2881,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1600:col=entropy:name=rutile:v=f9385dc277:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2743,6 +3001,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1700:col=entropy:name=rutile:v=142d42db21:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2862,6 +3121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1800:col=entropy:name=rutile:v=1cef5328d2:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -2981,6 +3241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=1900:col=entropy:name=rutile:v=0ca6736f28:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -3100,6 +3361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=2000:col=entropy:name=rutile:v=19c161ebb1:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -3219,6 +3481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=298.15:col=entropy:name=rutile:v=530412bb7c:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -3338,6 +3601,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=400:col=entropy:name=rutile:v=e57c344716:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -3457,6 +3721,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=500:col=entropy:name=rutile:v=278591ad0b:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -3576,6 +3841,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=600:col=entropy:name=rutile:v=81ec9a9f26:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -3695,6 +3961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=700:col=entropy:name=rutile:v=b724b6572f:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -3814,6 +4081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=800:col=entropy:name=rutile:v=e1419083a4:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -3933,6 +4201,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:S:shared:T=900:col=entropy:name=rutile:v=80daea6b3c:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -4052,6 +4321,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=rutile:v=f2e3117732:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -4236,6 +4506,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=rutile:v=4559107c6c:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -4420,6 +4691,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=rutile:v=9009f43a4c:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -4604,6 +4876,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=rutile:v=b70707c8c5:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -4788,6 +5061,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=rutile:v=425c4674c6:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -4972,6 +5246,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=rutile:v=7b5e394072:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -5156,6 +5431,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=rutile:v=f6d9e00054:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -5340,6 +5616,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=rutile:v=e9891a95ba:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -5524,6 +5801,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=rutile:v=55313c2632:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -5708,6 +5986,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=rutile:v=2096a4f953:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -5892,6 +6171,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=rutile:v=7dfb851769:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -6076,6 +6356,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=rutile:v=3227641282:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -6260,6 +6541,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=400:col=delta_f_G:name=rutile:v=300a0b79b0:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -6444,6 +6726,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=500:col=delta_f_G:name=rutile:v=93c3b41fd2:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -6628,6 +6911,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=600:col=delta_f_G:name=rutile:v=29a016f31b:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -6812,6 +7096,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=700:col=delta_f_G:name=rutile:v=e5600a169d:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -6996,6 +7281,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=800:col=delta_f_G:name=rutile:v=cd1ca35ffd:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -7180,6 +7466,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fG:from_the_elements:T=900:col=delta_f_G:name=rutile:v=d15e8bcf34:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -7364,6 +7651,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=rutile:v=a50cfe636d:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -7548,6 +7836,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=rutile:v=a4860a3e8e:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -7732,6 +8021,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=rutile:v=2dee52f215:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -7916,6 +8206,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=rutile:v=a3b8ab8a53:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -8100,6 +8391,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=rutile:v=27b31df53f:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -8284,6 +8576,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=rutile:v=d86615897a:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -8468,6 +8761,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=rutile:v=8fb6134e7d:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -8652,6 +8946,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=rutile:v=040d01efb0:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -8836,6 +9131,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=rutile:v=127f4067d6:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -9020,6 +9316,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=rutile:v=6b6f7b8583:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -9204,6 +9501,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=rutile:v=79c6ff9172:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -9388,6 +9686,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=rutile:v=844d6cb295:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -9572,6 +9871,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=400:col=delta_f_H:name=rutile:v=a87db419be:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -9756,6 +10056,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=500:col=delta_f_H:name=rutile:v=3c17a2f9c4:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -9940,6 +10241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=600:col=delta_f_H:name=rutile:v=f9c3c5c501:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -10124,6 +10426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=700:col=delta_f_H:name=rutile:v=3f5651a9ff:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -10308,6 +10611,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=800:col=delta_f_H:name=rutile:v=b2ff10e34c:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -10492,6 +10796,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:delta_fH:from_the_elements:T=900:col=delta_f_H:name=rutile:v=802409c88f:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -10676,6 +10981,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=rutile:v=2e81209f09:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -10851,6 +11157,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=rutile:v=a239e50784:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -11026,6 +11333,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=rutile:v=3348b91118:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -11201,6 +11509,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=rutile:v=09e3a6a016:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -11376,6 +11685,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=rutile:v=f06eb2248c:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -11551,6 +11861,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=rutile:v=aa42e97b99:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -11726,6 +12037,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=rutile:v=9dfd5d6bad:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -11901,6 +12213,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=rutile:v=ca86d1daa2:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -12076,6 +12389,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=rutile:v=a6330b4ee4:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -12251,6 +12565,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=rutile:v=3fb781214e:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -12426,6 +12741,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=rutile:v=681f5148de:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -12601,6 +12917,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=rutile:v=3a72bdac88:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -12776,6 +13093,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=400:col=log_Kf:name=rutile:v=8abd5c6e90:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -12951,6 +13269,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=500:col=log_Kf:name=rutile:v=9234dd097f:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -13126,6 +13445,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=600:col=log_Kf:name=rutile:v=b95c108553:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -13301,6 +13621,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=700:col=log_Kf:name=rutile:v=dada2128b6:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -13476,6 +13797,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=800:col=log_Kf:name=rutile:v=99d87620ea:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -13651,6 +13973,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:log10_Kf:from_the_elements:T=900:col=log_Kf:name=rutile:v=ff505383f5:poly=rutile
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0121-rutile:tabulation
   identity:
@@ -13826,3 +14149,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0121-rutile.json
     parameters: []
     output_unit: dimensionless
+    references: []

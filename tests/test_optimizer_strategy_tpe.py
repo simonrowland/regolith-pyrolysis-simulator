@@ -41,6 +41,7 @@ from simulator.optimize.recipe import (
     RecipeSchema,
     RecipeValidationError,
     _default_setpoint_value,
+    _validate_numeric_bounds,
 )
 from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
@@ -708,6 +709,10 @@ def _lunar_profile_for_hours(hours: int, *, gates: tuple[str, ...] | None = None
     return profile
 
 
+# Two full 60-hour lunar campaigns: campaign-length physics. On the studio PR
+# tier it takes 277-301 s against the 300 s per-test limit (green 287 s), so it
+# runs in the nightly tier, which covers it in full.
+@pytest.mark.nightly
 def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> None:
     furnace_path = ("furnace_max_T_C",)
     schema = RecipeSchema(
@@ -983,9 +988,25 @@ def test_highland_profile_seed_enqueues_seed_values_and_loaded_defaults(strategy
         else:
             has_unambiguous_default = default in (spec.choices or ())
         if has_unambiguous_default:
+            if spec.kind in {"float", "int"}:
+                try:
+                    _validate_numeric_bounds(spec, float(default))
+                except RecipeValidationError:
+                    no_default_paths.add(name)
+                    continue
             expected_params[name] = default
         else:
             no_default_paths.add(name)
+
+    c0_ramp_path = ("campaigns", "C0", "dT_dt_C_per_hr")
+    c0_ramp_name = ".".join(c0_ramp_path)
+    c0_ramp_spec = schema.spec_for(c0_ramp_path)
+    with pytest.raises(RecipeValidationError, match="above upper bound"):
+        _validate_numeric_bounds(
+            c0_ramp_spec,
+            float(_default_setpoint_value(c0_ramp_path)),
+        )
+    assert c0_ramp_name in no_default_paths
 
     hold_path = ("campaigns", "C6", "default_hold_T_C")
     hold_spec = schema.spec_for(hold_path)
@@ -1012,6 +1033,7 @@ def test_highland_profile_seed_enqueues_seed_values_and_loaded_defaults(strategy
     enqueued_params = waiting[0].system_attrs["fixed_params"]
 
     assert enqueued_params == expected_params
+    assert c0_ramp_name not in enqueued_params
     search_paths = {spec.path for spec in schema.search_allowlist}
     expected_c6_seed_params = {
         ".".join(path): value

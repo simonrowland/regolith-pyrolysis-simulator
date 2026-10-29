@@ -9,26 +9,8 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
-    - asset_id: pdf:shaw-2023-vacuum-thermal-sublimation-thesis
-      role: pdf
-      path: raw/shaw-2023-vacuum-thermal-sublimation-thesis/shaw-2023-vacuum-thermal-sublimation-thesis.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:shaw-2023-vacuum-thermal-sublimation-thesis
-      role: pdftotext
-      path: text/shaw-2023-vacuum-thermal-sublimation-thesis
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:shaw-2023-vacuum-thermal-sublimation-thesis
-      role: table_csv
-      path: tables/shaw-2023-vacuum-thermal-sublimation-thesis
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:shaw-2023-vacuum-thermal-sublimation-thesis
       role: pdftotext
       path: unknown
@@ -102,6 +84,7 @@ experiments:
               table: '8.1'
               note: Temp High 1148 C converted with T_K = T_C + 273.15
         output_unit: K
+        references: []
     pressure_low_atm:
       state:
         tag: value
@@ -151,6 +134,7 @@ experiments:
               table: '8.1'
               note: Pressure Average 1.33e-8 atm converted to Pa
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -218,6 +202,7 @@ experiments:
                 note: Temp High Duration 3.9 h; high temperature means reactor temperature above 1000 C per §5.4; converted
                   to seconds
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -271,6 +256,7 @@ experiments:
               section: 5.4.4
               note: Approximately 2.6 g sample; grams converted to kg
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -324,6 +310,7 @@ experiments:
               table: '8.1'
               note: Temp High 1127 C converted with T_K = T_C + 273.15
         output_unit: K
+        references: []
     pressure_low_atm:
       state:
         tag: value
@@ -373,6 +360,7 @@ experiments:
               table: '8.1'
               note: Pressure Average 2.73e-7 atm converted to Pa
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -440,6 +428,7 @@ experiments:
                 note: Temp High Duration 1.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted
                   to seconds
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -493,6 +482,7 @@ experiments:
               section: 5.4.4
               note: Approximately 2.6 g sample; grams converted to kg
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -546,6 +536,7 @@ experiments:
               table: '8.1'
               note: Temp High 1025 C converted with T_K = T_C + 273.15
         output_unit: K
+        references: []
     pressure_low_atm:
       state:
         tag: value
@@ -595,6 +586,7 @@ experiments:
               table: '8.1'
               note: Pressure Average 3.42e-7 atm converted to Pa
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -662,6 +654,7 @@ experiments:
                 note: Temp High Duration 4.3 h; high temperature means reactor temperature above 1000 C per §5.4; converted
                   to seconds
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -715,6 +708,7 @@ experiments:
               section: 5.4.4
               note: Approximately 2.6 g sample; grams converted to kg
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -768,6 +762,7 @@ experiments:
               table: '8.1'
               note: Temp High 1116 C converted with T_K = T_C + 273.15
         output_unit: K
+        references: []
     pressure_low_atm:
       state:
         tag: value
@@ -817,6 +812,7 @@ experiments:
               table: '8.1'
               note: Pressure Average 2.74e-8 atm converted to Pa
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -884,6 +880,7 @@ experiments:
                 note: Temp High Duration 7.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
                   to seconds
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -938,6 +935,7 @@ experiments:
               section: 5.4.4
               note: Approximately 2.6 g sample; grams converted to kg
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -991,6 +989,7 @@ experiments:
               table: '8.1'
               note: Temp High 1153 C converted with T_K = T_C + 273.15
         output_unit: K
+        references: []
     pressure_low_atm:
       state:
         tag: value
@@ -1040,6 +1039,7 @@ experiments:
               table: '8.1'
               note: Printed 1 atm converted to Pa
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -1107,6 +1107,7 @@ experiments:
                 note: Temp High Duration 2.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
                   to seconds
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -1160,6 +1161,7 @@ experiments:
               section: 5.4.4
               note: Approximately 2.6 g sample; grams converted to kg
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1213,6 +1215,7 @@ experiments:
               table: '8.1'
               note: Temp High 1121 C converted with T_K = T_C + 273.15
         output_unit: K
+        references: []
     pressure_low_atm:
       state:
         tag: value
@@ -1262,6 +1265,7 @@ experiments:
               table: '8.1'
               note: Pressure Average 5.01e-8 atm converted to Pa
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -1329,6 +1333,7 @@ experiments:
                 note: Temp High Duration 4.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
                   to seconds
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -1382,6 +1387,7 @@ experiments:
               section: 5.4.4
               note: Approximately 2.6 g sample; grams converted to kg
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1435,6 +1441,7 @@ experiments:
               table: '8.1'
               note: Temp High 1147 C converted with T_K = T_C + 273.15
         output_unit: K
+        references: []
     pressure_low_atm:
       state:
         tag: value
@@ -1484,6 +1491,7 @@ experiments:
               table: '8.1'
               note: Pressure Average 8.84e-8 atm converted to Pa
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -1551,6 +1559,7 @@ experiments:
                 note: Temp High Duration 3.5 h; high temperature means reactor temperature above 1000 C per §5.4; converted
                   to seconds
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -1604,6 +1613,7 @@ experiments:
               section: 5.4.4
               note: Approximately 2.6 g sample; grams converted to kg
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1660,6 +1670,7 @@ experiments:
               table: '8.1'
               note: Temp High 1151 C converted with T_K = T_C + 273.15
         output_unit: K
+        references: []
     pressure_low_atm:
       state:
         tag: value
@@ -1709,6 +1720,7 @@ experiments:
               table: '8.1'
               note: Pressure Average 3.83e-8 atm converted to Pa
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -1776,6 +1788,7 @@ experiments:
                 note: Temp High Duration 8.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted
                   to seconds
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown

@@ -9,6 +9,8 @@ import pytest
 import yaml
 
 from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
+from engines.builtin.vapor_pressure import VaporPressureComputationError
+import simulator.chemistry.langmuir_knudsen as langmuir_knudsen
 from simulator.chemistry.langmuir_knudsen import (
     grounded_alpha,
     knudsen_effusion_flux,
@@ -36,6 +38,14 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _VALIDATION_SIDECAR = (
     _REPO_ROOT / "data/literature/langmuir_knudsen_flux_validation.yaml"
 )
+
+
+def _patch_antoine_row(monkeypatch, coefficients):
+    monkeypatch.setattr(
+        langmuir_knudsen,
+        "_species_row",
+        lambda _species: {"antoine": coefficients},
+    )
 
 
 def test_langmuir_flux_matches_hk_formula():
@@ -195,6 +205,75 @@ def test_grounded_alpha_and_p_eq_match_provider_wiring():
 def test_pseudo_antoine_rejects_k_standard_reaction_without_context():
     with pytest.raises(ValueError, match="standard_reaction_term"):
         pseudo_antoine_p_eq_pa("K", 1429.0)
+
+
+@pytest.mark.parametrize(
+    "missing", ("A", "B", "C"), ids=lambda key: f"missing_{key}"
+)
+def test_pseudo_antoine_missing_coefficient_is_refused(monkeypatch, missing):
+    coefficients = {"A": 5.0, "B": 1000.0, "C": -200.0}
+    del coefficients[missing]
+    _patch_antoine_row(monkeypatch, coefficients)
+
+    with pytest.raises(
+        VaporPressureComputationError, match="missing_antoine_coefficient"
+    ):
+        pseudo_antoine_p_eq_pa("probe", 1000.0)
+
+
+@pytest.mark.parametrize(
+    ("coefficient", "value"),
+    (("A", math.nan), ("B", math.inf), ("C", -math.inf)),
+    ids=("A_nan", "B_pos_inf", "C_neg_inf"),
+)
+def test_pseudo_antoine_nonfinite_coefficient_is_refused(
+    monkeypatch, coefficient, value
+):
+    coefficients = {"A": 5.0, "B": 1000.0, "C": -200.0}
+    coefficients[coefficient] = value
+    _patch_antoine_row(monkeypatch, coefficients)
+
+    with pytest.raises(
+        VaporPressureComputationError, match="nonfinite_antoine_coefficient"
+    ):
+        pseudo_antoine_p_eq_pa("probe", 1000.0)
+
+
+@pytest.mark.parametrize(
+    "temperature_K",
+    (0.0, -1.0, math.nan, math.inf, -math.inf),
+    ids=("zero", "negative", "nan", "pos_inf", "neg_inf"),
+)
+def test_pseudo_antoine_invalid_temperature_is_refused(monkeypatch, temperature_K):
+    _patch_antoine_row(
+        monkeypatch, {"A": 5.0, "B": 1000.0, "C": -200.0}
+    )
+
+    with pytest.raises(
+        VaporPressureComputationError, match="invalid_antoine_temperature"
+    ):
+        pseudo_antoine_p_eq_pa("probe", temperature_K)
+
+
+@pytest.mark.parametrize(
+    ("a_coefficient", "expected_pressure_pa"),
+    (
+        (0.0, 0.03162277660168379),
+        (-1.0, 0.0031622776601683794),
+    ),
+    ids=("zero_A", "negative_A"),
+)
+def test_pseudo_antoine_nonpositive_a_uses_finite_antoine_pressure(
+    monkeypatch, a_coefficient, expected_pressure_pa
+):
+    _patch_antoine_row(
+        monkeypatch,
+        {"A": a_coefficient, "B": 1200.0, "C": -200.0},
+    )
+
+    assert pseudo_antoine_p_eq_pa("probe", 1000.0) == pytest.approx(
+        expected_pressure_pa, rel=1e-15
+    )
 
 
 def test_validate_against_baseline_reports_ratios_without_tuning():

@@ -49,7 +49,6 @@ from simulator.lab_geometry import (
 )
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
-from simulator.state import GAS_CONSTANT
 
 
 @dataclass
@@ -400,14 +399,24 @@ class EquipmentDesigner:
         # Calculate actual conductance
         p_Pa = pressure_mbar * 100.0
         T_K = 1773.15  # 1500°C pipe temperature
-        eta = 1.8e-5 * (T_K / 300.0) ** 0.7
+        from simulator.overhead import (
+            compressible_poiseuille_mass_flow,
+            gas_dynamic_viscosity_Pa_s,
+        )
+
+        eta = gas_dynamic_viscosity_Pa_s(T_K)
 
         M_avg = 0.040  # kg/mol
         # Apply the shared integrated compressible law derived at
         # simulator.overhead.PIPE-1; equipment capacity is P1 against vacuum.
-        C_mass = (
-            math.pi * d**4 * M_avg * p_Pa**2
-            / (256.0 * eta * L * GAS_CONSTANT * T_K)
+        C_mass = compressible_poiseuille_mass_flow(
+            d,
+            L,
+            M_avg,
+            eta,
+            T_K,
+            p_Pa,
+            0.0,
         )
 
         return PipeSpec(

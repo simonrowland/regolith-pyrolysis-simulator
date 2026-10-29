@@ -101,6 +101,7 @@ def test_plante_table2_series1104_first_row_quoted() -> None:
     values = obs["values"]
     assert "activity" not in values
     assert values["admission_status"] == "admitted"
+    assert obs["type"] == "partial_pressure"
     assert values["P_K_atm_as_published"] == pytest.approx(6.91e-7)
     assert values["T_K_as_published"] == pytest.approx(1302.0)
     assert _wt(values["composition_wt_pct"]["K2O"]) == Decimal("43.94")
@@ -113,6 +114,7 @@ def test_plante_table2_series1104_first_row_quoted() -> None:
     assert obs["quote"] == "1302 | 43.94 | 6.91E-7"
     assert "superscript a" not in obs["quote_normalization"]
     parent = _obs_by_id(doc, "plante1979_table2_k2o_s1104_000_1302K")
+    assert parent["type"] == "partial_pressure"
     assert "activity" not in parent["values"]
     assert obs["supersedes"] == parent["observation_id"]
     assert "pending" in parent["condensed_form"]["note"]
@@ -183,21 +185,29 @@ def test_plante_superseded_parent_1404_matches_printed_cell() -> None:
 def test_new_activity_rows_are_not_missing_numeric() -> None:
     """Numeric activity is present. T-domain skips are engine results, not missing data.
 
-    Na2O/K2O table gammas are certified at a single T (1673 K / 1500 K).
-    Tsukihashi and Plante points sit outside those certificates, so the
-    battery records assumed-input rather than a residual pin. That is a
-    real engine limitation, not a reason to drop the rows. SiO2 has no
-    single-T certificate and must remain comparable.
+    The Tsukihashi Na2O table gamma is certified at 1673 K.
+    The Tsukihashi points sit outside those certificates, so the battery
+    records assumed-input rather than a residual pin. Plante's 1104 K2O
+    row is a superseded partial-pressure measurement, not a numeric activity.
+    Tsukihashi's Gibbs-Duhem SiO2 value is derived, so the typed evidence
+    refusal must remain visible rather than becoming a measurement pin.
     """
 
     wanted = {
         "ts1985_na2o_table2_X0p40_T1200C",
         "ts1985_sio2_gibbs_duhem_1200C_X0500",
-        "plante1979_table2_k2o_s1104_000_1302K",
     }
+    plante_id = "plante1979_table2_k2o_s1104_000_1302K"
+    plante_parent = _obs_by_id(_load(PLANTE), plante_id)
+    assert plante_parent["type"] == "partial_pressure"
+    assert "activity" not in plante_parent["values"]
+    all_adopted = load_adopted_observations()
+    assert plante_id not in {obs.observation_id for obs in all_adopted}, (
+        "Plante's superseded K partial pressure is not a numeric K2O activity"
+    )
     adopted = {
         obs.observation_id: obs
-        for obs in load_adopted_observations()
+        for obs in all_adopted
         if obs.observation_id in wanted
     }
     assert wanted <= set(adopted), f"not adopted: {wanted - set(adopted)}"
@@ -209,15 +219,18 @@ def test_new_activity_rows_are_not_missing_numeric() -> None:
             f"{obs_id} still refused as missing_numeric_activity: {reason}"
         )
         assert evaluation.records, f"{obs_id} silent"
-        rec = evaluation.records[0]
-        assert rec.expected_value is not None and rec.expected_value > 0.0
         if obs_id == "ts1985_sio2_gibbs_duhem_1200C_X0500":
-            comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
-            assert comparable, (
-                f"{obs_id} must be comparable; skip={reason!r} "
-                f"statuses={[r.status for r in evaluation.records]}"
-            )
+            assert reason == "typed-refusal:derived_quantity_not_measurement"
+            assert all(r.status == "unsupported-observable" for r in evaluation.records)
+            continue
         else:
+            numeric = [
+                r
+                for r in evaluation.records
+                if r.expected_value is not None and r.expected_value > 0.0
+            ]
+            assert numeric, f"{obs_id} has no numeric activity record"
+            rec = numeric[0]
             # Out-of-domain constant-gamma certificate. Residual still computed.
             assert rec.actual_value is not None
             assert "documented_melt_activity_coefficient" in reason

@@ -15,7 +15,6 @@ import yaml
 from simulator.battery.enums import ValueKind
 from simulator.battery.identity import PA_PER_ATM_DEC, atm_to_pa
 from simulator.battery.migrate import (
-    PrintedOxygenFacts,
     collect_printed_oxygen,
     migrate,
 )
@@ -44,7 +43,9 @@ def test_collect_rejects_bound_inferred_and_disagreement() -> None:
         }],
         _page(2004),
     )
-    assert bound == PrintedOxygenFacts()
+    assert bound.log_fO2 is None
+    assert bound.oxygen_partial_pressure_Pa is None
+    assert not bound.rejected_log_fO2
 
     inferred = collect_printed_oxygen(
         [{
@@ -68,7 +69,9 @@ def test_collect_rejects_bound_inferred_and_disagreement() -> None:
         }],
         _page(),
     )
-    assert disagreed == PrintedOxygenFacts()
+    assert disagreed.log_fO2 is None
+    assert disagreed.oxygen_partial_pressure_Pa is None
+    assert disagreed.rejected_log_fO2
 
 
 def test_badro_printed_log_is_selected_and_atm_offset_is_recorded(tmp_path: Path) -> None:
@@ -236,7 +239,8 @@ def test_holzheid_table3_rows_land_printed_log_per_run(tmp_path: Path) -> None:
         for obs in result.observations.values()
         if "fO2_log" in (obs.point_conditions or {})
     ]
-    assert len(landed) == 33
+    # 33 + 65 new FeO rows that carry a printed log fO2 = 98.
+    assert len(landed) == 98
     # The printed log resolves the oxygen_condition waypoint as PRINTED.
     experiment = result.experiments[first.experiment_id]
     bench = result.benches[experiment.bench_id]

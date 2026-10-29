@@ -42,6 +42,7 @@ species:
         source_composition_references: [Palme and O'Neill 2003, O'Neill 1991, Lodders 2000, Lodders and Fegley 2011, Warren and Kallemeyn 1990, Warren et al. 1995, Mittlefehldt et al. 2002, Ringwood 1960, Vdovykin 1970, Wiik 1972, Jarosewich 1990, Klock et al. 1998]
       uncertainty: not reported for compiled input values in this paper
     - observation_id: visscher_2013_sio2_pure_melt_vapor_pressure_fit
+      quote: Visscher and Fegley (2013), quoting Fegley and Schaefer 2012 MAGMA calculation
       type: psat_series
       locator: {published_page: 4, equation: '2', section: '3.2'}
       phase: pure_molten_SiO2
@@ -49,14 +50,15 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
-        method_class: model_derived
-        generator: Fegley and Schaefer 2012 MAGMA calculation, reproduced as comparison
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), quoting Fegley and Schaefer 2012 MAGMA calculation
         expression: log10(P_vap_bar) = 8.203 - 25898.9/T_K
         coefficients: {intercept: 8.203, inverse_T_coefficient_K: -25898.9}
       uncertainty: no model uncertainty reported
   SiO:
     observations:
     - observation_id: visscher_2013_sio_partial_pressure_equilibrium
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation using IMCC activities
       type: psat_series
       locator: {published_page: 4, equation: '5', section: '3.2'}
       phase: multicomponent_silicate_melt
@@ -64,14 +66,15 @@ species:
       units: partial pressure in bar; fO2 in bar; T dependence through K4
       values:
         quantity: p_partial
-        method_class: model_derived
-        generator: MAGMA equilibrium calculation using IMCC activities
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation using IMCC activities
         expression: P_SiO = K4 * a_SiO2 * fO2^(-0.5)
         terms: {equilibrium_constant: K4, melt_activity: a_SiO2, oxygen_fugacity: fO2}
       uncertainty: no model uncertainty reported
   Na:
     observations:
     - observation_id: visscher_2013_low_temperature_volatile_dominance
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
       type: rate_series
       locator: {published_page: 3, section: '3.1'}
       phase: saturated_silicate_vapor
@@ -79,8 +82,8 @@ species:
       units: temperature K; qualitative model trend
       values:
         quantity: evolved_gas_yield
-        method_class: model_derived
-        generator: MAGMA equilibrium calculation
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         lower_temperature_dominant_species: [Na, Zn, O2]
         lower_temperature_regime: below 3000 K generally; transition is composition-dependent
         transition_temperature_K_as_printed: {volatile_rich_compositions: '3000-3500', volatile_poor_compositions: 'near 2500'}
@@ -88,6 +91,7 @@ species:
   Zn:
     observations:
     - observation_id: visscher_2013_low_temperature_volatile_dominance_zinc
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
       type: rate_series
       locator: {published_page: 3, section: '3.1'}
       phase: saturated_silicate_vapor
@@ -95,14 +99,15 @@ species:
       units: temperature K; qualitative model trend
       values:
         quantity: evolved_gas_yield
-        method_class: model_derived
-        generator: MAGMA equilibrium calculation
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         dominant_with_lower_temperature_volatile_species: [Na, Zn, O2]
         composition_sensitivity: relative abundance of volatile elements in melt
       uncertainty: no model uncertainty reported
   O2:
     observations:
     - observation_id: visscher_2013_o2_vapor_fraction
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
       type: rate_series
       locator: {published_page: 3, figure: '2', section: '3.1'}
       phase: saturated_silicate_vapor
@@ -110,12 +115,13 @@ species:
       units: mole fraction
       values:
         quantity: evolved_gas_yield
-        method_class: model_derived
-        generator: MAGMA equilibrium calculation
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         mole_fraction_range_as_printed: '20-30%'
         note: O2 mole fraction is described as relatively temperature-independent across all melt compositions.
       uncertainty: no model uncertainty reported
     - observation_id: visscher_2013_saturated_vapor_oxygen_fugacity
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
       type: psat_series
       locator: {published_page: 5, figure: '3b', section: '3.3'}
       phase: saturated_silicate_vapor
@@ -123,8 +129,8 @@ species:
       units: fO2 in bar; temperature K
       values:
         quantity: p_partial
-        method_class: model_derived
-        generator: MAGMA equilibrium calculation
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         expression: fO2 = gamma_O2 * P_O2 = gamma_O2 * X_O2 * P_T
         model_approximation: gamma_O2 approximately 1, therefore fO2 approximately P_O2 approximately X_O2 * P_T
         qualitative_result: saturated vapor is several orders of magnitude more oxidizing than solar-composition gas
@@ -132,6 +138,7 @@ species:
   SiO2_melt:
     observations:
     - observation_id: visscher_2013_total_vapor_pressure_sum
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
       type: psat_series
       locator: {published_page: 4, equation: '3', section: '3.2'}
       phase: multicomponent_silicate_melt
@@ -139,11 +146,12 @@ species:
       units: pressure in bar
       values:
         quantity: p_sat
-        method_class: model_derived
-        generator: MAGMA equilibrium calculation
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         expression: P_T = sum(P_i)
         species_scope: all gas species in equilibrium with the multicomponent melt
     - observation_id: visscher_2013_bse_total_vapor_pressure_fit
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
       type: psat_series
       locator: {published_page: 4, equation: '6', section: '3.2'}
       phase: BSE_composition_melt
@@ -151,12 +159,13 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
-        method_class: model_derived
-        generator: MAGMA equilibrium calculation
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         expression: log10(P_vap_bar) approximately equals -51.17 - 1048.8/T_K + 14.60*log10(T_K)
         composition: BSE
       uncertainty: no model uncertainty reported
     - observation_id: visscher_2013_bsm_total_vapor_pressure_fit
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
       type: psat_series
       locator: {published_page: 4, equation: '7', section: '3.2'}
       phase: BSM_composition_melt
@@ -164,8 +173,8 @@ species:
       units: P in bar; T in K
       values:
         quantity: p_sat
-        method_class: model_derived
-        generator: MAGMA equilibrium calculation
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
         expression: log10(P_vap_bar) approximately equals -41.45 - 4052.3/T_K + 14.90*log10(T_K)
         composition: BSM
       uncertainty: no model uncertainty reported
@@ -187,6 +196,7 @@ species:
   H2O:
     observations:
     - observation_id: visscher_2013_water_ratio_constraint
+      quote: Visscher and Fegley (2013), MAGMA-derived fO2 equilibrium relation
       type: psat_series
       locator: {published_page: 5, equation: '10', section: '3.3'}
       phase: saturated_silicate_vapor
@@ -194,14 +204,15 @@ species:
       units: dimensionless ratio; fO2 in bar
       values:
         quantity: p_partial
-        method_class: model_derived
-        generator: equilibrium relation constrained by MAGMA-derived fO2; H2O not included in MAGMA model
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), equilibrium relation constrained by MAGMA-derived fO2; H2O not included in MAGMA model
         expression: H2O/H2 = K9 * fO2^0.5
         model_status: inferred constraint, not a directly calculated MAGMA species abundance
       uncertainty: no model uncertainty reported
   CO2:
     observations:
     - observation_id: visscher_2013_carbon_dioxide_ratio_constraint
+      quote: Visscher and Fegley (2013), MAGMA-derived fO2 equilibrium relation
       type: psat_series
       locator: {published_page: 5, equation: '12', section: '3.3'}
       phase: saturated_silicate_vapor
@@ -209,8 +220,8 @@ species:
       units: dimensionless ratio; fO2 in bar
       values:
         quantity: p_partial
-        method_class: model_derived
-        generator: equilibrium relation constrained by MAGMA-derived fO2; CO2 and CO not included in MAGMA model
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), equilibrium relation constrained by MAGMA-derived fO2; CO2 and CO not included in MAGMA model
         expression: CO2/CO = K11 * fO2^0.5
         model_status: inferred constraint, not a directly calculated MAGMA species abundance
       uncertainty: no model uncertainty reported

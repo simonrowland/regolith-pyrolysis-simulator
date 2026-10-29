@@ -555,8 +555,8 @@ class ChemistryKernel:
         :class:`ProviderUnavailableError`, returns ``status='unavailable'``,
         or is absent AND ``intent`` is in :attr:`allow_fallback_intents`
         AND a fallback is registered, the dispatch is retried against the
-        fallback provider; the fallback result is returned with a
-        ``kernel_fallback_used`` diagnostic key surfaced for trace consumers.
+        fallback provider; the fallback result records the selected provider,
+        requested provider, and fallback reason in its diagnostic.
 
         Raises:
             ProviderUnavailableError: No authoritative provider for
@@ -589,6 +589,8 @@ class ChemistryKernel:
                 declared_accounts=declared_accounts,
                 account_mol_overrides=account_mol_overrides,
                 role="fallback",
+                fallback_requested_provider_id=None,
+                fallback_reason="no_authoritative_provider",
             )
 
         try:
@@ -622,6 +624,10 @@ class ChemistryKernel:
                 declared_accounts=declared_accounts,
                 account_mol_overrides=account_mol_overrides,
                 role="fallback",
+                fallback_requested_provider_id=(
+                    provider.capability_profile().provider_id
+                ),
+                fallback_reason="authoritative_status_unavailable",
             )
         except ProviderUnavailableError:
             # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION`` historical name:
@@ -644,6 +650,10 @@ class ChemistryKernel:
                 declared_accounts=declared_accounts,
                 account_mol_overrides=account_mol_overrides,
                 role="fallback",
+                fallback_requested_provider_id=(
+                    provider.capability_profile().provider_id
+                ),
+                fallback_reason="authoritative_provider_unavailable_error",
             )
 
     def _dispatch_authoritative_without_shadows(
@@ -695,6 +705,8 @@ class ChemistryKernel:
         declared_accounts: Optional[frozenset[str]],
         account_mol_overrides: Optional[Mapping[str, Mapping[str, float]]],
         role: str,
+        fallback_requested_provider_id: str | None = None,
+        fallback_reason: str | None = None,
     ) -> IntentResult:
         """Build the IntentRequest, dispatch, and validate.
 
@@ -799,6 +811,10 @@ class ChemistryKernel:
             tagged_diagnostic["kernel_fallback_used"] = (
                 profile.provider_id
             )
+            tagged_diagnostic["kernel_fallback_requested_provider"] = (
+                fallback_requested_provider_id or "none"
+            )
+            tagged_diagnostic["kernel_fallback_reason"] = fallback_reason
             result = IntentResult(
                 intent=result.intent,
                 status=result.status,

@@ -9,14 +9,14 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:deffrennes-2020-ca-o-calphad
       role: pdf
       path: raw/deffrennes-2020-ca-o-calphad/deffrennes-2020-ca-o-calphad.pdf
       sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
+        tag: value
+        value: 8b5c40c419d3bdcc1c7966613bb8a8adf6a6379231ff24a82d2435889ea24be7
     - asset_id: pdftotext:deffrennes-2020-ca-o-calphad
       role: pdftotext
       path: text/deffrennes-2020-ca-o-calphad
@@ -83,6 +83,7 @@ experiments:
               section: '2.3'
               note: Printed 0.3 MPa; converted 0.3 × 10^6 Pa/MPa = 300000 Pa.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -158,6 +159,7 @@ experiments:
               section: '2.3'
               note: Printed 0.3 MPa; converted 0.3 × 10^6 Pa/MPa = 300000 Pa.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -233,6 +235,7 @@ experiments:
               section: '5'
               note: Printed 0.1 MPa; converted 0.1 × 10^6 Pa/MPa = 100000 Pa.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown

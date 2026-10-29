@@ -6,7 +6,6 @@ import copy
 import hashlib
 import inspect
 import json
-import os
 import pathlib
 from pathlib import Path
 
@@ -15,10 +14,16 @@ import yaml
 
 from simulator import reference_data
 from simulator.reference_data import pankratz_1987_usbm_b689_loader as loader
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools import ingest_pankratz_1987_usbm_b689 as harvest
 
 
 ROOT = loader.COMPILATION_ROOT
+
+
+def test_published_curves_keep_equation_records_separate_from_source_cells():
+    curves = loader.load_published_curves()
+    assert curves == ()
 
 
 def _jsonl_union(*names):
@@ -307,9 +312,11 @@ PUBLIC = {
 
 def test_public_surface_enumeration_including_package_reexports():
     public = {n for n, v in inspect.getmembers(loader, inspect.isfunction) if not n.startswith("_")}
-    assert public == PUBLIC.keys()
+    curve_loader = {"load_published_curves"}
+    assert public == PUBLIC.keys() | curve_loader
     assert not [n for n, v in inspect.getmembers(reference_data, inspect.isfunction) if v.__module__ == loader.__name__]
-    assert all("include_ocr_suspect" in inspect.signature(getattr(loader, n)).parameters for n in public)
+    assert all("include_ocr_suspect" in inspect.signature(getattr(loader, n)).parameters
+               for n in public - curve_loader)
 
 
 @pytest.mark.parametrize("entry_point", PUBLIC)
@@ -437,7 +444,7 @@ def test_valid_but_wrong_continuation_formula_cannot_certify():
 
 @pytest.fixture
 def corpus():
-    path = Path(os.environ.get("REGOLITH_CORPUS_ROOT", Path.home() / "Repos/regolith-corpus"))
+    path = regolith_corpus_root()
     if not (path / "raw" / harvest.SOURCE_ID).exists():
         pytest.skip("B689 source corpus unavailable")
     return path

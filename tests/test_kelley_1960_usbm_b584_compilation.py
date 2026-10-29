@@ -111,6 +111,326 @@ def test_stored_values_match_independent_image_verified_fixture():
     _assert_image_verified_cells(list(load_records(include_ocr_suspect=True)), IMAGE_VERIFIED_CELLS)
 
 
+def test_published_curve_loader_exposes_printed_equations_and_gate_results():
+    curves = loader.load_published_curves()
+    assert curves
+    required = {
+        "formula", "phase", "quantity", "equation_as_printed", "terms",
+        "coefficients_as_printed", "units_as_printed", "temperature_range_K",
+        "accuracy_as_printed", "locator", "gate",
+    }
+    assert all(required <= curve.keys() for curve in curves)
+    assert all(curve["gate"]["status"] in {"passed", "transcription_gate_failed"} for curve in curves)
+    heat, cp = curves[:2]
+    assert heat["gate"]["status"] == "passed"
+    assert cp["gate"]["kind"] == "analytic_derivative_of_gated_H"
+    assert cp["gate"]["status"] == "passed"
+    # Printed CaO(c) Cp equation evaluated at the source reference temperature.
+    a, b, c = (float(value.replace("×10^", "e")) for value in cp["coefficients_as_printed"])
+    assert a + b * 298.15 + c / 298.15**2 == pytest.approx(10.238, abs=0.002)
+
+
+def test_silica_polymorph_curves_keep_failed_table_gates_typed():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "SiO2"]
+    assert len(curves) == 14
+    assert {curve["polymorph"] for curve in curves} == {
+        "quartz-alpha", "quartz-beta", "cristobalite-alpha", "cristobalite-beta",
+        "tridymite-alpha", "tridymite-beta", None,
+    }
+    by_key = {(curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("cristobalite-alpha", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("tridymite-alpha", "heat_content_increment")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("tridymite-alpha", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+
+
+def test_calcium_silicate_curves_gate_and_keep_table_mismatch():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "CaSiO3"]
+    assert len(curves) == 6
+    by_key = {(curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("wollastonite", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("wollastonite", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("pseudowollastonite", "heat_capacity")]["gate"]["kind"] == "analytic_derivative_of_gated_H"
+    assert by_key[(None, "heat_content_increment")]["gate"]["status"] == "passed"
+
+
+def test_anorthite_crystal_and_glass_curves_are_separate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "CaAl2Si2O8"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "gl"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_calcium_orthosilicate_polymorphs_use_their_own_transition_cells():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Ca2SiO4"]
+    assert len(curves) == 6
+    by_key = {(curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+    assert by_key[("alpha-prime", "heat_content_increment")]["gate"]["residuals"][0]["observed"] == 26560
+    assert by_key[("alpha", "heat_content_increment")]["gate"]["residuals"][0]["observed"] == 64680
+
+
+def test_magnesium_silicate_equations_retain_each_polymorph_and_glass():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] in {"MgSiO3", "Mg2SiO4"}]
+    assert len(curves) == 10
+    assert {curve["polymorph"] for curve in curves if curve["formula"] == "MgSiO3"} == {
+        "clinoenstatite", "amphibole-type", "pyroxene-type", None,
+    }
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_potassium_feldspar_crystal_and_glass_curves_remain_distinct():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "KAlSi3O8"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "gl"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_albite_crystal_and_glass_curves_remain_distinct():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "NaAlSi3O8"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "gl"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_nephelite_and_carnegieite_ranges_retain_gate_failures():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "NaAlSiO4"]
+    assert len(curves) == 10
+    by_key = {(curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("alpha-nephelite", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("alpha-nephelite", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("beta-nephelite", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("gamma-nephelite", "heat_capacity")]["gate"]["kind"] == "analytic_derivative_of_gated_H"
+
+
+def test_fayalite_crystal_and_liquid_curves_are_separate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Fe2SiO4"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "l"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_corundum_equations_keep_the_printed_table_mismatch_typed():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Al2O3"]
+    assert len(curves) == 2
+    heat, cp = curves
+    assert heat["gate"]["status"] == "transcription_gate_failed"
+    assert heat["gate"]["reason"] == "transcription_gate_failed"
+    assert len(heat["gate"]["residuals"]) == 3
+    assert cp["gate"]["reason"] == "no_independent_check"
+
+
+def test_aluminum_phases_keep_the_source_transition_and_equation_mismatch():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Al"]
+    assert len(curves) == 6
+    by_key = {(curve["phase"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("c", "heat_content_increment")]["gate"]["status"] == "passed"
+    assert by_key[("c", "heat_capacity")]["gate"]["status"] == "passed"
+    assert by_key[("l", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("l", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    # Rendered 150-dpi PDF page 26 (printed p. 10) reads "7.00 + 330"; it has no T after 7.00.
+    liquid_h = by_key[("l", "heat_content_increment")]
+    assert liquid_h["equation_as_printed"] == "H_T - H_298.15 = 7.00 + 330"
+    assert [row["predicted"] for row in liquid_h["gate"]["residuals"]] == [337.0, 337.0, 337.0]
+    assert by_key[("g", "heat_content_increment")]["gate"]["status"] == "passed"
+    assert by_key[("g", "heat_capacity")]["gate"]["status"] == "passed"
+
+
+def test_titania_polymorphs_are_gated_as_separate_curves():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "TiO2"]
+    assert len(curves) == 4
+    assert {curve["polymorph"] for curve in curves} == {"rutile", "anatase"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_chromia_equation_passes_its_printed_table_gate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Cr2O3"]
+    assert len(curves) == 2
+    assert {curve["polymorph"] for curve in curves} == {"beta"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_soda_equations_pass_their_printed_table_and_derivative_gates():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Na2O"]
+    assert len(curves) == 2
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+    assert curves[1]["gate"]["kind"] == "analytic_derivative_of_gated_H"
+
+
+def test_ferric_and_magnetite_polymorphs_pass_their_own_table_gates():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] in {"Fe2O3", "Fe3O4"}]
+    assert len(curves) == 10
+    assert {curve["polymorph"] for curve in curves if curve["formula"] == "Fe2O3"} == {"alpha", "beta", "gamma"}
+    assert {curve["polymorph"] for curve in curves if curve["formula"] == "Fe3O4"} == {"alpha", "beta"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_magnesium_elemental_equations_pass_their_table_and_derivative_gates():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Mg"]
+    assert len(curves) == 6
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+    assert {curve["phase"] for curve in curves} == {"c", "l", "g"}
+    assert all(curve["gate"]["kind"] == "analytic_derivative_of_gated_H" for curve in curves if curve["quantity"] == "heat_capacity")
+
+
+def test_manganese_equations_keep_all_printed_phases_and_gate_outcomes():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Mn"]
+    assert len(curves) == 14
+    heat = [curve for curve in curves if curve["quantity"] == "heat_content_increment"]
+    cp = [curve for curve in curves if curve["quantity"] == "heat_capacity"]
+    assert {(curve["phase"], curve["polymorph"], tuple(curve["temperature_range_K"])) for curve in heat} == {
+        ("c", "alpha", (298, 1000)), ("c", "beta", (1000, 1374)),
+        ("c", "gamma", (1374, 1410)), ("c", "delta", (1410, 1517)),
+        ("l", None, (1517, 2300)), ("c", "gamma", (298, 1374)),
+        ("g", None, (298, 3000)),
+    }
+    by_equation = {curve["equation_as_printed"]: curve for curve in heat}
+    assert by_equation["H_T - H_298.15 = 4.97T - 1,482"]["gate"]["status"] == "transcription_gate_failed"
+    assert len(by_equation["H_T - H_298.15 = 4.97T - 1,482"]["gate"]["residuals"]) == 3
+    assert all(curve["gate"]["status"] in {"passed", "transcription_gate_failed"} for curve in heat)
+    assert all(curve["derivation"] and curve["units_as_printed"] == "cal/(mol·K)" for curve in cp)
+    assert any(curve["gate"].get("kind") == "analytic_derivative_of_gated_H" for curve in cp)
+    assert all(curve["gate"]["reason"] in {None, "no_independent_check"} for curve in cp)
+
+    # Printed H(T)-H(298.15) differentiated term by term gives Cp; cal/mol per kelvin is cal/(mol·K).
+    # The printed Mn(alpha) Cp coefficients give 6.291 cal/(mol·K) at 298.15 K as a sanity value.
+    alpha_cp = next(curve for curve in cp if curve["polymorph"] == "alpha")
+    a, b, c = (float(value.replace("×10^", "e")) for value in alpha_cp["coefficients_as_printed"])
+    assert a + b * 298.15 + c / 298.15**2 == pytest.approx(6.291, abs=0.001)
+
+
+def test_magnesium_and_manganese_oxide_equation_mismatches_stay_typed():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] in {"MgO", "MnO"}]
+    assert len(curves) == 4
+    for formula in ("MgO", "MnO"):
+        by_quantity = {curve["quantity"]: curve for curve in curves if curve["formula"] == formula}
+        assert by_quantity["heat_content_increment"]["gate"]["reason"] == "transcription_gate_failed"
+        assert len(by_quantity["heat_content_increment"]["gate"]["residuals"]) == 3
+        assert by_quantity["heat_capacity"]["gate"]["reason"] == "no_independent_check"
+
+
+def test_iron_equations_keep_each_printed_phase_curve_and_gate_outcomes():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Fe"]
+    assert len(curves) == 14
+    assert {curve["phase"] for curve in curves} == {"c", "l", "g"}
+    by_key = {(curve["source_record_id"], curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    for source_id, polymorph in (("table-394", "alpha"), ("table-394", "beta"), ("table-396", None)):
+        assert by_key[(source_id, polymorph, "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+        assert by_key[(source_id, polymorph, "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    for source_id, polymorph in (("table-394", "gamma"), ("table-394", "delta"), ("table-394", None), ("table-395", "gamma")):
+        assert by_key[(source_id, polymorph, "heat_content_increment")]["gate"]["status"] == "passed"
+        assert by_key[(source_id, polymorph, "heat_capacity")]["gate"]["status"] == "passed"
+
+
+def test_chromium_elemental_phases_keep_their_independent_table_gates():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Cr"]
+    assert len(curves) == 6
+    by_key = {(curve["phase"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("c", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("c", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert all(by_key[("l", quantity)]["gate"]["status"] == "passed" for quantity in ("heat_content_increment", "heat_capacity"))
+    assert by_key[("g", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("g", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+
+
+def test_calcium_elemental_phases_pass_their_table_and_derivative_gates():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Ca"]
+    assert len(curves) == 8
+    assert {curve["phase"] for curve in curves} == {"c", "l", "g"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_sodium_elemental_phases_preserve_the_short_solid_gate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Na"]
+    assert len(curves) == 6
+    by_key = {(curve["phase"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("c", "heat_content_increment")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("c", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert all(by_key[(phase, quantity)]["gate"]["status"] == "passed"
+               for phase in ("l", "g") for quantity in ("heat_content_increment", "heat_capacity"))
+
+
+def test_potassium_elemental_phases_preserve_the_short_solid_gate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "K"]
+    assert len(curves) == 6
+    by_key = {(curve["phase"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("c", "heat_content_increment")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("c", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert all(by_key[(phase, quantity)]["gate"]["status"] == "passed"
+               for phase in ("l", "g") for quantity in ("heat_content_increment", "heat_capacity"))
+
+
+def test_silicon_and_titanium_elemental_equations_keep_their_printed_gates():
+    curves = loader.load_published_curves()
+    silicon = [curve for curve in curves if curve["formula"] == "Si"]
+    assert len(silicon) == 6
+    silicon_by_phase = {(curve["phase"], curve["quantity"]): curve for curve in silicon}
+    assert silicon_by_phase[("c", "heat_content_increment")]["gate"]["status"] == "passed"
+    assert silicon_by_phase[("c", "heat_capacity")]["gate"]["status"] == "passed"
+    assert silicon_by_phase[("l", "heat_content_increment")]["gate"]["status"] == "passed"
+    assert silicon_by_phase[("l", "heat_capacity")]["gate"]["status"] == "passed"
+    assert silicon_by_phase[("g", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert silicon_by_phase[("g", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+
+    titanium = [curve for curve in curves if curve["formula"] == "Ti"]
+    assert len(titanium) == 10
+    assert all(curve["gate"]["status"] == "passed" for curve in titanium)
+    assert {curve["polymorph"] for curve in titanium if curve["phase"] == "c"} == {"alpha", "beta"}
+
+    # Kelley gives no Cp column; compare its printed Si(s) equation at 298.15 K
+    # with JANAF's independent 20.000 J/(mol K) value after exact conversion.
+    silicon_cp = next(curve for curve in curves
+                      if curve["formula"] == "Si" and curve["phase"] == "c"
+                      and curve["quantity"] == "heat_capacity")
+    powers = {"a": 0, "b*T": 1, "c*T^-2": -2}
+    cp_cal_mol_k = sum(float(loader._decimal(coefficient)) * 298.15**powers[term]
+                       for coefficient, term in zip(silicon_cp["coefficients_as_printed"], silicon_cp["terms"]))
+    janaf = yaml.safe_load((COMPILATION_ROOT.parent / "janaf/tables/Si-002.yaml").read_text())
+    janaf_cp = next(row["heat_capacity"]["value"] for row in janaf["table"]["values"]
+                    if row["temperature"]["value"] == 298.15)
+    assert cp_cal_mol_k * 4.184 == pytest.approx(janaf_cp, abs=0.25)
+
+
+def test_wustite_equations_keep_the_printed_nonstoichiometric_formula_unit():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Fe0.947O"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "l"}
+    assert all(curve["note"] == "printed formula unit Fe0.947O (wustite); not stoichiometric FeO"
+               for curve in curves)
+    solid_h = next(curve for curve in curves if curve["phase"] == "c" and curve["quantity"] == "heat_content_increment")
+    solid_cp = next(curve for curve in curves if curve["phase"] == "c" and curve["quantity"] == "heat_capacity")
+    assert solid_h["coefficients_as_printed"] == ["11.66", "1.00×10^-3", "0.67×10^5", "-3,790"]
+    assert solid_h["gate"]["status"] == "transcription_gate_failed"
+    assert [row["residual"] for row in solid_h["gate"]["residuals"]] == pytest.approx([-8.5, -16.0, -22.3333333333])
+    # Printed H(T)-H(298.15) differentiates term by term to Cp; cal/mol per K
+    # is cal/(mol·K), and its 298.15 K sanity value is 11.50 cal/(mol·K).
+    cp_298 = 11.66 + 2.00e-3 * 298.15 - 0.67e5 * 298.15**-2
+    assert cp_298 == pytest.approx(11.50, abs=0.01)
+    assert solid_cp["gate"]["reason"] == "no_independent_check"
+    liquid_h = next(curve for curve in curves if curve["phase"] == "l" and curve["quantity"] == "heat_content_increment")
+    assert liquid_h["gate"]["status"] == "passed"
+
+
+def test_phosphorus_oxide_equations_keep_the_printed_polymer_formula_unit():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "P4O10"]
+    assert len(curves) == 4
+    assert all(curve["note"] == "printed formula unit P4O10 = 2 P2O5 per formula; values are per mole P4O10"
+               for curve in curves)
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+    heat = next(curve for curve in curves if curve["phase"] == "c" and curve["quantity"] == "heat_content_increment")
+    assert heat["coefficients_as_printed"] == ["16.75", "54.00×10^-3", "-9,794"]
+    cp = next(curve for curve in curves if curve["phase"] == "c" and curve["quantity"] == "heat_capacity")
+    # Printed H(T)-H(298.15) differentiated by T gives cal/(mol·K), on the P4O10 basis.
+    assert 16.75 + 108e-3 * 500 == pytest.approx(70.75)
+    assert cp["coefficients_as_printed"] == ["16.75", "108×10^-3"]
+
+
+def test_heat_content_gate_detects_a_coefficient_mutation():
+    heat = loader.load_published_curves()[0]
+    changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
+    source = next(record for record in load_records(include_ocr_suspect=True) if record["record_id"] == "table-134")
+    assert loader._gate_heat_content(changed, source)["gate"]["status"] == "transcription_gate_failed"
+
+
 def test_image_verified_fixture_mutation_is_detected():
     mutated = dict(IMAGE_VERIFIED_CELLS)
     key = ("table-500", 2, 1, "heat_content")
@@ -251,7 +571,9 @@ def test_no_public_loader_entry_point_returns_a_suspect_cell_bare():
         for name, value in inspect.getmembers(loader, inspect.isfunction)
         if not name.startswith("_") and value.__module__ == loader.__name__
     }
-    assert public_entry_points == {"load_manifest", "load_records", "lookup_temperature"}
+    assert public_entry_points == {
+        "load_manifest", "load_published_curves", "load_records", "lookup_temperature"
+    }
 
     manifest = load_manifest()
     assert all("rows" not in entry for entry in manifest["entries"])

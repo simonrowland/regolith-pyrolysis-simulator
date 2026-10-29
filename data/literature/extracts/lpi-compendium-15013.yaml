@@ -81,37 +81,6 @@ sample_characterization:
               value: lunar soil
               locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
           locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
-    context: &sample_15013_context
-    - observation_id: lpi_15013_sample_mass_and_collection
-      type: sample_characterization
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
-      units: as_published
-      values:
-        method_class: measured_tabulated
-        evidence_class: measured_tabulated
-        sample_id: '15013'
-        sample_form: lunar soil
-        sample_mass_g: 296.2
-        collection_location: surface under the Lunar Module
-        collection_container: special environmental sample container (SESC)
-        container_status_on_opening: 'wire caught in seal; container was not under vacuum when opened'
-      quote: 'Soil (vacuum container) 296.2 grams; the introduction states that the sample was collected from the surface under the Lunar Module and that the SESC had not sealed.'
-      reason: 'no closed observation type; off-rail sample characterization (decision d-126)'
-    - observation_id: lpi_15013_maturity_and_grain_size
-      type: sample_characterization
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Petrography}
-      units: as_published
-      values:
-        method_class: quoted_attributed
-        attribution: 'Morris 1978 (for Is/FeO = 77)'
-        evidence_class: quoted_attributed
-        sample_id: '15013'
-        maturity_index_Is_FeO: 77
-        average_grain_size_micrometres: 52
-        maturity_index_source: Morris 1978
-        note: 'The page text says average grain size = 52 microns; Figure 5 caption separately prints average grain size = 53 microns.'
-      disagreement: 'Narrative and Figure 5 caption differ: 52 versus 53 microns. Both are retained; neither is reconciled.'
-      reason: 'no closed observation type; off-rail sample characterization (decision d-126)'
   figure_only_characterization:
     observations: &sample_15013_figure_observations
     - observation_id: lpi_15013_grain_size_distribution_figure_only
@@ -234,7 +203,39 @@ chemical_composition:
         attribution: 'Gibson and Moore 1972'
         plotted_values: not_digitized
 species:
-  sample_15013: {observations: *sample_15013_observations, context: *sample_15013_context}
+  sample_15013:
+    observations: *sample_15013_observations
+    context: &sample_15013_context
+    - observation_id: lpi_15013_sample_mass_and_collection
+      type: sample_characterization
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+      units: as_published
+      values:
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        sample_id: '15013'
+        sample_form: lunar soil
+        sample_mass_g: 296.2
+        collection_location: surface under the Lunar Module
+        collection_container: special environmental sample container (SESC)
+        container_status_on_opening: 'wire caught in seal; container was not under vacuum when opened'
+      quote: 'Soil (vacuum container) 296.2 grams; the introduction states that the sample was collected from the surface under the Lunar Module and that the SESC had not sealed.'
+      reason: 'no closed observation type; off-rail sample characterization (decision d-126)'
+    - observation_id: lpi_15013_maturity_and_grain_size
+      type: sample_characterization
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Petrography}
+      units: as_published
+      values:
+        method_class: quoted_attributed
+        attribution: 'Morris 1978 (for Is/FeO = 77)'
+        evidence_class: quoted_attributed
+        sample_id: '15013'
+        maturity_index_Is_FeO: 77
+        average_grain_size_micrometres: 52
+        maturity_index_source: Morris 1978
+        note: 'The page text says average grain size = 52 microns; Figure 5 caption separately prints average grain size = 53 microns.'
+      disagreement: 'Narrative and Figure 5 caption differ: 52 versus 53 microns. Both are retained; neither is reconciled.'
+      reason: 'no closed observation type; off-rail sample characterization (decision d-126)'
   sample_15013_figure_only: {observations: [], context: *sample_15013_figure_observations}
   sample_15013_chemistry: {observations: *sample_15013_chemistry_observations}
   sample_15013_volatile_context: {observations: [], context: *sample_15013_volatile_observations}

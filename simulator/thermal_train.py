@@ -25,7 +25,7 @@ from simulator.condensation import (
     authoritative_condensation_temperature,
 )
 from simulator.condensation_routing import designated_stage_number
-from simulator.config import DEFAULT_DATA_DIR
+from simulator.config import DEFAULT_DATA_DIR, resolve_collector_bands_C
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT,
@@ -1280,28 +1280,13 @@ def knudsen_anchor(
 
 
 def condensation_stage_windows_K(setpoints: Mapping[str, Any]) -> dict[str, tuple[float, float]]:
-    train = setpoints.get("condensation_train")
-    if not isinstance(train, Mapping):
-        return {}
-    metals = train.get("metals_train")
-    if not isinstance(metals, Mapping):
-        return {}
+    bands = resolve_collector_bands_C(setpoints)
     windows: dict[str, tuple[float, float]] = {}
     for species in ("Fe", "Cr", "CrO2", "Mn", "SiO", "Na", "K", "Mg"):
         stage_number = designated_stage_number(species)
-        stage_key = {
-            1: "stage_1_fe_condenser",
-            2: "stage_2_cr_oxide_harvest",
-            3: "stage_3_sio_zone",
-            4: "stage_4_alkali_mg_cyclone",
-        }.get(stage_number)
-        stage = metals.get(stage_key) if stage_key else None
-        band = stage.get("temp_range_C") if isinstance(stage, Mapping) else None
-        if isinstance(band, Sequence) and not isinstance(band, (str, bytes)) and len(band) == 2:
-            low = _finite_positive(float(band[0]) + KELVIN_OFFSET, f"{species} stage low K")
-            high = _finite_positive(float(band[1]) + KELVIN_OFFSET, f"{species} stage high K")
-            if high >= low:
-                windows[species] = (low, high)
+        if stage_number in bands:
+            low, high = bands[stage_number]
+            windows[species] = (low + KELVIN_OFFSET, high + KELVIN_OFFSET)
     return windows
 
 

@@ -4,6 +4,7 @@ import io
 import math
 import inspect
 import os
+import resource
 import signal
 import subprocess
 import sys
@@ -118,6 +119,11 @@ class _StringifiableModel:
 def _load_data(filename):
     with open(DATA_DIR / filename) as f:
         return yaml.safe_load(f) or {}
+
+
+def _process_and_reaped_child_cpu_seconds():
+    children = resource.getrusage(resource.RUSAGE_CHILDREN)
+    return time.process_time() + children.ru_utime + children.ru_stime
 
 
 def _select_python_api_for_test(backend: AlphaMELTSBackend) -> None:
@@ -1668,7 +1674,20 @@ def test_first_row_mapping_propagates_table_access_key_error():
         AlphaMELTSBackend()._first_row_mapping(BrokenTable())
 
 
-def test_oxide_mole_fractions_propagates_formula_resolution_key_error(
+def test_activity_from_coefficients_pins_mixed_oxide_projection():
+    activities, gammas = AlphaMELTSBackend()._activities_from_coefficients(
+        {'SiO2': 1.0, 'FeO': 1.0},
+        {'SiO2': 70.0, 'FeO': 30.0},
+    )
+
+    assert activities == {
+        'SiO2': 0.736152890184833,
+        'FeO': 0.26384710981516696,
+    }
+    assert gammas == {'SiO2': 1.0, 'FeO': 1.0}
+
+
+def test_activities_from_coefficients_propagates_formula_resolution_key_error(
     monkeypatch,
 ):
     def fail_resolution(*_args, **_kwargs):
@@ -1680,7 +1699,9 @@ def test_oxide_mole_fractions_propagates_formula_resolution_key_error(
         fail_resolution,
     )
     with pytest.raises(KeyError, match='formula resolution defect'):
-        AlphaMELTSBackend()._oxide_mole_fractions({'SiO2': 50.0})
+        AlphaMELTSBackend()._activities_from_coefficients(
+            {'SiO2': 1.0}, {'SiO2': 50.0}
+        )
 
 
 @pytest.mark.parametrize(
@@ -1973,6 +1994,29 @@ def _system_main_fixture(
         f"{fO2_log:.6f} 0 {density_g_cm3:.6f} 0 "
         f"{log10_viscosity_poise:.6f} n/a n/a\n"
     )
+
+
+def _assert_no_fo2_or_qfm_publication(result, *, reason: str) -> None:
+    payload = dataclasses.asdict(result)
+
+    def check(value, *, key: str = "") -> None:
+        key_folded = key.casefold()
+        if key in {"fO2_output_status", "fO2_output_status_reason"}:
+            return
+        if any(token in key_folded for token in ("fo2", "qfm", "buffer")):
+            assert value is None, f"published {key}={value!r}"
+            return
+        if isinstance(value, dict):
+            for nested_key, nested_value in value.items():
+                check(nested_value, key=str(nested_key))
+        elif isinstance(value, (list, tuple)):
+            for nested_value in value:
+                check(nested_value, key=key)
+
+    check(payload)
+    check(result.diagnostics)
+    assert result.diagnostics["fO2_output_status"] == "not_reported"
+    assert result.diagnostics["fO2_output_status_reason"] == reason
 
 
 def _parse_subprocess_fixture(
@@ -3451,6 +3495,353 @@ def test_alphamelts_subprocess_serializes_configured_qfm_buffer(tmp_path):
     assert 'Log fO2 Delta:' not in text
 
 
+def test_alphamelts_not_an_input_omits_subprocess_fo2_constraint(
+    monkeypatch,
+    tmp_path,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    captured = {}
+
+    def transport(
+        temperature_C,
+        comp_wt,
+        fO2_log,
+        pressure_bar,
+        warnings=None,
+        **kwargs,
+    ):
+        captured.update(
+            temperature_C=temperature_C,
+            composition=comp_wt,
+            fO2_log=fO2_log,
+            pressure_bar=pressure_bar,
+            warnings=warnings,
+            **kwargs,
+        )
+        return EquilibriumResult(
+            status='ok',
+            activity_coefficients={'SiO2': 0.4},
+            liquid_fraction=1.0,
+        )
+
+    monkeypatch.setattr(backend, '_equilibrate_subprocess', transport)
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.5, 'CaO': 0.25, 'Al2O3': 0.25},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+        subprocess_run_mode='isothermal',
+    )
+
+    assert result.status == 'ok'
+    assert result.activity_coefficients == {'SiO2': 0.4}
+    assert captured['fO2_log'] is None
+    assert captured['run_mode'] is AlphaMELTSSubprocessRunMode.ISOTHERMAL
+
+    constraint = backend._subprocess_fo2_constraint(
+        None,
+        redox_mode='not_an_input',
+    )
+    path = tmp_path / 'input.melts'
+    backend._write_melts_file(
+        path,
+        {'SiO2': 50.0, 'CaO': 30.0, 'Al2O3': 20.0},
+        1400.0,
+        1.0,
+        fO2_path=constraint[0],
+        fO2_offset=constraint[1],
+    )
+    text = path.read_text()
+    assert 'Log fO2 Path:' not in text
+    assert 'Log fO2 Offset:' not in text
+
+
+def test_alphamelts_not_an_input_ignores_default_fO2_echo():
+    backend = AlphaMELTSBackend()
+    temperature_C = 1400.0
+    output = (
+        '<> Stable liquid assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+        'T 1400.000000 (C)\n'
+        'liquid: SiO2 Al2O3 CaO\n'
+        '100.0 g 50 20 30\n'
+        'Melt fraction = 1.0\n'
+    )
+    table_outputs = {
+        'System_main_tbl.txt': _system_main_fixture(
+            temperature_C=temperature_C,
+            fO2_log=0.0,
+        ),
+        'Phase_main_tbl.txt': (
+            'index 1 Pressure 1.00 Temperature 1400.00 SiO2 Al2O3 CaO\n'
+            'liquid1 100.0 -1059377.1 268.91 34.56 143.47 1.409 '
+            '50 20 30\n'
+        ),
+        'Solid_comp_tbl.txt': (
+            'index Pressure Temperature mass SiO2 Al2O3 CaO\n'
+            '1 1.00 1400.00 0.0 ---\n'
+        ),
+        'Bulk_comp_tbl.txt': (
+            'index Pressure Temperature mass SiO2 Al2O3 CaO\n'
+            '1 1.00 1400.00 100.0 50 20 30\n'
+        ),
+        'Liquid_comp_tbl.txt': (
+            'index Pressure Temperature mass SiO2 Al2O3 CaO\n'
+            '1 1.00 1400.00 100.0 50 20 30\n'
+        ),
+    }
+
+    result = backend._parse_single_point_stdout(
+        output,
+        requested_temperature_C=temperature_C,
+        pressure_bar=1.0,
+        fO2_log=None,
+        total_input_kg=0.1,
+        run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+        system_output=_system_main_fixture(
+            temperature_C=temperature_C,
+            fO2_log=0.0,
+        ),
+        fO2_constraint={'path': None, 'offset': None},
+        redox_mode='not_an_input',
+        table_outputs=table_outputs,
+    )
+
+    assert result.status == 'ok'
+    assert result.fO2_log is None
+    assert result.printed_fO2_echo_log is None
+    assert result.diagnostics.get('engine_reported_fO2_log') is None
+    assert result.diagnostics.get('printed_fO2_echo_log') is None
+    assert result.diagnostics['fO2_output_status'] == 'not_reported'
+    assert result.diagnostics['fO2_output_status_reason'] == (
+        'not_an_input_default_column'
+    )
+
+
+def test_alphamelts_python_api_not_an_input_omits_configured_buffer(monkeypatch):
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._redox_buffer = 'QFM'
+    backend._fo2_offset = -1.5
+    captured = {}
+
+    monkeypatch.setattr(backend, '_require_petthermotools_runtime', lambda: object())
+    monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda comp: comp)
+    monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
+
+    def run(operation, *, kwargs):
+        captured['operation'] = operation
+        captured.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(backend, '_run_petthermotools_isolated', run)
+    monkeypatch.setattr(
+        backend,
+        '_parse_petthermotools_result',
+        lambda *_args, **_kwargs: EquilibriumResult(status='out_of_domain'),
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.5, 'CaO': 0.25, 'Al2O3': 0.25},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+    )
+
+    assert result.status == 'out_of_domain'
+    assert captured['operation'] == 'equilibrate_MELTS'
+    assert captured['fO2_buffer'] is None
+    assert captured['fO2_offset'] is None
+
+
+def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    vapor_calls = []
+
+    class VapoRockSpy:
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **kwargs):
+            vapor_calls.append(kwargs)
+            return SimpleNamespace(status='ok', vapor_pressures_Pa={'SiO': 1.0})
+
+    backend._vaporock_available = True
+    backend._vaporock_helper = VapoRockSpy()
+    monkeypatch.setattr(backend, '_require_petthermotools_runtime', lambda: object())
+    monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda comp: comp)
+    monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
+    native_result = {
+        'Conditions': {'mass': 100.0, 'P_bar': 1.0, 'logfO2': 0.0},
+        'liquid1': {'SiO2_Liq': 70.0, 'CaO_Liq': 30.0},
+        'liquid1_prop': {'mass': 100.0},
+        'Activities': {'liquid1': {'SiO2_Liq': 0.4}},
+    }
+    monkeypatch.setattr(
+        backend,
+        '_run_petthermotools_isolated',
+        lambda *_args, **_kwargs: native_result,
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.7, 'CaO': 0.3},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+    )
+
+    assert result.status == 'ok'
+    assert result.activity_coefficients == {'SiO2_Liq': 0.4}
+    assert result.vapor_pressures_Pa == {}
+    _assert_no_fo2_or_qfm_publication(
+        result,
+        reason='not_an_input_default_column',
+    )
+    assert result.diagnostics['vapor_pressure_backend_status'] == 'not_attempted'
+    assert result.diagnostics['vapor_pressure_backend_status_reason'] == (
+        'fO2_not_an_input'
+    )
+    assert result.diagnostics['authoritative_for_requested_vapor_pressure'] is False
+    assert backend._mode == 'python_api'
+    assert vapor_calls == []
+
+
+def test_alphamelts_subprocess_keeps_activity_when_fO2_is_not_an_input(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/fake/alphamelts')
+    launches = []
+
+    def fake_run(args, *, cwd, **kwargs):
+        launches.append((args, kwargs))
+        return types.SimpleNamespace(returncode=0, stdout='', stderr='')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+
+    def parsed_native_echo(_output, **kwargs):
+        return EquilibriumResult(
+            temperature_C=kwargs['requested_temperature_C'],
+            pressure_bar=kwargs['pressure_bar'],
+            fO2_log=0.0,
+            requested_fO2_log=0.0,
+            printed_fO2_echo_log=0.0,
+            system_fO2_delta_QFM=5.118,
+            status='ok',
+            liquid_fraction=1.0,
+            liquid_composition_wt_pct={
+                'SiO2': 50.0,
+                'CaO': 25.0,
+                'Al2O3': 25.0,
+            },
+            activity_coefficients={'SiO2': 0.4},
+            diagnostics={
+                'engine_reported_fO2_log': 0.0,
+                'printed_fO2_echo_log': 0.0,
+                'system_fO2_delta_QFM': 5.118,
+                'fO2_buffer': 'QFM',
+                'fO2_offset': 5.118,
+                'fO2_output_status': 'not_reported',
+                'fO2_output_status_reason': 'not_an_input_default_column',
+            },
+        )
+
+    monkeypatch.setattr(
+        backend,
+        '_parse_single_point_stdout',
+        parsed_native_echo,
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.5, 'CaO': 0.25, 'Al2O3': 0.25},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+        subprocess_run_mode='isothermal',
+    )
+
+    assert len(launches) == 1
+    assert result.status == 'ok'
+    assert result.liquid_fraction == 1.0
+    assert result.activity_coefficients == {'SiO2': 0.4}
+    assert result.fO2_log is None
+    assert result.vapor_pressures_Pa == {}
+    _assert_no_fo2_or_qfm_publication(
+        result,
+        reason='not_an_input_default_column',
+    )
+    assert result.diagnostics['vapor_pressure_backend_status'] == 'not_attempted'
+    assert result.diagnostics['vapor_pressure_backend_status_reason'] == (
+        'fO2_not_an_input'
+    )
+
+
+def test_alphamelts_intrinsic_none_still_refuses_without_redox_mode():
+    backend = AlphaMELTSBackend()
+
+    with pytest.raises(ValueError, match='intrinsic closed-system fO2'):
+        backend.equilibrate(
+            temperature_C=1400.0,
+            composition_kg={'SiO2': 0.7, 'Al2O3': 0.3},
+            fO2_log=None,
+            pressure_bar=1.0,
+        )
+
+
+def test_alphamelts_not_an_input_na_silica_below_crash_floor_refuses_before_binary(
+    monkeypatch,
+):
+    import simulator.melt_backend.alphamelts as alphamelts_module
+
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    launches = []
+    monkeypatch.setattr(
+        alphamelts_module,
+        'engine_commissioning',
+        lambda *_args, **_kwargs: pytest.fail(
+            'subprocess preflight must reuse the commissioning assessment'
+        ),
+        raising=False,
+    )
+
+    def fake_run(*args, **kwargs):
+        launches.append((args, kwargs))
+        raise AssertionError('the crash-floor guard must run before launch')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.30, 'Na2O': 0.70},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+        subprocess_run_mode='isothermal',
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == 'silicate_window'
+    assert any('crash floor' in warning.lower() for warning in result.warnings)
+    assert launches == []
+
+
 def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     monkeypatch,
 ):
@@ -4363,16 +4754,20 @@ def test_configured_unavailable_alphamelts_backend_fail_closes():
         sim._get_equilibrium()
 
 
-def test_alphamelts_vapor_species_are_canonical_formula_names():
+def test_alphamelts_vapor_species_follow_vaporock_delegate():
     backend = AlphaMELTSBackend()
+    delegate = alphamelts_module.VapoRockBackend()
     backend._vaporock_available = True
+    backend._vaporock_helper = delegate
 
-    species = set(backend.get_vapor_species())
+    species = backend.get_vapor_species()
+    assert species == delegate.get_vapor_species()
+    assert {'SiO2_gas', 'CrO2', 'O', 'O2'} <= set(species)
 
-    assert 'SiO2' in species
-    assert 'Fe2O3' in species
-    assert 'SiO2_gas' not in species
-    assert 'Fe2O3_gas' not in species
+    backend._vaporock_available = False
+    assert backend.get_vapor_species() == [
+        'Na', 'K', 'Fe', 'Mg', 'Ca', 'SiO', 'Mn', 'Cr'
+    ]
 
 
 def test_alphamelts_rejects_metal_and_gas_account_inputs():
@@ -5101,6 +5496,24 @@ def test_backend_health_timeout_config_reaches_transport(monkeypatch):
     }) is True
     assert backend._thermoengine_transport.health_timeout_s == 41.0
     assert backend._thermoengine_transport.equilibrate_timeout_s == 7.0
+
+
+def test_thermoengine_backend_forwards_per_call_timeout():
+    backend = ThermoEngineBackend()
+    backend._composition_kg_to_wt_pct = lambda _composition: {'SiO2': 100.0}
+    backend._domain_gate = lambda *_args, **_kwargs: None
+    backend._apply_engine_commissioning = lambda *_args, **_kwargs: {}
+    backend._normalize_composition_to_melts_basis = lambda composition: composition
+    backend._last_normalization_warnings = []
+    backend._equilibrate_prepared = lambda **kwargs: kwargs
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={'SiO2': 1.0},
+        call_timeout_s=17.0,
+    )
+
+    assert result['call_timeout_s'] == 17.0
 
 
 def test_thermoengine_transport_rejects_unknown_model_name():
@@ -5892,6 +6305,38 @@ def test_petthermotools_result_parser_prefers_reported_oxide_activities():
     })
 
 
+def test_sr03_invalid_oxide_activity_notice_preserves_projected_values():
+    """Kill mutation: silently_drop_invalid_oxide_activity_notice."""
+    backend = AlphaMELTSBackend()
+    activities = {
+        'SiO2': 0.42,
+        'Al2O3': float('nan'),
+        'FeO': 0.0,
+        'MgO': float('inf'),
+    }
+
+    result = backend._emit_equilibrium_result(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        activity_coefficients=activities,
+    )
+
+    assert result.activity_coefficients['SiO2'].hex() == (0.42).hex()
+    assert result.diagnostics['diagnostic_oxide_activities'] == {'SiO2': 0.42}
+    assert result.warnings == [
+        "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
+        "'Al2O3' for phase liquid: nan",
+        "AlphaMELTS provider omitted nonpositive diagnostic_oxide_activities field "
+        "'FeO' for phase liquid: 0.0",
+        "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
+        "'MgO' for phase liquid: inf",
+    ]
+
+
 def test_petthermotools_activity_coefficients_are_multiplied_by_mole_fraction():
     backend = AlphaMELTSBackend()
     na2o_mass = resolve_species_formula('Na2O').molar_mass_kg_per_mol()
@@ -6531,6 +6976,30 @@ def test_thermoengine_transport_remaps_nonfinite_field_remote_error():
             pressure_bar=1.0,
             comp_wt=_melts_domain_composition(),
         )
+
+
+def test_thermoengine_transport_forwards_per_call_timeout():
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+    seen = {}
+
+    def _record_worker_call(_request, *, timeout_s=None):
+        seen['timeout_s'] = timeout_s
+        return object()
+
+    transport._worker.call = _record_worker_call
+    result = transport.equilibrate(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        comp_wt=_melts_domain_composition(),
+        call_timeout_s=27.0,
+    )
+
+    assert seen['timeout_s'] == 27.0
+    assert result is not None
 
 
 def test_thermoengine_transport_remaps_fo2_undefined_remote_error():
@@ -9485,7 +9954,7 @@ def test_project_local_alphamelts_populates_full_table_suite_when_installed():
 
 
 @pytest.mark.live_engine
-def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
+def test_project_local_alphamelts_cold_c0_step_returns_when_installed(capsys):
     backend = AlphaMELTSBackend()
     try:
         available = backend.initialize({'mode': 'subprocess'})
@@ -9503,26 +9972,64 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C0)
 
-    started = time.monotonic()
+    cpu_started = _process_and_reaped_child_cpu_seconds()
+    wall_started = time.monotonic()
     try:
         snapshot = sim.step()
     except AlphaMELTSSubprocessContractError as exc:
         if getattr(exc, "backend_status_reason", None) == "timeout":
             pytest.skip("AlphaMELTS live subprocess timed out")
         raise
-    elapsed_s = time.monotonic() - started
+    wall_elapsed_s = time.monotonic() - wall_started
+    cpu_elapsed_s = (
+        _process_and_reaped_child_cpu_seconds() - cpu_started
+    )
+    wall_cpu_ratio = (
+        wall_elapsed_s / cpu_elapsed_s if cpu_elapsed_s > 0.0 else math.inf
+    )
+    with capsys.disabled():
+        print(
+            "cold C0 step timing (expected_parallelism=1 solver lane): "
+            f"cpu={cpu_elapsed_s:.2f}s wall={wall_elapsed_s:.2f}s "
+            f"wall/cpu={wall_cpu_ratio:.2f}x",
+            flush=True,
+        )
 
     assert snapshot.hour == 1
-    # Bound covers a true cold start: the A-CX-02 fix instance-scoped the
-    # ThermoEngine health cache (process-global reuse masked stale health), so
-    # a fresh backend legitimately re-probes engine health (~4 s) before the
-    # step. Warm-worker pools reuse instances and never pay this.
-    # 2026-07-23 B1 budget re-derivation: the composed vapor package adds
-    # per-species certified-range guards + suppression-fit evaluation to the
-    # cold C0 step's first equilibrium; measured quiesced 30.8 s (subset-3)
-    # and 32.6 s (gate-1 under load). Budget = measured ~32 s x 1.4 headroom
-    # ~= 45 s; still a COLD-path-only cost that warm pools never pay.
-    assert elapsed_s < 45.0
+    # This metric is this process plus children it has reaped. The test selects
+    # the AlphaMELTS subprocess path at
+    # simulator/melt_backend/alphamelts.py:1754-1769;
+    # _run_alphamelts_subprocess waits in communicate() before returning at
+    # simulator/melt_backend/alphamelts.py:563-578. The test therefore counts
+    # the authoritative AlphaMELTS executable. It does not use the
+    # ThermoEngine worker path.
+    #
+    # A separate optional diagnostic is excluded: core registers a MAGEMin
+    # shadow at simulator/core.py:2424-2463, and the kernel dispatches shadows
+    # before the authoritative provider at
+    # simulator/chemistry/kernel/planner.py:180-242.
+    # If MAGEMin is installed, that shadow can leave a warm worker alive
+    # (engines/magemin/provider.py:513-553;
+    # simulator/melt_backend/magemin.py:1403-1406), so RUSAGE_CHILDREN cannot
+    # yet include its process or its nested MAGEMin executable. The shadow is
+    # diagnostic-only and cannot change the authoritative AlphaMELTS result;
+    # this CPU gate targets doubled AlphaMELTS solver work. The printed wall/CPU
+    # ratio retains the full step's serialization diagnostic, including time
+    # spent waiting for that shadow and host scheduling.
+    #
+    # Measured premise: six xdist-off runs on Mac-Studio-256-2 produced CPU /
+    # wall seconds of 18.18/34.00, 18.23/34.99, 19.13/32.27, 19.23/32.12,
+    # 19.09/30.77, and 18.76/31.20 (wall/CPU 1.61-1.92x). CPU median=18.93 s;
+    # min=18.18 s, max=19.23 s, spread=max-min=1.05 s. Allow five observed
+    # spreads beyond the maximum: 19.23 + 5 x 1.05 = 24.48 s, rounded up to
+    # 25 s. This leaves five full observed run ranges of headroom. Unit check:
+    # seconds + five x seconds = seconds. Sanity case: two full AlphaMELTS
+    # passes at the largest measured cost 2 x 19.23 = 38.46 s, which exceeds
+    # the cap.
+    assert cpu_elapsed_s < 25.0, (
+        f"cold C0 CPU time {cpu_elapsed_s:.2f}s exceeded 25.0s; "
+        f"wall={wall_elapsed_s:.2f}s ({wall_cpu_ratio:.2f}x wall/CPU)"
+    )
 
 
 @pytest.mark.live_engine
@@ -9658,11 +10165,11 @@ def _vaporock_helper_returning(pressures, status='ok'):
         def is_available(self):
             return True
 
-        def equilibrate(self, *, temperature_C, composition_kg,
-                        fO2_log, pressure_bar):
+        def equilibrate(self, *, temperature_C, composition_kg=None,
+                        fO2_log, pressure_bar, **_kwargs):
             self.calls.append({
                 'temperature_C': temperature_C,
-                'composition_kg': dict(composition_kg),
+                'composition_kg': dict(composition_kg or {}),
                 'fO2_log': fO2_log,
                 'pressure_bar': pressure_bar,
             })
@@ -9677,11 +10184,442 @@ def _vaporock_helper_returning(pressures, status='ok'):
     return _Helper()
 
 
+def _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, config):
+    if isinstance(backend, ThermoEngineBackend):
+        monkeypatch.setattr(backend, '_initialize_vaporock_delegate', lambda: None)
+        monkeypatch.setattr(
+            'simulator.melt_backend.thermoengine.ThermoEngineTransport',
+            lambda **_kwargs: types.SimpleNamespace(
+                initialize=lambda: True,
+                health_check=lambda **_kwargs: (True, None),
+                engine_version='test',
+                close=lambda: None,
+            ),
+        )
+    else:
+        monkeypatch.setattr(
+            backend, '_find_project_binary',
+            lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        )
+    return backend.initialize(config)
+
+
+@pytest.mark.parametrize('gas_bar', [1e-9, 2e-9, 1e-6])
+def test_alphamelts_transport_config_pin_before_shared_validation(
+    monkeypatch, gas_bar,
+):
+    backend = AlphaMELTSBackend()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': gas_bar},
+    )
+    assert backend._vapor_transport_pO2_bar == gas_bar
+
+
+@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, float('nan'), float('inf')])
+def test_alphamelts_transport_config_refusal_pin_before_shared_validation(
+    monkeypatch, gas_bar,
+):
+    backend = AlphaMELTSBackend()
+    with pytest.raises(ValueError, match='vapor_transport_pO2_bar must be finite'):
+        _initialize_melts_transport_for_oxygen_test(
+            backend, monkeypatch, {'vapor_transport_pO2_bar': gas_bar},
+        )
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_thermoengine_public_config_reaches_gas_resolver(backend_cls, monkeypatch):
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': 1e-6},
+    )
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0,
+        solved_melt_wt_pct={'SiO2': 100.0},
+        liquid_fraction=1.0,
+        fO2_log=-12.0,
+        pressure_bar=1e-6,
+        activities={'SiO2': 1.0},
+    )
+    assert helper.calls[0]['fO2_log'] == pytest.approx(-6.0)
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, float('nan'), float('inf')])
+def test_melts_public_config_rejects_invalid_transport_oxygen(
+    backend_cls, monkeypatch, gas_bar,
+):
+    with pytest.raises(ValueError, match='vapor_transport_pO2_bar must be finite'):
+        _initialize_melts_transport_for_oxygen_test(
+            backend_cls(), monkeypatch, {'vapor_transport_pO2_bar': gas_bar},
+        )
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_live_transport_control_can_cross_simulator_boundary(backend_cls, monkeypatch):
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': 1e-6},
+    )
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.backend = backend
+    assert sim._backend_accepts_kwarg('vapor_transport_pO2_bar')
+
+    def native_solve(**kwargs):
+        backend._vapor_pressures_via_vaporock_or_antoine(
+            T_C=kwargs['temperature_C'],
+            solved_melt_wt_pct=kwargs['comp_wt'],
+            liquid_fraction=1.0,
+            fO2_log=kwargs['fO2_log'],
+            pressure_bar=kwargs['pressure_bar'],
+            activities={},
+        )
+        return EquilibriumResult(status='ok', liquid_fraction=1.0)
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', native_solve)
+    for gas_bar, expected_log in ((1e-5, -5.0), (1e-7, -7.0), (None, -6.0)):
+        kwargs = {}
+        if gas_bar is not None and sim._backend_accepts_kwarg('vapor_transport_pO2_bar'):
+            kwargs['vapor_transport_pO2_bar'] = gas_bar
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg={
+                'SiO2': 49.0, 'Al2O3': 15.0, 'FeO': 10.0,
+                'Fe2O3': 1.0, 'MgO': 10.0, 'CaO': 10.0, 'Na2O': 5.0,
+            },
+            fO2_log=-12.0,
+            pressure_bar=1.0,
+            **kwargs,
+        )
+        assert helper.calls[-1]['fO2_log'] == pytest.approx(expected_log)
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_melts_transport_admission_rejects_unknown_mode(backend_cls, monkeypatch):
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {})
+    with pytest.raises(ValueError, match='unsupported vapor_transport_pO2_admission'):
+        backend.equilibrate(temperature_C=1600.0, vapor_transport_pO2_admission='unknown')
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+@pytest.mark.parametrize('gas_bar', [1.3e-12, 3.7e-7])
+def test_battery_melts_observation_reaches_gas_projection_and_resets(
+    backend_cls, gas_bar, monkeypatch,
+):
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot, EngineHandle, Po2Request, equilibrate_cell,
+    )
+
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': 1e-6},
+    )
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    requests = []
+    builtin_dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def capture(provider, request):
+        result = builtin_dispatch(provider, request)
+        requests.append((request, result))
+        return result
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, 'dispatch', capture)
+    native_inputs = []
+
+    def native_solve(**kwargs):
+        native_inputs.append(kwargs['fO2_log'])
+        result = EquilibriumResult(
+            status='ok', liquid_fraction=1.0,
+            temperature_C=kwargs['temperature_C'], pressure_bar=kwargs['pressure_bar'],
+            fO2_log=kwargs['fO2_log'], requested_fO2_log=kwargs['fO2_log'],
+            liquid_composition_wt_pct=kwargs['comp_wt'],
+        )
+        if backend._mode == 'subprocess':
+            backend._builtin_vapor_projection_for_subprocess(result)
+        else:
+            backend._vapor_pressures_via_vaporock_or_antoine(
+                T_C=kwargs['temperature_C'], solved_melt_wt_pct=kwargs['comp_wt'],
+                liquid_fraction=1.0, fO2_log=kwargs['fO2_log'],
+                pressure_bar=kwargs['pressure_bar'], activities={},
+            )
+        return result
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', native_solve)
+    cell = equilibrate_cell(
+        EngineHandle(backend.backend_name, backend, True, None, True, False),
+        BinaryPot('observation', None, 'transport receipt', _melts_domain_composition()),
+        temperature_K=1873.15, po2=Po2Request('commanded', gas_bar), isolated=False,
+    )
+    assert cell.status == 'ok', cell.engine_reason
+    assert native_inputs == [math.log10(gas_bar)]
+    assert backend._vapor_transport_pO2_bar == gas_bar
+    assert backend._vapor_transport_pO2_admission == 'observation'
+    assert backend._vapor_transport_floor_bar == 1e-9
+    if requests:
+        request, result = requests[-1]
+        assert request.control_inputs['pO2_admission'] == 'observation'
+        assert result.diagnostic['pO2_bar'] == gas_bar
+    else:
+        assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(gas_bar))
+
+    backend.equilibrate(
+        temperature_C=1600.0, composition_kg=_melts_domain_composition(),
+        fO2_log=-12.0, pressure_bar=1.0,
+    )
+    assert native_inputs[-1] == -12.0
+    assert backend._vapor_transport_pO2_bar == 1e-6
+    assert backend._vapor_transport_pO2_admission == 'environment'
+    if requests:
+        request, result = requests[-1]
+        assert request.control_inputs['pO2_admission'] == 'environment'
+        assert result.diagnostic['pO2_bar'] == 1e-6
+    else:
+        assert helper.calls[-1]['fO2_log'] == pytest.approx(-6.0)
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+@pytest.mark.parametrize('gas_bar', [0.0, -1.0, float('nan'), float('inf')])
+def test_battery_melts_invalid_observation_refuses_before_native(
+    backend_cls, gas_bar, monkeypatch,
+):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot, EngineHandle, Po2Request, equilibrate_cell,
+    )
+
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {})
+
+    def unexpected_native(**_kwargs):
+        pytest.fail('invalid observation reached native MELTS')
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', unexpected_native)
+    args = (
+        EngineHandle(backend.backend_name, backend, True, None, True, False),
+        BinaryPot('invalid', None, 'invalid oxygen', _melts_domain_composition()),
+    )
+    kwargs = dict(temperature_K=1873.15, po2=Po2Request('commanded', gas_bar), isolated=False)
+    if gas_bar <= 0:
+        with pytest.raises(ValueError):
+            equilibrate_cell(*args, **kwargs)
+    else:
+        cell = equilibrate_cell(*args, **kwargs)
+        assert cell.status == 'refusal'
+        assert cell.engine_status == 'ValueError'
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+@pytest.mark.parametrize('route', ['direct', 'kernel'])
+def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeypatch):
+    from simulator.environment import vacuum_floor_bar_for_environment
+    from simulator.state import Atmosphere
+
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': 1e-6},
+    )
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.backend = backend
+    sim.melt = types.SimpleNamespace(
+        body='moon', ambient_pressure_mbar=0.0,
+        atmosphere=Atmosphere.HARD_VACUUM,
+        temperature_C=1600.0, p_total_mbar=1000.0,
+        oxygen_reservoir=types.SimpleNamespace(
+            headspace_transport_pO2_bar=0.0, melt_intrinsic_fO2_log=-12.0,
+        ),
+    )
+    floor = vacuum_floor_bar_for_environment(body=sim.melt.body)
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = (
+        sim._headspace_transport_pO2_bar_from_ledger(0.0, head_o2_mol=0.0)
+    )
+    live = sim._vapor_pressure_dispatch_pO2_bar()
+    assert live == floor
+    assert sim._backend_accepts_kwarg('vapor_transport_pO2_bar')
+    assert sim._backend_accepts_kwarg('vapor_transport_floor_bar')
+
+    def native_solve(**kwargs):
+        assert kwargs['fO2_log'] == -12.0
+        assert backend._vapor_transport_pO2_admission == 'environment'
+        backend._vapor_pressures_via_vaporock_or_antoine(
+            T_C=kwargs['temperature_C'],
+            solved_melt_wt_pct=kwargs['comp_wt'],
+            liquid_fraction=1.0,
+            fO2_log=kwargs['fO2_log'],
+            pressure_bar=kwargs['pressure_bar'],
+            activities={},
+        )
+        return EquilibriumResult(
+            status='ok', liquid_fraction=1.0,
+            phase_masses_kg={'liquid': 100.0} if route == 'kernel' else {},
+            vapor_pressures_Pa={'SiO': 777.0},
+        )
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', native_solve)
+    melt_mol = {
+        s: w / resolve_species_formula(s).molar_mass_kg_per_mol()
+        for s, w in _melts_domain_composition().items()
+    }
+    sim._backend_failed = False
+    sim.species_formula_registry = {}
+    sim._chem_registry = types.SimpleNamespace(authoritative_for=lambda _intent: None)
+    if route == 'kernel':
+        from engines.alphamelts.provider import AlphaMELTSProvider
+        from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+        provider = AlphaMELTSProvider(backend)
+        sim._chem_registry = types.SimpleNamespace(authoritative_for=lambda _intent: provider)
+
+        def dispatch(intent, **kwargs):
+            return provider.dispatch(IntentRequest(
+                intent=intent,
+                account_view=ProviderAccountView(
+                    accounts={'process.cleaned_melt': melt_mol},
+                    species_formula_registry={},
+                ),
+                temperature_C=sim.melt.temperature_C,
+                pressure_bar=sim.melt.p_total_mbar / 1000.0,
+                **kwargs,
+            ))
+
+        monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+    monkeypatch.setattr(sim, '_backend_composition_mol', lambda: melt_mol)
+    monkeypatch.setattr(sim, '_backend_composition_mol_by_account', lambda: {
+        'process.cleaned_melt': melt_mol,
+    })
+    monkeypatch.setattr(sim, '_validate_backend_account_scope_support', lambda _view: None)
+    monkeypatch.setattr(sim, '_sync_oxygen_reservoir_mirror', lambda: None)
+    monkeypatch.setattr(
+        sim,
+        '_record_equilibrium_status',
+        lambda result, *, run_post_equilibrium_sulfsat=True: result,
+    )
+    result = sim._get_equilibrium()
+    if route == 'kernel':
+        # Diagnostic MELTS vapour is discarded before the builtin refresh.
+        assert result.vapor_pressures_Pa == {}
+    assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(floor))
+    backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg={'SiO2': 49.0, 'Al2O3': 15.0, 'FeO': 10.0,
+                        'Fe2O3': 1.0, 'MgO': 10.0, 'CaO': 10.0, 'Na2O': 5.0},
+        fO2_log=-12.0, pressure_bar=1.0,
+    )
+    assert helper.calls[-1]['fO2_log'] == pytest.approx(-6.0)
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_live_transport_refuses_below_active_environment_floor(backend_cls, monkeypatch):
+    from simulator.environment import vacuum_floor_bar_for_environment
+
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {})
+    floor = vacuum_floor_bar_for_environment(body='moon')
+    with pytest.raises(ValueError, match='floor'):
+        backend.equilibrate(
+            temperature_C=1600.0, fO2_log=-12.0,
+            vapor_transport_pO2_bar=floor / 2,
+            vapor_transport_floor_bar=floor,
+        )
+
+
+def test_core_direct_alphamelts_dispatch_keeps_isothermal(monkeypatch):
+    from functools import wraps
+
+    calls = []
+    equilibrate = AlphaMELTSBackend.equilibrate
+
+    @wraps(equilibrate)
+    def record_call(self, *args, **kwargs):
+        calls.append(kwargs.get('subprocess_run_mode'))
+        return equilibrate(self, *args, **kwargs)
+
+    monkeypatch.setattr(AlphaMELTSBackend, 'equilibrate', record_call)
+    test_live_lunar_transport_input_reaches_vaporock(AlphaMELTSBackend, 'direct', monkeypatch)
+    assert calls == ['isothermal', None]
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+@pytest.mark.parametrize('gas_bar', [0.0, -1.0, float('nan'), float('inf')])
+def test_live_transport_refuses_nonpositive_or_nonfinite_oxygen(
+    backend_cls, monkeypatch, gas_bar,
+):
+    from simulator.environment import vacuum_floor_bar_for_environment
+
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {})
+    with pytest.raises(ValueError):
+        backend.equilibrate(
+            temperature_C=1600.0, fO2_log=-12.0,
+            vapor_transport_pO2_bar=gas_bar,
+            vapor_transport_floor_bar=vacuum_floor_bar_for_environment(body='moon'),
+        )
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_configured_lunar_transport_floor_reaches_vaporock(backend_cls, monkeypatch):
+    from simulator.environment import vacuum_floor_bar_for_environment
+
+    floor = vacuum_floor_bar_for_environment(body='moon')
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {
+        'vapor_transport_pO2_bar': floor, 'vapor_transport_floor_bar': floor,
+    })
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0, solved_melt_wt_pct={'SiO2': 100.0}, liquid_fraction=1.0,
+        fO2_log=-12.0, pressure_bar=1e-6, activities={},
+    )
+    assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(floor))
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_vapor_bridge_uses_same_gas_oxygen_as_shadow(backend_cls):
+    from engines.vaporock import VapoRockProvider
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+    backend = backend_cls()
+    backend._vapor_transport_pO2_bar = 1e-6
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': {'SiO2': 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        fO2_log=-12.0,
+        control_inputs={'pO2_bar': 1e-6},
+    )
+    shadow = VapoRockProvider(backend=helper, vapor_pressure_data={})
+    shadow.dispatch(request)
+    backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0,
+        solved_melt_wt_pct={'SiO2': 100.0},
+        liquid_fraction=1.0,
+        fO2_log=-12.0,
+        pressure_bar=1e-6,
+        activities={'SiO2': 1.0},
+    )
+    assert helper.calls[0]['fO2_log'] == pytest.approx(-6.0)
+    assert helper.calls[1]['fO2_log'] == helper.calls[0]['fO2_log']
+
+
 def test_vapor_bridge_happy_path_labels_source_vaporock_and_passes_solved_comp():
     backend = AlphaMELTSBackend()
     backend._vaporock_available = True
     helper = _vaporock_helper_returning({'Na': 11.5, 'SiO': 0.4, 'Fe': 1.57})
     backend._vaporock_helper = helper
+    backend._vapor_transport_pO2_bar = 1e-6
 
     solved = {'SiO2': 45.0, 'FeO': 18.0, 'Na2O': 0.4}
     pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
@@ -9698,8 +10636,8 @@ def test_vapor_bridge_happy_path_labels_source_vaporock_and_passes_solved_comp()
     assert pressures == {'Na': 11.5, 'SiO': 0.4, 'Fe': 1.57}
     # The SOLVED equilibrium liquid was fed to VapoRock, not the fallback.
     assert helper.calls[0]['composition_kg'] == solved
-    # Absolute fO2_log forwarded unchanged (no buffer/offset conversion).
-    assert helper.calls[0]['fO2_log'] == pytest.approx(-7.96)
+    # Gas oxygen follows transport pO2, independently of intrinsic melt redox.
+    assert helper.calls[0]['fO2_log'] == pytest.approx(-6.0)
 
 
 def test_vapor_bridge_no_liquid_phase_returns_physical_zero_without_helper():
@@ -10682,6 +11620,81 @@ def test_gibbs_energy_library_failure_is_typed():
             temperature_C=1400.0,
             pressure_bar=1.0,
             component_mole_fraction={'SiO2': 1.0},
+            comp_wt={'SiO2': 100.0},
+        )
+
+
+def test_thermoengine_activity_matches_native_morita_and_pure_limits():
+    import numpy as np
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._initialize_in_process()
+    phase = transport._liq_phase
+    names = tuple(str(name) for name in phase.endmember_names)
+    temperature_K = 1823.0
+    pressure_bar = 1.0
+    # The oxide-to-MELTS component composition of Morita's 1823 K SiO2 row.
+    composition = {
+        'SiO2': 0.9112683723462167,
+        'CaSiO3': 0.042460533478497556,
+        'Al2O3': 0.04627109417528579,
+    }
+    mol = [composition.get(name, 0.0) for name in names]
+    observed = transport._activities_from_chemical_potentials(
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=pressure_bar,
+        component_mole_fraction=composition,
+        comp_wt={},
+    )['SiO2']
+    mu = np.asarray(
+        phase.chem_potential(temperature_K, pressure_bar, mol=[mol]), dtype=float
+    ).reshape(-1)[names.index('SiO2')]
+    pure = [0.0 for _ in names]
+    pure[names.index('SiO2')] = 1.0
+    mu0 = np.asarray(
+        phase.gibbs_energy(temperature_K, pressure_bar, mol=[pure]), dtype=float
+    ).reshape(-1)[0]
+    direct = activity_from_chem_potential(float(mu), float(mu0), temperature_K)
+    assert observed == pytest.approx(direct, rel=1e-9)
+    assert observed == pytest.approx(0.908291549557732, rel=1e-9)
+
+    pure_activity = transport._activities_from_chemical_potentials(
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=pressure_bar,
+        component_mole_fraction={'SiO2': 1.0},
+        comp_wt={'SiO2': 100.0},
+    )['SiO2']
+    # MELTS v1 returns 1.00003004 (1.3e-5 dex) at the pure limit; VapoRock's
+    # independent MELTS-v1 path gives 1.0000301. This is engine numerics, so
+    # do not normalize through a second reference path. A 1e-4 dex tolerance
+    # is negligible beside the 0.1-0.8 dex residuals measured on this rail.
+    assert pure_activity == pytest.approx(1.00003004283758, rel=1e-8)
+    assert abs(math.log10(pure_activity)) <= 1e-4
+
+
+@pytest.mark.parametrize(
+    ('fraction', 'error_type', 'message'),
+    (
+        (float('nan'), ThermoEngineNonFiniteField, 'fractions are not finite'),
+        (-0.01, thermoengine_module.ThermoEngineNotConvergedError, 'negative value'),
+    ),
+)
+def test_thermoengine_activity_rejects_invalid_endmember_fractions(
+    fraction, error_type, message
+):
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._liq_phase = types.SimpleNamespace(endmember_names=('SiO2',))
+    with pytest.raises(error_type, match=message):
+        transport._activities_from_chemical_potentials(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            component_mole_fraction={'SiO2': fraction},
             comp_wt={'SiO2': 100.0},
         )
 

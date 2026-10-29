@@ -1,0 +1,31 @@
+# Table 1's H2 and SiO pressure columns are the scalar pressure series admitted
+# from this table. Table 2 is a four-composition vector and the mapping language
+# cannot associate each composition column with its model case.
+source_id: jaggi-2021-mercury-atmosphere
+source:
+  citation: >-
+    Jäggi et al. (2021), Evolution of Mercury's Earliest Atmosphere,
+    The Planetary Science Journal.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables:
+  - page: 4
+    table_index: 1
+    type: partial_pressure
+    quantity: p_partial
+    evidence_class: model_derived
+    unit: bar
+    phase: gas
+    published_page: 4
+    rows: all
+    temperature:
+      as_printed: '2000'
+      unit: K
+    values:
+      - column: 5
+        species: Mercury_model
+      - column: 8
+        species: Mercury_model

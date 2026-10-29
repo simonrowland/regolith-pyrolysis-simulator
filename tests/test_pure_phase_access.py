@@ -42,6 +42,7 @@ from simulator.melt_backend.pure_phase import (
     PurePhaseProperties,
     PurePhaseUnknownSymbolError,
 )
+from tests.engine_availability import thermoengine_package_available
 
 # --- availability guards (true skipif, resolved at collection) -------------
 
@@ -55,19 +56,8 @@ needs_magemin_binary = pytest.mark.skipif(
 )
 
 
-def _thermoengine_available() -> bool:
-    try:
-        from simulator.engine_local_config import setup_thermoengine_dylib_path
-
-        setup_thermoengine_dylib_path()
-        import thermoengine  # noqa: F401
-        return True
-    except Exception:
-        return False
-
-
 needs_thermoengine = pytest.mark.skipif(
-    not _thermoengine_available(),
+    not thermoengine_package_available(),
     reason="ThermoEngine dylibs/package unavailable on this machine",
 )
 
@@ -375,6 +365,374 @@ def test_gbase_nonfinite_solution_endmember_refuses():
     )
     with pytest.raises(PurePhaseAccessError, match="not finite"):
         _parse_magemin_gbase_tables(stdout)
+
+
+# Live Verb=1 stdout, corundum bulk, 2100 K, 1 bar, captured 2026-10-22
+# from engines/magemin/bin/MAGEMin. Lines are verbatim. The bi row's tbi
+# token is the engine's own nan; cor, fo and per on this table are finite.
+_CAPTURED_COR_2100_GBASE = (
+    "  cor:  -2034.776231  +0.999740\n"
+    "   bi:\n"
+    "----\n"
+    "          phl         annm          obi          eas          tbi          fbi\n"
+    "  -7971.94905  -7138.24419  -7699.04743  -8069.34185          nan  -7735.79502\n"
+    "   ol:\n"
+    "----\n"
+    "         mont           fa           fo          cfm\n"
+    "  -2844.70237  -2182.52123  -2728.75017  -2455.63570\n"
+    " fper:\n"
+    "----\n"
+    "          per           wu\n"
+    "   -763.89700   -522.30584\n"
+)
+
+
+def test_unscoped_gbase_parse_still_refuses_captured_biotite_nan():
+    """An unscoped table parse still refuses any non-finite solution token."""
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _parse_magemin_gbase_tables(_CAPTURED_COR_2100_GBASE)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for bi:tbi is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_unrelated_biotite_nan_does_not_poison_requested_phase():
+    """cor, fo and per are read from the captured table; bi:tbi is recorded."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    note = (
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase bi, field tbi, raw token 'nan'"
+    )
+    expected = {
+        "cor": -2034.776231,
+        "fo": -2728.75017,
+        "per": -763.89700,
+    }
+    for phase_id, g_kJ in expected.items():
+        notes: list[str] = []
+        got = _magemin_endmember_gbase_kJ(
+            _MAGEMIN_PURE_PHASES[phase_id],
+            _CAPTURED_COR_2100_GBASE,
+            notes,
+        )
+        assert got == pytest.approx(g_kJ)
+        assert notes == [note]
+
+
+def test_sibling_endmember_nan_does_not_poison_requested_endmember():
+    """nan on olivine fa is not a value of the requested fo endmember."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  nan  -2728.75017  inf\n"
+    )
+    notes: list[str] = []
+    got = _magemin_endmember_gbase_kJ(
+        _MAGEMIN_PURE_PHASES["fo"], stdout, notes
+    )
+    assert got == pytest.approx(-2728.75017)
+    assert notes == [
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase ol, field fa, raw token 'nan'",
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase ol, field cfm, raw token 'inf'",
+    ]
+
+
+def test_unrequested_pure_phase_nan_is_recorded():
+    """nan/inf on a pure-phase row are tokens, not a skipped line."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    stdout = (
+        "  cor:  -2034.776231  +0.999740\n"
+        "    q:  nan  +1.000000\n"
+        "  trd:  -981.191364  nan\n"
+    )
+    notes: list[str] = []
+    got = _magemin_endmember_gbase_kJ(
+        _MAGEMIN_PURE_PHASES["cor"], stdout, notes
+    )
+    assert got == pytest.approx(-2034.776231)
+    assert notes == [
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase q, field gbase, raw token 'nan'",
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase trd, field factor, raw token 'nan'",
+    ]
+
+
+def test_requested_pure_phase_nan_refuses_with_typed_reason():
+    """A nan on the requested pure phase is the gbase refusal, not a miss."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    gbase_nan = "  cor:  nan  +0.999740\n"
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _magemin_endmember_gbase_kJ(_MAGEMIN_PURE_PHASES["cor"], gbase_nan)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for cor is not finite: 'nan'; "
+        "refusing engine output"
+    )
+    factor_nan = "  cor:  -2034.776231  nan\n"
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _magemin_endmember_gbase_kJ(_MAGEMIN_PURE_PHASES["cor"], factor_nan)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for cor factor is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_signed_pure_phase_factor_keeps_printed_token():
+    """A leading plus on the factor is part of the raw token."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+        _unrelated_gbase_nonfinite_fields,
+    )
+
+    stdout = (
+        "  cor:  -2034.776231  +0.999740\n"
+        "    q:  -981.191364  +nan\n"
+        "  trd:  -981.191364  +inf\n"
+    )
+    notes: list[str] = []
+    got = _magemin_endmember_gbase_kJ(
+        _MAGEMIN_PURE_PHASES["cor"], stdout, notes
+    )
+    assert got == pytest.approx(-2034.776231)
+    assert notes == [
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase q, field factor, raw token '+nan'",
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase trd, field factor, raw token '+inf'",
+    ]
+    assert _unrelated_gbase_nonfinite_fields(notes[0]) == ("q", "factor", "+nan")
+    assert _unrelated_gbase_nonfinite_fields(notes[1]) == ("trd", "factor", "+inf")
+    for token in ("+nan", "+inf"):
+        with pytest.raises(PurePhaseAccessError) as raised:
+            _magemin_endmember_gbase_kJ(
+                _MAGEMIN_PURE_PHASES["cor"],
+                f"  cor:  -2034.776231  {token}\n",
+            )
+        assert str(raised.value) == (
+            "MAGEMin gbase table value for cor factor is not finite: "
+            f"{token!r}; refusing engine output"
+        )
+
+
+def test_unscoped_pure_phase_nan_still_refuses():
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _parse_magemin_gbase_tables("    q:  nan  +1.000000\n")
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for q is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_short_solution_row_records_unrequested_nan_and_keeps_requested():
+    """A short row is read. Unrequested nan is a note; fo's own token stands."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  nan  -2728.75017\n"
+    )
+    notes: list[str] = []
+    got = _magemin_endmember_gbase_kJ(
+        _MAGEMIN_PURE_PHASES["fo"], stdout, notes
+    )
+    assert got == pytest.approx(-2728.75017)
+    assert notes == [
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase ol, field fa, raw token 'nan'",
+    ]
+
+
+def test_short_solution_row_requested_nan_refuses():
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  -2182.52123  nan\n"
+    )
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _magemin_endmember_gbase_kJ(_MAGEMIN_PURE_PHASES["fo"], stdout)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for ol:fo is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_unscoped_short_solution_row_nan_still_refuses():
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  nan  -2728.75017\n"
+    )
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _parse_magemin_gbase_tables(stdout)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for ol:fa is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_finite_short_row_stays_dropped_and_trailing_token_stays_ignored():
+    short = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  -2182.52123  -2728.75017\n"
+    )
+    _pp, ss = _parse_magemin_gbase_tables(short)
+    assert "ol" not in ss
+    trailing = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  -2182.52123  -2728.75017  -2455.63570  nan\n"
+    )
+    _pp, ss = _parse_magemin_gbase_tables(trailing)
+    assert ss["ol"]["fo"] == pytest.approx(-2728.75017)
+
+
+def test_requested_endmember_nan_refuses_with_typed_reason():
+    """NaN on the requested endmember keeps the gbase refusal text."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  -2182.52123  nan  -2455.63570\n"
+    )
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _magemin_endmember_gbase_kJ(_MAGEMIN_PURE_PHASES["fo"], stdout)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for ol:fo is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_mode_and_system_total_nan_keep_typed_refusals():
+    """Mode-vector and SYS-total NaN stay invalid output, not a gbase miss."""
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _MAGEMinEngineCallError,
+    )
+
+    with pytest.raises(_MAGEMinEngineCallError, match="Mode token") as raised:
+        MAGEMinBackend._parse_subprocess_stdout(
+            "Phase: liq ol\nMode: 0.2 nan\n"
+        )
+    assert raised.value.exception_type == "MAGEMinOutputError"
+    text = _matlab_text_with_sys_row(
+        [float("nan"), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    )
+    assert _parse_magemin_sys_oxide_row(text) is None
+    with pytest.raises(PurePhaseBulkMismatchError, match="parseable SYS"):
+        _assert_magemin_bulk_echo({"MgO": 100.0}, text)
+
+
+def _initialized_fake_magemin(monkeypatch, stdout: str, matlab: str):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+
+    def fake_probe(**_kwargs):
+        return stdout, matlab, []
+
+    monkeypatch.setattr(backend, "_run_pure_phase_probe", fake_probe)
+    return backend
+
+
+def test_pure_phase_read_records_unrelated_nan_and_keeps_stencil(monkeypatch):
+    """The property path returns cor and names the ignored bi:tbi token."""
+    import math
+
+    matlab = _matlab_text_with_sys_row(
+        [1.0e-8, 0.99999, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    )
+    backend = _initialized_fake_magemin(
+        monkeypatch,
+        _CAPTURED_COR_2100_GBASE + "Status : 0 [success]\n",
+        matlab,
+    )
+    result = backend.pure_phase_properties(
+        "cor", temperature_K=2100.0, pressure_bar=1.0
+    )
+    assert result.G_J_mol == pytest.approx(-2034.776231e3)
+    assert math.isfinite(result.S_J_K_mol)
+    assert math.isfinite(result.Cp_J_K_mol)
+    assert math.isfinite(result.H_J_mol)
+    assert any("pure-endmember gbase" in note for note in result.warnings)
+    assert any(
+        "phase bi, field tbi, raw token 'nan'" in note
+        for note in result.warnings
+    )
+
+
+def test_failed_status_still_refuses_when_unrelated_phase_is_nan(monkeypatch):
+    matlab = _matlab_text_with_sys_row(
+        [1.0e-8, 0.99999, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    )
+    backend = _initialized_fake_magemin(
+        monkeypatch,
+        _CAPTURED_COR_2100_GBASE
+        + "Status : 3 [failure, reached maximum iterations]\n",
+        matlab,
+    )
+    with pytest.raises(PurePhaseAccessError, match="maximum iterations"):
+        backend.pure_phase_properties(
+            "cor", temperature_K=2100.0, pressure_bar=1.0
+        )
+
+
+def test_sys_nan_still_refuses_before_requested_phase_read(monkeypatch):
+    matlab = _matlab_text_with_sys_row(
+        [float("nan"), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    )
+    backend = _initialized_fake_magemin(
+        monkeypatch,
+        _CAPTURED_COR_2100_GBASE + "Status : 0 [success]\n",
+        matlab,
+    )
+    with pytest.raises(PurePhaseBulkMismatchError, match="parseable SYS"):
+        backend.pure_phase_properties(
+            "cor", temperature_K=2100.0, pressure_bar=1.0
+        )
 
 
 def test_sys_oxide_row_nonfinite_refuses():

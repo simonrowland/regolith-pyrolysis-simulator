@@ -1,0 +1,49 @@
+source_id: park-min-2004-carbide-capacity-fluoride-soda-slags
+table: '1'
+locator:
+  table: '1'
+  page: 2
+  published_page: 224
+  pdf_page_index: 1
+transcription:
+  method: manual; born-digital pdftotext has no table cells; every displayed cell checked against 600 dpi PDF page 2 render
+  row_key: No.
+  row_count: 33
+  row_groups:
+    F: 21
+    N: 12
+  columns:
+    - printed_header: No.
+      maps_to: sample_name_as_printed
+    - printed_header: '%CaO'
+      formula: CaO
+      quantity: equilibrium_phase_composition
+      basis: wt_percent
+    - printed_header: '%CaF2'
+      formula: CaF2
+      quantity: equilibrium_phase_composition
+      basis: wt_percent
+    - printed_header: '%SiO2'
+      formula: SiO2
+      quantity: equilibrium_phase_composition
+      basis: wt_percent
+    - printed_header: '%Na2O'
+      formula: Na2O
+      quantity: equilibrium_phase_composition
+      basis: wt_percent
+    - printed_header: log C_carbide
+      maps_to: context.park-min-table1-carbide-capacity-no-token.values.samples
+      reason: No carbide-capacity token exists; do not encode as sulfide_capacity or chloride_capacity.
+  blank_cells:
+    rows: F-1 through F-21
+    column: '%Na2O'
+    handling: preserve as blank; do not fill or infer zero
+  temperature_disagreement:
+    table_1_caption: '1,733 K'
+    selected_temperature: '1,773 K'
+    supporting_locators:
+      title: physical PDF page 1
+      body_text: physical PDF page 2
+      figure_1_caption: physical PDF page 2
+    check: 600 dpi render of physical PDF page 2
+  render_audit: 33 rows x 6 printed columns (198 cell positions), including sample ids and 21 blank Na2O cells

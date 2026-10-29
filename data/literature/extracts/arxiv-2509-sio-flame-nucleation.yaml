@@ -133,7 +133,9 @@ species:
       phase: gas_reaction_mixture
       units: 'as printed: A, n, E'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Panjwani, B.; Olsen, J. E. (2013), "Combustion and mechanism for NOx formation in ferrosilicon electric arc furnaces," Proceedings of the European Combustion Meeting (ref. 14), as cited by Haugen et al. (2025); NOx elements omitted
         generator: Panjwani and Olsen reaction mechanism as used by authors; NOx elements omitted
         quantity: Arrhenius_reaction_mechanism
         rows_as_printed:

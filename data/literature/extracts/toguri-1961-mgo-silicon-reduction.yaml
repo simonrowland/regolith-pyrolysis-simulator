@@ -1,0 +1,336 @@
+schema_version: literature_extract.v1
+source_id: toguri-1961-mgo-silicon-reduction
+source:
+  citation: 'Toguri, J. M. & Pidgeon, L. M. (1961), "High-temperature studies of metallurgical processes: Part I. The thermal reduction of magnesium oxide with silicon", Canadian Journal of Chemistry 39(3):540–547, DOI 10.1139/v61-065.'
+  doi: 10.1139/v61-065
+  year: 1961
+extraction:
+  method: >-
+    Scanned source transcribed from the available MinerU output and checked against
+    the PDF. The table draft tool found Table I but classified all rows as headers
+    (zero body rows); its reaction-specific calculated quantities do not map safely
+    to scored profiles, so they remain context. Table I was checked against a 600 dpi
+    render of PDF page 6. The MinerU and pdftotext pressure for reaction V disagree;
+    the rendered cell reads 2.27 × 10^-1 mm Hg. Figures 1–4 are recorded without
+    numeric points; the measured curves in Figures 2–3 are deferred to a figure pass.
+  date: '2026-10-18'
+  worker: fam4-1018
+  provenance_path: raw/toguri-1961-mgo-silicon-reduction/toguri-1961-mgo-silicon-reduction.pdf
+review_status: draft
+corrections: []
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: toguri_1961_experimental_conditions
+        type: laboratory_conditions
+        locator:
+          page: 2
+          published_page: 541
+          pdf_page_index: 1
+          section: Experimental Procedures
+        units: wt%, mole ratio, mesh, inch, psi, g, min, °C, and micron of Hg as printed
+        values:
+          method_class: measured_condition_or_author_calculated_condition
+          apparatus: high-temperature vacuum furnace with thermobalance, graphite retort, and helical spring balance
+          MgO_grade_as_printed: C.P.
+          ferrosilicon_mesh: 200
+          ferrosilicon_silicon_analysis_as_printed: '96.7% Si'
+          reactant_mix_as_printed: 82% magnesium oxide and 18% ferrosilicon
+          MgO_to_Si_mole_ratio_as_printed: '3.33:1'
+          briquette_mold_diameter_as_printed: 1 in
+          briquette_pressing_pressure_as_printed: 1500 p.s.i.
+          briquettes_per_run: 3
+          mass_per_briquette_g: 10
+          spring_balance_weight_change_as_printed: 0.020 ± 0.005 g
+          degassing_temperature_C: 750
+          degassing_locator: {page: 3, published_page: 542, pdf_page_index: 2}
+          degassing_duration_min: 10
+          degassing_duration_locator: {page: 3, published_page: 542, pdf_page_index: 2}
+          time_to_reach_operating_temperature_min: [2, 5]
+          heat_up_locator: {page: 3, published_page: 542, pdf_page_index: 2}
+          system_pressure_during_run:
+            value:
+              kind: point
+              point: 1
+              approximate: true
+            units: micron of Hg
+            as_printed: approximately one micron
+            locator: {page: 3, published_page: 542, pdf_page_index: 2}
+          blank_run_result: MgO-only briquettes had negligible weight loss over 1100–1440 °C.
+      - observation_id: toguri_1961_measured_results_in_prose
+        type: relation
+        locator:
+          page: 4
+          published_page: 543
+          pdf_page_index: 3
+          section: Results and Discussion
+        units: °C, min, and qualitative mass-loss/X-ray results as printed
+        values:
+          method_class: measured_direct
+          reaction_temperature_range_C: [1140, 1460]
+          at_1460C:
+            result: tendency to level off after 25 minutes at temperature
+          liquid_silicon_temperature_C_as_stated: 1420
+          sharp_change_in_weight_loss_curve_temperature_C:
+            value:
+              kind: point
+              point: 1300
+              approximate: true
+            as_printed: about 1300 °C
+          condensate_observed_after_experiments_above_C: 1280
+          condensate_description: hard, glassy, brownish deposit on retort baffles and condenser; its weight corresponded to excess loss in weight
+          condensate_XRD_identification: intimate mixture of Mg2SiO4 and Si
+          volatility_check:
+            materials: Mg2SiO4 and Si, heated separately
+            temperature_C: 1350
+            duration_h: 1
+            result: no measurable loss in weight after one hour
+      - observation_id: toguri_1961_measured_residue_xrd_phases
+        type: relation
+        locator:
+          page: 6
+          published_page: 545
+          pdf_page_index: 5
+          section: Results and Discussion
+        phase: solid reaction residue
+        units: °C and qualitative phase identification as printed
+        values:
+          method_class: measured_direct
+          quantity_as_printed: X-ray identification of reaction residue phases
+          below_1280C:
+            temperature_condition: below 1280 °C
+            phases: [MgO, Mg2SiO4, Si]
+          above_1280C:
+            temperature_condition: above 1280 °C
+            phases: [MgO, Mg2SiO4]
+          method_as_printed: X-ray diffraction
+      - observation_id: toguri_1961_measured_mg2si_dissociation
+        type: relation
+        locator:
+          page: 7
+          published_page: 546
+          pdf_page_index: 6
+          section: Results and Discussion
+        phase: magnesium silicide and reaction residue
+        units: °C and qualitative reaction/X-ray results as printed
+        values:
+          method_class: measured_direct
+          quantity_as_printed: Mg2Si dissociation and effect on MgO-silicon reduction
+          added_Mg2Si_dissociation:
+            temperature_C: 1100
+            atmosphere: vacuum
+            reaction_as_printed: Mg2Si = 2Mg(g) + Si
+            result: complete dissociation
+            verification: X-ray diffraction
+          replacement_of_silicon_with_Mg2Si:
+            reaction_rate_change: none
+          reaction_residue:
+            magnesium_silicides_present: false
+            verification: X-ray diffraction
+      - observation_id: toguri_1961_table1_calculated_reaction_thermodynamics
+        type: relation
+        locator:
+          table: '1'
+          page: 6
+          published_page: 545
+          pdf_page_index: 5
+        units: kcal/mole of printed reaction component; equilibrium P_SiO in mm Hg
+        values:
+          method_class: model_derived
+          quantity_as_printed: free-energy change for reactions under consideration and equilibrium pressure
+          temperature_as_printed: 'ΔG° 1550° K (table header); no separate temperature is printed over the pressure column'
+          reactions:
+            - equation: IV
+              reaction_as_printed: MgO + Si = Mg + SiO
+              delta_G_as_printed: 47.8 kcal/mole Si
+              equilibrium_P_SiO_as_printed: 3.26 × 10^-1 mm Hg
+            - equation: V
+              reaction_as_printed: (4n+1)MgO + (1+n)Si = nMg2SiO4 + (1+2n)Mg + SiO
+              delta_G_as_printed: 44.9 kcal/mole Si
+              equilibrium_P_SiO_as_printed: 2.27 × 10^-1 mm Hg
+            - equation: VII
+              reaction_as_printed: 2SiO + 2MgO = Mg2SiO4 + Si
+              delta_G_as_printed: -27.0 kcal/mole MgO
+              equilibrium_P_SiO_as_printed: 1.18 × 10^-1 mm Hg
+          phase_note: The paper's body equations identify Mg and SiO as gases in reaction IV and Mg and SiO as gases in reaction V; phases are not stated in the Table I cells.
+          note: Values are calculations for the printed reactions, not formation Gibbs energies. Table I's reaction V pressure differs between the text layer and MinerU; the 600 dpi PDF render reads 2.27 × 10^-1 mm Hg.
+      - observation_id: toguri_1961_calculated_sio_pressure_at_1300C
+        type: relation
+        locator:
+          page: 6
+          published_page: 545
+          pdf_page_index: 5
+          section: Results and Discussion
+        units: mm Hg
+        values:
+          method_class: model_derived
+          quantity_as_printed: calculated equilibrium pressure of SiO above reaction V
+          reaction_as_printed: (4n+1)MgO + (1+n)Si = nMg2SiO4 + (1+2n)Mg + SiO
+          temperature_as_printed: 1300 °C
+          value:
+            kind: point
+            point: 0.325
+            approximate: false
+          value_as_printed: 3.25 × 10^-1 mm Hg
+          system_pressure_as_printed: of the order of 10^-2 mm Hg
+          system_pressure_value:
+            value:
+              kind: point
+              point: 0.01
+              approximate: true
+            units: mm Hg
+      - observation_id: toguri_1961_quoted_silicon_vapor_pressure
+        type: relation
+        locator:
+          page: 4
+          published_page: 543
+          pdf_page_index: 3
+          section: Results and Discussion
+        units: mm Hg
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: J. L. Margrave (6), Physico-chemical measurements at high temperature (1959)
+          quantity_as_printed: vapor pressure of silicon
+          temperature_as_printed: 1350 °C
+          value:
+            kind: point
+            point: 0.001
+            approximate: true
+          value_as_printed: approximately 10^-3 mm Hg
+      - observation_id: toguri_1961_figure_1
+        type: figure_only
+        locator:
+          figure: '1'
+          page: 2
+          published_page: 541
+          pdf_page_index: 1
+        units: not applicable
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: apparatus diagram
+          species: MgO and ferrosilicon reaction mixture
+          phase: graphite-retort apparatus
+          temperature_as_printed: not applicable to schematic
+          x_axis_as_printed: not applicable to schematic
+          y_axis_as_printed: not applicable to schematic
+          caption_as_printed: 'FIG. 1. Diagram of graphite retort.'
+          panel: single
+          series: []
+          attribution: Toguri and Pidgeon (1961)
+          digitisation: deferred to a figure pass
+      - observation_id: toguri_1961_figure_2
+        type: figure_only
+        locator:
+          figure: '2'
+          page: 3
+          published_page: 542
+          pdf_page_index: 2
+        units: percent loss in weight; min
+        values:
+          method_class: figure_only
+          typed_quantity: mass_loss_fraction
+          quantity_as_printed: percentage loss in weight of reactant versus time
+          species: MgO and ferrosilicon briquetted reactant mixture
+          phase: solid reactant mass loss during Mg and SiO evolution
+          temperature_as_printed: separate measured series by temperature
+          x_axis_as_printed: Time (in min)
+          y_axis_as_printed: '% Loss in weight'
+          caption_as_printed: 'FIG. 2. Rate of reaction.'
+          panel: single
+          series:
+            - name: 1140 °C
+              marker: open circle
+              marker_count: 9
+              method_class: measured_direct
+            - name: 1240 °C
+              marker: open circle
+              marker_count: 9
+              method_class: measured_direct
+            - name: 1260 °C
+              marker: open circle
+              marker_count: 9
+              method_class: measured_direct
+            - name: 1280 °C
+              marker: open circle
+              marker_count: 9
+              method_class: measured_direct
+            - name: 1335 °C
+              marker: open circle
+              marker_count: 9
+              method_class: measured_direct
+            - name: 1393 °C
+              marker: open circle
+              marker_count: 9
+              method_class: measured_direct
+            - name: 1460 °C
+              marker: open circle
+              marker_count: 8
+              method_class: measured_direct
+            - name: maximum theoretical weight loss from complete MgO reaction (equation II)
+              marker: dashed horizontal line
+              marker_count: 0
+              method_class: model_derived
+          attribution: Toguri and Pidgeon (1961)
+          digitisation: deferred to a figure pass
+      - observation_id: toguri_1961_figure_3
+        type: figure_only
+        locator:
+          figure: '3'
+          page: 4
+          published_page: 543
+          pdf_page_index: 3
+        units: percent loss in weight; °C
+        values:
+          method_class: figure_only
+          typed_quantity: mass_loss_fraction_vs_T
+          quantity_as_printed: percentage loss in weight versus temperature at constant time
+          species: MgO and ferrosilicon briquetted reactant mixture
+          phase: solid reactant mass loss during Mg and SiO evolution
+          temperature_as_printed: varied on the x-axis
+          x_axis_as_printed: Temperature °C
+          y_axis_as_printed: '% Loss in weight'
+          caption_as_printed: 'FIG. 3. Effect of temperature at constant time.'
+          panel: single
+          series:
+            - name: A, after 10 min of run
+              marker: open circle
+              marker_count: 7
+              method_class: measured_direct
+            - name: B, after 20 min of run
+              marker: open circle
+              marker_count: 7
+              method_class: measured_direct
+            - name: C, after 30 min of run
+              marker: open circle
+              marker_count: 7
+              method_class: measured_direct
+          attribution: Toguri and Pidgeon (1961)
+          digitisation: deferred to a figure pass
+      - observation_id: toguri_1961_figure_4
+        type: figure_only
+        locator:
+          figure: '4'
+          page: 5
+          published_page: 544
+          pdf_page_index: 4
+        units: X-ray diffraction trace; angle scale as printed
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: X-ray diffraction pattern of the brown condensate
+          species: Mg2SiO4 and Si
+          phase: brown condensate identified as an intimate Mg2SiO4 + Si mixture
+          temperature_as_printed: not stated for the X-ray scan
+          x_axis_as_printed: unlabeled horizontal direction
+          y_axis_as_printed: degree ticks from 22° to 78°; no axis title printed
+          caption_as_printed: 'FIG. 4. X-Ray of brown condensate.'
+          panel: single
+          series:
+            - name: brown-condensate X-ray diffraction trace
+              marker: continuous trace
+              marker_count: 0
+          attribution: Toguri and Pidgeon (1961)
+          digitisation: deferred to a figure pass

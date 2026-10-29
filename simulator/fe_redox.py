@@ -18,6 +18,18 @@ class Kress91InvalidControls(ValueError):
     """Invalid finite-control input for the Kress91 Fe-redox relation."""
 
 
+def legacy_iw_log10_fO2_bar(
+    temperature_K: float,
+    *,
+    vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+) -> float:
+    """Return the legacy IW line, flooring T unless it is strictly positive."""
+    temperature = float(temperature_K)
+    if not (temperature > 0.0):
+        return math.log10(vacuum_floor_bar)
+    return -27215.0 / temperature + 6.57
+
+
 def intrinsic_melt_fO2(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
@@ -27,12 +39,22 @@ def intrinsic_melt_fO2(
     """Return the legacy intrinsic-fO2 diagnostic for an oxide composition."""
     temperature = float(temperature_K)
     if temperature <= 0.0:
-        return math.log10(vacuum_floor_bar)
+        return legacy_iw_log10_fO2_bar(
+            temperature,
+            vacuum_floor_bar=vacuum_floor_bar,
+        )
     feo, fe2o3 = iron_oxide_values(composition_wt_pct)
     alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
         0.0, float(composition_wt_pct.get("K2O", 0.0))
     )
-    log_iw = -27215.0 / temperature + 6.57
+    log_iw = (
+        temperature
+        if math.isnan(temperature)
+        else legacy_iw_log10_fO2_bar(
+            temperature,
+            vacuum_floor_bar=vacuum_floor_bar,
+        )
+    )
     redox_offset = 0.0
     if feo > 0.0 and fe2o3 > 0.0:
         redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
@@ -607,6 +629,21 @@ class RedoxState:
             'delta_log10': self.delta_log10,
         }
 
+    def cache_identity(self) -> dict[str, str | float] | None:
+        """Return the non-absolute state identity carried beside scalar fO2."""
+        if self.kind == 'absolute':
+            return None
+        return self.to_descriptor()
+
+
+def _non_absolute_redox_state_kwargs(
+    redox_state: RedoxState | None,
+) -> dict[str, RedoxState]:
+    """Forward only redox states that add cache identity beyond scalar fO2."""
+    if redox_state is None or redox_state.cache_identity() is None:
+        return {}
+    return {'redox_state': redox_state}
+
 
 def normalize_redox_state(
     fO2_log: float | None,
@@ -850,27 +887,49 @@ def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, fl
     return {oxide: mol / total_mol for oxide, mol in mol_counts.items()}
 
 
-def _kress91_fe2o3_over_feo_molar(
+def kress91_dropped_components(
+    comp_wt: Mapping[str, float],
+) -> tuple[tuple[str, ...], float | None]:
+    """Report positive composition mass excluded by the KC91 oxide basis."""
+
+    supported = {*KRESS91_MOL_FRACTION_OXIDES, 'FeO', 'Fe2O3'}
+    values = {name: float(amount) for name, amount in comp_wt.items()}
+    dropped = tuple(
+        sorted(name for name, amount in values.items() if name not in supported and amount > 0.0)
+    )
+    total = math.fsum(amount for amount in values.values() if amount > 0.0)
+    if not dropped or total <= 0.0:
+        return (), None
+    dropped_total = math.fsum(values[name] for name in dropped)
+    return dropped, dropped_total / total
+
+
+def _kress91_ln_ratio(
     *,
     fO2_log: float,
     mol_fractions: Mapping[str, float],
     T_K: float,
     pressure_bar: float,
+    fo2_term: float | None = None,
 ) -> float:
-    _validate_kress91_controls(
-        fO2_log=fO2_log,
-        T_K=T_K,
-        pressure_bar=pressure_bar,
-    )
+    """Left fold of Kress91 ln(Fe2O3/FeO).
+
+    The fO2 term is the first addend, matching the historical forward.
+    Pass ``fo2_term=0.0`` to obtain the composition, temperature, and
+    pressure sum the inverse subtracts. ``float(T_K)`` is used only on the
+    inverse-temperature term; the other terms keep ``T_K`` as given.
+    """
+
+    _validate_kress91_controls(fO2_log=fO2_log, T_K=T_K, pressure_bar=pressure_bar)
+    if fo2_term is None:
+        # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10).
+        # 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and then
+        # math.log(0.0) raises (BUG-159). This product is the canonical term.
+        fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
     p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
-    ln_ratio = (
-        # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10) directly.
-        # The prior 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and
-        # then math.log(0.0) raises a domain error, aborting the provider (BUG-159).
-        # This form is algebraically exact and is the canonical Kress91 a*ln(fO2)
-        # term (the sibling exp() at the return is already domain-clamped).
-        KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
+    return (
+        fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
         - 6.675
         - 2.243 * x.get('Al2O3', 0.0)
@@ -889,7 +948,59 @@ def _kress91_fe2o3_over_feo_molar(
         )
         + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
     )
+
+
+def _kress91_fe2o3_over_feo_molar(
+    *,
+    fO2_log: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    ln_ratio = _kress91_ln_ratio(
+        fO2_log=fO2_log,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
     return math.exp(max(-745.0, min(709.0, ln_ratio)))
+
+
+def kress91_log10_fO2_from_fe3_over_sigma_fe(
+    *,
+    fe3_over_sigma_fe: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    """Invert Kress91 for log10(fO2/bar) at a printed Fe3+/ΣFe.
+
+    q = 2*ratio/(2*ratio+1), so ratio = q/(2*(1-q)). q of 0 or 1 has no
+    finite oxygen fugacity. This inverts the unclamped ln(ratio) equation;
+    the forward exp() clamp is a numerical guard, not part of the relation.
+    """
+
+    try:
+        fraction = float(fe3_over_sigma_fe)
+    except (TypeError, ValueError) as exc:
+        raise Kress91InvalidControls(
+            "Kress91 Fe3+/sumFe must be a fraction in (0, 1), "
+            f"got {fe3_over_sigma_fe!r}"
+        ) from exc
+    if not math.isfinite(fraction) or fraction <= 0.0 or fraction >= 1.0:
+        raise Kress91InvalidControls(
+            "Kress91 Fe3+/sumFe must be a fraction in (0, 1), "
+            f"got {fe3_over_sigma_fe!r}"
+        )
+    ratio = fraction / (2.0 * (1.0 - fraction))
+    other = _kress91_ln_ratio(
+        fO2_log=0.0,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+        fo2_term=0.0,
+    )
+    return (math.log(ratio) - other) / (KRESS91_LN_FO2_COEFFICIENT * math.log(10.0))
 
 
 def kress91_fe3_over_sigma_fe(
@@ -906,50 +1017,6 @@ def kress91_fe3_over_sigma_fe(
         pressure_bar=pressure_bar,
     )
     return 2.0 * ratio / (2.0 * ratio + 1.0)
-
-
-def _kress91_ferrous_feo_activity_raw(
-    *,
-    comp_wt: Mapping[str, float],
-    fO2_log: float,
-    T_K: float,
-    pressure_bar: float,
-    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
-) -> float:
-    feot = feot_equivalent_wt_pct(comp_wt)
-    if feot <= 0.0:
-        return 0.0
-    mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
-    if not mol_fractions:
-        return 0.0
-    # Vacuum tolerance — intentional, NOT a missing guard. Direct activity
-    # callers may pass pressure_bar == 0.0 at furnace vacuum. Kress91's pressure
-    # terms are a high-pressure (GPa) petrologic correction, negligible at
-    # furnace mbar pressures, so a non-positive pressure is floored here rather
-    # than refused. Vapor-equilibrium providers use
-    # kress91_furnace_activity_pressure_bar so neutral overhead p_total never
-    # enters this path. NON-FINITE pressure is deliberately left unfloored
-    # (isfinite gate) so NaN/inf still raises through the
-    # _validate_kress91_controls chokepoint.
-    # kress91_split, by contrast, serves the redox-split path where pressure is a
-    # real melt pressure > 0 and a non-positive value IS invalid — the two entry
-    # points have DIFFERENT valid-input domains, so this asymmetry is correct, not
-    # a class-incompleteness. (A prior fold removed this clamp on that mistaken
-    # premise and broke every vacuum evaporation golden — see test
-    # test_kress91_ferrous_feo_activity_vacuum_pressure_is_floored_not_refused.)
-    pressure_control = floor_vacuum_pressure_bar(
-        pressure_bar,
-        floor_bar=floor_bar,
-    )
-    split = kress91_split(
-        fO2_log=fO2_log,
-        mol_fractions=mol_fractions,
-        T_K=T_K,
-        pressure_bar=pressure_control,
-    )
-    # Kress & Carmichael 1991 uses oxide mole fractions; Holzheid et al. 1997
-    # Eq. (4) defines gamma_FeO on the X_FeO mole-fraction basis.
-    return max(0.0, float(split['x_feo']))
 
 
 def _calphad_authority_weight(delta_iw_log10: float) -> float:
@@ -1241,3 +1308,9 @@ def kress91_split(
         'extrapolation': temperature_band['extrapolation'],
         'high_uncertainty': temperature_band['high_uncertainty'],
     }
+
+
+def _kress91_fe3_fe2_ratio(fe2o3_over_feo_molar: float) -> float:
+    # One Fe2O3 formula unit contains two Fe3+ cations; FeO contains one
+    # Fe2+ cation, so Fe3+/Fe2+ = 2*n(Fe2O3)/n(FeO) = 2*ratio.
+    return 2.0 * float(fe2o3_over_feo_molar)

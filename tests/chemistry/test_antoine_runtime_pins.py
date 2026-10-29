@@ -12,9 +12,12 @@ from engines.builtin.melt_effect_adjustment import (
 )
 from engines.builtin.vapor_pressure import _reconstructed_anchor_pressure_Pa
 from simulator import volatile_properties
+from simulator.campaigns import CampaignManager
 from simulator.chemistry.ellingham_graph import _antoine_reference_pressure_Pa
 from simulator.chemistry.langmuir_knudsen import pseudo_antoine_p_eq_pa
 from simulator.condensation import _antoine_psat_pa
+from simulator.config import load_config_bundle
+from simulator.extraction import ExtractionMixin
 from simulator.diagnostic_helpers.alphamelts_volatility import (
     _analytical_vapor_pressures_from_activities,
 )
@@ -28,6 +31,7 @@ from simulator.vapour_rail.catalog import (
     ValidationStatus,
     _ReferencePressureModel,
 )
+from simulator.state import CampaignPhase
 
 
 def test_survey_antoine_sample_is_pinned_as_float_hex():
@@ -176,6 +180,146 @@ def test_species_rail_antoine_evaluator_pins_real_rows(vapor_pressure_data):
         )
         assert pressure_pa is not None
         assert pressure_pa.hex() == expected_hex
+
+
+def test_foulant_consumer_refuses_missing_antoine_A_as_invalid_input():
+    refusal = None
+    try:
+        _pure_component_antoine_pa(
+            {"pure_component_antoine": {"B": 1000.0, "C": 0.0}},
+            1000.0,
+        )
+    except Exception as exc:
+        refusal = exc
+    else:
+        pytest.fail("missing Antoine A unexpectedly produced a pressure")
+
+    assert refusal is not None
+    assert type(refusal).__name__ == "_AntoineCoefficientRefusal"
+    assert str(refusal) == "missing_antoine_coefficient: coefficient=A value=None"
+
+
+def test_foulant_consumer_refuses_missing_C_for_three_parameter_form():
+    coefficients = {
+        "A": 5.0,
+        "B": 1000.0,
+        "runtime_form": "log10(P_Pa) = A - B / (T_K + C)",
+    }
+
+    with pytest.raises(
+        ValueError,
+        match="missing_antoine_coefficient: coefficient=C",
+    ):
+        _pure_component_antoine_pa(
+            {"pure_component_antoine": coefficients},
+            1000.0,
+        )
+
+
+def test_ellingham_consumer_computes_declared_two_parameter_source():
+    from pathlib import Path
+
+    import yaml
+
+    source_path = Path(__file__).resolve().parents[2] / "data/vapor_pressures.yaml"
+    payload = yaml.safe_load(source_path.read_text())
+    record = payload["families"]["oxide_trace_In2O_family"][
+        "physical_properties"
+    ]["species"]["In2O"]["t431_correlations"][0]
+
+    pressure_pa = _antoine_reference_pressure_Pa(record, 1000.0)
+
+    # Valderrama and Jacob report log10(p/atm) = -13150/T_K + 7.58;
+    # at 1000 K this is about 0.273 Pa after converting atm to Pa.
+    assert pressure_pa == pytest.approx(0.273, rel=0.01)
+
+
+def test_ellingham_negative_denominator_regression_guard():
+    pressure_pa = _antoine_reference_pressure_Pa(
+        {"A": 5.0, "B": 1000.0, "C": -200.0},
+        100.0,
+    )
+
+    # Preserve existing algebra: log10(P/Pa) = 5 - 1000/(100 - 200).
+    assert pressure_pa == pytest.approx(1e15)
+
+
+def test_c7_ca_partial_antoine_block_is_omitted_with_notice(monkeypatch):
+    from types import SimpleNamespace
+
+    import engines.builtin.evaporation_flux as evaporation_flux
+    import simulator.evaporation as evaporation
+    import simulator.silent_zero as silent_zero
+    import simulator.transport_regime as transport_regime
+
+    class FakeExtraction(ExtractionMixin):
+        def __init__(self):
+            source_row = load_config_bundle().setpoints["campaigns"]["C7"]
+            self.setpoints = {
+                "campaigns": {
+                    "C7": {
+                        "default_hold_T_C": source_row["default_hold_T_C"]
+                    }
+                }
+            }
+            self.melt = SimpleNamespace(
+                campaign=CampaignPhase.C7_CA_ALUMINOTHERMIC,
+                campaign_hour=0,
+                stir_state=SimpleNamespace(axial=1.0),
+                stir_factor=1.0,
+                p_total_mbar=0.05,
+                melt_surface_area_m2=0.2,
+            )
+            self.vapor_pressures = {
+                "metals": {
+                    "Ca": {
+                        "pure_component_antoine": {"A": 5.0, "B": 1000.0},
+                        "evaporation_alpha": {"value": 1.0},
+                    }
+                }
+            }
+            self.campaign_mgr = CampaignManager(self.setpoints)
+            self.overhead = SimpleNamespace(headspace_temperature_K=0.0)
+            self.overhead_model = SimpleNamespace(pipe_diameter_m=0.12)
+
+        def _evaporation_bulk_partial_pressure_pa(self, species):
+            return 0.0
+
+    flux = SimpleNamespace(
+        flux_kg_s_m2=0.0,
+        knudsen_number=1.0,
+        r_melt=0.0,
+        r_interface=0.0,
+        r_gas=0.0,
+        alpha_effective=1.0,
+        frozen_skull_stir_clamped=False,
+    )
+    monkeypatch.setattr(
+        evaporation_flux,
+        "_series_resistance_evaporation_flux_kg_m2_s",
+        lambda **kwargs: flux,
+    )
+    monkeypatch.setattr(
+        evaporation,
+        "viscous_p_bulk_out_of_domain_diagnostic",
+        lambda **kwargs: None,
+    )
+    monkeypatch.setattr(transport_regime, "continuum_validity_refuses", lambda _: False)
+    monkeypatch.setattr(silent_zero, "record_on_host", lambda *args, **kwargs: None)
+
+    extent, diagnostic = FakeExtraction()._c7_transport_extent_mol(
+        {"hold_temp_C": 1200.0, "p_total_mbar": 0.05},
+        ca_per_extent=3.0,
+    )
+
+    assert extent == 0.0
+    assert "c7_ca_p_sat_pa" not in diagnostic
+    assert diagnostic["c7_transport_refusal"] == (
+        "missing_input_antoine_coefficient_C"
+    )
+    assert diagnostic["notices"][0].startswith(
+        "antoine_species_skipped: species=Ca"
+    )
 
 
 def test_melt_effect_antoine_forms_keep_stull_pressure_pins():

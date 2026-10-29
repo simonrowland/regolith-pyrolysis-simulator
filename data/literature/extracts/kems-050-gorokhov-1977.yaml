@@ -23,9 +23,10 @@ extraction:
     Gorokhov KEMS, not the unseen 1977 point tables. Second-law labelled
     model_derived. CrO2 Table Cr.T4 is cited on print-CrO2.html and is a
     true absence on the OA pages. No unit conversion. No MinerU.
+    validated in an internal review, 2026-09-06, wave-2
   date: '2026-09-06'
   worker: wave-W2-ivtan-report43-77
-  provenance_path: docs-private/research/2026-09-06-wave-2/W2-ivtan-report43-77/kems-050-gorokhov-1977
+
 review_status: draft
 fidelity_samples:
   - species: CrO
@@ -95,7 +96,8 @@ species:
       values:
         quantity: second_law_reaction_enthalpy_0K
         evidence_kind: model
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Gorokhov, Gusarov et al. (1977), Report 43-77 [77ГОР/ГУС], as reprocessed in Table Cr.T3"
         law: II
         reaction_as_printed: AlO + Cr = Al + CrO
         T_range_K_as_printed: 2242-2690 K

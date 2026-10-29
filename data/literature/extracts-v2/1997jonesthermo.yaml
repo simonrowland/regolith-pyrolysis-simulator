@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -86,6 +87,7 @@ observations:
               note: Qualitative comparison only; curve coordinates and activity values are not digitized.
               source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
         output_unit: K
+        references: []
 - observation_id: 1997jonesthermo::jones_1997_mn_vapour_pressure_tabulation
   experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::1997jonesthermo
   identity:
@@ -100,6 +102,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -170,3 +173,4 @@ observations:
               note: Explicit value in prose; Figure 10 is not digitized.
               source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
         output_unit: K
+        references: []

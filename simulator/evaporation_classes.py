@@ -20,6 +20,7 @@ from __future__ import annotations
 import math
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Final, Literal
 
@@ -27,6 +28,7 @@ from engines.builtin.evaporation_flux import (
     SeriesEvaporationFlux,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
+from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -37,7 +39,21 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 _REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
 _EXTRACTS_DIR: Final[Path] = _REPO_ROOT / "data" / "literature" / "extracts"
+_SPECIES_CATALOG_PATH: Final[Path] = _REPO_ROOT / "data" / "species_catalog.yaml"
 _VAPOR_PRESSURES_PATH: Final[Path] = _REPO_ROOT / "data" / "vapor_pressures.yaml"
+
+
+@lru_cache(maxsize=1)
+def _species_formula_registry() -> dict[str, Any]:
+    """Return formulas for every species in the full catalog (cached).
+
+    This deliberately uses the unfiltered catalog. The simulator's base registry
+    drops ``_gas`` rows marked ``direct_vapour_flux: false`` (e.g. FeO_gas,
+    P2O5_gas), which would refuse those known species in these diagnostics.
+    """
+
+    return load_species_formulas(_SPECIES_CATALOG_PATH)
+
 
 # ---------------------------------------------------------------------------
 # Comparability gate (mirror of rps-evid si-comparability / rail_system_class)
@@ -78,14 +94,9 @@ class EvidenceRow:
     scoring for the production melt carrier.
 
     ``alpha`` is the numeric pin this table uses for band-coverage checks.
-    When the named ``(source_id, observation_id)`` carries a scalar, or a
-    well-defined range mid, that is the usual source. It is not always a
-    same-observation extract pin: the SiO Fedkin Langmuir placeholder
-    ``fedkin_2006_sio_hashimoto_langmuir_table3`` stores 0.17 here while
-    its named extract row has ``values.alpha is None`` (the 0.17 scalar
-    lives on the same-source ``complete_b1`` observation and the declared
-    mirror). Fence rows may omit it. Band coverage for comparable
-    non-fence rows with a numeric alpha is enforced by
+    It comes from the named observation or a declared measurement mirror.
+    Fence rows may omit it. Band coverage for comparable non-fence rows with
+    a numeric alpha is enforced by
     :func:`assert_evidence_rows_present`.
     """
 
@@ -161,20 +172,6 @@ _SIO_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=math.sqrt(0.003 * 0.036),
     ),
     EvidenceRow(
-        source_id="kems-005-fedkin-2006",
-        observation_id="fedkin_2006_sio_hashimoto_langmuir_table3",
-        species="SiO",
-        system_class="silicate_melt",
-        transformation_class="network_former_dissociation",
-        alpha_note="Hashimoto Langmuir series 0.12-0.21",
-        comparable=True,
-        role="grounding",
-        # 0.17 is Fedkin Table 3 SiO at 2073 K (per-T 0.12/0.17/0.20/0.21
-        # at 1973–2273 K). Named observation values.alpha is None (OCR
-        # placeholder); the per-temperature series carries this value.
-        alpha=0.17,
-    ),
-    EvidenceRow(
         source_id="kems-037-richter-2002",
         observation_id="richter_2002_sio_cai_langmuir_gamma",
         species="SiO",
@@ -209,28 +206,6 @@ _REDOX_EVIDENCE: tuple[EvidenceRow, ...] = (
         comparable=True,
         role="grounding",
         alpha=0.01978,
-    ),
-    EvidenceRow(
-        source_id="kems-005-fedkin-2006",
-        observation_id="fedkin_2006_fe_hashimoto_langmuir_table3",
-        species="Fe",
-        system_class="silicate_melt",
-        transformation_class="redox_reduction_required",
-        alpha_note="0.24 Langmuir free-evap",
-        comparable=True,
-        role="grounding",
-        alpha=0.24,
-    ),
-    EvidenceRow(
-        source_id="kems-005-fedkin-2006",
-        observation_id="fedkin_2006_mg_hashimoto_langmuir_table3",
-        species="Mg",
-        system_class="silicate_melt",
-        transformation_class="redox_reduction_required",
-        alpha_note="0.24",
-        comparable=True,
-        role="grounding",
-        alpha=0.24,
     ),
     EvidenceRow(
         source_id="kems-037-richter-2002",
@@ -366,48 +341,18 @@ _MARKED_IDEAL_FENCES: tuple[EvidenceRow, ...] = (
 
 
 # ---------------------------------------------------------------------------
-# Class centrals derived from comparable rows (P0 b-153)
+# Fixed diagnostic class priors. Evidence rows below define current comparables;
+# context-only fit outputs do not enter evidence or residual-band coverage.
 # ---------------------------------------------------------------------------
 #
-# silicate_melt_cation_redox — recompute from comparable grounding alphas.
-# Pilot/kems mirrors of the same measurement are collapsed to one pole:
-#
-#   Costa Fe olivine KEMS (1753.84 K figure point):                 0.01978
-#   Fedkin Fe Hashimoto Langmuir (fedkin_2006_fe… / table3_fe…):  0.24
-#   Fedkin Mg Hashimoto (kems 0.24 + table3 0.27) → √(0.24·0.27): 0.254558
-#   Richter Mg CAI γ (richter_2002_mg…):                          0.04
-#
-# gmean = exp(mean(ln α_i))
-#       = exp( (ln 0.01978 + ln 0.24 + ln √(0.24·0.27) + ln 0.04) / 4 )
-#       = 0.083382…  → class central 0.083 (3 s.f.)
-#
-# Cross-check: Fe-pole-only gmean √(0.01978·0.24) = 0.0689, which alone already
-# refutes the prior 0.10 central. Full-class gmean is used (not Fe-only).
-#
-# Band: every grounded α ∈ {0.01978, 0.24, 0.27, 0.04} must lie in
-#   [α_c · 10^{-σ}, α_c · 10^{+σ}].
-#   max_i |log10(α_i / 0.083)| = |log10(0.01978/0.083)| ≈ 0.623 → residual 0.63 dex.
-#   Programme 0.5-dex pin is a floor, not a ceiling. Fe poles 0.01978 and 0.24
-#   differ by log10(0.24/0.01978) = 1.084 dex, but those two rows also differ in
-#   condensed phase (solid_solution_olivine / kems_effusion vs silicate_melt /
-#   langmuir_free_evaporation), material, and T window (Costa ~1700–1800 K
-#   vs Fedkin 1973–2273 K). This comment block does not isolate Motzfeldt
-#   geometry as the cause of that spread: Costa's extract records a
-#   Whitman–Motzfeld multi-cell path with missing numeric orifices; Fedkin
-#   is free-evaporation (not Knudsen). Residual 0.63 dex is coverage of the
-#   stored poles, not a Motzfeldt-corrected split. A unique-cause
-#   decomposition of the Fe spread is unestablished here.
-#
-# Unit check: α dimensionless; gmean and 10^{±σ} dimensionless. ✔
-# Limiting cases: σ→0 collapses to a point estimate (false precision here);
-# σ ≥ half-span of log poles is the minimum honest band.
+# The prior values are retained as diagnostics; the extracted Table 3 fit
+# outputs are context, not observations that establish or cover these priors.
 
 _REDOX_CENTRAL_ALPHA: Final[float] = 0.083
 _REDOX_RESIDUAL_DEX: Final[float] = 0.63
 
-# SiO-class: keep rail prior_scalar 0.04 as central; residual widens so every
-# stored comparable numeric pin (Costa log-mid ~0.0104, Fedkin 0.17) is covered.
-# max |log10(α/0.04)| over {0.010392, 0.17} ≈ 0.628 → 0.63 dex.
+# SiO-class: keep rail prior_scalar 0.04 as central. The diagnostic residual
+# remains a conservative prior; current comparable evidence is the Costa band.
 _SIO_RESIDUAL_DEX: Final[float] = 0.63
 
 # Na/K: 0.30 is a programme central, not a log-middle of the stored poles.
@@ -435,8 +380,8 @@ EVAPORATION_CLASSES: Final[dict[str, EvaporationClass]] = {
         species=("SiO", "Si", "Si2", "Si3", "SiO2_gas"),
         evidence=_SIO_EVIDENCE,
         notes=(
-            "Central matches rail prior_scalar on SiO. Residual 0.63 dex covers "
-            "Costa log-mid (~0.010) through Fedkin Langmuir mid (0.17). Wetzel "
+            "Central matches rail prior_scalar on SiO. Fedkin Table 3 fit "
+            "outputs remain extract context, not comparable evidence. Wetzel "
             "growth form is a fence (solid_film_growth)."
         ),
     ),
@@ -1131,52 +1076,6 @@ def _scalar_runtime_alpha(raw: Any) -> tuple[float | None, str]:
     return None, f"unparsed_type:{type(raw).__name__}"
 
 
-def _default_molar_mass_kg_mol(species: str) -> float:
-    """Default molar mass for diagnostic share in this module.
-
-    Used on the path in :func:`report_species_class_diagnostics` when
-    ``molar_mass_kg_mol`` is omitted.
-    """
-
-    # Partial local table of diagnostic molar masses (kg/mol) for species
-    # this function is commonly called with. It is not a complete match of
-    # the LJ proxy masses in engines/builtin/evaporation_flux.py
-    # (_EVAPORATION_LJ_PROXY_PARAMS). Mapped production species that have
-    # an LJ proxy mass there but are omitted here, and therefore take the
-    # 0.050 kg/mol fallback: Al2, Al2O, Al2O2, Al2O3_gas, AlO, AlO2, Ca2,
-    # CrO, CrO2, CrO3, TiO, TiO2_gas.
-    table = {
-        "Fe": 0.055845,
-        "Mg": 0.024305,
-        "MgO_gas": 0.040304,
-        "Mg2": 0.048610,
-        "Na": 0.022989769,
-        "Na2": 0.045979538,
-        "Na2O_gas": 0.0619785,
-        "K": 0.0390983,
-        "K2": 0.0781966,
-        "K2O_gas": 0.0941956,
-        "SiO": 0.044085,
-        "Si": 0.028085,
-        "Si2": 0.056170,
-        "Si3": 0.084255,
-        "SiO2_gas": 0.060083,
-        "Ca": 0.040078,
-        "CaO_gas": 0.056077,
-        "Al": 0.0269815,
-        "Ti": 0.047867,
-        "Cr": 0.051996,
-        "Mn": 0.054938,
-    }
-    if species in table:
-        return table[species]
-    # Fallback: 0.050 kg/mol — diagnostic only. k_HKL ∝ √M and k_g ∝ M, so
-    # s = r_i/(r_i+r_g) is mass-dependent. Substituting the omitted LJ
-    # proxies at 2000 K / 1000 Pa moved interface share by ~7–42 % relative
-    # for those twelve species (largest on Al2O3_gas and CrO3).
-    return 0.050
-
-
 def report_species_class_diagnostics(
     species: str,
     *,
@@ -1251,7 +1150,9 @@ def report_species_class_diagnostics(
         M = (
             float(molar_mass_kg_mol)
             if molar_mass_kg_mol is not None
-            else _default_molar_mass_kg_mol(species)
+            else resolve_species_formula(
+                species, _species_formula_registry()
+            ).molar_mass_kg_per_mol()
         )
         series = interface_resistance_share(
             species=species,
@@ -1314,19 +1215,39 @@ def _index_extract_observation_ids(
         for sp, block in (data.get("species") or {}).items():
             if not isinstance(block, Mapping):
                 continue
-            for obs in block.get("observations") or []:
-                if not isinstance(obs, Mapping):
+            records = [*(block.get("observations") or ()), *(block.get("context") or ())]
+            for record in records:
+                if not isinstance(record, Mapping):
                     continue
-                oid = obs.get("observation_id")
-                if not oid:
-                    continue
-                index[(source_id, str(oid))] = {
-                    "species": sp,
-                    "type": obs.get("type"),
-                    "phase": obs.get("phase"),
-                    "regime": obs.get("regime"),
-                    "values": dict(obs.get("values") or {}),
-                }
+                values = record.get("values") or {}
+                oid = record.get("observation_id")
+                if oid:
+                    index[(source_id, str(oid))] = {
+                        "species": sp,
+                        "type": record.get("type"),
+                        "phase": record.get("phase"),
+                        "regime": record.get("regime"),
+                        "values": dict(values) if isinstance(values, Mapping) else {},
+                    }
+                nested_rows = values if isinstance(values, list) else (
+                    values.get("rows") or () if isinstance(values, Mapping) else ()
+                )
+                for nested in nested_rows:
+                    if not isinstance(nested, Mapping):
+                        continue
+                    nested_id = nested.get("source_observation_id")
+                    if not nested_id:
+                        continue
+                    nested_values = nested.get("values")
+                    index[(source_id, str(nested_id))] = {
+                        "species": nested.get("element") or nested.get("species") or sp,
+                        "type": record.get("type"),
+                        "phase": record.get("phase"),
+                        "regime": record.get("regime"),
+                        "values": dict(nested_values)
+                        if isinstance(nested_values, Mapping)
+                        else dict(nested),
+                    }
     return index
 
 

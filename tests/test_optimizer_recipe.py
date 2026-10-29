@@ -73,9 +73,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
             .setpoints
         )
     ).encode()
-    # Recomputed after phosphorus batch 7e6bebc: its C0b-P controls changed
-    # data/setpoints.yaml, the sole batch input serialized by this resolved
-    # setpoints digest. Empty recipe/setpoints patch bytes remain neutral.
+    # Recomputed after d-252's C0 move. Diffing the resolved setpoints against
+    # green 0761129d0 shows these exact C0 leaves changed: label, notes,
+    # dT_dt_C_per_hr (50 -> 200), endpoint.type, and the new carrier_gas,
+    # p_total_mbar_default, pO2_mbar_default, and alkali budget; atmosphere,
+    # pO2_mbar, endpoint.threshold, and soft_endpoint were removed. Empty
+    # recipe/setpoints patch bytes remain neutral.
     # Recomputed 2026-08-07 (b-147 Mg TE-μ0 demotion): the derived
     # Mg_threshold_grounding roots in data/setpoints.yaml moved with the
     # Pref_GF retarget (moon 1978.564→1892.647 C; asteroid 1840.802→1768.703 C)
@@ -90,8 +93,31 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
+    # Recomputed 2026-10-22 (t-1441 stirring labels): 4 description strings
+    # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
+    # induction_stirring; endpoint_criteria.control.surface_renewal;
+    # endpoint_criteria.general; furnace.induction_stirring.note.
+    # Recomputed 2026-10-25 for t-1457 + b154. Relative to b154's normalized
+    # resolved setpoints, the C0 leaves differ as follows: label and notes
+    # changed; dT_dt_C_per_hr 50 -> 200; atmosphere=hard_vacuum and
+    # pO2_mbar=null were removed; carrier_gas=Ar, p_total_mbar_default=1,
+    # pO2_mbar_default=0, and alkali_retention_budget_fraction=0.001 were
+    # added; endpoint.type changed from ir_signal_decay to
+    # computed_alkali_and_evacuation_exit; endpoint.threshold=0.05 and
+    # soft_endpoint.type=temperature_min_after_min_hold,
+    # soft_endpoint.min_hold_hr=10, and soft_endpoint.temperature_min_C=940
+    # were removed. Restoring these C0 leaves to b154 while retaining b154's
+    # condensation_train.stage_6_turbine_compressor.temp_range_C [50, 200]
+    # and condensation_train.stage_7_accumulator.temp_range_C [20, 50]
+    # recovers b154's resolved digest
+    # 2584074346931c132b487ffb6ce56511d26f76805d63bcfa14eb996d1fe5ea57.
+    # The combined t-1457 C0 contract and b154 Stage-6/7 bands produce the
+    # resolved digest below.
+    # b-1043: the resolved-setpoints leaf chemistry_kernel.liquid_fraction_provider
+    # is now "magemin". Removing only that leaf recovers 911f820f...;
+    # EvalSpec's matching gate-input leaf is pinned separately below.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
+        "b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -336,7 +362,10 @@ def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> 
                     "C5": {
                         "allow_mre_voltage_cap_upper_bound_V": high,
                     }
-                }
+                },
+                "condensation_train": yaml.safe_load(SETPOINTS_PATH.read_text())[
+                    "condensation_train"
+                ],
             },
             sort_keys=True,
         ),
@@ -677,7 +706,14 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # serialize those fingerprints, and the June corpus is not interoperable.
     # Pin recomputed from this tree's executable cache_key(spec).
     # 2026-09-30 C7d removed the physics-gate version and class from this digest.
-    assert cache_key(spec) == "f6d1c88ba2fcbcca5ae07e720bfe53a721601506fbd93611c907e8869352c7a3"
+    # 2026-10-20 b-585 d-045: the default physics_constraints digest now includes
+    # coating_max_upstream_wall_deposit_fraction_per_campaign = 5e-4. Removing
+    # that one threshold from the default constraint payload restores
+    # f6d1c88b.... recipe_id is unchanged. The key carries no run result.
+    # b-1043: canonical EvalSpec adds chemistry_kernel.liquid_fraction_provider
+    # = "magemin". Removing only this input leaf recovers 368ca7f8...;
+    # the resolved-setpoints leaf above is the other changed pin, not key material.
+    assert cache_key(spec) == "121793938a461ee049568da3161697a0e791e3d3597e673ab61b14847faecb23"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -2068,6 +2104,7 @@ def test_forbidden_floor_cannot_be_neutered_by_custom_schema() -> None:
 def test_knob_bounds_source_provenance_is_honest() -> None:
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     range_sourced = 0
+    converted_setpoint_ranges = 0
     engineering_envelopes = 0
     grounded_sources = 0
 
@@ -2082,8 +2119,26 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             assert len(yaml_value) == 2
             assert spec.low is not None
             assert spec.high is not None
-            assert yaml_value[0] <= spec.low <= spec.high <= yaml_value[1]
+            assert (spec.low, spec.high) == tuple(yaml_value)
             range_sourced += 1
+        elif spec.bounds_source.startswith(
+            "engineering_envelope converted from setpoints.yaml range "
+        ):
+            yaml_value = _lookup_setpoint(setpoints, "campaigns.C5.pO2_bar")
+            assert (spec.low, spec.high) == tuple(
+                value * 1000 for value in yaml_value
+            )
+            mbar_target = (
+                "mbar default"
+                if spec.path[-1] == "pO2_mbar_default"
+                else "total mbar default"
+            )
+            assert spec.bounds_source == (
+                "engineering_envelope converted from setpoints.yaml range "
+                f"campaigns.C5.pO2_bar=[{yaml_value[0]!r}, {yaml_value[1]!r}] "
+                f"bar to {mbar_target}"
+            )
+            converted_setpoint_ranges += 1
         elif spec.bounds_source.startswith(
             ("hot_wall_invariant:", "condensation_train ")
         ):
@@ -2099,11 +2154,105 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             engineering_envelopes += 1
 
     assert (
-        range_sourced + engineering_envelopes + grounded_sources
+        range_sourced
+        + converted_setpoint_ranges
+        + engineering_envelopes
+        + grounded_sources
         == len(RecipeSchema().allowlist)
     )
+    assert range_sourced == 41
+    assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0
     assert grounded_sources > 0
+
+
+def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
+    expected = {
+        "campaigns.C0.temp_range_C": (20, 950),
+        "campaigns.C0b_p_cleanup.temp_range_C": (1180, 1320),
+        "campaigns.C0b_p_cleanup.pO2_mbar": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.pO2_mbar_default": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.p_total_mbar_default": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.duration_hr": (0.5, 2.5),
+        "campaigns.C2A_continuous.temp_range_C": (1050, 1843),
+        "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C": (10, 20),
+        "campaigns.C2A_continuous.p_total_mbar": (5, 15),
+        "campaigns.C2A_continuous.p_total_mbar_default": (5, 15),
+        "campaigns.C2A_staged.temp_range_C": (1250, 1750),
+        "campaigns.C2A_staged.default_hold_T_C": (1250, 1750),
+        "campaigns.C2A_staged.p_total_mbar": (5, 15),
+        "campaigns.C2A_staged.p_total_mbar_default": (5, 15),
+        "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.sio_window.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2B.temp_range_C": (1320, 1480),
+        "campaigns.C2B.pO2_mbar": (0.8, 2.3),
+        "campaigns.C2B.pO2_mbar_default": (0.8, 2.3),
+        "campaigns.C2B.p_total_mbar_default": (0.8, 2.3),
+        "campaigns.C3.pO2_mbar_default": (0.5, 1.5),
+        "campaigns.C3.p_total_mbar_default": (0.5, 1.5),
+        "campaigns.C3.K_phase.pO2_bakeout_mbar": (0.5, 1.5),
+        "campaigns.C3.Na_phase.pO2_bakeout_mbar": (0.5, 1.5),
+        "campaigns.C3.duration_after_pathA_hr": (10, 18),
+        "campaigns.C3.duration_after_pathB_hr_per_phase": (20, 35),
+        "campaigns.C4.temp_range_C": (1580, 1670),
+        "campaigns.C4.default_hold_T_C": (1580, 1670),
+        "campaigns.C4.pO2_mbar": (0.08, 0.35),
+        "campaigns.C4.pO2_mbar_default": (0.08, 0.35),
+        "campaigns.C4.p_total_mbar_default": (0.08, 0.35),
+        "campaigns.C4.optional_Ca_harvest.pO2_mbar": (0.03, 0.12),
+        "campaigns.C5.temp_range_C": (1500, 1650),
+        "campaigns.C5.pO2_bar": (0.01, 0.1),
+        "campaigns.C5.pO2_mbar_default": (10, 100),
+        "campaigns.C5.p_total_mbar_default": (10, 100),
+        "campaigns.C6.temp_range_C": (1380, 1450),
+        "campaigns.C6.default_hold_T_C": (1380, 1450),
+        "campaigns.C6.pO2_mbar": (0.08, 0.35),
+        "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
+        "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
+    }
+    schema = RecipeSchema()
+    actual = {
+        ".".join(spec.path): (
+            type(spec.low),
+            spec.low,
+            type(spec.high),
+            spec.high,
+        )
+        for spec in schema.allowlist
+        if spec.bounds_source.startswith("setpoints:")
+        or spec.bounds_source.startswith(
+            "engineering_envelope converted from setpoints.yaml range "
+        )
+    }
+
+    assert len(actual) == 43
+    assert actual == {
+        path: (type(low), low, type(high), high)
+        for path, (low, high) in expected.items()
+    }
+
+
+def test_recipe_schema_uses_supplied_setpoints_for_derived_bounds() -> None:
+    setpoints = copy.deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    setpoints["campaigns"]["C2A_staged"]["temp_range_C"] = [1250, 1700]
+    setpoints["campaigns"]["C5"]["pO2_bar"] = [0.02, 0.08]
+
+    schema = RecipeSchema(setpoints=setpoints)
+    c2a_hold = schema.spec_for(("campaigns", "C2A_staged", "default_hold_T_C"))
+    c5_po2 = schema.spec_for(("campaigns", "C5", "pO2_bar"))
+    c5_po2_mbar = schema.spec_for(
+        ("campaigns", "C5", "pO2_mbar_default")
+    )
+    c5_total_mbar = schema.spec_for(
+        ("campaigns", "C5", "p_total_mbar_default")
+    )
+
+    assert (c2a_hold.low, c2a_hold.high) == (1250, 1700)
+    assert (c5_po2.low, c5_po2.high) == (0.02, 0.08)
+    assert (c5_po2_mbar.low, c5_po2_mbar.high) == (20, 80)
+    assert (c5_total_mbar.low, c5_total_mbar.high) == (20, 80)
 
 
 def test_pressure_default_pair_map_covers_allowlisted_siblings() -> None:

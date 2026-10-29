@@ -1,0 +1,206 @@
+schema_version: literature_extract.v1
+source_id: matzen-2022-martian-basalt-redox
+source:
+  citation: "Matzen, A.K., Woodland, A., Beckett, J.R. & Wood, B.J. (2022) Oxidation state of iron and Fe-Mg partitioning between olivine and basaltic Martian melts. American Mineralogist, in press."
+  doi: 10.2138/am-2021-7682
+  url: https://doi.org/10.2138/am-2021-7682
+  version: Accepted manuscript, Revision 2 (June 28, 2021)
+  year: 2022
+extraction:
+  method: Manual transcription from the accepted-manuscript PDF; every Table 1, 2, and 3 value was checked row-label by row-label against 150-dpi rendered page images.
+  date: '2026-10-10'
+  worker: t1188b
+  provenance_path: data/literature/extracts/matzen-2022-martian-basalt-redox.yaml
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[matzen_2022_run_11_method_a].values.Fe3_over_FeT
+  value: '0.19'
+  locator: {page: 39, table: 2, note: PDF page 39}
+- path: species.Fe.observations[matzen_2022_run_11_method_b].values.Fe3_over_FeT
+  value: '0.08'
+  locator: {page: 39, table: 2, note: PDF page 39}
+benches:
+- id: matzen-one-atmosphere-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Vertical one-atmosphere furnace}
+    locator: {page: 6, published_page: 6, section: Experimental Techniques}
+  heating_method:
+    state: {tag: value, value: Furnace heating; experiments introduced at approximately 850 °C in the selected flowing gas mixture}
+    locator: {page: 6, published_page: 6, section: Experimental Techniques}
+  gas_mixing:
+    state: {tag: value, value: 'Flowing CO-CO2 mixtures or air, total flow approximately 200 ml/min; mass-flow controllers set mixtures to the desired fO2 at final run temperature'}
+    locator: {page: 6, published_page: 6, section: Experimental Techniques}
+  fO2_measurement:
+    state: {tag: value, value: 'Yttria-stabilized zirconia oxygen sensor in most experiments; Table 2 footnote distinguishes sensor measurements (two decimal places) from gas-mixing-ratio fO2 values (one decimal place), except the air experiment'}
+    locator: {page: 6, published_page: 6, section: Experimental Techniques, note: Table 2 footnote a is on PDF page 39}
+  temperature_measurement:
+    instrument:
+      state: {tag: value, value: Type-B thermocouple calibrated against the melting point of gold}
+      locator: {page: 6, published_page: 6, section: Experimental Techniques}
+    ramp:
+      state: {tag: value, value: From approximately 850 °C to final run temperature at 400–500 °C/hr; ramp time excluded from tabulated run times}
+      locator: {page: 6, published_page: 6, section: Experimental Techniques}
+  quench:
+    state: {tag: value, value: Experiments drop quenched into a beaker of deionized water}
+    locator: {page: 6, published_page: 6, section: Experimental Techniques}
+experiments:
+- experiment_id: matzen-run-7
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample:
+    characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}
+    printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; Table 1 reports FeO* and footnote b states all Fe as FeO}, locator: {page: 38, table: 1}}
+  conditions:
+    temperature_C: {state: {tag: value, value: '1458'}, locator: {page: 39, table: 2}}
+    log_fO2: {state: {tag: value, value: '-0.68'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2; gas mixing ratio or air value at final run temperature (1458 °C), not relative to QFM'}}
+    duration_h: {state: {tag: value, value: '15.5'}, locator: {page: 39, table: 2}}
+    loop: {state: {tag: value, value: Pt1/3}, locator: {page: 39, table: 2}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '55800'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 15.5 h'}}}
+- experiment_id: matzen-run-11
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.88'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '48.6'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/3}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '174960'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 48.6 h'}}}
+- experiment_id: matzen-run-13
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1450'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.85'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1450 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '23.3'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/4}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '83880'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 23.3 h'}}}
+- experiment_id: matzen-run-15
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.87'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '13.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/5}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '48600'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 13.5 h'}}}
+- experiment_id: matzen-run-20
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-4.76'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '12.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt4/3}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '45000'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 12.5 h'}}}
+- experiment_id: matzen-run-21
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-2.48'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '13.4'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt5/3}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '48240'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 13.4 h'}}}
+- experiment_id: matzen-run-27
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1450'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-8.0'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1450 °C), not relative to QFM; printed to one decimal place'}}, duration_h: {state: {tag: value, value: '8.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re1/2}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '30600'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 8.5 h'}}}
+- experiment_id: matzen-run-30
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1449'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-10.0'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1449 °C), not relative to QFM; printed to one decimal place'}}, duration_h: {state: {tag: value, value: '14.4'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re2/2}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '51840'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 14.4 h'}}}
+- experiment_id: matzen-run-31
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1500'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-4.9'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1500 °C), not relative to QFM; printed to one decimal place'}}, duration_h: {state: {tag: value, value: '10.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt6/2}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '37800'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 10.5 h'}}}
+- experiment_id: matzen-run-57
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-10.03'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '11.0'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re16/2}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '39600'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 11.0 h'}}}
+- experiment_id: matzen-run-60
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1452'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-8.20'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1452 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '9.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re18/2}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '34200'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 9.5 h'}}}
+- experiment_id: matzen-run-61
+  series: Synthetic Martian basalt iron redox series
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1300'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-7.20'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1300 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '36.1'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt14/3}, locator: {page: 39, table: 2}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '129960'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 36.1 h'}}}
+- experiment_id: matzen-run-2-3
+  series: Olivine-bearing partitioning experiment
+  bench_id: matzen-one-atmosphere-furnace
+  method: one_atmosphere_gas_mixing_furnace_then_drop_quench
+  locator: {page: 39, table: 2}
+  sample: {characterization: {state: {tag: value, value: 'Syn-MB2 glass and olivine; Table 1 row Syn-MB2 gl/ol identifies coexisting glass and olivine from experiment 2-3'}, locator: {page: 38, table: 1}}, printed_composition: {state: {tag: value, value: Syn-MB2}, locator: {page: 38, table: 1}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1300'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-7.24'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1300 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '41.2'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt14/5}, locator: {page: 39, table: 2}}, redox_results: {state: {tag: unknown, reason: not_reported}, locator: {page: 39, table: 2, note: 'Both Fe3+/sum Fe cells are blank for run 2-3; this is the additional olivine-bearing partitioning run, not a redox result row'}}}
+  thermal_schedule: {total_duration_s: {state: {tag: value, value: '148320'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 41.2 h'}}, cooling_or_quench: {state: {tag: value, value: Drop quenched into a beaker of deionized water}, locator: {page: 6, published_page: 6, section: Experimental Techniques}}}
+starting_compositions:
+  locator: {page: 38, table: 1}
+  units: wt.%
+  iron_basis: All Fe as FeO (Table 1 footnote b); FeO* denotes wt.% of all Fe in glass computed as FeO based on mass balance (Table 2 footnote c)
+  rows:
+    Prim. Home Plate Avg.: {n: not_reported, SiO2: '49.42', TiO2: '0.98', Al2O3: '9.84', Cr2O3: '-', FeO*: '17.78', MnO: '0.35', MgO: '11.57', CaO: '6.51', Na2O: '3.12', K2O: '0.43', NiO: '–', Sum: '100'}
+    MB1: {SiO2: '51.01', TiO2: '1.01', Al2O3: '10.15', Cr2O3: '0.0', FeO*: '18.36', MnO: '0.36', MgO: '11.94', CaO: '6.72', Na2O: '0.0', K2O: '0.0', NiO: '0.45', Sum: '100'}
+    Syn-MB1: {SiO2: '51.01', TiO2: '1.00', Al2O3: '10.15', Cr2O3: '0.0', FeO*: '18.36', MnO: '0.36', MgO: '11.94', CaO: '6.72', Na2O: '0.0', K2O: '0.0', NiO: '0.46', Sum: '100'}
+    Syn-MB1 Exp. Avg: {n: '107', SiO2: '50.33(28)', TiO2: '1.00(3)', Al2O3: '10.09(8)', Cr2O3: BDL, FeO*: '18.13(31)', MnO: '0.37(4)', MgO: '11.76(9)', CaO: '6.89(8)', Na2O: '0.06(2)', K2O: BDL, NiO: '0.33(8)', Sum: '98.96'}
+    Syn-MB2: {SiO2: '48.36', TiO2: '0.83', Al2O3: '8.36', Cr2O3: '0.0', FeO*: '18.86', MnO: '0.301', MgO: '16.62', CaO: '5.71', Na2O: '0.0', K2O: '0.0', NiO: '0.38', Sum: '100'}
+    Syn-MB2 gl: {n: '20', SiO2: '50.13(11)', TiO2: '0.94(3)', Al2O3: '9.46(8)', Cr2O3: BDL, FeO*: '18.61(18)', MnO: '0.32(4)', MgO: '13.03(8)', CaO: '6.54(8)', Na2O: '0.10(1)', K2O: BDL, NiO: '0.21(3)', Sum: '99.35'}
+    Syn-MB2 ol: {n: '15', SiO2: '38.92(14)', TiO2: BDL, Al2O3: BDL, Cr2O3: BDL, FeO*: '18.50(10)', MnO: '0.25(1)', MgO: '41.17(16)', CaO: '0.16(1)', Na2O: BDL, K2O: '–', NiO: '1.53(5)', Sum: '100.55'}
+  notes:
+    - Table 1 footnote c: Prim. Home Plate Avg. is the average of Home Plate primitive magma compositions from Filiberto and Dasgupta (2011).
+    - Table 1 footnote d: MB1 is the target after replacing K2O with an equal amount of NiO and renormalizing on an alkali-free basis.
+    - Table 1 footnote e: Syn-MB1 is the as-weighed composition.
+    - Table 1 footnote f: Syn-MB1 Exp. Avg. averages 107 analyses from 12 experiments; parenthetical digits are analytical uncertainties in least units, e.g. 50.33(28) means 50.33 ± 0.28 (standard deviation).
+    - Table 1 footnote g: Na2O average uses experiments 11, 13, 57, 60, and 61 where Na2O exceeded detection.
+    - Table 1 footnote h: NiO average excludes experiments 30 and 57 where NiO was below detection.
+    - Table 1 footnote i: Syn-MB2 is 83% Syn-MB1 experimental average plus 17% synthetic Fo77 olivine; Fe, Ni, and Na values were calculated using theoretical Syn-MB1 values due to possible Fe and Ni loss and Na gain.
+    - Table 1 footnote j: Syn-MB2 gl and Syn-MB2 ol are coexisting glass and olivine from experiment 2-3 at 1300 °C, log10 fO2 -7.24, 41.25 hrs.
+    - BDL means below detection limit; a dash means not analyzed or not reported.
+species:
+  Fe:
+    observations:
+    - {observation_id: matzen_2022_run_7_method_a, experiment: matzen-run-7, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1731.15', '1731.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-0.68', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.69', reported_value: '0.69 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_7_method_b, experiment: matzen-run-7, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1731.15', '1731.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-0.68', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.66', reported_value: '0.66 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_11_method_a, experiment: matzen-run-11, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-5.88', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.19', reported_value: '0.19 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_11_method_b, experiment: matzen-run-11, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-5.88', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.08', reported_value: '0.08 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_13_method_a, experiment: matzen-run-13, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1723.15', '1723.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-5.85', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.19', reported_value: '0.19 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_13_method_b, experiment: matzen-run-13, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1723.15', '1723.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-5.85', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.09', reported_value: '0.09 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_15_method_a, experiment: matzen-run-15, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-5.87', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.19', reported_value: '0.19 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_15_method_b, experiment: matzen-run-15, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-5.87', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.09', reported_value: '0.09 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_20_method_a, experiment: matzen-run-20, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-4.76', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.25', reported_value: '0.25 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_20_method_b, experiment: matzen-run-20, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-4.76', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.16', reported_value: '0.16 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_21_method_a, experiment: matzen-run-21, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-2.48', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.44', reported_value: '0.44 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_21_method_b, experiment: matzen-run-21, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-2.48', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.38', reported_value: '0.38 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_27_method_a, experiment: matzen-run-27, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1723.15', '1723.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-8.0', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.06', reported_value: '0.06 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_27_method_b, experiment: matzen-run-27, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1723.15', '1723.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-8.0', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.01', reported_value: '0.01 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_30_method_a, experiment: matzen-run-30, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1722.15', '1722.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-10.0', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.06', reported_value: '0.06 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_30_method_b, experiment: matzen-run-30, type: concentration_series, locator: {page: 39, table: 2, note: 'Method B fixes the ferrous endmember from run 30 (see the method definition, PDF p. 9); this 0.00 is a constraint of the fit, not an independent measurement.'}, T_range_K: ['1722.15', '1722.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-10.0', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.00', reported_value: '0.00 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_31_method_a, experiment: matzen-run-31, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1773.15', '1773.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-4.9', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.22', reported_value: '0.22 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_31_method_b, experiment: matzen-run-31, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1773.15', '1773.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-4.9', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.13', reported_value: '0.13 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_57_method_a, experiment: matzen-run-57, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-10.03', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.07', reported_value: '0.07 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_57_method_b, experiment: matzen-run-57, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1724.15', '1724.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-10.03', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.00', reported_value: '0.00 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_60_method_a, experiment: matzen-run-60, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1725.15', '1725.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-8.20', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.06', reported_value: '0.06 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_60_method_b, experiment: matzen-run-60, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1725.15', '1725.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-8.20', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.01', reported_value: '0.01 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_61_method_a, experiment: matzen-run-61, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1573.15', '1573.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-7.20', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.19', reported_value: '0.19 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method A, fitting_scheme_definition_locator: 'PDF p. 8 lines 173-178; PDF p. 40 Table 3 note; two Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}
+    - {observation_id: matzen_2022_run_61_method_b, experiment: matzen-run-61, type: concentration_series, locator: {page: 39, table: 2}, T_range_K: ['1573.15', '1573.15'], phase: quenched synthetic Martian basalt glass, units: fraction (Fe3+/sum Fe), uncertainty: {Fe3_over_FeT: '±0.03 (estimated error reported by the authors; Table 2 footnote f)'}, values: {log_fO2: '-7.20', method_class: measured_direct, quantity: fe3_fe2_ratio, Fe3_over_FeT: '0.09', reported_value: '0.09 ± 0.03', analytical_method: Mössbauer spectroscopy, fitting_scheme: Method B, fitting_scheme_definition_locator: 'PDF pp. 8-9 lines 178-189; PDF p. 40 Table 3 note; simulation of Berry et al. (2018), three Fe2+ doublets and one Fe3+ doublet', composition_basis: all Fe reported as FeO*}}

@@ -1449,7 +1449,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     ) -> dict[str, dict[str, float]]:
         result: dict[str, dict[str, float]] = {}
         accounts = set(product_kg_by_account) | set(substrate_kg_by_account)
-        for account in accounts:
+        for account in sorted(accounts):
             species_delta: dict[str, float] = {}
             for species, kg in dict(product_kg_by_account.get(account, {})).items():
                 species_delta[species] = species_delta.get(species, 0.0) + float(kg)

@@ -6,8 +6,9 @@ import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
-from simulator.battery.migrate import REPO_ROOT, Migrator
+from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.validate import validate_corpus
+from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -38,8 +39,7 @@ def test_kassis_frischat_source_facts_survive_migration() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
 
-    migrator = Migrator(REPO_ROOT)
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(REPO_ROOT, EXTRACT)
     result = migrator.result
     queued_total_pressure = [
         entry for entry in result.queue if entry.why == TOTAL_PRESSURE_REASON

@@ -1,0 +1,198 @@
+"""Regression pin for O'Neill & Eggins (2002) printed FeO uncertainties."""
+
+from dataclasses import replace
+from decimal import Decimal
+from pathlib import Path
+import re
+
+import yaml
+
+from simulator.battery.enums import Quantity, UncertaintyKind
+from simulator.battery.score import _printed_uncertainty_band
+from tests.battery.factories import migrate_one_extract
+
+
+ROOT = Path(__file__).resolve().parents[1]
+EXTRACT = ROOT / "data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml"
+
+# Table 5, p. 162, "Number of data" by melt.
+TABLE5_MO_COUNTS = {
+    "AD eutectic": 6,
+    "AD+Fo": 6,
+    "AD+En": 7,
+    "AD+Wo": 7,
+    "AD+Qz": 7,
+    "AD+TiO2": 7,
+    "A": 9,
+    "B": 9,
+    "C": 9,
+    "D": 9,
+    "E": 9,
+    "F": 9,
+    "MAS1": 3,
+    "MAS2": 6,
+    "CAS1": 5,
+    "CAS2": 6,
+    "CAS4": 5,
+}
+
+
+def test_feo_table_7_rows_keep_their_own_printed_one_sigma():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    source_observation = document["species"]["FeO"]["observations"][0]
+    source_rows = source_observation["values"]["series"]
+    composition_basis_note = source_observation["values"]["composition_basis_note"]
+    assert "Table 4" in composition_basis_note
+    assert "wt.% is inferred" in composition_basis_note
+    source_uncertainty = source_observation["uncertainty"]
+    assert source_uncertainty["note"].startswith(
+        "Errors are one standard deviation and do not include systematic errors, "
+        "e.g., in the standard state thermodynamic data."
+    )
+    assert source_uncertainty["locator"]["page"] == 13
+    assert source_uncertainty["locator"]["published_page"] == 163
+    assert source_uncertainty["locator"]["table"] == "7"
+
+    migrator = migrate_one_extract(ROOT, EXTRACT, index=None, aliases={})
+    migrator.finalize()
+    observations = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        and observation.identity.species.formula == "FeO"
+    ]
+
+    assert len(source_rows) == 19
+    assert len(observations) == 19
+    bands = []
+    for row, observation in zip(source_rows, observations, strict=True):
+        printed = row["gamma_as_printed"]
+        match = re.fullmatch(r"\s*\d+(?:\.(\d+))?\s+\((\d+)\)\s*", printed)
+        assert match is not None
+        digits = len(match.group(1) or "")
+        expected_sigma = Decimal(match.group(2)).scaleb(-digits)
+        assert observation.uncertainty.kind is UncertaintyKind.PRINTED
+        assert observation.uncertainty.verbatim["sigma"] == row["sigma"]
+        assert Decimal(observation.uncertainty.verbatim["sigma"]) == expected_sigma
+        assert observation.uncertainty.verbatim["confidence_level"] == "one_sigma"
+        assert observation.identity.temperature_K.value == Decimal("1673.15")
+        assert (
+            observation.point_conditions["temperature_K"].state.value
+            == Decimal("1673.15")
+        )
+        assert observation.point_conditions["temperature_K"].locator is not None
+        assert observation.point_conditions["composition"].state.is_value
+        assert observation.point_conditions["composition"].locator is not None
+        resolution = _printed_uncertainty_band(
+            observation.identity.quantity.value,
+            observation.uncertainty,
+            observation.value.point,
+            source_observation=observation,
+        )
+        assert resolution.refusal is None
+        assert resolution.band is not None
+        assert resolution.band.rule.startswith("printed_1sigma:")
+        bands.append(resolution.band.value)
+
+        old_units_observation = replace(
+            observation,
+            derivation=replace(
+                observation.derivation,
+                output_unit=(
+                    "dimensionless activity coefficient; "
+                    "Table 4 composition values interpreted as wt.%"
+                ),
+            ),
+        )
+        old_units = _printed_uncertainty_band(
+            old_units_observation.identity.quantity.value,
+            old_units_observation.uncertainty,
+            old_units_observation.value.point,
+            source_observation=old_units_observation,
+        )
+        assert old_units.band is None
+        assert old_units.refusal["reason"] == "printed_uncertainty_unit_unmapped"
+
+    assert len(bands) == 19
+    assert bands[:3] == [
+        Decimal("0.006877170700136778177155847580"),
+        Decimal("0.01462079132824429539788449331"),
+        Decimal("0.007325359695819540850617842192"),
+    ]
+
+
+def test_phase_parent_pressure_inference_survives_in_observation_provenance():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    source_parents = [
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row.get("type") == "equilibrium_phase_composition"
+    ]
+    assert len(source_parents) == 230
+    pressure_source = source_parents[0]["provenance"]["identity"]["total_pressure_Pa"]
+    assert pressure_source["state"] == {"tag": "value", "value": "101325"}
+    assert pressure_source["inference"]["relation"] == "extract_inference"
+    assert "inferred=true" in pressure_source["inference"]["inputs"]
+
+    migrator = migrate_one_extract(ROOT, EXTRACT, index=None, aliases={})
+    migrator.finalize()
+    parents = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == document["source_id"]
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(parents) == 230
+    for observation in parents:
+        assert observation.identity.total_pressure_Pa.value == Decimal("101325")
+        assert observation.provenance is not None
+        pressure = observation.provenance["identity"]["total_pressure_Pa"]
+        assert pressure["state"]["value"] == "101325"
+        assert pressure["inference"]["relation"] == "extract_inference"
+        assert "inferred=true" in pressure["inference"]["inputs"]
+
+
+def test_mo_fit_links_match_table5_and_pressure_locator_page():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+    for species in ("MoO2", "MoO3"):
+        observations = document["species"][species]["observations"]
+        fit = next(
+            row
+            for row in observations
+            if row["observation_id"] == f"oneill_2002_table7_{species.lower()}"
+        )
+        series = fit["values"]["series"]
+        assert {
+            row["melt"]: len(row["derived_from"])
+            for row in series
+        } == TABLE5_MO_COUNTS
+        row_inputs = [parent_id for row in series for parent_id in row["derived_from"]]
+        assert len(row_inputs) == len(set(row_inputs))
+        assert set(fit["derivation"]["inputs"]) == set(row_inputs)
+
+    phase_parents = [
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row.get("type") == "equilibrium_phase_composition"
+    ]
+    assert len(phase_parents) == 230
+    for parent in phase_parents:
+        locator = parent["values"]["point_conditions"]["total_pressure_Pa"]["locator"]
+        assert (locator["page"], locator["published_page"], locator["pdf_page_index"]) == (
+            156,
+            156,
+            5,
+        )
+        assert "oil trap (p. 156)" in locator["note"]
+        assert "oil trap (p. 156)" in parent["method_note"]
+        pressure_provenance = parent["provenance"]["identity"]["total_pressure_Pa"]
+        assert any(
+            "p. 156 oil-trap vent" in source
+            for source in pressure_provenance["inference"]["inputs"]
+        )

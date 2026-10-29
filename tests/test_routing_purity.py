@@ -123,3 +123,32 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     assert impurity >= 0.0
     total_deposited = condensed + route.wall_deposit_by_species.get("K", 0.0)
     assert route.remaining_by_species["K"] == pytest.approx(1.0 - total_deposited)
+
+
+def test_default_k_route_allocation_numeric_pin():
+    """Deterministic cb13f9f92 output pin, not a physics calibration target."""
+    model = CondensationModel(CondensationTrain.create_default())
+    assert tuple(stage_purity_report(model.train)) == (
+        'stage_0', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
+        'stage_3_sio_zone', 'stage_4_alkali_mg_cyclone',
+        'stage_5', 'stage_6', 'stage_7',
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={'K': 1.0},
+        stage_area_m2_by_stage={str(s.stage_number): 1.0 for s in model.train.stages},
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1650.0),
+    )
+    assert route.condensed_by_stage_species == {
+        4: {'K': 0.069231258147549},
+        5: {'K': 0.4481944627183763},
+        6: {'K': 0.0469400801551171},
+    }
+    assert route.remaining_by_species == {'K': 0.4356341989789576}
+    assert route.wall_deposit_by_species == {}
+    assert route.impurity_by_stage_species == {
+        5: {'K': 0.4481944627183763}, 6: {'K': 0.0469400801551171},
+    }

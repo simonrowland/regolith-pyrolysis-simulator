@@ -1,0 +1,113 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2022-k2o-al2o3-melts.yaml
+observations:
+- observation_id: shornikov-2022-k2o-al2o3-melts::k2o_2022_kalo2_tm_glushko
+  experiment_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666::shornikov-2022-k2o-al2o3-melts
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: KAlO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1986'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '10'
+      verbatim: 1986±10 K
+      confidence_level: not_stated
+      basis: One printed ±. The paper does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Glushko et al. (1982), the melting point the paper accepts.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2022-k2o-al2o3-melts::k2o_2022_kalo2_tm_glushko
+  source_id: shornikov-2022-k2o-al2o3-melts
+  locator:
+    page: 3
+    published_page: 72
+    pdf_page_index: 2
+    section: Introduction
+    note: The sentence accepts Glushko et al. (1982), 1986±10 K, against Roth (1980) and Moya et al. (1982).
+  read_from: pdf:shornikov-2022-k2o-al2o3-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1986'
+      locator:
+        page: 3
+        published_page: 72
+        pdf_page_index: 2
+        section: Introduction
+        note: The sentence accepts Glushko et al. (1982), 1986±10 K, against Roth (1980) and Moya et al. (1982).

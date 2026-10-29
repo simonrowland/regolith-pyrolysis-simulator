@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -92,7 +93,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -107,7 +108,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -130,6 +131,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_fe_pressure_series::T=1875.0:h=8e3d1c5ee1f8
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -144,6 +146,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -220,7 +223,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -235,7 +238,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -258,6 +261,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_fe_pressure_series::T=1900.0:h=5249ae8cbc4a
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -272,6 +276,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -348,7 +353,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -363,7 +368,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -386,6 +391,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_fe_pressure_series::T=2000.0:h=fb69471498a3
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -400,6 +406,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -476,7 +483,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -491,7 +498,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -514,6 +521,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_fe_pressure_series::T=2125.0:h=f00e1ae33fb7
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -528,6 +536,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -604,7 +613,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -619,7 +628,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -642,6 +651,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_fe_pressure_series::T=2250.0:h=6ff8172309d8
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -656,6 +666,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -732,7 +743,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -747,7 +758,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -770,6 +781,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_fe_pressure_series::T=2375.0:h=b4ca0fe7b56a
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -784,6 +796,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -860,7 +873,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -875,7 +888,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -898,6 +911,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_fe_pressure_series::T=2500.0:h=43e37cb69898
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -912,6 +926,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -988,7 +1003,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -1003,7 +1018,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -1026,6 +1041,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_k_pressure_series::T=1750.0:h=23173c7e734d
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -1040,6 +1056,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1116,7 +1133,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -1131,7 +1148,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -1154,6 +1171,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_k_pressure_series::T=1875.0:h=6f31e89c72b9
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -1168,6 +1186,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1244,7 +1263,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -1259,7 +1278,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -1282,6 +1301,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_k_pressure_series::T=1900.0:h=6763fce6e994
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -1296,6 +1316,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1372,7 +1393,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -1387,7 +1408,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -1410,6 +1431,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_k_pressure_series::T=2000.0:h=0b3a88437f39
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -1424,6 +1446,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1500,7 +1523,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -1515,7 +1538,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -1538,6 +1561,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_k_pressure_series::T=2125.0:h=34ef3c81999d
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -1552,6 +1576,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1628,7 +1653,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -1643,7 +1668,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -1666,6 +1691,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_k_pressure_series::T=2250.0:h=a9797208dfbe
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -1680,6 +1706,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1756,7 +1783,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -1771,7 +1798,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -1794,6 +1821,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_k_pressure_series::T=2375.0:h=ba0daabf11fe
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -1808,6 +1836,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1884,7 +1913,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -1899,7 +1928,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -1922,6 +1951,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_k_pressure_series::T=2500.0:h=dc335ab16f3b
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -1936,6 +1966,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2012,7 +2043,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -2027,7 +2058,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -2050,6 +2081,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_mg_pressure_series::T=1750.0:h=9fb9adeaa4fe
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -2064,6 +2096,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2140,7 +2173,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -2155,7 +2188,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -2178,6 +2211,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_mg_pressure_series::T=1875.0:h=d5e9f2549b1d
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -2192,6 +2226,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2268,7 +2303,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -2283,7 +2318,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -2306,6 +2341,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_mg_pressure_series::T=1900.0:h=bd1108c2d4f3
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -2320,6 +2356,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2396,7 +2433,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -2411,7 +2448,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -2434,6 +2471,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_mg_pressure_series::T=2000.0:h=e80dec3a847b
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -2448,6 +2486,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2524,7 +2563,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -2539,7 +2578,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -2562,6 +2601,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_mg_pressure_series::T=2125.0:h=0375dd0c93bd
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -2576,6 +2616,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2652,7 +2693,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -2667,7 +2708,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -2690,6 +2731,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_mg_pressure_series::T=2250.0:h=2fff862b9ae1
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -2704,6 +2746,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2780,7 +2823,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -2795,7 +2838,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -2818,6 +2861,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_mg_pressure_series::T=2375.0:h=1f2006c0ebd4
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -2832,6 +2876,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2908,7 +2953,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -2923,7 +2968,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -2946,6 +2991,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_mg_pressure_series::T=2500.0:h=bbe22fa123df
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -2960,6 +3006,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3036,7 +3083,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -3051,7 +3098,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -3074,6 +3121,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_na_pressure_series::T=1750.0:h=280166cb0637
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -3088,6 +3136,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3164,7 +3213,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -3179,7 +3228,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -3202,6 +3251,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_na_pressure_series::T=1875.0:h=ec5b57a79680
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -3216,6 +3266,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3292,7 +3343,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -3307,7 +3358,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -3330,6 +3381,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_na_pressure_series::T=1900.0:h=eb1dfc04cf2a
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -3344,6 +3396,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3420,7 +3473,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -3435,7 +3488,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -3458,6 +3511,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_na_pressure_series::T=2000.0:h=dc3e99976534
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -3472,6 +3526,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3548,7 +3603,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -3563,7 +3618,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -3586,6 +3641,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_na_pressure_series::T=2125.0:h=78b7d8ae6107
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -3600,6 +3656,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3676,7 +3733,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -3691,7 +3748,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -3714,6 +3771,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_na_pressure_series::T=2250.0:h=2e1f4216a348
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -3728,6 +3786,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3804,7 +3863,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -3819,7 +3878,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -3842,6 +3901,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_na_pressure_series::T=2375.0:h=c9bc56c8545e
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -3856,6 +3916,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3932,7 +3993,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -3947,7 +4008,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -3970,6 +4031,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_na_pressure_series::T=2500.0:h=ce2013d61009
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -3984,6 +4046,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4060,7 +4123,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -4075,7 +4138,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -4098,6 +4161,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o2_pressure_series::T=1750.0:h=90c602038b9c
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -4112,6 +4176,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4188,7 +4253,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -4203,7 +4268,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -4226,6 +4291,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o2_pressure_series::T=1875.0:h=191596d89244
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -4240,6 +4306,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4316,7 +4383,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -4331,7 +4398,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -4354,6 +4421,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o2_pressure_series::T=1900.0:h=608f101efb10
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -4368,6 +4436,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4444,7 +4513,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -4459,7 +4528,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -4482,6 +4551,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o2_pressure_series::T=2000.0:h=b5671de94120
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -4496,6 +4566,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4572,7 +4643,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -4587,7 +4658,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -4610,6 +4681,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o2_pressure_series::T=2125.0:h=8d7cb05666b2
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -4624,6 +4696,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4700,7 +4773,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -4715,7 +4788,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -4738,6 +4811,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o2_pressure_series::T=2250.0:h=73b179fbdffd
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -4752,6 +4826,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4828,7 +4903,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -4843,7 +4918,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -4866,6 +4941,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o2_pressure_series::T=2375.0:h=3d7f1279c846
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -4880,6 +4956,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4956,7 +5033,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -4971,7 +5048,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -4994,6 +5071,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o2_pressure_series::T=2500.0:h=d3754eb72a4f
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -5008,6 +5086,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5084,7 +5163,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -5099,7 +5178,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -5122,6 +5201,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o_pressure_series::T=1750.0:h=6ca2c0d0a515
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -5136,6 +5216,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5212,7 +5293,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -5227,7 +5308,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -5250,6 +5331,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o_pressure_series::T=1875.0:h=c763285a9e9a
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -5264,6 +5346,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5340,7 +5423,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -5355,7 +5438,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -5378,6 +5461,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o_pressure_series::T=1900.0:h=08dfaf73eace
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -5392,6 +5476,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5468,7 +5553,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -5483,7 +5568,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -5506,6 +5591,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o_pressure_series::T=2000.0:h=4c3eeb155c79
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -5520,6 +5606,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5596,7 +5683,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -5611,7 +5698,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -5634,6 +5721,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o_pressure_series::T=2125.0:h=4fd0272f5f51
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -5648,6 +5736,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5724,7 +5813,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -5739,7 +5828,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -5762,6 +5851,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o_pressure_series::T=2250.0:h=5f7f01e26258
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -5776,6 +5866,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5852,7 +5943,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -5867,7 +5958,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -5890,6 +5981,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o_pressure_series::T=2375.0:h=4851bce62b55
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -5904,6 +5996,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5980,7 +6073,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -5995,7 +6088,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -6018,6 +6111,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_o_pressure_series::T=2500.0:h=270e4e6b2e57
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -6032,6 +6126,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6108,7 +6203,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -6123,7 +6218,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -6146,6 +6241,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_sio_pressure_series::T=1750.0:h=8352281d4ea1
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -6160,6 +6256,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6236,7 +6333,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -6251,7 +6348,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -6274,6 +6371,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_sio_pressure_series::T=1875.0:h=3435acc39120
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -6288,6 +6386,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6364,7 +6463,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -6379,7 +6478,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -6402,6 +6501,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_sio_pressure_series::T=1900.0:h=b86d3dffcd9a
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -6416,6 +6516,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6492,7 +6593,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -6507,7 +6608,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -6530,6 +6631,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_sio_pressure_series::T=2000.0:h=6d51b0831aec
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -6544,6 +6646,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6620,7 +6723,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -6635,7 +6738,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -6658,6 +6761,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_sio_pressure_series::T=2125.0:h=6277c158f08e
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -6672,6 +6776,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6748,7 +6853,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -6763,7 +6868,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -6786,6 +6891,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_sio_pressure_series::T=2250.0:h=8968d1e964e1
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -6800,6 +6906,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6876,7 +6983,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -6891,7 +6998,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -6914,6 +7021,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_sio_pressure_series::T=2375.0:h=3b59d70848f3
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -6928,6 +7036,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7004,7 +7113,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -7019,7 +7128,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -7042,6 +7151,7 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []
 - observation_id: sf04-magma-companion-workbook::sf04_workbook_tho_sio_pressure_series::T=2500.0:h=71253dc3875f
   experiment_id: 10.1016/j.icarus.2003.08.023::experiment::sf04-tholeiite-workbook-grid
   identity:
@@ -7056,6 +7166,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7132,7 +7243,7 @@ observations:
     figure: 10a
     note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
     record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
-  read_from: pdf:sf04-magma-companion-workbook
+  read_from: unknown:sf04-magma-companion-workbook
   point_conditions:
     temperature_K:
       state:
@@ -7147,7 +7258,7 @@ observations:
   derivation:
     relation: bar_to_Pa
     inputs:
-    - pdf:sf04-magma-companion-workbook
+    - unknown:sf04-magma-companion-workbook
     parameters:
     - - original
       - state:
@@ -7170,3 +7281,4 @@ observations:
           note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
           record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
     output_unit: Pa
+    references: []

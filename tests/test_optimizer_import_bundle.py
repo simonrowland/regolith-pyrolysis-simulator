@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import csv
 import copy
 import hashlib
 import io
 import json
+import math
 from pathlib import Path
 import sqlite3
 import zipfile
@@ -233,13 +235,16 @@ def _sqlite_bytes(
                         ]
                     ),
                     json.dumps(
-                        {
-                            "delivered_stream_purity": {
-                                "feasible": True,
-                                "margin": 0.25,
-                                "observed": 0.98,
-                            }
-                        }
+                        record.get(
+                            "feasibility_margins",
+                            {
+                                "delivered_stream_purity": {
+                                    "feasible": True,
+                                    "margin": 0.25,
+                                    "observed": 0.98,
+                                }
+                            },
+                        )
                     ),
                     json.dumps(spec_payload),
                 ),
@@ -470,6 +475,104 @@ def test_import_accepts_current_schema_version_bundle(tmp_path: Path) -> None:
 
     assert imported.study_id == "study123"
     assert (imported.path / "study.profile.yaml").is_file()
+
+
+@pytest.mark.parametrize(
+    ("margin", "serialized"),
+    [(math.inf, "+inf"), (-math.inf, "-inf")],
+)
+def test_import_preserves_infinite_margins_and_confirms_identical_evaluation(
+    tmp_path: Path,
+    margin: float,
+    serialized: str,
+) -> None:
+    margins = {
+        "coating": {
+            "feasible": True,
+            "margin": serialized,
+            "observed": serialized,
+        }
+    }
+    bundle = _write_zip(
+        tmp_path / f"infinite-margin-{serialized}.rpstudy.zip",
+        _members(
+            tmp_path,
+            study_id=f"infinite-margin-{serialized}",
+            sqlite_rows=[
+                {
+                    "cache_key": "cache-a",
+                    "candidate_id": "candidate-a",
+                    "feasibility_margins": margins,
+                }
+            ],
+        ),
+    )
+
+    def evaluator(
+        patch,
+        feedstock_id,
+        fidelity,
+        *,
+        profile,
+        candidate_id=None,
+        schema=None,
+        cost_parameters=None,
+    ) -> ScoredResult:
+        scored = _scored(
+            oxygen=10.0,
+            candidate_id=candidate_id or "candidate-a",
+        )
+        return replace(
+            scored,
+            feasibility_margins={
+                "coating": GateMargin(
+                    gate="coating",
+                    feasible=True,
+                    margin=margin,
+                    threshold=ThresholdSpec(
+                        id="coating",
+                        value=1.0,
+                        units="campaigns",
+                        source="test",
+                        source_ref="infinite-margin import test",
+                    ),
+                    observed=margin,
+                    detail="infinite margin",
+                )
+            },
+        )
+
+    imported = import_study_bundle(
+        bundle,
+        tmp_path / "runs",
+        evaluator=evaluator,
+    )
+    overlay = json.loads(
+        (imported.path / import_bundle_module.IMPORT_OVERLAY_NAME).read_text(
+            encoding="utf-8"
+        )
+    )
+    candidate = overlay["verification"]["candidates"][0]
+
+    assert candidate["verdict"] == "confirmed"
+    assert candidate["local"]["margins"]["coating"]["margin"] == serialized
+    assert candidate["imported"]["margins"]["coating"]["margin"] == serialized
+
+
+@pytest.mark.parametrize(
+    ("serialized", "expected"), [("+inf", math.inf), ("-inf", -math.inf)]
+)
+def test_margin_mapping_preserves_signed_infinity(
+    serialized: str,
+    expected: float,
+) -> None:
+    margins = import_bundle_module._margin_mapping(
+        {"coating": {"feasible": True, "margin": serialized, "observed": serialized}}
+    )
+
+    assert margins["coating"]["margin"] == expected
+    assert margins["coating"]["observed"] == expected
+    assert import_bundle_module._optional_number(serialized) is None
 
 
 def test_t155_import_preserves_conditional_subspace_identity_in_cache(

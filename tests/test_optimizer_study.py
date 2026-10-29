@@ -622,13 +622,13 @@ def test_export_host_path_redaction_resists_encoding_and_case_bypass() -> None:
     from simulator.optimize.save_bundle import _sanitize_manifest_for_export
 
     redacted = {
-        "upper_uri": "FILE:///Users/simon/secret",
-        "mixed_uri": "File:/Users/simon/secret",
-        "encoded_uri": "file:%2FUsers%2Fsimon%2Fsecret",
-        "encoded_abs": "%2FUsers%2Fsimon%2Fsecret",
-        "double_encoded_abs": "%252FUsers%252Fsimon%252Fsecret%252Fseed.json",
-        "unicode_solidus": "／Users／simon／secret",
-        "plain_abs": "/Users/simon/secret",
+        "upper_uri": "FILE:///opt/probe/secret",
+        "mixed_uri": "File:/opt/probe/secret",
+        "encoded_uri": "file:%2Fopt%2Fprobe%2Fsecret",
+        "encoded_abs": "%2Fopt%2Fprobe%2Fsecret",
+        "double_encoded_abs": "%252Fopt%252Fprobe%252Fsecret%252Fseed.json",
+        "unicode_solidus": "／opt／probe／secret",
+        "plain_abs": "/opt/probe/secret",
         "win_drive": "C:\\Users\\simon\\secret\\seed.json",
         "win_drive_encoded": "C:%5CUsers%5Csimon%5Csecret",
         "backslash_root": "\\work\\prior\\pareto.json",
@@ -3269,6 +3269,23 @@ def test_optuna_partial_warm_start_is_admitted_in_search_provenance(
     )
 
 
+def test_optuna_warm_start_does_not_fix_default_outside_search_bounds() -> None:
+    from simulator.optimize.strategy.bayesian import _optuna_params_from_seed
+
+    schema = RecipeSchema()
+    seed = WarmStartSeed(
+        id="partial-c0-seed",
+        patch=RecipePatch({}),
+        proposal_source="seed_recipe",
+    )
+
+    params = _optuna_params_from_seed(seed, schema.search_allowlist, schema)
+
+    # C0's production default is 200 C/hr while this search dimension remains
+    # bounded at 10–100; this absent partial-seed value must be sampled normally.
+    assert "campaigns.C0.dT_dt_C_per_hr" not in params
+
+
 def test_evalspec_seed_identity_tracks_canonical_evalspec_fields() -> None:
     schema = RecipeSchema()
     patch = RecipePatch.from_nested(
@@ -4835,10 +4852,17 @@ def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_pa
 
 
 def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
+    profile = {
+        **PROFILE,
+        "constraints": {
+            "gates": ["delivered_stream_purity", "furnace_temperature"]
+        },
+    }
     schema = RecipeSchema()
     patch = RecipePatch({})
-    loose = PhysicsConstraintSet()
-    tight = PhysicsConstraintSet(
+    loose = physics_constraints_from_profile(profile)
+    tight = replace(
+        loose,
         furnace_T_max_C=ThresholdSpec(
             id="furnace_T_max_C",
             value=1300.0,
@@ -4851,7 +4875,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
         patch.validated(schema),
         FEEDSTOCK,
         "internal-analytical",
-        PROFILE,
+        profile,
         schema,
         constraints=loose,
     )
@@ -4859,7 +4883,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
         patch.validated(schema),
         FEEDSTOCK,
         "internal-analytical",
-        PROFILE,
+        profile,
         schema,
         constraints=tight,
     )
@@ -4897,8 +4921,240 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     candidate = study.Candidate(id="random-7-000000", patch=patch)
 
     assert cache_key(spec_tight) != cache_key(spec_loose)
-    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, loose)
-    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, tight) is None
+    assert study._lookup_cached(
+        candidate,
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        loose,
+    )
+    assert study._lookup_cached(
+        candidate,
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        tight,
+    ) is None
+
+
+def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
+    tmp_path: Path,
+) -> None:
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = "legacy-extraction-capture-probe"
+    profile["constraints"] = {
+        "gates": ["extraction_completeness"],
+        "target_species": ["SiO", "Fe", "Ca", "Al", "Mg", "Na"],
+        "extraction_min_fraction": 0.01,
+    }
+    schema = RecipeSchema()
+    patch = RecipePatch({})
+    constraints = physics_constraints_from_profile(profile)
+    spec, _ = _build_eval_inputs(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "internal-analytical",
+        profile,
+        schema,
+        constraints=constraints,
+    )
+    trace = {
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "backend_status": "diagnostic_stub",
+        "backend_authoritative": False,
+        "evidence_class": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "certification_allowed": False,
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
+    }
+    primary_captures = (
+        "product_ledger_kg",
+        "terminal_rump_by_species_kg",
+        "terminal_rump_by_class_kg",
+        "oxygen_terminal_partition_kg",
+        "condensation_totals_kg",
+        "extraction_completeness_by_target",
+    )
+    assert all(key not in trace for key in primary_captures)
+    bound_margin = constraints.extraction_completeness(SimpleNamespace(**trace))
+    assert not bound_margin.feasible
+    assert "trace missing product_ledger_kg" in bound_margin.detail
+
+    threshold = ThresholdSpec(
+        id="extraction_completeness_min",
+        value=0.01,
+        units="fraction",
+        source="profile",
+        source_ref="legacy-extraction-capture-probe",
+    )
+    old_margin = GateMargin(
+        gate="extraction_completeness",
+        feasible=True,
+        margin=0.02668332604274586,
+        threshold=threshold,
+        observed=0.03668332604274586,
+        detail="legacy completeness without current capture evidence",
+    )
+    scored = ScoredResult(
+        candidate_id="legacy-completeness-row",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
+                ObjectiveValue(
+                    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+                    "minimize",
+                    1.0,
+                    "kWh",
+                    ordinal=1,
+                ),
+            )
+        ),
+        feasibility_margins={"extraction_completeness": old_margin},
+        run_reference=_run_reference(
+            status="ok",
+            trace=trace,
+            product_summary={
+                "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                },
+            },
+            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            backend_status="diagnostic_stub",
+            backend_authoritative=False,
+            evidence_class=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            certification_allowed=False,
+        ),
+    )
+    store = ResultStore(tmp_path / "legacy-extraction-cache.sqlite")
+    store.store(spec, scored, created_at="legacy")
+
+    cached = study._lookup_cached(
+        Candidate("legacy-completeness-probe", patch),
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        constraints,
+    )
+
+    assert cached is None
+
+    product_ledger = {
+        "SiO": 0.001,
+        "Fe": 0.001,
+        "Ca": 0.001,
+        "Al": 0.001,
+        "Mg": 0.001,
+        "Na": 0.001,
+    }
+    terminal_rump = {
+        "SiO2": 1.0,
+        "FeO": 1.0,
+        "Ca": 1.0,
+        "Al": 1.0,
+        "MgO": 1.0,
+        "Na2O": 1.0,
+    }
+    valid_scored = replace(
+        scored,
+        run_reference=replace(
+            scored.run_reference,
+            trace={**trace, "terminal_rump_by_species_kg": terminal_rump},
+            product_summary={
+                **scored.run_reference.product_summary,
+                "product_ledger_kg": product_ledger,
+            },
+        ),
+    )
+    store.store(spec, study._strip_heavy_result(valid_scored), created_at="bound")
+    bound = constraints.extraction_completeness(
+        SimpleNamespace(
+            **{
+                **trace,
+                "product_ledger_kg": product_ledger,
+                "terminal_rump_by_species_kg": terminal_rump,
+            }
+        )
+    )
+    assert math.isfinite(bound.observed)
+    assert not bound.feasible
+
+    stored = store.lookup(spec)
+    assert stored is not None
+    assert (
+        stored.feasibility_margins["extraction_completeness"].observed
+        == scored.feasibility_margins["extraction_completeness"].observed
+    )
+    replayed = study._lookup_cached(
+        Candidate("legacy-completeness-probe", patch),
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        constraints,
+    )
+    assert replayed is None
+
+
+def test_aborted_artifacts_skip_unbound_extraction_cache_rows(
+    tmp_path: Path,
+) -> None:
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = "aborted-extraction-capture-probe"
+    profile["constraints"] = {
+        "gates": ["extraction_completeness"],
+        "target_species": ["SiO", "Fe", "Ca", "Al", "Mg", "Na"],
+        "extraction_min_fraction": 0.01,
+    }
+    constraints = physics_constraints_from_profile(profile)
+    schema = RecipeSchema()
+    patch = RecipePatch({}).validated(schema)
+    scored = _seed_safe_certified_evaluator(
+        patch,
+        FEEDSTOCK,
+        "internal-analytical",
+        profile=profile,
+        candidate_id="legacy-extraction-candidate",
+        constraints=constraints,
+    )
+    assert scored.feasible
+    assert not constraints.extraction_completeness(
+        SimpleNamespace(**scored.run_reference.trace)
+    ).feasible
+    out = tmp_path / "aborted-extraction-cache"
+    out.mkdir()
+    ResultStore(out / "cache.sqlite").store(
+        scored.eval_spec,
+        scored,
+        created_at="legacy",
+    )
+
+    study._write_empty_artifacts(
+        out,
+        profile=profile,
+        feedstock=FEEDSTOCK,
+        fidelity="internal-analytical",
+        definitions=study.objective_definitions(profile),
+        failure_counts={},
+        constraints=constraints,
+    )
+
+    summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
+    pareto = json.loads((out / "pareto.json").read_text(encoding="utf-8"))
+    leaderboard_rows = list(csv.DictReader((out / "leaderboard.csv").open()))
+    assert summary["evaluated"] == 0
+    assert pareto["pareto"] == []
+    assert leaderboard_rows == []
 
 
 def test_feasible_analytical_cache_hit_skips_evaluation_and_splits_keys(
@@ -5083,6 +5339,9 @@ def test_physics_policy_version_is_excluded_from_eval_cache_key(
         changed_version
     )
 
+    # PHYSICS_GATE_VERSION is a label. Green excludes it from the eval cache
+    # key; corpus_version is the cache lever. A version-string edit must not
+    # change physics_constraints_digest.
     assert current_digest == changed_digest
     assert current_cache_key == changed_cache_key
     assert current_recipe_id == changed_recipe_id
@@ -5319,28 +5578,75 @@ def test_all_infeasible_completes_with_no_feasible_winner(tmp_path) -> None:
 
 
 def test_stale_profile_refusal_flows_through_study_as_named_failure(tmp_path) -> None:
-    with pytest.raises(study.StudyNoFeasibleError, match="stale_profile"):
-        study.run(
-            _stale_melt_target_profile(),
-            FEEDSTOCK,
-            "random",
-            "internal-analytical",
-            1,
-            1,
-            tmp_path,
-            seed=7,
-        )
+    result = study.run(
+        _stale_melt_target_profile(),
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        1,
+        1,
+        tmp_path,
+        seed=7,
+    )
 
     pareto_payload = json.loads((tmp_path / "pareto.json").read_text())
     provenance = _read_provenance(tmp_path)
+    leaderboard = list(csv.DictReader((tmp_path / "leaderboard.csv").open()))
 
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
     assert pareto_payload["failure_counts"] == {"stale_profile": 1}
     assert provenance[0]["status"] == "stale_profile"
     assert provenance[0]["failure_category"] == "stale_profile"
+    assert leaderboard[0]["rank"] == "1"
+    assert leaderboard[0]["composition_target:stale-profile-target"] == ""
     assert "delivered_stream_purity" in provenance[0]["notes"][0]
     assert "residual_rump_at_stop" in provenance[0]["notes"][0]
     assert "FORCE_PROFILES=1" in provenance[0]["notes"][0]
     assert not (tmp_path / "winner.recipe.yaml").exists()
+
+
+def test_cli_stale_profile_file_runs_as_ranked_unavailable_candidate(tmp_path) -> None:
+    profile_path = tmp_path / "stale-melt-profile.yaml"
+    profile_path.write_text(
+        yaml.safe_dump(_stale_melt_target_profile()),
+        encoding="utf-8",
+    )
+    out_dir = tmp_path / "stale-profile-cli"
+
+    exit_code = optimizer_cli.main(
+        [
+            "--feedstock",
+            FEEDSTOCK,
+            "--profile",
+            str(profile_path),
+            "--strategy",
+            "random",
+            "--fidelity",
+            "internal-analytical",
+            "--budget",
+            "1",
+            "--out",
+            str(out_dir),
+            "--seed",
+            "7",
+        ]
+    )
+
+    assert exit_code == 0
+    status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
+    pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
+    leaderboard = list(csv.DictReader((out_dir / "leaderboard.csv").open()))
+    provenance = _read_provenance(out_dir)
+
+    assert status["status"] == "completed-no-feasible-winner"
+    assert status["success"] is True
+    assert pareto["failure_counts"] == {"stale_profile": 1}
+    assert len(leaderboard) == 1
+    assert leaderboard[0]["rank"] == "1"
+    assert leaderboard[0]["composition_target:stale-profile-target"] == ""
+    assert provenance[0]["failure_category"] == "stale_profile"
+    assert "FORCE_PROFILES=1" in provenance[0]["notes"][0]
 
 
 def test_all_out_of_domain_completes_no_feasible_and_logs_count(tmp_path) -> None:

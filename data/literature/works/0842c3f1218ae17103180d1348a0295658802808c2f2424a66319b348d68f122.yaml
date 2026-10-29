@@ -1,0 +1,1159 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  citation: Hastie, J. W., Bonnell, D. W., Plante, E. R. & Horton, W. S. (1980). Vaporization and Chemical Transport Under
+    Coal Gasification Conditions. NBSIR 80-2178 (DoE), National Bureau of Standards, December 1980.
+  source_ids:
+  - kems-214-hastie-1980-nbsir-80-2178
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:kems-214-hastie-1980-nbsir-80-2178
+      role: pdf
+      path: raw/kems-214-hastie-1980-nbsir-80-2178/kems-214-hastie-1980-nbsir-80-2178.pdf
+      sha256:
+        tag: value
+        value: b8d286533fefd87b82376add0c38f53e82d7a48d20260aad15c02bc45c146a43
+    - asset_id: pdftotext:kems-214-hastie-1980-nbsir-80-2178
+      role: pdftotext
+      path: text/kems-214-hastie-1980-nbsir-80-2178
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kems-214-hastie-1980-nbsir-80-2178
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122::kems-214-hastie-1980-nbsir-80-2178
+  kind: literature
+  method:
+    tag: value
+    value: transpiration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  locator:
+    page: 99
+    published_page: 13
+    pdf_page_index: 98
+    note: Section 2.2.2; typical TMS data point
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+context:
+- observation_id: hastie_1980_appb_fig1_transpiration_mass_spectrometer_schematic
+  type: figure_record
+  locator:
+    page: 113
+    pdf_page_index: 112
+    figure: '1'
+  phase: transpiration mass spectrometer
+  units: schematic; no numeric data
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - Mg
+    - MgOH
+    - K
+    - Na
+    phase: transpiration mass spectrometer
+    temperature_as_printed: not stated
+    axes_as_printed:
+      x: none; schematic
+      y: none
+    caption_as_printed: Schematic of transpiration mass spectrometer system.
+    panel: whole figure
+    series:
+    - name: instrument components
+      marker: schematic
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    schema_gap: No quantitative species token fits an apparatus schematic; candidate p_partial and ion_intensity do not apply.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig1_transpiration_mass_spectrometer_schematic
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: Mg
+- observation_id: hastie_1980_appb_fig2_H2O_equilibrium_test
+  type: figure_record
+  locator:
+    page: 114
+    pdf_page_index: 113
+    figure: '2'
+  phase: gas over MgO(s)
+  units: dimensionless axes
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - H2O
+    - H2
+    - O2
+    phase: gas over MgO(s)
+    temperature_as_printed: 2050
+    axes_as_printed:
+      x: log apparent H2 pressure (atm)
+      y: log apparent equilibrium constant
+    caption_as_printed: Mass-action test for equilibrium in H2O = H2 + 1/2 O2 over MgO(s) at 2050 K. Data at 20 eV; dashed
+      line from JANAF [14].
+    panel: whole figure
+    series:
+    - name: present-work data
+      marker: open circles with error bars
+      marker_count: 5
+      evidence_class: measured_reduced
+    - name: JANAF [14]
+      marker: dashed line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    attribution: Present-work measurements; JANAF [14] comparison
+    digitisation: deferred to a figure pass
+    schema_gap: No generic equilibrium-constant token fits this apparent Kp plot; candidate log10_Kf and log10_K_star do not
+      fit the printed reaction constant.
+  T_K: 2050
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig2_H2O_equilibrium_test
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: Mg
+- observation_id: hastie_1980_appb_fig3_MgOH_equilibrium_constant
+  type: figure_record
+  locator:
+    page: 115
+    pdf_page_index: 114
+    figure: '3'
+  phase: gas over MgO(s)
+  units: dimensionless axes; kcal/mol annotations
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - MgOH
+    - Mg
+    - H2O
+    - O2
+    phase: gas over MgO(s)
+    temperature_as_printed: temperature axis 1923–2170 K
+    axes_as_printed:
+      x: 10^4/T (K)
+      top_x: temperature (K)
+      y: Kp for reaction (3), logarithmic
+    caption_as_printed: Variation of the equilibrium constant with temperature for Mg + 1/2 H2O + 1/4 O2 = MgOH. Data at 20
+      eV. Solid curve through data from third-law analysis; dashed curves from JANAF [14] estimates. Figure annotations are
+      reaction enthalpies in kcal/mol.
+    panel: whole figure
+    series:
+    - name: present-work measurements
+      marker: open circles
+      marker_count: 11
+      evidence_class: measured_reduced
+    - name: authors' third-law curve
+      marker: solid line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: JANAF [14] estimates
+      marker: dashed lines
+      marker_count: 0
+      evidence_class: quoted_attributed
+    attribution: Present-work measurements; third-law and JANAF comparisons
+    digitisation: deferred to a figure pass
+    enthalpy_annotations_as_printed: ΔH_T = −58.1, −44.4, −51.1 (second law), and −40.8 (third law) kcal/mol; reaction (3),
+      not ΔfH.
+    schema_gap: No generic equilibrium-constant token fits the printed Kp; candidate log10_Kf and log10_K_star do not fit
+      the printed reaction constant.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig3_MgOH_equilibrium_constant
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: MgOH
+- observation_id: hastie_1980_appb_fig4_K1_mass_spectrum
+  type: figure_record
+  locator:
+    page: 116
+    pdf_page_index: 115
+    figure: '4'
+  phase: K-enriched Illinois No. 6 coal slag K1
+  units: mV and atm axes
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - H2O
+    - Na
+    - N2
+    - O2
+    - K
+    - H2S
+    - CO2
+    - SO2
+    - KO
+    - KOH
+    - SiS
+    - SiSH
+    - KS
+    - KSiO
+    phase: K-enriched Illinois No. 6 coal slag K1
+    temperature_as_printed: 1428
+    axes_as_printed:
+      x: molecular weight (amu)
+      left_y: ion intensity (mV)
+      right_y: approximate partial pressure × 10^5 (atm)
+    caption_as_printed: Typical 30 eV mass spectrum of species evolved from K-enriched Illinois No. 6 coal slag K1 during
+      initial heating at 1428 K (run 1), TMS with capillary probe; approximately 1 g sample, N2 pressure 0.5 atm and flow
+      about 25 SCCM. Approximate partial pressures are shown using the printed sensitivity relation.
+    panel: whole figure
+    series:
+    - name: TMS mass-spectrum trace and labeled species
+      marker: vertical spectral peaks
+      marker_count: 0
+      evidence_class: measured_reduced
+    attribution: This work; possible assignments are marked tentative in the caption
+    digitisation: deferred to a figure pass
+    sample_id: K1
+    method_as_printed: P_i = k_i I_i T; plotted pressure scale is approximate.
+  T_K: 1428
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig4_K1_mass_spectrum
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_appb_fig5_initial_volatiles
+  type: figure_record
+  locator:
+    page: 117
+    pdf_page_index: 116
+    figure: '5'
+  phase: K-enriched Illinois No. 6 coal slag K1
+  units: mV and atm axes
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - H2O
+    - CO2
+    - SO2
+    - K
+    - Na
+    - K2CO3
+    - KAlO2
+    phase: K-enriched Illinois No. 6 coal slag K1
+    temperature_as_printed: temperature axis 1250–1620 K
+    axes_as_printed:
+      x: 10^4/T (K)
+      top_x: temperature (K)
+      left_y: ion intensity (mV)
+      right_y: pressure × 10^5 (atm)
+    caption_as_printed: Ion-intensity and partial-pressure variation of initial volatiles (K2O 19.5–19.1 wt%) with temperature
+      for slag with melting point about 1700 ± 30 K (run 1), TMS; 0.5 atm N2, capillary probe. Literature K2CO3(l) and KAlO2(s)
+      curves are shown for comparison.
+    panel: whole figure
+    series:
+    - name: H2O
+      marker: continuous curve
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: CO2
+      marker: continuous curve
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: SO2
+      marker: continuous curve
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: K × 2.6 pressure scale
+      marker: continuous curve
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: Na × 1.5 pressure scale
+      marker: continuous curve
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: K2CO3(l)
+      marker: literature curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: KAlO2(s)
+      marker: literature curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    attribution: This work; K2CO3 and KAlO2 comparison curves are literature data
+    digitisation: deferred to a figure pass
+    sample_id: K1
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig5_initial_volatiles
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_appb_fig6_K_pressure_temperature
+  type: figure_record
+  locator:
+    page: 118
+    pdf_page_index: 117
+    figure: '6'
+  phase: K-enriched Illinois No. 6 coal slag K1
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - K
+    phase: K-enriched Illinois No. 6 coal slag K1
+    temperature_as_printed: temperature axis 1250–1650 K
+    axes_as_printed:
+      x: 10^4/T (K)
+      top_x: temperature (K)
+      y: K pressure (atm), logarithmic
+    caption_as_printed: K partial pressure versus temperature for K2O contents 19.1–17.8 wt% (run 1, KMS), 18.17–18.07 wt%
+      (run 2, TMS), and 18.07–18.0 wt% (run 3, IMS/TMS). Literature pressure curves for K2SO4(l), K2CO3(l), KAlO2(s), and
+      K2O·9Al2O3−Al2O3(s) are comparisons; arrows show run 3 chronology.
+    panel: whole figure
+    series:
+    - name: run 1, KMS, 19.1–17.8 wt% K2O
+      marker: open circles
+      marker_count: 11
+      evidence_class: measured_reduced
+    - name: run 2, TMS, 18.17–18.07 wt% K2O
+      marker: open squares
+      marker_count: 7
+      evidence_class: measured_reduced
+    - name: run 3, IMS/TMS, 18.07–18.0 wt% K2O
+      marker: open squares
+      marker_count: 8
+      evidence_class: measured_reduced
+    - name: K2SO4(l)
+      marker: dashed literature curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: K2CO3(l)
+      marker: dashed literature curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: KAlO2(s)
+      marker: dashed literature curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: K2O·9Al2O3−Al2O3(s)
+      marker: dashed literature curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    attribution: This work for runs; literature attribution as stated in the caption
+    digitisation: deferred to a figure pass
+    sample_id: K1
+    standard_state_as_printed: K partial pressure; literature comparison curves are separately attributed.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig6_K_pressure_temperature
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_appb_fig7_K2O_activity_coefficient
+  type: figure_record
+  locator:
+    page: 119
+    pdf_page_index: 118
+    figure: '7'
+  phase: K-enriched Illinois No. 6 coal slag K1
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: figure_only
+    species:
+    - K2O
+    phase: K-enriched Illinois No. 6 coal slag K1
+    temperature_as_printed: temperature axis 1200–1900 K
+    axes_as_printed:
+      x: 10^4/T (K)
+      top_x: temperature (K)
+      y: K2O activity coefficient, logarithmic; labels give remaining K2O mole fraction
+    caption_as_printed: KMS variation of the apparent K2O activity coefficient with temperature and composition for slag.
+      Labels 0.08–0.154 are K2O mole fraction remaining; runs 1–3 were consecutive on one sample.
+    panel: whole figure
+    series:
+    - name: run 1
+      marker: open circles
+      marker_count: 10
+      evidence_class: measured_reduced
+    - name: run 2
+      marker: triangles
+      marker_count: 11
+      evidence_class: measured_reduced
+    - name: run 3
+      marker: open circles
+      marker_count: 10
+      evidence_class: measured_reduced
+    attribution: This work; pure-K2O reference data from [14] and Natola and Touzain (1970)
+    digitisation: deferred to a figure pass
+    sample_id: K1
+    composition_as_printed: remaining K2O mole fractions labeled 0.08–0.154; individual composition values are not digitised.
+    standard_state_as_printed: pure K2O reference; the phase is inferred from the reference temperature range and K2O phase
+      equilibrium.
+    standard_state:
+      phase: liquid
+      inferred: true
+      basis: Pure K2O melts at 919 K (Natola and Touzain, 1970, DOI 10.1139/v70-324); the plotted reference data span 1200–1900
+        K, so the stable reference phase is liquid throughout.
+      transition_notice: The plotted range begins 281 K above the fusion point, outside the approximately 100 K transition
+        notice range.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig7_K2O_activity_coefficient
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K2O
+- observation_id: hastie_1980_appb_fig8_K_pressure_vs_temperature_with_water
+  type: figure_record
+  locator:
+    page: 120
+    pdf_page_index: 119
+    figure: '8'
+  phase: K-enriched Illinois No. 6 coal slag K1
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - K
+    phase: K-enriched Illinois No. 6 coal slag K1
+    temperature_as_printed: temperature axis 1538–1695 K
+    axes_as_printed:
+      x: 10^4/T (K)
+      top_x: temperature (K)
+      y: K pressure × 10^5 (atm), logarithmic
+    caption_as_printed: K-pressure dependence on temperature in H2O about 3 × 10^-2 atm and N2 at 0.5 atm, TMS with capillary
+      probe.
+    panel: whole figure
+    series:
+    - name: K pressure
+      marker: open circles
+      marker_count: 7
+      evidence_class: measured_reduced
+    attribution: This work
+    digitisation: deferred to a figure pass
+    sample_id: K1
+    H2O_pressure_as_printed: about 3 × 10^-2 atm
+    N2_pressure_atm_as_printed: '0.5'
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig8_K_pressure_vs_temperature_with_water
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_appb_fig9_K_pressure_vs_water_pressure
+  type: figure_record
+  locator:
+    page: 121
+    pdf_page_index: 120
+    figure: '9'
+  phase: K-enriched Illinois No. 6 coal slag K1
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - K
+    phase: K-enriched Illinois No. 6 coal slag K1
+    temperature_as_printed: 1673
+    axes_as_printed:
+      x: H2O pressure (atm), logarithmic
+      y: K pressure × 10^5 (atm), logarithmic
+    caption_as_printed: K-pressure dependence on H2O content in N2 at 0.35 atm and 1673 K, TMS with capillary probe. Dashed
+      slope 0.5 is the theoretical equilibrium dependence for reaction (8).
+    panel: whole figure
+    series:
+    - name: K pressure
+      marker: open circles
+      marker_count: 6
+      evidence_class: measured_reduced
+    - name: reaction (8) slope 0.5
+      marker: dashed line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: This work; theoretical line is reaction (8)
+    digitisation: deferred to a figure pass
+    sample_id: K1
+    N2_pressure_atm_as_printed: '0.35'
+  T_K: 1673
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_fig9_K_pressure_vs_water_pressure
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_appb_table1_KMS_TMS_calibration
+  type: calibration_table
+  locator:
+    page: 105
+    pdf_page_index: 104
+    published_page: 19
+    table: '1'
+  units: relative ionization cross section and sensitivity factors
+  values:
+    quantity: unavailable
+    method_class: measured_direct
+    candidate_tokens:
+    - ion_intensity
+    - partial_pressure
+    schema_gap: No store token types ionization cross sections or sensitivity factors; neither candidate token fits the printed
+      calibration constants.
+    rows_as_printed:
+    - species: N2
+      KMS_sigma: —
+      KMS_S: —
+      TMS_sigma: '1.48'
+      TMS_S: '1.0'
+    - species: O2
+      KMS_sigma: '2.62'
+      KMS_S: '0.177'
+      TMS_sigma: '1.26'
+      TMS_S: '1.3'
+    - species: H2O
+      KMS_sigma: '1.73'
+      KMS_S: '0.236'
+      TMS_sigma: '1.5'
+      TMS_S: '0.8'
+    - species: Mg
+      KMS_sigma: '3.44'
+      KMS_S: '0.204'
+      TMS_sigma: —
+      TMS_S: —
+    - species: MgOH
+      KMS_sigma: '4.98'
+      KMS_S: '0.156'
+      TMS_sigma: —
+      TMS_S: —
+    - species: K
+      KMS_sigma: —
+      KMS_S: —
+      TMS_sigma: '7.8'
+      TMS_S: '1.3'
+    - species: Na
+      KMS_sigma: —
+      KMS_S: —
+      TMS_sigma: '4.5'
+      TMS_S: '1.0'
+    notes_as_printed:
+    - Mg cross section from J. B. Mann, J. Chem. Phys. 46, 1646 (1967).
+    - H2O, O2, and MgOH cross sections estimated with 30 percent uncertainty.
+    - KMS O2 partial pressures are obtained through relationships (1) and (2); no cross section or sensitivity data were required
+      for K and O2.
+    - TMS sigma and S values measured directly as described in reference [16].
+    - K and Na TMS cross sections are cited to Kieffer and Dunn, Rev. Mod. Phys. 38, 1 (1966).
+  note: This table is instrument calibration, not an observation table; its values are retained as method context.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_table1_KMS_TMS_calibration
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: Mg
+- observation_id: hastie_1980_appb_table2_KMS_reduction_inputs
+  type: calibration_inputs
+  locator:
+    page: 106
+    pdf_page_index: 105
+    published_page: 20
+    table: '2'
+  units: as printed
+  values:
+    quantity: unavailable
+    method_class: measured_reduced
+    candidate_tokens:
+    - ion_intensity
+    - partial_pressure
+    schema_gap: A_i and k_i are reduction factors without a token; the printed I_i·T inputs are method evidence. The four
+      pressure cells are typed once from Table 3 and linked here as a second locator.
+    system_as_printed: Typical reaction (3) data at 2029 K
+    rows_as_printed:
+    - ion: Mg+
+      A_i: '0.78'
+      k_i_atm_per_uV_K: '3.16e-12'
+      I_i_times_T_uV_K: 2.19e6
+    - ion: O2+
+      A_i: '1.0'
+      k_i_atm_per_uV_K: '3.73e-12'
+      I_i_times_T_uV_K: 2.86e5
+    - ion: H2O+
+      A_i: '1.0'
+      k_i_atm_per_uV_K: '4.05e-12'
+      I_i_times_T_uV_K: 4.02e5
+    - ion: MgOH+
+      A_i: '0.78'
+      k_i_atm_per_uV_K: '2.85e-12'
+      I_i_times_T_uV_K: 1.58e3
+    pressure_values_are_single_observations_in: Table 3 at 2029 K (d-068).
+    calibration_note_as_printed: Values of sigma_i and S_i used to derive k_i are given in Table 1.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_table2_KMS_reduction_inputs
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: Mg
+- observation_id: hastie_1980_appb_table3_Kp_and_reaction_enthalpy
+  type: typed_refusal
+  locator:
+    page: 107
+    pdf_page_index: 106
+    published_page: 21
+    table: '3'
+  units: Kp dimensionless; reaction enthalpy cal/mol
+  values:
+    quantity: unavailable
+    candidate_tokens:
+    - log10_Kf
+    - delta_fH
+    schema_gap: No generic reaction-Kp or reaction-enthalpy token fits these printed columns; log10_Kf and delta_fH do not
+      fit Kp or reaction (3) enthalpy.
+    method_class: model_derived
+    reaction_as_printed: Mg + 1/2 H2O + 1/4 O2 = MgOH
+    rows_as_printed:
+    - T_K: 2077
+      Kp: '11.3'
+      delta_H298_cal_per_mol_as_printed: '-42306'
+    - T_K: 2077
+      Kp: '11.0'
+      delta_H298_cal_per_mol_as_printed: '-42195'
+    - T_K: 2022
+      Kp: '14.4'
+      delta_H298_cal_per_mol_as_printed: '-42194'
+    - T_K: 2022
+      Kp: '12.5'
+      delta_H298_cal_per_mol_as_printed: '-41625'
+    - T_K: 2029
+      Kp: '15.8'
+      delta_H298_cal_per_mol_as_printed: '-42710'
+    - T_K: 2054
+      Kp: '14.4'
+      delta_H298_cal_per_mol_as_printed: '-42841'
+    - T_K: 2054
+      Kp: '13.6'
+      delta_H298_cal_per_mol_as_printed: '-42608'
+    - T_K: 2054
+      Kp: '13.8'
+      delta_H298_cal_per_mol_as_printed: '-42668'
+    - T_K: 2054
+      Kp: '12.3'
+      delta_H298_cal_per_mol_as_printed: '-42198'
+    - T_K: 2054
+      Kp: '12.3'
+      delta_H298_cal_per_mol_as_printed: '-42198'
+    - T_K: 2107
+      Kp: '8.73'
+      delta_H298_cal_per_mol_as_printed: '-41817'
+    - T_K: 2107
+      Kp: '10.8'
+      delta_H298_cal_per_mol_as_printed: '-42708'
+    - T_K: 2098
+      Kp: '8.67'
+      delta_H298_cal_per_mol_as_printed: '-41615'
+    - T_K: 2167
+      Kp: '6.28'
+      delta_H298_cal_per_mol_as_printed: '-41550'
+    - T_K: 2167
+      Kp: '6.34'
+      delta_H298_cal_per_mol_as_printed: '-41591'
+    average_delta_H298_cal_per_mol_as_printed: '-42188'
+    equation_note: The table derives delta_H298 from thermodynamic functions and Kp; these are not delta_fH values.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_table3_Kp_and_reaction_enthalpy
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: MgOH
+- observation_id: hastie_1980_appb_table3_MgOH_pressure_unreadable_row3
+  type: typed_refusal
+  locator:
+    page: 107
+    pdf_page_index: 106
+    published_page: 21
+    table: '3'
+    row: '3'
+    note: 600 dpi render checked; exponent remains unreadable in the source scan
+  units: atm
+  values:
+    quantity: partial_pressure
+    candidate_tokens:
+    - partial_pressure
+    method_class: measured_reduced
+    species: MgOH
+    temperature_K_as_printed: 2022
+    pressure_as_printed: 3.34- [
+    unavailable_reason: The exponent glyph is not recoverable from the 600 dpi page render; no value inferred.
+    oxygen_partial_pressure_as_printed_at_same_row_atm: '9.73e-7'
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_table3_MgOH_pressure_unreadable_row3
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: MgOH
+- observation_id: hastie_1980_appb_table3_MgOH_pressure_unreadable_row4
+  type: typed_refusal
+  locator:
+    page: 107
+    pdf_page_index: 106
+    published_page: 21
+    table: '3'
+    row: '4'
+    note: 600 dpi render checked; exponent remains unreadable in the source scan
+  units: atm
+  values:
+    quantity: partial_pressure
+    candidate_tokens:
+    - partial_pressure
+    method_class: measured_reduced
+    species: MgOH
+    temperature_K_as_printed: 2022
+    pressure_as_printed: 1.09- [
+    unavailable_reason: The exponent glyph is not recoverable from the 600 dpi page render; no value inferred.
+    oxygen_partial_pressure_as_printed_at_same_row_atm: '1.19e-6'
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_table3_MgOH_pressure_unreadable_row4
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: MgOH
+- observation_id: hastie_1980_appb_table3_MgOH_pressure_unreadable_row6
+  type: typed_refusal
+  locator:
+    page: 107
+    pdf_page_index: 106
+    published_page: 21
+    table: '3'
+    row: '6'
+    note: 600 dpi render checked; exponent remains unreadable in the source scan
+  units: atm
+  values:
+    quantity: partial_pressure
+    candidate_tokens:
+    - partial_pressure
+    method_class: measured_reduced
+    species: MgOH
+    temperature_K_as_printed: 2054
+    pressure_as_printed: 6.16- [
+    unavailable_reason: The exponent glyph is not recoverable from the 600 dpi page render; no value inferred.
+    oxygen_partial_pressure_as_printed_at_same_row_atm: '1.75e-6'
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_appb_table3_MgOH_pressure_unreadable_row6
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: MgOH
+- observation_id: hastie_1980_main_fig1_transpiration_reactor_photo
+  type: figure_record
+  locator:
+    page: 23
+    pdf_page_index: 22
+    figure: '1'
+  phase: transpiration mass-spectrometry apparatus
+  units: photograph; no numeric data
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - K
+    - Na
+    - O2
+    phase: transpiration mass-spectrometry apparatus
+    temperature_as_printed: not stated
+    axes_as_printed:
+      x: none; photograph
+      y: none
+    caption_as_printed: Photo of disassembled transpiration reactor showing the thermocouple, sample boat, and capillary tube
+      with beam-sampling nozzles attached.
+    panel: whole figure
+    series:
+    - name: reactor and sampling components
+      marker: photograph
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    schema_gap: No quantitative species or apparatus geometry token fits this photograph; candidate p_partial and ion_intensity
+      do not apply.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_fig1_transpiration_reactor_photo
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_fig2_K_O2_vs_temperature
+  type: figure_record
+  locator:
+    page: 25
+    pdf_page_index: 24
+    figure: '2'
+  phase: K2 slag
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - K
+    - O2
+    phase: K2 slag
+    temperature_as_printed: temperature axis 1333–1818 K
+    axes_as_printed:
+      x: 10^4/T (K)
+      top_x: Temperature (K)
+      y: partial pressure (atm), logarithmic
+    caption_as_printed: Vaporization of K and O2 from the K2 slag, expressed as log P versus 1/T plots. Open circles are O2
+      (KMS), closed circles O2 (TMS), open triangles K (KMS), and closed triangles K (TMS); arrows mark decreasing-temperature
+      points.
+    panel: whole figure
+    series:
+    - name: O2, KMS
+      marker: open circles
+      marker_count: 15
+      evidence_class: measured_reduced
+    - name: O2, TMS
+      marker: closed circles
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: K, KMS
+      marker: open triangles
+      marker_count: 29
+      evidence_class: measured_reduced
+    - name: K, TMS
+      marker: closed triangles
+      marker_count: 25
+      evidence_class: measured_reduced
+    attribution: This work; K2 slag
+    digitisation: deferred to a figure pass
+    sample_id: K2
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_fig2_K_O2_vs_temperature
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_fig3_K_pressure_vs_water
+  type: figure_record
+  locator:
+    page: 26
+    pdf_page_index: 25
+    figure: '3'
+  phase: K2 slag
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - K
+    phase: K2 slag
+    temperature_as_printed: 1610
+    axes_as_printed:
+      x: H2O pressure (atm)
+      y: K pressure (atm), logarithmic
+    caption_as_printed: Dependence of K pressure on H2O pressure at constant temperature for the K2 slag (TMS data); the curve
+      of slope 0.5 is the theoretical pressure dependence for reaction (6).
+    panel: whole figure
+    series:
+    - name: K pressure, TMS
+      marker: open circles with error bars
+      marker_count: 6
+      evidence_class: measured_reduced
+    - name: reaction (6) slope 0.5
+      marker: theoretical line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: This work; theoretical line is reaction (6)
+    digitisation: deferred to a figure pass
+    sample_id: K2
+    N2_pressure_atm_as_printed: '0.21'
+  T_K: 1610
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_fig3_K_pressure_vs_water
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_fig4_KOH_pressure_vs_water
+  type: figure_record
+  locator:
+    page: 27
+    pdf_page_index: 26
+    figure: '4'
+  phase: K2 slag
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - KOH
+    - K
+    phase: K2 slag
+    temperature_as_printed: 1794
+    axes_as_printed:
+      x: apparent H2O pressure (atm)
+      y: pressure (atm), logarithmic
+    caption_as_printed: Dependence of KOH pressure on H2O apparent pressure at constant temperature for the K2 slag (KMS data);
+      the 0.5-slope curve represents the theoretical pressure dependence for a process analogous to reaction (4).
+    panel: whole figure
+    series:
+    - name: KOH
+      marker: open circles
+      marker_count: 4
+      evidence_class: measured_reduced
+    - name: K divided by 100
+      marker: open triangle
+      marker_count: 1
+      evidence_class: measured_reduced
+    - name: analogy to reaction (4), slope 0.5
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: This work; theoretical comparison is reaction (4)
+    digitisation: deferred to a figure pass
+    sample_id: K2
+  T_K: 1794
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_fig4_KOH_pressure_vs_water
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_fig5_gas_response_to_added_hydrogen
+  type: figure_record
+  locator:
+    page: 28
+    pdf_page_index: 27
+    figure: '5'
+  phase: K2 slag
+  units: atm and mV as plotted
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - O2
+    - H2O
+    - H2
+    phase: K2 slag
+    temperature_as_printed: 1655
+    axes_as_printed:
+      x: applied H2 pressure (10^2 atm)
+      left_y: H2O and O2 pressure
+      right_y: H2 ion intensity (mV)
+    caption_as_printed: 'Response of the K2 slag system to added H2, showing conversion of slag O2 to H2O. Conditions: 1655
+      K, N2 carrier-gas pressure 0.18 atm, capillary nozzle.'
+    panel: whole figure
+    series:
+    - name: H2O pressure
+      marker: open circles
+      marker_count: 6
+      evidence_class: measured_reduced
+    - name: O2 pressure
+      marker: open triangles
+      marker_count: 7
+      evidence_class: measured_reduced
+    - name: H2 ion intensity
+      marker: open squares
+      marker_count: 5
+      evidence_class: measured_direct
+    attribution: This work
+    digitisation: deferred to a figure pass
+    sample_id: K2
+  T_K: 1655
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_fig5_gas_response_to_added_hydrogen
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_fig6_K_O2_vs_water_in_hydrogen
+  type: figure_record
+  locator:
+    page: 29
+    pdf_page_index: 28
+    figure: '6'
+  phase: K2 slag
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - K
+    - O2
+    phase: K2 slag
+    temperature_as_printed: 1655
+    axes_as_printed:
+      x: H2O pressure (atm)
+      left_y: K pressure (atm)
+      right_y: O2 pressure (atm)
+    caption_as_printed: 'K pressure (open symbols) and O2 pressure (closed symbols) with H2O pressure for K2 slag in the presence
+      of added H2. Conditions: 1655 K, N2 carrier-gas pressure 0.18 atm, capillary nozzle.'
+    panel: whole figure
+    series:
+    - name: K pressure
+      marker: open circles
+      marker_count: 7
+      evidence_class: measured_reduced
+    - name: O2 pressure
+      marker: closed circles
+      marker_count: 6
+      evidence_class: measured_reduced
+    attribution: This work
+    digitisation: deferred to a figure pass
+    sample_id: K2
+  T_K: 1655
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_fig6_K_O2_vs_water_in_hydrogen
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_fig7_K_intensity_burst_vs_time
+  type: figure_record
+  locator:
+    page: 30
+    pdf_page_index: 29
+    figure: '7'
+  phase: K2 slag
+  units: μV
+  values:
+    quantity: ion_intensity
+    method_class: figure_only
+    species:
+    - K
+    phase: K2 slag
+    temperature_as_printed: 1500
+    axes_as_printed:
+      x: time (minutes)
+      y: K+ ion intensity (μV)
+    caption_as_printed: 'K-species pressure-burst phenomenon, expressed as K+ ion intensity versus time for K2 slag. Conditions:
+      1500 K, N2 carrier-gas pressure 0.21 atm, capillary nozzle.'
+    panel: whole figure
+    series:
+    - name: K+ ion-intensity burst
+      marker: open circles
+      marker_count: 22
+      evidence_class: measured_direct
+    attribution: This work
+    digitisation: deferred to a figure pass
+    sample_id: K2
+  T_K: 1500
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_fig7_K_intensity_burst_vs_time
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_fig8_K_intensity_decay_vs_time
+  type: figure_record
+  locator:
+    page: 31
+    pdf_page_index: 30
+    figure: '8'
+  phase: K2 slag
+  units: μV
+  values:
+    quantity: ion_intensity
+    method_class: figure_only
+    species:
+    - K
+    phase: K2 slag
+    temperature_as_printed: 1570
+    axes_as_printed:
+      x: time (minutes)
+      y: K+ ion intensity (μV)
+    caption_as_printed: 'Typical K+ ion-intensity signal decay with time for K2 slag. Conditions: 1570 K, N2 carrier-gas pressure
+      0.21 atm, capillary nozzle.'
+    panel: whole figure
+    series:
+    - name: K+ ion-intensity decay
+      marker: open circles
+      marker_count: 17
+      evidence_class: measured_direct
+    attribution: This work
+    digitisation: deferred to a figure pass
+    sample_id: K2
+  T_K: 1570
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_fig8_K_intensity_decay_vs_time
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_table1_K2_slag_model_pressures
+  type: model_pressure_table
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 7
+    table: '1'
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: model_derived
+    model: SOLGASMIX ideal- and non-ideal-solution thermodynamic model output
+    species:
+    - K
+    - KOH
+    - H2
+    - H2O
+    - O2
+    sample_id: K2
+    composition_as_printed: SiO2 47.3, Al2O3 11.1, Fe2O3 12, CaO 13.9, MgO 7.0, K2O 8.7 wt%
+    gas_condition_as_printed: 1 atm H2
+    rows_as_printed:
+    - species: K
+      ideal_1000K_atm: '6.7e-3'
+      ideal_1500K_atm: '1.8e-2'
+      nonideal_1000K_atm: '3.3e-8'
+      nonideal_1500K_atm: '4.6e-6'
+    - species: KOH
+      ideal_1000K_atm: '1.4e-2'
+      ideal_1500K_atm: '3.3e-3'
+      nonideal_1000K_atm: '8.2e-8'
+      nonideal_1500K_atm: '6.7e-7'
+    - species: H2
+      ideal_1000K_atm: '0.96'
+      ideal_1500K_atm: '0.95'
+      nonideal_1000K_atm: '0.97'
+      nonideal_1500K_atm: '0.97'
+    - species: H2O
+      ideal_1000K_atm: '2.3e-2'
+      ideal_1500K_atm: '3.4e-2'
+      nonideal_1000K_atm: '2.7e-2'
+      nonideal_1500K_atm: '2.7e-2'
+    - species: O2
+      ideal_1000K_atm: '4.2e-24'
+      ideal_1500K_atm: '4.5e-15'
+      nonideal_1000K_atm: '5.7e-24'
+      nonideal_1500K_atm: '2.7e-15'
+    activity_input_as_printed: K2O activity was an experimental input; K2O + SiO2 data were used.
+  note: Table 1 is explicitly thermodynamic model output, so these pressures remain model_derived context and are not observations.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_table1_K2_slag_model_pressures
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K
+- observation_id: hastie_1980_main_table2_K2_slag_H2_model_pressures
+  type: model_pressure_table
+  locator:
+    page: 19
+    pdf_page_index: 18
+    published_page: 9
+    table: '2'
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: model_derived
+    model: SOLGASMIX non-ideal multicomponent equilibrium calculation
+    species:
+    - H2
+    - H2O
+    - O2
+    - K
+    - KOH
+    - SiO
+    sample_id: K2
+    system_as_printed: K2 slag + H2
+    K2O_activity_coefficient_input_as_printed: 10^-8, independent of temperature
+    rows_as_printed:
+    - species: H2
+      1600K_atm: '0.11e-3'
+      1700K_atm: '0.63e-4'
+    - species: H2O
+      1600K_atm: '0.26e-3'
+      1700K_atm: '0.27e-3'
+    - species: O2
+      1600K_atm: '0.23e-9'
+      1700K_atm: '0.77e-8'
+    - species: K
+      1600K_atm: '0.57e-3'
+      1700K_atm: '0.60e-3'
+    - species: KOH
+      1600K_atm: '0.51e-4'
+      1700K_atm: '0.55e-4'
+    - species: SiO
+      1600K_atm: '0.54e-8'
+      1700K_atm: '0.31e-7'
+  note: Table 2 is explicitly equilibrium-model output; printed SiO values are retained here as model-derived context.
+  context_id: kems-214-hastie-1980-nbsir-80-2178::context::hastie_1980_main_table2_K2_slag_H2_model_pressures
+  work_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122
+  source_id: kems-214-hastie-1980-nbsir-80-2178
+  species: K

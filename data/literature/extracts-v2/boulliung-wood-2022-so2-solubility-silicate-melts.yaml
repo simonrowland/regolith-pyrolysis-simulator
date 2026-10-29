@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -52,6 +53,7 @@ observations:
     - pdf:boulliung-wood-2022-so2-solubility-silicate-melts
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: boulliung-wood-2022-so2-solubility-silicate-melts::boulliung_wood_2022_equilibrated_glass_measurements
   experiment_id: 10.1016/j.gca.2022.08.032::experiment::sulfate-solubility-series
   identity:
@@ -66,6 +68,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -102,6 +105,7 @@ observations:
     - pdf:boulliung-wood-2022-so2-solubility-silicate-melts
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: boulliung-wood-2022-so2-solubility-silicate-melts::boulliung_wood_2022_starting_material_compositions
   experiment_id: 10.1016/j.gca.2022.08.032::boulliung-wood-2022-so2-solubility-silicate-melts
   identity:
@@ -116,6 +120,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -137,7 +142,9 @@ observations:
   notices: []
   source_id: boulliung-wood-2022-so2-solubility-silicate-melts
   locator:
-    page: 151
+    page: 3
+    published_page: 152
+    pdf_page_index: 2
     table: '1'
     note: Every value below is transcribed from the printed Table 1 cell under its column header; parenthesized values are
       1-sigma uncertainty on the last digit, b.d.l. means below detection limit.

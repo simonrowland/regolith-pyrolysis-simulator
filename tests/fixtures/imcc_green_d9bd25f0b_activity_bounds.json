@@ -1,0 +1,2953 @@
+# Frozen per-parent log-activity bounds for the d9bd25f0b oracle.
+# OpenIMCC commit: e1423d82237486f58dc8ffbb1f8c295f54f169c0
+# Derivation: For oracle y_o and certified y_c, r_o=F(y_o), r_c=F(y_c), and J=DF(y_c). Taylor expansion gives y_c-y_o=-J^-1 r_o + J^-1 r_c + J^-1 R. The per-parent log-activity bound is |J^-1 r_o| + |J^-1 r_c| + |J^-1| R_abs + 32*eps. R_abs uses the exponential Hessian envelope over the segment box verified to contain y_o-y_c.
+# Generator: tests/helpers/generate_openimcc_activity_bounds.py
+{
+  "derivation": "For oracle y_o and certified y_c, r_o=F(y_o), r_c=F(y_c), and J=DF(y_c). Taylor expansion gives y_c-y_o=-J^-1 r_o + J^-1 r_c + J^-1 R. The per-parent log-activity bound is |J^-1 r_o| + |J^-1 r_c| + |J^-1| R_abs + 32*eps. R_abs uses the exponential Hessian envelope over the segment box verified to contain y_o-y_c.",
+  "generator": "tests/helpers/generate_openimcc_activity_bounds.py",
+  "openimcc_commit": "e1423d82237486f58dc8ffbb1f8c295f54f169c0",
+  "rounding_allowance_log": 7.105427357601002e-15,
+  "rows": [
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.5050082075720173e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.102892632922369e-16,
+          "second_order_allowance": 3.177805136292176e-26,
+          "total_log_activity_bound": 7.966217441682218e-15
+        },
+        "CaO": {
+          "certified_residual_term": 1.2895386676530827e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.5504299529217152e-15,
+          "second_order_allowance": 6.215406556984414e-26,
+          "total_log_activity_bound": 9.945395978237953e-15
+        },
+        "FeO": {
+          "certified_residual_term": 1.8009450146662745e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.000073185423757e-16,
+          "second_order_allowance": 3.090866315772018e-26,
+          "total_log_activity_bound": 7.785529177640914e-15
+        },
+        "K2O": {
+          "certified_residual_term": 9.895875173917228e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.128358608733517e-12,
+          "second_order_allowance": 4.841602729094388e-24,
+          "total_log_activity_bound": 2.145359911269877e-12
+        },
+        "MgO": {
+          "certified_residual_term": 3.1612350554457e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0338212703820381e-15,
+          "second_order_allowance": 4.1267429460844676e-26,
+          "total_log_activity_bound": 8.455372133568877e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.6819195565235975e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.7604967905166143e-15,
+          "second_order_allowance": 2.2116347218801073e-25,
+          "total_log_activity_bound": 1.1547843704862377e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.945490779226725e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1833800022566584e-16,
+          "second_order_allowance": 2.713168272857916e-26,
+          "total_log_activity_bound": 7.618314435776472e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 8.180227215724962e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.8740905997660016e-16,
+          "second_order_allowance": 4.744708765176202e-26,
+          "total_log_activity_bound": 8.310859139197545e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 4.793198258105663e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.793198258105663e-16,
+          "second_order_allowance": 1.0554907218123035e-27,
+          "total_log_activity_bound": 8.06406700922319e-15
+        },
+        "CaO": {
+          "certified_residual_term": 6.486960606482137e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.486960606482137e-17,
+          "second_order_allowance": 1.6323589912866032e-27,
+          "total_log_activity_bound": 7.235166569732277e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.4719555744983438e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.4719555744983438e-16,
+          "second_order_allowance": 7.659245593015546e-28,
+          "total_log_activity_bound": 7.799818472501437e-15
+        },
+        "K2O": {
+          "certified_residual_term": 1.2298967410012888e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2298967410012888e-14,
+          "second_order_allowance": 6.2454539600817636e-27,
+          "total_log_activity_bound": 3.1703362177633023e-14
+        },
+        "MgO": {
+          "certified_residual_term": 4.288594074630009e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.288594074630009e-16,
+          "second_order_allowance": 1.1233109877513072e-27,
+          "total_log_activity_bound": 7.963146172528127e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 2.840696150372757e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.840696150372757e-16,
+          "second_order_allowance": 6.58508896479822e-27,
+          "total_log_activity_bound": 7.673566587682138e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 8.098224821168507e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.098224821168507e-16,
+          "second_order_allowance": 7.442469918844942e-28,
+          "total_log_activity_bound": 8.725072321835447e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 5.277787760538761e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.277787760538761e-16,
+          "second_order_allowance": 1.2198736173081573e-27,
+          "total_log_activity_bound": 8.160984909709973e-15
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 4.554013296156034e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.554013296156034e-16,
+          "second_order_allowance": 4.867645637629243e-27,
+          "total_log_activity_bound": 8.016230016837077e-15
+        },
+        "CaO": {
+          "certified_residual_term": 6.444316012562257e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.444316012562257e-16,
+          "second_order_allowance": 1.0339925214585984e-26,
+          "total_log_activity_bound": 8.394290560123793e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.1027149294295885e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.1027149294295885e-16,
+          "second_order_allowance": 4.543381789328369e-27,
+          "total_log_activity_bound": 7.725970343491462e-15
+        },
+        "K2O": {
+          "certified_residual_term": 4.1799135025228256e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.1799135025228256e-13,
+          "second_order_allowance": 7.733377243492969e-25,
+          "total_log_activity_bound": 8.430881278629395e-13
+        },
+        "MgO": {
+          "certified_residual_term": 5.501770824183784e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.501770824183784e-16,
+          "second_order_allowance": 8.163392337106977e-27,
+          "total_log_activity_bound": 8.205781522445923e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 2.2800051651655364e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.2800051651655364e-15,
+          "second_order_allowance": 3.289283170205294e-26,
+          "total_log_activity_bound": 1.1665437687964968e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.9896618943896782e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.9896618943896782e-16,
+          "second_order_allowance": 4.9968256436333e-27,
+          "total_log_activity_bound": 7.503359736483934e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 1.2783362007282504e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2783362007282504e-16,
+          "second_order_allowance": 6.4305115487589656e-27,
+          "total_log_activity_bound": 7.361094597753083e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.0588613204508557e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0588613204508557e-16,
+          "second_order_allowance": 1.0126220333016789e-27,
+          "total_log_activity_bound": 7.317199621692185e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.578720188762631e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.578720188762631e-16,
+          "second_order_allowance": 1.3198668775436303e-27,
+          "total_log_activity_bound": 7.821171395354848e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.930157416411373e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.930157416411373e-16,
+          "second_order_allowance": 7.659277533089807e-28,
+          "total_log_activity_bound": 7.891458840884043e-15
+        },
+        "K2O": {
+          "certified_residual_term": 6.9590285703998295e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.9590285703998295e-15,
+          "second_order_allowance": 4.3407125688766985e-27,
+          "total_log_activity_bound": 2.1023484498405e-14
+        },
+        "MgO": {
+          "certified_residual_term": 9.036147179633044e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.036147179633044e-16,
+          "second_order_allowance": 1.1533513691727837e-27,
+          "total_log_activity_bound": 8.912656793528764e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 9.952790811924728e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.952790811924728e-16,
+          "second_order_allowance": 4.7184366427965075e-27,
+          "total_log_activity_bound": 9.095985519990667e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 8.494831498421424e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.494831498421424e-17,
+          "second_order_allowance": 7.733098659270358e-28,
+          "total_log_activity_bound": 7.275323987570204e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 1.4010833242165046e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.4010833242165046e-16,
+          "second_order_allowance": 9.834643564265983e-28,
+          "total_log_activity_bound": 7.385644022445286e-15
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 6.2178024986165e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.2178024986165e-16,
+          "second_order_allowance": 1.198690061659516e-27,
+          "total_log_activity_bound": 8.348987857325501e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.488975809986984e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.488975809986984e-16,
+          "second_order_allowance": 1.4006765731786223e-27,
+          "total_log_activity_bound": 7.803222519599799e-15
+        },
+        "FeO": {
+          "certified_residual_term": 8.553886532023243e-18,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.553886532023243e-18,
+          "second_order_allowance": 8.521624592999021e-28,
+          "total_log_activity_bound": 7.122535130665901e-15
+        },
+        "K2O": {
+          "certified_residual_term": 3.0651520556524607e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.0651520556524607e-15,
+          "second_order_allowance": 3.910981382283448e-27,
+          "total_log_activity_bound": 1.3235731468909834e-14
+        },
+        "MgO": {
+          "certified_residual_term": 4.557954575008035e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.557954575008035e-16,
+          "second_order_allowance": 1.2057453412318386e-27,
+          "total_log_activity_bound": 8.017018272603814e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.8974636781005373e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8974636781005373e-15,
+          "second_order_allowance": 4.459205202558125e-27,
+          "total_log_activity_bound": 1.0900354713806535e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 3.225979907484015e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.225979907484015e-17,
+          "second_order_allowance": 8.503326688310672e-28,
+          "total_log_activity_bound": 7.169946955751532e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 3.5657934068390034e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.5657934068390034e-16,
+          "second_order_allowance": 1.0260314961547667e-27,
+          "total_log_activity_bound": 7.818586038969829e-15
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 2.5547235492480367e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.5547235492480367e-16,
+          "second_order_allowance": 8.997442986364014e-28,
+          "total_log_activity_bound": 7.616372067451509e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.493448087862084e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.493448087862084e-16,
+          "second_order_allowance": 1.676529616498757e-27,
+          "total_log_activity_bound": 7.804116975175096e-15
+        },
+        "FeO": {
+          "certified_residual_term": 6.605110436439085e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.605110436439085e-16,
+          "second_order_allowance": 1.149433731276562e-27,
+          "total_log_activity_bound": 8.426449444889968e-15
+        },
+        "K2O": {
+          "certified_residual_term": 3.877770600039632e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.877770600039632e-17,
+          "second_order_allowance": 3.724629713190684e-27,
+          "total_log_activity_bound": 7.182982769605519e-15
+        },
+        "MgO": {
+          "certified_residual_term": 8.206710273755116e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.206710273755116e-16,
+          "second_order_allowance": 1.3316002644984132e-27,
+          "total_log_activity_bound": 8.746769412353357e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 2.100426305842936e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.100426305842936e-15,
+          "second_order_allowance": 7.042599079448398e-27,
+          "total_log_activity_bound": 1.1306279969293916e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 6.908058817471182e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.908058817471182e-16,
+          "second_order_allowance": 7.8849385231350415e-28,
+          "total_log_activity_bound": 8.487039121096026e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 1.1920763690709572e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1920763690709572e-15,
+          "second_order_allowance": 1.763031671406772e-27,
+          "total_log_activity_bound": 9.48958009574468e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.8993528748477962e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8993528748477962e-16,
+          "second_order_allowance": 1.0495564412734216e-27,
+          "total_log_activity_bound": 7.48529793257161e-15
+        },
+        "CaO": {
+          "certified_residual_term": 1.796317798523746e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.796317798523746e-15,
+          "second_order_allowance": 1.891879280167012e-27,
+          "total_log_activity_bound": 1.0698062954650387e-14
+        },
+        "FeO": {
+          "certified_residual_term": 2.393377661664326e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.393377661664326e-16,
+          "second_order_allowance": 1.1758974686837816e-27,
+          "total_log_activity_bound": 7.584102889935043e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.2178051667074915e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.2178051667074915e-14,
+          "second_order_allowance": 9.389861266221717e-27,
+          "total_log_activity_bound": 5.146153069176022e-14
+        },
+        "MgO": {
+          "certified_residual_term": 6.683947838579058e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.683947838579058e-16,
+          "second_order_allowance": 1.6352843297750635e-27,
+          "total_log_activity_bound": 8.442216925318448e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 3.1739715223616337e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.1739715223616337e-15,
+          "second_order_allowance": 7.017858928221049e-27,
+          "total_log_activity_bound": 1.3453370402331287e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.4111681959429872e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.4111681959429872e-16,
+          "second_order_allowance": 9.22853821846076e-28,
+          "total_log_activity_bound": 7.387660996790521e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 5.604502248785284e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.604502248785284e-16,
+          "second_order_allowance": 1.7894134553895565e-27,
+          "total_log_activity_bound": 8.226327807359848e-15
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 2.4786559863129343e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4786559863129343e-17,
+          "second_order_allowance": 1.6158001877383364e-27,
+          "total_log_activity_bound": 7.155000477328876e-15
+        },
+        "CaO": {
+          "certified_residual_term": 1.7053162839051608e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.7053162839051608e-15,
+          "second_order_allowance": 2.9524913087036214e-27,
+          "total_log_activity_bound": 1.0516059925414276e-14
+        },
+        "FeO": {
+          "certified_residual_term": 1.2316665771475335e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2316665771475335e-16,
+          "second_order_allowance": 1.7871096117762214e-27,
+          "total_log_activity_bound": 7.351760673032296e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.247439962004984e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.247439962004984e-15,
+          "second_order_allowance": 6.898161395206947e-27,
+          "total_log_activity_bound": 1.1600307281617868e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.3972448161699483e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.3972448161699483e-15,
+          "second_order_allowance": 2.9370538999380784e-27,
+          "total_log_activity_bound": 9.899916989943835e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.339019881938471e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.339019881938471e-15,
+          "second_order_allowance": 1.0562297625749657e-26,
+          "total_log_activity_bound": 9.783467121488506e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 1.09529876701782e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.09529876701782e-15,
+          "second_order_allowance": 1.611279987262906e-27,
+          "total_log_activity_bound": 9.296024891638253e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 8.810396941553489e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.810396941553489e-16,
+          "second_order_allowance": 2.4922735716561156e-27,
+          "total_log_activity_bound": 8.867506745914191e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 8.809418616700274e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.809418616700274e-17,
+          "second_order_allowance": 1.1783473741941203e-27,
+          "total_log_activity_bound": 7.281615729936185e-15
+        },
+        "CaO": {
+          "certified_residual_term": 1.2522933669530292e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2522933669530292e-15,
+          "second_order_allowance": 2.0931796266176356e-27,
+          "total_log_activity_bound": 9.610014091509153e-15
+        },
+        "FeO": {
+          "certified_residual_term": 2.1622895918448122e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1622895918448122e-16,
+          "second_order_allowance": 1.380907059767037e-27,
+          "total_log_activity_bound": 7.537885275971345e-15
+        },
+        "K2O": {
+          "certified_residual_term": 6.154859381295969e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.154859381295969e-15,
+          "second_order_allowance": 5.690805722572216e-27,
+          "total_log_activity_bound": 1.9415146120198633e-14
+        },
+        "MgO": {
+          "certified_residual_term": 7.597970099526857e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.597970099526857e-16,
+          "second_order_allowance": 2.2406652660370735e-27,
+          "total_log_activity_bound": 8.625021377508614e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 6.049227900738625e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.049227900738625e-16,
+          "second_order_allowance": 7.160980782121093e-27,
+          "total_log_activity_bound": 8.315272937755888e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 3.611376944035164e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.611376944035164e-16,
+          "second_order_allowance": 1.2171289669681164e-27,
+          "total_log_activity_bound": 7.827702746409252e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 7.312207602361673e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.312207602361673e-16,
+          "second_order_allowance": 1.714298469333864e-27,
+          "total_log_activity_bound": 8.56786887807505e-15
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 3.7123086632384094e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.7123086632384094e-16,
+          "second_order_allowance": 1.221935896403785e-27,
+          "total_log_activity_bound": 7.847889090249906e-15
+        },
+        "CaO": {
+          "certified_residual_term": 9.179711967252727e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.179711967252727e-16,
+          "second_order_allowance": 1.9623987824401046e-27,
+          "total_log_activity_bound": 8.94136975105351e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.3430967268237e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.3430967268237e-16,
+          "second_order_allowance": 1.3937120539771936e-27,
+          "total_log_activity_bound": 7.774046702967136e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.391652096738287e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.391652096738287e-15,
+          "second_order_allowance": 4.784876735092904e-27,
+          "total_log_activity_bound": 1.1888731551082361e-14
+        },
+        "MgO": {
+          "certified_residual_term": 9.922609242611035e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.922609242611035e-17,
+          "second_order_allowance": 2.2571563455443735e-27,
+          "total_log_activity_bound": 7.30387954245548e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.0481838433497133e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0481838433497133e-15,
+          "second_order_allowance": 6.361271526738236e-27,
+          "total_log_activity_bound": 9.201795044306789e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 2.445724315594558e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.445724315594558e-16,
+          "second_order_allowance": 1.2023512802135444e-27,
+          "total_log_activity_bound": 7.594572220721116e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 8.731830850254405e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.731830850254405e-16,
+          "second_order_allowance": 1.5840916054331682e-27,
+          "total_log_activity_bound": 8.851793527653467e-15
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 3.1516758027271674e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.1516758027271674e-15,
+          "second_order_allowance": 4.874566826637475e-26,
+          "total_log_activity_bound": 1.3408778963104081e-14
+        },
+        "CaO": {
+          "certified_residual_term": 1.2946426699668004e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2946426699668004e-15,
+          "second_order_allowance": 5.647589770159794e-26,
+          "total_log_activity_bound": 9.694712697591079e-15
+        },
+        "FeO": {
+          "certified_residual_term": 7.155568065644885e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.155568065644885e-16,
+          "second_order_allowance": 2.1712377614171482e-26,
+          "total_log_activity_bound": 8.536540970751692e-15
+        },
+        "K2O": {
+          "certified_residual_term": 3.141675090596155e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.141675090596155e-13,
+          "second_order_allowance": 5.992533576201572e-25,
+          "total_log_activity_bound": 6.354404454774313e-13
+        },
+        "MgO": {
+          "certified_residual_term": 1.8784061573730545e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8784061573730545e-15,
+          "second_order_allowance": 2.8106881082334387e-26,
+          "total_log_activity_bound": 1.0862239672375219e-14
+        },
+        "Na2O": {
+          "certified_residual_term": 1.0167595246633681e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0167595246633681e-14,
+          "second_order_allowance": 1.8447753260613325e-25,
+          "total_log_activity_bound": 2.744061785105284e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.872882424757456e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.872882424757456e-15,
+          "second_order_allowance": 2.429715194036169e-26,
+          "total_log_activity_bound": 1.0851192207140211e-14
+        },
+        "TiO2": {
+          "certified_residual_term": 5.89431113211591e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.89431113211591e-16,
+          "second_order_allowance": 3.139597202510714e-26,
+          "total_log_activity_bound": 8.28428958405558e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 5.704892059273632e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.704892059273632e-15,
+          "second_order_allowance": 2.9252776168311113e-25,
+          "total_log_activity_bound": 1.8515211476440792e-14
+        },
+        "CaO": {
+          "certified_residual_term": 1.4867587685377895e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.4867587685377895e-15,
+          "second_order_allowance": 3.646029768742156e-25,
+          "total_log_activity_bound": 1.0078944895041183e-14
+        },
+        "FeO": {
+          "certified_residual_term": 9.734107962079853e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.734107962079853e-16,
+          "second_order_allowance": 1.1827693345935857e-25,
+          "total_log_activity_bound": 9.052248950135249e-15
+        },
+        "K2O": {
+          "certified_residual_term": 8.953637014947397e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.953637014947397e-13,
+          "second_order_allowance": 4.197005258273467e-24,
+          "total_log_activity_bound": 1.7978328303512774e-12
+        },
+        "MgO": {
+          "certified_residual_term": 2.0118716783434053e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.0118716783434053e-15,
+          "second_order_allowance": 1.7587260324554122e-25,
+          "total_log_activity_bound": 1.1129170714463686e-14
+        },
+        "Na2O": {
+          "certified_residual_term": 1.1745237967955354e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1745237967955354e-14,
+          "second_order_allowance": 1.0165866226289086e-24,
+          "total_log_activity_bound": 3.0595903294528296e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.0266158364057315e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0266158364057315e-15,
+          "second_order_allowance": 1.3469012949163606e-25,
+          "total_log_activity_bound": 9.158659030547155e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 2.1185386732040664e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1185386732040664e-15,
+          "second_order_allowance": 1.7226289228670513e-25,
+          "total_log_activity_bound": 1.1342504704181397e-14
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 6.966970529166491e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.966970529166491e-16,
+          "second_order_allowance": 2.0849505295802468e-27,
+          "total_log_activity_bound": 8.498821463436385e-15
+        },
+        "CaO": {
+          "certified_residual_term": 9.38195438746968e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.38195438746968e-16,
+          "second_order_allowance": 2.4425859772138344e-27,
+          "total_log_activity_bound": 8.98181823509738e-15
+        },
+        "FeO": {
+          "certified_residual_term": 2.2989519344088587e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.2989519344088587e-16,
+          "second_order_allowance": 8.311339523242058e-28,
+          "total_log_activity_bound": 7.565217744483605e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.4162533489961416e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4162533489961416e-14,
+          "second_order_allowance": 1.1971589607989988e-26,
+          "total_log_activity_bound": 5.5430494337535806e-14
+        },
+        "MgO": {
+          "certified_residual_term": 2.3126575447081237e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.3126575447081237e-16,
+          "second_order_allowance": 1.4035002357311679e-27,
+          "total_log_activity_bound": 7.56795886654403e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 2.952997399926665e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.952997399926665e-15,
+          "second_order_allowance": 8.001802339556719e-27,
+          "total_log_activity_bound": 1.3011422157462333e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.1439059029860331e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1439059029860331e-16,
+          "second_order_allowance": 1.1478178179976657e-27,
+          "total_log_activity_bound": 7.534208538199356e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 6.850401554458894e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.850401554458894e-16,
+          "second_order_allowance": 1.2995371361122339e-27,
+          "total_log_activity_bound": 8.47550766849408e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 4.522605339807217e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.522605339807217e-16,
+          "second_order_allowance": 1.3801350795978003e-27,
+          "total_log_activity_bound": 8.009948425563825e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.658221669021321e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.658221669021321e-16,
+          "second_order_allowance": 1.5100422279825202e-27,
+          "total_log_activity_bound": 7.837071691406776e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.0672009024034513e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.0672009024034513e-16,
+          "second_order_allowance": 5.902239175962673e-28,
+          "total_log_activity_bound": 7.718867538082282e-15
+        },
+        "K2O": {
+          "certified_residual_term": 6.669296063626871e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.669296063626871e-15,
+          "second_order_allowance": 5.094715085196089e-27,
+          "total_log_activity_bound": 2.044401948485984e-14
+        },
+        "MgO": {
+          "certified_residual_term": 4.6593615823423285e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.6593615823423285e-17,
+          "second_order_allowance": 9.471509427932364e-28,
+          "total_log_activity_bound": 7.198614589248795e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.728923610723566e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.728923610723566e-15,
+          "second_order_allowance": 4.841658835394194e-27,
+          "total_log_activity_bound": 1.0563274579052976e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.936653338905014e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.936653338905014e-17,
+          "second_order_allowance": 7.568721777248666e-28,
+          "total_log_activity_bound": 7.144160424379859e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 9.288120365977136e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.288120365977136e-15,
+          "second_order_allowance": 2.0775546556036816e-27,
+          "total_log_activity_bound": 2.568166808955735e-14
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 5.607674841024343e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.607674841024343e-16,
+          "second_order_allowance": 1.1691300614071605e-25,
+          "total_log_activity_bound": 8.226962325922783e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.1811520941782943e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.1811520941782943e-16,
+          "second_order_allowance": 2.6932784978563876e-25,
+          "total_log_activity_bound": 7.741657776705988e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.035971086832999e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.035971086832999e-17,
+          "second_order_allowance": 1.329510342576435e-25,
+          "total_log_activity_bound": 7.166146779470613e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.1971857724542694e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1971857724542694e-15,
+          "second_order_allowance": 4.092542764559101e-25,
+          "total_log_activity_bound": 1.1499798902918795e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.5716351846286933e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.5716351846286933e-16,
+          "second_order_allowance": 1.60180923431642e-25,
+          "total_log_activity_bound": 7.41975439468692e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.862762087963569e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.862762087963569e-15,
+          "second_order_allowance": 5.4484842590280515e-25,
+          "total_log_activity_bound": 1.0830951534072987e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.3605340979222336e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.3605340979222336e-17,
+          "second_order_allowance": 1.2787665508340072e-25,
+          "total_log_activity_bound": 7.152638039687324e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 6.700945624891027e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.700945624891027e-13,
+          "second_order_allowance": 3.746004057255569e-24,
+          "total_log_activity_bound": 1.3472945523395523e-12
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 2.87464490724558e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.87464490724558e-16,
+          "second_order_allowance": 1.0606345365455038e-27,
+          "total_log_activity_bound": 7.680356339051178e-15
+        },
+        "CaO": {
+          "certified_residual_term": 2.4491238232127526e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4491238232127526e-16,
+          "second_order_allowance": 1.8214571934363585e-27,
+          "total_log_activity_bound": 7.595252122245374e-15
+        },
+        "FeO": {
+          "certified_residual_term": 2.70949399356541e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.70949399356541e-16,
+          "second_order_allowance": 9.164322934930431e-28,
+          "total_log_activity_bound": 7.647326156315e-15
+        },
+        "K2O": {
+          "certified_residual_term": 1.1714430574874557e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1714430574874557e-14,
+          "second_order_allowance": 6.0480094297362184e-27,
+          "total_log_activity_bound": 3.0534288507356164e-14
+        },
+        "MgO": {
+          "certified_residual_term": 6.452206730483778e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.452206730483778e-17,
+          "second_order_allowance": 9.686010255493102e-28,
+          "total_log_activity_bound": 7.234471492211646e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 4.351228621922931e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.351228621922931e-16,
+          "second_order_allowance": 5.7636454213951e-27,
+          "total_log_activity_bound": 7.975673081991352e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 3.993966380157464e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.993966380157464e-16,
+          "second_order_allowance": 5.375449019206483e-28,
+          "total_log_activity_bound": 7.904220633633031e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 1.0419391313431293e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0419391313431293e-15,
+          "second_order_allowance": 1.5929430541495993e-27,
+          "total_log_activity_bound": 9.189305620288854e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.6310321579998655e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.6310321579998655e-16,
+          "second_order_allowance": 1.5105185985527984e-27,
+          "total_log_activity_bound": 7.431633789202486e-15
+        },
+        "CaO": {
+          "certified_residual_term": 2.0289841558623667e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.0289841558623667e-15,
+          "second_order_allowance": 2.7326137485765826e-27,
+          "total_log_activity_bound": 1.1163395669328467e-14
+        },
+        "FeO": {
+          "certified_residual_term": 1.1861681290665532e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1861681290665532e-17,
+          "second_order_allowance": 1.2176318214434172e-27,
+          "total_log_activity_bound": 7.12915072018355e-15
+        },
+        "K2O": {
+          "certified_residual_term": 1.328489103250335e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.328489103250335e-14,
+          "second_order_allowance": 9.059599691972047e-27,
+          "total_log_activity_bound": 3.367520942261676e-14
+        },
+        "MgO": {
+          "certified_residual_term": 3.984109009068112e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.984109009068112e-16,
+          "second_order_allowance": 1.7094076661112137e-27,
+          "total_log_activity_bound": 7.902249159416333e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.5961161381558338e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.5961161381558338e-15,
+          "second_order_allowance": 8.222463050940792e-27,
+          "total_log_activity_bound": 1.0297659633920892e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 5.291312846823651e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.291312846823651e-16,
+          "second_order_allowance": 9.118413027611102e-28,
+          "total_log_activity_bound": 8.163689926966644e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 2.679582069252686e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.679582069252686e-15,
+          "second_order_allowance": 2.3180708333494785e-27,
+          "total_log_activity_bound": 1.2464591496108693e-14
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 2.661294598847652e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.661294598847652e-16,
+          "second_order_allowance": 1.4152650632451732e-26,
+          "total_log_activity_bound": 7.637686277384684e-15
+        },
+        "CaO": {
+          "certified_residual_term": 2.760585958666636e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.760585958666636e-15,
+          "second_order_allowance": 3.1439764605910764e-26,
+          "total_log_activity_bound": 1.2626599274965713e-14
+        },
+        "FeO": {
+          "certified_residual_term": 9.82113597901165e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.82113597901165e-16,
+          "second_order_allowance": 1.3284919299221577e-26,
+          "total_log_activity_bound": 9.069654553416617e-15
+        },
+        "K2O": {
+          "certified_residual_term": 1.1572266565250461e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1572266565250461e-14,
+          "second_order_allowance": 5.626727877352685e-26,
+          "total_log_activity_bound": 3.024996048815819e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.8225352684052608e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8225352684052608e-15,
+          "second_order_allowance": 2.857580454071035e-26,
+          "total_log_activity_bound": 1.0750497894440099e-14
+        },
+        "Na2O": {
+          "certified_residual_term": 1.9776887144408243e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.9776887144408243e-13,
+          "second_order_allowance": 2.8997273616635692e-25,
+          "total_log_activity_bound": 4.0264317024605585e-13
+        },
+        "SiO2": {
+          "certified_residual_term": 1.6069496456881016e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.6069496456881016e-15,
+          "second_order_allowance": 1.9828198780757985e-26,
+          "total_log_activity_bound": 1.0319326648997033e-14
+        },
+        "TiO2": {
+          "certified_residual_term": 8.479098498648927e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.479098498648927e-16,
+          "second_order_allowance": 1.4391215545521383e-26,
+          "total_log_activity_bound": 8.801247057345179e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 3.137184397019507e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.137184397019507e-17,
+          "second_order_allowance": 1.3162860953418244e-27,
+          "total_log_activity_bound": 7.168171045542708e-15
+        },
+        "CaO": {
+          "certified_residual_term": 2.587387236361626e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.587387236361626e-16,
+          "second_order_allowance": 1.8939880401390392e-27,
+          "total_log_activity_bound": 7.622904804875221e-15
+        },
+        "FeO": {
+          "certified_residual_term": 7.239501088761635e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.239501088761635e-17,
+          "second_order_allowance": 1.1098645967230143e-27,
+          "total_log_activity_bound": 7.250217379377345e-15
+        },
+        "K2O": {
+          "certified_residual_term": 6.943994376211949e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.943994376211949e-15,
+          "second_order_allowance": 5.3898130154148515e-27,
+          "total_log_activity_bound": 2.0993416110030292e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.7109065343359074e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.7109065343359074e-16,
+          "second_order_allowance": 1.4677885051319917e-27,
+          "total_log_activity_bound": 7.447608664469652e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 9.516883732092467e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.516883732092467e-16,
+          "second_order_allowance": 5.736876212292099e-27,
+          "total_log_activity_bound": 9.008804104025232e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 1.4894697575842543e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.4894697575842543e-16,
+          "second_order_allowance": 8.094625679955996e-28,
+          "total_log_activity_bound": 7.403321309118663e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 5.341864322578815e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.341864322578815e-15,
+          "second_order_allowance": 1.8281499025923974e-27,
+          "total_log_activity_bound": 1.778915600276046e-14
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.8166579990051177e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8166579990051177e-16,
+          "second_order_allowance": 1.971818148158304e-25,
+          "total_log_activity_bound": 7.468758957599207e-15
+        },
+        "CaO": {
+          "certified_residual_term": 8.747644283683399e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.747644283683399e-16,
+          "second_order_allowance": 5.762307955912013e-25,
+          "total_log_activity_bound": 8.854956214913913e-15
+        },
+        "FeO": {
+          "certified_residual_term": 1.013316283608031e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.013316283608031e-15,
+          "second_order_allowance": 4.145373553273132e-25,
+          "total_log_activity_bound": 9.132059925231602e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.1334843819272577e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1334843819272577e-14,
+          "second_order_allowance": 7.935925322617048e-25,
+          "total_log_activity_bound": 4.977511499693975e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.1355934321431372e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1355934321431372e-15,
+          "second_order_allowance": 3.994139388177029e-25,
+          "total_log_activity_bound": 9.37661422228669e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.0972194093961254e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0972194093961254e-15,
+          "second_order_allowance": 1.1358959864204389e-24,
+          "total_log_activity_bound": 9.299866177529148e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 3.7750472861094907e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.7750472861094907e-16,
+          "second_order_allowance": 2.451963999991306e-25,
+          "total_log_activity_bound": 7.860436815068096e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 6.754981096330589e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.754981096330589e-13,
+          "second_order_allowance": 3.956113678464819e-24,
+          "total_log_activity_bound": 1.3581016466276749e-12
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 4.3306366513512946e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.3306366513512946e-15,
+          "second_order_allowance": 8.44152641140574e-28,
+          "total_log_activity_bound": 1.5766700660304434e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.0932584237676782e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.0932584237676782e-16,
+          "second_order_allowance": 3.999334848180098e-29,
+          "total_log_activity_bound": 7.524079042354578e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 5.604700988301672e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.604700988301672e-16,
+          "second_order_allowance": 3.030202199490062e-28,
+          "total_log_activity_bound": 8.226367555261638e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 2.9485018641363914e-18,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.9485018641363914e-18,
+          "second_order_allowance": 2.8058815668352474e-29,
+          "total_log_activity_bound": 7.111324361329302e-15
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 5.12664326169787e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.12664326169787e-14,
+          "second_order_allowance": 2.585719320955733e-26,
+          "total_log_activity_bound": 1.0963829259158427e-13
+        },
+        "SiO2": {
+          "certified_residual_term": 3.213855880862507e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.213855880862507e-17,
+          "second_order_allowance": 2.911705228184882e-28,
+          "total_log_activity_bound": 7.169704475218543e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 9.80147939805592e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.80147939805592e-16,
+          "second_order_allowance": 3.3089669841243686e-28,
+          "total_log_activity_bound": 9.065723237212517e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 4.9646824888721905e-18,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.9646824888721905e-18,
+          "second_order_allowance": 2.83337538569129e-29,
+          "total_log_activity_bound": 7.115356722578774e-15
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 2.7991243299739795e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.7991243299739795e-16,
+          "second_order_allowance": 2.5964336637641118e-28,
+          "total_log_activity_bound": 7.665252223596057e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 1.379719232036413e-18,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.379719232036413e-18,
+          "second_order_allowance": 2.7467431413948266e-29,
+          "total_log_activity_bound": 7.108186796065102e-15
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 4.354068479865931e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.354068479865931e-14,
+          "second_order_allowance": 2.249946107658629e-26,
+          "total_log_activity_bound": 9.418679695494212e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.0898834229091795e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0898834229091795e-17,
+          "second_order_allowance": 4.729571764298231e-28,
+          "total_log_activity_bound": 7.127225026059658e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 2.9058295984506033e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.9058295984506033e-13,
+          "second_order_allowance": 7.558346718838763e-25,
+          "total_log_activity_bound": 5.882713470484775e-13
+        },
+        "SiO2": {
+          "certified_residual_term": 4.116418244071695e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.116418244071695e-16,
+          "second_order_allowance": 1.3725397718352874e-26,
+          "total_log_activity_bound": 7.928711006429066e-15
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 3.649996452268066e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.649996452268066e-16,
+          "second_order_allowance": 6.267721872946476e-28,
+          "total_log_activity_bound": 7.835426648055241e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 2.323903512225907e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.323903512225907e-16,
+          "second_order_allowance": 4.2090226666916736e-29,
+          "total_log_activity_bound": 7.570208060046226e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 2.4408586717235994e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4408586717235994e-15,
+          "second_order_allowance": 8.584201926235496e-28,
+          "total_log_activity_bound": 1.198714470104906e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.4906355356443383e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4906355356443383e-16,
+          "second_order_allowance": 4.574889057305232e-29,
+          "total_log_activity_bound": 7.603554464729915e-15
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "v1.0.2",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 1.5518022050003996e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.5518022050003996e-15,
+          "second_order_allowance": 5.476834439520212e-28,
+          "total_log_activity_bound": 1.020903176760235e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.0876853904804758e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0876853904804758e-17,
+          "second_order_allowance": 3.2968556337037164e-29,
+          "total_log_activity_bound": 7.127181065410644e-15
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.5050082075720173e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.102892632922369e-16,
+          "second_order_allowance": 3.177805136292176e-26,
+          "total_log_activity_bound": 7.966217441682218e-15
+        },
+        "CaO": {
+          "certified_residual_term": 1.2895386676530827e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.5504299529217152e-15,
+          "second_order_allowance": 6.215406556984414e-26,
+          "total_log_activity_bound": 9.945395978237953e-15
+        },
+        "FeO": {
+          "certified_residual_term": 1.8009450146662745e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.000073185423757e-16,
+          "second_order_allowance": 3.090866315772018e-26,
+          "total_log_activity_bound": 7.785529177640914e-15
+        },
+        "K2O": {
+          "certified_residual_term": 9.895875173917228e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.128358608733517e-12,
+          "second_order_allowance": 4.841602729094388e-24,
+          "total_log_activity_bound": 2.145359911269877e-12
+        },
+        "MgO": {
+          "certified_residual_term": 3.1612350554457e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0338212703820381e-15,
+          "second_order_allowance": 4.1267429460844676e-26,
+          "total_log_activity_bound": 8.455372133568877e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.6819195565235975e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.7604967905166143e-15,
+          "second_order_allowance": 2.2116347218801073e-25,
+          "total_log_activity_bound": 1.1547843704862377e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.945490779226725e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1833800022566584e-16,
+          "second_order_allowance": 2.713168272857916e-26,
+          "total_log_activity_bound": 7.618314435776472e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 8.180227215724962e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.8740905997660016e-16,
+          "second_order_allowance": 4.744708765176202e-26,
+          "total_log_activity_bound": 8.310859139197545e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 4.793198258105663e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.793198258105663e-16,
+          "second_order_allowance": 1.0554907218123035e-27,
+          "total_log_activity_bound": 8.06406700922319e-15
+        },
+        "CaO": {
+          "certified_residual_term": 6.486960606482137e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.486960606482137e-17,
+          "second_order_allowance": 1.6323589912866032e-27,
+          "total_log_activity_bound": 7.235166569732277e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.4719555744983438e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.4719555744983438e-16,
+          "second_order_allowance": 7.659245593015546e-28,
+          "total_log_activity_bound": 7.799818472501437e-15
+        },
+        "K2O": {
+          "certified_residual_term": 1.2298967410012888e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2298967410012888e-14,
+          "second_order_allowance": 6.2454539600817636e-27,
+          "total_log_activity_bound": 3.1703362177633023e-14
+        },
+        "MgO": {
+          "certified_residual_term": 4.288594074630009e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.288594074630009e-16,
+          "second_order_allowance": 1.1233109877513072e-27,
+          "total_log_activity_bound": 7.963146172528127e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 2.840696150372757e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.840696150372757e-16,
+          "second_order_allowance": 6.58508896479822e-27,
+          "total_log_activity_bound": 7.673566587682138e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 8.098224821168507e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.098224821168507e-16,
+          "second_order_allowance": 7.442469918844942e-28,
+          "total_log_activity_bound": 8.725072321835447e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 5.277787760538761e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.277787760538761e-16,
+          "second_order_allowance": 1.2198736173081573e-27,
+          "total_log_activity_bound": 8.160984909709973e-15
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 4.554013296156034e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.554013296156034e-16,
+          "second_order_allowance": 4.867645637629243e-27,
+          "total_log_activity_bound": 8.016230016837077e-15
+        },
+        "CaO": {
+          "certified_residual_term": 6.444316012562257e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.444316012562257e-16,
+          "second_order_allowance": 1.0339925214585984e-26,
+          "total_log_activity_bound": 8.394290560123793e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.1027149294295885e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.1027149294295885e-16,
+          "second_order_allowance": 4.543381789328369e-27,
+          "total_log_activity_bound": 7.725970343491462e-15
+        },
+        "K2O": {
+          "certified_residual_term": 4.1799135025228256e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.1799135025228256e-13,
+          "second_order_allowance": 7.733377243492969e-25,
+          "total_log_activity_bound": 8.430881278629395e-13
+        },
+        "MgO": {
+          "certified_residual_term": 5.501770824183784e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.501770824183784e-16,
+          "second_order_allowance": 8.163392337106977e-27,
+          "total_log_activity_bound": 8.205781522445923e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 2.2800051651655364e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.2800051651655364e-15,
+          "second_order_allowance": 3.289283170205294e-26,
+          "total_log_activity_bound": 1.1665437687964968e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.9896618943896782e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.9896618943896782e-16,
+          "second_order_allowance": 4.9968256436333e-27,
+          "total_log_activity_bound": 7.503359736483934e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 1.2783362007282504e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2783362007282504e-16,
+          "second_order_allowance": 6.4305115487589656e-27,
+          "total_log_activity_bound": 7.361094597753083e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.0588613204508557e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0588613204508557e-16,
+          "second_order_allowance": 1.0126220333016789e-27,
+          "total_log_activity_bound": 7.317199621692185e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.578720188762631e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.578720188762631e-16,
+          "second_order_allowance": 1.3198668775436303e-27,
+          "total_log_activity_bound": 7.821171395354848e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.930157416411373e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.930157416411373e-16,
+          "second_order_allowance": 7.659277533089807e-28,
+          "total_log_activity_bound": 7.891458840884043e-15
+        },
+        "K2O": {
+          "certified_residual_term": 6.9590285703998295e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.9590285703998295e-15,
+          "second_order_allowance": 4.3407125688766985e-27,
+          "total_log_activity_bound": 2.1023484498405e-14
+        },
+        "MgO": {
+          "certified_residual_term": 9.036147179633044e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.036147179633044e-16,
+          "second_order_allowance": 1.1533513691727837e-27,
+          "total_log_activity_bound": 8.912656793528764e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 9.952790811924728e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.952790811924728e-16,
+          "second_order_allowance": 4.7184366427965075e-27,
+          "total_log_activity_bound": 9.095985519990667e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 8.494831498421424e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.494831498421424e-17,
+          "second_order_allowance": 7.733098659270358e-28,
+          "total_log_activity_bound": 7.275323987570204e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 1.4010833242165046e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.4010833242165046e-16,
+          "second_order_allowance": 9.834643564265983e-28,
+          "total_log_activity_bound": 7.385644022445286e-15
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "lunar_mare_low_ti",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 6.2178024986165e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.2178024986165e-16,
+          "second_order_allowance": 1.198690061659516e-27,
+          "total_log_activity_bound": 8.348987857325501e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.488975809986984e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.488975809986984e-16,
+          "second_order_allowance": 1.4006765731786223e-27,
+          "total_log_activity_bound": 7.803222519599799e-15
+        },
+        "FeO": {
+          "certified_residual_term": 8.553886532023243e-18,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.553886532023243e-18,
+          "second_order_allowance": 8.521624592999021e-28,
+          "total_log_activity_bound": 7.122535130665901e-15
+        },
+        "K2O": {
+          "certified_residual_term": 3.0651520556524607e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.0651520556524607e-15,
+          "second_order_allowance": 3.910981382283448e-27,
+          "total_log_activity_bound": 1.3235731468909834e-14
+        },
+        "MgO": {
+          "certified_residual_term": 4.557954575008035e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.557954575008035e-16,
+          "second_order_allowance": 1.2057453412318386e-27,
+          "total_log_activity_bound": 8.017018272603814e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.8974636781005373e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8974636781005373e-15,
+          "second_order_allowance": 4.459205202558125e-27,
+          "total_log_activity_bound": 1.0900354713806535e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 3.225979907484015e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.225979907484015e-17,
+          "second_order_allowance": 8.503326688310672e-28,
+          "total_log_activity_bound": 7.169946955751532e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 3.5657934068390034e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.5657934068390034e-16,
+          "second_order_allowance": 1.0260314961547667e-27,
+          "total_log_activity_bound": 7.818586038969829e-15
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 2.5547235492480367e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.5547235492480367e-16,
+          "second_order_allowance": 8.997442986364014e-28,
+          "total_log_activity_bound": 7.616372067451509e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.493448087862084e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.493448087862084e-16,
+          "second_order_allowance": 1.676529616498757e-27,
+          "total_log_activity_bound": 7.804116975175096e-15
+        },
+        "FeO": {
+          "certified_residual_term": 6.605110436439085e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.605110436439085e-16,
+          "second_order_allowance": 1.149433731276562e-27,
+          "total_log_activity_bound": 8.426449444889968e-15
+        },
+        "K2O": {
+          "certified_residual_term": 3.877770600039632e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.877770600039632e-17,
+          "second_order_allowance": 3.724629713190684e-27,
+          "total_log_activity_bound": 7.182982769605519e-15
+        },
+        "MgO": {
+          "certified_residual_term": 8.206710273755116e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.206710273755116e-16,
+          "second_order_allowance": 1.3316002644984132e-27,
+          "total_log_activity_bound": 8.746769412353357e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 2.100426305842936e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.100426305842936e-15,
+          "second_order_allowance": 7.042599079448398e-27,
+          "total_log_activity_bound": 1.1306279969293916e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 6.908058817471182e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.908058817471182e-16,
+          "second_order_allowance": 7.8849385231350415e-28,
+          "total_log_activity_bound": 8.487039121096026e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 1.1920763690709572e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1920763690709572e-15,
+          "second_order_allowance": 1.763031671406772e-27,
+          "total_log_activity_bound": 9.48958009574468e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.8993528748477962e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8993528748477962e-16,
+          "second_order_allowance": 1.0495564412734216e-27,
+          "total_log_activity_bound": 7.48529793257161e-15
+        },
+        "CaO": {
+          "certified_residual_term": 1.796317798523746e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.796317798523746e-15,
+          "second_order_allowance": 1.891879280167012e-27,
+          "total_log_activity_bound": 1.0698062954650387e-14
+        },
+        "FeO": {
+          "certified_residual_term": 2.393377661664326e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.393377661664326e-16,
+          "second_order_allowance": 1.1758974686837816e-27,
+          "total_log_activity_bound": 7.584102889935043e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.2178051667074915e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.2178051667074915e-14,
+          "second_order_allowance": 9.389861266221717e-27,
+          "total_log_activity_bound": 5.146153069176022e-14
+        },
+        "MgO": {
+          "certified_residual_term": 6.683947838579058e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.683947838579058e-16,
+          "second_order_allowance": 1.6352843297750635e-27,
+          "total_log_activity_bound": 8.442216925318448e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 3.1739715223616337e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.1739715223616337e-15,
+          "second_order_allowance": 7.017858928221049e-27,
+          "total_log_activity_bound": 1.3453370402331287e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.4111681959429872e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.4111681959429872e-16,
+          "second_order_allowance": 9.22853821846076e-28,
+          "total_log_activity_bound": 7.387660996790521e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 5.604502248785284e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.604502248785284e-16,
+          "second_order_allowance": 1.7894134553895565e-27,
+          "total_log_activity_bound": 8.226327807359848e-15
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 2.4786559863129343e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4786559863129343e-17,
+          "second_order_allowance": 1.6158001877383364e-27,
+          "total_log_activity_bound": 7.155000477328876e-15
+        },
+        "CaO": {
+          "certified_residual_term": 1.7053162839051608e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.7053162839051608e-15,
+          "second_order_allowance": 2.9524913087036214e-27,
+          "total_log_activity_bound": 1.0516059925414276e-14
+        },
+        "FeO": {
+          "certified_residual_term": 1.2316665771475335e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2316665771475335e-16,
+          "second_order_allowance": 1.7871096117762214e-27,
+          "total_log_activity_bound": 7.351760673032296e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.247439962004984e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.247439962004984e-15,
+          "second_order_allowance": 6.898161395206947e-27,
+          "total_log_activity_bound": 1.1600307281617868e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.3972448161699483e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.3972448161699483e-15,
+          "second_order_allowance": 2.9370538999380784e-27,
+          "total_log_activity_bound": 9.899916989943835e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.339019881938471e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.339019881938471e-15,
+          "second_order_allowance": 1.0562297625749657e-26,
+          "total_log_activity_bound": 9.783467121488506e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 1.09529876701782e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.09529876701782e-15,
+          "second_order_allowance": 1.611279987262906e-27,
+          "total_log_activity_bound": 9.296024891638253e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 8.810396941553489e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.810396941553489e-16,
+          "second_order_allowance": 2.4922735716561156e-27,
+          "total_log_activity_bound": 8.867506745914191e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 8.809418616700274e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.809418616700274e-17,
+          "second_order_allowance": 1.1783473741941203e-27,
+          "total_log_activity_bound": 7.281615729936185e-15
+        },
+        "CaO": {
+          "certified_residual_term": 1.2522933669530292e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2522933669530292e-15,
+          "second_order_allowance": 2.0931796266176356e-27,
+          "total_log_activity_bound": 9.610014091509153e-15
+        },
+        "FeO": {
+          "certified_residual_term": 2.1622895918448122e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1622895918448122e-16,
+          "second_order_allowance": 1.380907059767037e-27,
+          "total_log_activity_bound": 7.537885275971345e-15
+        },
+        "K2O": {
+          "certified_residual_term": 6.154859381295969e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.154859381295969e-15,
+          "second_order_allowance": 5.690805722572216e-27,
+          "total_log_activity_bound": 1.9415146120198633e-14
+        },
+        "MgO": {
+          "certified_residual_term": 7.597970099526857e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.597970099526857e-16,
+          "second_order_allowance": 2.2406652660370735e-27,
+          "total_log_activity_bound": 8.625021377508614e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 6.049227900738625e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.049227900738625e-16,
+          "second_order_allowance": 7.160980782121093e-27,
+          "total_log_activity_bound": 8.315272937755888e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 3.611376944035164e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.611376944035164e-16,
+          "second_order_allowance": 1.2171289669681164e-27,
+          "total_log_activity_bound": 7.827702746409252e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 7.312207602361673e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.312207602361673e-16,
+          "second_order_allowance": 1.714298469333864e-27,
+          "total_log_activity_bound": 8.56786887807505e-15
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "lunar_highland",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 3.7123086632384094e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.7123086632384094e-16,
+          "second_order_allowance": 1.221935896403785e-27,
+          "total_log_activity_bound": 7.847889090249906e-15
+        },
+        "CaO": {
+          "certified_residual_term": 9.179711967252727e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.179711967252727e-16,
+          "second_order_allowance": 1.9623987824401046e-27,
+          "total_log_activity_bound": 8.94136975105351e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.3430967268237e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.3430967268237e-16,
+          "second_order_allowance": 1.3937120539771936e-27,
+          "total_log_activity_bound": 7.774046702967136e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.391652096738287e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.391652096738287e-15,
+          "second_order_allowance": 4.784876735092904e-27,
+          "total_log_activity_bound": 1.1888731551082361e-14
+        },
+        "MgO": {
+          "certified_residual_term": 9.922609242611035e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.922609242611035e-17,
+          "second_order_allowance": 2.2571563455443735e-27,
+          "total_log_activity_bound": 7.30387954245548e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.0481838433497133e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0481838433497133e-15,
+          "second_order_allowance": 6.361271526738236e-27,
+          "total_log_activity_bound": 9.201795044306789e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 2.445724315594558e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.445724315594558e-16,
+          "second_order_allowance": 1.2023512802135444e-27,
+          "total_log_activity_bound": 7.594572220721116e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 8.731830850254405e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.731830850254405e-16,
+          "second_order_allowance": 1.5840916054331682e-27,
+          "total_log_activity_bound": 8.851793527653467e-15
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 3.1516758027271674e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.1516758027271674e-15,
+          "second_order_allowance": 4.874566826637475e-26,
+          "total_log_activity_bound": 1.3408778963104081e-14
+        },
+        "CaO": {
+          "certified_residual_term": 1.2946426699668004e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.2946426699668004e-15,
+          "second_order_allowance": 5.647589770159794e-26,
+          "total_log_activity_bound": 9.694712697591079e-15
+        },
+        "FeO": {
+          "certified_residual_term": 7.155568065644885e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.155568065644885e-16,
+          "second_order_allowance": 2.1712377614171482e-26,
+          "total_log_activity_bound": 8.536540970751692e-15
+        },
+        "K2O": {
+          "certified_residual_term": 3.141675090596155e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.141675090596155e-13,
+          "second_order_allowance": 5.992533576201572e-25,
+          "total_log_activity_bound": 6.354404454774313e-13
+        },
+        "MgO": {
+          "certified_residual_term": 1.8784061573730545e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8784061573730545e-15,
+          "second_order_allowance": 2.8106881082334387e-26,
+          "total_log_activity_bound": 1.0862239672375219e-14
+        },
+        "Na2O": {
+          "certified_residual_term": 1.0167595246633681e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0167595246633681e-14,
+          "second_order_allowance": 1.8447753260613325e-25,
+          "total_log_activity_bound": 2.744061785105284e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.872882424757456e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.872882424757456e-15,
+          "second_order_allowance": 2.429715194036169e-26,
+          "total_log_activity_bound": 1.0851192207140211e-14
+        },
+        "TiO2": {
+          "certified_residual_term": 5.89431113211591e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.89431113211591e-16,
+          "second_order_allowance": 3.139597202510714e-26,
+          "total_log_activity_bound": 8.28428958405558e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 5.704892059273632e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.704892059273632e-15,
+          "second_order_allowance": 2.9252776168311113e-25,
+          "total_log_activity_bound": 1.8515211476440792e-14
+        },
+        "CaO": {
+          "certified_residual_term": 1.4867587685377895e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.4867587685377895e-15,
+          "second_order_allowance": 3.646029768742156e-25,
+          "total_log_activity_bound": 1.0078944895041183e-14
+        },
+        "FeO": {
+          "certified_residual_term": 9.734107962079853e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.734107962079853e-16,
+          "second_order_allowance": 1.1827693345935857e-25,
+          "total_log_activity_bound": 9.052248950135249e-15
+        },
+        "K2O": {
+          "certified_residual_term": 8.953637014947397e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.953637014947397e-13,
+          "second_order_allowance": 4.197005258273467e-24,
+          "total_log_activity_bound": 1.7978328303512774e-12
+        },
+        "MgO": {
+          "certified_residual_term": 2.0118716783434053e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.0118716783434053e-15,
+          "second_order_allowance": 1.7587260324554122e-25,
+          "total_log_activity_bound": 1.1129170714463686e-14
+        },
+        "Na2O": {
+          "certified_residual_term": 1.1745237967955354e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1745237967955354e-14,
+          "second_order_allowance": 1.0165866226289086e-24,
+          "total_log_activity_bound": 3.0595903294528296e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.0266158364057315e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0266158364057315e-15,
+          "second_order_allowance": 1.3469012949163606e-25,
+          "total_log_activity_bound": 9.158659030547155e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 2.1185386732040664e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1185386732040664e-15,
+          "second_order_allowance": 1.7226289228670513e-25,
+          "total_log_activity_bound": 1.1342504704181397e-14
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 6.966970529166491e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.966970529166491e-16,
+          "second_order_allowance": 2.0849505295802468e-27,
+          "total_log_activity_bound": 8.498821463436385e-15
+        },
+        "CaO": {
+          "certified_residual_term": 9.38195438746968e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.38195438746968e-16,
+          "second_order_allowance": 2.4425859772138344e-27,
+          "total_log_activity_bound": 8.98181823509738e-15
+        },
+        "FeO": {
+          "certified_residual_term": 2.2989519344088587e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.2989519344088587e-16,
+          "second_order_allowance": 8.311339523242058e-28,
+          "total_log_activity_bound": 7.565217744483605e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.4162533489961416e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4162533489961416e-14,
+          "second_order_allowance": 1.1971589607989988e-26,
+          "total_log_activity_bound": 5.5430494337535806e-14
+        },
+        "MgO": {
+          "certified_residual_term": 2.3126575447081237e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.3126575447081237e-16,
+          "second_order_allowance": 1.4035002357311679e-27,
+          "total_log_activity_bound": 7.56795886654403e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 2.952997399926665e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.952997399926665e-15,
+          "second_order_allowance": 8.001802339556719e-27,
+          "total_log_activity_bound": 1.3011422157462333e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.1439059029860331e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1439059029860331e-16,
+          "second_order_allowance": 1.1478178179976657e-27,
+          "total_log_activity_bound": 7.534208538199356e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 6.850401554458894e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.850401554458894e-16,
+          "second_order_allowance": 1.2995371361122339e-27,
+          "total_log_activity_bound": 8.47550766849408e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 4.522605339807217e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.522605339807217e-16,
+          "second_order_allowance": 1.3801350795978003e-27,
+          "total_log_activity_bound": 8.009948425563825e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.658221669021321e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.658221669021321e-16,
+          "second_order_allowance": 1.5100422279825202e-27,
+          "total_log_activity_bound": 7.837071691406776e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.0672009024034513e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.0672009024034513e-16,
+          "second_order_allowance": 5.902239175962673e-28,
+          "total_log_activity_bound": 7.718867538082282e-15
+        },
+        "K2O": {
+          "certified_residual_term": 6.669296063626871e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.669296063626871e-15,
+          "second_order_allowance": 5.094715085196089e-27,
+          "total_log_activity_bound": 2.044401948485984e-14
+        },
+        "MgO": {
+          "certified_residual_term": 4.6593615823423285e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.6593615823423285e-17,
+          "second_order_allowance": 9.471509427932364e-28,
+          "total_log_activity_bound": 7.198614589248795e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.728923610723566e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.728923610723566e-15,
+          "second_order_allowance": 4.841658835394194e-27,
+          "total_log_activity_bound": 1.0563274579052976e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.936653338905014e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.936653338905014e-17,
+          "second_order_allowance": 7.568721777248666e-28,
+          "total_log_activity_bound": 7.144160424379859e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 9.288120365977136e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.288120365977136e-15,
+          "second_order_allowance": 2.0775546556036816e-27,
+          "total_log_activity_bound": 2.568166808955735e-14
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "mars_basalt",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 5.607674841024343e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.607674841024343e-16,
+          "second_order_allowance": 1.1691300614071605e-25,
+          "total_log_activity_bound": 8.226962325922783e-15
+        },
+        "CaO": {
+          "certified_residual_term": 3.1811520941782943e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.1811520941782943e-16,
+          "second_order_allowance": 2.6932784978563876e-25,
+          "total_log_activity_bound": 7.741657776705988e-15
+        },
+        "FeO": {
+          "certified_residual_term": 3.035971086832999e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.035971086832999e-17,
+          "second_order_allowance": 1.329510342576435e-25,
+          "total_log_activity_bound": 7.166146779470613e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.1971857724542694e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1971857724542694e-15,
+          "second_order_allowance": 4.092542764559101e-25,
+          "total_log_activity_bound": 1.1499798902918795e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.5716351846286933e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.5716351846286933e-16,
+          "second_order_allowance": 1.60180923431642e-25,
+          "total_log_activity_bound": 7.41975439468692e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.862762087963569e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.862762087963569e-15,
+          "second_order_allowance": 5.4484842590280515e-25,
+          "total_log_activity_bound": 1.0830951534072987e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.3605340979222336e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.3605340979222336e-17,
+          "second_order_allowance": 1.2787665508340072e-25,
+          "total_log_activity_bound": 7.152638039687324e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 6.700945624891027e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.700945624891027e-13,
+          "second_order_allowance": 3.746004057255569e-24,
+          "total_log_activity_bound": 1.3472945523395523e-12
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 2.87464490724558e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.87464490724558e-16,
+          "second_order_allowance": 1.0606345365455038e-27,
+          "total_log_activity_bound": 7.680356339051178e-15
+        },
+        "CaO": {
+          "certified_residual_term": 2.4491238232127526e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4491238232127526e-16,
+          "second_order_allowance": 1.8214571934363585e-27,
+          "total_log_activity_bound": 7.595252122245374e-15
+        },
+        "FeO": {
+          "certified_residual_term": 2.70949399356541e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.70949399356541e-16,
+          "second_order_allowance": 9.164322934930431e-28,
+          "total_log_activity_bound": 7.647326156315e-15
+        },
+        "K2O": {
+          "certified_residual_term": 1.1714430574874557e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1714430574874557e-14,
+          "second_order_allowance": 6.0480094297362184e-27,
+          "total_log_activity_bound": 3.0534288507356164e-14
+        },
+        "MgO": {
+          "certified_residual_term": 6.452206730483778e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.452206730483778e-17,
+          "second_order_allowance": 9.686010255493102e-28,
+          "total_log_activity_bound": 7.234471492211646e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 4.351228621922931e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.351228621922931e-16,
+          "second_order_allowance": 5.7636454213951e-27,
+          "total_log_activity_bound": 7.975673081991352e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 3.993966380157464e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.993966380157464e-16,
+          "second_order_allowance": 5.375449019206483e-28,
+          "total_log_activity_bound": 7.904220633633031e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 1.0419391313431293e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0419391313431293e-15,
+          "second_order_allowance": 1.5929430541495993e-27,
+          "total_log_activity_bound": 9.189305620288854e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.6310321579998655e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.6310321579998655e-16,
+          "second_order_allowance": 1.5105185985527984e-27,
+          "total_log_activity_bound": 7.431633789202486e-15
+        },
+        "CaO": {
+          "certified_residual_term": 2.0289841558623667e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.0289841558623667e-15,
+          "second_order_allowance": 2.7326137485765826e-27,
+          "total_log_activity_bound": 1.1163395669328467e-14
+        },
+        "FeO": {
+          "certified_residual_term": 1.1861681290665532e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1861681290665532e-17,
+          "second_order_allowance": 1.2176318214434172e-27,
+          "total_log_activity_bound": 7.12915072018355e-15
+        },
+        "K2O": {
+          "certified_residual_term": 1.328489103250335e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.328489103250335e-14,
+          "second_order_allowance": 9.059599691972047e-27,
+          "total_log_activity_bound": 3.367520942261676e-14
+        },
+        "MgO": {
+          "certified_residual_term": 3.984109009068112e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.984109009068112e-16,
+          "second_order_allowance": 1.7094076661112137e-27,
+          "total_log_activity_bound": 7.902249159416333e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.5961161381558338e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.5961161381558338e-15,
+          "second_order_allowance": 8.222463050940792e-27,
+          "total_log_activity_bound": 1.0297659633920892e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 5.291312846823651e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.291312846823651e-16,
+          "second_order_allowance": 9.118413027611102e-28,
+          "total_log_activity_bound": 8.163689926966644e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 2.679582069252686e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.679582069252686e-15,
+          "second_order_allowance": 2.3180708333494785e-27,
+          "total_log_activity_bound": 1.2464591496108693e-14
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 2.661294598847652e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.661294598847652e-16,
+          "second_order_allowance": 1.4152650632451732e-26,
+          "total_log_activity_bound": 7.637686277384684e-15
+        },
+        "CaO": {
+          "certified_residual_term": 2.760585958666636e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.760585958666636e-15,
+          "second_order_allowance": 3.1439764605910764e-26,
+          "total_log_activity_bound": 1.2626599274965713e-14
+        },
+        "FeO": {
+          "certified_residual_term": 9.82113597901165e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.82113597901165e-16,
+          "second_order_allowance": 1.3284919299221577e-26,
+          "total_log_activity_bound": 9.069654553416617e-15
+        },
+        "K2O": {
+          "certified_residual_term": 1.1572266565250461e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1572266565250461e-14,
+          "second_order_allowance": 5.626727877352685e-26,
+          "total_log_activity_bound": 3.024996048815819e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.8225352684052608e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8225352684052608e-15,
+          "second_order_allowance": 2.857580454071035e-26,
+          "total_log_activity_bound": 1.0750497894440099e-14
+        },
+        "Na2O": {
+          "certified_residual_term": 1.9776887144408243e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.9776887144408243e-13,
+          "second_order_allowance": 2.8997273616635692e-25,
+          "total_log_activity_bound": 4.0264317024605585e-13
+        },
+        "SiO2": {
+          "certified_residual_term": 1.6069496456881016e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.6069496456881016e-15,
+          "second_order_allowance": 1.9828198780757985e-26,
+          "total_log_activity_bound": 1.0319326648997033e-14
+        },
+        "TiO2": {
+          "certified_residual_term": 8.479098498648927e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.479098498648927e-16,
+          "second_order_allowance": 1.4391215545521383e-26,
+          "total_log_activity_bound": 8.801247057345179e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 3.137184397019507e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.137184397019507e-17,
+          "second_order_allowance": 1.3162860953418244e-27,
+          "total_log_activity_bound": 7.168171045542708e-15
+        },
+        "CaO": {
+          "certified_residual_term": 2.587387236361626e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.587387236361626e-16,
+          "second_order_allowance": 1.8939880401390392e-27,
+          "total_log_activity_bound": 7.622904804875221e-15
+        },
+        "FeO": {
+          "certified_residual_term": 7.239501088761635e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 7.239501088761635e-17,
+          "second_order_allowance": 1.1098645967230143e-27,
+          "total_log_activity_bound": 7.250217379377345e-15
+        },
+        "K2O": {
+          "certified_residual_term": 6.943994376211949e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.943994376211949e-15,
+          "second_order_allowance": 5.3898130154148515e-27,
+          "total_log_activity_bound": 2.0993416110030292e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.7109065343359074e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.7109065343359074e-16,
+          "second_order_allowance": 1.4677885051319917e-27,
+          "total_log_activity_bound": 7.447608664469652e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 9.516883732092467e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.516883732092467e-16,
+          "second_order_allowance": 5.736876212292099e-27,
+          "total_log_activity_bound": 9.008804104025232e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 1.4894697575842543e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.4894697575842543e-16,
+          "second_order_allowance": 8.094625679955996e-28,
+          "total_log_activity_bound": 7.403321309118663e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 5.341864322578815e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.341864322578815e-15,
+          "second_order_allowance": 1.8281499025923974e-27,
+          "total_log_activity_bound": 1.778915600276046e-14
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "kreep_like_bulk",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Al2O3": {
+          "certified_residual_term": 1.8166579990051177e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.8166579990051177e-16,
+          "second_order_allowance": 1.971818148158304e-25,
+          "total_log_activity_bound": 7.468758957599207e-15
+        },
+        "CaO": {
+          "certified_residual_term": 8.747644283683399e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 8.747644283683399e-16,
+          "second_order_allowance": 5.762307955912013e-25,
+          "total_log_activity_bound": 8.854956214913913e-15
+        },
+        "FeO": {
+          "certified_residual_term": 1.013316283608031e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.013316283608031e-15,
+          "second_order_allowance": 4.145373553273132e-25,
+          "total_log_activity_bound": 9.132059925231602e-15
+        },
+        "K2O": {
+          "certified_residual_term": 2.1334843819272577e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.1334843819272577e-14,
+          "second_order_allowance": 7.935925322617048e-25,
+          "total_log_activity_bound": 4.977511499693975e-14
+        },
+        "MgO": {
+          "certified_residual_term": 1.1355934321431372e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.1355934321431372e-15,
+          "second_order_allowance": 3.994139388177029e-25,
+          "total_log_activity_bound": 9.37661422228669e-15
+        },
+        "Na2O": {
+          "certified_residual_term": 1.0972194093961254e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0972194093961254e-15,
+          "second_order_allowance": 1.1358959864204389e-24,
+          "total_log_activity_bound": 9.299866177529148e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 3.7750472861094907e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.7750472861094907e-16,
+          "second_order_allowance": 2.451963999991306e-25,
+          "total_log_activity_bound": 7.860436815068096e-15
+        },
+        "TiO2": {
+          "certified_residual_term": 6.754981096330589e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 6.754981096330589e-13,
+          "second_order_allowance": 3.956113678464819e-24,
+          "total_log_activity_bound": 1.3581016466276749e-12
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 4.3306366513512946e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.3306366513512946e-15,
+          "second_order_allowance": 8.44152641140574e-28,
+          "total_log_activity_bound": 1.5766700660304434e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.0932584237676782e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.0932584237676782e-16,
+          "second_order_allowance": 3.999334848180098e-29,
+          "total_log_activity_bound": 7.524079042354578e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 5.604700988301672e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.604700988301672e-16,
+          "second_order_allowance": 3.030202199490062e-28,
+          "total_log_activity_bound": 8.226367555261638e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 2.9485018641363914e-18,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.9485018641363914e-18,
+          "second_order_allowance": 2.8058815668352474e-29,
+          "total_log_activity_bound": 7.111324361329302e-15
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 5.12664326169787e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 5.12664326169787e-14,
+          "second_order_allowance": 2.585719320955733e-26,
+          "total_log_activity_bound": 1.0963829259158427e-13
+        },
+        "SiO2": {
+          "certified_residual_term": 3.213855880862507e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.213855880862507e-17,
+          "second_order_allowance": 2.911705228184882e-28,
+          "total_log_activity_bound": 7.169704475218543e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 9.80147939805592e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 9.80147939805592e-16,
+          "second_order_allowance": 3.3089669841243686e-28,
+          "total_log_activity_bound": 9.065723237212517e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 4.9646824888721905e-18,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.9646824888721905e-18,
+          "second_order_allowance": 2.83337538569129e-29,
+          "total_log_activity_bound": 7.115356722578774e-15
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "Na2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "Na2O": {
+          "certified_residual_term": 2.7991243299739795e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.7991243299739795e-16,
+          "second_order_allowance": 2.5964336637641118e-28,
+          "total_log_activity_bound": 7.665252223596057e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 1.379719232036413e-18,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.379719232036413e-18,
+          "second_order_allowance": 2.7467431413948266e-29,
+          "total_log_activity_bound": 7.108186796065102e-15
+        }
+      },
+      "temperature_K": 3000.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 4.354068479865931e-14,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.354068479865931e-14,
+          "second_order_allowance": 2.249946107658629e-26,
+          "total_log_activity_bound": 9.418679695494212e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.0898834229091795e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0898834229091795e-17,
+          "second_order_allowance": 4.729571764298231e-28,
+          "total_log_activity_bound": 7.127225026059658e-15
+        }
+      },
+      "temperature_K": 1700.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 2.9058295984506033e-13,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.9058295984506033e-13,
+          "second_order_allowance": 7.558346718838763e-25,
+          "total_log_activity_bound": 5.882713470484775e-13
+        },
+        "SiO2": {
+          "certified_residual_term": 4.116418244071695e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 4.116418244071695e-16,
+          "second_order_allowance": 1.3725397718352874e-26,
+          "total_log_activity_bound": 7.928711006429066e-15
+        }
+      },
+      "temperature_K": 1950.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 3.649996452268066e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 3.649996452268066e-16,
+          "second_order_allowance": 6.267721872946476e-28,
+          "total_log_activity_bound": 7.835426648055241e-15
+        },
+        "SiO2": {
+          "certified_residual_term": 2.323903512225907e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.323903512225907e-16,
+          "second_order_allowance": 4.2090226666916736e-29,
+          "total_log_activity_bound": 7.570208060046226e-15
+        }
+      },
+      "temperature_K": 2200.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 2.4408586717235994e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4408586717235994e-15,
+          "second_order_allowance": 8.584201926235496e-28,
+          "total_log_activity_bound": 1.198714470104906e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 2.4906355356443383e-16,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 2.4906355356443383e-16,
+          "second_order_allowance": 4.574889057305232e-29,
+          "total_log_activity_bound": 7.603554464729915e-15
+        }
+      },
+      "temperature_K": 2500.0
+    },
+    {
+      "composition": "K2O-SiO2",
+      "pack": "ext-v4",
+      "parent_bounds": {
+        "K2O": {
+          "certified_residual_term": 1.5518022050003996e-15,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.5518022050003996e-15,
+          "second_order_allowance": 5.476834439520212e-28,
+          "total_log_activity_bound": 1.020903176760235e-14
+        },
+        "SiO2": {
+          "certified_residual_term": 1.0876853904804758e-17,
+          "floating_point_allowance": 7.105427357601002e-15,
+          "oracle_residual_term": 1.0876853904804758e-17,
+          "second_order_allowance": 3.2968556337037164e-29,
+          "total_log_activity_bound": 7.127181065410644e-15
+        }
+      },
+      "temperature_K": 3000.0
+    }
+  ],
+  "schema": "imcc-green-activity-bounds.v1"
+}

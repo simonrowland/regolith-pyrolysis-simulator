@@ -30,6 +30,22 @@ COMPOSITION_MOL = {
 }
 
 
+def test_pack_load_failure_stays_a_diagnostic_refusal(monkeypatch) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    def invalid_pack(_name):
+        raise ValueError("invalid pack")
+
+    monkeypatch.setattr(openimcc_bridge, "_require_openimcc", lambda: object())
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", invalid_pack)
+    shadow = build_imcc_activity_shadow(
+        composition_mol=COMPOSITION_MOL, temperature_K=1800.0,
+    )
+    assert shadow["status"] == "refused"
+    assert shadow["refusal"]["type"] == "ValueError"
+    assert shadow["refusal"]["detail"] == "invalid pack"
+
+
 def _lunar_run(
     *,
     imcc_activity_shadow: bool | None = None,

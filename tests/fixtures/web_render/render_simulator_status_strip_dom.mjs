@@ -37,6 +37,9 @@ const controlsScriptPath = input.controls_script_path;
 const sequence = Array.isArray(input.sequence) ? input.sequence : [];
 const mutateBadgeClobber = Boolean(input.mutate_badge_clobber);
 const mutateNoTickRecovery = Boolean(input.mutate_no_tick_recovery);
+const simulateFurnaceCatalogFailure = Boolean(
+  input.simulate_furnace_catalog_failure,
+);
 
 if (
   !socketScriptPath
@@ -205,6 +208,24 @@ seed['engine-select'] = new Element('engine-select', 'select');
 seed['engine-select'].value = 'internal-analytical';
 seed['batch-mass'] = new Element('batch-mass', 'input');
 seed['batch-mass'].value = '1000';
+if (simulateFurnaceCatalogFailure) {
+  const furnaceSelect = new Element('furnace-material', 'select');
+  furnaceSelect.dataset.catalogUrl = '/api/furnace-material-catalog';
+  const defaultOption = new Element('', 'option');
+  defaultOption.value = '';
+  furnaceSelect.options = [defaultOption];
+  furnaceSelect.querySelector = (selector) => (
+    selector === 'option[value=""]' ? defaultOption : null
+  );
+  furnaceSelect.replaceChildren = (...options) => {
+    furnaceSelect.options = options;
+  };
+  seed['furnace-material'] = furnaceSelect;
+
+  const furnaceError = new Element('furnace-material-error');
+  furnaceError.hidden = true;
+  seed['furnace-material-error'] = furnaceError;
+}
 for (const id of ['add-na', 'add-k', 'add-mg', 'add-ca', 'add-c']) {
   seed[id] = new Element(id, 'input');
   seed[id].value = '0';
@@ -295,6 +316,9 @@ const context = {
   io() {
     return socket;
   },
+  fetch: simulateFurnaceCatalogFailure
+    ? () => Promise.reject(new Error('catalog offline'))
+    : undefined,
   window: {},
   Plotly: plotlyNoop,
   chartConfig: {},
@@ -408,11 +432,15 @@ vm.runInContext(fs.readFileSync(controlsScriptPath, 'utf8'), context, {
   filename: controlsScriptPath,
 });
 
+if (simulateFurnaceCatalogFailure) {
+  await new Promise((resolve) => setImmediate(resolve));
+}
+
 function snapshot() {
   const text = context.document.getElementById('status-text');
   const badge = context.document.getElementById('status-backend');
   const hour = context.document.getElementById('status-hour');
-  return {
+  const result = {
     statusText: text ? text.textContent : null,
     backendText: badge ? badge.textContent : null,
     backendClass: badge ? badge.className : null,
@@ -424,6 +452,14 @@ function snapshot() {
     emittedCount: emitted.length,
     lifecycle: context.simulatorLifecycleSnapshot(),
   };
+  if (simulateFurnaceCatalogFailure) {
+    const furnaceError = context.document.getElementById(
+      'furnace-material-error',
+    );
+    result.furnaceMaterialErrorHidden = furnaceError.hidden;
+    result.furnaceMaterialErrorText = furnaceError.textContent;
+  }
+  return result;
 }
 
 const steps = [];

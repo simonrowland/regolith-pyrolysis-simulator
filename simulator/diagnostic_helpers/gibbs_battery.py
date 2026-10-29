@@ -663,6 +663,23 @@ def elemental_phosphorus_polynomial(
     return p_l
 
 
+def formation_subtraction_kJ_mol(
+    species_property_J_per_mol: float,
+    elemental_references: Sequence[tuple[float, float]],
+) -> float:
+    """Subtract resolved elemental-reference properties, J/mol → kJ/mol.
+
+    Each ordered pair is (reference-species coefficient, property J/mol).
+    Resolution of phase and pressure convention belongs to the source caller;
+    this ordered loop owns the stoichiometric formation subtraction.
+    """
+
+    net_J_per_mol = float(species_property_J_per_mol)
+    for coefficient, reference_J_per_mol in elemental_references:
+        net_J_per_mol -= float(coefficient) * float(reference_J_per_mol)
+    return net_J_per_mol / 1000.0
+
+
 def engine_delta_fG_kJ_mol(
     channel: PilotChannel,
     T_K: float,
@@ -678,23 +695,26 @@ def engine_delta_fG_kJ_mol(
         raise GibbsDomainRefusal(
             f"{TYPED_REFUSAL_PREFIX}T_outside_engine_domain:{exc}"
         ) from exc
+    elemental_references: list[tuple[float, float]] = []
     if channel.nu_P:
         p_el = elemental_phosphorus_polynomial(T, extract_path=extract_path)
         try:
-            g -= channel.nu_P * p_el.evaluate(T).g_J_per_mol
+            p_g = p_el.evaluate(T).g_J_per_mol
         except NasaCeaDomainError as exc:
             raise GibbsDomainRefusal(
                 f"{TYPED_REFUSAL_PREFIX}T_outside_engine_domain:{exc}"
             ) from exc
+        elemental_references.append((channel.nu_P, p_g))
     if channel.nu_O2:
         o2 = cea_polynomial(CEA_ELEMENT_O2_KEY, extract_path=extract_path)
         try:
-            g -= channel.nu_O2 * o2.evaluate(T).g_J_per_mol
+            o2_g = o2.evaluate(T).g_J_per_mol
         except NasaCeaDomainError as exc:
             raise GibbsDomainRefusal(
                 f"{TYPED_REFUSAL_PREFIX}T_outside_engine_domain:{exc}"
             ) from exc
-    return g / 1000.0
+        elemental_references.append((channel.nu_O2, o2_g))
+    return formation_subtraction_kJ_mol(g, elemental_references)
 
 
 def _dfg_points_from_values(

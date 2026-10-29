@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -91,7 +92,7 @@ observations:
     pdf_page_index: 62
     figure: 3-16
     section: 3.5 In situ observation of the high-low transformation in cristobalite
-  read_from: pdf:mamiya-2000-sio-disproportionation
+  read_from: unknown:mamiya-2000-sio-disproportionation
   point_conditions:
     temperature_K:
       state:
@@ -130,6 +131,7 @@ observations:
               figure: 3-16
               section: 3.5 In situ observation of the high-low transformation in cristobalite
         output_unit: K
+        references: []
 - observation_id: mamiya-2000-sio-disproportionation::mamiya_2000_cristobalite_dta_heating_endotherm
   experiment_id: 10.11501/3169166::experiment::mamiya_cristobalite_dta_heating
   identity:
@@ -144,6 +146,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -219,7 +222,7 @@ observations:
     pdf_page_index: 62
     figure: 3-16
     section: 3.5 In situ observation of the high-low transformation in cristobalite
-  read_from: pdf:mamiya-2000-sio-disproportionation
+  read_from: unknown:mamiya-2000-sio-disproportionation
   point_conditions:
     temperature_K:
       state:
@@ -258,3 +261,4 @@ observations:
               figure: 3-16
               section: 3.5 In situ observation of the high-low transformation in cristobalite
         output_unit: K
+        references: []

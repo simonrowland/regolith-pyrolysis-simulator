@@ -1,14 +1,14 @@
 """SocketIO event handlers for the simulator interface."""
 
 import copy
-from collections.abc import Mapping
-from dataclasses import replace
-from datetime import datetime, timezone
 import json
 import math
 import threading
 import time
 import uuid
+from collections.abc import Mapping
+from dataclasses import replace
+from datetime import datetime, timezone
 from pathlib import Path
 
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -82,10 +82,12 @@ from simulator.runner import (
     RunnerError,
     _attach_diagnostic_gate_authority_notice,
     _attach_engine_commissioning_notice,
+    _attach_high_t_melt_activity_fallback_notice,
     _attach_rump_expectation_notice,
     _attach_sulfur_saturation_notice,
     _composition_projected_liquidus_notice,
     _deep_merge_setpoints,
+    _oxygen_reservoir_exchange_observables,
 )
 from simulator.session import (
     DecisionPolicy,
@@ -103,6 +105,7 @@ from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
 # owns that runner-format summary and returns it in ``StepResult``; this
 # adapter only emits it alongside the legacy ``simulation_tick`` payload.
 from web.feedstock_data import load_visible_feedstocks
+from simulator.config import _load_setpoints_file
 from web.advisory import (
     active_wall_species_from_flue,
     ceramic_rump_payload,
@@ -121,6 +124,8 @@ DATA_DIR = Path(__file__).parent.parent / 'data'
 
 def _load_yaml(filename):
     path = DATA_DIR / filename
+    if filename == 'setpoints.yaml':
+        return _load_setpoints_file(path)
     if not path.exists():
         return {}
     with open(path) as f:
@@ -151,6 +156,7 @@ _BACKEND_WIRE_TOKEN_FIELDS = frozenset({
 _draft_validation_slots = threading.BoundedSemaphore(1)
 _registered_start_handler = None
 _registered_socketio = None
+SIMULATION_TICK_PAYLOAD_VERSION = 4
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
 _MAX_SIM_SPEED_SECONDS = 3600.0
@@ -320,8 +326,8 @@ def read_ledger_api(
         return response()
 
 
-def read_ledger_api_for_client(client_id: str, resource: str, **params):
-    """Resolve an active run owned by one signed Flask browser session."""
+def _active_simulation_sid_for_client(client_id: str) -> str:
+    """Resolve the unique active run owned by a signed browser session."""
     with _run_command_lock:
         with _simulations_guard:
             matches = [
@@ -330,7 +336,57 @@ def read_ledger_api_for_client(client_id: str, resource: str, **params):
             ]
         if len(matches) != 1:
             raise LookupError("no unique active simulation for this browser session")
-        return read_ledger_api(matches[0], resource, **params)
+        return matches[0]
+
+
+def read_ledger_api_for_client(client_id: str, resource: str, **params):
+    """Resolve an active run owned by one signed Flask browser session."""
+    return read_ledger_api(
+        _active_simulation_sid_for_client(client_id), resource, **params
+    )
+
+
+def read_simulation_history(
+    sid: str,
+    *,
+    include_run_id: bool = False,
+) -> dict[str, object]:
+    """Return the current run's hourly entries on demand."""
+    state, lock = _current_simulation_state(sid)
+    if state is None:
+        raise LookupError("no active simulation")
+    run_id = state.get('run_id')
+
+    def response() -> dict[str, object]:
+        session = state.get('session')
+        summaries_builder = getattr(session, 'per_hour_summaries', None)
+        summaries = summaries_builder() if callable(summaries_builder) else []
+        payload: dict[str, object] = {
+            'payload_version': SIMULATION_TICK_PAYLOAD_VERSION,
+            'per_hour_summary': [
+                _per_hour_summary_entry(summary)
+                for summary in summaries
+                if isinstance(summary, Mapping)
+            ],
+        }
+        if include_run_id:
+            payload['run_id'] = run_id
+        return payload
+
+    if lock is None:
+        return response()
+    with lock:
+        current, _ = _current_simulation_state(sid, run_id)
+        if current is not state:
+            raise LookupError("simulation run changed")
+        return response()
+
+
+def read_simulation_history_for_client(client_id: str) -> dict[str, object]:
+    """Resolve the active run owned by one signed Flask browser session."""
+    return read_simulation_history(
+        _active_simulation_sid_for_client(client_id), include_run_id=True
+    )
 
 
 def read_advisory_panel_detail(
@@ -346,6 +402,13 @@ def read_advisory_panel_detail(
     run_id = state.get('run_id')
 
     def read():
+        if panel == 'wall_risk_panel':
+            capture = state.get('last_recipe_capture') or {}
+            tick = capture.get('tick') if isinstance(capture, Mapping) else None
+            detail = tick.get('wall_risk_panel') if isinstance(tick, Mapping) else None
+            if not isinstance(detail, Mapping):
+                raise LookupError('wall-risk detail is not available yet')
+            return copy.deepcopy(dict(detail))
         return sc50_vr_socket_panel_detail(state['session'].simulator, panel)
 
     def response():
@@ -366,15 +429,11 @@ def read_advisory_panel_detail(
 
 def read_advisory_panel_detail_for_client(client_id: str, panel: str):
     """Resolve the live VR panel detail for one signed Flask browser session."""
-    with _run_command_lock:
-        with _simulations_guard:
-            matches = [
-                sid for sid, state in _simulations.items()
-                if state.get('ledger_client_id') == client_id
-            ]
-        if len(matches) != 1:
-            raise LookupError("no unique active simulation for this browser session")
-        return read_advisory_panel_detail(matches[0], panel, include_run_id=True)
+    return read_advisory_panel_detail(
+        _active_simulation_sid_for_client(client_id),
+        panel,
+        include_run_id=True,
+    )
 
 
 # A LAWFUL PHYSICS REFUSAL IS A RESULT, NOT A CRASH -- SAY SO IN WORDS.
@@ -592,7 +651,7 @@ def _knudsen_pressure_basis(diagnostic: object) -> dict[str, object] | None:
                 carrier_gas=carrier_gas.strip(),
                 **kwargs,
             )
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError, KnudsenRegimeRefusal):
             continue
     return None
 
@@ -639,16 +698,145 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
         return True
 
 
+_PER_HOUR_DETAIL_FIELDS = (
+    'condensation_refusals_by_species',
+    'vapour_batch_summary',
+    'vapour_batch_flux_overlay',
+)
+_PER_HOUR_CARRIER_MAP_FIELDS = (
+    'condensation_train_kg',
+    'vapor_species_kg_hr',
+    'metal_yields_kg',
+    'product_ledger_kg_at_hour',
+    'condensation_train_kg_cumulative',
+    'recycled_to_reagent_kg_cumulative',
+)
+
+
+def _per_hour_summary_entry(
+    summary: Mapping[str, object],
+) -> dict[str, object]:
+    """Build the compact per-hour row shared by tick and history payloads."""
+    entry = copy.deepcopy(dict(summary))
+    for key in _PER_HOUR_DETAIL_FIELDS:
+        entry.pop(key, None)
+    for key in _PER_HOUR_CARRIER_MAP_FIELDS:
+        entry.pop(key, None)
+    redox_breakdown = entry.get('redox_source_breakdown')
+    if isinstance(redox_breakdown, Mapping):
+        # The live redox panel consumes this projection; verbose diagnostics
+        # remain available in the run capture and completion payload.
+        entry['redox_source_breakdown'] = {
+            key: redox_breakdown[key]
+            for key in (
+                'applied_terms_mol_o2_equiv_by_label',
+                'skipped_terms_mol_o2_equiv_by_label',
+                'net_mol_o2_equiv',
+                'delta_log10_fO2',
+                'ferric_divergence',
+                'source_campaign',
+                'source_hour',
+                'source_campaign_hour',
+            )
+            if key in redox_breakdown
+        }
+    return entry
+
+
 def _browser_socket_payload(event: str, payload):
-    if event != 'per_hour_summary' or not isinstance(payload, Mapping):
+    if not isinstance(payload, Mapping):
         return payload
     emitted = dict(payload)
-    for key in (
-        'condensation_refusals_by_species',
-        'vapour_batch_summary',
-        'vapour_batch_flux_overlay',
-    ):
-        emitted.pop(key, None)
+    if event == 'per_hour_summary':
+        return _per_hour_summary_entry(payload)
+    if event == 'simulation_tick':
+        # This whole-train report is also included in simulation_complete. It
+        # is not consumed from hourly ticks and grows as product is captured.
+        emitted.pop('stage_purity_report', None)
+        vapour_rail = emitted.get('vapour_rail_instrumentation_panel')
+        if isinstance(vapour_rail, Mapping):
+            channels = vapour_rail.get('channels_by_species')
+            refusals = vapour_rail.get('refusals_by_species')
+            condensation = vapour_rail.get('condensation_refusals')
+            authority = vapour_rail.get('condensation_authority')
+            flux_overlay = vapour_rail.get('flux_overlay')
+            emitted['vapour_rail_instrumentation_panel'] = {
+                key: vapour_rail[key]
+                for key in (
+                    'status',
+                    'diagnostic_only',
+                    'shadow_equal',
+                    'shadow_outcome',
+                    'n_requested',
+                    'n_flux_active',
+                    'n_refused',
+                    'message',
+                )
+                if key in vapour_rail
+            }
+            emitted['vapour_rail_instrumentation_panel'].update({
+                'tick_view': 'compact',
+                'n_channel_species': (
+                    len(channels) if isinstance(channels, Mapping) else 0
+                ),
+                'n_refused_species': (
+                    len(refusals) if isinstance(refusals, Mapping) else 0
+                ),
+                'flux_overlay': {
+                    key: flux_overlay[key]
+                    for key in (
+                        'catalog_pa_shadow_equal',
+                        'catalog_pa_shadow_outcome',
+                    )
+                    if isinstance(flux_overlay, Mapping)
+                    and key in flux_overlay
+                },
+                'condensation_refusals': {
+                    key: condensation[key]
+                    for key in ('schema', 'n_species', 'has_refusals')
+                    if isinstance(condensation, Mapping)
+                    and key in condensation
+                },
+                'condensation_authority': {
+                    key: authority[key]
+                    for key in (
+                        'schema',
+                        'n_species',
+                        'status_counts',
+                        'max_mass_closure_error_kg_hr',
+                    )
+                    if isinstance(authority, Mapping) and key in authority
+                },
+            })
+        refusals = emitted.get('condensation_refusals_panel')
+        if isinstance(refusals, Mapping):
+            emitted['condensation_refusals_panel'] = {
+                key: refusals[key]
+                for key in (
+                    'status',
+                    'diagnostic_only',
+                    'n_species',
+                    'has_refusals',
+                    'message',
+                )
+                if key in refusals
+            }
+            emitted['condensation_refusals_panel']['tick_view'] = 'compact'
+        wall_risk = emitted.get('wall_risk_panel')
+        if isinstance(wall_risk, Mapping):
+            active_species = wall_risk.get('active_species')
+            emitted['wall_risk_panel'] = {
+                'status': wall_risk.get('status', 'n/a'),
+                'active_species_count': (
+                    len(active_species)
+                    if isinstance(active_species, (list, tuple))
+                    else 0
+                ),
+                'operating_point': copy.deepcopy(
+                    wall_risk.get('operating_point')
+                ),
+                'tick_view': 'compact',
+            }
     return emitted
 
 
@@ -1887,11 +2075,16 @@ def _decision_payload(decision):
     }
 
 
-def _rounded_positive_species(values, digits: int) -> dict[str, float]:
+def _rounded_positive_species(
+    values,
+    digits: int,
+    *,
+    minimum_amount: float = 1e-12,
+) -> dict[str, float]:
     species = {}
     for key, value in dict(values or {}).items():
         amount = float(value or 0.0)
-        if amount > 1e-12:
+        if amount > minimum_amount:
             species[str(key)] = round(amount, digits)
     return dict(sorted(species.items()))
 
@@ -1899,11 +2092,10 @@ def _rounded_positive_species(values, digits: int) -> dict[str, float]:
 def _wt_pct_from_kg(species_kg: dict[str, float]) -> dict[str, float]:
     total_kg = sum(float(value or 0.0) for value in species_kg.values())
     if total_kg <= 0.0:
-        return {}
+        return {species: 0.0 for species in sorted(species_kg)}
     return {
         species: round(float(kg) / total_kg * 100.0, 2)
         for species, kg in sorted(species_kg.items())
-        if float(kg or 0.0) > 1e-12
     }
 
 
@@ -1913,7 +2105,10 @@ def _pot_composition_kg(sim, snapshot) -> dict[str, float]:
         return {}
     try:
         return _rounded_positive_species(
-            ledger.project_account_kg('process.cleaned_melt'), 4)
+            ledger.project_account_kg('process.cleaned_melt'),
+            4,
+            minimum_amount=0.0,
+        )
     except Exception as exc:
         _safe_log(f'Unable to read cleaned-melt ledger for web tick: {exc}')
         return {}
@@ -2012,6 +2207,7 @@ def _tick_payload(
     flue_composition = _flue_composition_kg_hr(snapshot)
     active_wall_species = active_wall_species_from_flue(flue_composition)
     return {
+        'payload_version': SIMULATION_TICK_PAYLOAD_VERSION,
         'hour': snapshot.hour,
         'campaign': snapshot.campaign.name,
         'temperature_C': round(snapshot.temperature_C, 1),
@@ -2129,6 +2325,7 @@ def _tick_payload(
         'condensation': {
             k: round(v, 3) for k, v in snapshot.condensation_totals.items()
         },
+        **_oxygen_reservoir_exchange_observables(snapshot),
         'stage_purity_report': stage_purity_report(sim.train),
         'energy_electrical_plus_evaporation_kWh': round(
             snapshot.energy.electrical_plus_evaporation_kWh, 4),
@@ -2494,11 +2691,13 @@ def _merge_product_story_mass(target, species, mass):
 
 
 def _product_story_bucket(species_kg, **details):
-    rounded_species = {
-        species: round(mass, 2)
-        for species, mass in sorted(species_kg.items())
-        if float(mass) > 0.0
-    }
+    rounded_species = {}
+    for species, mass in sorted(species_kg.items()):
+        if float(mass) <= 0.0:
+            continue
+        displayed_mass = round(mass, 2)
+        if displayed_mass != 0.0:
+            rounded_species[species] = displayed_mass
     return {
         'species_kg': rounded_species,
         **{key: round(float(value), 2) for key, value in details.items()},
@@ -2829,6 +3028,7 @@ def _available_runner_payload(
         _attach_diagnostic_gate_authority_notice,
         _attach_sulfur_saturation_notice,
         _attach_rump_expectation_notice,
+        _attach_high_t_melt_activity_fallback_notice,
     ):
         try:
             attach_notice(metadata, sim)
@@ -3138,6 +3338,12 @@ def _start_background_loop(
                             backend_error=step_result.backend_error,
                             backend_status_reason=step_backend_status_reason,
                         )
+                        if isinstance(step_result.per_hour_summary, Mapping):
+                            tick_data['per_hour_summary_delta'] = (
+                                _per_hour_summary_entry(
+                                    step_result.per_hour_summary
+                                )
+                            )
                         _record_last_recipe_capture(
                             sid,
                             run_id,
@@ -3464,6 +3670,29 @@ def register_events(socketio):
     global _registered_socketio, _registered_start_handler
     _registered_socketio = socketio
 
+    def client_protocol_version_error(data, event_name: str):
+        received_version = (
+            data.get('payload_version') if isinstance(data, Mapping) else None
+        )
+        if (
+            isinstance(received_version, int)
+            and not isinstance(received_version, bool)
+            and received_version == SIMULATION_TICK_PAYLOAD_VERSION
+        ):
+            return None
+        return {
+            'status': 'error',
+            'error_type': 'client_protocol_version_mismatch',
+            'reload_required': True,
+            'expected_payload_version': SIMULATION_TICK_PAYLOAD_VERSION,
+            'received_payload_version': received_version,
+            'message': (
+                f'{event_name} requires simulator protocol version '
+                f'{SIMULATION_TICK_PAYLOAD_VERSION}. Reload this page before '
+                'starting or resuming a run.'
+            ),
+        }
+
     @socketio.on('connect')
     def handle_connect():
         with _run_command_lock:
@@ -3575,6 +3804,18 @@ def register_events(socketio):
                 'status': 'error',
                 'message': 'start_simulation payload must be an object',
             }, 'invalid_run_request')
+        if not command_mode:
+            protocol_error = client_protocol_version_error(
+                data, 'start_simulation'
+            )
+            if protocol_error is not None:
+                return reject(
+                    protocol_error,
+                    'client_protocol_version_mismatch',
+                    426,
+                )
+            data = dict(data)
+            data.pop('payload_version', None)
         if 'single_run' in data:
             try:
                 command_payload, parsed_single_run_context = (
@@ -4150,8 +4391,18 @@ def register_events(socketio):
             )
 
     @socketio.on('resume_simulation')
-    def handle_resume():
+    def handle_resume(data=None):
         sid = request.sid
+        protocol_error = client_protocol_version_error(
+            data, 'resume_simulation'
+        )
+        if protocol_error is not None:
+            socketio.emit(
+                'simulation_status',
+                protocol_error,
+                room=sid,
+            )
+            return
         state, lock = _current_simulation_state(sid)
         if not state or not lock:
             reject_control_without_active_run(sid, 'resume_simulation')

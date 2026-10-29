@@ -25,6 +25,8 @@ def _repo_setpoints() -> dict:
 
 
 def _sim(setpoints: dict) -> PyrolysisSimulator:
+    setpoints = deepcopy(setpoints)
+    setpoints.setdefault("chemistry_kernel", {})["liquid_fraction_provider"] = "analytical"
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
@@ -223,6 +225,18 @@ def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
     assert al_high == pytest.approx(1.857324, abs=1e-6)
     assert mg_high == pytest.approx(1.792604, abs=1e-6)
     assert mg_high < al_high
+
+
+@pytest.mark.xfail(strict=True, reason="b-848: Cr2O3 liquid-standard fusion correction is missing")
+def test_cr2o3_mre_voltage_includes_fusion_correction_at_1500_c():
+    ref = mre_ladder.mre_decomposition_voltage_reference(
+        "Cr2O3",
+        temperature_K=1773.15,
+    )
+
+    assert ref is not None
+    assert ref.raw_graph_voltage_V is not None
+    assert ref.voltage == pytest.approx(ref.raw_graph_voltage_V - 0.067, abs=0.001)
 
 
 def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():

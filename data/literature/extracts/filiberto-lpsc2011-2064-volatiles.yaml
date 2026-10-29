@@ -13,6 +13,10 @@ extraction:
   worker: i1-filiberto-lpsc2011-2064-volatiles
   provenance_path: corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
 review_status: draft
+fidelity_samples:
+- path: species.F_Cl_H2O.observations[filiberto_2011_figure1_near_liquidus_relations].values.phase_fields_printed[0]
+  value: Liquid
+  locator: {published_page: 1, figure: '1', note: 'Figure 1 labels the liquid phase field.'}
 scope_assessment:
   document_type: 2-page LPSC conference abstract reporting experiments, not a full experimental paper
   measured_direct_observations: 0

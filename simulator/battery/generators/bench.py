@@ -5,8 +5,13 @@ from decimal import Decimal
 from collections.abc import Mapping
 
 from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
-from simulator.battery.enums import Phase, ReferenceStateConvention, ValueKind
-from simulator.battery.records import StandardState, Value, phase_token
+from simulator.battery.enums import Fo2Mode, Phase, ReferenceStateConvention, ValueKind
+from simulator.battery.records import (
+    StandardState,
+    Value,
+    phase_token,
+    polymorph_token,
+)
 from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
@@ -14,6 +19,7 @@ from simulator.battery.waypoints import (
     WaypointResult, _prediction_pressure_waypoint, pure_substance_engine_point_gap,
     is_invalid_row_composition_gap,
 )
+from simulator.melt_backend.base import multivalent_components
 
 
 _FLAGGED_AUTHORITIES = {"assumed", "bound", "extrapolated"}
@@ -112,31 +118,6 @@ class UnsupportedValue(ValueError):
 
 
 # Each element has more than one oxidation state in silicate melts over the
-# fO2 range these engines are asked to run. Omitting fO2 lets the engine
-# invent that redox state. Composition names and the measured species are
-# mapped onto this table; the element symbols are not repeated elsewhere.
-# Fe: Fe2+ and Fe3+, and Fe0 at very low fO2. Every MELTS iron alias, including
-#     the total-iron prints, maps here.
-# Ti: Ti4+ and Ti3+.
-# Cr: Cr3+ and Cr2+.
-# Mn: Mn2+ and Mn3+.
-# V: V3+, V4+, and V5+.
-# Eu: Eu3+ and Eu2+.
-# Ce: Ce4+ and Ce3+.
-# S: sulfide S2- and sulfate S6+.
-# Ga: Ga3+ and Ga+. Bischof measures Ga dissolved in CMAS, so Ga is not in the bulk map.
-MULTIVALENT_MELT_ELEMENTS: dict[str, str] = {
-    "Fe": "Fe2+/Fe3+",
-    "Ti": "Ti4+/Ti3+",
-    "Cr": "Cr3+/Cr2+",
-    "Mn": "Mn2+/Mn3+",
-    "V": "V3+/V4+/V5+",
-    "Eu": "Eu3+/Eu2+",
-    "Ce": "Ce4+/Ce3+",
-    "S": "S2-/S6+",
-    "Ga": "Ga3+/Ga+",
-}
-
 # Parent-oxide basis tokens already printed on rows. single_cation is a
 # different activity and is not converted into this set.
 _PARENT_OXIDE_COMPONENT_BASES = frozenset({"oxide", "parent", "parent_oxide"})
@@ -176,63 +157,18 @@ _ENGINE_REPORTED_ACTIVITY["openimcc"] = EngineReportedActivity(
     Phase.L,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
-
-
-def _oxide_lookup_key(name: str) -> str:
-    key = str(name).strip()
-    if key.endswith("_Liq"):
-        key = key[:-4]
-    # FeO* is total iron written as FeO. The MELTS alias map keys FeO, not the star.
-    if key.endswith("*"):
-        key = key[:-1]
-    return key
-
-
-def _elements_of_component(name: str) -> frozenset[str]:
-    """Elements in one composition name or species formula.
-
-    Iron aliases come from the MELTS basis map (FeO_tot, FeOT, FeO_total,
-    and the same keys in any case). A name the map does not know is parsed
-    as a formula, which is how TiO2, V2O3, and Ga reach the element table.
-    """
-
-    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
-    from simulator.reference_data.janaf import formula_composition
-
-    key = _oxide_lookup_key(name)
-    canonical = MELTS_OXIDE_ALIASES.get(key.lower())
-    # FeO_total does not parse: the underscore is not a formula token.
-    # Every MELTS total-iron alias is total Fe expressed as FeO.
-    formula = "FeO" if canonical == "FeO_total" else (canonical or key)
-    parsed = formula_composition(formula)
-    if not parsed:
-        return frozenset()
-    return frozenset(element for element, _count in parsed)
-
-
-def _is_multivalent(name: str) -> bool:
-    return any(element in MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name))
-
-
-def _redox_components(composition: Mapping, species: str | None = None) -> tuple[str, ...]:
-    """Names that hold a multivalent element at a positive amount, plus the species.
-
-    A printed zero does not count, so FeO = 0 cannot hide TiO2.
-    """
-
-    present: list[str] = []
-    for name, amount in composition.items():
-        try:
-            number = Decimal(str(amount))
-        except (ArithmeticError, ValueError):
-            continue
-        if number <= 0:
-            continue
-        if _is_multivalent(str(name)):
-            present.append(str(name))
-    if species and _is_multivalent(species) and species not in present:
-        present.append(species)
-    return tuple(sorted(present))
+_ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
+    "raoultian_pure_liquid_endmember",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.L,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
+_ENGINE_REPORTED_ACTIVITY["magemin"] = EngineReportedActivity(
+    "raoultian_native_crystal_activity",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.CR,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
 
 
 def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
@@ -278,10 +214,22 @@ def _imcc_reports_parent_oxide(formula: str) -> tuple[bool, str]:
 
 
 def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
+    if engine == "magemin":
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        if formula in MAGEMIN_NATIVE_MELT_ACTIVITIES:
+            return True, "raoultian_native_crystal_activity"
+        return False, f"typed-refusal:magemin_no_native_activity:{formula}"
     if engine in ("alphamelts", "thermoengine"):
         return _melts_reports_oxide_endmember(formula)
     if engine == "openimcc":
         return _imcc_reports_parent_oxide(formula)
+    if engine == "internal-analytical":
+        from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
+
+        if formula in MELT_OXIDE_CATIONS_PER_FORMULA:
+            return True, "raoultian_pure_liquid_endmember"
+        return False, f"typed-refusal:unsupported_internal_analytical_oxide:{formula}"
     return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
 
 
@@ -306,6 +254,15 @@ def _reference_matches(
     )
     if not structural:
         return False, reported.reported
+    if engine == "magemin":
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        native = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(state.endmember.formula)
+        polymorph = polymorph_token(state.endmember)
+        if native is None or polymorph is None:
+            return False, reported.reported
+        if polymorph.value != native[1]:
+            return False, reported.reported
     return _engine_reports_formula(engine, state.endmember.formula)
 
 
@@ -450,16 +407,22 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
     return tuple(results)
 
 
-def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
+def melt_activity_requests(
+    inputs: ConsumerInputs, *, experiment=None, bench=None, observation=None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+) -> tuple[GeneratedInput, ...]:
     """Activity and activity-coefficient requests for engines that report activities.
 
     Required: a normalized composition, a point temperature, and a reference
-    state whose endmember formula is the activity that engine reports. An
-    oxygen point is required when the composition or the measured species
-    holds a multivalent element. Pressure and the gas boundary are not inputs.
-    A missing required input is a typed gap. A missing oxygen point is not
-    filled: the scorer must not substitute PO2_ENGINE_DEFAULT for an activity
-    comparison.
+    state whose endmember formula is the activity that engine reports. When
+    the composition or measured species holds a multivalent element, every
+    engine receives the same fO2 from the row ladder, or the same oxygen gap
+    when no tier resolves. A printed fO2 is attached for every engine even
+    when oxygen is not otherwise an input. Pressure and the gas boundary are
+    not inputs. ``engine_intrinsic`` omits fO2 only for internal-analytical;
+    all other engines retain the shared-ladder requirement. A missing required
+    input is a typed gap, and a missing oxygen point is never filled from the
+    engine default.
     """
     provenance = _provenance(inputs)
     if inputs.pure_substance_reference:
@@ -499,28 +462,75 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         point_gap = _point_gap("temperature_K", temperature.selected)
         if point_gap is not None:
             gaps.append(point_gap)
-    redox: tuple[str, ...] = ()
-    if composition.selected is not None:
-        redox = _redox_components(composition.selected.value, inputs.measured_species)
-    elif inputs.measured_species and _is_multivalent(inputs.measured_species):
-        redox = (inputs.measured_species,)
-    if redox:
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+
+    # One owner for which melt components are multivalent (b-932). The
+    # shared ladder (mode 2) then attaches one fO2, or the same oxygen gap
+    # when no tier resolves. engine_intrinsic drops that gap only for
+    # internal-analytical, below.
+    redox = multivalent_components(
+        composition.selected.value if composition.selected is not None else None,
+        inputs.measured_species,
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    )
+    temperature_K = None
+    thermal = inputs.waypoints["temperature_K"]
+    if thermal.selected is not None and _point_gap("temperature_K", thermal.selected) is None:
+        try:
+            temperature_K = float(_point(inputs, "temperature_K"))
+        except UnsupportedValue:
+            temperature_K = None
+    moles = None
+    if composition.selected is not None and isinstance(composition.selected.value, Mapping):
+        moles = composition.selected.value
+    resolved = None
+    if fo2_mode is Fo2Mode.SHARED_LADDER:
+        from simulator.battery.fo2_ladder import resolve_row_fo2
+
+        resolved = resolve_row_fo2(
+            experiment,
+            bench,
+            observation,
+            composition_moles=moles,
+            temperature_K=temperature_K,
+            oxygen=inputs.waypoints["oxygen_condition"],
+        )
+    # Tier 1 is the printed fO2 and is shared even when oxygen is not
+    # otherwise an input. Tiers 2-4 fill only a multivalent row.
+    # A vapour effusion closure is not an activity fO2.
+    if resolved is not None and resolved.closure:
+        resolved = None
+    shared = resolved if resolved is not None and (resolved.tier == 1 or redox) else None
+    if redox and shared is None:
         oxygen = inputs.waypoints["oxygen_condition"]
-        if oxygen.selected is None:
-            absence = oxygen.absence
-            gaps.append(ReadinessGap(
-                "oxygen_condition",
-                GapReason.MISSING_EVIDENCE,
-                tuple(dict.fromkeys((*redox, *(absence.missing if absence else ())))),
-            ))
-        else:
-            point_gap = _point_gap("oxygen_condition", oxygen.selected)
-            if point_gap is not None:
-                gaps.append(point_gap)
-    status = ReadinessStatus.GAP if gaps else ReadinessStatus.READY
+        absence = oxygen.absence
+        gaps.append(ReadinessGap(
+            "oxygen_condition",
+            GapReason.MISSING_EVIDENCE,
+            tuple(dict.fromkeys((*redox, *(absence.missing if absence else ())))),
+        ))
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
+        if engine == "magemin" and inputs.activity_quantity != "activity":
+            results.append(_not_applicable(provenance, engine))
+            continue
+        if engine == "internal-analytical" and inputs.activity_quantity != "activity":
+            results.append(_not_applicable(provenance, engine))
+            continue
+        engine_gaps = tuple(
+            gap
+            for gap in gap_tuple
+            if not (
+                fo2_mode is Fo2Mode.ENGINE_INTRINSIC
+                and engine == "internal-analytical"
+                and gap.waypoint == "oxygen_condition"
+            )
+        )
+        engine_status = (
+            ReadinessStatus.GAP if engine_gaps else ReadinessStatus.READY
+        )
+        readiness = ConsumerReadiness("melt_activity", engine_status, engine_gaps, engine)
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
         single_cation = (
             inputs.activity_quantity == "activity_coefficient"
@@ -550,11 +560,12 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                 (_reference_gap(state, engine_side),),
             ))
             continue
-        readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
-        if status is not ReadinessStatus.READY:
+        if engine_status is not ReadinessStatus.READY:
             results.append(GeneratedInput(readiness, None, provenance))
             continue
-        if inputs.measured_species != state.endmember.formula:
+        if (
+            inputs.measured_species != state.endmember.formula
+        ):
             gap = ReadinessGap(
                 "reference_state",
                 GapReason.REFERENCE_STATE_MISMATCH,
@@ -597,21 +608,39 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                     "engine_reports": reported,
                 },
             }
-            if redox:
-                oxygen_log = _point(inputs, "oxygen_condition")
-                payload["fO2_log"] = float(oxygen_log)
-                routes["fO2_log"] = {"waypoint": "oxygen_condition", "because": list(redox)}
+            if shared is not None:
+                payload["fO2_log"] = shared.log10_fO2_bar
+                payload["fO2_tier"] = shared.tier
+                payload["fO2_route"] = shared.route
+                payload["fO2_borrowed"] = shared.borrowed
+                if shared.po2_bar is not None:
+                    payload["fO2_bar"] = shared.po2_bar
+                routes["fO2_log"] = {
+                    "waypoint": "fo2_ladder",
+                    "authority": "assumed" if shared.borrowed else "derived",
+                    "tier": shared.tier,
+                    "route": shared.route,
+                    "borrowed": shared.borrowed,
+                    "because": list(redox),
+                }
             results.append(GeneratedInput(readiness, payload, {**provenance, "output_routes": routes}))
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))
     return tuple(results)
 
 
-def activity_request_for_engine(experiment, observation, engine: str) -> GeneratedInput | None:
+def activity_request_for_engine(
+    experiment,
+    observation,
+    engine: str,
+    *,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+) -> GeneratedInput | None:
     """One engine's melt-activity contract for this observation.
 
     The scorer calls this before it would fill a missing fO2. A gap here is
-    a typed refusal. PO2_ENGINE_DEFAULT is not an oxygen input.
+    a typed refusal. ``engine_intrinsic`` is limited to the internal
+    analytical activity calculation. PO2_ENGINE_DEFAULT is not an oxygen input.
     """
 
     from simulator.battery.consumer_inputs import collect_consumer_inputs
@@ -623,7 +652,13 @@ def activity_request_for_engine(experiment, observation, engine: str) -> Generat
         getattr(experiment, "work_id", None) or observation.source_id or "melt-activity",
         BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
     )
-    for item in melt_activity_requests(collect_consumer_inputs(experiment, bench, observation)):
+    for item in melt_activity_requests(
+        collect_consumer_inputs(experiment, bench, observation),
+        experiment=experiment,
+        bench=bench,
+        observation=observation,
+        fo2_mode=fo2_mode,
+    ):
         if item.readiness.engine == engine:
             return item
     return None

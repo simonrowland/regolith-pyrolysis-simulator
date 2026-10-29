@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:nagabayashi-hino-banya-1989-phosphorus
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:nagabayashi-hino-banya-1989-phosphorus
-      role: table_csv
-      path: tables/nagabayashi-hino-banya-1989-phosphorus
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:nagabayashi-hino-banya-1989-phosphorus
       role: pdftotext
       path: unknown
@@ -68,6 +62,7 @@ experiments:
               section: 2. Experimentals
               source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
         output_unit: kg
+        references: []
     form:
       state:
         tag: value

@@ -168,7 +168,6 @@ species:
       note: 'Table 2 footnotes retain the printed reference-state conditions: Mg(g) reference above 1378 K, Ca(g) above 1767.4 K, Na(g) above 1177 K, K(g) above 1044 K, and O2(g) at all temperatures.'
     - observation_id: fegley_cameron_1987_table4_predicted_compositions
       type: rate_series
-      derived_from: [no27-fegley-cameron-1987-epsl::fegley_cameron_1987_model_setup_initial_oxide_magma]
       locator: {published_page: '213', table: '4', section: 'Predicted mantle and crust compositions from different vaporization models'}
       phase: condensed_liquid
       regime: thermodynamic_model
@@ -176,8 +175,8 @@ species:
       values:
         quantity: condensate_composition
         evidence_class: model_derived
-        method_class: model_derived
-        derivation: {relation: MAGMA vaporization calculation at stated temperature and model column, output_unit: mass_percent_oxide}
+        method_class: quoted_attributed
+        attribution: Fegley and Cameron (1987), Table 4; output of the MAGMA vaporization code using ideal and Hastie-model nonideal silicate melts
         model_generator: MAGMA; ideal solution at 3000 K and nonideal IMCC solution at 2500, 3000, and 3500 K
         condition: mean uncompressed planetary density = 5.3 g/cm3
         model_columns: ['1 ideal 3000 K', '2 nonideal 2500 K', '3 nonideal 3000 K', '4 nonideal 3500 K']
@@ -193,7 +192,6 @@ species:
         - {oxide: Th, units: ppb, value: [278, 401, 377, 322], note: primordial abundance 4.55 x 10^9 years ago}
     - observation_id: fegley_cameron_1987_printed_model_results
       type: rate_series
-      derived_from: [no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table4_predicted_compositions]
       locator: {published_page: '212-215', figures: ['1', '2', '3', '4', '5', '6', '7', '8', '9'], sections: ['2.3', '2.4']}
       phase: condensed_liquid
       regime: thermodynamic_model
@@ -201,8 +199,8 @@ species:
       values:
         quantity: vaporization_model_results
         evidence_class: model_derived
-        method_class: model_derived
-        derivation: {relation: MAGMA vaporization calculation and printed prose summary, output_unit: as_printed}
+        method_class: quoted_attributed
+        attribution: Fegley and Cameron (1987), sections 2.3–2.4; output of the MAGMA vaporization code using ideal and Hastie-model nonideal silicate melts
         model_generator: MAGMA with ideal solution and IMCC nonideal solution models
         printed_results:
         - {result: ideal_magma_first_elements_lost, value: 'Na and K; K more volatile; Si follows, then Fe and Mg', locator: 'p. 212, section 2.3'}

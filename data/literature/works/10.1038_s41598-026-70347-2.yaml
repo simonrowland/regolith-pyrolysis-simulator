@@ -10,26 +10,8 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
-    - asset_id: pdf:suzuki-2026-vacuum-oxygen-extraction
-      role: pdf
-      path: raw/suzuki-2026-vacuum-oxygen-extraction/suzuki-2026-vacuum-oxygen-extraction.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:suzuki-2026-vacuum-oxygen-extraction
-      role: pdftotext
-      path: text/suzuki-2026-vacuum-oxygen-extraction
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:suzuki-2026-vacuum-oxygen-extraction
-      role: table_csv
-      path: tables/suzuki-2026-vacuum-oxygen-extraction
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:suzuki-2026-vacuum-oxygen-extraction
       role: pdftotext
       path: unknown
@@ -121,6 +103,7 @@ experiments:
               pdf_page_index: 3
               figure: '2'
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -162,6 +145,7 @@ experiments:
               section: Vacuum heating experiment
               note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -288,6 +272,7 @@ experiments:
               pdf_page_index: 3
               figure: '2'
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -329,6 +314,7 @@ experiments:
               section: Vacuum heating experiment
               note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -455,6 +441,7 @@ experiments:
               pdf_page_index: 3
               figure: '2'
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -496,6 +483,7 @@ experiments:
               section: Vacuum heating experiment
               note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -567,6 +555,7 @@ experiments:
               section: Results
               note: Printed duration 1.5 h; converted to seconds (5400) by h_to_s.
         output_unit: s
+        references: []
 benches:
 - id: 10.1038/s41598-026-70347-2::bench::vacuum-heating-furnace
   work_id: 10.1038/s41598-026-70347-2

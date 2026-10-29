@@ -400,6 +400,43 @@ def resolve_species_formula(
         raise UnknownSpeciesError(f"unknown species {species!r}") from exc
 
 
+def project_oxide_composition(
+    values: Mapping[str, Any],
+    *,
+    source_basis: str,
+) -> dict[str, float]:
+    """Normalize an oxide composition from wt% or formula-unit moles.
+
+    Formula resolution and mass conversion stay here so engine proxies,
+    benchmarks, and redox output projection use the same oxide molar masses.
+    """
+    if source_basis not in {"wt_pct", "moles"}:
+        raise ValueError("source_basis must be 'wt_pct' or 'moles'")
+    projected: dict[str, float] = {}
+    for raw_species, raw_amount in values.items():
+        species = str(raw_species)
+        try:
+            amount = float(raw_amount)
+        except (TypeError, ValueError) as exc:
+            raise AccountingError(f"{species} amount must be numeric") from exc
+        if not math.isfinite(amount) or amount < 0.0:
+            raise AccountingError(f"{species} amount must be finite and non-negative")
+        if amount == 0.0:
+            continue
+        molar_mass = resolve_species_formula(species).molar_mass_g_per_mol()
+        # Premise: wt% is proportional to mass, while formula-unit moles are
+        # proportional to amount. Therefore n ∝ wt%/M and m ∝ n*M; the units
+        # are respectively mol and g up to a common scale that normalization
+        # cancels. A single positive species projects to fraction 1.
+        projected[species] = (
+            amount / molar_mass if source_basis == "wt_pct" else amount * molar_mass
+        )
+    total = sum(projected.values())
+    if total <= 0.0:
+        return {}
+    return {species: amount / total for species, amount in sorted(projected.items())}
+
+
 class _FormulaParser:
     def __init__(self, text: str) -> None:
         self.text = text

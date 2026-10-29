@@ -10,6 +10,16 @@ STAGE_KEY_BY_NUMBER: dict[int, str] = {
     4: 'stage_4_alkali_mg_cyclone',
 }
 
+# Config includes ducts and downstream monitors as well as product collectors.
+# Keep the product/report registry above stable; reuse its canonical keys here.
+COLLECTOR_STAGE_KEY_BY_NUMBER: dict[int, str] = {
+    0: 'stage_0_hot_duct',
+    **STAGE_KEY_BY_NUMBER,
+    5: 'stage_5_vortex_dust_filter',
+    6: 'stage_6_turbine_compressor',
+    7: 'stage_7_accumulator',
+}
+
 STAGE_NUMBER_BY_KEY: dict[str, int] = {
     key: number for number, key in STAGE_KEY_BY_NUMBER.items()
 }

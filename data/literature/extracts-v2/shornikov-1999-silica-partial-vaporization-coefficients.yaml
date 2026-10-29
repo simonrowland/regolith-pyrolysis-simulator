@@ -1,0 +1,1553 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-1999-silica-partial-vaporization-coefficients.yaml
+observations:
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c03
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1700, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0201'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0045 on values.alpha.
+      printed: ±0.45
+      on_alpha: ±0.0045
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c03
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (10). It is not recomputed, and it is not linked to Table 3.; row_label=(SiO)
+      1700–1950; column_header=(10)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c04
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1700, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0239'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0035 on values.alpha.
+      printed: ±0.35
+      on_alpha: ±0.0035
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c04
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (15). It is not recomputed, and it is not linked to Table 3.; row_label=(SiO)
+      1700–1950; column_header=(15)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c05
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1700, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0225'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0025 on values.alpha.
+      printed: ±0.25
+      on_alpha: ±0.0025
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c05
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (17). It is not recomputed, and it is not linked to Table 3.; row_label=(SiO)
+      1700–1950; column_header=(17)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c06
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1700, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.022'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0024 on values.alpha.
+      printed: ±0.24
+      on_alpha: ±0.0024
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c06
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (19). It is not recomputed, and it is not linked to Table 3.; row_label=(SiO)
+      1700–1950; column_header=(19)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c07
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1700, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0223'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0030 on values.alpha.
+      printed: ±0.30
+      on_alpha: ±0.0030
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c07
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: '600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul''ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      The recommended cell is not the arithmetic mean of columns (10), (15), (17), and (19): SiO mean 2.2125 against printed
+      2.23; SiO2 mean 1.78 against printed 1.80; Si2O2 mean 1.58 against printed 1.62. Those columns are not linked as parents.
+      Published p. 194 also states this silicon monoxide coefficient as (2.23±0.30)×10^{-2} and constant at 1610–1980 K. The
+      table cell''s temperature range is the one stored.; row_label=(SiO) 1700–1950; column_header=recommended value'
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c03
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0156'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0052 on values.alpha.
+      printed: ±0.52
+      on_alpha: ±0.0052
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c03
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (10). It is not recomputed, and it is not linked to Table 3.; row_label=(SiO2)
+      1850–1950; column_header=(10)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c04
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.019'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0043 on values.alpha.
+      printed: ±0.43
+      on_alpha: ±0.0043
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c04
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (15). It is not recomputed, and it is not linked to Table 3.; row_label=(SiO2)
+      1850–1950; column_header=(15)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c05
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0164'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0035 on values.alpha.
+      printed: ±0.35
+      on_alpha: ±0.0035
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c05
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (17). It is not recomputed, and it is not linked to Table 3.; row_label=(SiO2)
+      1850–1950; column_header=(17)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c06
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0202'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0038 on values.alpha.
+      printed: ±0.38
+      on_alpha: ±0.0038
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c06
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (19). It is not recomputed, and it is not linked to Table 3.; row_label=(SiO2)
+      1850–1950; column_header=(19)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c07
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.018'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0041 on values.alpha.
+      printed: ±0.41
+      on_alpha: ±0.0041
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c07
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: '600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul''ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      The recommended cell is not the arithmetic mean of columns (10), (15), (17), and (19): SiO mean 2.2125 against printed
+      2.23; SiO2 mean 1.78 against printed 1.80; Si2O2 mean 1.58 against printed 1.62. Those columns are not linked as parents.;
+      row_label=(SiO2) 1850–1950; column_header=recommended value'
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c03
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Si2O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0131'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0056 on values.alpha.
+      printed: ±0.56
+      on_alpha: ±0.0056
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c03
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (10). It is not recomputed, and it is not linked to Table 3.; row_label=(Si2O2)
+      1850–1950; column_header=(10)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c04
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Si2O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.016'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0049 on values.alpha.
+      printed: ±0.49
+      on_alpha: ±0.0049
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c04
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (15). It is not recomputed, and it is not linked to Table 3.; row_label=(Si2O2)
+      1850–1950; column_header=(15)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c05
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Si2O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0153'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0041 on values.alpha.
+      printed: ±0.41
+      on_alpha: ±0.0041
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c05
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (17). It is not recomputed, and it is not linked to Table 3.; row_label=(Si2O2)
+      1850–1950; column_header=(17)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c06
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Si2O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0188'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0045 on values.alpha.
+      printed: ±0.45
+      on_alpha: ±0.0045
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c06
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      This cell is the printed result of equation (19). It is not recomputed, and it is not linked to Table 3.; row_label=(Si2O2)
+      1850–1950; column_header=(19)
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients
+- observation_id: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c07
+  experiment_id: db945eae38b50ab9d37ad1e635c69529628e25b2821775bf327893d0564f1ce1::shornikov-1999-silica-partial-vaporization-coefficients
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Si2O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1850, 1950]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0162'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0047 on values.alpha.
+      printed: ±0.47
+      on_alpha: ±0.0047
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-1999-silica-partial-vaporization-coefficients::shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c07
+  source_id: shornikov-1999-silica-partial-vaporization-coefficients
+  locator:
+    page: 8
+    published_page: 194
+    pdf_page_index: 7
+    table: '4'
+    note: '600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was changed. MinerU had tagged
+      the data row as a header; the scratch CSV retagged rows 7–9 to body before emit. The column header is α_i × 10^2, so
+      values.alpha is the printed cell divided by 100. The temperature cell is a range, so it was not passed through the temperature
+      column. Condensed phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+      the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is stored. Part I (Shornikov,
+      Archakov, and Shul''ts, Russian Journal of General Chemistry, 68(8), 1171–1177, 1998) prints the melting point of [SiO2]
+      as 1996±5 K. This interval ends at 1950 K, outside the melting band 1991–2001 K and within 100 K of that melting point.
+      The recommended cell is not the arithmetic mean of columns (10), (15), (17), and (19): SiO mean 2.2125 against printed
+      2.23; SiO2 mean 1.78 against printed 1.80; Si2O2 mean 1.58 against printed 1.62. Those columns are not linked as parents.;
+      row_label=(Si2O2) 1850–1950; column_header=recommended value'
+  read_from: pdf:shornikov-1999-silica-partial-vaporization-coefficients

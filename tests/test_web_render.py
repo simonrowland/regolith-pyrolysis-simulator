@@ -147,6 +147,7 @@ def producer_backed_operator_tick(monkeypatch):
         client.emit(
             "start_simulation",
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
@@ -220,7 +221,7 @@ def test_simulation_tick_payload_renders_operator_dom_readouts(
     assert rendered["text"]["status-mass"] == (
         f"Melt: {payload['melt_mass_kg']:.0f} kg"
     )
-    assert rendered["text"]["status-atmosphere"] == "Atmosphere: Hard vacuum"
+    assert rendered["text"]["status-atmosphere"] == "Atmosphere: Argon flow"
     assert rendered["text"]["energy-cumulative"] == (
         f"{payload['energy_electrical_plus_evaporation_cumulative_kWh']:.1f} kWh"
     )
@@ -606,6 +607,8 @@ def test_disconnect_reconnect_resets_controls_and_decision_modal():
 def _minimal_tick_payload(**overrides):
     """Bare tick with the numeric fields the tick DOM path always reads."""
     payload = {
+        "payload_version": 4,
+        "per_hour_summary_delta": {"hour": 70},
         "run_id": "run-1",
         "hour": 70,
         "temperature_C": 1459.0,
@@ -989,6 +992,28 @@ def test_status_strip_harness_loads_production_lifecycle_module_order():
     assert rendered["final"]["statusText"] == "Complete"
 
 
+def test_furnace_material_default_label_does_not_claim_a_fixed_ceiling():
+    template = (_REPO_ROOT / "web" / "templates" / "simulator.html").read_text()
+    controls = _SIMULATOR_CONTROLS_JS.read_text()
+
+    assert '<option value="" selected>Default</option>' in template
+    assert 'id="furnace-material-error"' in template
+    assert "Default (1800 C ceiling)" not in template
+    assert "Default (1800 C ceiling)" not in controls
+
+
+def test_furnace_material_catalog_failure_is_reported():
+    rendered = _render_status_strip(
+        sequence=[],
+        simulate_furnace_catalog_failure=True,
+    )
+
+    assert rendered["final"]["furnaceMaterialErrorHidden"] is False
+    assert rendered["final"]["furnaceMaterialErrorText"] == (
+        "Could not load furnace material options. The default remains selected."
+    )
+
+
 def test_duplicate_pending_starts_accept_only_latest_generation():
     sequence = [
         {"event": "start_click", "payload": {}},
@@ -1341,7 +1366,8 @@ def test_new_advisory_panels_render_empty_payloads_as_na():
 def _assert_producer_tick_baseline(payload):
     assert payload["hour"] == 1
     assert payload["campaign"] == "C0"
-    assert payload["temperature_C"] == pytest.approx(75.0)
+    # d-252 made C0 a 200 C/hr dry-Ar bakeout; its live tick starts at 25 C.
+    assert payload["temperature_C"] == pytest.approx(225.0)
     # 2026-08-05 MC-1 trace wiring d1b4f5d: Stage-0 routes 1.2285257819218 kg
     # of lunar trace passengers before this rounded operator payload is emitted.
     assert payload["melt_mass_kg"] == pytest.approx(998.8)
@@ -1349,9 +1375,9 @@ def _assert_producer_tick_baseline(payload):
     assert payload["mass_balance_error_breached"] is False
     assert payload["pot_composition_units"] == "kg"
     assert payload["pot_composition"]["SiO2"] > 0
-    assert payload["atmosphere"] == "HARD_VACUUM"
-    assert payload["actual_ramp_rate"] == pytest.approx(50.0)
-    assert payload["nominal_ramp_rate"] == pytest.approx(50.0)
+    assert payload["atmosphere"] == "ARGON_FLOW"
+    assert payload["actual_ramp_rate"] == pytest.approx(200.0)
+    assert payload["nominal_ramp_rate"] == pytest.approx(200.0)
     assert "backend_fallback_active" in payload
     assert "backend_message" in payload
 
@@ -1445,13 +1471,14 @@ def _render_advisory_sequence(*, html, events):
     return json.loads(completed.stdout)
 
 
-def _render_socket_lifecycle():
+def _render_socket_lifecycle(*, simulation_ticks=None):
     completed = subprocess.run(
         ["node", str(_SOCKET_HARNESS)],
         input=json.dumps(
             {
                 "socket_script_path": str(_SIMULATOR_SOCKET_JS),
                 "decisions_script_path": str(_SIMULATOR_DECISIONS_JS),
+                "simulation_ticks": simulation_ticks or [],
             }
         ),
         text=True,
@@ -1468,6 +1495,7 @@ def _render_status_strip(
     sequence,
     mutate_badge_clobber=False,
     mutate_no_tick_recovery=False,
+    simulate_furnace_catalog_failure=False,
 ):
     completed = subprocess.run(
         ["node", str(_STATUS_STRIP_HARNESS)],
@@ -1482,6 +1510,7 @@ def _render_status_strip(
                 "sequence": sequence,
                 "mutate_badge_clobber": mutate_badge_clobber,
                 "mutate_no_tick_recovery": mutate_no_tick_recovery,
+                "simulate_furnace_catalog_failure": simulate_furnace_catalog_failure,
             }
         ),
         text=True,

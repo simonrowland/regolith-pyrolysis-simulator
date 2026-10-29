@@ -35,10 +35,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from engines.builtin.cco_redox_buffer import (
-    CCO_SOURCE,
-    cco_log10_fO2_bar,
-)
+from engines.builtin.cco_redox_buffer import CCO_SOURCE
+from simulator.chemistry.graphite_c_co import cco_log10_fO2_bar
 from simulator.silent_zero import (
     CATEGORY_MARK,
     CATEGORY_PROVEN_ZERO,

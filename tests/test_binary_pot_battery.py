@@ -5,8 +5,12 @@ from __future__ import annotations
 import json
 import math
 import os
+import signal
 import resource
+import subprocess
+import sys
 import time
+from functools import partial
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -22,6 +26,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     QUALIFICATION_SIO2_SWEEP_WT_PCT,
     QUANTITY_ACTIVITY,
     QUANTITY_PRESSURE,
+    PO2_NOT_AN_INPUT,
     REFUSAL_COMPOSITION_PROJECTED,
     REFUSAL_ENGINE_CRASH,
     REFUSAL_GATE_REFUSED_IN_ADAPTER,
@@ -72,12 +77,11 @@ FIXTURE_REPORT = (
 
 
 def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> None:
+    from simulator.state import MeltState
+
     class Core:
         def __init__(self) -> None:
-            self.melt = SimpleNamespace(
-                oxygen_reservoir=SimpleNamespace(),
-                update_total_mass=lambda: None,
-            )
+            self.melt = MeltState()
 
         def _new_atom_ledger(self):
             return object()
@@ -88,7 +92,10 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
         def _build_chemistry_kernel(self):
             return None
 
-        def _refresh_vapor_pressures_from_kernel(self, equilibrium):
+        def _refresh_vapor_pressures_from_kernel(
+            self, equilibrium, *, simulation_hour, observation_pO2_bar
+        ):
+            assert simulation_hour == self.melt.hour + 1
             equilibrium.vapor_pressures_Pa = {"SiO": 1.0}
             equilibrium.vapor_pressures_source = {
                 "SiO": "builtin_authoritative:test"
@@ -118,6 +125,88 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
     assert (
         cell_score_authority(SimpleNamespace(authority=authority), refused=False)
         != "certified"
+    )
+
+
+def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monkeypatch):
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from engines.vaporock.provider import VapoRockProvider
+
+    # This receipt concerns builtin transport, independent of native shadow boot.
+    monkeypatch.setattr(VapoRockProvider, '_ensure_backend', lambda self: None)
+
+    receipts = []
+    dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def capture(provider, request):
+        result = dispatch(provider, request)
+        receipts.append((request, result))
+        return result
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, 'dispatch', capture)
+    oxygen = 1.3e-12
+    cell = equilibrate_cell(
+        open_battery_engine('internal-analytical'),
+        BinaryPot('observation', None, 'transport receipt', {'SiO2': 90., 'FeO': 10.}),
+        temperature_K=1873.15,
+        po2=Po2Request(mode='commanded', po2_bar=oxygen),
+        isolated=False,
+    )
+    assert cell.status == 'ok', cell.engine_reason
+    request, result = receipts[-1]
+    assert request.control_inputs['pO2_bar'] == oxygen
+    assert result.diagnostic['pO2_bar'] == oxygen
+    assert request.fO2_log == math.log10(oxygen)
+    assert request.control_inputs['intrinsic_fO2_log'] == math.log10(oxygen)
+    assert request.control_inputs['vacuum_floor_bar'] == 1e-9
+
+
+def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> None:
+    pot = BinaryPot(
+        pot_id="sio2_na2o_60_40",
+        kato_1993_table4_system=None,
+        why="core out-of-band notice probe",
+        composition_wt_pct={"SiO2": 60.0, "Na2O": 40.0},
+    )
+    handle = open_battery_engine("internal-analytical")
+    po2 = Po2Request(mode="commanded", po2_bar=1e-10)
+
+    extrapolated = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=4500.0,
+        po2=po2,
+        timeout_s=30.0,
+        isolated=False,
+    )
+    assert extrapolated.authority == AUTHORITY_EXTRAPOLATED, (
+        extrapolated.status,
+        extrapolated.refusal_reason,
+        extrapolated.engine_status,
+        extrapolated.engine_reason,
+    )
+    notices = [
+        notice
+        for notice in extrapolated.notices
+        if notice.get("kind") == "out_of_certified_band"
+    ]
+    assert notices
+    notice = notices[0]
+    assert notice["reason"]
+    assert notice["authority"] == AUTHORITY_EXTRAPOLATED
+    assert notice["band"]
+
+    in_band = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=po2,
+        timeout_s=30.0,
+        isolated=False,
+    )
+    assert not any(
+        notice.get("kind") in {"out_of_certified_band", "floor_inversion"}
+        for notice in in_band.notices
     )
 
 
@@ -245,6 +334,24 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
     assert reason == "no_liquid"
 
 
+def test_classify_thermoengine_nonfinite_keeps_field_detail() -> None:
+    class NonFiniteField(ValueError):
+        backend_status_reason = "thermoengine_nonfinite_field"
+
+    status, reason, engine_reason = classify_equilibrate_outcome(
+        error=NonFiniteField(
+            "ThermoEngine Liquid GibbsFreeEnergy is not finite: nan"
+        )
+    )
+
+    assert status == "refusal"
+    assert reason == REFUSAL_UNAVAILABLE
+    assert engine_reason == (
+        "thermoengine_nonfinite_field: "
+        "ThermoEngine Liquid GibbsFreeEnergy is not finite: nan"
+    )
+
+
 @pytest.mark.parametrize(
     ("liquid_fraction", "expected"),
     [
@@ -340,6 +447,71 @@ def test_equilibrate_cell_refuses_invalid_fraction_without_assemblage():
 
     assert cell.status == "refusal"
     assert cell.refusal_reason == "liquid_fraction_invalid"
+
+
+def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> None:
+    captured = {}
+
+    class _Backend:
+        def equilibrate(
+            self,
+            *,
+            temperature_C,
+            composition_kg,
+            composition_mol,
+            pressure_bar,
+            fO2_log=-9.0,
+            call_timeout_s=None,
+            native_activity_formula=None,
+        ):
+            captured.update(
+                {
+                    "fO2_log": fO2_log,
+                    "call_timeout_s": call_timeout_s,
+                    "native_activity_formula": native_activity_formula,
+                }
+            )
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={"MgO": 0.2},
+                activity_coefficient_details={},
+                vapor_pressures_Pa={},
+                liquid_fraction=1.0,
+                phase_assemblage_available=True,
+            )
+
+    handle = EngineHandle(
+        name="magemin",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="magemin-uncommanded-fo2",
+        kato_1993_table4_system=None,
+        why="native activity uses MAGEMin's declared default redox seed",
+        composition_wt_pct={"MgO": 50.0, "SiO2": 50.0},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1800.0,
+        po2=Po2Request(mode="not_an_input", po2_bar=None),
+        native_activity_formula="MgO",
+    )
+
+    assert cell.status == "ok"
+    assert cell.melt_activities == {"MgO": 0.2}
+    assert captured == {
+        "fO2_log": -9.0,
+        "call_timeout_s": 20.0,
+        "native_activity_formula": "MgO",
+    }
 
 
 def test_classify_composition_projected_is_typed_refusal() -> None:
@@ -561,18 +733,20 @@ def test_extract_preserves_valid_partial_pressures_and_reports_invalid_names() -
 def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     pot = BinaryPot(
         pot_id="fixture_pot",
-        kato_1993_table4_system="Al2O3-SiO2",
+        kato_1993_table4_system="CaO-Al2O3-SiO2",
         why="fixture",
-        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+        composition_wt_pct={"SiO2": 50.0, "CaO": 25.0, "Al2O3": 25.0},
     )
-    po2 = Po2Request(mode="engine_default", po2_bar=None)
+    po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     captured: dict[str, object] = {}
 
     class _SubprocessBackend:
         _mode = "subprocess"
 
-        def equilibrate(self, **kwargs):
+        def equilibrate(self, fO2_log=None, redox_mode=None, **kwargs):
             captured.update(kwargs)
+            captured["fO2_log"] = fO2_log
+            captured["redox_mode"] = redox_mode
             return SimpleNamespace(
                 status="ok",
                 diagnostics={},
@@ -594,10 +768,205 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     cell = equilibrate_cell(handle, pot, temperature_K=1500.0, po2=po2)
     assert cell.status == "ok"
     assert captured["subprocess_run_mode"] == "isothermal"
+    assert captured["fO2_log"] is None
+    assert captured["redox_mode"] == PO2_NOT_AN_INPUT
     assert captured["pressure_bar"] == 1.0
     assert cell.melt_activities == {"SiO2": 0.5}
     assert cell.gas_partial_pressures_Pa == {"Na": 1.0}
     assert handle.available is True
+
+
+def test_psat_without_fo2_on_fe_melt_keeps_green_scorer_request() -> None:
+    from decimal import Decimal
+
+    from simulator.battery.enums import AmountBasis, Engine, Quantity
+    from simulator.battery.records import Composition
+    from simulator.battery.score import _oxygen_input_request
+    from tests.battery.factories import psat_identity
+
+    composition = Composition(
+        "review pin",
+        (("FeO", Decimal("0.2")), ("SiO2", Decimal("0.8"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    notices = []
+    request = _oxygen_input_request(
+        engine=Engine.THERMOENGINE,
+        channel="review pin",
+        sources=(),
+        identity=psat_identity("Na"),
+        requested=None,
+        quantity=Quantity.P_SAT,
+        composition_value=composition,
+        input_notices=notices,
+    )
+
+    assert isinstance(request, Po2Request)
+    assert request.mode == PO2_NOT_AN_INPUT
+    assert request.po2_bar is None
+
+
+def test_multivalent_not_an_input_keeps_alphamelts_intrinsic_refusal() -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    omitted = object()
+    received: list[tuple[float | None, object]] = []
+
+    class _RecordingAlphaMELTSBackend(AlphaMELTSBackend):
+        def equilibrate(
+            self,
+            temperature_C,
+            composition_kg=None,
+            fO2_log=None,
+            pressure_bar=1.0e-6,
+            *,
+            composition_mol=None,
+            composition_mol_by_account=None,
+            species_formula_registry=None,
+            redox_mode=omitted,
+            subprocess_run_mode=None,
+            **kwargs,
+        ):
+            received.append((fO2_log, redox_mode))
+            forwarded = dict(kwargs)
+            if redox_mode is not omitted:
+                forwarded["redox_mode"] = redox_mode
+            return super().equilibrate(
+                temperature_C=temperature_C,
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_formula_registry,
+                fO2_log=fO2_log,
+                pressure_bar=pressure_bar,
+                subprocess_run_mode=subprocess_run_mode,
+                **forwarded,
+            )
+
+    pot = BinaryPot(
+        pot_id="feo_psat",
+        kato_1993_table4_system="FeO-SiO2",
+        why="Fe-bearing p_sat with no printed oxygen potential",
+        composition_wt_pct={"FeO": 20.0, "SiO2": 80.0},
+    )
+    backend = _RecordingAlphaMELTSBackend()
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        isolated=False,
+        timeout_s=2.0,
+    )
+
+    assert received == [(None, omitted)], {
+        "received": received,
+        "status": cell.status,
+        "refusal_reason": cell.refusal_reason,
+        "engine_reason": cell.engine_reason,
+    }
+    assert cell.status == "refusal"
+    assert "intrinsic closed-system fO2" in (cell.engine_reason or "")
+
+
+@pytest.mark.parametrize(
+    "oxide",
+    ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO", "FeOT"),
+)
+def test_backend_owned_multivalent_rule_keeps_pinned_results(oxide: str) -> None:
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+    from simulator.melt_backend.base import multivalent_components
+
+    composition = {oxide: 1.0, "SiO2": 0.0}
+    expected = (oxide,)
+
+    assert multivalent_components(
+        composition,
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    ) == expected
+    assert multivalent_components(
+        SimpleNamespace(components=tuple(composition.items())),
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    ) == expected
+
+
+@pytest.mark.parametrize(
+    "redox_oxide",
+    ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO"),
+)
+def test_not_an_input_refusal_stays_at_backend_boundary_for_multivalent_cell(
+    monkeypatch,
+    redox_oxide: str,
+) -> None:
+    from engines.domain_reason import OutOfDomainReason
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.base import EquilibriumResult
+
+    composition_kg = {"SiO2": 0.5, "CaO": 0.4, redox_oxide: 0.1}
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    transport_calls: list[dict[str, object]] = []
+
+    def fake_transport(*args, **kwargs):
+        transport_calls.append(kwargs)
+        return EquilibriumResult(
+            status="ok",
+            liquid_fraction=1.0,
+            activity_coefficients={"SiO2": 0.5},
+        )
+
+    monkeypatch.setattr(backend, "_equilibrate_subprocess", fake_transport)
+    monkeypatch.setattr(backend, "_domain_gate", lambda *_args, **_kwargs: None)
+
+    direct = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg=composition_kg,
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode=PO2_NOT_AN_INPUT,
+        subprocess_run_mode="isothermal",
+    )
+
+    pot = BinaryPot(
+        pot_id=f"redox_{redox_oxide}",
+        kato_1993_table4_system="SiO2-CaO-redox oxide",
+        why="multivalent redox-mode refusal fixture",
+        composition_wt_pct={key: value * 100.0 for key, value in composition_kg.items()},
+    )
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        isolated=False,
+        timeout_s=2.0,
+    )
+
+    assert direct.status == "out_of_domain"
+    assert direct.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.INVALID_INPUT.value
+    )
+    assert cell.status == "refusal"
+    assert cell.engine_status == "ValueError"
+    assert "intrinsic closed-system fO2" in (cell.engine_reason or "")
+    assert transport_calls == []
 
 
 def test_domain_exception_does_not_kill_engine_handle() -> None:
@@ -716,6 +1085,89 @@ def test_crash_serializer_uses_loaded_backend_model_id() -> None:
 
     assert cell.status == "refusal"
     assert cell.model_id == backend.model_id
+
+
+@pytest.mark.parametrize(
+    ("returncode", "stderr", "expected_reason"),
+    [
+        (-6, "AlphaMELTS aborted", "SIGABRT (returncode -6): AlphaMELTS aborted"),
+        (-6, "", "SIGABRT (returncode -6)"),
+        (1, "synthetic crash", "isolated worker exit_code=1: synthetic crash"),
+    ],
+)
+def test_crash_cell_preserves_existing_reason_and_signal_stderr(
+    returncode: int, stderr: str, expected_reason: str
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        ARM_HEADLINE,
+        _crash_cell_from_returncode,
+    )
+
+    handle = EngineHandle(
+        name="alphamelts", backend=None, available=False,
+        unavailable_reason="test", takes_fo2=True, supports_intrinsic_fo2=False,
+    )
+    cell = _crash_cell_from_returncode(
+        handle=handle,
+        pot=BinaryPot(
+            pot_id="stderr-crash",
+            kato_1993_table4_system=None,
+            why="stderr retention test",
+            composition_wt_pct={"SiO2": 100.0},
+        ),
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        wall0=time.perf_counter(),
+        cpu0=time.process_time(),
+        hostname="test",
+        returncode=returncode,
+        timed_out=False,
+        stderr=stderr,
+        arm=ARM_HEADLINE,
+        notices=(),
+        authority=None,
+        certified_band=None,
+    )
+
+    assert cell.refusal_reason == REFUSAL_ENGINE_CRASH
+    assert cell.engine_reason == expected_reason
+
+
+def test_signal_crash_stderr_is_bounded_to_4000_characters() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        ARM_HEADLINE,
+        _crash_cell_from_returncode,
+    )
+
+    stderr = "prefix" + "x" * 5000 + "tail"
+    handle = EngineHandle(
+        name="alphamelts", backend=None, available=False,
+        unavailable_reason="test", takes_fo2=True, supports_intrinsic_fo2=False,
+    )
+    cell = _crash_cell_from_returncode(
+        handle=handle,
+        pot=BinaryPot(
+            pot_id="bounded-stderr-crash",
+            kato_1993_table4_system=None,
+            why="stderr bound test",
+            composition_wt_pct={"SiO2": 100.0},
+        ),
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        wall0=time.perf_counter(),
+        cpu0=time.process_time(),
+        hostname="test",
+        returncode=-6,
+        timed_out=False,
+        stderr=stderr,
+        arm=ARM_HEADLINE,
+        notices=(),
+        authority=None,
+        certified_band=None,
+    )
+
+    assert cell.engine_reason.endswith("x" * 3996 + "tail")
+    assert len(cell.engine_reason.rsplit(": ", 1)[1]) == 4000
 
 
 def test_handle_without_backend_has_no_model_id() -> None:
@@ -1411,6 +1863,105 @@ def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
     ].startswith("antoine_fallback_from_vaporock")
 
 
+def test_equilibrate_cell_payload_shape_includes_activity_metadata() -> None:
+    payload = _ok_cell(engine="internal-analytical", gas={}).as_payload()
+    assert set(payload) == {
+        "pot_id",
+        "engine",
+        "temperature_K",
+        "po2",
+        "status",
+        "refusal_reason",
+        "engine_status",
+        "engine_reason",
+        "engine_annotation",
+        "melt_activities",
+        "melt_activity_coefficients",
+        "melt_activity_coefficient_details",
+        "activities_standard_state",
+        "gas_partial_pressures_Pa",
+        "invalid_gas_partial_pressure_components",
+        "liquid_fraction",
+        "wall_s",
+        "cpu_s",
+        "hostname",
+        "vapor_pressures_source",
+        "vapor_pressure_backend_status",
+        "vapor_pressure_backend_status_reason",
+        "authoritative_for_requested_vapor_pressure",
+        "arm",
+        "notices",
+        "authority",
+        "certified_band",
+        "exit_signal",
+        "exit_code",
+        "model_id",
+        "liquid_composition_wt_pct",
+        "fe_redox_split",
+    }
+
+
+def test_equilibrate_cell_copies_liquid_composition_and_fe_redox_split() -> None:
+    # Recorded ThermoEngine split shape: FeO 9 wt% and Fe2O3 1 wt%, plus Fe3Fet_Liq.
+    class _Backend:
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={},
+                vapor_pressures_Pa={},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={
+                    "SiO2": 50.0,
+                    "FeO": 9.0,
+                    "Fe2O3": 1.0,
+                    "bad": float("nan"),
+                },
+                fe_redox_split={
+                    "FeO_wt_pct": 9.0,
+                    "Fe2O3_wt_pct": 1.0,
+                    "Fe3Fet_Liq": 0.1,
+                },
+            )
+
+    handle = EngineHandle(
+        name="thermoengine",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="fe-split",
+        kato_1993_table4_system=None,
+        why="copy the engine ferric split onto the cell",
+        composition_wt_pct={"SiO2": 50.0, "FeO": 9.0, "Fe2O3": 1.0},
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        isolated=False,
+        qualification=False,
+    )
+    assert cell.status == "ok"
+    assert cell.liquid_composition_wt_pct == {"SiO2": 50.0, "FeO": 9.0, "Fe2O3": 1.0}
+    assert cell.fe_redox_split == {
+        "FeO_wt_pct": 9.0,
+        "Fe2O3_wt_pct": 1.0,
+        "Fe3Fet_Liq": 0.1,
+    }
+    rebuilt = EquilibrateCell.from_payload(cell.as_payload())
+    assert rebuilt.fe_redox_split == cell.fe_redox_split
+    assert rebuilt.liquid_composition_wt_pct == cell.liquid_composition_wt_pct
+    legacy = EquilibrateCell.from_payload({"pot_id": "legacy", "engine": "alphamelts"})
+    assert legacy.fe_redox_split == {}
+    assert legacy.liquid_composition_wt_pct == {}
+
+
 def test_openimcc_cell_round_trips_through_harness() -> None:
     pot = BinaryPot(
         pot_id="mgo_sio2_40_60",
@@ -1545,6 +2096,33 @@ def test_qualification_temperature_below_and_above_published_band() -> None:
     assert low["temperature_in_band"] is True
 
 
+@pytest.mark.parametrize("sio2_wt_pct", (32.0, 34.0))
+def test_qualification_gate_pins_observed_crash_floor_assessment(
+    sio2_wt_pct: float,
+) -> None:
+    from engines.engine_commissioning import assess_engine_commissioning
+
+    composition = scale_feo_mgo_for_sio2(
+        sio2_wt_pct,
+        {"FeO": 30.0, "MgO": 20.0, "SiO2": 50.0},
+    )
+    expected = assess_engine_commissioning(
+        "alphamelts",
+        sio2_wt_pct=sio2_wt_pct,
+        temperature_K=1700.0,
+    )
+
+    gate = assess_qualification_gate(composition, 1700.0)
+
+    assert gate["below_crash_floor"] is expected.below_crash_floor
+    assert gate["certified_band"]["sio2_crash_floor_wt_pct"] == (
+        expected.spec.sio2_wt_pct.observed_crash_floor_wt_pct
+    )
+    assert any("crash floor" in warning for warning in gate["warnings"]) is (
+        expected.below_crash_floor
+    )
+
+
 def test_qualification_sio2_sweep_pots_sum_to_100() -> None:
     pots = qualification_sio2_sweep_pots(
         BinaryPot(
@@ -1598,41 +2176,35 @@ def test_simulated_crash_yields_engine_crash() -> None:
     assert any(notice.get("kind") == "melts_domain_gate" for notice in cell.notices)
 
 
-_TEST_ISOLATED_CELL_BOOTSTRAP = r"""
-import json
-import os
-import subprocess
-import sys
-import time
-from pathlib import Path
+def _fake_isolated_cell_bootstrap(
+    _engine: str, *, initialization_delay_s: float = 0.0
+):
+    time.sleep(initialization_delay_s)
+    return None, "fake-ready"
 
-from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell, Po2Request
 
-# Give the worker its own tight descriptor ceiling. It inherits the parent's
-# soft limit, which the fd test raises above 256 when the parent is busy, so
-# without this a one-fd-per-cell leak inside the worker could go unnoticed.
-import resource
-_fd_now = len(os.listdir("/dev/fd"))
-_soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-_cap = _fd_now + 64
-if _hard != resource.RLIM_INFINITY:
-    _cap = min(_cap, _hard)
-if _soft == resource.RLIM_INFINITY or _cap < _soft:
-    resource.setrlimit(resource.RLIMIT_NOFILE, (_cap, _hard))
-
-for line in sys.stdin:
-    request = json.loads(line)
+def _fake_isolated_cell_handler(_resource, request, _diagnostic_log):
     mode = request.get("simulate_crash")
     if mode == "exit":
         os._exit(73)
     if mode == "grandchild":
         marker = Path(request["why"])
-        child_code = (
-            "import time; from pathlib import Path; "
-            f"time.sleep(2.5); Path({str(marker)!r}).write_text('survived')"
+        release_file = marker.with_suffix(".release")
+        child_code = "\n".join(
+            (
+                "import time",
+                "from pathlib import Path",
+                f"release = Path({str(release_file)!r})",
+                f"marker = Path({str(marker)!r})",
+                "while not release.exists():",
+                "    time.sleep(0.01)",
+                "time.sleep(2.5)",
+                "marker.write_text('survived')",
+            )
         )
         child = subprocess.Popen([sys.executable, "-c", child_code])
         marker.with_suffix(".pid").write_text(str(child.pid))
+    if mode == "hang":
         time.sleep(30)
     po2_raw = request["po2"]
     cell = EquilibrateCell(
@@ -1656,35 +2228,115 @@ for line in sys.stdin:
         hostname="worker-test",
         arm=request["arm"],
     )
-    sys.stdout.write(chr(30) + json.dumps(cell.as_payload()) + chr(10))
-    sys.stdout.flush()
-"""
+    return cell.as_payload()
+
+
+def _nested_warm_hang_handler(_resource, _request, _diagnostic_log):
+    time.sleep(30.0)
+
+
+def _nested_warm_worker_bootstrap():
+    return None, "nested-warm-ready"
+
+
+class _NestedWarmHangBackend:
+    def __init__(
+        self,
+        budget_path: str,
+        pid_path: str,
+        call_started_path: str,
+    ) -> None:
+        from simulator.engine_pool import WarmEngineWorker
+
+        self.budget_path = Path(budget_path)
+        self.worker = WarmEngineWorker(
+            name="nested test warm engine",
+            bootstrap=_nested_warm_worker_bootstrap,
+            handler=_nested_warm_hang_handler,
+            # Match the 30 s startup floor used by ThermoEngine's warm worker;
+            # startup must not masquerade as the per-cell call timeout below.
+            startup_timeout_s=30.0,
+            call_timeout_s=5.0,
+            diagnostic_signal=signal.SIGCONT,
+            watchdog_grace_s=0.05,
+            daemon=False,
+        )
+        self.worker.start()
+        Path(pid_path).write_text(str(self.worker.process.pid), encoding="utf-8")
+        self.call_started_path = Path(call_started_path)
+
+    def equilibrate(self, *, call_timeout_s: float, **_kwargs):
+        call_started = time.monotonic()
+        self.call_started_path.write_text(repr(call_started), encoding="utf-8")
+        original_call = self.worker.call
+
+        def record_call_budget(request, *, timeout_s=None):
+            self.budget_path.write_text(repr(timeout_s), encoding="utf-8")
+            return original_call(request, timeout_s=timeout_s)
+
+        self.worker.call = record_call_budget
+        return self.worker.call({}, timeout_s=call_timeout_s)
+
+    def close(self) -> None:
+        self.worker.close()
+
+
+def _nested_warm_hang_bootstrap(
+    engine: str,
+    *,
+    budget_path: str,
+    pid_path: str,
+    call_started_path: str,
+):
+    import simulator.diagnostic_helpers.binary_pot_battery as binary_pot_battery
+
+    backend = _NestedWarmHangBackend(budget_path, pid_path, call_started_path)
+    handle = EngineHandle(
+        name=engine,
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    return binary_pot_battery._IsolatedCellEngine(handle), "nested-warm-ready"
 
 
 def _install_fake_isolated_cell_worker(
     monkeypatch: pytest.MonkeyPatch,
+    *,
+    initialization_delay_s: float = 0.0,
 ):
-    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    import simulator.diagnostic_helpers.binary_pot_battery as binary_pot_battery
 
-    battery._close_isolated_cell_workers()
+    binary_pot_battery._close_isolated_cell_workers()
     monkeypatch.setattr(
-        battery,
-        "_ISOLATED_CELL_BOOTSTRAP",
-        _TEST_ISOLATED_CELL_BOOTSTRAP,
+        binary_pot_battery,
+        "_bootstrap_isolated_cell_engine",
+        partial(
+            _fake_isolated_cell_bootstrap,
+            initialization_delay_s=float(initialization_delay_s),
+        ),
     )
-    return battery
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_handle_isolated_cell_request",
+        _fake_isolated_cell_handler,
+    )
+    return binary_pot_battery
 
 
 def _run_fake_isolated_cell(
     battery,
     *,
     pot_id: str,
+    engine: str = "alphamelts",
     simulate_crash: str | None = None,
     why: str = "worker-test",
     timeout_s: float = 10.0,
 ) -> EquilibrateCell:
     handle = EngineHandle(
-        name="alphamelts",
+        name=engine,
         backend=object(),
         available=True,
         unavailable_reason=None,
@@ -1728,15 +2380,38 @@ def test_isolated_cell_worker_reuses_one_process_and_keeps_fds_bounded(
         capped_soft = min(capped_soft, hard)
     try:
         resource.setrlimit(resource.RLIMIT_NOFILE, (capped_soft, hard))
-        for index in range(300):
+        first = _run_fake_isolated_cell(battery, pot_id="worker-0")
+        assert first.status == "ok"
+        fd_after_start = len(os.listdir("/dev/fd"))
+        for index in range(1, 300):
             cell = _run_fake_isolated_cell(battery, pot_id=f"worker-{index}")
             assert cell.status == "ok"
         worker = battery._ISOLATED_CELL_WORKERS["alphamelts"]
         assert worker.start_count == 1
-        assert len(os.listdir("/dev/fd")) <= fd_before + 2
+        assert len(os.listdir("/dev/fd")) <= fd_after_start + 2
     finally:
         battery._close_isolated_cell_workers()
         resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
+
+
+def test_isolated_cell_startup_has_a_separate_budget_from_the_call_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_fake_isolated_cell_worker(
+        monkeypatch,
+        initialization_delay_s=2.2,
+    )
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-slow-initialization",
+            engine="thermoengine",
+            timeout_s=0.001,
+        )
+        assert cell.status == "ok"
+        assert battery._ISOLATED_CELL_WORKERS["thermoengine"].start_count == 1
+    finally:
+        battery._close_isolated_cell_workers()
 
 
 def test_isolated_cell_worker_crash_refuses_one_cell_then_restarts(
@@ -1763,22 +2438,111 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
     tmp_path: Path,
 ) -> None:
     battery = _install_fake_isolated_cell_worker(monkeypatch)
+    original_worker = battery.WarmEngineWorker
+
+    def fatal_diagnostic_signal_worker(**kwargs):
+        kwargs["diagnostic_signal"] = signal.SIGUSR1
+        return original_worker(**kwargs)
+
+    # Exercise the shared reaper against the fatal signal that exposed the
+    # leak, even though isolated cells now use a non-fatal diagnostic signal.
+    monkeypatch.setattr(
+        battery, "WarmEngineWorker", fatal_diagnostic_signal_worker
+    )
     marker = tmp_path / "grandchild.sentinel"
+    pid_file = marker.with_suffix(".pid")
+    release_file = marker.with_suffix(".release")
     try:
+        started = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-timeout-grandchild-ready",
+            simulate_crash="grandchild",
+            why=str(marker),
+        )
+        assert started.status == "ok"
+        assert pid_file.is_file()
+        grandchild_pid = int(pid_file.read_text(encoding="utf-8"))
+        release_file.touch()
+
         timed_out = _run_fake_isolated_cell(
             battery,
             pot_id="worker-timeout",
-            simulate_crash="grandchild",
+            simulate_crash="hang",
             why=str(marker),
             timeout_s=0.001,
         )
         assert timed_out.refusal_reason == REFUSAL_TIMEOUT
-        assert marker.with_suffix(".pid").is_file()
-        time.sleep(1.0)
+        deadline = time.monotonic() + 0.1
+        while True:
+            try:
+                os.kill(grandchild_pid, 0)
+            except ProcessLookupError:
+                break
+            if time.monotonic() >= deadline:
+                pytest.fail(
+                    f"worker timeout left grandchild pid {grandchild_pid} alive"
+                )
+            time.sleep(0.05)
+        time.sleep(0.5)
         assert not marker.exists(), "worker timeout left its sleeping grandchild alive"
         recovered = _run_fake_isolated_cell(battery, pot_id="worker-after-timeout")
         assert recovered.status == "ok"
         assert battery._ISOLATED_CELL_WORKERS["alphamelts"].start_count == 2
+    finally:
+        battery._close_isolated_cell_workers()
+
+
+def test_thermoengine_nested_warm_hang_uses_cell_budget_and_times_out(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    battery._close_isolated_cell_workers()
+    budget_path = tmp_path / "nested-budget.txt"
+    pid_path = tmp_path / "nested-worker.pid"
+    call_started_path = tmp_path / "nested-call-started.txt"
+    monkeypatch.setattr(
+        battery,
+        "_bootstrap_isolated_cell_engine",
+        partial(
+            _nested_warm_hang_bootstrap,
+            budget_path=str(budget_path),
+            pid_path=str(pid_path),
+            call_started_path=str(call_started_path),
+        ),
+    )
+    timeout_s = 0.8
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="nested-warm-timeout",
+            engine="thermoengine",
+            why="nested-warm-timeout",
+            timeout_s=timeout_s,
+        )
+
+        assert cell.refusal_reason == REFUSAL_TIMEOUT
+        assert cell.engine_reason == (
+            f"equilibrate exceeded hard timeout of {timeout_s:g}s"
+        )
+        assert budget_path.is_file(), "nested worker reached equilibrate after startup"
+        assert call_started_path.is_file(), "nested worker call began after startup"
+        assert float(budget_path.read_text(encoding="utf-8")) == pytest.approx(
+            timeout_s
+        )
+        nested_pid = int(pid_path.read_text(encoding="utf-8"))
+        deadline = time.monotonic() + 1.0
+        while True:
+            try:
+                os.kill(nested_pid, 0)
+            except ProcessLookupError:
+                break
+            if time.monotonic() >= deadline:
+                pytest.fail(
+                    f"nested warm timeout left engine pid {nested_pid} alive"
+                )
+            time.sleep(0.05)
     finally:
         battery._close_isolated_cell_workers()
 

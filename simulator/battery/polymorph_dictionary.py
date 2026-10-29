@@ -8,7 +8,13 @@ from __future__ import annotations
 
 import ast
 import re
-from simulator.battery.enums import Polymorph, PrintedQualifierKind, StateTag
+from simulator.battery.enums import (
+    Polymorph,
+    PolymorphRejectionKind,
+    PrintedQualifierKind,
+    StateTag,
+)
+from simulator.state_types import State
 
 _TRAILING_FORMULA_RE = re.compile(r"\s*\([^()]*(?:\([^()]*\)[^()]*)*\)\s*$")
 _PRESSURE_QUALIFIER_RE = re.compile(r"^\d+ Bar$")
@@ -134,12 +140,24 @@ JANAF_TRANSITION_ALIASES: dict[tuple[str, Polymorph], Polymorph] = {
     ("SiO2", Polymorph.II): Polymorph.BETA,
 }
 
+# CEA thermo.inp and BURCAT print Zr(a) / Zr(b) for the JANAF alpha / beta
+# standard states (Chase 1998: alpha through 1135 K, beta 1135–2125 K).
+# The letter is that element's card suffix. It is not a second allotrope
+# and it is not an alias for any other formula.
+CEA_ELEMENT_ALLOTROPE_ALIASES: dict[tuple[str, str], Polymorph] = {
+    ("Zr", "a"): Polymorph.ALPHA,
+    ("Zr", "b"): Polymorph.BETA,
+}
+
 # Printed names / legacy free-form strings → closed token. Not a qualifier-only
 # map: these names already identify a mineral or a previously stored token.
 POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "alpha": Polymorph.ALPHA,
+    "α": Polymorph.ALPHA,
     "beta": Polymorph.BETA,
+    "β": Polymorph.BETA,
     "gamma": Polymorph.GAMMA,
+    "γ": Polymorph.GAMMA,
     "delta": Polymorph.DELTA,
     "kappa": Polymorph.KAPPA,
     "i": Polymorph.I,
@@ -205,6 +223,7 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "wollastonite": Polymorph.WOLLASTONITE,
     "cyclowollastonite": Polymorph.CYCLOWOLLASTONITE,
     "cyclowollastonite (pseudowollastonite)": Polymorph.CYCLOWOLLASTONITE,
+    "pseudowollastonite": Polymorph.PSEUDOWOLLASTONITE,
     "lime": Polymorph.LIME,
     "periclase": Polymorph.PERICLASE,
     "dickite": Polymorph.DICKITE,
@@ -219,6 +238,23 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "crystalline": Polymorph.CRYSTALLINE,
     "reference": Polymorph.REFERENCE,
 }
+
+# Named phases whose tokens are valid only beside their mineral formula.
+# Diopside's two formulas are equivalent ways the cited compilations print
+# CaMgSi2O6; the other labels have one formula here.
+POLYMORPH_FORMULAS: dict[Polymorph, frozenset[str]] = {
+    Polymorph.CLINOENSTATITE: frozenset({"MgSiO3"}),
+    Polymorph.DIOPSIDE: frozenset({"CaMgSi2O6", "CaMg(SiO3)2"}),
+    Polymorph.ALBITE_HIGH: frozenset({"NaAlSi3O8"}),
+    Polymorph.SANIDINE_HIGH: frozenset({"KAlSi3O8"}),
+}
+
+
+def polymorph_matches_formula(formula: str, token: Polymorph) -> bool:
+    """Whether a formula supports a formula-scoped named phase token."""
+
+    allowed = POLYMORPH_FORMULAS.get(token)
+    return allowed is None or formula in allowed
 
 CROSS_SOURCE_EQUIVALENCES: tuple[tuple[str, str, str, Polymorph], ...] = (
     ("Al2O3", "Alpha", "Corundum", Polymorph.CORUNDUM),
@@ -298,6 +334,23 @@ def unrecognised_polymorph_reason(spelling: object) -> str:
     return f"unrecognised polymorph {str(spelling)!r} is not a closed Polymorph token"
 
 
+def unrecognised_polymorph_state(spelling: object) -> State[Polymorph]:
+    return State.unknown(
+        unrecognised_polymorph_reason(spelling),
+        rejection_kind=PolymorphRejectionKind.UNRECOGNISED,
+    )
+
+
+def contradicting_polymorph_state(
+    value: object, formula: str, *, quoted: bool = False
+) -> State[Polymorph]:
+    printed = repr(value) if quoted else str(value)
+    return State.unknown(
+        f"polymorph {printed} does not denote formula {formula}",
+        rejection_kind=PolymorphRejectionKind.CONTRADICTS_FORMULA,
+    )
+
+
 def unrecognised_polymorph_spelling(reason: str | None) -> str | None:
     """Original spelling if ``reason`` is an unrecognised-token degradation."""
 
@@ -327,6 +380,29 @@ def canonicalize_janaf_transition(formula: str, token: Polymorph) -> Polymorph:
     """Map a JANAF transition-label token through the formula-keyed alias table."""
 
     return JANAF_TRANSITION_ALIASES.get((formula, token), token)
+
+
+def canonical_element_allotrope(formula: str, token: str | None) -> str | None:
+    """One allotrope identity for an elemental token.
+
+    Formula-scoped CEA letters are applied first. Other printed names use
+    ``POLYMORPH_ALIASES``. An unrecognised token stays itself, so two
+    distinct labels still compare as distinct. ``None`` is an omitted
+    allotrope.
+    """
+
+    if token is None:
+        return None
+    key = token.strip().lower()
+    if not key:
+        return None
+    aliased = CEA_ELEMENT_ALLOTROPE_ALIASES.get((formula, key))
+    if aliased is not None:
+        return aliased.value
+    named = POLYMORPH_ALIASES.get(key)
+    if named is not None:
+        return named.value
+    return key
 
 
 def lookup_janaf_crystal(formula: str, qualifier: str) -> Polymorph | None:

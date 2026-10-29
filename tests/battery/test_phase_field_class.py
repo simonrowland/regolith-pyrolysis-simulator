@@ -114,24 +114,31 @@ def test_stolyarova_1991_gas_rows_keep_phase_g(migrated) -> None:
         )
 
 
-def test_stolyarova_1991_point_composition_is_not_promoted(migrated) -> None:
+def test_stolyarova_1991_printed_composition_is_carried(migrated) -> None:
     rows = _printed_rows(migrated)
     assert len(rows) == 130
     assert sum(_x_sio2(observation) in CLASS_S_X for observation in rows) == 28
     for observation in rows:
         composition = observation.identity.composition
-        assert composition is None or not composition.is_value, observation.observation_id
+        # The repair carries printed compositions from b-890/d-142; this is
+        # explicit extract data, not promotion from phase_field_class or x(SiO2).
+        assert composition is not None and composition.is_value, observation.observation_id
+        point_composition = observation.point_conditions["composition"].state
+        assert point_composition.is_value
+        assert composition.value == point_composition.value
 
 
-def test_stolyarova_1991_identity_advisories_stay_434_138_138_84(migrated) -> None:
+def test_stolyarova_1991_identity_advisories_stay_250_8_84_84(migrated) -> None:
     detail = Counter(
         str(issue.detail)
         for issue in migrated.validation.issues
         if str(issue.reason) == "identity_incomplete"
     )
-    assert sum(detail.values()) == 434
-    assert detail["required axis composition is unknown"] == 138
-    assert detail["required axis fO2_Pa is unknown"] == 138
+    # Printed compositions now carried from b-890/d-142 remove 130
+    # composition advisories; the remaining required-axis gaps stay pinned.
+    assert sum(detail.values()) == 250
+    assert detail["required axis composition is unknown"] == 8
+    assert detail["required axis fO2_Pa is unknown"] == 84
     assert detail["required axis total_pressure_Pa is unknown"] == 84
 
 
@@ -149,9 +156,16 @@ def test_stolyarova_1991_x036_to_x040_rows_stay_numeric(
         for observation in contested
         if internal_analytical_residuals[observation.observation_id].numeric is not None
     ]
-    # Green: 14 internal-analytical numeric residuals on these 44 rows
-    # (t-1123 proposal section 4: 40 single-liquid numeric = 26 openimcc + 14 here).
-    assert len(numeric) == 14
+    # 14 of these were already numeric before the alias stack: Ca(g) matched
+    # the exact key "Ca" (8 rows, both 1993 K series, x = 0.36/0.38/0.39/0.40)
+    # and SiO(g) matched "SiO" (6 rows, both 1933 K series, x = 0.38/0.39/0.40).
+    # 0c5b7486a accepts one vapour alias, formula + "_gas", when the adapter
+    # renames an oxide gas that collides with the melt oxide. That is the same
+    # closed formula, not a Berman polymorph (d-243 does not score these gas
+    # rows; oxide activity still ignores the suffix). The nine added rows are
+    # CaO(g) via "CaO_gas" (8: both 1993 K series, the same four x) and
+    # SiO2(g) via "SiO2_gas" (1: 1933 K ion comparison, x = 0.40).
+    assert len(numeric) == 23
     assert all(residual.status is not ResidualStatus.REFUSED for residual in numeric)
 
 
@@ -227,7 +241,8 @@ def test_stolyarova_1991_class_s_is_exactly_the_20_points_at_1933k(migrated) -> 
     for x, notice in classified.values():
         payload = _payload(notice, OUTSIDE_SINGLE_LIQUID_FIELD)
         assert payload["criterion"] == "stated_liquidus_side_and_printed_plateau_within_2_sigma"
-        assert payload["locator"]["page"] == 3711
+        assert payload["locator"]["page"] == 2
+        assert payload["locator"]["published_page"] == 3711
         values = payload["test_values"]
         assert Decimal(values["x"]) == x
         assert (values["liquidus"], values["liquidus_sigma"]) == ("0.37", "0.02")
@@ -262,7 +277,8 @@ def test_stolyarova_1991_contested_rows_carry_stated_liquidus_and_sigma(migrated
         assert payload["stated_liquidus"] == "0.37"
         assert payload["stated_liquidus_sigma"] == "0.02"
         assert payload["superseded_liquidus"] == ["0.41"]
-        assert payload["locator"]["page"] == 3711
+        assert payload["locator"]["page"] == 2
+        assert payload["locator"]["published_page"] == 3711
         assert not any(notice.band for notice in observation.notices)
 
 
@@ -335,7 +351,9 @@ def test_stolyarova_1991_contested_numeric_rows_are_flagged_out_of_certified_lin
         if _x_sio2(observation) in CONTESTED_X
     ]
     numeric = [residual for residual in contested if residual.numeric is not None]
-    assert len(numeric) == 14
+    # Same 23 as test_stolyarova_1991_x036_to_x040_rows_stay_numeric.
+    # The nine above the old pin of 14 are the CaO_gas and SiO2_gas rows.
+    assert len(numeric) == 23
     assert all(
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED in flagged_strata(residual.notices)
         for residual in contested

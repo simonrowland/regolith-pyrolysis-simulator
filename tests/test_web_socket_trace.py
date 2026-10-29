@@ -156,6 +156,7 @@ def _record_trace(app, captured_tasks):
         client.emit(
             "start_simulation",
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,

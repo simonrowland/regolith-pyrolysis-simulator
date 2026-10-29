@@ -1,14 +1,17 @@
 """Melt-activity observations are not held to the engine_point contract.
 
-An activity or activity coefficient needs a normalized composition, a
-point temperature, and a reference state that matches the engine. Oxygen
-is required when the composition or the measured species holds a
-multivalent element. Pressure is not an input, and a missing required
-input is refused rather than defaulted.
+A melt activity or activity coefficient needs a normalized composition, a
+point temperature, and a reference state that matches the engine. For melt
+activity, oxygen is required when the composition or measured species holds
+a multivalent element. That oxygen is one fO2 from the row ladder, the same
+value on every engine. Other quantities follow their identity input profile.
+Pressure is not an input, and a missing required input is refused rather than
+defaulted.
 """
 
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
@@ -189,7 +192,57 @@ def _case(
 
 
 def _melt(experiment, bench, observation):
-    return melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
+    return melt_activity_requests(
+        collect_consumer_inputs(experiment, bench, observation),
+        experiment=experiment,
+        bench=bench,
+        observation=observation,
+    )
+
+
+def _install_scoring_cell(
+    monkeypatch,
+    *,
+    melt_activities=None,
+    gas_pressures=None,
+):
+    seen = {"cell_calls": []}
+
+    def _open(name):
+        return SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fO2=False,
+        )
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        seen["cell_calls"].append(
+            {"mode": po2.mode, "po2_bar": po2.po2_bar}
+        )
+        return SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            melt_activities=dict(melt_activities or {}),
+            melt_activity_coefficients={},
+            gas_partial_pressures_Pa=dict(gas_pressures or {}),
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[],
+            authority=None,
+            certified_band=None,
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    return seen
 
 
 def test_requirement_tuple_does_not_include_pressure_or_oxygen():
@@ -199,15 +252,19 @@ def test_requirement_tuple_does_not_include_pressure_or_oxygen():
 
 
 def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():
-    # SiO2 is a pure-liquid-oxide activity for every activity engine. Na2O is not.
+    # The liquid-basis engines are ready. MAGEMin requires the production
+    # fusion owner to convert this liquid reference to its quartz standard.
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert [item.readiness.engine for item in results] == list(MELT_ACTIVITY_ENGINES)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
-    assert all(item.readiness.gaps == () for item in results)
+    liquid_basis = [item for item in results if item.readiness.engine != "magemin"]
+    assert all(item.readiness.status is ReadinessStatus.READY for item in liquid_basis)
+    assert all(item.readiness.gaps == () for item in liquid_basis)
+    magemin = next(item for item in results if item.readiness.engine == "magemin")
+    assert magemin.readiness.status is ReadinessStatus.NOT_APPLICABLE
     payload = results[0].payload
     assert payload["engine"] == "alphamelts"
     assert payload["temperature_C"] == pytest.approx(1473.15 - 273.15)
@@ -229,19 +286,43 @@ def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():
 
 
 def test_iron_without_oxygen_is_a_typed_refusal():
+    """No printed fO2: every liquid-basis engine gets the same borrowed fO2.
+
+    MAGEMin still refuses the liquid reference. engine_point stays on the
+    oxygen gap; the ladder does not fill that consumer.
+    """
+
     experiment, bench, observation = _case(
         composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
-    gaps = results[0].readiness.gaps
-    oxygen = [gap for gap in gaps if gap.waypoint == "oxygen_condition"]
-    assert len(oxygen) == 1
-    assert oxygen[0].reason is GapReason.MISSING_EVIDENCE
-    assert "FeO" in oxygen[0].missing
-    assert not any(gap.waypoint == "pressure_boundary" for gap in gaps)
+    comparable = [
+        item for item in results
+        if item.readiness.engine != "magemin"
+    ]
+    assert {item.readiness.engine for item in comparable} == {
+        "alphamelts", "thermoengine", "openimcc", "internal-analytical",
+    }
+    assert all(item.readiness.status is ReadinessStatus.READY for item in comparable)
+    assert all(item.payload is not None for item in comparable)
+    assert len({item.payload["fO2_log"] for item in comparable}) == 1
+    assert all(item.payload["fO2_tier"] == 4 for item in comparable)
+    assert all(item.payload["fO2_route"] == "intrinsic_melt_fO2" for item in comparable)
+    assert all(item.payload["fO2_borrowed"] is True for item in comparable)
+    magemin = next(item for item in results if item.readiness.engine == "magemin")
+    assert magemin.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert magemin.payload is None
+    engine_point = [
+        item for item in consumer_readiness(experiment, bench, observation)
+        if item.consumer == "engine_point"
+    ]
+    assert engine_point
+    assert all(item.status is ReadinessStatus.GAP for item in engine_point)
+    assert all(
+        any(gap.waypoint == "oxygen_condition" for gap in item.gaps)
+        for item in engine_point
+    )
 
 
 def test_iron_with_point_oxygen_is_ready():
@@ -251,8 +332,15 @@ def test_iron_with_point_oxygen_is_ready():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
-    assert results[0].payload["fO2_log"] == pytest.approx(-9)
+    assert all(
+        item.readiness.status is ReadinessStatus.READY
+        for item in results if item.readiness.engine != "magemin"
+    )
+    ready = [item for item in results if item.readiness.engine != "magemin"]
+    assert all(item.payload["fO2_log"] == float(Decimal("-9")) for item in ready)
+    assert all(item.payload["fO2_tier"] == 1 for item in ready)
+    assert all(item.payload["fO2_borrowed"] is False for item in ready)
+    assert len({item.payload["fO2_route"] for item in ready}) == 1
     assert "pressure_bar" not in results[0].payload
 
 
@@ -262,7 +350,10 @@ def test_zero_iron_does_not_demand_oxygen():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    assert all(
+        item.readiness.status is ReadinessStatus.READY
+        for item in results if item.readiness.engine != "magemin"
+    )
     assert "fO2_log" not in results[0].payload
 
 
@@ -280,7 +371,10 @@ def test_missing_composition_is_refused_and_not_defaulted():
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
+    assert all(
+        item.readiness.status is ReadinessStatus.GAP
+        for item in results if item.readiness.engine != "magemin"
+    )
     assert results[0].readiness.gaps[0].waypoint == "normalized_composition"
     assert results[0].readiness.gaps[0].reason is GapReason.MISSING_EVIDENCE
     assert not any(gap.waypoint == "oxygen_condition" for gap in results[0].readiness.gaps)
@@ -309,7 +403,19 @@ def test_activity_coefficient_uses_the_same_contract():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    internal_analytical = next(
+        item for item in results if item.readiness.engine == "internal-analytical"
+    )
+    assert internal_analytical.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert internal_analytical.payload is None
+    assert all(
+        item.readiness.status is ReadinessStatus.READY
+        for item in results
+        if item.readiness.engine not in {"internal-analytical", "magemin"}
+    )
+    assert next(
+        item for item in results if item.readiness.engine == "magemin"
+    ).readiness.status is ReadinessStatus.NOT_APPLICABLE
     assert results[0].payload["quantity"] == "activity_coefficient"
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     activity = _melt(*_case(
@@ -363,12 +469,15 @@ def test_multivalent_oxide_without_oxygen_is_a_typed_refusal(oxide):
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
-    oxygen = [gap for gap in results[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
-    assert len(oxygen) == 1
-    assert oxygen[0].reason is GapReason.MISSING_EVIDENCE
-    assert oxide in oxygen[0].missing
+    comparable = [
+        item for item in results if item.readiness.engine != "magemin"
+    ]
+    assert all(item.readiness.status is ReadinessStatus.READY for item in comparable)
+    assert all(item.payload is not None for item in comparable)
+    assert len({item.payload["fO2_log"] for item in comparable}) == 1
+    assert all(item.payload["fO2_tier"] == 4 for item in comparable)
+    assert all(item.payload["fO2_borrowed"] is True for item in comparable)
+    assert "internal-analytical" in {item.readiness.engine for item in comparable}
     engine_point = [
         item for item in consumer_readiness(experiment, bench, observation)
         if item.consumer == "engine_point"
@@ -384,8 +493,18 @@ def test_iron_alias_without_oxygen_is_a_typed_refusal(alias):
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    oxygen = [gap for gap in results[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
+    comparable = [item for item in results if item.readiness.engine != "magemin"]
+    assert all(item.payload is None for item in comparable)
+    assert all(item.readiness.status is ReadinessStatus.GAP for item in comparable)
+    signatures = [
+        tuple((gap.waypoint, gap.reason, gap.missing) for gap in item.readiness.gaps)
+        for item in comparable
+    ]
+    assert len(set(signatures)) == 1
+    oxygen = [
+        gap for gap in comparable[0].readiness.gaps
+        if gap.waypoint == "oxygen_condition"
+    ]
     assert len(oxygen) == 1
     assert alias in oxygen[0].missing
 
@@ -396,11 +515,15 @@ def test_zero_iron_does_not_hide_another_multivalent_oxide():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    oxygen = [gap for gap in results[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
-    assert len(oxygen) == 1
-    assert "TiO2" in oxygen[0].missing
-    assert "FeO" not in oxygen[0].missing
+    comparable = [item for item in results if item.readiness.engine != "magemin"]
+    assert all(item.readiness.status is ReadinessStatus.READY for item in comparable)
+    assert all(item.payload is not None for item in comparable)
+    assert len({item.payload["fO2_log"] for item in comparable}) == 1
+    assert all(item.payload["fO2_tier"] == 4 for item in comparable)
+    assert all(item.payload["fO2_borrowed"] is True for item in comparable)
+    assert "FeO" not in comparable[0].payload["composition_mol"] or (
+        comparable[0].payload["composition_mol"]["FeO"] == 0.0
+    )
 
 
 def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas():
@@ -413,10 +536,21 @@ def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas():
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
-    oxygen = [gap for gap in results[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
-    assert len(oxygen) == 1
-    assert "Ga" in oxygen[0].missing
-    assert "fO2_log" not in (results[0].payload or {})
+    assert all(
+        item.readiness.status is ReadinessStatus.NOT_APPLICABLE for item in results
+    )
+    assert all(
+        any(
+            gap.waypoint == "reference_state"
+            and gap.reason is GapReason.REFERENCE_STATE_MISMATCH
+            for gap in item.readiness.gaps
+        )
+        for item in results
+    )
+    assert all(
+        not any(gap.waypoint == "oxygen_condition" for gap in item.readiness.gaps)
+        for item in results
+    )
 
 
 @pytest.mark.parametrize(
@@ -433,6 +567,7 @@ def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas():
 def test_mismatched_reference_state_is_refused(convention, phase, basis, formula):
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        oxygen=Decimal("-9"),
     )
     state = StandardState(convention, Species(formula, phase), basis, Decimal("1"))
     observation = replace(
@@ -464,13 +599,68 @@ def test_accepted_reference_is_named_on_the_payload():
     assert "fO2_log" not in results[0].payload
 
 
-def test_scorer_refuses_a_multivalent_gap_before_the_engine_default(monkeypatch):
-    def _opened(*_args, **_kwargs):
-        raise AssertionError("activity gap must not open an engine")
+def test_internal_analytical_reports_activity_but_not_coefficient():
+    experiment, bench, observation = _case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
+    )
+    activity = next(
+        item for item in _melt(experiment, bench, observation)
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert activity.readiness.status is ReadinessStatus.READY
+    assert activity.payload is not None
+    assert activity.payload["quantity"] == "activity"
+
+    coefficient_experiment, coefficient_bench, coefficient_observation = _case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+    )
+    coefficient = next(
+        item for item in _melt(
+            coefficient_experiment, coefficient_bench, coefficient_observation,
+        )
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert coefficient.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert coefficient.payload is None
+
+
+def test_scorer_commands_one_borrowed_fo2_for_a_multivalent_gap(monkeypatch):
+    seen: dict[str, object] = {}
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        seen[str(_handle.name)] = po2.po2_bar
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {"SiO2": 0.2, "SiO2_Liq": 0.2},
+            "melt_activity_coefficients": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "engine_reason": None,
+        })()
 
     monkeypatch.setattr(
         "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
-        _opened,
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
     )
     experiment, _bench, observation = _case(
         composition=_composition(("TiO2", "0.2"), ("SiO2", "0.8")),
@@ -479,13 +669,207 @@ def test_scorer_refuses_a_multivalent_gap_before_the_engine_default(monkeypatch)
     from simulator.battery.enums import Engine
     from simulator.battery.score import predict_with_engine
 
+    predictions = [
+        predict_with_engine(engine, observation, experiment=experiment, isolated=False)
+        for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC)
+    ]
+    assert len(set(seen.values())) == 1
+    assert next(iter(seen.values())) is not None
+    assert all(prediction.value is not None for prediction in predictions)
+    assert all(prediction.refusal_reason is None for prediction in predictions)
+    assert all(
+        any(
+            notice.origin == "fo2_ladder"
+            and notice.reason.startswith("fo2_tier=4;")
+            and notice.reason.endswith("; borrowed")
+            for notice in prediction.notices
+        )
+        for prediction in predictions
+    )
+    assert all(
+        prediction.refusal_detail.get("reason") != "engine_default"
+        for prediction in predictions
+    )
+
+
+def test_redox_free_activity_is_scored_without_an_oxygen_input(monkeypatch):
+    seen = _install_scoring_cell(
+        monkeypatch,
+        melt_activities={"SiO2": 0.4},
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("SiO2", "0.5"), ("CaO", "0.3"), ("Al2O3", "0.2"),
+        ),
+        formula="SiO2",
+    )
     prediction = predict_with_engine(
         Engine.ALPHAMELTS, observation, experiment=experiment, isolated=False,
     )
-    assert prediction.value is None
-    assert prediction.refusal_detail["reason"] == "missing_evidence"
-    assert any("TiO2" in gap["missing"] for gap in prediction.refusal_detail["gaps"])
-    assert prediction.refusal_detail["reason"] != "engine_default"
+
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
+    assert prediction.value == Decimal('0.4')
+
+
+def test_alphamelts_activity_score_surfaces_invalid_oxide_notice(monkeypatch):
+    """Kill mutation:
+
+    ``drop_activity_repair_notice_forwarding_in_predict_with_engine``
+    """
+
+    from engines.alphamelts.domain import (
+        _canonical_oxide_activity_map_with_notices,
+    )
+    from simulator.battery.enums import Engine, NoticeKind
+    from simulator.battery.score import predict_with_engine
+
+    activities = {
+        "SiO2_Liq": 0.42,
+        "Al2O3": float("nan"),
+        "FeO": 0.0,
+    }
+    retained, repair_warnings = _canonical_oxide_activity_map_with_notices(
+        activities
+    )
+    assert retained == {"SiO2": 0.42}
+
+    _install_scoring_cell(monkeypatch, melt_activities=activities)
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("SiO2", "0.5"), ("CaO", "0.3"), ("Al2O3", "0.2"),
+        ),
+        formula="SiO2",
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.value == Decimal("0.42")
+    assert len(prediction.notices) == 3
+    assert [notice.kind for notice in prediction.notices] == [
+        NoticeKind.INPUT_OMITTED,
+        NoticeKind.INPUT_OMITTED,
+        NoticeKind.INPUT_OMITTED,
+    ]
+    oxide_notices = [
+        notice
+        for notice in prediction.notices
+        if notice.origin == "engine:alphamelts"
+    ]
+    assert [notice.reason for notice in oxide_notices] == list(repair_warnings)
+    oxygen_notices = [
+        notice
+        for notice in prediction.notices
+        if notice.origin == "score:predict_with_engine"
+    ]
+    assert len(oxygen_notices) == 1
+    assert oxygen_notices[0].reason.endswith(
+        "oxygen is not an input and was omitted"
+    )
+
+
+def test_multivalent_psat_without_oxygen_keeps_green_scorer_decision(monkeypatch):
+    seen = _install_scoring_cell(monkeypatch, gas_pressures={"FeO": 3.0})
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment = f.tabulation_experiment()
+    observation = f.observation(
+        "feo-psat",
+        experiment.experiment_id,
+        f.psat_identity("FeO"),
+        Decimal("1"),
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.value == Decimal("3.0")
+    assert prediction.refusal_reason is None
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
+
+
+def test_fe_free_psat_numeric_residual_keeps_omitted_oxygen_mode(monkeypatch):
+    seen = _install_scoring_cell(monkeypatch, gas_pressures={"Na": 4.0})
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import (
+        ScoreContext,
+        predict_with_engine,
+        score_store,
+    )
+
+    work = f.work()
+    experiment = f.tabulation_experiment()
+    observation = f.observation(
+        "na-psat",
+        experiment.experiment_id,
+        f.psat_identity("Na"),
+        Decimal("2"),
+        source_id="janaf-4th",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={"janaf-4th": "reviewed"},
+        hostname="test",
+    )
+
+    def predict(engine, candidate, *, handles=None, experiment=None):
+        return predict_with_engine(
+            engine,
+            candidate,
+            experiment=experiment,
+            isolated=False,
+        )
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.ALPHAMELTS,),
+        predict=predict,
+    )
+
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
+    assert residuals[0].numeric is not None
+    assert residuals[0].numeric.value == Decimal("0.3010299956639812")
+
+
+def test_redox_active_no_input_refuses_as_typed_scorer_input_error():
+    from simulator.battery.enums import Engine, RefusalReason
+    from simulator.battery.score import _oxygen_input_request
+
+    experiment, _bench, observation = _case(
+        composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
+    )
+    identity = observation.identity
+    assert identity is not None
+    composition = identity.composition
+    assert composition is not None and composition.is_value
+
+    decision = _oxygen_input_request(
+        engine=Engine.ALPHAMELTS,
+        channel="melt_activity",
+        sources=(),
+        identity=identity,
+        requested=identity.composition,
+        quantity=Quantity.ACTIVITY,
+        composition_value=composition.value,
+        input_notices=[],
+    )
+
+    assert decision.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert decision.refusal_detail['reason'] == 'missing_fO2'
+    assert decision.refusal_detail['multivalent'] == ['FeO']
 
 
 def test_scorer_compares_activity_and_coefficient_to_different_maps(monkeypatch):
@@ -609,6 +993,67 @@ def test_printed_oxygen_is_commanded_and_not_the_engine_default(monkeypatch):
     assert seen["po2_bar"] == pytest.approx(1e-7)
     assert seen["mode"] != "engine_default"
     assert prediction.value == Decimal("0.2")
+
+
+def test_alphamelts_activity_uses_printed_oxygen_and_matches_direct_call(monkeypatch):
+    calls = []
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        calls.append((po2.mode, po2.po2_bar))
+        activity = 0.25 + (po2.po2_bar or 0.0)
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {"SiO2": activity},
+            "melt_activity_coefficients": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("Na2O", "0.2"), ("K2O", "0.2"), ("SiO2", "0.6"),
+        ),
+        oxygen=Decimal("-7"),
+        formula="SiO2",
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment, isolated=False,
+    )
+    assert calls == [("commanded", pytest.approx(1e-7))]
+    assert prediction.value == Decimal(str(0.25 + 1e-7))
+
+    direct = _cell(
+        _open("alphamelts"), None,
+        po2=type("Po2", (), {"mode": "commanded", "po2_bar": 1e-7})(),
+    )
+    assert float(prediction.value) == pytest.approx(
+        direct.melt_activities["SiO2"], rel=1e-9,
+    )
 
 
 def test_coefficient_without_a_gamma_map_is_refused(monkeypatch):
@@ -877,6 +1322,7 @@ def test_na2sio3_endmember_is_not_ready_for_imcc(monkeypatch):
 def test_formula_basis_does_not_broaden_parent_oxide_recognition(formula, basis):
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        oxygen=Decimal("-9"),
         formula=formula,
         basis=basis,
     )
@@ -895,6 +1341,7 @@ def test_formula_basis_does_not_broaden_parent_oxide_recognition(formula, basis)
 def test_formula_basis_does_not_hide_tridymite_phase_mismatch():
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
+        oxygen=Decimal("-9"),
         formula="SiO2",
         basis="SiO2",
         phase=Phase.CR,
@@ -993,6 +1440,23 @@ def test_scorer_compares_canonical_oxide_activity_not_raw_labels(monkeypatch):
     assert match_reported_species("Na2O", {"Na": 0.2, "K": 0.03, "Fe": 0.25}, oxide_activity=True) is None
     assert match_reported_species("Na", {"Na": 0.08}, oxide_activity=True) is None
     assert match_reported_species("Na", {"Na": 0.08}) == ("Na", 0.08)
+
+
+def test_match_reported_species_accepts_exact_gas_suffix():
+    """SiO2_gas is the vapour adapter's oxide-collision name, not a fuzzy stem."""
+
+    from simulator.battery.score import match_reported_species
+
+    reported = {"SiO2_gas": 12.5, "Na": 0.08, "FeO_association_gas": 3.0}
+    assert match_reported_species("SiO2", reported) == ("SiO2_gas", 12.5)
+    assert match_reported_species("SiO2", reported, oxide_activity=True) is None
+    assert match_reported_species("SiO2", {"SiO2gas": 1.0}) is None
+    assert match_reported_species("SiO2", {"SiO2_gaseous": 1.0}) is None
+    assert match_reported_species("Na", reported) == ("Na", 0.08)
+    assert match_reported_species("FeO", reported) is None
+    assert match_reported_species("FeO", {"FeO_gas": 4.0}) == ("FeO_gas", 4.0)
+    both = {"SiO2": 1.5, "SiO2_gas": 12.5}
+    assert match_reported_species("SiO2", both) == ("SiO2", 1.5)
 
 
 def _fake_engine(monkeypatch, activities, gammas=None):

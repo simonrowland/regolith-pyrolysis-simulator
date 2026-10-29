@@ -490,11 +490,12 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
         digest.update(b"\0")
         digest.update(path.read_bytes())
         digest.update(b"\0")
-    # Byte pin of this fixture after the merged migrator. The checks above
-    # are the behaviour; the digest moves when row identity or bench wiring
-    # changes the written tree.
+    # Byte pin of this fixture after the merged migrator. Car 32f8a434f writes
+    # Derivation.references as references: []. Green b-985 adds an empty
+    # "Unavailable input work census" section to migration-report.md. The
+    # checks above are the behaviour; this digest is the merged tree.
     assert digest.hexdigest() == (
-        "69d1ac13c09d9bcc31ee40032342c3ffe035a5e84aaa656ce729439041ebea6f"
+        "1e71d46b76d3c2f30dd5c0632a7397e412d15f3995e8d43c7d245e6db8e3746a"
     )
 
 

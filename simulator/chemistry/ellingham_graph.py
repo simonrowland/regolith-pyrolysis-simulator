@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import _antoine_log10_pressure, _read_antoine_coefficients
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO,
@@ -26,6 +26,9 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_metal_phase_kind,
     ellingham_segment_for_temperature,
     ellingham_stoichiometry,
+)
+from simulator.chemistry.gas_rail_authority import (
+    _gas_rail_block_is_authoritative,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -51,21 +54,32 @@ class EllinghamPressureRefusal(ValueError):
 
 
 def _physical_pO2_bar(pO2_bar: float) -> float:
-    """Mass-action pO2 (bar): refuse a negative fugacity, then floor tiny positives.
+    """Delegate supplied oxygen admission and notices to the O2 owner."""
+    from simulator.vapour_rail.channels import validate_physical_pO2_bar
 
-    The 1e-30 floor is a division guard for a physically valid (zero or
-    tiny) pO2, not a validator. ``max(negative, 1e-30)`` maps an invalid
-    fugacity onto a valid-looking one and kills the ``numerator <= 0``
-    guard in ``_metal_activity_factor_from_segment``. Refuse first, floor
-    second.
-    """
-    pO2 = float(pO2_bar)
-    if pO2 < 0.0:
-        raise EllinghamPressureRefusal(
-            f"pO2_bar must be non-negative; got {pO2_bar!r} "
-            "(negative fugacity is not a physical pO2)"
-        )
-    return max(pO2, 1e-30)
+    try:
+        return validate_physical_pO2_bar(pO2_bar)
+    except ValueError as exc:
+        raise EllinghamPressureRefusal(str(exc)) from exc
+
+
+
+def _sio_oxygen_pressure_factor(pO2_bar: float, reference_bar: float) -> float:
+    """SiO2(l) -> SiO(g) + 1/2 O2: continue the declared reaction reference."""
+    from simulator.vapour_rail.channels import _log_oxygen_ratio
+
+    oxygen = _physical_pO2_bar(pO2_bar)
+    # K = (P_SiO/P0)*(pO2/P0)**(1/2)/a_SiO2. At fixed T/activity,
+    # P/P_ref = sqrt(p_ref/pO2); bar/bar is dimensionless. This applies on
+    # both sides of p_ref and tends continuously to 1 there. Keep the direct
+    # sqrt expression for exact in-band compatibility; use log differences
+    # only when the unpowered quotient under/overflows.
+    ratio = reference_bar / oxygen
+    return (
+        math.sqrt(ratio) if 0.0 < ratio < math.inf
+        else math.exp(0.5 * _log_oxygen_ratio(reference_bar, oxygen))
+    )
+
 
 
 @dataclass(frozen=True)
@@ -183,7 +197,7 @@ def _antoine_reference_pressure_Pa(
     """Evaluate catalog Antoine reference pressure (Pa), or None if no number.
 
     Three-category rule (project doctrine):
-    (1) missing/corrupt input (A <= 0, non-coercible coeffs, non-finite log):
+    (1) missing/corrupt input (missing/non-coercible coeffs, non-finite log):
         return None → callers raise EllinghamPressureRefusal.
     (2) out-of-domain T (historical comfort band T_K <= 300 K) with evaluable
         coeffs: COMPUTE the value. This is non-authoritative extrapolation on
@@ -203,14 +217,11 @@ def _antoine_reference_pressure_Pa(
     computable cold-T diagnostics.
     """
     try:
-        A = float(antoine.get("A", 0) or 0)
-        B = float(antoine.get("B", 0) or 0)
-        C = float(antoine.get("C", 0) or 0)
+        A, B, C = _read_antoine_coefficients(antoine)
+        T_K = float(temperature_K)
     except (TypeError, ValueError):
         return None
-    T_K = float(temperature_K)
-    # Category (1): no positive A → coefficients cannot produce a pressure.
-    if not (A > 0) or not math.isfinite(T_K):
+    if not math.isfinite(T_K):
         return None
     # Category (2): T may be outside the historical comfort band; still evaluate.
     log_P = _antoine_log10_pressure(A, B, C, T_K)
@@ -353,28 +364,11 @@ def effective_equilibrium_pressure_Pa(
         gas_rail_rxn = sp_data.get("gas_rail_standard_reaction")
         gas_rail_authoritative = True
         if isinstance(gas_rail_rxn, Mapping):
-            # Mirror Builtin demotion gate (MC-5 Ca): dormant TE liquid-oxide
-            # Pref must not select over JANAF gas-metal Ellingham gas_fugacity.
-            if gas_rail_rxn.get("authoritative") is False:
-                gas_rail_authoritative = False
-            else:
-                _gr_status = str(
-                    gas_rail_rxn.get("status")
-                    or gas_rail_rxn.get("runtime_disposition")
-                    or gas_rail_rxn.get("authority_status")
-                    or ""
-                ).strip().lower()
-                if _gr_status in {
-                    "dormant",
-                    "dormant_non_authoritative",
-                    "inactive",
-                    "inactive_dormant",
-                    "inactive_provenance_only",
-                    "status_bearing_non_authoritative",
-                    "non_authoritative",
-                    "provenance_only",
-                } or _gr_status.startswith("dormant"):
-                    gas_rail_authoritative = False
+            # A dormant TE liquid-oxide Pref must not select over JANAF
+            # gas-metal Ellingham gas_fugacity (MC-5 Ca).
+            gas_rail_authoritative = _gas_rail_block_is_authoritative(
+                gas_rail_rxn
+            )
         if (
             fit_target != "standard_reaction_term"
             and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
@@ -470,8 +464,11 @@ def effective_equilibrium_pressure_Pa(
                 float(row.get("pO2_reference_bar", 1.0) or 1.0),
             )
             P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
-        elif species == "SiO" and pO2 > float(vacuum_floor_bar):
-            P_eq_Pa *= math.sqrt(float(vacuum_floor_bar) / pO2)
+        elif species == "SiO":
+            # Historical argument is a legacy reference fallback, never an
+            # admission floor; a declared source reference takes precedence.
+            reference_bar = float(row.get("pO2_reference_bar", vacuum_floor_bar) or vacuum_floor_bar)
+            P_eq_Pa *= _sio_oxygen_pressure_factor(pO2, reference_bar)
         return max(P_eq_Pa, 0.0)
 
     raise EllinghamPressureRefusal(

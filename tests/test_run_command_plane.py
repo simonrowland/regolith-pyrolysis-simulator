@@ -516,6 +516,7 @@ def test_start_racing_disconnect_cannot_publish_orphan(tmp_path, monkeypatch):
         lambda *_args, **_kwargs: None,
     )
     payload = {
+        "payload_version": 4,
         "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
@@ -587,6 +588,7 @@ def test_socket_restart_persists_displaced_run(tmp_path, monkeypatch):
         "mass_kg": 1000,
         "speed": 0,
     })
+    payload = {**payload, "payload_version": 4}
     client.emit("start_simulation", payload)
     sid = next(reversed(web_events._simulations))
     first_state = web_events._simulations[sid]
@@ -1046,12 +1048,13 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
         "speed": 0,
         "track": "pyrolysis",
     }
+    socket_payload = {**payload, "payload_version": 4}
 
     try:
         if first_transport == "socket":
             first = socket_client.emit(
                 "start_simulation",
-                payload,
+                socket_payload,
                 callback=True,
             )
             prior_run_id = first["run_id"]
@@ -1072,7 +1075,7 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
             prior_run_id = response.get_json()["run_id"]
             replacement = socket_client.emit(
                 "start_simulation",
-                payload,
+                socket_payload,
                 callback=True,
             )
             replacement_run_id = replacement["run_id"]
@@ -1190,7 +1193,7 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
         assert response.get_json()["error_type"] == "run_replacement_failed"
     else:
         result = web_events._registered_start_handler(
-            payload,
+            {**payload, "payload_version": 4},
             sid="socket-replacement",
             ledger_client_id="owner",
         )
@@ -2086,7 +2089,7 @@ def test_global_active_run_cap_is_shared_by_http_and_socket(
         assert response.get_json()["error_type"] == "global_run_capacity_exhausted"
     else:
         result = web_events._registered_start_handler(
-            payload,
+            {**payload, "payload_version": 4},
             sid="saturated-socket",
             ledger_client_id="socket-owner",
         )

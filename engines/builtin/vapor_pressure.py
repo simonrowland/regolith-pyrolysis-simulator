@@ -56,7 +56,15 @@ if TYPE_CHECKING:
         GasChannelPotential,
     )
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _is_missing_antoine_intercept,
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+    _antoine_skip_reason_for_refusal,
+    _read_antoine_coefficients,
+)
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
@@ -71,6 +79,9 @@ from simulator.vapour_rail.domain_policy import (
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.chemistry.gas_rail_authority import (
+    _gas_rail_block_is_authoritative,
+)
 
 
 # Vapor-pressure convention contract (`data/vapor_pressures.yaml`):
@@ -108,9 +119,12 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     MELT_OXIDE_ACTIVITY_TIER,
     melt_oxide_activity,
     normalize_high_t_melt_activity,
+    single_cation_mole_fractions,
 )
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K  # noqa: E402
+from simulator.melt_backend import openimcc_bridge  # noqa: E402
 from simulator.physical_constants import (  # noqa: E402
+    GAS_CONSTANT,
     MELT_DISSOCIATION_PO2_MAX_BAR,
     MELT_DISSOCIATION_PO2_MIN_BAR,
 )
@@ -319,6 +333,22 @@ def _attach_pO2_floor_inversion_notices(
     return notices
 
 
+def _vapor_pressure_temperature_extrapolation_notice(
+    *,
+    temperature_K: float,
+    valid_range_K: tuple[float, float],
+    reason: str,
+) -> dict[str, Any]:
+    band = (float(valid_range_K[0]), float(valid_range_K[1]))
+    return {
+        "temperature_K": float(temperature_K),
+        "valid_range_K": band,
+        "authority_level": "extrapolated",
+        "certified_band": {"temperature_K": band},
+        "reason": reason,
+    }
+
+
 class VaporPressureComputationError(RuntimeError):
     """Raised when vapor-pressure math cannot produce an authoritative value."""
 
@@ -357,6 +387,9 @@ VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG = (
 VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS = "reconstructed_limited"
 PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
 ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+# A computed partial pressure at or below this floor is left out of
+# vapor_pressures_Pa. The omission record is the proof; absence alone is not.
+VAPOR_PRESSURE_REPORTING_THRESHOLD_PA = 1e-15
 _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
     {
         "builtin_authoritative",
@@ -370,39 +403,44 @@ def _fit_target(row: Mapping[str, Any] | None) -> str:
     return str((row or {}).get("fit_target", "") or "").strip()
 
 
-def _gas_rail_block_is_authoritative(block: Mapping[str, Any]) -> bool:
-    """Return False for demoted / dormant gas_rail blocks (provenance only).
+def _publishes_vapor_pressure(
+    pressure_Pa: float, *, retain_subthreshold: bool
+) -> bool:
+    """True when this computed pressure is copied onto vapor_pressures_Pa."""
 
-    Premise: a present ``gas_rail_standard_reaction`` mapping historically
-    always selected the liquid-oxide Pref over Ellingham gas_fugacity.
-    Algebra: demotion is an explicit status/authority gate, not key deletion,
-    so the TE+JANAF coefficients remain inspectable while Builtin falls through
-    to the gas-metal Ellingham root. Unitless status string / bool. Sanity:
-    ``status: dormant_non_authoritative`` (MC-5 Ca, 2026-08-07) must not
-    produce ``pressure_rail=gas_rail_liquid_oxide_standard_reaction``.
+    return pressure_Pa > 0.0 and (
+        retain_subthreshold
+        or pressure_Pa > VAPOR_PRESSURE_REPORTING_THRESHOLD_PA
+    )
+
+
+def _record_reporting_threshold_omission(
+    omissions: dict[str, dict[str, Any]],
+    species: str,
+    pressure_Pa: float,
+    *,
+    field: str,
+    pressure_rail: str,
+) -> None:
+    """Record a species evaluated on this call and found at or below the floor.
+
+    Negative pressure fails the positivity gate and is not this record.
+    A species skipped before a pressure exists gets no record.
     """
 
-    if block.get("authoritative") is False:
-        return False
-    status = str(
-        block.get("status")
-        or block.get("runtime_disposition")
-        or block.get("authority_status")
-        or ""
-    ).strip().lower()
-    if not status:
-        return True
-    dormant_markers = (
-        "dormant",
-        "dormant_non_authoritative",
-        "inactive",
-        "inactive_dormant",
-        "inactive_provenance_only",
-        "status_bearing_non_authoritative",
-        "non_authoritative",
-        "provenance_only",
-    )
-    return status not in dormant_markers and not status.startswith("dormant")
+    if (
+        not math.isfinite(pressure_Pa)
+        or pressure_Pa < 0.0
+        or pressure_Pa > VAPOR_PRESSURE_REPORTING_THRESHOLD_PA
+    ):
+        return
+    omissions[str(species)] = {
+        "species": str(species),
+        "reporting_threshold_Pa": VAPOR_PRESSURE_REPORTING_THRESHOLD_PA,
+        "computed_pressure_Pa": float(pressure_Pa),
+        "field": field,
+        "pressure_rail": pressure_rail,
+    }
 
 
 def _gas_rail_standard_reaction_block(
@@ -451,19 +489,10 @@ def _o2_channel_term_and_potential(
 ) -> tuple[CompiledReactionTerm | None, GasChannelPotential | None]:
     """Route a legacy linear-space rail's O2 dependence through channel #1.
 
-    t-571 Phase 1: the O2 scalar no longer enters pressure math as a free
-    fugacity — it is wrapped by the owner-gated channel factory
-    (:func:`o2_potential_from_pO2_bar`, the registered Phase-1 runtime
-    owner), which applies the b-148 physical envelope clamp and records the
-    clamp/reference receipts.  The returned pair feeds
-    :func:`channel_linear_mass_action_factor`, which reproduces the exact
-    pre-migration expression ``(p_clamped / p_ref) ** e`` bit-for-bit:
-
-    - ``legacy_pO2_bar`` is ``clamp_physical_pO2_bar(pO2_bar)``, identical to
-      the legacy inline ``min(max(pO2, MIN), MAX)``;
-    - ``term.derived_exponent`` is ``-(-e)/1 == e`` exactly (IEEE negation
-      and division by 1.0 are exact), matching the legacy scalar exponent;
-    - ``p_ref`` keeps the legacy ``max(1e-30, ref or 1.0)`` normalization.
+    The owner-gated O2 factory validates finite-positive oxygen and records
+    a notice outside its stated evaluator band. The returned potential keeps
+    the actual input; mass action applies ``(p / p_ref) ** e`` with bar/bar
+    dimensionless. In-band results retain the pre-migration IEEE identity.
 
     Returns ``(None, None)`` for a zero exponent (no O2 dependence).
     """
@@ -548,6 +577,71 @@ _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
     },
 }
 
+# Per-species cap on a first-order ln-gamma continuation, as a single-cation
+# L1 distance from the last certified composition. Provenance: the solved
+# c2b7b4e call log (117 calls, 2023–2473 K). On that trajectory the ln γ
+# slope is composition-driven: a secant in T and in 1/T leaves the same
+# error, so the cap is a composition distance, not a temperature window.
+# The owner's step counts are the horizon at which parent-basis γ stays
+# inside median absolute error ≤ 5% and worst ≤ 20% on the 7.5 K ramp:
+# FeO 8, MgO 4, CaO 4, SiO2 3, Al2O3 3, TiO2 3, K2O 1, Na2O 0.
+# FeO at 8 steps measured a worst error of 20.40% (0.40 percentage points
+# over the 20% target) on that ramp; the count stays 8 because that is the
+# horizon the owner counted in.
+# Premise: one ramp step is a consecutive solved pair whose temperatures
+# differ by exactly 7.5 K. There are 69 such pairs. Their single-cation L1
+# distances, on the same eight flux parents as the r2 window, sum to
+# 0.8844714170310508 (dimensionless). The mean step is that sum divided by
+# 69. cap_L1 = steps * mean. Both factors are dimensionless, so the cap is
+# a mole-fraction distance and compares directly with D(X_now, X_cert).
+# A cap of 0 (Na2O) freezes at the certificate: one step of that parent can
+# be ~94% off, so it is never first-order extrapolated. Distance == 0 is
+# inside every cap, including 0, because the gate is distance > cap.
+# K2O is listed so the prior is complete, but the 2026-09-26 exclusion
+# still keeps it off the OpenIMCC certificate; this table does not lift
+# that ruling. These distances are a prior to be tightened by bench/KEMS
+# scoring, not a fit to a campaign rump.
+_EXTRAPOLATION_CAP_STEPS: dict[str, int] = {
+    "FeO": 8,
+    "MgO": 4,
+    "CaO": 4,
+    "SiO2": 3,
+    "Al2O3": 3,
+    "TiO2": 3,
+    "K2O": 1,
+    "Na2O": 0,
+}
+_EXTRAPOLATION_RAMP_STEP_COUNT = 69
+_EXTRAPOLATION_RAMP_L1_SUM = 0.8844714170310508
+_EXTRAPOLATION_MEAN_STEP_L1 = (
+    _EXTRAPOLATION_RAMP_L1_SUM / _EXTRAPOLATION_RAMP_STEP_COUNT
+)
+_EXTRAPOLATION_CAP_L1: dict[str, float] = {
+    oxide: steps * _EXTRAPOLATION_MEAN_STEP_L1
+    for oxide, steps in _EXTRAPOLATION_CAP_STEPS.items()
+}
+
+# Same-composition temperature bridge. A nonconvergence inside OpenIMCC's
+# declared domain is usually isolated in T: the same composition solves one
+# step away. Probe at most these offsets, nearest first, and stop once the
+# solved points bracket the refused temperature. Six probes is the whole
+# schedule (two signs, three widths). Points outside [1700, 3000] K are not
+# called; that is the datapack domain, and a probe past it is a typed
+# domain refusal rather than a gamma observation.
+_TEMPERATURE_BRIDGE_OFFSETS_K = (25.0, 50.0, 75.0)
+_TEMPERATURE_BRIDGE_MAX_CALLS = 6
+_TEMPERATURE_BRIDGE_CAP_K = 75.0
+
+# One diagnostic-tier data table. This is the warning threshold suggested
+# by d-175, not an accuracy calibration or a ceiling on projected solves.
+_PROJECTED_COMPOSITION_WARNING_TIERS = (
+    {
+        "flag": "projected_composition_high_omission",
+        "above_omitted_wt_pct": 5.0,
+        "provenance": "owner d-175 / b-921 round 4 brief, 2026-10-18: flag above 5 wt%; no solve cap",
+    },
+)
+
 # Gamma(KO0.5) is read from the production bridge's activity_coefficients row.
 # Its activity is the square root of the K2O parent activity, and its x is the
 # single-cation mole fraction: K cation moles divided by all cation moles.
@@ -559,7 +653,7 @@ _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
 # The content digest keys each evaluation so packs sharing a model id cannot
 # reuse one another's numbers.
 _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
-    "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05": {
+    "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c": {
         "pack_alias": "published-core",
         "model_id": "IMCC-SF04",
         "pack_version": "1.0.2",
@@ -572,7 +666,7 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
             1673.15: True,
         },
     },
-    "d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e": {
+    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75": {
         "pack_alias": "default",
         "model_id": "IMCC-SF04-D066",
         "pack_version": "1.0.3-d066-v1",
@@ -646,11 +740,324 @@ def openimcc_binding_selected_by_inputs(
     *,
     temperature_K: float,
     controls: Mapping[str, Any],
+    quantity_class: str = "activity",
 ) -> bool:
+    if quantity_class not in {"activity", "vapour"}:
+        raise ValueError(f"Unknown OpenIMCC quantity class: {quantity_class!r}")
     mode = normalize_high_t_melt_activity(
         controls.get("high_t_melt_activity", "openimcc")
     )
-    return not (temperature_K <= VAPOROCK_T_MAX_K or mode != "openimcc")
+    if mode != "openimcc":
+        return False
+    if quantity_class == "vapour":
+        return temperature_K > VAPOROCK_T_MAX_K
+    return temperature_K >= openimcc_bridge._temperature_domain_K()[0]
+
+
+def _high_t_composition_vector(composition_mol: Mapping[str, float]) -> dict[str, float]:
+    return {
+        parent: fraction
+        for parent, fraction in single_cation_mole_fractions(composition_mol).items()
+        if parent in _HIGH_T_FLUX_OXIDES
+    }
+
+
+def _high_t_composition_distance(
+    current: Mapping[str, float], previous: Mapping[str, float],
+) -> float:
+    return sum(
+        abs(current.get(p, 0.0) - previous.get(p, 0.0))
+        for p in _HIGH_T_FLUX_OXIDES
+    )
+
+
+def _ln_gamma_at_progress(
+    certificate: Mapping[str, Any],
+    progress_s: float,
+    slope: float | None,
+) -> float:
+    """Evaluate the first-order ln-gamma step, with s = 0 exact.
+
+    s = 0 returns gamma_last itself. exp(ln gamma_last) is not bit-identical
+    to the certified coefficient, and the unit check of the Taylor step is
+    that a zero step reproduces the last certified value.
+    """
+
+    gamma_last = float(certificate["gamma_last"])
+    if progress_s == 0.0 or slope is None:
+        return gamma_last
+    return math.exp(float(certificate["ln_gamma_last"]) + slope * progress_s)
+
+
+def _continued_certified_effective_gamma(
+    certificate: Mapping[str, Any],
+    *,
+    temperature_K: float,
+    composition: Mapping[str, float],
+    composition_distance_L1: float,
+    composition_cap_L1: float | None = None,
+) -> dict[str, Any]:
+    """First-order continuation of one certified effective gamma.
+
+    The chemical potential of a melt component is
+        μ_i = μ_i°(T) + RT ln a_i,
+        ln a_i = ln γ_i + ln X_i.
+    The flux multiplies the current bulk single-cation fraction X_i, which
+    is known without a solve, by an effective γ_i. A refused solve withholds
+    γ_i. Continue ln γ rather than γ: ln γ is the excess part of RT ln a, so
+    a step is linear in the quantity the equilibrium condition uses. Apply
+    the composition cap before exponentiation.
+
+    One certified step supplies the secant. With progress s,
+        ln γ_i(s) = ln γ_i,last + (ln γ_i,last − ln γ_i,prev) * s.
+    s is dimensionless. On a thermal ramp it is the temperature step
+        s = (T − T_last) / (T_last − T_prev)
+    with both differences in kelvin, so the ratio has no unit. That is the
+    progress of the lunar ramp this continuation was measured on. The ln γ
+    slope there is composition-driven (a secant in T and in 1/T gives the
+    same error); the caller caps accuracy with a composition distance and
+    does not treat s as a thermal validity window. When T_last == T_prev the
+    ramp is isothermal and s is the ratio of single-cation L1 distances
+        s = D(X_now, X_last) / D(X_last, X_prev).
+    L1 is dimensionless, so this ratio is too. A zero denominator (no
+    observed composition step) gives s = 0.
+
+    A quadratic term would need a third certified point. That three-point
+    second difference amplifies solver noise, and the linear step is already
+    within about 0.7% at one step (about 0.1% on some parents). The extra
+    point is not worth the noise.
+
+    One certified call has no slope: return gamma_last, the zero-order hold.
+    s = 0 returns that same coefficient bit-exactly.
+    """
+
+    gamma_last = float(certificate["gamma_last"])
+    ln_last = certificate.get("ln_gamma_last")
+    ln_prev = certificate.get("ln_gamma_prev")
+    has_slope = (
+        ln_last is not None
+        and ln_prev is not None
+        and gamma_last > 0.0
+    )
+    slope = (float(ln_last) - float(ln_prev)) if has_slope else None
+    temperature_prev = certificate.get("temperature_prev_K")
+    if not has_slope or temperature_prev is None:
+        return {
+            "gamma": gamma_last,
+            "method": "hold_last_certified_effective_gamma",
+            "progress_s": 0.0,
+            "progress_variable": "temperature",
+            "ln_gamma_slope": None,
+        }
+    temperature_last = float(certificate["temperature_K"])
+    temperature_prev = float(temperature_prev)
+    if temperature_last != temperature_prev:
+        progress_s = (float(temperature_K) - temperature_last) / (
+            temperature_last - temperature_prev
+        )
+        progress_variable = "temperature"
+    else:
+        previous_composition = certificate.get("composition_prev_single_cation")
+        step = (
+            _high_t_composition_distance(
+                certificate["composition_single_cation"],
+                previous_composition,
+            )
+            if previous_composition is not None else 0.0
+        )
+        progress_s = (
+            0.0 if step == 0.0 else _high_t_composition_distance(
+                composition, certificate["composition_single_cation"],
+            ) / step
+        )
+        progress_variable = "composition"
+    gamma_progress_s = progress_s
+    if (
+        composition_cap_L1 is not None
+        and composition_distance_L1 > composition_cap_L1
+    ):
+        # Continue only to the declared composition boundary before exp():
+        # s_cap = s * (cap / D). Both cap and D are dimensionless L1
+        # distances, so s_cap and the ln-gamma exponent stay dimensionless.
+        # A zero cap gives s_cap = 0 and the exact certified gamma_last.
+        gamma_progress_s = (
+            0.0 if composition_cap_L1 <= 0.0
+            else progress_s * (composition_cap_L1 / composition_distance_L1)
+        )
+    return {
+        "gamma": _ln_gamma_at_progress(certificate, gamma_progress_s, slope),
+        "method": "extrapolated_first_order_ln_gamma",
+        "progress_s": progress_s,
+        "progress_variable": progress_variable,
+        "ln_gamma_slope": slope,
+    }
+
+
+def _regular_solution_gamma_fit(
+    observations: list[tuple[float, float]],
+    temperature_K: float,
+) -> dict[str, Any] | None:
+    """Fit RT ln γ = W + S T and evaluate it at the refused temperature.
+
+    μ_i = μ_i° + RT ln a_i and ln a_i = ln γ_i + ln X_i. At fixed bulk
+    composition X_i is known and does not change between probes, so the
+    temperature dependence left in the activity is γ_i(T). A regular-solution
+    excess folds the composition factors into two constants,
+        RT ln γ_i = W_i + S_i T,
+    with W in J/mol and S in J/(mol·K). Those constants are constants only
+    while the composition is the one they were fit on, which is why every
+    probe uses the refused melt and not a neighbour on the campaign
+    trajectory. R is GAS_CONSTANT, J/(mol·K), the same CODATA value the
+    reach report rounded to 8.314462618. y = RT ln γ is therefore J/mol,
+    and (W + S T) / (RT) is dimensionless, as ln γ must be.
+
+    Two points determine W and S exactly. Three or more use least squares
+    on y = W + S T. The algebra recovers each two-point observation: at
+    T = T_1, W + S T_1 = y_1, so ln γ returns ln γ_1. A zero temperature
+    span has no slope and is not a fit. This is the primary continuation.
+    The trajectory secant remains the fallback when fewer than two probes
+    converge; that secant changes composition, and this fit does not.
+    """
+
+    usable = [
+        (float(probe_T), float(gamma))
+        for probe_T, gamma in observations
+        if gamma > 0.0 and math.isfinite(gamma) and math.isfinite(probe_T)
+    ]
+    if len(usable) < 2 or not math.isfinite(temperature_K) or temperature_K == 0.0:
+        return None
+    gas_R = float(GAS_CONSTANT)
+    if len(usable) == 2:
+        (first_T, first_gamma), (second_T, second_gamma) = usable
+        if first_T == second_T:
+            return None
+        first_y = gas_R * first_T * math.log(first_gamma)
+        second_y = gas_R * second_T * math.log(second_gamma)
+        entropy = (second_y - first_y) / (second_T - first_T)
+        enthalpy = first_y - entropy * first_T
+        fit = "exact_line"
+    else:
+        count = float(len(usable))
+        sum_T = sum(probe_T for probe_T, _gamma in usable)
+        sum_T2 = sum(probe_T * probe_T for probe_T, _gamma in usable)
+        ys = [
+            gas_R * probe_T * math.log(gamma) for probe_T, gamma in usable
+        ]
+        sum_y = sum(ys)
+        sum_Ty = sum(
+            probe_T * y for (probe_T, _gamma), y in zip(usable, ys)
+        )
+        # denom = n ΣT² − (ΣT)² = Σ_{i<j} (T_j − T_i)², in K².
+        # It is zero only when every probe temperature is the same.
+        denom = count * sum_T2 - sum_T * sum_T
+        if denom == 0.0:
+            return None
+        enthalpy = (sum_y * sum_T2 - sum_T * sum_Ty) / denom
+        entropy = (count * sum_Ty - sum_T * sum_y) / denom
+        fit = "least_squares"
+    gamma = math.exp((enthalpy + entropy * float(temperature_K)) / (gas_R * float(temperature_K)))
+    temperatures = [probe_T for probe_T, _gamma in usable]
+    low = min(temperatures)
+    high = max(temperatures)
+    return {
+        "gamma": gamma,
+        "W_J_per_mol": enthalpy,
+        "S_J_per_mol_K": entropy,
+        "bridge_mode": (
+            "interpolation" if low <= float(temperature_K) <= high else "extrapolation"
+        ),
+        "bridge_span_K": high - low,
+        "bridge_temperatures_K": temperatures,
+        "bridge_fit": fit,
+    }
+
+
+def _same_composition_temperature_bridge(
+    composition_mol: Mapping[str, float],
+    temperature_K: float,
+    refusal_types: tuple[type[BaseException], ...],
+    *,
+    activity_basis_mol: Mapping[str, float],
+) -> dict[str, Any]:
+    """Re-solve one composition at T±25, ±50 and ±75 K until it brackets."""
+
+    from simulator.melt_backend.openimcc_bridge import evaluate_cleaned_melt
+
+    points: list[tuple[float, dict[str, float]]] = []
+    attempted: list[float] = []
+    domain_low, domain_high = openimcc_bridge._temperature_domain_K()
+
+    def bracketed() -> bool:
+        return any(probe_T < temperature_K for probe_T, _gammas in points) and any(
+            probe_T > temperature_K for probe_T, _gammas in points
+        )
+
+    for offset in _TEMPERATURE_BRIDGE_OFFSETS_K:
+        if bracketed() or len(attempted) >= _TEMPERATURE_BRIDGE_MAX_CALLS:
+            break
+        for sign in (1.0, -1.0):
+            if bracketed() or len(attempted) >= _TEMPERATURE_BRIDGE_MAX_CALLS:
+                break
+            probe_T = float(temperature_K) + sign * float(offset)
+            if probe_T < domain_low or probe_T > domain_high:
+                continue
+            if abs(probe_T - float(temperature_K)) > _TEMPERATURE_BRIDGE_CAP_K:
+                continue
+            attempted.append(probe_T)
+            try:
+                cleaned = evaluate_cleaned_melt(
+                    composition_mol=composition_mol,
+                    temperature_K=probe_T,
+                    allow_extrapolation=False,
+                )
+            except refusal_types:
+                continue
+            probe_authority = {
+                "provider": "openimcc",
+                "activities_by_oxide": {
+                    oxide: float(activity)
+                    for oxide, activity in cleaned.single_cation_activities.items()
+                },
+                "openimcc_pack_model_id": cleaned.bridge.pack_model_id,
+                "openimcc_pack_version": cleaned.bridge.pack_version,
+                "openimcc_pack_digest": cleaned.bridge.pack_digest,
+            }
+            gammas: dict[str, float] = {}
+            for oxide in probe_authority["activities_by_oxide"]:
+                if oxide in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS:
+                    continue
+                activity = _high_t_activity_for_parent(
+                    oxide,
+                    activity_basis_mol,
+                    temperature_K=probe_T,
+                    authority=probe_authority,
+                )
+                if (
+                    activity is None
+                    or activity.activity_model != "openimcc_single_cation_activity"
+                    or not (activity.effective_gamma > 0.0)
+                ):
+                    continue
+                gammas[oxide] = float(activity.effective_gamma)
+            if gammas:
+                points.append((probe_T, gammas))
+    fits: dict[str, dict[str, Any]] = {}
+    parents = {oxide for _probe_T, gammas in points for oxide in gammas}
+    for oxide in sorted(parents):
+        observations = [
+            (probe_T, gammas[oxide])
+            for probe_T, gammas in points
+            if oxide in gammas
+        ]
+        fit = _regular_solution_gamma_fit(observations, float(temperature_K))
+        if fit is not None:
+            fits[oxide] = fit
+    return {
+        "call_count": len(attempted),
+        "attempted_temperatures_K": attempted,
+        "cap_K": _TEMPERATURE_BRIDGE_CAP_K,
+        "fits": fits,
+    }
 
 
 def _build_high_t_melt_activity_authority(
@@ -661,16 +1068,12 @@ def _build_high_t_melt_activity_authority(
     below_cap_fe_activity: float,
     below_cap_fe_activity_basis: str,
 ) -> dict[str, Any] | None:
-    """Resolve C3's high-temperature activity source once per pressure call.
-
-    The returned payload is diagnostic state only.  Pressure and pO2 algebra
-    remain in the existing dispatch branches; callers replace only the melt
-    activity object for the eight flux oxides when this payload is successful.
-    """
+    """Resolve melt activity once; the quantity gate controls its pressure use."""
 
     if not openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K,
         controls=controls,
+        quantity_class="activity",
     ):
         return None
     mode = "openimcc"
@@ -680,7 +1083,7 @@ def _build_high_t_melt_activity_authority(
         "requested": mode,
         "temperature_K": float(temperature_K),
         "vaporock_cap_K": float(VAPOROCK_T_MAX_K),
-        "above_vaporock_cap": True,
+        "above_vaporock_cap": temperature_K > VAPOROCK_T_MAX_K,
         "fallback": False,
         "provider": "openimcc",
         "composition_policy": {},
@@ -688,17 +1091,98 @@ def _build_high_t_melt_activity_authority(
         "seam": {},
         "authority_exclusions": {},
     }
-    try:
-        from simulator.melt_backend.openimcc_bridge import (
-            evaluate_cleaned_melt,
-        )
+    # Trajectory certificates continue vapour operands. Fresh activity solves
+    # below that domain must not seed a later pressure secant.
+    previous = controls.get("high_t_melt_activity_previous") or {}
+    vapour_selected = openimcc_binding_selected_by_inputs(
+        temperature_K=temperature_K, controls=controls, quantity_class="vapour",
+    )
+    if not vapour_selected or (previous and not openimcc_binding_selected_by_inputs(
+        temperature_K=previous["temperature_K"],
+        controls=controls, quantity_class="vapour",
+    )):
+        previous = {}
+    certificates = dict(previous.get("certified_effective_gamma_by_parent") or {})
+    base["certified_effective_gamma_by_parent"] = certificates
+    hour = controls.get("simulation_hour")
+    from simulator.melt_backend.openimcc_bridge import (
+        _IMCC_REFUSAL_ERROR_TYPE,
+        _cleaned_melt_projection,
+        OpenImccCompositionPolicyRefusal,
+        OpenImccUnavailableError,
+        evaluate_cleaned_melt,
+    )
 
-        cleaned = evaluate_cleaned_melt(
-            composition_mol=composition_mol,
-            temperature_K=temperature_K,
-            allow_extrapolation=temperature_K > 3000.0,
-        )
-    except Exception as exc:  # noqa: BLE001 - C3 is an hour-local fallback
+    expected_refusal_types = (
+        OpenImccCompositionPolicyRefusal,
+        OpenImccUnavailableError,
+    )
+    if _IMCC_REFUSAL_ERROR_TYPE is not None:
+        expected_refusal_types += (_IMCC_REFUSAL_ERROR_TYPE,)
+    solve_composition = composition_mol
+    projection_notice = None
+    projection_classification = None
+    try:
+        try:
+            cleaned = evaluate_cleaned_melt(
+                composition_mol=solve_composition,
+                temperature_K=temperature_K,
+                allow_extrapolation=temperature_K > openimcc_bridge._temperature_domain_K()[1],
+            )
+        except OpenImccCompositionPolicyRefusal as policy_refusal:
+            if policy_refusal.code != "openimcc_projection_over_threshold":
+                raise
+            # d-175 (2026-10-18): composition coverage is not a numerical
+            # gap. Reuse OpenIMCC's projection (including Fe2O3 -> FeO) and
+            # solve the remaining oxide basis at the actual T. Its existing
+            # mole -> wt% conversion normalizes the retained mass to 100%:
+            # w'_i = 100 m_i / sum(retained m), all masses in kg, so w' is
+            # wt%. On the folded-iron basis, omitting fraction f of that
+            # represented mass rescales retained weights by 1/(1-f); f -> 0
+            # recovers the unprojected folded-iron input. Reported omitted
+            # wt% uses the original source mass (before the iron fold).
+            # This removes the omitted components' interactions, not their
+            # ledger mass.
+            # A fresh equilibrium tracks current T and retained chemistry;
+            # a frozen gamma can drift for hundreds of kelvin and cannot.
+            # Activities keep the projected pure-liquid reference. Reporting
+            # gamma_eff = a_projected / X_bulk_single absorbs the changed
+            # cation denominator; do NOT dilute a by (1-f), a mass fraction
+            # rather than a cation fraction. Then gamma_eff*X_bulk returns
+            # a_projected exactly (all dimensionless). The omitted chemistry
+            # is unmodelled, so this is extrapolated, never a certificate.
+            _, solve_composition = _cleaned_melt_projection(composition_mol)
+            projection_classification = dict(
+                policy_refusal.diagnostics["composition_projection_classification"]
+            )
+            projection_notice = {
+                "code": "projected_composition_solve",
+                "method": "projected_composition_solve",
+                "authority": "extrapolated",
+                "temperature_K": float(temperature_K),
+                "omitted_component_wt_pct": dict(
+                    projection_classification["dropped_component_wt_pct"]
+                ),
+                "omitted_total_wt_pct": projection_classification["dropped_total_wt_pct"],
+                "projection_threshold_wt_pct": projection_classification["threshold_wt_pct"],
+                "original_refusal": {
+                    "code": policy_refusal.code,
+                    "type": type(policy_refusal).__name__,
+                    "detail": str(policy_refusal),
+                },
+            }
+            projection_notice["warning_tiers"] = [
+                dict(tier) for tier in _PROJECTED_COMPOSITION_WARNING_TIERS
+                if projection_notice["omitted_total_wt_pct"] > tier["above_omitted_wt_pct"]
+            ]
+            base["projected_composition_solve"] = projection_notice
+            base["notices"].append(projection_notice)
+            cleaned = evaluate_cleaned_melt(
+                composition_mol=solve_composition,
+                temperature_K=temperature_K,
+                allow_extrapolation=temperature_K > openimcc_bridge._temperature_domain_K()[1],
+            )
+    except expected_refusal_types as exc:
         code = str(getattr(exc, "code", "openimcc_evaluation_refused"))
         diagnostics = getattr(exc, "diagnostics", {})
         classification = (
@@ -706,22 +1190,37 @@ def _build_high_t_melt_activity_authority(
             if isinstance(diagnostics, Mapping)
             else None
         )
+        fallback_reason = {
+            "code": code,
+            "type": type(exc).__name__,
+            "detail": str(exc),
+        }
+        fallback_notice = {
+            "code": code,
+            "reason": code,
+            "authority": "extrapolated",
+            "message": str(exc),
+        }
+        if isinstance(diagnostics, Mapping):
+            for residual_key in ("residual_inf", "residual_l2"):
+                if residual_key not in diagnostics:
+                    continue
+                fallback_reason[residual_key] = diagnostics[residual_key]
+                fallback_notice[residual_key] = diagnostics[residual_key]
         base.update(
             {
                 "provider": "constant_gamma",
                 "fallback": True,
-                "fallback_reason": {
-                    "code": code,
-                    "type": type(exc).__name__,
-                    "detail": str(exc),
-                },
+                "authority": "extrapolated",
+                "fallback_reason": fallback_reason,
+                "notices": base["notices"] + [fallback_notice],
                 "activities_by_oxide": {},
                 "openimcc_extrapolated": False,
                 "openimcc_flags": [],
                 "openimcc_notices": [],
                 "composition_projection_classification": (
-                    dict(classification)
-                    if isinstance(classification, Mapping)
+                    dict(projection_classification or classification)
+                    if projection_classification or isinstance(classification, Mapping)
                     else {}
                 ),
             }
@@ -733,6 +1232,168 @@ def _build_high_t_melt_activity_authority(
         )
         if isinstance(relaxed_projection, Mapping):
             base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
+        held = {}
+        last_extrapolated: dict[str, float] = {}
+        # Primary path: same composition, nearby T. The trajectory secant
+        # below is the fallback when that bridge cannot gather two points.
+        # The constant-gamma table is not used for a parent that has a
+        # certificate, and it is not used when the bridge itself supplied
+        # a gamma.
+        bridge_result = (
+            _same_composition_temperature_bridge(
+                solve_composition, float(temperature_K), expected_refusal_types,
+                activity_basis_mol=composition_mol,
+            )
+            if code == "imcc_nonconvergence"
+            else None
+        )
+        bridge_fits = bridge_result["fits"] if bridge_result else {}
+        if bridge_result is not None:
+            base["temperature_bridge"] = {
+                "call_count": bridge_result["call_count"],
+                "attempted_temperatures_K": list(
+                    bridge_result["attempted_temperatures_K"]
+                ),
+                "cap_K": bridge_result["cap_K"],
+            }
+        can_continue = (
+            hour is not None and bool(certificates)
+            and not isinstance(exc, OpenImccCompositionPolicyRefusal)
+        )
+        # Composition-policy refusals never enter secant/freeze. A projected
+        # numerical refusal bridges the projected composition above.
+        # ImccTOutsideDatapackDomainError keeps its existing secant/freeze
+        # route; the MELTS handoff below 1700 K is t-1314, not d-175.
+        if bridge_fits or can_continue:
+            composition = _high_t_composition_vector(composition_mol)
+            prior_extrapolated = dict(
+                previous.get("last_extrapolated_gamma_by_parent") or {}
+            )
+            refusal_count = int(previous.get("consecutive_refusal_count") or 0) + 1
+            parents = list(certificates)
+            for parent in bridge_fits:
+                if parent not in parents:
+                    parents.append(parent)
+            for parent in parents:
+                if parent not in composition_mol:
+                    continue
+                certificate = certificates.get(parent)
+                fit = bridge_fits.get(parent)
+                if fit is not None:
+                    notice = {
+                        "code": "hold_last_certified_effective_gamma",
+                        "type": "typed_notice",
+                        "authority": "extrapolated",
+                        "parent": parent,
+                        **(certificate or {}),
+                        "method": "same_composition_T_bridge",
+                        "gamma_applied": fit["gamma"],
+                        "W_J_per_mol": fit["W_J_per_mol"],
+                        "S_J_per_mol_K": fit["S_J_per_mol_K"],
+                        "bridge_mode": fit["bridge_mode"],
+                        "bridge_span_K": fit["bridge_span_K"],
+                        "bridge_temperatures_K": list(fit["bridge_temperatures_K"]),
+                        "bridge_fit": fit["bridge_fit"],
+                        "bridge_call_count": bridge_result["call_count"],
+                        "bridge_cap_K": bridge_result["cap_K"],
+                        "bridge_attempted_temperatures_K": list(
+                            bridge_result["attempted_temperatures_K"]
+                        ),
+                        "original_refusal": dict(fallback_reason),
+                        "consecutive_refusal_count": refusal_count,
+                        "message": (
+                            "Same-composition temperature bridge of the "
+                            "effective single-cation gamma"
+                        ),
+                    }
+                    if certificate is not None:
+                        notice["temperature_gap_K"] = abs(
+                            temperature_K - certificate["temperature_K"]
+                        )
+                        if hour is not None:
+                            notice["hour_gap"] = float(hour) - certificate["hour"]
+                        notice["composition_distance_L1"] = (
+                            _high_t_composition_distance(
+                                composition,
+                                certificate["composition_single_cation"],
+                            )
+                        )
+                    held[parent] = notice
+                    base["notices"].append(notice)
+                    continue
+                if not can_continue or certificate is None:
+                    continue
+                temperature_gap = abs(temperature_K - certificate["temperature_K"])
+                hour_gap = float(hour) - certificate["hour"]
+                composition_distance = _high_t_composition_distance(
+                    composition, certificate["composition_single_cation"],
+                )
+                cap = _EXTRAPOLATION_CAP_L1.get(parent)
+                past_cap = cap is not None and composition_distance > cap
+                continued = _continued_certified_effective_gamma(
+                    certificate,
+                    temperature_K=temperature_K,
+                    composition=composition,
+                    composition_distance_L1=composition_distance,
+                    composition_cap_L1=(
+                        0.0 if past_cap and parent in prior_extrapolated else cap
+                    ),
+                )
+                if past_cap and parent in prior_extrapolated:
+                    gamma = float(prior_extrapolated[parent])
+                    method = "extrapolation_capped_frozen"
+                    flag = "extrapolation_capped_frozen"
+                elif past_cap:
+                    gamma = float(continued["gamma"])
+                    method = "extrapolation_capped_frozen"
+                    flag = "extrapolation_capped_frozen"
+                else:
+                    gamma = float(continued["gamma"])
+                    method = str(continued["method"])
+                    flag = None
+                notice = {
+                    "code": "hold_last_certified_effective_gamma",
+                    "type": "typed_notice",
+                    "authority": "extrapolated",
+                    "parent": parent,
+                    **certificate,
+                    "temperature_gap_K": temperature_gap,
+                    "composition_distance_L1": composition_distance,
+                    "hour_gap": hour_gap,
+                    "original_refusal": dict(fallback_reason),
+                    "method": method,
+                    "gamma_applied": gamma,
+                    "progress_s": continued["progress_s"],
+                    "progress_variable": continued["progress_variable"],
+                    "consecutive_refusal_count": refusal_count,
+                    "message": (
+                        "Extrapolation cap reached; freezing the last extrapolated effective gamma"
+                        if flag else (
+                            "First-order continuation of the certified effective single-cation ln gamma"
+                            if method == "extrapolated_first_order_ln_gamma"
+                            else "Holding the last certified effective single-cation gamma"
+                        )
+                    ),
+                }
+                if continued["ln_gamma_slope"] is not None:
+                    notice["ln_gamma_slope"] = continued["ln_gamma_slope"]
+                if cap is not None:
+                    notice["composition_cap_L1"] = cap
+                if flag is not None:
+                    notice["flag"] = flag
+                if bridge_result is not None:
+                    notice["bridge_call_count"] = bridge_result["call_count"]
+                    notice["bridge_cap_K"] = bridge_result["cap_K"]
+                    notice["bridge_attempted_temperatures_K"] = list(
+                        bridge_result["attempted_temperatures_K"]
+                    )
+                    notice["bridge_fallback"] = "fewer_than_two_temperature_points"
+                held[parent] = notice
+                last_extrapolated[parent] = gamma
+                base["notices"].append(notice)
+            base["consecutive_refusal_count"] = refusal_count
+        base["held_effective_gamma_by_parent"] = held
+        base["last_extrapolated_gamma_by_parent"] = last_extrapolated
         return base
 
     bridge = cleaned.bridge
@@ -782,13 +1443,21 @@ def _build_high_t_melt_activity_authority(
             "openimcc_acid_sink_ratio": bridge.acid_sink_ratio,
             "temperature_domain_status": (
                 "predict_and_flag_extrapolated"
-                if temperature_K > 3000.0
+                if temperature_K > openimcc_bridge._temperature_domain_K()[1]
                 else "in_domain"
             ),
         }
     )
     if isinstance(relaxed_projection, Mapping):
         base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
+
+    if projection_notice is not None:
+        base.update({
+            "fallback": True,
+            "authority": "extrapolated",
+            "fallback_reason": dict(projection_notice["original_refusal"]),
+            "composition_projection_classification": projection_classification,
+        })
 
     max_abs_dex = 0.0
     for oxide in _HIGH_T_FLUX_OXIDES:
@@ -892,6 +1561,89 @@ def _build_high_t_melt_activity_authority(
             }
         )
     base["seam_max_abs_ratio_dex"] = max_abs_dex
+    if vapour_selected and hour is not None and not bridge.extrapolated and projection_notice is None:
+        composition = _high_t_composition_vector(composition_mol)
+        previous_temperature = controls.get("high_t_melt_activity_previous_temperature_K")
+        # The recorded window is still two observed local steps: thermal
+        # window_K = 2*|T_cert-T_previous| (K), and composition_window_L1 =
+        # 2*D(X_cert, X_previous_cert) on the flux parents' single-cation
+        # fractions. D is an L1, so parents do not cancel. Those fields
+        # describe the step the certificate was taken over. A later refusal
+        # does not consult them: continuation is the first-order ln-gamma
+        # step, capped per species by _EXTRAPOLATION_CAP_L1. Refused and
+        # extrapolated calls never refresh the certificate.
+        window_K = (
+            2.0 * abs(temperature_K - float(previous_temperature))
+            if previous_temperature is not None else 0.0
+        )
+        for parent in cleaned.single_cation_activities:
+            if parent in base["authority_exclusions"]:
+                continue
+            selected = _high_t_activity_for_parent(
+                parent, composition_mol, temperature_K=temperature_K, authority=base,
+            )
+            if selected is None or selected.x_single_cation <= 0.0:
+                continue
+            previous_composition = certificates.get(parent, {}).get(
+                "composition_single_cation"
+            )
+            composition_window = (
+                2.0 * _high_t_composition_distance(composition, previous_composition)
+                if previous_composition is not None else 0.0
+            )
+            # Premise: the bridge has already converted parent activities
+            # to single-cation a; a = gamma_eff * X_bulk_single. Thus
+            # gamma_eff,last = a_last / X_last. On refusal the continuation
+            # steps ln gamma_eff, and a single certified point holds
+            # gamma_eff,last. Either way a_current = gamma_applied * X_current.
+            # This is NOT OpenIMCC's internal gamma against unbound-parent
+            # X on a total-species basis: that current X needs the failed
+            # solve. Both this effective coefficient and the table use the
+            # same available bulk single-cation basis. All factors are
+            # dimensionless; X->0 gives a->0 for finite gamma. With smooth
+            # T/composition, gamma_eff,last tends to the true current value
+            # as step size->0. Over one step it retains the solved local
+            # non-ideality; the table is a different model (SiO2 gamma=1
+            # was 43x too high in the diagnosed refusal). Numerical
+            # certification of the last solve is not empirical validation.
+            # Keep the previous certificate's (T, X, ln γ) so the next
+            # refusal has the secant. Two points only: the new record
+            # replaces the parent, and the old record becomes prev.
+            gamma_last = float(selected.effective_gamma)
+            record: dict[str, Any] = {
+                "gamma_last": gamma_last,
+                "temperature_K": float(temperature_K),
+                "hour": float(hour),
+                "window_K": window_K,
+                "composition_single_cation": composition,
+                "composition_window_L1": composition_window,
+                "coefficient_basis": "bulk_single_cation",
+            }
+            if gamma_last > 0.0 and math.isfinite(gamma_last):
+                record["ln_gamma_last"] = math.log(gamma_last)
+            previous_certificate = certificates.get(parent)
+            if (
+                isinstance(previous_certificate, Mapping)
+                and float(previous_certificate.get("gamma_last") or 0.0) > 0.0
+                and "ln_gamma_last" in record
+            ):
+                record["gamma_prev"] = float(previous_certificate["gamma_last"])
+                record["ln_gamma_prev"] = float(
+                    previous_certificate.get("ln_gamma_last")
+                    if previous_certificate.get("ln_gamma_last") is not None
+                    else math.log(float(previous_certificate["gamma_last"]))
+                )
+                record["temperature_prev_K"] = float(
+                    previous_certificate["temperature_K"]
+                )
+                record["composition_prev_single_cation"] = dict(
+                    previous_certificate.get("composition_single_cation") or {}
+                )
+            certificates[parent] = record
+    # A successful solve ends the refusal streak. The next refusal
+    # extrapolates from the new certificate instead of a frozen gamma.
+    base["consecutive_refusal_count"] = 0
+    base["last_extrapolated_gamma_by_parent"] = {}
     return base
 
 
@@ -902,18 +1654,56 @@ def _high_t_activity_for_parent(
     temperature_K: float,
     authority: Mapping[str, Any] | None,
 ) -> Any:
-    """Return legacy activity or the successful C3 openimcc replacement."""
+    """Select the table, solved OpenIMCC, or local effective-gamma hold."""
 
     legacy = melt_oxide_activity(
         parent_oxide,
         composition_mol,
         temperature_K=temperature_K,
     )
-    if not authority or authority.get("provider") != "openimcc":
+    if not authority:
         return legacy
     if parent_oxide not in _HIGH_T_FLUX_OXIDES or legacy is None:
         return legacy
     if parent_oxide in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS:
+        return legacy
+    if authority.get("fallback") and authority.get("provider") != "openimcc":
+        fallback_reason = dict(authority.get("fallback_reason") or {})
+        held = authority.get("held_effective_gamma_by_parent", {}).get(parent_oxide)
+        if held is not None:
+            if "gamma_applied" in held:
+                gamma = float(held["gamma_applied"])
+            else:
+                gamma = float(held["gamma_last"])
+            method = str(held.get("method") or "hold_last_certified_effective_gamma")
+            return replace(
+                legacy,
+                gamma=gamma,
+                effective_gamma=gamma,
+                activity=gamma * legacy.x_single_cation,
+                activity_model=method,
+                citation="Last numerically certified OpenIMCC activity on the bulk single-cation basis",
+                warning=(
+                    f"{method}:"
+                    f"{fallback_reason.get('code', 'openimcc_evaluation_refused')}"
+                ),
+                evidence_tier="PREDICT_AND_FLAG",
+                authority_status="openimcc_continuation",
+            )
+        fallback_warning = (
+            "openimcc_refused_constant_gamma_fallback:"
+            f"{fallback_reason.get('code', 'openimcc_evaluation_refused')}"
+        )
+        return replace(
+            legacy,
+            warning=(
+                f"{legacy.warning}; {fallback_warning}"
+                if legacy.warning
+                else fallback_warning
+            ),
+            evidence_tier="PREDICT_AND_FLAG",
+        )
+    if authority.get("provider") != "openimcc":
         return legacy
     activity = float(authority.get("activities_by_oxide", {}).get(parent_oxide, 0.0) or 0.0)
     if activity <= 0.0:
@@ -929,12 +1719,22 @@ def _high_t_activity_for_parent(
             f"{authority.get('openimcc_pack_version', '')} "
             f"digest={authority.get('openimcc_pack_digest', '')}"
         ),
-        warning=None,
+        warning=("projected_composition_solve" if authority.get("projected_composition_solve") else None),
         effective_gamma=effective_gamma,
-        activity_model="openimcc_single_cation_activity",
+        activity_model=(
+            "projected_composition_solve" if authority.get("projected_composition_solve")
+            else "openimcc_single_cation_activity"
+        ),
         evidence_tier="PREDICT_AND_FLAG",
         authority_status="openimcc",
     )
+
+
+def _high_t_fe_activity_selected(authority: Mapping[str, Any] | None) -> bool:
+    return bool(authority and (
+        authority.get("provider") == "openimcc"
+        or "FeO" in authority.get("held_effective_gamma_by_parent", {})
+    ))
 
 
 def _attach_high_t_activity_provenance(
@@ -956,6 +1756,11 @@ def _attach_high_t_activity_provenance(
         parent_oxide = str(row.get("parent_oxide") or "")
         if parent_oxide not in _HIGH_T_FLUX_OXIDES:
             continue
+        fallback_applied = bool(authority.get("fallback")) and (
+            parent_oxide not in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS
+        )
+        if fallback_applied:
+            provenance["melt_activity_parent_oxide"] = parent_oxide
         provenance["high_t_melt_activity_mode"] = str(
             authority.get("requested") or "openimcc"
         )
@@ -982,6 +1787,8 @@ def _attach_high_t_activity_provenance(
                 exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(
                     parent_oxide
                 )
+        elif authority.get("fallback"):
+            exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(parent_oxide)
         if exclusion is not None:
             provenance["melt_activity_authority"] = exclusion["authority"]
             exclusion_payload = dict(exclusion)
@@ -997,7 +1804,11 @@ def _attach_high_t_activity_provenance(
                     "authority": exclusion["authority"],
                     "ruling": exclusion["ruling"],
                     "certification": exclusion["tracking_id"],
-                    "reason": exclusion["reason"],
+                    **(
+                        {"reason": exclusion["reason"]}
+                        if exclusion.get("reason")
+                        else {}
+                    ),
                     "citation": exclusion["citation"],
                 }
             token = (
@@ -1044,12 +1855,28 @@ def _attach_high_t_activity_provenance(
             )
             token = "openimcc"
         else:
-            provenance["melt_activity_authority"] = provider
+            held = authority.get("held_effective_gamma_by_parent", {}).get(parent_oxide)
+            method = (
+                str(held.get("method") or "hold_last_certified_effective_gamma")
+                if held else None
+            )
+            provenance["melt_activity_authority"] = method or provider
             provenance["melt_activity_fallback"] = True
             provenance["openimcc_refusal"] = fallback_reason
-            token = "openimcc_refused_constant_gamma_fallback"
+            token = method or "openimcc_refused_constant_gamma_fallback"
+            if held:
+                provenance["hold_last_certified_effective_gamma"] = dict(held)
+                if held.get("flag"):
+                    provenance["melt_activity_flag"] = held["flag"]
             if fallback_reason.get("code"):
                 token += f"_{fallback_reason['code']}"
+        projected = authority.get("projected_composition_solve")
+        if projected and exclusion is None:
+            provenance["projected_composition_solve"] = dict(projected)
+            provenance["melt_activity_fallback"] = True
+            if provider == "openimcc":
+                provenance["melt_activity_authority"] = "projected_composition_solve"
+                token = "projected_composition_solve"
         classification = authority.get("composition_projection_classification")
         if classification:
             provenance["composition_projection_classification"] = dict(
@@ -1116,10 +1943,11 @@ def _reconstructed_anchor_pressure_Pa(
         antoine = (gas_rail or {}).get("antoine", {}) or {}
         temperature_K = float(anchor["temperature_K"])
         try:
+            A, B, C = _read_antoine_coefficients(antoine)
             log10_pressure_Pa = _antoine_log10_pressure(
-                float(antoine["A"]),
-                float(antoine["B"]),
-                float(antoine.get("C", 0.0) or 0.0),
+                A,
+                B,
+                C,
                 temperature_K,
             )
         except (KeyError, TypeError, ValueError, ZeroDivisionError) as exc:
@@ -1235,6 +2063,224 @@ def vapor_pressure_authority_diagnostic(
     }
 
 
+# Segment phase words that name the same reservoir phase. Any other
+# non-empty token, including condensed_liquid and ideal_gas, stays itself.
+# An empty phase is undeclared: callers must not invent one.
+_ANTOINE_PHASE_SYNONYMS = {
+    "crystal": "cr",
+    "cr": "cr",
+    "c": "cr",
+    "solid": "cr",
+    "s": "cr",
+    "crystalline": "cr",
+    "liquid": "l",
+    "l": "l",
+    "gas": "g",
+    "g": "g",
+}
+
+
+def declared_antoine_segment_phase(block: Mapping[str, Any] | None) -> str | None:
+    """Closed phase token declared by an Antoine segment, or None if absent."""
+
+    if not _is_mapping(block):
+        return None
+    raw = str(block.get("phase") or block.get("fit_source_phase") or "").strip().lower()
+    if not raw:
+        return None
+    return _ANTOINE_PHASE_SYNONYMS.get(raw, raw)
+
+
+def _phase_boundary_gap(
+    left: Mapping[str, Any], right: Mapping[str, Any]
+) -> dict[str, Any] | None:
+    """Marker when the gap between two segments crosses a declared phase."""
+
+    left_phase = declared_antoine_segment_phase(left)
+    right_phase = declared_antoine_segment_phase(right)
+    if not left_phase or not right_phase or left_phase == right_phase:
+        return None
+    return {
+        "selection_refusal": "antoine-gap-crosses-phase-boundary",
+        "left_segment": str(left.get("name") or ""),
+        "right_segment": str(right.get("name") or ""),
+        "left_phase": left_phase,
+        "right_phase": right_phase,
+    }
+
+
+def _segment_antoine_finite(
+    segment: Mapping[str, Any], temperature_K: float
+) -> bool:
+    """True when the flank's pressure at this temperature is finite and positive.
+
+    ``_pure_segment_usable`` only requires a finite log10 pressure at or
+    below 308. Exponentiating a large negative log underflows to 0.0,
+    and the wall evaluator refuses that. A flank that cannot produce a
+    positive pressure is not an available extension.
+    """
+
+    for key in ("A", "B", "C"):
+        if segment.get(key) is None:
+            return False
+        try:
+            value = float(segment[key])
+        except (TypeError, ValueError):
+            return False
+        if not math.isfinite(value):
+            return False
+    if not _pure_segment_usable(segment, temperature_K):
+        return False
+    try:
+        pressure = _pow10_pressure_or_raise(
+            _antoine_log10_pressure(
+                float(segment["A"]),
+                float(segment["B"]),
+                float(segment["C"]),
+                float(temperature_K),
+            ),
+            species=str(segment.get("name") or "antoine_segment"),
+            field="phase_gap_flank_Pa",
+        )
+    except (VaporPressureComputationError, VaporPressureNumericalOverflowError):
+        return False
+    return math.isfinite(pressure) and pressure > 0.0
+
+
+def _declared_join_temperature_K(
+    *segments: Mapping[str, Any],
+) -> float | None:
+    """Shared melting join, or None when the flanks do not agree."""
+
+    found: list[float] = []
+    for segment in segments:
+        if "join_anchor_K" not in segment:
+            continue
+        try:
+            value = float(segment["join_anchor_K"])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            found.append(value)
+    if not found:
+        return None
+    if any(abs(value - found[0]) > 1e-9 for value in found[1:]):
+        return None
+    return found[0]
+
+
+def _phase_gap_extension(
+    left: Mapping[str, Any],
+    right: Mapping[str, Any],
+    *,
+    left_low: float,
+    left_high: float,
+    right_low: float,
+    right_high: float,
+    temperature_K: float,
+) -> dict[str, Any] | None:
+    """Extend one finite flank across a declared phase gap, and flag it.
+
+    Premise: a temperature between two certified Antoine segments of
+    different phases is out of domain, not a missing fit (CLAUDE.md
+    section 4). Predict from the segment on the physical side of a
+    declared transition and carry the original reason. Crystal is the
+    flank below the transition; liquid is the flank above it.
+
+    Si(cr) ``crystal_janaf`` is certified on [100, 1685] and declares
+    ``join_anchor_K`` 1685, the melting join. Si(l) ``liquid_janaf`` is
+    certified on [1700, 3500]. The open gap is (1685, 1700). 1688.3 K
+    and 1690 K are above 1685 K, so the extension is the liquid
+    segment. Limiting case: at 1700 K the request is inside that
+    segment, so the value is the segment's own Antoine value and this
+    helper does not run. At 1685 K the liquid formula equals the
+    crystal formula (``join_step_log10_dex`` is 0), so the extension
+    meets the crystal value at the boundary.
+
+    If the gap has no single declared join on its closure, use the
+    nearer certified edge and record that. An equal distance takes the
+    lower edge. A flank is finite only when its pressure at this
+    temperature is representable and positive. An exponent that
+    underflows to 0 is not finite: use the other flank and say so.
+    If neither flank is finite, return None and the caller keeps the
+    coefficient-free refusal.
+    """
+
+    gap = _phase_boundary_gap(left, right)
+    if gap is None:
+        return None
+    left_finite = _segment_antoine_finite(left, temperature_K)
+    right_finite = _segment_antoine_finite(right, temperature_K)
+    if not left_finite and not right_finite:
+        return None
+
+    def phase_segment(token: str) -> Mapping[str, Any] | None:
+        if gap["left_phase"] == token:
+            return left
+        if gap["right_phase"] == token:
+            return right
+        return None
+
+    transition = _declared_join_temperature_K(left, right)
+    on_gap = (
+        transition is not None
+        and left_high - 1e-9 <= transition <= right_low + 1e-9
+    )
+    crystal = phase_segment("cr")
+    liquid = phase_segment("l")
+    chosen: Mapping[str, Any] | None = None
+    choice = ""
+    if on_gap and crystal is not None and liquid is not None:
+        preferred = crystal if temperature_K <= transition else liquid
+        choice = (
+            "crystal_below_declared_transition"
+            if preferred is crystal
+            else "liquid_above_declared_transition"
+        )
+        preferred_finite = (
+            left_finite if preferred is left else right_finite
+        )
+        if preferred_finite:
+            chosen = preferred
+        elif left_finite or right_finite:
+            chosen = left if left_finite else right
+            choice = "only_finite_flank"
+    if chosen is None:
+        if left_finite and right_finite:
+            distance_left = temperature_K - left_high
+            distance_right = right_low - temperature_K
+            if distance_right < distance_left:
+                chosen = right
+                choice = "nearer_edge"
+            elif distance_left < distance_right:
+                chosen = left
+                choice = "nearer_edge"
+            else:
+                chosen = left
+                choice = "nearer_edge_tie_lower"
+        elif left_finite or right_finite:
+            chosen = left if left_finite else right
+            choice = "only_finite_flank"
+        else:
+            return None
+
+    chosen_low, chosen_high = (
+        (left_low, left_high) if chosen is left else (right_low, right_high)
+    )
+    extended = dict(chosen)
+    extended.update(gap)
+    extended["authority_level"] = "extrapolated"
+    extended["segment_used"] = str(chosen.get("name") or "")
+    extended["segment_choice"] = choice
+    extended["certified_band_K"] = (float(chosen_low), float(chosen_high))
+    extended["gap_band_K"] = (float(left_high), float(right_low))
+    extended["left_segment_band_K"] = (float(left_low), float(left_high))
+    extended["right_segment_band_K"] = (float(right_low), float(right_high))
+    if on_gap and transition is not None:
+        extended["transition_temperature_K"] = float(transition)
+    return extended
+
+
 def _selected_temperature_segment(
     block: Mapping[str, Any],
     temperature_K: float | None,
@@ -1271,6 +2317,27 @@ def _selected_temperature_segment(
     ranged.sort(key=lambda item: item[0])
     if temperature_K < ranged[0][0]:
         return ranged[0][2]
+    if temperature_K > ranged[-1][1]:
+        return ranged[-1][2]
+    previous = ranged[0]
+    for low, _high, segment in ranged[1:]:
+        if temperature_K < low:
+            gap = _phase_boundary_gap(previous[2], segment)
+            if gap is not None:
+                extension = _phase_gap_extension(
+                    previous[2],
+                    segment,
+                    left_low=previous[0],
+                    left_high=previous[1],
+                    right_low=low,
+                    right_high=_high,
+                    temperature_K=temperature_K,
+                )
+                return extension if extension is not None else gap
+            # Same declared phase, or a flank with no phase: today's
+            # choice is the last segment, not a nearer edge.
+            return ranged[-1][2]
+        previous = (low, _high, segment)
     return ranged[-1][2]
 
 
@@ -1351,6 +2418,10 @@ def vapor_pressure_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
+            # The selector owns a phase-boundary gap. Falling through to
+            # the legacy antoine block would reintroduce the other phase.
+            if selected.get("selection_refusal"):
+                return selected, COEFF_BLOCK_PURE_COMPONENT
             if not _pure_segment_usable(selected, temperature_K):
                 antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
                 if _is_mapping(antoine):
@@ -1377,18 +2448,27 @@ def _pure_segment_usable(
     Hartmann-Schneider fit has a pole at 594.6 K).
     """
 
+    if not selected:
+        return False
+    try:
+        A, B, C = _read_antoine_coefficients(selected)
+    except _AntoineCoefficientRefusal as exc:
+        # An absent A is an unusable source record and can select the legacy
+        # block. A partial block or malformed value must reach the consumer's
+        # typed refusal path instead of being hidden by that fallback.
+        return not _is_missing_antoine_intercept(exc)
     if temperature_K is None:
         return True
     try:
-        denominator = float(temperature_K) + float(selected.get("C", 0.0))
+        denominator = float(temperature_K) + C
         # Antoine's shifted inverse-temperature fit is calibrated on the
         # T + C > 0 branch; crossing its pole is not a physical continuation.
         if denominator <= 0.0:
             return False
         projected_log_pressure = _antoine_log10_pressure(
-            float(selected.get("A", 0.0)),
-            float(selected.get("B", 0.0)),
-            float(selected.get("C", 0.0)),
+            A,
+            B,
+            C,
             float(temperature_K),
         )
     except (TypeError, ValueError, ZeroDivisionError):
@@ -1403,12 +2483,11 @@ def wall_condensation_antoine_coefficients(
     """Return coefficients for local wall ``P_sat`` consumers.
 
     Melt-source standard-reaction terms are not pure-species saturation
-    pressures. When a standard-reaction row carries a grounded pure-component
-    sidecar usable at this temperature, wall re-evaporation uses that sidecar;
-    otherwise it fails closed (empty block -> caller types a refusal; never
-    invents a fiat pressure) rather than serve the melt activity/pO2 term as
-    a local P_sat. Non-standard-reaction rows keep the runtime selector's
-    behavior byte-for-byte.
+    pressures. A standard-reaction row uses its pure-component sidecar when
+    the segment projection gate accepts it, or when the block is partial or
+    malformed with A present so the wall consumer can type the refusal. Other
+    unusable projections fail closed with an empty block. Non-standard rows
+    use the runtime selector unchanged.
     """
 
     if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
@@ -1417,6 +2496,11 @@ def wall_condensation_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
+            # Same guard as the runtime selector: do not replace the
+            # selector's phase-boundary result with an empty block or
+            # the other phase. An extension already carries its flank.
+            if selected.get("selection_refusal"):
+                return selected, COEFF_BLOCK_PURE_COMPONENT
             if _pure_segment_usable(selected, temperature_K):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
             # A grounded pure-species wall answer exists but not at this
@@ -1424,6 +2508,23 @@ def wall_condensation_antoine_coefficients(
             # than extrapolate through a pole or substitute the melt term.
             return {}, COEFF_BLOCK_PURE_COMPONENT
     return {}, COEFF_BLOCK_PURE_COMPONENT
+
+
+def _raise_invalid_antoine_coefficient(
+    refusal: _AntoineCoefficientRefusal,
+    *,
+    species: str,
+    field: str,
+) -> None:
+    prefix = (
+        "vapor_pressure_nonfinite"
+        if refusal.invalid_kind == "nonfinite"
+        else "invalid_antoine_coefficient"
+    )
+    raise VaporPressureComputationError(
+        f"{prefix}: species={species} field={field} "
+        f"coefficient={refusal.coefficient} value={refusal.value!r}"
+    ) from refusal
 
 
 def vapor_pressure_valid_range_K(
@@ -1932,7 +3033,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 intent=ChemistryIntent.VAPOR_PRESSURE,
                 status="ok",
                 control_audit=control_audit,
-                diagnostic={"vapor_pressures_Pa": {}, "activities": {}},
+                diagnostic={
+                    "vapor_pressures_Pa": {},
+                    "activities": {},
+                    # Below 400 K nothing is evaluated, so the omission map is empty.
+                    "below_reporting_threshold_omissions": {},
+                },
             )
 
         vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
@@ -1967,6 +3073,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             temperature_K=T_K,
         )
         warnings: list[str] = []
+        antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
         melt_account_mol = dict(
             request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
         )
@@ -1998,11 +3105,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             below_cap_fe_activity=below_cap_fe_activity,
             below_cap_fe_activity_basis=below_cap_fe_activity_basis,
         )
+        vapour_activity_authority = (
+            high_t_activity_authority
+            if openimcc_binding_selected_by_inputs(
+                temperature_K=T_K, controls=controls, quantity_class="vapour",
+            ) else None
+        )
         # An openimcc activity can move a valid carrier below the numerical
         # output floor; preserve the carrier so predict-and-flag never drops it.
         retain_high_t_openimcc_carriers = bool(
-            high_t_activity_authority
-            and high_t_activity_authority.get("provider") == "openimcc"
+            vapour_activity_authority
+            and (
+                vapour_activity_authority.get("provider") == "openimcc"
+                or vapour_activity_authority.get("held_effective_gamma_by_parent")
+            )
         )
         if high_t_activity_authority:
             for notice in high_t_activity_authority.get("notices", ()):
@@ -2027,11 +3143,27 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}
+        below_reporting_threshold_omissions: dict[str, dict[str, Any]] = {}
         activities: dict[str, float] = {}
         metal_extrapolations: dict[str, dict[str, object]] = {}
         oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
         vapor_pressure_authority_limits: dict[str, dict[str, Any]] = {}
+        transport_o2 = o2_potential_from_pO2_bar(
+            pO2_bar=transport_pO2_bar,
+            temperature_K=T_K,
+            reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+        )
+        transport_notice = transport_o2.observation_or_setpoint_receipt.get(
+            "extrapolation_notice"
+        )
+        if transport_notice is not None:
+            warnings.append(
+                f"{transport_notice['reason']}: "
+                f"pO2_bar={transport_notice['pO2_bar_used']!r} "
+                f"certified_band={transport_notice['certified_band']!r} "
+                "authority_level=extrapolated"
+            )
         if melt_dissociation_pO2_clamped and intrinsic_fO2_log is not None:
             # Visible, non-authoritative: redox returned a non-physical fO2;
             # mass action uses the physical envelope edge so oxygen-dependent
@@ -2128,11 +3260,28 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         sp_data,
                         coefficient_block,
                     )
-                A = antoine.get('A', 0)
-                B = antoine.get('B', 0)
-                C = antoine.get('C', 0)
-                if compiled_reference_Pa is None and not (A > 0 and T_K > 300):
-                    continue
+                if compiled_reference_Pa is None:
+                    try:
+                        A, B, C = _read_antoine_coefficients(antoine)
+                    except _AntoineCoefficientRefusal as exc:
+                        if not _is_missing_antoine_intercept(exc):
+                            _raise_invalid_antoine_coefficient(
+                                exc,
+                                species=species,
+                                field="P_reference_Antoine_Pa",
+                            )
+                        _append_antoine_skip_notice(
+                            warnings,
+                            antoine_skip_notice_keys,
+                            antoine,
+                            species=species,
+                            site="builtin_vapor_pressure.metal_antoine",
+                            temperature_K=T_K,
+                            reason=_antoine_skip_reason_for_refusal(exc),
+                        )
+                        continue
+                    if T_K <= 300.0:
+                        continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
                 )
@@ -2197,10 +3346,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         valid_low = float(valid_range[0])
                         valid_high = float(valid_range[1])
                         if T_K < valid_low or T_K > valid_high:
-                            metal_extrapolations[species] = {
-                                "temperature_K": T_K,
-                                "valid_range_K": (valid_low, valid_high),
-                            }
+                            metal_extrapolations[species] = (
+                                _vapor_pressure_temperature_extrapolation_notice(
+                                    temperature_K=T_K,
+                                    valid_range_K=(valid_low, valid_high),
+                                    reason="metal_vapor_pressure_out_of_validated_range",
+                                )
+                            )
                             warnings.append(
                                 f"{species} metal Antoine fit extrapolated beyond "
                                 f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
@@ -2229,7 +3381,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 0.0 or (
                     not retain_analytical_channel
@@ -2289,10 +3441,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{T_K:.2f} K (regular-solution continuation "
                         "UNCERTIFIED)"
                     )
-                if P_eq_Pa > 0.0 and (
-                    retain_analytical_channel
-                    or P_eq_Pa > 1e-15
-                    or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=(
+                        retain_analytical_channel
+                        or retain_high_t_openimcc_carriers
+                    ),
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = vapor_pressure_source_label(
@@ -2339,6 +3493,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         vapor_pressure_provenance[species][
                             "gamma_domain_authority"
                         ] = gamma_auth
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_standard_reaction",
+                        pressure_rail="liquid_oxide_standard_reaction",
+                    )
                 continue
 
             # Al/Ti/Cr/Mn: liquid-oxide standard reaction for oxide-coupled P
@@ -2346,20 +3508,43 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             liquid_rxn = _liquid_oxide_standard_reaction_block(sp_data)
             if liquid_rxn is not None and fit_target != FIT_TARGET_STANDARD_REACTION:
                 antoine_liq = liquid_rxn.get("antoine", {}) or {}
-                A_l = float(antoine_liq.get("A", 0.0) or 0.0)
-                B_l = float(antoine_liq.get("B", 0.0) or 0.0)
-                C_l = float(antoine_liq.get("C", 0.0) or 0.0)
-                if not (A_l > 0.0 and T_K > 300.0):
+                try:
+                    A_l, B_l, C_l = _read_antoine_coefficients(antoine_liq)
+                except _AntoineCoefficientRefusal as exc:
+                    if not _is_missing_antoine_intercept(exc):
+                        _raise_invalid_antoine_coefficient(
+                            exc,
+                            species=species,
+                            field=(
+                                "P_reference_liquid_oxide_standard_reaction_Pa"
+                            ),
+                        )
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine_liq,
+                        species=species,
+                        site="builtin_vapor_pressure.liquid_oxide_antoine",
+                        temperature_K=T_K,
+                        reason=_antoine_skip_reason_for_refusal(exc),
+                    )
+                    continue
+                if T_K <= 300.0:
                     continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
                     vlo, vhi = valid_liq
                     if T_K < vlo or T_K > vhi:
-                        metal_extrapolations[species] = {
-                            "temperature_K": T_K,
-                            "valid_range_K": (vlo, vhi),
-                            "rail": "liquid_oxide_standard_reaction",
-                        }
+                        metal_extrapolations[species] = (
+                            _vapor_pressure_temperature_extrapolation_notice(
+                                temperature_K=T_K,
+                                valid_range_K=(vlo, vhi),
+                                reason="metal_vapor_pressure_out_of_validated_range",
+                            )
+                        )
+                        metal_extrapolations[species]["rail"] = (
+                            "liquid_oxide_standard_reaction"
+                        )
                         warnings.append(
                             f"{species} liquid-oxide standard reaction "
                             f"extrapolated beyond valid_range_K "
@@ -2375,7 +3560,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -2415,8 +3600,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_liquid_oxide_standard_reaction",
                 )
-                if P_eq_Pa > 0.0 and (
-                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=retain_high_t_openimcc_carriers,
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
@@ -2450,6 +3636,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
                     )
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_liquid_oxide_standard_reaction",
+                        pressure_rail="liquid_oxide_standard_reaction",
+                    )
                 continue
 
             # Ca/Mg gas rail: liquid-oxide standard reaction replaces solid
@@ -2457,10 +3651,28 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             gas_rail_rxn = gas_rail_rxn_early
             if gas_standard_rail and gas_rail_rxn is not None:
                 antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
-                A_g = float(antoine_gas.get("A", 0.0) or 0.0)
-                B_g = float(antoine_gas.get("B", 0.0) or 0.0)
-                C_g = float(antoine_gas.get("C", 0.0) or 0.0)
-                if not (A_g > 0.0 and T_K > 300.0):
+                try:
+                    A_g, B_g, C_g = _read_antoine_coefficients(antoine_gas)
+                except _AntoineCoefficientRefusal as exc:
+                    if not _is_missing_antoine_intercept(exc):
+                        _raise_invalid_antoine_coefficient(
+                            exc,
+                            species=species,
+                            field=(
+                                "P_reference_gas_rail_standard_reaction_Pa"
+                            ),
+                        )
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine_gas,
+                        species=species,
+                        site="builtin_vapor_pressure.gas_rail_antoine",
+                        temperature_K=T_K,
+                        reason=_antoine_skip_reason_for_refusal(exc),
+                    )
+                    continue
+                if T_K <= 300.0:
                     continue
                 if _is_mapping(
                     sp_data.get(RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY)
@@ -2483,15 +3695,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     if valid_gas is not None:
                         vlo, vhi = valid_gas
                         if T_K < vlo or T_K > vhi:
-                            metal_extrapolations[species] = {
-                                "temperature_K": T_K,
-                                "valid_range_K": (vlo, vhi),
-                                "rail": "gas_rail_standard_reaction",
-                            }
+                            metal_extrapolations[species] = (
+                                _vapor_pressure_temperature_extrapolation_notice(
+                                    temperature_K=T_K,
+                                    valid_range_K=(vlo, vhi),
+                                    reason="metal_vapor_pressure_out_of_validated_range",
+                                )
+                            )
                             warnings.append(
                                 f"{species} gas-rail liquid-oxide standard reaction "
                                 f"extrapolated beyond valid_range_K "
                                 f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
+                            )
+                            metal_extrapolations[species]["rail"] = (
+                                "gas_rail_standard_reaction"
                             )
                     log_P_gas = _antoine_log10_pressure(A_g, B_g, C_g, T_K)
                     P_reference_Pa = _pow10_pressure_or_raise(
@@ -2507,7 +3724,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -2551,8 +3768,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_gas_rail_standard_reaction",
                 )
-                if P_eq_Pa > 0.0 and (
-                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=retain_high_t_openimcc_carriers,
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
@@ -2603,6 +3821,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
                     )
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_gas_rail_standard_reaction",
+                        pressure_rail="gas_rail_liquid_oxide_standard_reaction",
+                    )
                 continue
 
             fe_degraded_activity_basis = None
@@ -2612,16 +3838,24 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if (
-                    high_t_activity_authority
-                    and high_t_activity_authority.get("provider") == "openimcc"
+                    _high_t_fe_activity_selected(vapour_activity_authority)
                     and candidate_activity is not None
                 ):
                     oxide_activity = candidate_activity
                     a_oxide = oxide_activity.activity
-                    fe_activity_basis = "openimcc_single_cation"
+                    fe_activity_basis = (
+                        candidate_activity.activity_model
+                        if candidate_activity.activity_model in {
+                            "hold_last_certified_effective_gamma",
+                            "extrapolated_first_order_ln_gamma",
+                            "extrapolation_capped_frozen",
+                            "same_composition_T_bridge",
+                        }
+                        else "openimcc_single_cation"
+                    )
                 elif intrinsic_fO2_log is not None:
                     oxide_activity = None
                     a_oxide = below_cap_fe_activity
@@ -2646,7 +3880,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None:
                     continue
@@ -2709,13 +3943,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if parent_oxide != 'FeO':
                 # t-571: the Ellingham O2 denominator is sourced from the
                 # owner-gated O2 channel potential (melt_interface plane).
-                # In-envelope the factory's envelope clamp is the identity,
-                # so legacy_pO2_bar equals dissociation_pO2_bar bit-for-bit;
-                # out-of-envelope degraded transport fallbacks (>100 bar
-                # without intrinsic fO2) now receive the declared b-148
-                # envelope instead of mass-actioning a float sentinel.
-                # FeO intentionally retains the legacy transport denominator
-                # (Kress91 activity already carries melt redox).
+                # The potential retains the actual oxygen, including a domain
+                # notice beyond the evaluator band. FeO retains its transport
+                # denominator (Kress91 activity already carries melt redox).
                 dissociation_pO2_bar = o2_potential_from_pO2_bar(
                     pO2_bar=dissociation_pO2_bar,
                     temperature_K=T_K,
@@ -2772,8 +4002,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="P_eq_Pa",
             )
-            if P_eq_Pa > 0.0 and (
-                P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+            if _publishes_vapor_pressure(
+                P_eq_Pa,
+                retain_subthreshold=retain_high_t_openimcc_carriers,
             ):
                 vapor_pressures[species] = P_eq_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
@@ -2849,6 +4080,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "raw_metal_activity_root": metal_activity_root,
                     "source_label": source_label,
                 }
+                if species in metal_extrapolations:
+                    provenance["extrapolation_notice"] = dict(
+                        metal_extrapolations[species]
+                    )
                 if P_reference_Pa is not None:
                     provenance["P_reference_Antoine_Pa"] = P_reference_Pa
                 if reconstructed_vapor_limit is not None:
@@ -2884,6 +4119,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         self._pseudo_vapor_pressure_warning_seen,
                         stacklevel=2,
                     )
+            else:
+                _record_reporting_threshold_omission(
+                    below_reporting_threshold_omissions,
+                    species,
+                    P_eq_Pa,
+                    field="P_eq_Pa",
+                    pressure_rail=pressure_rail,
+                )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         from simulator.vapour_rail.catalog import CatalogCompileError
@@ -2904,13 +4147,33 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     COEFF_BLOCK_ANTOINE,
                 )
             antoine = (data or {}).get('antoine', {}) or {}
-            A = antoine.get('A', 0)
-            B = antoine.get('B', 0)
-            C = antoine.get('C', 0)
+            coefficients = None
+            coefficient_refusal = None
+            try:
+                coefficients = _read_antoine_coefficients(antoine)
+            except _AntoineCoefficientRefusal as exc:
+                coefficient_refusal = exc
+            if (
+                coefficient_refusal is not None
+                and not _is_missing_antoine_intercept(coefficient_refusal)
+                and not (
+                    coefficient_refusal.input_category == "missing_input"
+                    and coefficient_refusal.coefficient == "C"
+                )
+            ):
+                _raise_invalid_antoine_coefficient(
+                    coefficient_refusal,
+                    species=name,
+                    field="P_reference_Antoine_Pa",
+                )
             valid = data.get('valid_range_K', [0, 9999])
             compiled_evaluator = None
             compiled_species = None
-            if not A > 0 and self._vapour_rail_catalog is not None:
+            if (
+                (coefficient_refusal is not None
+                 or (coefficients is not None and coefficients[0] <= 0.0))
+                and self._vapour_rail_catalog is not None
+            ):
                 try:
                     compiled_species = self._vapour_rail_catalog.species[name]
                     # b-189-exempt: applicability gated at loop top
@@ -2919,8 +4182,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
                 except (KeyError, ValueError):
                     pass
-            if not A > 0 and compiled_evaluator is None:
+            if coefficient_refusal is not None and compiled_evaluator is None:
+                _append_antoine_skip_notice(
+                    warnings,
+                    antoine_skip_notice_keys,
+                    antoine,
+                    species=name,
+                    site="builtin_vapor_pressure.oxide_vapor_antoine",
+                    temperature_K=T_K,
+                    reason=_antoine_skip_reason_for_refusal(
+                        coefficient_refusal
+                    ),
+                )
                 continue
+            if coefficients is not None:
+                A, B, C = coefficients
             coefficient_block = (
                 "compiled_reference_pressure_model"
                 if compiled_evaluator is not None
@@ -2941,7 +4217,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None:
                     continue
@@ -2990,12 +4266,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         # t-838 pilot: the domain miss demotes evidence, not
                         # the numeric source reaction. Other rails retain their
                         # existing admission policy until separately reviewed.
-                        oxide_vapor_extrapolations[name] = {
-                            "temperature_K": T_K,
-                            "valid_range_K": (valid_low, valid_high),
-                            "authority_level": "extrapolated",
-                            "reason": "oxide_vapor_pressure_out_of_validated_range",
-                        }
+                        oxide_vapor_extrapolations[name] = (
+                            _vapor_pressure_temperature_extrapolation_notice(
+                                temperature_K=T_K,
+                                valid_range_K=(valid_low, valid_high),
+                                reason=(
+                                    "oxide_vapor_pressure_out_of_validated_range"
+                                ),
+                            )
+                        )
                     else:
                         extrapolation_allowed_range = _range_tuple(
                             data.get("extrapolation_allowed_range_K")
@@ -3016,14 +4295,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 "extrapolation_allowed_range_K="
                                 f"[{allowed_low:g}, {allowed_high:g}]"
                             )
-                        oxide_vapor_extrapolations[name] = {
-                            "temperature_K": T_K,
-                            "valid_range_K": (valid_low, valid_high),
-                            "extrapolation_allowed_range_K": (
-                                allowed_low,
-                                allowed_high,
-                            ),
-                        }
+                        oxide_vapor_extrapolations[name] = (
+                            _vapor_pressure_temperature_extrapolation_notice(
+                                temperature_K=T_K,
+                                valid_range_K=(valid_low, valid_high),
+                                reason=(
+                                    "oxide_vapor_pressure_out_of_validated_range"
+                                ),
+                            )
+                        )
+                        oxide_vapor_extrapolations[name][
+                            "extrapolation_allowed_range_K"
+                        ] = (allowed_low, allowed_high)
                     warnings.append(
                         f"{name} oxide-vapor Antoine fit extrapolated beyond "
                         f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
@@ -3078,12 +4361,28 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_exponent = compiled_evaluator.pO2_exponent
                 pO2_scaled = bool(pO2_exponent)
                 if evaluation.out_of_range:
-                    oxide_vapor_extrapolations[name] = {
-                        "temperature_K": T_K,
-                        "valid_range_K": compiled_evaluator.valid_temperature_K,
-                        "status": evaluation.status,
-                        "acquisition_flag": evaluation.acquisition_flag,
-                    }
+                    existing_notice = oxide_vapor_extrapolations.get(name)
+                    existing_reason = (
+                        existing_notice.get("reason")
+                        if isinstance(existing_notice, dict)
+                        else None
+                    )
+                    oxide_vapor_extrapolations[name] = (
+                        _vapor_pressure_temperature_extrapolation_notice(
+                            temperature_K=T_K,
+                            valid_range_K=compiled_evaluator.valid_temperature_K,
+                            reason=(
+                                existing_reason
+                                or "oxide_vapor_pressure_out_of_validated_range"
+                            ),
+                        )
+                    )
+                    oxide_vapor_extrapolations[name]["status"] = (
+                        evaluation.status
+                    )
+                    oxide_vapor_extrapolations[name]["acquisition_flag"] = (
+                        evaluation.acquisition_flag
+                    )
                     warnings.append(str(evaluation.status))
                     # Premise: the compiled evaluator's consequence-aware
                     # continuation is its best available point estimate; refusing
@@ -3092,10 +4391,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # Algebra: P_eq = 10**log10(P_cont),
                     # with activity and fO2 powers already applied exactly once
                     # by evaluate(). Units: P_eq remains Pa. Sanity: only the two
-                    # fields above change at the boundary (typed warning +
-                    # acquisition flag); the pressure remains continuous for every
-                    # status-bearing compiled carrier.
+                    # status and acquisition metadata change at the boundary;
+                    # the pressure remains continuous for every status-bearing
+                    # compiled carrier.
             else:
+                assert coefficients is not None
                 # Premise: above-band SiO retains its source reaction fit.
                 # Algebra: log10(P_reference/Pa) = A - B/(T_K+C), unchanged;
                 # B and T_K+C carry K, so the exponent is dimensionless.
@@ -3122,9 +4422,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
                 # t-571: transport-plane O2 through channel #1.  The legacy
-                # form here applied no envelope clamp; the channel factory's
-                # clamp is the identity in-envelope (bit-identical) and now
-                # bounds out-of-envelope transport fallbacks (b-148 physics).
+                # form uses the actual transport oxygen; the channel factory
+                # records a notice outside its stated evaluator band.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
                     pO2_bar=transport_pO2_bar,
@@ -3164,19 +4463,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # t-571: the sqrt mass action consumes the owner-gated O2
                 # channel potential (transport_headspace plane).  The exact
                 # legacy expression sqrt(p_ref / p) is preserved — only the
-                # scalar source changes (typed, clamped, receipted).  The
-                # envelope clamp is the identity for fail-loud floored
-                # transport pO2 (>= 1e-9 bar); an out-of-envelope explicit
-                # control (>100 bar) now receives the b-148 envelope.
+                # scalar source is validated and receipted without substitution.
                 sio_o2_potential = o2_potential_from_pO2_bar(
                     pO2_bar=transport_pO2_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
                     pO2_reference_bar=sio_reference_bar,
                 )
-                mass_action = math.sqrt(
-                    sio_o2_potential.legacy_pO2_reference_bar
-                    / sio_o2_potential.legacy_pO2_bar
+                from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
+
+                mass_action = _sio_oxygen_pressure_factor(
+                    sio_o2_potential.legacy_pO2_bar,
+                    sio_o2_potential.legacy_pO2_reference_bar,
                 )
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa * mass_action,
@@ -3188,10 +4486,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             retain_analytical_channel = compiled_evaluator is not None or bool(
                 data.get("retain_analytical_pressure_channel", False)
             )
-            if P_eq_Pa > 0.0 and (
-                retain_analytical_channel
-                or P_eq_Pa > 1e-15
-                or retain_high_t_openimcc_carriers
+            if _publishes_vapor_pressure(
+                P_eq_Pa,
+                retain_subthreshold=(
+                    retain_analytical_channel
+                    or retain_high_t_openimcc_carriers
+                ),
             ):
                 vapor_pressures[name] = P_eq_Pa
                 # Above-band predictions remain diagnostic-limited, including
@@ -3237,9 +4537,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
-                if name == "SiO" and oxide_extrapolated:
-                    vapor_pressure_provenance[name]["extrapolation_notice"] = dict(
-                        oxide_vapor_extrapolations[name]
+                oxygen_notice = (
+                    evaluation.extrapolation_notice
+                    if compiled_evaluator is not None
+                    else transport_notice if pO2_scaled else None
+                )
+                if oxygen_notice is not None:
+                    vapor_pressure_provenance[name].setdefault(
+                        "extrapolation_notice", dict(oxygen_notice)
                     )
                 if compiled_evaluator is not None:
                     vapor_pressure_provenance[name][
@@ -3262,6 +4567,33 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     self._pseudo_vapor_pressure_warning_seen,
                     stacklevel=2,
                 )
+            else:
+                _record_reporting_threshold_omission(
+                    below_reporting_threshold_omissions,
+                    name,
+                    P_eq_Pa,
+                    field="P_eq_Pa",
+                    pressure_rail="oxide_vapor",
+                )
+
+        # The carrier adapter copies this field into its public extra. Keep its
+        # notice aligned with the temperature-extrapolation diagnostic.
+        for extrapolations, reason in (
+            (
+                metal_extrapolations,
+                "metal_vapor_pressure_out_of_validated_range",
+            ),
+            (
+                oxide_vapor_extrapolations,
+                "oxide_vapor_pressure_out_of_validated_range",
+            ),
+        ):
+            for species, notice in extrapolations.items():
+                notice.setdefault("authority_level", "extrapolated")
+                notice.setdefault("reason", reason)
+                provenance = vapor_pressure_provenance.get(species)
+                if provenance is not None:
+                    provenance["extrapolation_notice"] = dict(notice)
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}
@@ -3285,7 +4617,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             }
 
         _attach_high_t_activity_provenance(
-            authority=high_t_activity_authority,
+            authority=vapour_activity_authority,
             metals_data=metals_data,
             oxide_vapors_data=oxide_vapors_data,
             vapor_pressure_sources=vapor_pressure_sources,
@@ -3319,6 +4651,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "vapor_pressures_Pa": vapor_pressures,
             "vapor_pressures_source": vapor_pressure_sources,
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
+            "below_reporting_threshold_omissions": (
+                below_reporting_threshold_omissions
+            ),
             "activities": activities,
             "activities_provider": "BuiltinVaporPressureProvider",
             "activities_standard_state": {
@@ -3382,6 +4717,55 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "species_authority": species_authority,
         }
         if high_t_activity_authority is not None:
+            selected_parent_activities = {}
+            selected_parent_provenance = {}
+            for parent in melt_account_mol:
+                selected = _high_t_activity_for_parent(
+                    parent, melt_account_mol, temperature_K=T_K,
+                    authority=high_t_activity_authority,
+                )
+                if selected is not None:
+                    analytical_fe = (
+                        parent == "FeO"
+                        and not _high_t_fe_activity_selected(high_t_activity_authority)
+                    )
+                    selected_parent_activities[parent] = (
+                        below_cap_fe_activity
+                        if analytical_fe else selected.thermodynamic_parent_activity()
+                    )
+                    from_openimcc = selected.authority_status in {
+                        "openimcc", "openimcc_continuation",
+                    }
+                    reason = selected.warning or selected.authority_status
+                    if analytical_fe:
+                        reason = (
+                            (high_t_activity_authority.get("fallback_reason") or {}).get("code")
+                            or "openimcc_fe_activity_unavailable"
+                        )
+                    elif parent in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS:
+                        reason = "openimcc_authority_excluded"
+                    elif parent not in _HIGH_T_FLUX_OXIDES:
+                        reason = "outside_openimcc_activity_coverage"
+                    selected_parent_provenance[parent] = {
+                        "provider": "openimcc" if from_openimcc else "internal-analytical",
+                        "authority": (
+                            below_cap_fe_activity_basis if analytical_fe
+                            else selected.activity_model
+                        ),
+                        "reason": reason,
+                        "activity": selected_parent_activities[parent],
+                        "component_basis": "parent_oxide_formula",
+                    }
+            high_t_activity_authority["selected_parent_activities"] = selected_parent_activities
+            high_t_activity_authority["selected_parent_activity_provenance"] = selected_parent_provenance
+            providers = {row["provider"] for row in selected_parent_provenance.values()}
+            high_t_activity_authority["selected_parent_activities_provider"] = (
+                "mixed" if len(providers) > 1 else next(iter(providers), None)
+            )
+            high_t_activity_authority["selected_parent_activities_standard_state"] = {
+                **diagnostic["activities_standard_state"],
+                "component_basis": "parent_oxide_formula",
+            }
             diagnostic["high_t_melt_activity"] = dict(
                 high_t_activity_authority
             )
@@ -3394,7 +4778,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             transition=None,
             control_audit=control_audit,
             diagnostic=diagnostic,
-            warnings=tuple(warnings),
+            warnings=tuple(
+                _antoine_skip_notices_for_omitted_species(
+                    warnings,
+                    vapor_pressures,
+                )
+            ),
         )
 
     # ------------------------------------------------------------------

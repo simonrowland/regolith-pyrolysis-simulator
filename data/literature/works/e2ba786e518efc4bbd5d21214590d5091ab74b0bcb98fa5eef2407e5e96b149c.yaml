@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:lpsc-2017-2171
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:lpsc-2017-2171
-      role: table_csv
-      path: tables/lpsc-2017-2171
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:lpsc-2017-2171
       role: pdftotext
       path: unknown
@@ -41,7 +35,7 @@ context:
   type: method_description
   locator:
     page: 2
-    pdf_page_index: 2
+    pdf_page_index: 1
     section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
   phase: instrument_design
   standard_state: ProSPA analytical capability and project status as printed
@@ -87,7 +81,7 @@ context:
               categorical: ion trap device and magnetic sector instrument
           locator:
             page: 2
-            pdf_page_index: 2
+            pdf_page_index: 1
             section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
       - name: heritage_device_mass_as_printed
         unit: as printed
@@ -99,7 +93,7 @@ context:
               categorical: <500 gram all-in device
           locator:
             page: 2
-            pdf_page_index: 2
+            pdf_page_index: 1
             section: Instrument Heritage
       - name: gas_handling
         unit: as printed
@@ -111,11 +105,11 @@ context:
               categorical: open/closed valves, metering valves, micro-reactors, pressure sensors, and reference materials
           locator:
             page: 2
-            pdf_page_index: 2
+            pdf_page_index: 1
             section: Volatiles Analysis
       locator:
         page: 2
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
   context_id: lpsc-2017-2171::context::barber_2017_prospa_analysis_capability_and_status
   work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
@@ -125,7 +119,7 @@ context:
   type: method_description
   locator:
     page: 2
-    pdf_page_index: 2
+    pdf_page_index: 1
     section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
   phase: instrument_design
   standard_state: ProSPA proposed extraction modes as printed
@@ -160,11 +154,11 @@ context:
               categorical: sealed sample oven for thermal extraction
           locator:
             page: 2
-            pdf_page_index: 2
+            pdf_page_index: 1
             section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
       locator:
         page: 2
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
   context_id: lpsc-2017-2171::context::barber_2017_prospa_extraction_programmes
   work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
@@ -174,7 +168,7 @@ context:
   type: method_description
   locator:
     page: 1
-    pdf_page_index: 1
+    pdf_page_index: 0
     section: Volatiles Preservation
   phase: instrument_design
   standard_state: ProSPA sample handling and sealed-oven design as printed
@@ -210,7 +204,7 @@ context:
               categorical: series of single-use sample ovens on a rotary carousel with sample imager
           locator:
             page: 1
-            pdf_page_index: 1
+            pdf_page_index: 0
             section: Volatiles Preservation
       - name: thermal_isolation
         unit: as printed
@@ -222,11 +216,11 @@ context:
               categorical: SIS thermally isolated from the warm enclosure
           locator:
             page: 1
-            pdf_page_index: 1
+            pdf_page_index: 0
             section: Volatiles Preservation
       locator:
         page: 1
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: Volatiles Preservation
   context_id: lpsc-2017-2171::context::barber_2017_prospa_sample_preservation_and_oven
   work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c

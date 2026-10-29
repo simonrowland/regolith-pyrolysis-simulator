@@ -9,7 +9,8 @@ import subprocess
 import sys
 
 
-POLICY_PATH = Path(__file__).resolve().parents[1] / "simulator" / "_blas_policy.py"
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+POLICY_PATH = _REPO_ROOT / "simulator" / "_blas_policy.py"
 THREAD_NAMES = (
     "OMP_NUM_THREADS",
     "OPENBLAS_NUM_THREADS",
@@ -23,7 +24,7 @@ def _run(code: str, *, overrides: dict[str, str] | None = None) -> str:
     env = os.environ.copy()
     for name in THREAD_NAMES:
         env.pop(name, None)
-    env["PYTHONPATH"] = "/private/tmp/claude-501/oimcc-1f3c82d/src"
+    env["PYTHONPATH"] = str(_REPO_ROOT)
     env.update(overrides or {})
     completed = subprocess.run(
         [sys.executable, "-c", code, str(POLICY_PATH)],
@@ -951,7 +952,7 @@ def test_blas_policy_spawned_child_initializes_its_own_pool() -> None:
     env = os.environ.copy()
     for name in THREAD_NAMES:
         env.pop(name, None)
-    env["PYTHONPATH"] = f"/private/tmp/claude-501/oimcc-1f3c82d/src:{Path(__file__).resolve().parents[1]}"
+    env["PYTHONPATH"] = str(_REPO_ROOT)
     completed = subprocess.run(
         [sys.executable, str(Path(__file__).resolve()), "--spawn-parent"],
         capture_output=True,

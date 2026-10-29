@@ -27,6 +27,7 @@ from simulator.feedstock_composition import (
     resolve_feedstock_composition,
 )
 
+from engines.builtin._common import resolve_transport_pO2_bar
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -204,11 +205,18 @@ def validate_fo2_grid(fo2_log10_bar: Sequence[float]) -> tuple[float, ...]:
         raise EngineCrosscheckError("fO2 slope grid requires at least two points")
     if any(not math.isfinite(value) for value in values):
         raise EngineCrosscheckError("fO2 grid values must be finite")
-    if any(10.0**value < 1.0e-9 for value in values):
-        raise EngineCrosscheckError(
-            "fO2 grid falls below the live rail transport floor (1e-9 bar); "
-            "no floor substitution is permitted"
-        )
+    for value in values:
+        try:
+            resolve_transport_pO2_bar(_rail_request(
+                composition_mol={},
+                temperature_K=VAPOROCK_T_MIN_K,
+                fo2_log10_bar=value,
+                pressure_bar=DEFAULT_PRESSURE_BAR,
+            ))
+        except (ValueError, OverflowError) as exc:
+            raise EngineCrosscheckError(
+                f"invalid observation oxygen in fO2 grid: {exc}"
+            ) from exc
     if len(set(values)) != len(values):
         raise EngineCrosscheckError("fO2 grid must not contain duplicates")
     return tuple(sorted(values))
@@ -255,6 +263,7 @@ def _rail_request(
     oxygen_bar = 10.0**fo2_log10_bar
     control_inputs: dict[str, Any] = {
         "pO2_bar": oxygen_bar,
+        "pO2_admission": "observation",
         "intrinsic_fO2_log": fo2_log10_bar,
     }
     if process_phase is not None:
@@ -797,8 +806,8 @@ def build_crosscheck_report(
             "p_floor_Pa": p_floor_Pa,
             "vaporock_external_gate": [VAPOROCK_T_MIN_K, VAPOROCK_T_MAX_K],
             "fo2_grid_note": (
-                "Fixed admitted grid used on both sources; IW-1 can fall below the "
-                "live rail 1e-9 bar floor at low T and is not silently clamped."
+                "Observation oxygen is admitted unchanged on both sources when "
+                "finite and positive, without a simulated-headspace floor."
             ),
         },
         "composition": {

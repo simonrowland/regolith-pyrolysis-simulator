@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -77,8 +77,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 95
+        pdf_page_index: 101
+        table: b1259-ht-0070-gibbsite
+        note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0070-gibbsite.json
+        record: b1259-ht-0070-gibbsite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -108,6 +121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:H_minus_H298:shared:T=400:col=H_minus_H298:name=gibbsite:v=ca78408497:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -126,8 +140,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -183,8 +197,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 95
+        pdf_page_index: 101
+        table: b1259-ht-0070-gibbsite
+        note: as_published='2.505'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0070-gibbsite.json
+        record: b1259-ht-0070-gibbsite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -214,6 +241,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:S:shared:T=298.15:col=entropy:name=gibbsite:v=857f1a9bd2:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -333,6 +361,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:S:shared:T=400:col=entropy:name=gibbsite:v=cf32893a6f:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -452,6 +481,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=gibbsite:v=5ad672bc5c:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -659,6 +689,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fG:from_the_elements:T=400:col=delta_f_G:name=gibbsite:v=b4f63c1da1:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -866,6 +897,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=gibbsite:v=b440c13b94:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -1073,6 +1105,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fH:from_the_elements:T=400:col=delta_f_H:name=gibbsite:v=f45f7cbf00:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -1280,6 +1313,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=gibbsite:v=3f124d0382:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -1478,6 +1512,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0070-gibbsite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:log10_Kf:from_the_elements:T=400:col=log_Kf:name=gibbsite:v=dd098885dc:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
@@ -1676,3 +1711,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0070-gibbsite.json
     parameters: []
     output_unit: dimensionless
+    references: []

@@ -8,7 +8,7 @@ source:
   url: https://solarsystem.wustl.edu/wp-content/uploads/reprints/2007/Schaefer%20and%20Fegley%202007%20Icarus%20outgassing%20of%20OC.pdf
   year: 2007
 extraction:
-  method: Official Washington University reprint PDF (corpus raw/schaefer-and-fegley-2007-icarus-outgassing-of-oc).
+  method: Official Washington University reprint PDF (corpus raw/schaefer-and-fegley-2007-icarus-outgassing-of-oc).; validated in an internal review, 2026-09-12, pyrolysis-extracts
     Tables 1–3 and printed T–P / fO2 / quoted-heating numbers transcribed from 350 dpi pdftoppm renders
     of PDF pages 3, 4, 5, 11 and 12 (published pp. 464–466, 472–473). pdftotext-layout and MinerU were
     used only as a table/figure inventory; they are not data. Figs 1–17 recorded figure-only; no axis
@@ -18,7 +18,7 @@ extraction:
     and Muenow, Brett and Sato).
   date: '2026-09-12'
   worker: extract-pyro-outgas
-  provenance_path: docs-private/reviews/2026-09-12-pyrolysis-extracts/
+  provenance_path: raw/schaefer-and-fegley-2007-icarus-outgassing-of-oc/schaefer-and-fegley-2007-icarus-outgassing-of-oc.pdf
 review_status: draft
 corrections: []
 fidelity_samples:
@@ -30,7 +30,8 @@ fidelity_samples:
   locator:
     table: '1'
     published_page: 464
-    pdf_page_index: 3
+    pdf_page_index: 2
+    page: 3
     note: Table 1 H chondrite SiO2 Average 36.49 as printed on 350 dpi render
 - species: H_chondrite
   observable: gibbs_table
@@ -40,7 +41,8 @@ fidelity_samples:
   locator:
     table: '1'
     published_page: 464
-    pdf_page_index: 3
+    pdf_page_index: 2
+    page: 3
     note: Table 1 H chondrite Total 99.98 as printed
 - species: H_chondrite
   observable: gibbs_table
@@ -70,8 +72,8 @@ species:
       locator:
         table: '1'
         published_page: 464
-        pdf_page_index: 3
-        page: 464
+        pdf_page_index: 2
+        page: 3
         note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
       phase: average_H_chondrite_falls
       condensed_form:
@@ -180,7 +182,7 @@ species:
         table: '2'
         published_page: 472
         pdf_page_index: 11
-        page: 472
+        page: 12
         note: Table 2 Solid solution compositions, H chondrites block; 350 dpi pdftoppm of PDF page 11
       T_range_K:
       - 300.0
@@ -213,8 +215,8 @@ species:
       locator:
         table: '3'
         published_page: 473
-        pdf_page_index: 12
-        page: 473
+        pdf_page_index: 11
+        page: 12
         note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
       T_range_K:
       - 300.0
@@ -283,8 +285,8 @@ species:
       type: rate_series
       locator:
         published_page: 465
-        pdf_page_index: 4
-        page: 465
+        pdf_page_index: 3
+        page: 4
         section: '2.4'
         figure: '1'
         note: Printed T–P program numbers from §2.4 prose; Fig. 1 itself is figure-only
@@ -347,7 +349,11 @@ species:
       units: log mole fraction / fO2 as plotted; no numeric table
       values:
         quantity: equilibrium_outgassed_gas_composition_vs_T
-        method_class: model_derived
+        evidence_class: quoted_attributed
+        method_class: quoted_attributed
+        attribution: >-
+          Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type
+          described by Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
         admission_status: figure_only
         status: typed_refusal
         reason: Gas speciation, elemental distribution, fO2, mineralogy, and sensitivity panels exist
@@ -403,8 +409,8 @@ species:
       locator:
         table: '1'
         published_page: 464
-        pdf_page_index: 3
-        page: 464
+        pdf_page_index: 2
+        page: 3
         note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
       phase: average_L_chondrite_falls
       condensed_form:
@@ -513,7 +519,7 @@ species:
         table: '2'
         published_page: 472
         pdf_page_index: 11
-        page: 472
+        page: 12
         note: Table 2 L chondrites block; 350 dpi pdftoppm of PDF page 11
       T_range_K:
       - 300.0
@@ -544,8 +550,8 @@ species:
       locator:
         table: '3'
         published_page: 473
-        pdf_page_index: 12
-        page: 473
+        pdf_page_index: 11
+        page: 12
         note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
       T_range_K:
       - 300.0
@@ -617,8 +623,8 @@ species:
       locator:
         table: '1'
         published_page: 464
-        pdf_page_index: 3
-        page: 464
+        pdf_page_index: 2
+        page: 3
         note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
       phase: average_LL_chondrite_falls
       condensed_form:
@@ -727,7 +733,7 @@ species:
         table: '2'
         published_page: 472
         pdf_page_index: 11
-        page: 472
+        page: 12
         note: Table 2 LL chondrites block; 350 dpi pdftoppm of PDF page 11
       T_range_K:
       - 300.0
@@ -758,8 +764,8 @@ species:
       locator:
         table: '3'
         published_page: 473
-        pdf_page_index: 12
-        page: 473
+        pdf_page_index: 11
+        page: 12
         note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
       T_range_K:
       - 300.0
@@ -831,7 +837,7 @@ species:
       locator:
         published_page: 472
         pdf_page_index: 11
-        page: 472
+        page: 12
         paragraph: '3.1'
         note: Quoted Brett and Sato (1984) measured log fO2; not this work
       T_range_K:
@@ -866,8 +872,8 @@ species:
       type: rate_series
       locator:
         published_page: 466
-        pdf_page_index: 5
-        page: 466
+        pdf_page_index: 4
+        page: 5
         section: '2.5'
         note: Quoted Muenow et al. (1995) vacuum heating of ordinary chondrites; not this work
       T_range_K:
@@ -897,8 +903,8 @@ species:
       type: rate_series
       locator:
         published_page: 466
-        pdf_page_index: 5
-        page: 466
+        pdf_page_index: 4
+        page: 5
         section: '2.5'
         figure: '2'
         note: Quoted Gooding and Muenow (1977) Holbrook L6 vacuum stepwise heating; Fig. 2 is this work's
@@ -935,7 +941,7 @@ species:
       locator:
         published_page: 462
         pdf_page_index: 1
-        page: 462
+        page: 2
         paragraph: Abstract
       T_range_K:
       - 300.0
@@ -946,8 +952,11 @@ species:
       units: dimensionless identity claim as printed
       values:
         quantity: identity_of_major_C_bearing_gas
-        method_class: model_derived
-        admission_status: model_output_not_measurement
+        evidence_class: quoted_attributed
+        method_class: quoted_attributed
+        attribution: >-
+          Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type
+          described by Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
         major_C_bearing_gas_during_metamorphism: CH4
         CO_never_major_during_ordinary_chondrite_metamorphism: true
         numeric_mole_fractions: figure_only

@@ -23,8 +23,9 @@ import re
 import math
 from typing import Any, Dict, Mapping, Optional, Tuple
 
+from engines.alphamelts.domain import _canonical_oxide_activity_map_with_notices
 from engines.alphamelts.result import LiquidusDiagnostics
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import is_declared_real_scalar, is_finite
 
 
 class ParserError(RuntimeError):
@@ -80,6 +81,13 @@ def project_equilibrium_to_diagnostics(
         )
 
     warnings: Tuple[str, ...] = tuple(getattr(equilibrium_result, 'warnings', ()) or ())
+    raw_activities = dict(
+        getattr(equilibrium_result, 'activity_coefficients', {}) or {}
+    )
+    _oxide_activities, activity_notices = (
+        _canonical_oxide_activity_map_with_notices(raw_activities)
+    )
+    warnings += tuple(notice for notice in activity_notices if notice not in warnings)
     # An absent or empty status is the ABSENCE of an answer, not a good one.
     # This seam previously manufactured 'ok' for a statusless result, and no
     # amount of validation further downstream can recover the lost
@@ -115,14 +123,12 @@ def project_equilibrium_to_diagnostics(
         for k, v in dict(
             getattr(equilibrium_result, 'liquid_composition_wt_pct', {}) or {}
         ).items()
-        if _is_finite(v)
+        if is_finite(v)
     }
     activities = {
         str(k): float(v)
-        for k, v in dict(
-            getattr(equilibrium_result, 'activity_coefficients', {}) or {}
-        ).items()
-        if _is_finite(v)
+        for k, v in raw_activities.items()
+        if is_finite(v)
     }
 
     return LiquidusDiagnostics(
@@ -355,7 +361,7 @@ def _phase_masses_kg(equilibrium_result: Any) -> Dict[str, float]:
         for phase, mass_kg in dict(
             getattr(equilibrium_result, 'phase_masses_kg', {}) or {}
         ).items()
-        if _is_finite(mass_kg) and float(mass_kg) > 0.0
+        if is_finite(mass_kg) and float(mass_kg) > 0.0
     }
 
 
@@ -368,14 +374,14 @@ def _phase_modes_wt_pct(masses_kg: Mapping[str, float]) -> Dict[str, float]:
     """
     total = sum(
         float(m) for m in masses_kg.values()
-        if _is_finite(m) and float(m) > 0.0
+        if is_finite(m) and float(m) > 0.0
     )
     if total <= 0.0:
         return {}
     return {
         str(phase): float(mass_kg) / total * 100.0
         for phase, mass_kg in masses_kg.items()
-        if _is_finite(mass_kg) and float(mass_kg) > 0.0
+        if is_finite(mass_kg) and float(mass_kg) > 0.0
     }
 
 
@@ -399,7 +405,7 @@ def _liquid_fraction_path(equilibrium_result: Any) -> Tuple[Dict[str, Any], ...]
                 'liquid_composition_wt_pct': {
                     str(k): float(v)
                     for k, v in dict(composition or {}).items()
-                    if _is_finite(v)
+                    if is_finite(v)
                 },
             })
         except (TypeError, ValueError):
@@ -419,7 +425,7 @@ def _control_float(
         result = float(value)
     except (TypeError, ValueError):
         return float(default)
-    if not _is_finite(result):
+    if not is_finite(result):
         return float(default)
     return result
 
@@ -443,21 +449,9 @@ def _safe_attr_float(obj: Any, name: str) -> Optional[float]:
         result = float(value)
     except (TypeError, ValueError):
         return None
-    if not _is_finite(result):
+    if not is_finite(result):
         return None
     return result
-
-
-def _is_finite(value: Any) -> bool:
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return False
-    if numeric != numeric:
-        return False
-    if numeric in (float('inf'), float('-inf')):
-        return False
-    return True
 
 
 __all__ = ('diagnostics_to_equilibrium', 'project_equilibrium_to_diagnostics')

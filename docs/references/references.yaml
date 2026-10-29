@@ -31,36 +31,6 @@ references:
     found: "2026-06-14 reference-library bootstrap"
     needs_quote: true
     pull_quotes: []
-  REF-003:
-    authors: "Ewing, C.T. & Stern, K.H."
-    title: "Equilibrium vaporization rates and vapor pressures of alkali chlorides"
-    journal: "Journal of Physical Chemistry"
-    year: 1974
-    volume: "78"
-    pages: "1998-2005"
-    doi: "10.1021/j100613a005"
-    url: ""
-    role: MEASUREMENT
-    topic: vapor-pressure
-    status: current
-    found: "2026-06-14 reference-library bootstrap"
-    needs_quote: true
-    pull_quotes: []
-  REF-004:
-    authors: "Tomeoka, K. & Buseck, P.R."
-    title: "Matrix mineralogy of the Orgueil CI carbonaceous chondrite"
-    journal: "Geochimica et Cosmochimica Acta"
-    year: 1988
-    volume: "52"
-    pages: "1627-1640"
-    doi: "10.1016/0016-7037(88)90231-1"
-    url: ""
-    role: OBSERVATION
-    topic: carbonaceous-chondrites
-    status: current
-    found: "2026-06-14 reference-library bootstrap"
-    needs_quote: true
-    pull_quotes: []
   REF-005:
     authors: "Alexander, C.M.O'D., Cody, G.D., De Gregorio, B.T., Nittler, L.R. & Stroud, R.M."
     title: "The nature, origin and modification of insoluble organic matter in chondrites, the major source of Earth's C and N"
@@ -560,7 +530,7 @@ references:
     role: MODEL
     topic: redox-fo2
     status: current
-    coefficient_note: "CCO buffer grounding for the in-repo graphite-CO-CO2 point formula: log10(fO2/bar) = -21803/T + 4.325 + 0.171*(P_bar - 1)/T."
+    coefficient_note: "CCO buffer grounding for the in-repo graphite-CO-CO2 point formula; owned by simulator.chemistry.graphite_c_co.cco_log10_fO2_bar."
     found: "2026-06-19 sso-r-r20-redox-grounding"
     needs_quote: true
     pull_quotes: []
@@ -576,7 +546,7 @@ references:
     role: OBSERVATION
     topic: redox-fo2
     status: current
-    coefficient_note: "Lunar initial-fO2 prior grounding: reduced lunar basalt/regolith state near IW-2 .. IW for native-Fe-bearing mare/highland material."
+    coefficient_note: "Lunar redox context for the initial-fO2 prior: reduced basalt/regolith conditions near IW-2 .. IW for native-Fe-bearing mare/highland material; does not ground runtime composition-to-fO2 offset coefficients."
     found: "2026-06-19 sso-r-r20-redox-grounding"
     needs_quote: true
     pull_quotes: []
@@ -592,7 +562,7 @@ references:
     role: OBSERVATION
     topic: redox-fo2
     status: current
-    coefficient_note: "Mars initial-fO2 prior grounding: martian basalts span ~IW to QFM-1 (reduced vs terrestrial) per Herd et al. 2002; SSO-R Mars sweep prior spans this reduced igneous range, while oxidized sulfate/perchlorate surface regolith sits higher."
+    coefficient_note: "Martian redox context for the initial-fO2 prior: basalts span ~IW to QFM-1 (reduced vs terrestrial) per Herd et al. 2002; this range does not ground runtime composition-to-fO2 offset coefficients."
     found: "2026-06-19 sso-r-r20-redox-grounding"
     needs_quote: true
     pull_quotes: []
@@ -779,12 +749,12 @@ references:
     authors: "Plante, E.R. (in Hastie, J.W., ed.)"
     title: "Vapor pressure measurements of potassium over K2O-SiO2 solutions by a Knudsen effusion, mass spectrometric method"
     journal: "NBS Special Publication 561: Characterization of High Temperature Vapors and Gases"
-    year: 1981
-    volume: ""
+    year: 1979
+    volume: "1"
     pages: "265-281"
-    doi: ""
-    url: ""
-    provenance_unavailable_reason: "The 2026-07-05 DOI sweep resolved the Sossi & Fegley 2018 Table 2 'Hastie et al. 1981' KO0.5 row to this Hastie-edited NBS chapter, but did not verify a DOI from a primary/publisher/Crossref source."
+    doi: "10.6028/NBS.SP.561v1"
+    url: "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication561v1.pdf"
+    provenance_note: "The DOI identifies the containing NBS volume; Plante's chapter is on pp. 265-281 and has no separate chapter DOI."
     role: MEASUREMENT
     topic: volatility
     status: current

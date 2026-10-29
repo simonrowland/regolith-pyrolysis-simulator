@@ -45,6 +45,27 @@ def adapter() -> KEMSAdapter:
     return KEMSAdapter(data)
 
 
+def test_kems_observation_oxygen_reaches_transport_unchanged(adapter, monkeypatch):
+    receipts = []
+    dispatch = adapter._provider.dispatch
+
+    def capture(request):
+        result = dispatch(request)
+        receipts.append((request.control_inputs['pO2_bar'], result.diagnostic['pO2_bar']))
+        return result
+
+    monkeypatch.setattr(adapter._provider, 'dispatch', capture)
+    oxygen = 1.3e-12
+    surface, runtime = adapter._surface({
+        'oxide': {'formula': 'MgO'},
+        'provider_inputs': {'pO2_bar': oxygen},
+        'exterior_chamber_pressure': {'value_pa': oxygen * 1e5},
+    }, temperature_K=1873.15)
+    assert surface['Mg'] > 0
+    assert receipts == [(oxygen, oxygen)]
+    assert runtime['pO2_bar'] == oxygen
+
+
 def _comparison(**overrides):
     payload = {
         "case_id": "case",
@@ -403,7 +424,9 @@ def test_provider_refusal_precedes_missing_speciation(
 
     assert {record.status for record in run.records} == {"out-of-domain"}
     assert {row["provider_status"] for row in run.runtime_rows} == {"refused"}
-    assert refusing_provider.request.control_inputs == {"pO2_bar": 1.0e-8}
+    assert refusing_provider.request.control_inputs == {
+        "pO2_bar": 1.0e-8, "pO2_admission": "observation",
+    }
 
 
 @pytest.mark.parametrize("provider_status", ["not_converged", "unavailable"])

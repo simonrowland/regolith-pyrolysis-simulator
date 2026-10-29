@@ -5,11 +5,6 @@ import math
 from pathlib import Path
 from typing import Any, Mapping
 
-from simulator.fe_redox import (
-    floor_vacuum_pressure_bar,
-    kress91_fe3_over_sigma_fe,
-    melt_mol_fractions_for_kress91,
-)
 from simulator.feedstock_composition import (
     DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR,
     fe2o3_equivalent_wt_pct,
@@ -177,9 +172,6 @@ def classify_industrial_glass(
     total_fe = _total_fe2o3_equivalent(composition, clarity_model)
     resolved_fe2, redox_source = _resolve_fe2_fraction(
         composition,
-        pO2_mbar=pO2_mbar,
-        temperature_C=temperature_C,
-        pressure_mbar=pressure_mbar,
         explicit=fe2_fraction,
     )
     clarity = _band_value(
@@ -537,9 +529,6 @@ def _total_fe2o3_equivalent(
 def _resolve_fe2_fraction(
     composition: Mapping[str, float],
     *,
-    pO2_mbar: float | None,
-    temperature_C: float | None,
-    pressure_mbar: float | None,
     explicit: float | None,
 ) -> tuple[float | None, str]:
     if explicit is not None:
@@ -550,24 +539,9 @@ def _resolve_fe2_fraction(
     iron_atoms = feot_equivalent_moles(
         {"FeO": feo_mol, "Fe2O3": fe2o3_mol}
     )
-    if iron_atoms > 0.0:
-        return feo_mol / iron_atoms, "ledger_speciation"
-    if pO2_mbar is None or temperature_C is None or iron_atoms <= 0.0:
+    if not math.isfinite(iron_atoms) or iron_atoms <= 0.0:
         return None, "unavailable"
-    mol_fractions = melt_mol_fractions_for_kress91(composition)
-    if not mol_fractions:
-        return None, "unavailable"
-    fo2_bar = max(float(pO2_mbar) / 1000.0, 1e-300)
-    total_pressure_bar = floor_vacuum_pressure_bar(
-        max(float(pressure_mbar or pO2_mbar), 0.0) / 1000.0
-    )
-    fe3_fraction = kress91_fe3_over_sigma_fe(
-        fO2_log=math.log10(fo2_bar),
-        mol_fractions=mol_fractions,
-        T_K=float(temperature_C) + 273.15,
-        pressure_bar=total_pressure_bar,
-    )
-    return 1.0 - float(fe3_fraction), "kress91_from_pO2"
+    return feo_mol / iron_atoms, "ledger_speciation"
 
 
 def _band_value(value: float, bands: list[dict[str, Any]], key: str) -> str:

@@ -5,8 +5,9 @@ source_id: form589
 date: "2026-08-09"
 species: SiO
 validation: mass_spec
-pinned_residual_dex: 0.40986276901889873
-prior_pinned_residual_dex: 1.2974849325542646
+pinned_residual_dex: 0.21214346131136663
+prior_pinned_residual_dex: 0.40986276901889873
+prior_prior_pinned_residual_dex: 1.2974849325542646
 residual_change: tightens
 metric: max_absolute_residual_dex
 comparison_basis: >-
@@ -16,14 +17,16 @@ method: >-
   Condensed-form gate. Costa Fo93Fa7 crystalline olivine SiO α
   (not_comparable_condensed_form:crystalline; not form-correctable) and
   Wetzel amorphous/provenance-misbound row (form_unresolved) excluded.
-  Prior max 1.297 dex was a solid-olivine point. New max 0.409862769 is the
-  Schaefer-Fegley liquid silica/forsterite survey. No Pref/γ retune.
+  The prior 0.409862769 dex maximum was the Schaefer-Fegley liquid
+  silica/forsterite survey; the current maximum is Richter 2007 Si-CaI α at
+  2173 K (0.212143461 dex). The earlier 1.297 dex maximum was a solid-olivine
+  point. No Pref/γ retune.
 conditions:
   observation_class: silicate_melt liquid_melt SiO α
   excluded_form: crystalline olivine Fo93Fa7 (Costa); unresolved Wetzel SiO
 checkable_claims:
-  - residual tightened 1.29748 → 0.40986 dex after form exclusion
-  - governing point is schaefer_fegley_2004_sio_alpha_s_survey liquid survey
+  - residual tightened 1.29748 → 0.40986 dex after form exclusion, then to 0.21214 dex at the Richter 2007 baseline
+  - governing point is richter_2007_si_cai_arrhenius_langmuir at 2173 K
   - Costa / Wetzel SiO rows remain with typed form skips
   - no SiO Pref / γ retune to improve this pin
 runtime_changes:

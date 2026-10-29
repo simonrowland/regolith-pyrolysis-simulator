@@ -1,0 +1,2551 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/majzlan-2021-magnesium-silicate-glass-cp.yaml
+observations:
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_entropy_of_fusion_text
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1834'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '41.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: calculated in this work from the cited fusion enthalpy
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_entropy_of_fusion_text
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 9
+    pdf_page_index: 8
+    section: Configurational entropy of enstatitic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1834'
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Configurational entropy of enstatitic glass
+  derived_from:
+  - majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_heat_of_fusion_text
+  derivation:
+    relation: Δfusion S = Δfusion H / Tfusion
+    inputs:
+    - majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_heat_of_fusion_text
+    parameters: []
+    output_unit: J/mol K
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_heat_of_fusion_text
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1834'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '75.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '6'
+      units: kJ/mol
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stebbins et al. (1984); Richet and Bottinga (1986)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_heat_of_fusion_text
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 9
+    pdf_page_index: 8
+    section: Configurational entropy of enstatitic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1834'
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Configurational entropy of enstatitic glass
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_table2_cp_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'enstatite' is not a closed Polymorph token
+        rejection_kind: unrecognised
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '82.05'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Krupka et al. (1985b)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_table2_cp_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=enstatite; column=Cp°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=enstatite; column=Cp°298.15
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_table2_entropy_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'enstatite' is not a closed Polymorph token
+        rejection_kind: unrecognised
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '66.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.1'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Krupka et al. (1985b)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatite_table2_entropy_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=enstatite; column=S°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=enstatite; column=S°298.15
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatitic_glass_transition_temperature
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Mg0.996SiO2.996
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1063'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Briggs (1975)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_enstatitic_glass_transition_temperature
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 9
+    pdf_page_index: 8
+    section: Configurational entropy of enstatitic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1063'
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Configurational entropy of enstatitic glass
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_entropy_of_fusion_navrotsky_1989
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2163'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '52.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '9.2'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: calculated in this work from Navrotsky et al. (1989)
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_entropy_of_fusion_navrotsky_1989
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Configurational entropy of forsteritic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+  derived_from:
+  - majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_heat_of_fusion_navrotsky_1989
+  derivation:
+    relation: Δfusion S = Δfusion H / Tfusion from Navrotsky et al. (1989) Δfusion H = 114.0 ± 20.0 kJ/mol and Tfusion = 2163
+      K
+    inputs:
+    - majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_heat_of_fusion_navrotsky_1989
+    parameters: []
+    output_unit: J/mol K
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_entropy_of_fusion_richet_1993
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2174'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '65.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '6.4'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: calculated in this work from Richet et al. (1993)
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_entropy_of_fusion_richet_1993
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Configurational entropy of forsteritic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2174'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+  derived_from:
+  - majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_heat_of_fusion_richet_1993
+  derivation:
+    relation: Δfusion S = Δfusion H / Tfusion from Richet et al. (1993) Δfusion H = 142.0 ± 14.0 kJ/mol and Tfusion = 2174
+      K
+    inputs:
+    - majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_heat_of_fusion_richet_1993
+    parameters: []
+    output_unit: J/mol K
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_heat_of_fusion_navrotsky_1989
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2163'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '114'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '20'
+      units: kJ/mol
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Navrotsky et al. (1989)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_heat_of_fusion_navrotsky_1989
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Configurational entropy of forsteritic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_heat_of_fusion_richet_1993
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2174'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '142'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '14'
+      units: kJ/mol
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. (1993)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_heat_of_fusion_richet_1993
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Configurational entropy of forsteritic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2174'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_table2_cp_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: forsterite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '118.59'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robie et al. (1982)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_table2_cp_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=forsterite; column=Cp°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=forsterite; column=Cp°298.15
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_table2_entropy_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: forsterite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '94.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.1'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robie et al. (1982)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsterite_table2_entropy_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=forsterite; column=S°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=forsterite; column=S°298.15
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsteritic_glass_transition_temperature_richet_1993
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '990'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 10
+      units: K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. (1993)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_forsteritic_glass_transition_temperature_richet_1993
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Configurational entropy of forsteritic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '990'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg50_table2_cp_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg0.996SiO2.996
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '80.08'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg50_table2_cp_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG50; column=Cp°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG50; column=Cp°298.15
+  derivation:
+    relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial
+      fits.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg50_table2_entropy_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg0.996SiO2.996
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '72.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.9'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg50_table2_entropy_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG50; column=S°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG50; column=S°298.15
+  derivation:
+    relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity
+      data, fitted by orthogonal polynomials and extrapolated to 0 K.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg54_table2_cp_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg1.174SiO3.174
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '87.31'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg54_table2_cp_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG54; column=Cp°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG54; column=Cp°298.15
+  derivation:
+    relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial
+      fits.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg54_table2_entropy_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg1.174SiO3.174
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '78.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.9'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg54_table2_entropy_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG54; column=S°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG54; column=S°298.15
+  derivation:
+    relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity
+      data, fitted by orthogonal polynomials and extrapolated to 0 K.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg58_table2_cp_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg1.364SiO3.364
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '94.36'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg58_table2_cp_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG58; column=Cp°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG58; column=Cp°298.15
+  derivation:
+    relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial
+      fits.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg58_table2_entropy_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg1.364SiO3.364
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '85.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg58_table2_entropy_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG58; column=S°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG58; column=S°298.15
+  derivation:
+    relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity
+      data, fitted by orthogonal polynomials and extrapolated to 0 K.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg62_table2_cp_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg1.611SiO3.611
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '101.89'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg62_table2_cp_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG62; column=Cp°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG62; column=Cp°298.15
+  derivation:
+    relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial
+      fits.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg62_table2_entropy_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg1.611SiO3.611
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '91.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1.1'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg62_table2_entropy_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG62; column=S°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG62; column=S°298.15
+  derivation:
+    relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity
+      data, fitted by orthogonal polynomials and extrapolated to 0 K.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg67_assumed_glass_transition_temperature_tangeman_2001
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Mg1.907SiO3.907
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1040'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Tangeman et al. (2001)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg67_assumed_glass_transition_temperature_tangeman_2001
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Configurational entropy of forsteritic glass
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1040'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg67_table2_cp_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg1.907SiO3.907
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '115.68'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg67_table2_cp_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG67; column=Cp°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG67; column=Cp°298.15
+  derivation:
+    relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial
+      fits.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []
+- observation_id: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg67_table2_entropy_29815
+  experiment_id: 10.1007/s00269-021-01153-7::majzlan-2021-magnesium-silicate-glass-cp
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg1.907SiO3.907
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '102.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1.2'
+      units: J/mol K
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: majzlan-2021-magnesium-silicate-glass-cp::majzlan_2021_mg67_table2_entropy_29815
+  source_id: majzlan-2021-magnesium-silicate-glass-cp
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    note: row=MG67; column=S°298.15
+  read_from: pdf:majzlan-2021-magnesium-silicate-glass-cp
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        note: row=MG67; column=S°298.15
+  derivation:
+    relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity
+      data, fitted by orthogonal polynomials and extrapolated to 0 K.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Data availability
+        note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs
+          are not printed in the article and the workbook is not present in the local corpus.
+    references: []

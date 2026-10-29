@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:hendrix-2024-reactivity-reduced-simulants
       role: pdf
@@ -24,12 +24,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:hendrix-2024-reactivity-reduced-simulants
-      role: table_csv
-      path: tables/hendrix-2024-reactivity-reduced-simulants
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:hendrix-2024-reactivity-reduced-simulants
       role: pdftotext
       path: unknown
@@ -81,6 +75,7 @@ experiments:
               section: Methods - Milling and Reduction of Lunar Simulants
               note: Printed three grams of milled material; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -121,6 +116,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -194,6 +190,7 @@ experiments:
               section: Methods - Milling and Reduction of Lunar Simulants
               note: Target temperature 950 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -300,6 +297,7 @@ experiments:
                 section: Methods - Milling and Reduction of Lunar Simulants
                 note: Target temperature 950 C; unit conversion only
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value
@@ -337,6 +335,7 @@ experiments:
                 section: Methods - Milling and Reduction of Lunar Simulants
                 note: Reaction continued 15 min at target temperature; unit conversion only
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -389,6 +388,7 @@ experiments:
               section: Methods - Milling and Reduction of Lunar Simulants
               note: Printed three grams of milled material; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -431,6 +431,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -505,6 +506,7 @@ experiments:
               section: Methods - Milling and Reduction of Lunar Simulants
               note: Target temperature 950 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -602,6 +604,7 @@ experiments:
                 section: Methods - Milling and Reduction of Lunar Simulants
                 note: Target temperature 950 C; unit conversion only
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value
@@ -639,6 +642,7 @@ experiments:
                 section: Methods - Milling and Reduction of Lunar Simulants
                 note: Reaction continued 15 min at target temperature; unit conversion only
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown
@@ -691,6 +695,7 @@ experiments:
               section: Methods - Milling and Reduction of Lunar Simulants
               note: Printed three grams of milled material; unit conversion only
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -734,6 +739,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -809,6 +815,7 @@ experiments:
               section: Methods - Milling and Reduction of Lunar Simulants
               note: Target temperature 950 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -906,6 +913,7 @@ experiments:
                 section: Methods - Milling and Reduction of Lunar Simulants
                 note: Target temperature 950 C; unit conversion only
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value
@@ -943,6 +951,7 @@ experiments:
                 section: Methods - Milling and Reduction of Lunar Simulants
                 note: Reaction continued 15 min at target temperature; unit conversion only
           output_unit: s
+          references: []
     total_duration_s:
       state:
         tag: unknown

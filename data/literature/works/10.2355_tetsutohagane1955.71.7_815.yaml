@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
     files:
     - asset_id: pdf:ts1985
       role: pdf
@@ -23,12 +23,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:ts1985
-      role: table_csv
-      path: tables/ts1985
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:ts1985
       role: pdftotext
       path: unknown
@@ -110,6 +104,7 @@ experiments:
               table: '1'
               note: 1200 C converted to K.
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -294,6 +289,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1100 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -332,6 +328,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -459,6 +456,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -568,6 +566,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1200 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -606,6 +605,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -733,6 +733,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -842,6 +843,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1300 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -880,6 +882,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -1007,6 +1010,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -1116,6 +1120,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1100 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1154,6 +1159,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -1281,6 +1287,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -1390,6 +1397,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1200 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1428,6 +1436,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -1555,6 +1564,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -1664,6 +1674,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1300 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1702,6 +1713,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -1829,6 +1841,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -1938,6 +1951,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1100 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1976,6 +1990,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -2103,6 +2118,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -2212,6 +2228,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1200 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2250,6 +2267,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -2377,6 +2395,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -2486,6 +2505,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1300 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2524,6 +2544,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -2651,6 +2672,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -2760,6 +2782,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1100 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -2798,6 +2821,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -2925,6 +2949,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -3034,6 +3059,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1200 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -3072,6 +3098,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -3199,6 +3226,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -3308,6 +3336,7 @@ experiments:
               figure: '7'
               note: Figure 7 isotherm at 1300 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -3346,6 +3375,7 @@ experiments:
               section: Experimental principle / synopsis
               note: CO partial pressure 1 atm for the Na2O activity runs; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value
@@ -3473,6 +3503,7 @@ experiments:
               section: 4.1 Experimental method
               note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
         output_unit: s
+        references: []
     cooling_or_quench:
       state:
         tag: value
@@ -3529,6 +3560,7 @@ experiments:
               published_page: 816
               paragraph: 実験原理 / eq. (4)
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -3541,7 +3573,7 @@ experiments:
   locator:
     page: 7
     published_page: 821
-    pdf_page_index: 7
+    pdf_page_index: 6
     table: '2'
     figure: '4'
     equation: log a_Na2O = A/T + B
@@ -3579,6 +3611,7 @@ experiments:
                 published_page: 816
                 paragraph: 3-2 実験方法 inner diameter 15 mm
           output_unit: m2
+          references: []
 benches:
 - id: 10.2355/tetsutohagane1955.71.7_815::bench::ts-graphite-co-equilibration
   work_id: 10.2355/tetsutohagane1955.71.7_815

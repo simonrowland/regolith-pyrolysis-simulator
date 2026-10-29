@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import gc
+import inspect
 import math
 import pickle
 from collections import deque
@@ -59,7 +60,6 @@ from simulator.thermal_train import (
     integrate_molar_sensible_enthalpy_j_per_mol,
     oxygen_cp_shomate_j_per_mol_k,
 )
-from engines.alphamelts import AlphaMELTSProvider
 from engines.magemin import MAGEMinShadowProvider
 
 
@@ -552,9 +552,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
 
     intent = ChemistryIntent.GATE_LIQUID_FRACTION
     registry = ProviderRegistry()
-    authoritative = AlphaMELTSProvider(backend=None)
     shadow = MAGEMinShadowProvider()
-    registry.register(authoritative, [intent])
     registry.register(shadow, [intent], shadow=True)
     registry_before = registry.capability_summary()
 
@@ -567,6 +565,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
         last_sticking_alpha_provenance_notice={},
     )
     sim.backend = None
+    sim._liquid_fraction_provider = "magemin"
     sim._chem_registry = registry
     sim._chem_kernel = object()
     sim.atom_ledger = FakeLedger()
@@ -592,7 +591,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
 
     assert raised.value is refusal
     assert registry.capability_summary() == registry_before
-    assert registry.authoritative_for(intent) is authoritative
+    assert registry.authoritative_for(intent) is None
     assert registry.shadows_for(intent) == (shadow,)
     assert registry.fallback_for(intent) is None
 
@@ -627,6 +626,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_authority(
         last_sticking_alpha_provenance_notice={},
     )
     sim.backend = SimpleNamespace(backend_name=backend_name)
+    sim._liquid_fraction_provider = "magemin"
     sim._chem_registry = registry
     sim._chem_kernel = object()
     sim.atom_ledger = FakeLedger()
@@ -636,7 +636,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_authority(
 
     def refuse_after_registering_authority() -> None:
         sim._register_freeze_gate_liquid_fraction_providers()
-        assert registry.authoritative_for(intent) is not None
+        assert registry.authoritative_for(intent) is None
         assert registry.fallback_for(intent) is not None
         raise refusal
 
@@ -732,6 +732,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
         last_sticking_alpha_provenance_notice={},
     )
     sim.backend = SimpleNamespace(backend_name="alphamelts")
+    sim._liquid_fraction_provider = "magemin"
     sim._chem_registry = registry
     sim._chem_kernel = object()
     sim.atom_ledger = FakeLedger()
@@ -746,7 +747,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
     assert sim.step().hour == 4
     assert registry.capability_summary() == {
         "gate_liquid_fraction": {
-            "authoritative": "alphamelts-diagnostic",
+            "authoritative": None,
             "fallback": "magemin-shadow",
             "shadows": (),
         },
@@ -855,6 +856,125 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     assert isinstance(direct_snapshot.value.__cause__, AssertionError)
 
 
+def _refusal_step_sim() -> PyrolysisSimulator:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = BatchRecord(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        operating_history=[],
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.runtime_state = {"plain": {"value": 1}}
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+    return sim
+
+
+def test_successful_step_shares_committed_yield_disposition_rows() -> None:
+    class CommittedRow:
+        deepcopy_count = 0
+
+        def __deepcopy__(self, memo):
+            type(self).deepcopy_count += 1
+            copied = type(self)()
+            memo[id(self)] = copied
+            return copied
+
+    CommittedRow.deepcopy_count = 0
+    row = CommittedRow()
+    key = (0, "C0", 0)
+    sim = _refusal_step_sim()
+    sim._yield_disposition_ledger_snapshots = {key: row}
+    sim._step_one_hour = lambda: HourSnapshot(hour=4)
+
+    assert sim.step().hour == 4
+
+    assert CommittedRow.deepcopy_count == 0
+    assert sim._yield_disposition_ledger_snapshots[key] is row
+    assert sim.runtime_state == {"plain": {"value": 1}}
+
+
+def test_terminal_refusal_restores_inserted_yield_rows_and_copies_other_roots(
+    monkeypatch,
+) -> None:
+    def make_simulator():
+        key = (3, "C0", 3)
+        committed = {
+            "gross_events": [
+                {"account": "process.condensation_train", "n": 1},
+            ],
+        }
+        sim = _refusal_step_sim()
+        sim._yield_disposition_ledger_snapshots = {key: committed}
+        refusal = EvaporationFluxRefusal(
+            "terminal", {"reason": "yield-disposition-row"},
+        )
+
+        def refuse_after_append():
+            sim._yield_disposition_ledger_snapshots[(4, "C0", 4)] = {
+                "gross_events": [],
+            }
+            raise refusal
+
+        sim._step_one_hour = refuse_after_append
+        return sim, key, committed, refusal
+
+    def assert_refusal_rolls_back(sim, key, committed, refusal):
+        with pytest.raises(EvaporationFluxRefusal) as raised:
+            sim.step()
+
+        assert raised.value is refusal
+        restored = sim._yield_disposition_ledger_snapshots
+        assert list(restored) == [key]
+        assert restored[key] == committed
+        assert restored[key] is not committed
+        assert restored[key]["gross_events"] is not committed["gross_events"]
+        assert (
+            restored[key]["gross_events"][0]
+            is not committed["gross_events"][0]
+        )
+        assert sim.runtime_state == {"plain": {"value": 1}}
+
+    sim, key, committed, refusal = make_simulator()
+    assert_refusal_rolls_back(sim, key, committed, refusal)
+
+    sim, key, committed, refusal = make_simulator()
+    snapshot = sim._snapshot_terminal_refusal_hour_state
+
+    def broken_snapshot(*, defer_committed_history=False):
+        state, ledger, cost_state = snapshot(
+            defer_committed_history=defer_committed_history,
+        )
+        state["_yield_disposition_ledger_snapshots"] = (
+            sim._yield_disposition_ledger_snapshots
+        )
+        return state, ledger, cost_state
+
+    monkeypatch.setattr(
+        sim,
+        "_snapshot_terminal_refusal_hour_state",
+        broken_snapshot,
+    )
+    with pytest.raises(AssertionError):
+        assert_refusal_rolls_back(sim, key, committed, refusal)
+
+
 def test_terminal_refusal_materializes_detached_committed_history() -> None:
     class FakeLedger:
         def __init__(self) -> None:
@@ -921,6 +1041,102 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     assert sim.record.snapshots[0].composition_wt_pct is not (
         committed.composition_wt_pct
     )
+
+
+def _refusal_step_sim() -> PyrolysisSimulator:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = BatchRecord(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        operating_history=[],
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.runtime_state = {"plain": {"value": 1}}
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+    return sim
+
+
+def test_successful_step_shares_committed_yield_disposition_rows() -> None:
+    class CommittedRow:
+        def __deepcopy__(self, _memo):
+            raise AssertionError(
+                "committed yield row must stay off the hot deepcopy path"
+            )
+
+    row = CommittedRow()
+    key = (0, "C0", 0)
+    sim = _refusal_step_sim()
+    sim._yield_disposition_ledger_snapshots = {key: row}
+    sim._step_one_hour = lambda: HourSnapshot(hour=4)
+
+    assert sim.step().hour == 4
+    assert sim._yield_disposition_ledger_snapshots[key] is row
+    assert sim.runtime_state == {"plain": {"value": 1}}
+
+
+def test_terminal_refusal_restores_inserted_yield_rows_and_copies_other_roots() -> None:
+    refusal = EvaporationFluxRefusal("terminal", {"reason": "yield-rows"})
+    key = (0, "C0", 0)
+    row = {
+        "gross_events": [
+            {"account": "process.condensation_train", "n": 1},
+        ],
+    }
+    sim = _refusal_step_sim()
+    sim._yield_disposition_ledger_snapshots = {key: row}
+    # A list is not the insert-only dict contract, so rollback must copy it.
+    unlisted = [{"n": 1}]
+    sim._unlisted_yield_shape = unlisted
+
+    def refuse_after_overwrite() -> None:
+        sim.runtime_state["plain"]["value"] = 9
+        sim._unlisted_yield_shape[0]["n"] = 9
+        sim._unlisted_yield_shape.append({"n": 2})
+        sim._yield_disposition_ledger_snapshots[(1, "C5", 0)] = {
+            "gross_events": [],
+        }
+        sim._yield_disposition_ledger_snapshots[key] = {
+            "gross_events": [{"n": 9}],
+        }
+        raise refusal
+
+    sim._step_one_hour = refuse_after_overwrite
+
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    restored = sim._yield_disposition_ledger_snapshots
+    assert isinstance(restored, dict)
+    assert list(restored) == [key]
+    assert restored[key] == {
+        "gross_events": [
+            {"account": "process.condensation_train", "n": 1},
+        ],
+    }
+    assert restored[key] is not row
+    assert restored[key]["gross_events"] is not row["gross_events"]
+    assert sim.runtime_state == {"plain": {"value": 1}}
+    assert sim._unlisted_yield_shape == [{"n": 1}]
+    assert sim._unlisted_yield_shape is not unlisted
+    assert sim._unlisted_yield_shape[0] is not unlisted[0]
 
 
 def test_unsupported_refusal_snapshot_graph_raises_typed_error() -> None:
@@ -1138,33 +1354,8 @@ def test_public_mol_serialization_projects_signed_dust() -> None:
     assert ledger.mol_by_account("process.cleaned_melt")["FeO"] < 0.0
 
 
-def test_direct_liquidus_backend_receives_projected_mol_and_refuses_real_negative() -> None:
-    ledger = _signed_dust_ledger()
-    calls: list[dict[str, object]] = []
-
-    def finder(**kwargs):
-        calls.append(kwargs)
-        raise RuntimeError("probe complete")
-
-    sim = SimpleNamespace(
-        atom_ledger=ledger,
-        backend=SimpleNamespace(find_liquidus_solidus=finder),
-        species_formula_registry={},
-    )
-    reasons: list[str] = []
-    assert EvaporationMixin._freeze_gate_curve_from_backend_liquidus(
-        sim, reasons, pressure_bar=1.0e-6, fO2_log=-9.0
-    ) is None
-    assert calls[0]["composition_mol_by_account"] == {
-        "process.cleaned_melt": {}
-    }
-
-    ledger._balances["process.cleaned_melt"]["FeO"] *= 10.0
-    with pytest.raises(AccountingError, match="negative outward mass"):
-        EvaporationMixin._freeze_gate_curve_from_backend_liquidus(
-            sim, [], pressure_bar=1.0e-6, fO2_log=-9.0
-        )
-    assert len(calls) == 1
+def test_freeze_gate_has_no_direct_backend_liquidus_fallback() -> None:
+    assert not hasattr(EvaporationMixin, '_freeze_gate_curve_from_backend_liquidus')
 
 
 def test_legacy_backend_composition_projects_dust_and_refuses_real_negative() -> None:
@@ -1252,6 +1443,13 @@ def test_in_loop_mol_consumers_use_canonical_raw() -> None:
     Projection remains an outward/provider boundary only. These sites must not
     raise AccountingError via project_account_mol, because they no longer call it.
     """
+    assert not hasattr(
+        EvaporationMixin, "_freeze_gate_curve_from_parametric_liquidus"
+    )
+    assert "allow_parametric" not in inspect.signature(
+        EvaporationMixin._freeze_gate_curve_from_kernel_liquidus
+    ).parameters
+
     consumers = (
         (
             "extraction_availability",
@@ -1260,14 +1458,6 @@ def test_in_loop_mol_consumers_use_canonical_raw() -> None:
                 sim, ("FeO",)
             ),
             lambda result: result == {"FeO": 0.0},
-        ),
-        (
-            "parametric_liquidus",
-            "process.cleaned_melt",
-            lambda sim: EvaporationMixin._freeze_gate_curve_from_parametric_liquidus(
-                sim, []
-            ),
-            lambda result: result is None,
         ),
         (
             "headspace_holdup",
@@ -1536,6 +1726,9 @@ def test_c6_acquisition_timeout_ends_as_transport_bound_refusal() -> None:
         "c6_hold_target_not_acquired"
     )
     assert refusal["diagnostic"]["unacquired_hold_target_C"] == 1400.0
+    # Target-inventory depletion diagnostics belong to the C0 endpoint only.
+    assert "target_inventory_diagnostic" not in refusal[
+        "diagnostic"]["binding_transport_state"]
     # 2026-08-07 b-147: transport_state now also carries this-hour ramp
     # telemetry (nominal/actual/throttle_reason) for the C4 acquisition
     # opportunity clock; this SimpleNamespace scenario sets none, so the
@@ -1560,7 +1753,9 @@ def test_uncontrolled_equilibrium_po2_ignores_downstream_residual() -> None:
         overhead=SimpleNamespace(composition={"O2": 500.0}),
         _melt_headspace_composition_mbar={"O2": 2.0},
         _overhead_headspace_enabled=lambda: False,
-        _vacuum_floor_bar=lambda: 1.0e-12,
+        # This declared vacuum contributes no cover-gas oxygen.
+        _headspace_equilibrated_pO2_bar=lambda pO2: pO2,
+        _oxygen_numerical_floor_bar=lambda: 1.0e-12,
     )
     first = EquilibriumMixin._commanded_pO2_bar(sim)
     sim.overhead.composition["O2"] = 0.001
@@ -1655,7 +1850,8 @@ def test_null_resinter_threshold_emits_finite_deposition_constraint() -> None:
     )
     margin = PhysicsConstraintSet().coating(overlay)
     assert not margin.feasible
-    assert margin.authoritative
+    assert margin.authoritative is False
+    assert margin.status == "warning"
     assert margin.margin == pytest.approx(-0.5)
     assert margin.status_payload["coating_constraint_mode"] == (
         "no_unqualified_deposition"

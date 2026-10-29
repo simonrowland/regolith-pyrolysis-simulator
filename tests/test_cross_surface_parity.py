@@ -141,6 +141,7 @@ class StepwiseWebDriver:
 
 
 # gate-2: 3-surface drive at 301 s under load; ceiling includes slot-wait allowance.
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(900)
 def test_batch_cli_web_mol_ledger_parity(monkeypatch):
@@ -371,6 +372,8 @@ def _run_web_session(monkeypatch) -> SurfaceResult:
                 "mass_kg": MASS_KG,
                 "speed": 1,
                 "track": TRACK,
+                # b-793: the server refuses a start without the current tick-payload version.
+                "payload_version": web_events.SIMULATION_TICK_PAYLOAD_VERSION,
             },
         )
         drain()
