@@ -564,6 +564,10 @@ from simulator.state import (
     ProcessInventory,
     STOICH_RATIOS,
 )
+from simulator.engine_pool import (
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
+)
 from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import (
@@ -2720,7 +2724,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'campaign_hour': int(self.melt.campaign_hour),
                 'per_species': per_species,
             }
-        except TimeoutError:
+        except TimeoutError as exc:
+            _mark_engine_compute_refusal(exc, type(exc).__name__)
             raise
         except Exception as exc:  # noqa: BLE001 - diagnostics cannot gate chemistry
             record = {
@@ -5177,10 +5182,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             except EvaporationFluxRefusal:
                 raise
             except liquidus_provider_failures as exc:
-                if isinstance(exc, TimeoutError):
-                    # A hard wall is a run refusal. Letting it become the
-                    # liquidus floor would make redox/saturation decisions
-                    # depend on worker load.
+                if _is_engine_compute_refusal(exc):
+                    _mark_engine_compute_refusal(exc)
                     raise
                 # Non-timeout ProviderUnavailableError, LiquidusSampleError,
                 # and typed ThermoEngine failures retain their classified
@@ -5196,6 +5199,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     reason=reason,
                     liquidus_status=liquidus_status,
                 )
+            except Exception as exc:
+                if _is_engine_compute_refusal(exc):
+                    _mark_engine_compute_refusal(exc)
+                raise
 
         try:
             solidus_T_C = float(curve['solidus_T_C'])
@@ -13636,9 +13643,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self._freeze_gate_enabled():
             try:
                 raw_liquid_fraction = self._freeze_gate_liquid_fraction_factor()
-            except TimeoutError:
+            except TimeoutError as exc:
+                _mark_engine_compute_refusal(exc, type(exc).__name__)
                 raise
             except Exception as exc:
+                if _is_engine_compute_refusal(exc):
+                    _mark_engine_compute_refusal(exc)
+                    raise
                 hard_reason = f"unknown: {exc}"
             else:
                 liquid_fraction = float(raw_liquid_fraction)

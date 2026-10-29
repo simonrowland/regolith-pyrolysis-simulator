@@ -70,6 +70,10 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.fe_redox import normalize_redox_state
+from simulator.engine_pool import (
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
+)
 from simulator.alphamelts_reference_pressure import (
     ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR,
     alphamelts_condensed_phase_pressure_bar,
@@ -716,6 +720,9 @@ class AlphaMELTSProvider(ChemistryProvider):
                 species_formula_registry=species_registry,
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             typed_failure = liquidus_sample_error_from_exception(exc)
             if typed_failure is not None:
                 status = typed_failure.status
@@ -827,6 +834,9 @@ class AlphaMELTSProvider(ChemistryProvider):
                 species_formula_registry=species_registry,
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             typed_failure = liquidus_sample_error_from_exception(exc)
             if typed_failure is not None:
                 return mode, completed(EquilibriumCrystallizationPathResult(

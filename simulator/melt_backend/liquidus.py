@@ -14,6 +14,10 @@ from simulator.melt_backend.base import (
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_regime import liquid_fraction_invalidity
+from simulator.engine_pool import (
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
+)
 
 
 # MAGEMin-facing default only - the generic finder stays unbounded so
@@ -91,6 +95,25 @@ def _sample_error_with_exception_context(
     diagnostics.setdefault('exception_class', type(exc).__name__)
     diagnostics.setdefault('exception_message', str(exc))
     return LiquidusSampleError(exc.status, exc.warnings, diagnostics)
+
+
+def _mark_liquidus_engine_refusal(exc: BaseException) -> bool:
+    diagnostics = getattr(exc, 'diagnostics', None)
+    diagnostics = diagnostics if isinstance(diagnostics, Mapping) else {}
+    if not (
+        _is_engine_compute_refusal(exc)
+        or diagnostics.get('terminal_refusal') is True
+        or diagnostics.get('reason_code') == 'engine_compute_timeout'
+        or diagnostics.get('backend_failure_disposition') == 'environment'
+    ):
+        return False
+    kind = (
+        diagnostics.get('timeout_kind')
+        or diagnostics.get('backend_failure_exception')
+        or diagnostics.get('exception_class')
+    )
+    _mark_engine_compute_refusal(exc, kind)
+    return True
 
 
 class _LiquidusNonMonotoneError(RuntimeError):
@@ -454,17 +477,6 @@ def find_liquidus_solidus_by_fraction(
                 diagnostics=_budget_diagnostics(),
             )
 
-    def mark_engine_timeout_refusal(exc: BaseException) -> None:
-        """Keep the engine exception type while making its timeout terminal."""
-        exc.terminal_refusal = True
-        exc.reason_code = 'engine_compute_timeout'
-        exc.timeout_kind = type(exc).__name__
-        exc.diagnostic = {
-            'reason': 'engine_compute_timeout',
-            'terminal_refusal': True,
-            'timeout_kind': exc.timeout_kind,
-        }
-
     def sample(T_C: float) -> MeltFractionSample:
         nonlocal last_T_C
         check_budget()
@@ -488,14 +500,11 @@ def find_liquidus_solidus_by_fraction(
             except _LiquidusFinderBudgetExceeded:
                 raise
             except LiquidusSampleError as exc:
-                engine_timeout = (
-                    exc.diagnostics.get('reason') == 'engine_compute_timeout'
-                    and exc.diagnostics.get('terminal_refusal') is True
-                )
+                if _mark_liquidus_engine_refusal(exc):
+                    raise
                 if (
                     deadline is not None
                     and time.monotonic() >= deadline
-                    and not engine_timeout
                 ):
                     raise _LiquidusFinderBudgetExceeded(
                         budget_warning(),
@@ -503,23 +512,24 @@ def find_liquidus_solidus_by_fraction(
                     ) from exc
                 raise _sample_error_with_exception_context(exc) from exc
             except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
-                if isinstance(exc, TimeoutError):
-                    mark_engine_timeout_refusal(exc)
+                if _mark_liquidus_engine_refusal(exc):
                     raise
                 projected = _sample_error_for_declared_engine_failure(exc)
                 if projected is None:
                     raise
                 raise projected from exc
             except MeltBackendError as exc:
-                if isinstance(exc, TimeoutError):
-                    mark_engine_timeout_refusal(exc)
+                if _mark_liquidus_engine_refusal(exc):
                     raise
                 projected = liquidus_sample_error_from_exception(exc)
                 if projected is None:
                     raise
                 raise projected from exc
             except TimeoutError as exc:
-                mark_engine_timeout_refusal(exc)
+                _mark_engine_compute_refusal(exc, type(exc).__name__)
+                raise
+            except Exception as exc:
+                _mark_liquidus_engine_refusal(exc)
                 raise
             raw_fraction_by_temperature[temperature_C] = raw
         frac = _clamp_fraction(raw)
@@ -590,7 +600,49 @@ def find_liquidus_solidus_by_fraction(
             max_iterations=max_bisection_iterations,
         )
         iterations += liquidus_iterations
+    except _LiquidusFinderBudgetExceeded as exc:
+        return LiquidusSolidusResult(
+            status='not_converged',
+            warnings=tuple([*smoothing_warnings, str(exc)]),
+            samples=tuple(samples),
+            iterations=iterations,
+            diagnostics=_budget_diagnostics(),
+        )
     except LiquidusSampleError as exc:
+        if _mark_liquidus_engine_refusal(exc):
+            if deadline is not None and time.monotonic() >= deadline:
+                engine_diagnostics = dict(exc.diagnostics)
+                diagnostics = _budget_diagnostics()
+                diagnostics.update({
+                    'backend_failure_exception': (
+                        engine_diagnostics.get('backend_failure_exception')
+                        or engine_diagnostics.get('exception_class')
+                        or type(exc).__name__
+                    ),
+                    'backend_failure_disposition': (
+                        engine_diagnostics.get(
+                            'backend_failure_disposition'
+                        )
+                        or 'environment'
+                    ),
+                    'engine_timeout_kind': (
+                        engine_diagnostics.get('timeout_kind')
+                        or type(exc).__name__
+                    ),
+                    'engine_failure_diagnostic': engine_diagnostics,
+                })
+                return LiquidusSolidusResult(
+                    status='not_converged',
+                    warnings=tuple([
+                        *smoothing_warnings,
+                        budget_warning(),
+                        *exc.warnings,
+                    ]),
+                    samples=tuple(samples),
+                    iterations=iterations,
+                    diagnostics=diagnostics,
+                )
+            raise
         return LiquidusSolidusResult(
             status=exc.status,
             warnings=tuple([*smoothing_warnings, *exc.warnings]),
@@ -798,6 +850,8 @@ def build_equilibrium_crystallization_path(
     except LiquidFractionInvalidError:
         raise
     except LiquidusSampleError as exc:
+        if _mark_liquidus_engine_refusal(exc):
+            raise
         return _equilibrium_path_from_sample_error(
             exc,
             smoothing_warnings=smoothing_warnings,
@@ -805,6 +859,8 @@ def build_equilibrium_crystallization_path(
             samples=samples,
         )
     except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
+        if _mark_liquidus_engine_refusal(exc):
+            raise
         projected = _sample_error_for_declared_engine_failure(exc)
         if projected is None:
             raise
@@ -815,6 +871,8 @@ def build_equilibrium_crystallization_path(
             samples=samples,
         )
     except MeltBackendError as exc:
+        if _mark_liquidus_engine_refusal(exc):
+            raise
         projected = liquidus_sample_error_from_exception(exc)
         if projected is None:
             raise

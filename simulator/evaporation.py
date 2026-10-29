@@ -30,7 +30,10 @@ from simulator.melt_backend.liquidus import (
     LIQUIDUS_LIQUID_EPSILON,
     LiquidusSampleError,
 )
-from simulator.engine_pool import EngineWorkerTimeout
+from simulator.engine_pool import (
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
+)
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -2731,9 +2734,13 @@ class EvaporationMixin:
         if callable(register_gate_providers):
             try:
                 register_gate_providers()
-            except TimeoutError:
+            except TimeoutError as exc:
+                _mark_engine_compute_refusal(exc, type(exc).__name__)
                 raise
             except Exception as exc:  # noqa: BLE001 - optional provider boundary
+                if _is_engine_compute_refusal(exc):
+                    _mark_engine_compute_refusal(exc)
+                    raise
                 record_gate_curve_provider_outcome(
                     self,
                     GateCurveProviderOutcome.FAILED,
@@ -2743,35 +2750,71 @@ class EvaporationMixin:
                     f'gate provider registration failed: {type(exc).__name__}',
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
-        for attempt in range(2):
-            try:
-                result = self._dispatch_only(
-                    ChemistryIntent.GATE_LIQUID_FRACTION,
-                    control_inputs={},
-                    fO2_log=fO2_log,
-                    redox_state=redox_state,
-                    fe_redox_policy='intrinsic',
+        try:
+            result = self._dispatch_only(
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                control_inputs={},
+                fO2_log=fO2_log,
+                redox_state=redox_state,
+                fe_redox_policy='intrinsic',
+            )
+        except (ProviderUnavailableError, LiquidusSampleError) as exc:
+            sample_diagnostic = dict(
+                getattr(exc, 'diagnostics', {}) or {}
+            )
+            if (
+                _is_engine_compute_refusal(exc)
+                or sample_diagnostic.get('terminal_refusal') is True
+                or sample_diagnostic.get('reason_code')
+                == 'engine_compute_timeout'
+                or sample_diagnostic.get('backend_failure_disposition')
+                == 'environment'
+            ):
+                _mark_engine_compute_refusal(
+                    exc,
+                    sample_diagnostic.get('timeout_kind'),
                 )
-            except (
-                ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
-            ) as exc:
-                diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
-                if isinstance(exc, EngineWorkerTimeout):
-                    diagnostic['reason'] = 'engine_worker_timeout'
-                diagnostic['exception_class'] = type(exc).__name__
-                diagnostic['exception_message'] = str(exc)
-                status = str(getattr(exc, 'status', 'unavailable'))
-                warnings = list(getattr(exc, 'warnings', ()) or ())
-            else:
-                diagnostic = dict(getattr(result, 'diagnostic', None) or {})
-                status = str(
-                    getattr(result, 'status', None)
-                    or diagnostic.get('backend_status')
-                    or 'unavailable'
-                )
-                warnings = list(getattr(result, 'warnings', ()) or ())
-            if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
-                break
+                raise
+            diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
+            diagnostic['exception_class'] = type(exc).__name__
+            diagnostic['exception_message'] = str(exc)
+            status = str(getattr(exc, 'status', 'unavailable'))
+            warnings = list(getattr(exc, 'warnings', ()) or ())
+        except Exception as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+            raise
+        else:
+            diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+            status = str(
+                getattr(result, 'status', None)
+                or diagnostic.get('backend_status')
+                or 'unavailable'
+            )
+            warnings = list(getattr(result, 'warnings', ()) or ())
+        if (
+            gate_curve_provider_timed_out(diagnostic)
+            or diagnostic.get('backend_failure_disposition') == 'environment'
+            or diagnostic.get('terminal_refusal') is True
+        ):
+            timeout_kind = (
+                diagnostic.get('timeout_kind')
+                or diagnostic.get('backend_failure_exception')
+                or diagnostic.get('exception_class')
+                or 'engine_compute_timeout'
+            )
+            refusal = EvaporationFluxRefusal(
+                'engine_compute_timeout',
+                {
+                    'reason': 'engine_compute_timeout',
+                    'reason_code': 'engine_compute_timeout',
+                    'terminal_refusal': True,
+                    'timeout_kind': str(timeout_kind),
+                    'provider_diagnostic': diagnostic,
+                },
+            )
+            _mark_engine_compute_refusal(refusal, str(timeout_kind))
+            raise refusal
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
@@ -2799,10 +2842,7 @@ class EvaporationMixin:
                 **({'detail': diagnostic['exception_message']}
                    if diagnostic.get('exception_message') else {}),
             }
-            if (
-                status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
-                or gate_curve_provider_timed_out(diagnostic)
-            ):
+            if status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE:
                 held = self._hold_freeze_gate_provider_curve(failure)
                 if held is not None:
                     return held
@@ -3562,9 +3602,13 @@ class EvaporationMixin:
                     effective_pressure_species_ids=effective_pressure_species_ids,
                 ),
             )
-        except TimeoutError:
+        except TimeoutError as exc:
+            _mark_engine_compute_refusal(exc, type(exc).__name__)
             raise
         except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             self._last_vapour_batch_resolve_error = {
                 'status': 'unavailable',
                 'reason': 'vapour_batch_resolve_failed',

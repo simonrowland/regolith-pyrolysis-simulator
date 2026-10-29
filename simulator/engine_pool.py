@@ -20,6 +20,7 @@ import threading
 import time
 import traceback
 import weakref
+from collections.abc import Mapping
 from concurrent.futures import Future
 from pathlib import Path
 from typing import Any, Callable, Optional
@@ -103,6 +104,79 @@ class EngineWorkerRemoteError(RuntimeError):
         self.detail = detail
         self.remote_traceback = remote_traceback
         self.failure_disposition = failure_disposition
+
+
+def _mark_engine_compute_refusal(
+    exc: BaseException,
+    timeout_kind: Optional[str] = None,
+) -> None:
+    """Mark a worker timeout or environment failure without wrapping it."""
+    prior = getattr(exc, 'diagnostic', None)
+    if not isinstance(prior, Mapping):
+        prior = getattr(exc, 'diagnostics', None)
+    prior = prior if isinstance(prior, Mapping) else {}
+    kind = (
+        timeout_kind
+        or getattr(exc, 'timeout_kind', None)
+        or getattr(exc, 'exception_type', None)
+        or getattr(exc, 'exc_name', None)
+        or getattr(exc, 'exception_class', None)
+        or prior.get('timeout_kind')
+        or prior.get('backend_failure_exception')
+        or prior.get('exception_class')
+        or type(exc).__name__
+    )
+    exc.terminal_refusal = True
+    exc.reason_code = 'engine_compute_timeout'
+    exc.timeout_kind = str(kind)
+    diagnostic = dict(prior)
+    diagnostic.update({
+        'reason': 'engine_compute_timeout',
+        'terminal_refusal': True,
+        'timeout_kind': exc.timeout_kind,
+    })
+    exc.diagnostic = diagnostic
+
+
+def _is_engine_compute_refusal(exc: BaseException) -> bool:
+    """Recognize compute timeouts and explicitly classified engine failures."""
+    diagnostics = getattr(exc, 'diagnostic', None)
+    if not isinstance(diagnostics, Mapping):
+        diagnostics = getattr(exc, 'diagnostics', None)
+    if isinstance(diagnostics, Mapping) and (
+        diagnostics.get('terminal_refusal') is True
+        or diagnostics.get('reason_code') == 'engine_compute_timeout'
+        or diagnostics.get('reason') == 'engine_compute_timeout'
+        or diagnostics.get('backend_failure_disposition') == 'environment'
+        or diagnostics.get('backend_failure_reason_code') == 'timeout'
+        or diagnostics.get('backend_status_reason') == 'timeout'
+    ):
+        return True
+    if isinstance(diagnostics, Mapping):
+        diagnostic_kind = str(
+            diagnostics.get('timeout_kind')
+            or diagnostics.get('backend_failure_exception')
+            or diagnostics.get('exception_class')
+            or ''
+        ).lower()
+        if 'timeout' in diagnostic_kind or 'budgetexceeded' in diagnostic_kind:
+            return True
+    if (
+        getattr(exc, 'terminal_refusal', False)
+        or getattr(exc, 'reason_code', None) == 'engine_compute_timeout'
+        or getattr(exc, 'failure_disposition', None) == 'environment'
+        or isinstance(exc, TimeoutError)
+        or type(exc).__name__ == 'TimeoutExpired'
+    ):
+        return True
+    kind = str(
+        getattr(exc, 'timeout_kind', None)
+        or getattr(exc, 'exception_type', None)
+        or getattr(exc, 'exc_name', None)
+        or getattr(exc, 'exception_class', None)
+        or ''
+    ).lower()
+    return 'timeout' in kind or 'budgetexceeded' in kind
 
 
 class EngineWorkerPoolLifecycleError(RuntimeError):

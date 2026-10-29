@@ -60,6 +60,10 @@ from simulator.battery.identity import (
     quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
 )
+from simulator.engine_pool import (
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
+)
 from simulator.battery.polymorph_dictionary import canonical_element_allotrope
 from simulator.battery.records import (
     DecisionBand,
@@ -1537,9 +1541,13 @@ def _pure_phase_attempt(
             second = caller(engine, symbol, _H298_K, pressure_bar)
         elif quantity is Quantity.H_MINUS_H298:
             second = props
-    except TimeoutError:
+    except TimeoutError as exc:
+        _mark_engine_compute_refusal(exc, type(exc).__name__)
         raise
     except PurePhaseAccessError as exc:
+        if _is_engine_compute_refusal(exc):
+            _mark_engine_compute_refusal(exc)
+            raise
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
             "pure-phase-unavailable",
@@ -1548,6 +1556,9 @@ def _pure_phase_attempt(
             extra={"engine": engine.value, "detail": str(exc)},
         )
     except (ImportError, ValueError, OSError, RuntimeError) as exc:
+        if _is_engine_compute_refusal(exc):
+            _mark_engine_compute_refusal(exc)
+            raise
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
             "pure-phase-unavailable",
@@ -1578,7 +1589,8 @@ def _pure_phase_attempt(
         else:
             try:
                 fetched = caller(engine, symbol, t_ref_float, pressure_bar)
-            except TimeoutError:
+            except TimeoutError as exc:
+                _mark_engine_compute_refusal(exc, type(exc).__name__)
                 raise
             except (
                 PurePhaseAccessError,
@@ -1587,6 +1599,9 @@ def _pure_phase_attempt(
                 OSError,
                 RuntimeError,
             ) as exc:
+                if _is_engine_compute_refusal(exc):
+                    _mark_engine_compute_refusal(exc)
+                    raise
                 # A missing H at T_ref is still the Cp·ΔT fallback. The
                 # notice has to say the H call failed, not only term=engine-Cp.
                 fetched = None

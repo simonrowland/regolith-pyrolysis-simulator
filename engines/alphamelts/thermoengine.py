@@ -36,6 +36,8 @@ from simulator.engine_pool import (
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
     WarmEngineWorker,
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
 )
 from engines.alphamelts.petthermo import (
     _PetThermoToolsExternalCallFailure,
@@ -1082,6 +1084,9 @@ class ThermoEngineTransport:
         try:
             self.engine_version = str(self._worker.start())
         except EngineWorkerRemoteError as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             raise RuntimeError(
                 f'ThermoEngine initialization failed: {exc.detail}\n'
                 f'{exc.remote_traceback}'
@@ -1319,9 +1324,12 @@ print('ok')
             'ThermoEngineFO2OmittedError': ThermoEngineFO2OmittedError,
             'ThermoEngineNotConvergedError': ThermoEngineNotConvergedError,
         }.get(exc_name, RuntimeError)
-        raise exception_type(
+        failure = exception_type(
             f'ThermoEngine equilibrium failed: {detail}\n{child_traceback}'
         )
+        if _is_engine_compute_refusal(exc):
+            _mark_engine_compute_refusal(failure, exc_name)
+        raise failure from exc
 
     def pure_phase_properties(
         self,
@@ -1363,6 +1371,9 @@ print('ok')
         except EngineWorkerRemoteError as exc:
             if exc.exc_name == 'PurePhaseUnknownSymbolError':
                 raise PurePhaseUnknownSymbolError(exc.detail) from exc
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             raise PurePhaseAccessError(
                 f'ThermoEngine pure-phase query failed: {exc.detail}\n'
                 f'{exc.remote_traceback}'

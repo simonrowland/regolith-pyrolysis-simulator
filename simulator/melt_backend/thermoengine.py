@@ -24,7 +24,10 @@ from engines.alphamelts.thermoengine import (
     thermoengine_refusal_cause_from_exception,
     thermoengine_timeout_cause_from_exception,
 )
-from simulator.engine_pool import EngineWorkerTimeout
+from simulator.engine_pool import (
+    EngineWorkerTimeout,
+    _mark_engine_compute_refusal,
+)
 from simulator.config import resolve_grid_engine_model
 from simulator.melt_backend.alphamelts import (
     VaporPressureActivityRefusal,
@@ -595,13 +598,12 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             eq.fe_redox_split = dict(payload.fe_redox_split)
             return self._fail_closed_on_clamped_operating_point(eq)
         except EngineWorkerTimeout as exc:
-            # Warm-call wall: unfinished computation, not absence and
-            # not a policy refusal. Retype onto the closed timeout set
-            # so consumers can classify by token.
-            raise ThermoEngineTimeoutError(
+            timeout = ThermoEngineTimeoutError(
                 ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT,
                 timeout_s=exc.timeout_s,
-            ) from exc
+            )
+            _mark_engine_compute_refusal(timeout, exc.timeout_kind)
+            raise timeout from exc
         except (
             ThermoEngineTimeoutError,
             ThermoEngineNonFiniteField,

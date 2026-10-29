@@ -88,6 +88,8 @@ from simulator.engine_pool import (
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
     WarmEngineWorker,
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
 )
 from simulator.melt_backend.alphamelts_contract import (
     AlphaMELTSSubprocessRunMode,
@@ -2011,6 +2013,9 @@ class _MELTSBackendSupport(MeltBackend):
                     species_formula_registry=species_formula_registry,
                 )
             except Exception as exc:
+                if _is_engine_compute_refusal(exc):
+                    _mark_engine_compute_refusal(exc)
+                    raise
                 typed_failure = liquidus_sample_error_from_exception(exc)
                 if typed_failure is None:
                     raise
@@ -3105,6 +3110,9 @@ class _MELTSBackendSupport(MeltBackend):
                 f'{timeout_s:g}s',
             ) from exc
         except EngineWorkerRemoteError as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             if exc.exc_name in {'ImportError', '_PetThermoToolsUnavailable'}:
                 raise _PetThermoToolsUnavailable(
                     f'PetThermoTools {operation} failed: {exc.detail}\n'
@@ -3376,16 +3384,17 @@ class _MELTSBackendSupport(MeltBackend):
             self._mode = None
             raise
         except EngineWorkerTimeout as exc:
-            return None, (
-                f'PetThermoTools findLiq failed '
-                f'({type(exc).__name__}): {exc}',
-            )
+            _mark_engine_compute_refusal(exc, exc.timeout_kind)
+            raise
         except ImportError as exc:
             return None, (
                 f'PetThermoTools findLiq unavailable '
                 f'({type(exc).__name__}): {exc}',
             )
         except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             origin = getattr(exc, 'exception_class', type(exc).__name__)
             detail = getattr(exc, 'message', str(exc))
             return None, (

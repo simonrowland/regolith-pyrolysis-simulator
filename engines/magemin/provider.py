@@ -68,6 +68,10 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.fe_redox import normalize_redox_state
+from simulator.engine_pool import (
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
+)
 from simulator.melt_backend.base import (
     RealBackendAuthority,
     RealBackendFamily,
@@ -523,10 +527,13 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             if not self._backend_initialised:
                 try:
                     self._backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
-                except TimeoutError:
+                except TimeoutError as exc:
+                    _mark_engine_compute_refusal(exc, type(exc).__name__)
                     raise
-                except Exception:
-                    pass
+                except Exception as exc:
+                    if _is_engine_compute_refusal(exc):
+                        _mark_engine_compute_refusal(exc)
+                        raise
                 self._backend_initialised = True
             return self._backend
         backend = None
@@ -540,19 +547,23 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     self, _enqueue_backend_close, close, os.getpid()
                 )
             backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
-        except TimeoutError:
+        except TimeoutError as exc:
             if backend_finalizer is not None:
                 try:
                     backend_finalizer()
                 except Exception:
                     pass
+            _mark_engine_compute_refusal(exc, type(exc).__name__)
             raise
-        except Exception:
+        except Exception as exc:
             if backend_finalizer is not None:
                 try:
                     backend_finalizer()
                 except Exception:
                     pass
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             self._backend = None
             self._backend_finalizer = None
             return None
@@ -567,7 +578,10 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         if callable(is_avail):
             try:
                 return bool(is_avail())
-            except Exception:
+            except Exception as exc:
+                if _is_engine_compute_refusal(exc):
+                    _mark_engine_compute_refusal(exc)
+                    raise
                 return False
         return False
 
