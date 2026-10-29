@@ -289,20 +289,27 @@ def runner_golden_loader(tmp_path_factory):
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
-        if item.get_closest_marker("cpu_budget") is None:
+        get_closest_marker = getattr(item, "get_closest_marker", None)
+        if not callable(get_closest_marker):
+            continue
+        if get_closest_marker("cpu_budget") is None:
             continue
         try:
             budget_seconds = cpu_budget_seconds(item)
         except ValueError as exc:
             raise pytest.UsageError(f"{item.nodeid}: {exc}") from exc
-        if item.get_closest_marker("timeout") is not None:
+        if get_closest_marker("timeout") is not None:
             continue
         item.add_marker(pytest.mark.timeout(wall_guard_seconds(budget_seconds)))
 
     if PLAYWRIGHT_SYNC_API is not None:
         return
     for item in items:
-        if item.get_closest_marker("browser_e2e") is not None:
+        get_closest_marker = getattr(item, "get_closest_marker", None)
+        if (
+            callable(get_closest_marker)
+            and get_closest_marker("browser_e2e") is not None
+        ):
             item.add_marker(PLAYWRIGHT_SKIP_MARK)
 
 
@@ -350,6 +357,8 @@ def _start_cpu_budget(item: pytest.Item) -> None:
     CPU is budgeted; child and engine-pool CPU is outside the budget and bounded
     only by the wall-clock hang guard.
     """
+    if not callable(getattr(item, "get_closest_marker", None)):
+        return
     budget_seconds = cpu_budget_seconds(item)
     state = _CpuBudgetState(
         budget_seconds=budget_seconds,
@@ -584,13 +593,18 @@ def pytest_runtest_protocol(
         finally:
             _DOCS_PRIVATE_ACTIVE_TEST_NODEID = previous_nodeid
     finally:
-        if _CPU_BUDGET_STATE in item.stash:
-            del item.stash[_CPU_BUDGET_STATE]
+        stash = getattr(item, "stash", None)
+        if stash is not None and _CPU_BUDGET_STATE in stash:
+            del stash[_CPU_BUDGET_STATE]
 
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_call(item: pytest.Item) -> Iterator[object]:
-    state = item.stash[_CPU_BUDGET_STATE]
+    stash = getattr(item, "stash", None)
+    if stash is None or _CPU_BUDGET_STATE not in stash:
+        yield
+        return
+    state = stash[_CPU_BUDGET_STATE]
     started_cpu_seconds = time.process_time()
     started_wall_seconds = time.monotonic()
     yield
@@ -609,9 +623,10 @@ def pytest_runtest_makereport(
     report = outcome.get_result()
     _wall_guard_failure(report)
 
-    if _CPU_BUDGET_STATE not in item.stash:
+    stash = getattr(item, "stash", None)
+    if stash is None or _CPU_BUDGET_STATE not in stash:
         return
-    state = item.stash[_CPU_BUDGET_STATE]
+    state = stash[_CPU_BUDGET_STATE]
     if (
         report.when == "call"
         and state.call_cpu_seconds > state.budget_seconds

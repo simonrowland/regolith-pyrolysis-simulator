@@ -29,6 +29,19 @@ def test_runtest_protocol_accepts_items_without_marker_api(
     with pytest.raises(StopIteration):
         next(protocol)
 
+    conftest.pytest_collection_modifyitems([SimpleNamespace()])
+
+    call_phase = conftest.pytest_runtest_call(SimpleNamespace())
+    assert next(call_phase) is None
+    with pytest.raises(StopIteration):
+        next(call_phase)
+
+    report = SimpleNamespace(failed=False)
+    report_hook = conftest.pytest_runtest_makereport(SimpleNamespace(), None)
+    assert next(report_hook) is None
+    with pytest.raises(StopIteration):
+        report_hook.send(SimpleNamespace(get_result=lambda: report))
+
 
 def _run_probe(
     tmp_path: Path,
