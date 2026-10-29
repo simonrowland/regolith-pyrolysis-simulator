@@ -2233,3 +2233,66 @@ def test_authoritative_gate_preserves_returned_ec_sample_refusal(
     assert result.status != 'not_converged'
     diagnostic = dict(result.diagnostic or {})
     assert diagnostic.get('backend_status_reason') == f'{sample_status}_reason'
+
+
+@pytest.mark.parametrize(
+    'intent',
+    [
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+    ],
+)
+@pytest.mark.parametrize('failure_kind', ['worker_timeout', 'remote_environment'])
+def test_provider_preserves_terminal_liquidus_engine_failure(
+    intent, failure_kind,
+):
+    from simulator.engine_pool import EngineWorkerRemoteError, EngineWorkerTimeout
+
+    if failure_kind == 'worker_timeout':
+        failure = EngineWorkerTimeout(
+            'AlphaMELTS liquidus', 0.1, phase='job'
+        )
+        mode = (
+            'thermoengine'
+            if intent is ChemistryIntent.SILICATE_LIQUIDUS
+            else 'python_api'
+        )
+    else:
+        failure = EngineWorkerRemoteError(
+            'TimeoutExpired',
+            'AlphaMELTS liquidus worker timed out',
+            'worker traceback',
+            failure_disposition='environment',
+        )
+        mode = (
+            'thermoengine'
+            if intent is ChemistryIntent.SILICATE_LIQUIDUS
+            else 'python_api'
+        )
+
+    backend = _FakeAlphaMELTSBackend(
+        mode=mode,
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+
+    def fail(**_kwargs):
+        raise failure
+
+    backend.find_liquidus_solidus = fail
+    provider = AlphaMELTSProvider(backend=backend)
+
+    with pytest.raises(type(failure)) as caught:
+        provider.dispatch(
+            _make_request(
+                intent,
+                composition_mol=_basalt_species_mol(),
+            )
+        )
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind in {
+        'EngineWorkerTimeout',
+        'TimeoutExpired',
+    }

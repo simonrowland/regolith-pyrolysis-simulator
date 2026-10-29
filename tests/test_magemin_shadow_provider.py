@@ -416,20 +416,146 @@ def test_liquidus_finder_keyerror_propagates():
 
 
 def test_backend_initialization_timeout_propagates(monkeypatch):
+    failure = EngineWorkerTimeout(
+        'MAGEMin startup', 0.1, phase='initialization'
+    )
+
     class TimedOutBackend:
         def initialize(self, _config):
-            raise EngineWorkerTimeout(
-                'MAGEMin startup', 0.1, phase='initialization'
-            )
+            raise failure
 
     monkeypatch.setattr(provider_module, '_ensure_close_reaper', lambda: None)
     provider = MAGEMinShadowProvider(backend=TimedOutBackend())
     provider._backend_initialised = False
 
-    with pytest.raises(EngineWorkerTimeout, match='MAGEMin startup'):
+    with pytest.raises(Exception) as caught:
         provider._ensure_backend()
 
+    assert caught.value is failure
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'EngineWorkerTimeout'
     assert provider._backend_initialised is False
+
+
+def test_provider_does_not_swallow_marked_remote_startup_refusal(monkeypatch):
+    from simulator.engine_pool import (
+        EngineWorkerRemoteError,
+        _mark_engine_compute_refusal,
+    )
+
+    failure = EngineWorkerRemoteError(
+        'TimeoutExpired', 'MAGEMin worker startup timed out', 'trace',
+        failure_disposition='environment',
+    )
+    _mark_engine_compute_refusal(failure, 'TimeoutExpired')
+
+    class RemoteFailureBackend:
+        def initialize(self, _config):
+            raise failure
+
+    monkeypatch.setattr(provider_module, '_ensure_close_reaper', lambda: None)
+    provider = MAGEMinShadowProvider(backend=RemoteFailureBackend())
+    provider._backend_initialised = False
+
+    with pytest.raises(Exception) as caught:
+        provider._ensure_backend()
+
+    assert caught.value is failure
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'TimeoutExpired'
+
+
+def test_provider_does_not_swallow_marked_new_backend_startup_refusal(
+    monkeypatch,
+):
+    import simulator.melt_backend.magemin as magemin_module
+    from simulator.engine_pool import (
+        EngineWorkerRemoteError,
+        _mark_engine_compute_refusal,
+    )
+
+    failure = EngineWorkerRemoteError(
+        'TimeoutExpired', 'MAGEMin worker startup timed out', 'trace',
+        failure_disposition='environment',
+    )
+    _mark_engine_compute_refusal(failure, 'TimeoutExpired')
+
+    class RemoteFailureBackend:
+        def __init__(self):
+            self.closed = False
+
+        def initialize(self, _config):
+            raise failure
+
+        def close(self):
+            self.closed = True
+
+    monkeypatch.setattr(provider_module, '_ensure_close_reaper', lambda: None)
+    monkeypatch.setattr(
+        magemin_module, 'MAGEMinBackend', RemoteFailureBackend
+    )
+    provider = MAGEMinShadowProvider()
+
+    with pytest.raises(Exception) as caught:
+        provider._ensure_backend()
+
+    assert caught.value is failure
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'TimeoutExpired'
+
+
+def test_provider_preserves_remote_startup_refusal_from_diagnostic_only(
+    monkeypatch,
+):
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    failure = EngineWorkerRemoteError(
+        'WorkerStartupError', 'worker startup timed out', 'trace'
+    )
+    failure.diagnostic = {
+        'reason': 'engine_compute_timeout',
+        'terminal_refusal': True,
+        'timeout_kind': 'EngineWorkerTimeout',
+    }
+
+    class RemoteFailureBackend:
+        def initialize(self, _config):
+            raise failure
+
+    monkeypatch.setattr(provider_module, '_ensure_close_reaper', lambda: None)
+    provider = MAGEMinShadowProvider(backend=RemoteFailureBackend())
+    provider._backend_initialised = False
+
+    with pytest.raises(EngineWorkerRemoteError) as caught:
+        provider._ensure_backend()
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.diagnostic['terminal_refusal'] is True
+
+
+def test_backend_availability_timeout_remains_a_terminal_refusal():
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    failure = EngineWorkerRemoteError(
+        'TimeoutExpired',
+        'MAGEMin worker availability timed out',
+        'trace',
+        failure_disposition='environment',
+    )
+
+    class TimedOutBackend:
+        def is_available(self):
+            raise failure
+
+    with pytest.raises(EngineWorkerRemoteError) as caught:
+        MAGEMinShadowProvider._backend_available(TimedOutBackend())
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'TimeoutExpired'
 
 
 def test_provider_parity_accepts_equal_optional_fo2_state_points() -> None:

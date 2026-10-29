@@ -276,10 +276,8 @@ def _make_absent_magemin(monkeypatch):
 class _ImmediateFailurePool:
     def __init__(self, exception):
         self.exception = exception
-        self.submit_calls = 0
 
     def submit(self, *_args, **_kwargs):
-        self.submit_calls += 1
         future = Future()
         future.set_exception(self.exception)
         return future
@@ -930,9 +928,6 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
     assert backend._subprocess_pool.workers[0].call_timeout_s == pytest.approx(
         MAGEMIN_WARM_CALL_TIMEOUT_S
     )
-    assert backend._subprocess_pool.workers[0].startup_timeout_s == pytest.approx(
-        MAGEMIN_WORKER_STARTUP_TIMEOUT_S
-    )
 
     projection = backend._build_db_bulk_projection({
         'SiO2': 60.0,
@@ -944,10 +939,7 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
         MAGEMIN_WARM_CALL_TIMEOUT_S + 0.5
     )
     assert submitted['result_timeout_s'] == pytest.approx(
-        engine_pool.WarmEngineWorker._caller_future_timeout_s(
-            MAGEMIN_WARM_CALL_TIMEOUT_S,
-            MAGEMIN_WORKER_STARTUP_TIMEOUT_S,
-        )
+        47.4
     )
     assert backend._call_magemin(
         projection,
@@ -1098,7 +1090,7 @@ def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend():
         ),
     ],
 )
-def test_magemin_equilibrate_retries_once_after_worker_or_slot_timeout(
+def test_magemin_equilibrate_retries_worker_or_slot_timeout_once(
     monkeypatch, timeout_error,
 ):
     backend = MAGEMinBackend()
@@ -1119,8 +1111,8 @@ def test_magemin_equilibrate_retries_once_after_worker_or_slot_timeout(
         composition_mol={'SiO2': 1.0, 'MgO': 1.0},
     )
 
-    assert len(calls) == 2
     assert result.status == 'ok'
+    assert len(calls) == 2
 
 
 def test_magemin_worker_exit_returns_typed_not_converged():
@@ -1190,7 +1182,7 @@ def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
     assert 'no live consumer' in result.diagnostics['backend_failure_message']
 
 
-def test_magemin_in_process_budget_exhaustion_raises_typed_timeout():
+def test_magemin_in_process_budget_exhaustion_returns_terminal_status():
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = 'pymagemin'
@@ -1198,19 +1190,18 @@ def test_magemin_in_process_budget_exhaustion_raises_typed_timeout():
         minimize=lambda **_kwargs: {'phases': {'liq': {'mass_kg': 1.0}}}
     )
 
-    with pytest.raises(Exception) as raised:
-        backend.equilibrate(
-            1500.0,
-            composition_mol={'SiO2': 1.0},
-            fO2_log=-8.0,
-            pressure_bar=1.0,
-            call_timeout_s=0.0,
-        )
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+        call_timeout_s=0.0,
+    )
 
-    assert raised.value.terminal_refusal is True
-    assert raised.value.reason_code == 'engine_compute_timeout'
-    assert raised.value.timeout_kind == 'MAGEMinAggregateBudgetExceeded'
-    assert raised.value.diagnostic['timeout_kind'] == (
+    assert result.status == 'not_converged'
+    assert result.diagnostics['terminal_refusal'] is True
+    assert result.diagnostics['reason_code'] == 'engine_compute_timeout'
+    assert result.diagnostics['timeout_kind'] == (
         'MAGEMinAggregateBudgetExceeded'
     )
 
@@ -1240,8 +1231,12 @@ def test_magemin_equilibrate_records_environment_timeout_refusal(
         lambda _timeout: nullcontext(),
     )
 
+    timeout_error = None
+
     def timeout_run(args, *, timeout, **_kwargs):
-        raise subprocess.TimeoutExpired(args, timeout)
+        nonlocal timeout_error
+        timeout_error = subprocess.TimeoutExpired(args, timeout)
+        raise timeout_error
 
     monkeypatch.setattr(magemin_module.subprocess, 'run', timeout_run)
 
@@ -1253,12 +1248,13 @@ def test_magemin_equilibrate_records_environment_timeout_refusal(
     assert result.status == 'not_converged'
     assert result.diagnostics['backend_failure_exception'] == 'TimeoutExpired'
     assert result.diagnostics['backend_failure_disposition'] == 'environment'
-    assert result.diagnostics['reason'] == 'engine_compute_timeout'
     assert result.diagnostics['terminal_refusal'] is True
+    assert result.diagnostics['reason_code'] == 'engine_compute_timeout'
     assert result.diagnostics['timeout_kind'] == 'TimeoutExpired'
+    assert timeout_error is not None
 
 
-def test_magemin_subprocess_slot_timeout_raises_typed_refusal(
+def test_magemin_subprocess_slot_timeout_returns_terminal_status(
     monkeypatch, tmp_path,
 ):
     from simulator.melt_backend import magemin as magemin_module
@@ -1283,20 +1279,84 @@ def test_magemin_subprocess_slot_timeout_raises_typed_refusal(
     monkeypatch.setattr(magemin_module.fcntl, 'flock', contended_flock)
     monkeypatch.setattr(magemin_module.time, 'sleep', lambda _seconds: None)
 
-    with pytest.raises(Exception) as raised:
-        backend.equilibrate(
-            1500.0,
-            composition_mol={'SiO2': 1.0},
-            fO2_log=-8.0,
-            pressure_bar=1.0,
-        )
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
 
-    assert raised.value.terminal_refusal is True
-    assert raised.value.reason_code == 'engine_compute_timeout'
-    assert raised.value.exception_type == 'MAGEMinSubprocessSlotTimeout'
-    assert raised.value.diagnostic['timeout_kind'] == (
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinSubprocessSlotTimeout'
     )
+    assert result.diagnostics['terminal_refusal'] is True
+    assert result.diagnostics['reason_code'] == 'engine_compute_timeout'
+    assert result.diagnostics['timeout_kind'] == 'MAGEMinSubprocessSlotTimeout'
+
+
+def test_magemin_in_process_budget_exhaustion_returns_typed_status():
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'pymagemin'
+    backend._magemin_module = types.SimpleNamespace(
+        minimize=lambda **_kwargs: {'phases': {'liq': {'mass_kg': 1.0}}}
+    )
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+        call_timeout_s=0.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinAggregateBudgetExceeded'
+    )
+    assert 'aggregate liquidus budget exhausted' in (
+        result.diagnostics['backend_failure_message']
+    )
+
+
+def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
+    monkeypatch, tmp_path,
+):
+    from simulator.melt_backend import magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {'timeout_s': 0.001}
+    lock_path = tmp_path / 'magemin.lock'
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path
+    )
+    monkeypatch.setattr(magemin_module, '_MAGEMIN_SUBPROCESS_LOCK', lock_path)
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot_count', lambda: 1
+    )
+
+    def contended_flock(*_args, **_kwargs):
+        raise BlockingIOError
+
+    monkeypatch.setattr(magemin_module.fcntl, 'flock', contended_flock)
+    monkeypatch.setattr(magemin_module.time, 'sleep', lambda _seconds: None)
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinSubprocessSlotTimeout'
+    )
+    assert 'slot timed out' in result.diagnostics['backend_failure_message']
 
 
 @pytest.mark.parametrize(
@@ -1336,12 +1396,7 @@ def test_magemin_liquidus_budget_is_tight_only_for_warm_pool(
 
 
 def test_magemin_cold_liquidus_budget_retains_bounded_diagnostic_headroom():
-    assert liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S == pytest.approx(
-        1630.0
-    )
-    assert MAGEMIN_SUBPROCESS_CALL_TIMEOUT_S == pytest.approx(1630.0)
-    assert MAGEMIN_SUBPROCESS_SLOT_TIMEOUT_S == pytest.approx(1630.0)
-    assert MAGEMIN_WORKER_STARTUP_TIMEOUT_S == pytest.approx(1630.0)
+    assert liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S == pytest.approx(300.0)
 
 
 # The test pins its OWN coarse grid rather than relying on the backend's
@@ -2002,20 +2057,26 @@ def test_magemin_liquidus_finder_honors_aggregate_budget_config(monkeypatch):
         warnings.simplefilter("ignore", UserWarning)
         assert backend.initialize({"liquidus_finder_budget_s": 0.05}) is True
 
-    with pytest.raises(liquidus_module._LiquidusFinderBudgetExceeded) as expired:
-        backend.find_liquidus_solidus(
-            composition_mol={"SiO2": 1.0, "MgO": 1.0},
-            fO2_log=-8.0,
-            pressure_bar=1e-6,
-            min_T_C=800.0,
-            max_T_C=1500.0,
-            scan_step_C=100.0,
-            tolerance_C=1.0,
-        )
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
 
-    assert expired.value.diagnostics["reason"] == "aggregate_budget_exceeded"
-    assert expired.value.diagnostics["call_count"] == 1
-    assert expired.value.diagnostics["last_T_C"] == pytest.approx(800.0)
+    assert result.status == "not_converged"
+    assert len(result.samples) == 1
+    assert any(
+        "liquidus finder exceeded aggregate budget 0.05s after 1 calls"
+        in warning
+        for warning in result.warnings
+    )
+    assert result.diagnostics["reason"] == "aggregate_budget_exceeded"
+    assert result.diagnostics["call_count"] == 1
+    assert result.diagnostics["last_T_C"] == pytest.approx(800.0)
 
 
 def test_magemin_liquidus_finder_rejects_none_budget(monkeypatch):
@@ -2075,6 +2136,43 @@ def test_magemin_warm_worker_startup_timeout_propagates(monkeypatch):
     assert raised.value.terminal_refusal is True
     assert raised.value.reason_code == 'engine_compute_timeout'
     assert raised.value.timeout_kind == 'TimeoutError'
+
+
+def test_magemin_warm_worker_environment_error_keeps_remote_type(
+    monkeypatch,
+):
+    import simulator.melt_backend.magemin as magemin_module
+
+    _disable_configured_magemin_path(monkeypatch)
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_locate_binary',
+        staticmethod(lambda _explicit: Path('/fake/MAGEMin')),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_import_magemin_bridge',
+        lambda self, *, requested: ('subprocess', None),
+    )
+    failure = EngineWorkerRemoteError(
+        'PermissionError', 'worker could not read MAGEMin database', 'trace',
+        failure_disposition='environment',
+    )
+    monkeypatch.setattr(
+        magemin_module,
+        'EngineWorkerPool',
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(failure),
+    )
+    backend = MAGEMinBackend()
+
+    with pytest.raises(Exception) as raised:
+        backend.initialize({})
+
+    assert raised.value is failure
+    assert raised.value.terminal_refusal is True
+    assert raised.value.reason_code == 'engine_compute_timeout'
+    assert raised.value.timeout_kind == 'PermissionError'
+    assert raised.value.diagnostic['timeout_kind'] == 'PermissionError'
 
 
 @pytest.mark.parametrize(
@@ -2204,13 +2302,68 @@ def test_magemin_liquidus_subprocess_path_preserves_budget_diagnostics(
         tolerance_C=1.0,
     )
 
+    assert result.status == "not_converged"
     assert seen_timeouts == [pytest.approx(0.05)]
+    assert any(
+        "liquidus finder exceeded aggregate budget 0.05s after 0 calls"
+        in warning
+        for warning in result.warnings
+    )
+    assert result.diagnostics["reason"] == "aggregate_budget_exceeded"
+    assert result.diagnostics["call_count"] == 0
+    assert result.diagnostics["last_T_C"] == pytest.approx(800.0)
+    assert result.diagnostics["budget_s"] == pytest.approx(0.05)
+    assert result.diagnostics["elapsed_s"] == pytest.approx(0.05)
+    assert not any(
+        warning.startswith("liquidus finder failed:")
+        for warning in result.warnings
+    )
+
+
+def test_magemin_residual_timeout_keeps_budget_and_engine_refusal_diagnostics(
+    monkeypatch,
+):
+    clock = {'t': 0.0}
+
+    def fake_run(*args, **kwargs):
+        timeout = float(kwargs['timeout'])
+        clock['t'] += timeout
+        raise subprocess.TimeoutExpired(cmd=args[0], timeout=timeout)
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.subprocess.run', fake_run
+    )
+    monkeypatch.setattr(liquidus_module.time, 'monotonic', lambda: clock['t'])
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {
+        'timeout_s': 60.0,
+        'database': 'ig',
+        'liquidus_finder_budget_s': 0.05,
+    }
+    backend._database = 'ig'
+    backend._magemin_module = None
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
     assert result.status == 'not_converged'
-    assert result.diagnostics['backend_failure_exception'] == 'TimeoutExpired'
-    assert result.diagnostics['backend_failure_disposition'] == 'environment'
-    assert result.diagnostics['reason'] == 'engine_compute_timeout'
+    assert result.diagnostics['reason'] == 'aggregate_budget_exceeded'
+    assert result.diagnostics['reason_code'] == 'engine_compute_timeout'
     assert result.diagnostics['terminal_refusal'] is True
-    assert result.diagnostics['timeout_kind'] == 'TimeoutExpired'
+    assert result.diagnostics['timeout_kind'] == 'liquidus_scan'
+    assert result.diagnostics['backend_failure_exception'] == 'TimeoutExpired'
+    assert result.diagnostics['engine_timeout_kind'] == 'TimeoutExpired'
 
 
 def test_magemin_liquidus_finder_unavailable_without_backend():
@@ -3072,7 +3225,7 @@ def test_magemin_remote_engine_call_error_returns_typed_not_converged():
     )
 
 
-def test_magemin_remote_subprocess_slot_timeout_raises_typed_refusal():
+def test_magemin_remote_subprocess_slot_timeout_returns_terminal_status():
     from simulator.melt_backend.magemin import _MAGEMinEngineLifecycleError
 
     backend = _make_pooled_subprocess_backend(
@@ -3083,18 +3236,20 @@ def test_magemin_remote_subprocess_slot_timeout_raises_typed_refusal():
         )
     )
 
-    with pytest.raises(Exception) as raised:
-        backend.equilibrate(
-            1500.0,
-            composition_mol={'SiO2': 1.0},
-            fO2_log=-8.0,
-            pressure_bar=1.0,
-        )
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
 
-    assert raised.value.terminal_refusal is True
-    assert raised.value.reason_code == 'engine_compute_timeout'
-    assert raised.value.exception_type == 'MAGEMinSubprocessSlotTimeout'
-    assert raised.value.diagnostic['timeout_kind'] == (
+    assert result.status == 'not_converged'
+    assert result.diagnostics['terminal_refusal'] is True
+    assert result.diagnostics['reason_code'] == 'engine_compute_timeout'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinSubprocessSlotTimeout'
+    )
+    assert result.diagnostics['timeout_kind'] == (
         'MAGEMinSubprocessSlotTimeout'
     )
 
@@ -3110,7 +3265,7 @@ def test_magemin_liquidus_refuses_subprocess_slot_timeout():
         )
     )
 
-    with pytest.raises(Exception) as expired:
+    with pytest.raises(Exception) as raised:
         backend.find_liquidus_solidus(
             composition_mol={'SiO2': 1.0},
             fO2_log=-8.0,
@@ -3120,11 +3275,40 @@ def test_magemin_liquidus_refuses_subprocess_slot_timeout():
             scan_step_C=100.0,
         )
 
-    assert expired.value.terminal_refusal is True
-    assert expired.value.reason_code == 'engine_compute_timeout'
-    assert expired.value.exception_type == 'MAGEMinSubprocessSlotTimeout'
-    assert expired.value.diagnostic['timeout_kind'] == (
+    assert raised.value.terminal_refusal is True
+    assert raised.value.reason_code == 'engine_compute_timeout'
+    assert raised.value.diagnostic['timeout_kind'] == (
         'MAGEMinSubprocessSlotTimeout'
+    )
+    assert raised.value.diagnostics['backend_failure_exception'] == (
+        'MAGEMinSubprocessSlotTimeout'
+    )
+
+
+def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
+    from simulator.melt_backend.magemin import _MAGEMinEngineLifecycleError
+
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerRemoteError(
+            _MAGEMinEngineLifecycleError.__name__,
+            'MAGEMinSubprocessSlotTimeout: subprocess slot timed out',
+            'Traceback: _magemin_subprocess_slot -> timeout',
+        )
+    )
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinSubprocessSlotTimeout'
+    )
+    assert result.diagnostics['backend_failure_message'] == (
+        'subprocess slot timed out'
     )
 
 

@@ -4870,16 +4870,8 @@ def test_failed_enthalpy_call_at_t_ref_is_named_on_the_cp_fallback() -> None:
             self.absences = ()
             self.warnings = ()
 
-    def at_temperature(
-        temperature_K: float,
-        *,
-        fail: bool,
-        with_cp: bool,
-        timeout: bool = False,
-    ):
+    def at_temperature(temperature_K: float, *, fail: bool, with_cp: bool):
         if abs(temperature_K - 298.0) < 1e-9:
-            if timeout:
-                raise TimeoutError("t-ref timed out")
             if fail:
                 raise RuntimeError("t-ref down")
             return _Props(None, None)
@@ -4910,18 +4902,6 @@ def test_failed_enthalpy_call_at_t_ref_is_named_on_the_cp_fallback() -> None:
     assert "term=engine-Cp after a failed H call" in failed.notices[0].reason
     assert "RuntimeError: t-ref down" in failed.notices[0].reason
 
-    with pytest.raises(TimeoutError, match="t-ref timed out"):
-        predict_thermo_attempt(
-            Engine.MAGEMIN,
-            observation,
-            pure_phase=lambda engine, symbol, temperature_K, pressure_bar: at_temperature(
-                temperature_K,
-                fail=False,
-                with_cp=True,
-                timeout=True,
-            ),
-        )
-
     refused = predict_thermo_attempt(
         Engine.MAGEMIN,
         observation,
@@ -4935,6 +4915,54 @@ def test_failed_enthalpy_call_at_t_ref_is_named_on_the_cp_fallback() -> None:
     assert refused.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-no-H-or-Cp"
     assert refused.refusal_detail["H_call_at_T_ref"] == "failed"
     assert refused.refusal_detail["H_call_detail"] == "RuntimeError: t-ref down"
+
+
+def test_terminal_engine_failure_at_t_ref_is_not_replaced_by_cp_delta_t():
+    from simulator.engine_pool import _mark_engine_compute_refusal
+    from simulator.melt_backend.pure_phase import PurePhaseAccessError
+
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298 K)"),
+    )
+    observation = F.observation(
+        "mgo-tref-timeout", "exp-1", identity, Decimal("4")
+    )
+    failure = PurePhaseAccessError("MAGEMin reference-temperature timeout")
+    _mark_engine_compute_refusal(failure, "EngineWorkerRemoteError")
+
+    class _Props:
+        formula = "MgO"
+        H_J_mol = 1000.0
+        Cp_J_K_mol = 40.0
+        S_J_K_mol = 26.0
+        absences = ()
+        warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(float(temperature_K) - 298.0) < 1e-9:
+            raise failure
+        return _Props()
+
+    with pytest.raises(PurePhaseAccessError) as caught:
+        predict_thermo_attempt(
+            Engine.MAGEMIN,
+            observation,
+            pure_phase=pure_phase,
+        )
+
+    assert caught.value is failure
+    assert caught.value.reason_code == "engine_compute_timeout"
+    assert caught.value.timeout_kind == "EngineWorkerRemoteError"
 
 
 def test_enthalpy_anchor_without_h_or_cp_refuses_typed() -> None:

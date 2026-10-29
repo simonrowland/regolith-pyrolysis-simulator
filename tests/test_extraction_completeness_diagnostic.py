@@ -78,6 +78,23 @@ def test_extraction_hard_floor_invalid_liquid_fraction_preserves_false_gate() ->
     assert divergence["liquid_fraction_invalid"] == "non_finite"
 
 
+def test_extraction_hard_floor_timeout_is_a_terminal_refusal() -> None:
+    sim = _diagnostic_sim()
+    sim._freeze_gate_enabled = lambda: True
+    failure = TimeoutError("freeze gate computation timed out")
+    sim._freeze_gate_liquid_fraction_factor = lambda: (_ for _ in ()).throw(
+        failure
+    )
+
+    with pytest.raises(TimeoutError) as caught:
+        sim._update_extraction_completeness_diagnostic()
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == "engine_compute_timeout"
+    assert caught.value.timeout_kind == "TimeoutError"
+
+
 def test_completeness_diagnostic_does_not_change_campaign_advancement() -> None:
     with_diagnostic = _diagnostic_sim()
     without_diagnostic = _diagnostic_sim()

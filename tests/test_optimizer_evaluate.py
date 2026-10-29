@@ -5105,14 +5105,13 @@ def _typed_refusal_execution(reason: str) -> SimpleNamespace:
 
 
 def _typed_refusal_cases() -> tuple[tuple[str, str, Exception | None, object | None], ...]:
-    from simulator.melt_backend.liquidus import _LiquidusFinderBudgetExceeded
+    from simulator.engine_pool import EngineWorkerTimeout
 
     campaign_pressure = CampaignPressureSetpointRefusal(
         {"status": "refused", "detail": "empty pN2 operating band"}
     )
-    compute_timeout = _LiquidusFinderBudgetExceeded(
-        "liquidus finder budget expired",
-        diagnostics={"budget": "liquidus_aggregate"},
+    compute_timeout = EngineWorkerTimeout(
+        "liquidus finder", 0.001, phase="job"
     )
     return (
         (

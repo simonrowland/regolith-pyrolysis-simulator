@@ -11723,3 +11723,124 @@ def test_dead_uppercase_vaporock_stub_is_gone_from_source():
     assert 'VapoRock.calc_vapor' not in src
     assert 'calc_vapor' not in src
     assert '_get_vaporock_pressures' not in src
+
+
+def test_petthermotools_liquidus_timeout_remains_a_typed_refusal(monkeypatch):
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    backend = AlphaMELTSBackend()
+    failure = EngineWorkerTimeout(
+        'PetThermoTools findLiq', 0.1, phase='job'
+    )
+    monkeypatch.setattr(
+        backend,
+        '_require_petthermotools_runtime',
+        lambda: types.SimpleNamespace(findLiq=lambda *_a, **_k: None),
+    )
+    monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda _c: {})
+    monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
+
+    def fail(*_args, **_kwargs):
+        raise failure
+
+    monkeypatch.setattr(backend, '_run_petthermotools_isolated', fail)
+
+    with pytest.raises(EngineWorkerTimeout) as caught:
+        backend._find_petthermotools_liquidus_C(
+            {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1400.0
+        )
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'EngineWorkerTimeout'
+
+
+def test_petthermotools_external_timeout_keeps_its_origin_type(monkeypatch):
+    from engines.alphamelts.petthermo import (
+        _PetThermoToolsExternalCallFailure,
+    )
+
+    backend = AlphaMELTSBackend()
+    failure = _PetThermoToolsExternalCallFailure(
+        'TimeoutExpired', 'findLiq exceeded its subprocess deadline'
+    )
+    monkeypatch.setattr(
+        backend,
+        '_require_petthermotools_runtime',
+        lambda: types.SimpleNamespace(findLiq=lambda *_a, **_k: None),
+    )
+    monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda _c: {})
+    monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
+
+    def fail(*_args, **_kwargs):
+        raise failure
+
+    monkeypatch.setattr(backend, '_run_petthermotools_isolated', fail)
+
+    with pytest.raises(_PetThermoToolsExternalCallFailure) as caught:
+        backend._find_petthermotools_liquidus_C(
+            {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1400.0
+        )
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'TimeoutExpired'
+
+
+def test_petthermotools_remote_environment_refusal_keeps_remote_type():
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    backend = AlphaMELTSBackend()
+    failure = EngineWorkerRemoteError(
+        'PermissionError',
+        'PetThermoTools worker could not load its runtime',
+        'worker traceback',
+        failure_disposition='environment',
+    )
+
+    class FailingWorker:
+        def call(self, *_args, **_kwargs):
+            raise failure
+
+    backend._pet_worker = FailingWorker()
+
+    with pytest.raises(EngineWorkerRemoteError) as caught:
+        backend._run_petthermotools_isolated('findLiq')
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'PermissionError'
+
+
+def test_liquidus_sampling_timeout_is_not_retyped(monkeypatch):
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    backend = AlphaMELTSBackend()
+    backend._mode = 'thermoengine'
+    failure = EngineWorkerTimeout('ThermoEngine', 0.1, phase='job')
+    monkeypatch.setattr(backend, 'is_available', lambda: True)
+    monkeypatch.setattr(
+        backend,
+        '_composition_for_liquidus_finder',
+        lambda **_kwargs: {'SiO2': 100.0},
+    )
+
+    def fail(**_kwargs):
+        raise failure
+
+    monkeypatch.setattr(backend, 'equilibrate', fail)
+
+    with pytest.raises(EngineWorkerTimeout) as caught:
+        backend.find_liquidus_solidus(
+            composition_kg={'SiO2': 100.0},
+            min_T_C=800.0,
+            max_T_C=900.0,
+            scan_step_C=100.0,
+        )
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'

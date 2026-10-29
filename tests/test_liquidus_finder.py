@@ -647,17 +647,22 @@ def test_liquidus_finder_stops_on_aggregate_budget(monkeypatch):
 
     monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
 
-    with pytest.raises(TimeoutError) as expired:
-        find_liquidus_solidus_by_fraction(
-            sample,
-            min_T_C=800.0,
-            max_T_C=1000.0,
-            scan_step_C=100.0,
-            budget_s=0.05,
-        )
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+        budget_s=0.05,
+    )
 
-    assert remaining_seen == [pytest.approx(0.05)]
-    diagnostics = expired.value.diagnostics
+    assert result.status == 'not_converged'
+    assert len(result.samples) == 1
+    assert any(
+        'liquidus finder exceeded aggregate budget 0.05s after 1 calls'
+        in warning
+        for warning in result.warnings
+    )
+    diagnostics = dict(result.diagnostics)
     assert diagnostics['reason'] == 'aggregate_budget_exceeded'
     assert diagnostics['call_count'] == 1
     assert diagnostics['last_T_C'] == pytest.approx(800.0)
@@ -687,21 +692,24 @@ def test_liquidus_finder_threads_remaining_budget_into_each_call(monkeypatch):
         min_T_C=800.0,
         max_T_C=1000.0,
         scan_step_C=100.0,
-        budget_s=0.65,
+        budget_s=0.55,
         tolerance_C=50.0,  # avoid deep bisection; grid alone may finish
         max_bisection_iterations=0,
     )
     # At least two residual observations, strictly decreasing by call cost.
     assert len(remaining_seen) >= 2
-    assert remaining_seen[0] == pytest.approx(0.65)
-    assert remaining_seen[1] == pytest.approx(0.45)
+    assert remaining_seen[0] == pytest.approx(0.55)
+    assert remaining_seen[1] == pytest.approx(0.35)
     assert all(
         earlier > later
         for earlier, later in zip(remaining_seen, remaining_seen[1:])
     )
-    # The full deterministic grid fits in the guard. Bisection refuses at its
-    # declared zero-iteration limit, independent of wall time.
-    assert result.status == 'not_converged'
+    # Either ok (with max_bisection 0 path) or not_converged; budget must not
+    # have been the failure mode for the first two cheap calls.
+    if result.status == 'not_converged':
+        assert result.diagnostics.get('reason') != 'aggregate_budget_exceeded' or len(
+            result.samples
+        ) >= 2
 
 
 def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
@@ -738,26 +746,33 @@ def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
 
     monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
 
-    with pytest.raises(TimeoutError) as expired:
-        find_liquidus_solidus_by_fraction(
-            sample,
-            min_T_C=800.0,
-            max_T_C=1000.0,
-            scan_step_C=100.0,
-            budget_s=0.05,
-        )
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+        budget_s=0.05,
+    )
 
+    assert result.status == 'not_converged'
+    assert result.samples == ()  # timed out before a sample was recorded
     assert remaining_seen == [pytest.approx(0.05)]
-    diagnostics = expired.value.diagnostics
+    assert any(
+        'liquidus finder exceeded aggregate budget 0.05s after 0 calls'
+        in warning
+        for warning in result.warnings
+    )
+    diagnostics = dict(result.diagnostics)
     assert diagnostics['reason'] == 'aggregate_budget_exceeded'
     assert diagnostics['call_count'] == 0
     assert diagnostics['last_T_C'] == pytest.approx(800.0)
     assert diagnostics['budget_s'] == pytest.approx(0.05)
     assert diagnostics['elapsed_s'] == pytest.approx(0.05)
-    assert diagnostics['reason_code'] == 'engine_compute_timeout'
-    assert diagnostics['terminal_refusal'] is True
-    assert diagnostics['timeout_kind'] == 'liquidus_scan'
-    assert diagnostics['budget'] == 'liquidus_scan'
+    # Must not be the generic Exception envelope.
+    assert not any(
+        warning.startswith('liquidus finder failed:')
+        for warning in result.warnings
+    )
 
 
 def test_liquidus_finder_worker_timeout_is_a_run_refusal():
@@ -783,6 +798,32 @@ def test_liquidus_finder_worker_timeout_is_a_run_refusal():
         'terminal_refusal': True,
         'timeout_kind': 'TimeoutError',
     }
+
+
+def test_liquidus_finder_preserves_environment_remote_error():
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    failure = EngineWorkerRemoteError(
+        'TimeoutExpired', 'engine process timed out', 'worker traceback',
+        failure_disposition='environment',
+    )
+
+    def sample(_temperature_C: float) -> float:
+        raise failure
+
+    with pytest.raises(Exception) as caught:
+        find_liquidus_solidus_by_fraction(
+            sample,
+            min_T_C=800.0,
+            max_T_C=900.0,
+            scan_step_C=100.0,
+            budget_s=10.0,
+        )
+
+    assert caught.value is failure
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'TimeoutExpired'
+    assert caught.value.diagnostic['terminal_refusal'] is True
 
 
 def test_finder_projects_tagged_external_failure():

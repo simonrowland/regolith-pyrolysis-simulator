@@ -811,3 +811,176 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     held = sim._melt_redox_liquidus_gate_curve()
     assert held['liquidus_T_C'] == 1500.0
     assert held['gate_provider_refusal']['computed_hour'] == 10
+
+
+def test_engine_timeout_from_declared_gate_propagates_without_curve_fallback(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    failure = EngineWorkerTimeout('MAGEMin gate', 0.1, phase='liquidus')
+
+    def fail(*_args, **_kwargs):
+        raise failure
+
+    monkeypatch.setattr(sim, '_dispatch_only', fail)
+
+    with pytest.raises(Exception) as caught:
+        sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-8.0)
+
+    assert caught.value is failure
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.diagnostic['timeout_kind'] == 'EngineWorkerTimeout'
+
+
+def test_gate_dispatch_preserves_environment_sample_error_type(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    failure = LiquidusSampleError(
+        'unavailable',
+        ('MAGEMin worker startup failed',),
+        {
+            'backend_failure_disposition': 'environment',
+            'backend_failure_exception': 'EngineWorkerRemoteError',
+            'timeout_kind': 'EngineWorkerRemoteError',
+        },
+    )
+
+    def fail(*_args, **_kwargs):
+        raise failure
+
+    monkeypatch.setattr(sim, '_dispatch_only', fail)
+
+    with pytest.raises(LiquidusSampleError) as caught:
+        sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-8.0)
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.diagnostic['timeout_kind'] == 'EngineWorkerRemoteError'
+
+
+def test_gate_dispatch_marks_environment_remote_error_as_refusal(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    failure = EngineWorkerRemoteError(
+        'WorkerStartupError', 'MAGEMin worker startup failed', 'trace',
+        failure_disposition='environment',
+    )
+
+    def fail(*_args, **_kwargs):
+        raise failure
+
+    monkeypatch.setattr(sim, '_dispatch_only', fail)
+
+    with pytest.raises(EngineWorkerRemoteError) as caught:
+        sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-8.0)
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'WorkerStartupError'
+
+
+def test_gate_provider_registration_timeout_propagates(monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    failure = TimeoutError('MAGEMin gate registration timeout')
+
+    def fail_registration():
+        raise failure
+
+    monkeypatch.setattr(
+        sim,
+        '_register_freeze_gate_liquid_fraction_providers',
+        fail_registration,
+    )
+
+    with pytest.raises(TimeoutError) as caught:
+        sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-8.0)
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'TimeoutError'
+
+
+def test_melt_redox_gate_does_not_floor_fallback_terminal_sample_error(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    failure = LiquidusSampleError(
+        'not_converged',
+        ('MAGEMin liquidus timed out',),
+        {
+            'reason': 'engine_compute_timeout',
+            'terminal_refusal': True,
+            'timeout_kind': 'EngineWorkerRemoteError',
+        },
+    )
+
+    def fail(**_kwargs):
+        raise failure
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', fail)
+
+    with pytest.raises(LiquidusSampleError) as caught:
+        sim._melt_redox_liquidus_gate_curve()
+
+    assert caught.value is failure
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.terminal_refusal is True
+
+
+def test_melt_redox_gate_marks_environment_remote_error_as_refusal(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    failure = EngineWorkerRemoteError(
+        'WorkerStartupError', 'MAGEMin startup failed', 'trace',
+        failure_disposition='environment',
+    )
+
+    def fail(**_kwargs):
+        raise failure
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', fail)
+
+    with pytest.raises(EngineWorkerRemoteError) as caught:
+        sim._melt_redox_liquidus_gate_curve()
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'WorkerStartupError'
+
+
+def test_environment_timeout_diagnostic_cannot_select_a_gate_curve(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status='not_converged',
+            diagnostic={
+                'backend_failure_disposition': 'environment',
+                'backend_failure_exception': 'TimeoutExpired',
+            },
+        ),
+    )
+
+    with pytest.raises(EvaporationFluxRefusal) as caught:
+        sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-8.0)
+
+    assert caught.value.reason == 'engine_compute_timeout'
+    assert caught.value.diagnostic['reason_code'] == 'engine_compute_timeout'
+    assert caught.value.diagnostic['timeout_kind'] == 'TimeoutExpired'
+    assert caught.value.terminal_refusal is True

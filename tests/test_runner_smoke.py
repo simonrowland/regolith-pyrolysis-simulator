@@ -2443,19 +2443,7 @@ def test_runner_failure_envelope_for_unknown_feedstock(tmp_path):
     assert payload["shadow_trace"] == []
 
 
-@pytest.mark.parametrize(
-    ("compute_timeout", "expected_status", "expected_reason"),
-    [
-        (False, "failed", "poisoned_hour"),
-        (True, "refused", "engine_compute_timeout"),
-    ],
-)
-def test_runner_envelopes_poisoned_hour_error_loudly(
-    monkeypatch,
-    compute_timeout,
-    expected_status,
-    expected_reason,
-):
+def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C5",
@@ -2495,17 +2483,92 @@ def test_runner_envelopes_poisoned_hour_error_loudly(
     )
     monkeypatch.setattr(sim, "_update_temperature", lambda: None)
     monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", lambda: None)
+    monkeypatch.setattr(
+        sim,
+        "_get_equilibrium",
+        lambda: (_ for _ in ()).throw(RuntimeError("post-MRE runner abort")),
+    )
+    sim._establish_melt_redox_gate_authority_for_current_hour()
+    sim._apply_fe_redox_respeciation()
 
-    if compute_timeout:
-        from simulator.melt_backend.liquidus import _LiquidusFinderBudgetExceeded
+    original_step = sim.step
+    observed_errors = []
 
-        failure = _LiquidusFinderBudgetExceeded(
-            "liquidus scan wall budget expired",
-            diagnostics={"budget": "liquidus_scan"},
-        )
-    else:
-        failure = RuntimeError("post-MRE runner abort")
+    def record_step_error():
+        try:
+            return original_step()
+        except Exception as exc:
+            observed_errors.append(exc)
+            raise
 
+    monkeypatch.setattr(sim, "step", record_step_error)
+
+    payload = run._run_session(session)
+
+    assert len(observed_errors) == 1
+    assert type(observed_errors[0]) is RuntimeError
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "poisoned_hour"
+    assert "RuntimeError: post-MRE runner abort" in payload["error_message"]
+    assert "simulator hour 0 is poisoned" in payload["error_message"]
+    assert sim._poisoned_hour is not None
+    assert (
+        f"{sim._poisoned_hour.committed_transition_count} ledger transition(s) committed"
+        in payload["error_message"]
+    )
+    assert "fresh simulator or reload the batch" in payload["error_message"]
+    assert payload["run_metadata"]["hours_completed"] == 0
+    assert payload["per_hour_summary"] == []
+
+    with pytest.raises(PoisonedHourError) as replay_error:
+        session.advance()
+
+    assert type(replay_error.value) is PoisonedHourError
+    assert len(observed_errors) == 2
+    assert observed_errors[-1] is replay_error.value
+
+
+def test_runner_refuses_and_rolls_back_liquidus_budget_expiry(monkeypatch):
+    from simulator.melt_backend.liquidus import _LiquidusFinderBudgetExceeded
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C5",
+        hours=1,
+        c5_enabled=True,
+        mre_target_species="CaO",
+        mre_max_voltage_V=2.5,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "liquidus-timeout-smoke",
+        },
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.melt.temperature_C = 1600.0
+    sim.melt.target_temperature_C = 1600.0
+    curve_calls = 0
+    from simulator.engine_binding_admission import write_gate_curve_memo_record
+
+    def fail_to_floor_then_recover():
+        nonlocal curve_calls
+        curve_calls += 1
+        if curve_calls == 1:
+            raise ProviderUnavailableError("runner poison authority probe")
+        return write_gate_curve_memo_record(sim, {
+            "source": "test_recovered_real_curve",
+            "solidus_T_C": 1000.0,
+            "liquidus_T_C": 1700.0,
+            "path": ((1000.0, 0.0), (1700.0, 1.0)),
+        })
+
+    monkeypatch.setattr(sim, "_freeze_gate_curve_record", fail_to_floor_then_recover)
+    monkeypatch.setattr(sim, "_update_temperature", lambda: None)
+    monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", lambda: None)
+    failure = _LiquidusFinderBudgetExceeded(
+        "liquidus scan wall budget expired",
+        diagnostics={"budget": "liquidus_scan"},
+    )
     monkeypatch.setattr(
         sim,
         "_get_equilibrium",
@@ -2529,7 +2592,6 @@ def test_runner_envelopes_poisoned_hour_error_loudly(
             raise
 
     monkeypatch.setattr(sim, "_step_one_hour", record_step_commits)
-
     original_step = sim.step
     observed_errors = []
 
@@ -2541,43 +2603,22 @@ def test_runner_envelopes_poisoned_hour_error_loudly(
             raise
 
     monkeypatch.setattr(sim, "step", record_step_error)
-
     payload = run._run_session(session)
 
     assert len(committed_deltas) == 1
     assert committed_deltas[0] > 0
-    assert len(observed_errors) == 1
-    assert observed_errors[0] is failure
-    assert payload["status"] == expected_status
-    assert payload["reason"] == expected_reason
+    assert observed_errors == [failure]
+    assert payload["status"] == "refused"
+    assert payload["reason"] == "engine_compute_timeout"
     assert payload["run_metadata"]["hours_completed"] == 0
     assert payload["per_hour_summary"] == []
-
-    if compute_timeout:
-        assert sim.atom_ledger.mol_by_account() == ledger_before_step
-        assert sim._poisoned_hour is None
-        assert failure.terminal_refusal is True
-        assert failure.reason_code == 'engine_compute_timeout'
-        refusal_diagnostic = payload["run_metadata"]["refusal_diagnostic"]
-        assert refusal_diagnostic["reason"] == "engine_compute_timeout"
-        assert refusal_diagnostic["budget"]["budget"] == "liquidus_scan"
-        return
-
-    assert "RuntimeError: post-MRE runner abort" in payload["error_message"]
-    assert "simulator hour 0 is poisoned" in payload["error_message"]
-    assert sim._poisoned_hour is not None
-    assert (
-        f"{sim._poisoned_hour.committed_transition_count} ledger transition(s) committed"
-        in payload["error_message"]
-    )
-    assert "fresh simulator or reload the batch" in payload["error_message"]
-
-    with pytest.raises(PoisonedHourError) as replay_error:
-        session.advance()
-
-    assert type(replay_error.value) is PoisonedHourError
-    assert len(observed_errors) == 2
-    assert observed_errors[-1] is replay_error.value
+    assert sim.atom_ledger.mol_by_account() == ledger_before_step
+    assert sim._poisoned_hour is None
+    assert failure.terminal_refusal is True
+    assert failure.reason_code == "engine_compute_timeout"
+    refusal_diagnostic = payload["run_metadata"]["refusal_diagnostic"]
+    assert refusal_diagnostic["reason"] == "engine_compute_timeout"
+    assert refusal_diagnostic["budget"]["budget"] == "liquidus_scan"
 
 
 @pytest.fixture

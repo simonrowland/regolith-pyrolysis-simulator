@@ -2008,19 +2008,19 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     }
 
 
-def test_liquidus_finder_raises_when_aggregate_budget_expires() -> None:
-    from simulator.melt_backend.liquidus import (
-        _LiquidusFinderBudgetExceeded,
-        find_liquidus_solidus_by_fraction,
+def test_liquidus_finder_reports_typed_aggregate_budget_expiry() -> None:
+    from simulator.melt_backend.liquidus import find_liquidus_solidus_by_fraction
+
+    result = find_liquidus_solidus_by_fraction(
+        lambda _temperature_C: 1.0,
+        budget_s=1.0e-12,
     )
 
-    with pytest.raises(_LiquidusFinderBudgetExceeded) as expired:
-        find_liquidus_solidus_by_fraction(
-            lambda _temperature_C: 1.0,
-            budget_s=1.0e-12,
-        )
-
-    assert expired.value.diagnostics["reason"] == "aggregate_budget_exceeded"
+    assert result.status == "not_converged"
+    assert result.diagnostics["reason"] == "aggregate_budget_exceeded"
+    assert result.diagnostics["reason_code"] == "engine_compute_timeout"
+    assert result.diagnostics["terminal_refusal"] is True
+    assert result.diagnostics["timeout_kind"] == "liquidus_scan"
 
 
 def test_sso2_owner_execution_refuses_without_native_fe_split_count_on_timeout(

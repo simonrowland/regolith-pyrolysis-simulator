@@ -262,8 +262,12 @@ def test_magemin_pure_phase_timeout_remains_a_timeout(monkeypatch, tmp_path):
         lambda _timeout: nullcontext(),
     )
 
+    timeout_error = None
+
     def timeout_run(args, *, timeout, **_kwargs):
-        raise subprocess.TimeoutExpired(args, timeout)
+        nonlocal timeout_error
+        timeout_error = subprocess.TimeoutExpired(args, timeout)
+        raise timeout_error
 
     monkeypatch.setattr(magemin_module.subprocess, "run", timeout_run)
 
@@ -275,6 +279,8 @@ def test_magemin_pure_phase_timeout_remains_a_timeout(monkeypatch, tmp_path):
         )
 
     assert raised.value.terminal_refusal is True
+    assert raised.value is timeout_error
+    assert isinstance(raised.value, subprocess.TimeoutExpired)
     assert raised.value.reason_code == 'engine_compute_timeout'
     assert raised.value.timeout_kind == 'TimeoutExpired'
     assert raised.value.diagnostic == {
