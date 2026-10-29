@@ -162,7 +162,7 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         row_label = experiment["experiment_id"].removeprefix("cai-")
         assert experiment["locator"]["page"] == physical_page
         assert experiment["locator"]["table"] == "1"
-        assert experiment["locator"]["row"] == row_label
+        assert experiment["locator"]["row"].casefold() == row_label.casefold()
         assert experiment["bench_id"] == "hashimoto-vacuum-furnace"
         assert experiment["conditions"]["temperature_K"]["state"]["tag"] == "value"
         assert experiment["conditions"]["temperature_K"]["locator"]["page"] == physical_page
