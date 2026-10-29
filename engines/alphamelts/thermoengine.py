@@ -7,6 +7,7 @@ emits a ledger transition.
 
 from __future__ import annotations
 
+import builtins
 import faulthandler
 import hashlib
 import json
@@ -638,12 +639,11 @@ class ThermoEngineFailureDisposition:
 def thermoengine_failure_disposition_from_exception(
     exc: BaseException,
 ) -> ThermoEngineFailureDisposition:
-    """Classify one failure by exception type, never attached attributes.
+    """Classify one typed failure or origin-tagged external call.
 
-    Only the declared typed family, optional-import absence, and an
-    origin-tagged PetThermoTools external call receive a disposition.
-    A bare ``RuntimeError`` is not an engine origin. Every other type
-    propagates.
+    A bare ``RuntimeError`` is not an engine origin. Engine timeouts and
+    environment failures remain terminal refusals; other typed solve
+    failures keep their row-local nonconvergence disposition.
     """
 
     if isinstance(exc, ThermoEngineOutOfDomainError):
@@ -688,6 +688,16 @@ def thermoengine_failure_disposition_from_exception(
             reason_code=normalized.cause.value,
             exception=normalized,
         )
+    if _is_engine_compute_refusal(exc) and not isinstance(
+        exc,
+        (ThermoEngineTimeoutError, EngineWorkerTimeout),
+    ):
+        _mark_engine_compute_refusal(exc)
+        return ThermoEngineFailureDisposition(
+            status='refused',
+            reason_code='engine_compute_timeout',
+            exception=exc,
+        )
     if isinstance(exc, ImportError):
         return ThermoEngineFailureDisposition(
             status='unavailable',
@@ -716,6 +726,9 @@ def _thermoengine_native_call(call):
     except DECLARED_THERMOENGINE_FAILURE_TYPES:
         raise
     except Exception as exc:
+        if _is_engine_compute_refusal(exc):
+            _mark_engine_compute_refusal(exc)
+            raise
         raise ThermoEngineNotConvergedError(
             f'{type(exc).__name__}: {exc}'
         ) from exc
@@ -1306,13 +1319,14 @@ print('ok')
                 kwargs, timeout_s=max(0.001, float(call_timeout_s))
             )
         except EngineWorkerRemoteError as exc:
+            remote_error = exc
             exc_name = exc.exc_name
             detail = exc.detail
             child_traceback = exc.remote_traceback
-        # Exact child type name only. Unknown names become RuntimeError
-        # and then close (untyped). Do not substring-match the detail
-        # to choose the type. ThermoEngineOutOfDomainError reconstructs
-        # its cause from the closed token set; an unknown cause raises.
+        # Use exact child type names; never substring-match detail. Known
+        # environment types are reconstructed, while unrecognized marked
+        # failures retain their EngineWorkerRemoteError type. The typed
+        # out-of-domain cause comes from its closed token set.
         if exc_name == 'ThermoEngineOutOfDomainError':
             raise reconstruct_thermoengine_out_of_domain_error(detail)
         exception_type = {
@@ -1323,13 +1337,30 @@ print('ok')
             'ThermoEngineFO2UndefinedError': ThermoEngineFO2UndefinedError,
             'ThermoEngineFO2OmittedError': ThermoEngineFO2OmittedError,
             'ThermoEngineNotConvergedError': ThermoEngineNotConvergedError,
-        }.get(exc_name, RuntimeError)
+        }.get(exc_name)
+        if exception_type is None:
+            remote_type = getattr(builtins, exc_name, None) or getattr(
+                subprocess, exc_name, None
+            )
+            if (
+                isinstance(remote_type, type)
+                and (
+                    issubclass(remote_type, (OSError, MemoryError))
+                    or remote_type is subprocess.SubprocessError
+                )
+            ):
+                exception_type = remote_type
+        if exception_type is None:
+            if _is_engine_compute_refusal(remote_error):
+                _mark_engine_compute_refusal(remote_error, exc_name)
+                raise remote_error
+            exception_type = RuntimeError
         failure = exception_type(
             f'ThermoEngine equilibrium failed: {detail}\n{child_traceback}'
         )
-        if _is_engine_compute_refusal(exc):
+        if _is_engine_compute_refusal(remote_error):
             _mark_engine_compute_refusal(failure, exc_name)
-        raise failure from exc
+        raise failure from remote_error
 
     def pure_phase_properties(
         self,

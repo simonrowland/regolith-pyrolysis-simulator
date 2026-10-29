@@ -894,6 +894,10 @@ def _reraise_petthermotools_startup_failure(
 ) -> None:
     """Apply the shared remote decoder to the first worker start."""
 
+    if _is_engine_compute_refusal(exc):
+        _mark_engine_compute_refusal(exc)
+        raise exc
+
     external_failure = _decode_petthermotools_remote_failure(
         exc.exc_name,
         exc.detail,
@@ -909,6 +913,8 @@ def _reraise_petthermotools_startup_failure(
             f'{exc.detail}\n{exc.remote_traceback}'
         ) from exc
     if external_failure is not None:
+        if _is_engine_compute_refusal(external_failure):
+            _mark_engine_compute_refusal(external_failure)
         raise external_failure from exc
     raise exc
 
@@ -1261,8 +1267,11 @@ class _MELTSBackendSupport(MeltBackend):
                         self._engine_path = Path('alphamelts')
                         self._binary_path = Path('alphamelts')
                         self._mode = 'subprocess'
-                except (FileNotFoundError, subprocess.TimeoutExpired):
+                except FileNotFoundError:
                     pass
+                except subprocess.TimeoutExpired as exc:
+                    _mark_engine_compute_refusal(exc, 'TimeoutExpired')
+                    raise
             if self._mode is None and require_subprocess:
                 raise ImportError('AlphaMELTS subprocess transport unavailable')
 
@@ -1315,7 +1324,10 @@ class _MELTSBackendSupport(MeltBackend):
                     _reraise_petthermotools_startup_failure(exc)
             self._pet_available = True
             self._mode = 'python_api'
-        except ImportError:
+        except ImportError as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             self._pet_available = False
             self._pet_module = None
             self._pet_melts = None
@@ -1388,7 +1400,10 @@ class _MELTSBackendSupport(MeltBackend):
     def _import_petthermotools(self):
         try:
             return importlib.import_module('petthermotools')
-        except ImportError:
+        except ImportError as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             return importlib.import_module('PetThermoTools')
 
     def _preload_petthermotools_payload(self, module) -> None:
@@ -1398,6 +1413,9 @@ class _MELTSBackendSupport(MeltBackend):
                 meltsdynamic = importlib.import_module('meltsdynamic')
                 loader = getattr(meltsdynamic, 'MELTSdynamic', None)
             except ImportError as exc:
+                if _is_engine_compute_refusal(exc):
+                    _mark_engine_compute_refusal(exc)
+                    raise
                 raise ImportError(
                     'PetThermoTools compiled MELTS payload missing: '
                     'cannot import meltsdynamic.MELTSdynamic'
@@ -3341,6 +3359,9 @@ class _MELTSBackendSupport(MeltBackend):
         try:
             ptt = self._require_petthermotools_runtime()
         except ImportError as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             return None, (f'PetThermoTools runtime unavailable: {exc}',)
         ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
         find_liq_melts = getattr(ptt, 'findLiq_MELTS', None)
@@ -3387,6 +3408,9 @@ class _MELTSBackendSupport(MeltBackend):
             _mark_engine_compute_refusal(exc, exc.timeout_kind)
             raise
         except ImportError as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             return None, (
                 f'PetThermoTools findLiq unavailable '
                 f'({type(exc).__name__}): {exc}',

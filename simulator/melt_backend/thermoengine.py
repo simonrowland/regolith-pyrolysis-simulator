@@ -26,6 +26,7 @@ from engines.alphamelts.thermoengine import (
 )
 from simulator.engine_pool import (
     EngineWorkerTimeout,
+    _is_engine_compute_refusal,
     _mark_engine_compute_refusal,
 )
 from simulator.config import resolve_grid_engine_model
@@ -638,6 +639,10 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             self._close_after_failure(exc)
             raise
         except Exception as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                self._close_after_failure(exc)
+                raise
             # Legacy wire / remapped ValueError may still carry an
             # out-of-domain mark. Retype it; never close on OOD.
             cause = thermoengine_refusal_cause_from_exception(exc)

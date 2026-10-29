@@ -148,6 +148,7 @@ def _is_engine_environment_failure(failure: BaseException | str) -> bool:
         kind = (
             getattr(failure, 'exception_type', None)
             or getattr(failure, 'exc_name', None)
+            or getattr(failure, 'exception_class', None)
             or type(failure).__name__
         )
     else:

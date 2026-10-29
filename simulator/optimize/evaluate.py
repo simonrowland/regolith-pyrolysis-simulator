@@ -65,7 +65,13 @@ from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
-from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
+from simulator.engine_pool import (
+    EngineWorkerTimeout,
+    EngineWorkerUnavailable,
+    _is_engine_compute_refusal,
+    _is_engine_environment_failure,
+    _mark_engine_compute_refusal,
+)
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
@@ -867,6 +873,14 @@ def evaluate(
             exc,
         )
     except RunnerError as exc:
+        if _is_engine_compute_terminal_refusal(exc):
+            _mark_engine_compute_refusal(exc)
+            return _typed_physics_refusal_result(
+                candidate_id,
+                spec,
+                key,
+                exc,
+            )
         if _is_backend_unavailable(exc):
             raise BackendUnavailableAbort(
                 str(exc),
@@ -936,6 +950,14 @@ def evaluate(
             message,
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
+        if _is_engine_compute_terminal_refusal(exc):
+            _mark_engine_compute_refusal(exc)
+            return _typed_physics_refusal_result(
+                candidate_id,
+                spec,
+                key,
+                exc,
+            )
         if _is_malformed_recipe_error(exc):
             return _malformed_recipe_result(
                 candidate_id,
@@ -963,17 +985,24 @@ def evaluate(
 
     status = str(getattr(run_execution, "status", "ok"))
     error_message = str(getattr(run_execution, "error_message", ""))
-    if (
-        status == "refused"
-        and _run_execution_has_environment_failure_disposition(run_execution)
+    if status == "refused" and _run_execution_has_engine_compute_refusal(
+        run_execution
     ):
-        raise EngineBugAbort(
-            "environment-disposition refusal cannot be scored as candidate "
-            "physics",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
+        failure_exception = getattr(run_execution, "failure_exception", None)
+        if isinstance(failure_exception, BaseException):
+            _mark_engine_compute_refusal(failure_exception)
+        refusal_diagnostic = getattr(run_execution, "refusal_diagnostic", None)
+        if not isinstance(refusal_diagnostic, MappingABC):
+            refusal_diagnostic = getattr(failure_exception, "diagnostic", None)
+        return _physics_refused_result(
+            candidate_id,
+            spec,
+            key,
+            reason="engine_compute_timeout",
+            error_message=error_message or "engine compute refused",
+            run_execution=run_execution,
+            profile=profile,
+            diagnostic=refusal_diagnostic,
         )
     if status == "failed":
         failure_exc = getattr(run_execution, "failure_exception", None)
@@ -1398,16 +1427,22 @@ def _result_from_honest_engine_exception(
         thermoengine_timeout_cause_from_exception,
     )
 
-    timeout = thermoengine_timeout_cause_from_exception(exc)
-    if timeout is not None or isinstance(exc, (EngineWorkerTimeout, ThermoEngineTimeoutError)):
-        return _engine_not_converged_result(
+    if _is_engine_compute_terminal_refusal(exc):
+        _mark_engine_compute_refusal(exc)
+        return _typed_physics_refusal_result(
             candidate_id,
             spec,
             key,
-            None,
-            profile,
-            reason=str(getattr(timeout, "value", None) or exc),
-            message=f"{type(exc).__name__}: {exc}",
+            exc,
+        )
+    timeout = thermoengine_timeout_cause_from_exception(exc)
+    if timeout is not None or isinstance(exc, (EngineWorkerTimeout, ThermoEngineTimeoutError)):
+        _mark_engine_compute_refusal(exc, str(getattr(timeout, "value", None)))
+        return _typed_physics_refusal_result(
+            candidate_id,
+            spec,
+            key,
+            exc,
         )
     refusal = thermoengine_refusal_cause_from_exception(exc)
     if refusal is None and not isinstance(exc, ThermoEngineOutOfDomainError):
@@ -1578,26 +1613,85 @@ def _run_execution_refusal_reason(run_execution: Any) -> str:
     return _reason_from_message(error_message) or "typed_physics_refusal"
 
 
-def _run_execution_has_environment_failure_disposition(
+def _run_execution_has_engine_compute_refusal(
     run_execution: Any,
 ) -> bool:
     failure_exception = getattr(run_execution, "failure_exception", None)
+    if (
+        isinstance(failure_exception, BaseException)
+        and _is_engine_compute_terminal_refusal(failure_exception)
+    ):
+        return True
     diagnostics = (
         getattr(run_execution, "refusal_diagnostic", None),
         getattr(failure_exception, "diagnostic", None),
     )
 
-    def contains_environment(value: Any) -> bool:
+    def contains_engine_compute_refusal(value: Any) -> bool:
         if isinstance(value, MappingABC):
-            return (
+            if (
                 value.get("backend_failure_disposition") == "environment"
-                or any(contains_environment(item) for item in value.values())
+                or value.get("reason_code") == "engine_compute_timeout"
+                or value.get("reason") == "engine_compute_timeout"
+                or value.get("backend_failure_reason_code") == "timeout"
+                or value.get("backend_status_reason") == "timeout"
+            ):
+                return True
+            for key in (
+                "backend_failure_exception",
+                "exception_class",
+                "exception_type",
+                "timeout_kind",
+            ):
+                kind = str(value.get(key) or "")
+                if (
+                    _is_engine_environment_failure(kind)
+                    or "timeout" in kind.lower()
+                    or "budgetexceeded" in kind.lower()
+                ):
+                    return True
+            return any(
+                contains_engine_compute_refusal(item)
+                for item in value.values()
             )
         if isinstance(value, (list, tuple)):
-            return any(contains_environment(item) for item in value)
+            return any(
+                contains_engine_compute_refusal(item) for item in value
+            )
         return False
 
-    return any(contains_environment(item) for item in diagnostics)
+    return any(
+        contains_engine_compute_refusal(item) for item in diagnostics
+    )
+
+
+def _is_engine_compute_terminal_refusal(exc: BaseException) -> bool:
+    if not _is_engine_compute_refusal(exc):
+        return False
+    diagnostic = getattr(exc, "diagnostic", None)
+    if not isinstance(diagnostic, MappingABC):
+        diagnostic = getattr(exc, "diagnostics", None)
+    reason_code = getattr(exc, "reason_code", None)
+    if reason_code == "engine_compute_timeout":
+        return True
+    if getattr(exc, "failure_disposition", None) == "environment":
+        return True
+    if _is_engine_environment_failure(exc):
+        return True
+    if isinstance(diagnostic, MappingABC) and (
+        diagnostic.get("reason_code") == "engine_compute_timeout"
+        or diagnostic.get("reason") == "engine_compute_timeout"
+        or diagnostic.get("backend_failure_disposition") == "environment"
+    ):
+        return True
+    kind = str(
+        getattr(exc, "timeout_kind", None)
+        or getattr(exc, "exception_type", None)
+        or getattr(exc, "exc_name", None)
+        or getattr(exc, "exception_class", None)
+        or type(exc).__name__
+    ).lower()
+    return "timeout" in kind or "budgetexceeded" in kind
 
 
 def _typed_physics_refusal_reason(exc: BaseException) -> str:

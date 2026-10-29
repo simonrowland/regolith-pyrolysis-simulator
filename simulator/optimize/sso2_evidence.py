@@ -11,6 +11,11 @@ from simulator.account_ids import METAL_PHASE_ACCOUNTS
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.core import PyrolysisSimulator
+from simulator.engine_pool import (
+    _is_engine_compute_refusal,
+    _mark_engine_compute_refusal,
+)
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.sso_r_owner_surface import (
@@ -21,7 +26,6 @@ from simulator.optimize.sso_r_owner_surface import (
     OWNER_RECIPE_PO2_MBAR,
     OWNER_RECIPE_TOTAL_PRESSURE_MBAR,
 )
-from simulator.melt_backend.liquidus import _LiquidusFinderBudgetExceeded
 from simulator.runner import PyrolysisRun
 from simulator.run_executor import RunExecution, RunExecutor
 from simulator.session import SimSession
@@ -56,6 +60,26 @@ SSO2_CHUNK3B_READER_HANDOFF = (
     "evidence, not just captured_stage_3_silica."
 )
 _EPS = 1.0e-12
+
+
+def _capture_owner_run_refusal(exc: Exception) -> bool:
+    """Keep a terminal engine failure in the owner's refused execution."""
+    if isinstance(exc, EvaporationFluxRefusal):
+        diagnostic = exc.diagnostic
+        if (
+            exc.reason == "engine_compute_timeout"
+            or diagnostic.get("reason_code") == "engine_compute_timeout"
+            or diagnostic.get("backend_failure_disposition") == "environment"
+        ):
+            _mark_engine_compute_refusal(
+                exc,
+                diagnostic.get("timeout_kind"),
+            )
+        return True
+    if not _is_engine_compute_refusal(exc):
+        return False
+    _mark_engine_compute_refusal(exc)
+    return True
 
 
 def sso2_owner_recipe_patch() -> RecipePatch:
@@ -111,7 +135,9 @@ def build_sso2_owner_recipe_execution(
             backend_name=backend_name,
             setpoints_patch=setpoints_patch,
         )
-    except _LiquidusFinderBudgetExceeded as exc:
+    except Exception as exc:
+        if not _capture_owner_run_refusal(exc):
+            raise
         calibration_refusal = exc
         dose_kg = 0.0
     run = PyrolysisRun(
@@ -131,7 +157,9 @@ def build_sso2_owner_recipe_execution(
     session = SimSession()
     try:
         session.start(run._session_config())
-    except _LiquidusFinderBudgetExceeded as exc:
+    except Exception as exc:
+        if not _capture_owner_run_refusal(exc):
+            raise
         return executor.execute_session(
             session,
             hours=int(hours),
@@ -145,14 +173,18 @@ def build_sso2_owner_recipe_execution(
         )
     try:
         _apply_certified_na_dose(session.simulator)
-    except _LiquidusFinderBudgetExceeded as exc:
+    except Exception as exc:
+        if not _capture_owner_run_refusal(exc):
+            raise
         # The owner-dose mutation runs before execute_session takes its normal
         # per-hour rollback snapshots. Recreate a clean, undosed session for
         # the refused result so no partial calibration state can be reported.
         clean_session = SimSession()
         try:
             clean_session.start(run._session_config())
-        except _LiquidusFinderBudgetExceeded as startup_exc:
+        except Exception as startup_exc:
+            if not _capture_owner_run_refusal(startup_exc):
+                raise
             exc = startup_exc
         return executor.execute_session(
             clean_session,
