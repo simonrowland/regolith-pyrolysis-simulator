@@ -329,3 +329,44 @@ def test_adamkovicova_prior_fusion_enthalpies_convert_in_kj_per_mol():
         assert observation.identity.temperature_K.is_unknown
         temperature = (observation.point_conditions or {})["temperature_K"]
         assert temperature.state.is_unknown and temperature.locator is not None
+
+
+def test_ammin_76_904_quoted_fusion_enthalpies_migrate_with_temperature():
+    candidates = _observations(
+        "ammin-76-904.yaml",
+        "ammin_76_904_quoted_",
+    )
+    expected = {
+        "ammin_76_904_quoted_comparator_enthalpy_values": (
+            Decimal("138.1"),
+            Decimal("1665"),
+        ),
+        "ammin_76_904_quoted_richet_bottinga_diopside_fusion": (
+            Decimal("137.7"),
+            Decimal("1665"),
+        ),
+        "ammin_76_904_quoted_ferrier_diopside_fusion": (
+            Decimal("128"),
+            Decimal("1665"),
+        ),
+        "ammin_76_904_quoted_adamkovicova_wollastonite_fusion": (
+            Decimal("57.3"),
+            Decimal("1821"),
+        ),
+    }
+    observations = [
+        observation
+        for observation in candidates
+        if observation.observation_id.rsplit("::", 1)[-1] in expected
+    ]
+    assert len(observations) == len(expected)
+    for observation in observations:
+        observation_id = observation.observation_id.rsplit("::", 1)[-1]
+        value, temperature = expected[observation_id]
+        assert observation.identity.quantity.value is Quantity.ENTHALPY_OF_FUSION
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == value
+        located_temperature = (observation.point_conditions or {})["temperature_K"]
+        assert located_temperature.state.is_value
+        assert located_temperature.state.value == temperature
+        assert located_temperature.locator is not None
