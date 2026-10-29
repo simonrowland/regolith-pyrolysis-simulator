@@ -9,6 +9,11 @@ from simulator.state import EvaporationFlux, MeltState
 from tests.test_condensation_input_refusals import _configured_model
 
 
+def _fe_stage_wall_K(model):
+    """Production Stage-1 wall: band midpoint, not a pasted temperature."""
+    return condensation._stage_midpoint_temperature_K(model.train.stages[1])
+
+
 def efficiency(model, pressure, *, alpha=0.02, residence=5.0, flow=1.0):
     return model._condensation_efficiency(
         stage=model.train.stages[1], species="Fe", T_cond_C=1250.0,
@@ -45,7 +50,7 @@ def test_zero_surface_uptake_or_residence(alpha, residence):
 
 def test_undersaturated_and_saturated_stream_passes_through():
     model = _configured_model()
-    psat, refused = condensation._try_antoine_psat_pa("Fe", 1523.15)
+    psat, refused = condensation._try_antoine_psat_pa("Fe", _fe_stage_wall_K(model))
     assert not refused
     assert efficiency(model, psat / 2) == 0.0
     assert efficiency(model, psat) == 0.0
@@ -54,7 +59,7 @@ def test_undersaturated_and_saturated_stream_passes_through():
 def test_large_capture_rate_stops_at_equilibrium():
     model = _configured_model()
     model.stage_area_m2_by_stage = {"1": 1e12}
-    psat, refused = condensation._try_antoine_psat_pa("Fe", 1523.15)
+    psat, refused = condensation._try_antoine_psat_pa("Fe", _fe_stage_wall_K(model))
     assert not refused
     # Same owning saturation resolver as the wall model, not a copied fit.
     assert efficiency(model, 27.18) == pytest.approx(1 - psat / 27.18)
@@ -69,7 +74,7 @@ def test_capture_matches_numerical_excess_inventory_ode(sat_ratio, integrated_ca
     model.regime_factor = 1.0
     area = 0.045238934
     model.stage_area_m2_by_stage = {"1": area}
-    psat, refused = condensation._try_antoine_psat_pa("Fe", 1523.15)
+    psat, refused = condensation._try_antoine_psat_pa("Fe", _fe_stage_wall_K(model))
     assert not refused
     pressure = psat / sat_ratio
     molar_mass = condensation.MOLAR_MASS["Fe"] / 1000
@@ -97,7 +102,7 @@ def test_free_molecular_rate_uses_actual_flow_inventory():
     model = _configured_model()
     model.regime_factor = 1.0
     model.stage_area_m2_by_stage = {"1": 1e-5}
-    psat, refused = condensation._try_antoine_psat_pa("Fe", 1523.15)
+    psat, refused = condensation._try_antoine_psat_pa("Fe", _fe_stage_wall_K(model))
     assert not refused
     # Safarian & Engh HKL, molar form: J=alpha*dp/sqrt(2*pi*M*R*Tgas).
     # M from the species registry; flow is kg/h, so n_dot=flow/M/3600.

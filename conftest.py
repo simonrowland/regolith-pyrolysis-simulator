@@ -641,6 +641,9 @@ def production_configured_condensation_route(monkeypatch):
                 pipe_diameter_m=overhead_model.pipe_diameter_m,
                 gas_temperature_C=transport["conductance_temperature_C"],
                 stage_area_m2_by_stage=transport["stage_area_m2_by_stage"],
+                stage_hydraulic_diameter_m_by_stage=transport[
+                    "stage_hydraulic_diameter_m_by_stage"
+                ],
                 stage_area_geometry_provenance_notice=transport.get(
                     "stage_area_geometry_provenance_notice", {}
                 ),

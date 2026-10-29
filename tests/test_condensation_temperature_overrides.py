@@ -917,7 +917,7 @@ def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
 
     setpoints = load_config_bundle().setpoints
     expected = (
-        (1400, 1600), (1100, 1400), (1100, 1300), (900, 1200),
+        (1400, 1600), (1150, 1150), (1100, 1300), (900, 1200),
         (350, 700), (200, 350), (50, 200), (20, 50),
     )
     sim = _collector_sim(setpoints)
