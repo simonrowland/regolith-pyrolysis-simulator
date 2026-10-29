@@ -3472,21 +3472,16 @@ class EvaporationMixin:
             campaign_name = str(getattr(campaign, 'name', '') or '')
             # Keep the global request phase on the legacy hot-train contract.
             # C0 does not select stage0_p_carriers: phosphorus stays condensed
-            # through C0. C0B still selects c0b_p_cleanup. Flipping the whole
-            # phase to stage0 would change unrelated Na/Fe eligibility.
+            # through C0. C0B adds P carriers to the ordinary evaporation
+            # channels. Flipping the whole phase to stage0 would change
+            # unrelated Na/Fe eligibility.
             request_stage = (
                 'c0b_p_cleanup'
                 if campaign_name == 'C0B'
                 else 'evaporation'
             )
             effective_pressure_species_ids = effective_pressure_source.species_ids
-            if campaign_name == 'C0B':
-                effective_pressure_species_ids = frozenset(
-                    species_id
-                    for species_id in effective_pressure_species_ids
-                    if species_id in _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
-                )
-            elif campaign_name == 'C0':
+            if campaign_name == 'C0':
                 # Drop the carriers from the claim. Leaving them claimed on
                 # stage evaporation fail-closes the batch: their stage0_only
                 # predicate does not wake, and the pre-RG guard refuses any
