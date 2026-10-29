@@ -129,7 +129,7 @@ def test_isolated_migration_maps_compositions_temperatures_and_unknown_condition
         assert row.identity.total_pressure_Pa is not None
         assert row.identity.total_pressure_Pa.is_unknown
         assert "total_pressure_Pa" not in row.point_conditions
-        assert "fO2_Pa" not in row.point_conditions
+        assert row.point_conditions["fO2_Pa"].state.is_unknown
 
     bracket = by_id["kushiro_1971_mixture_a_chromite_first_appearance_bracket"]
     assert bracket.identity.quantity.is_value
