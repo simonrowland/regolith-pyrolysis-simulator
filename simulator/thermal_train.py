@@ -24,8 +24,12 @@ from simulator.condensation import (
     antoine_dew_temperature_diagnostic,
     authoritative_condensation_temperature,
 )
-from simulator.condensation_routing import designated_stage_number
-from simulator.config import DEFAULT_DATA_DIR, resolve_collector_bands_C
+from simulator.condensation_routing import DESIGNATED_STAGE, designated_stage_number
+from simulator.config import (
+    DEFAULT_DATA_DIR,
+    resolve_collector_bands_C,
+    resolve_substage_bands_C,
+)
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT,
@@ -1281,12 +1285,18 @@ def knudsen_anchor(
 
 def condensation_stage_windows_K(setpoints: Mapping[str, Any]) -> dict[str, tuple[float, float]]:
     bands = resolve_collector_bands_C(setpoints)
+    substage_bands = resolve_substage_bands_C(setpoints)
     windows: dict[str, tuple[float, float]] = {}
     for species in ("Fe", "Cr", "CrO2", "Mn", "SiO", "Na", "K", "Mg"):
-        stage_number = designated_stage_number(species)
-        if stage_number in bands:
+        destination = DESIGNATED_STAGE.get(species)
+        if destination in substage_bands:
+            low, high = substage_bands[destination]
+        else:
+            stage_number = designated_stage_number(species)
+            if stage_number not in bands:
+                continue
             low, high = bands[stage_number]
-            windows[species] = (low + KELVIN_OFFSET, high + KELVIN_OFFSET)
+        windows[species] = (low + KELVIN_OFFSET, high + KELVIN_OFFSET)
     return windows
 
 

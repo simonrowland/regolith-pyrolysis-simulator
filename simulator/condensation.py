@@ -30,7 +30,7 @@ Train topology (metals train, active C2A onward):
              the reactive Si/SiO2 product limit at or below the declared
              SiO routing temperature; unavailable inputs remain refusals.
              Stage-3 capture has no axial stirring suppression gate.
-    Stage 4  Alkali/Mg cyclone (350-700°C) — Na/K/Mg condensation
+    Stage 4  Na collector (250°C wall) — Na/Mg. K is stage 4b.
     Stage 5  Vortex dust filter (200-350°C) — entrained particle capture
     Stage 6  Turbine-compressor      — pressure regulation, pO₂ control
     Stage 7  Turbine outlet monitor — terminal ledger owns O2 storage
@@ -130,11 +130,16 @@ from simulator.lab_geometry import (
     require_lab_pipe_diameter,
 )
 from simulator.condensation_routing import (
+    DESIGNATED_STAGE,
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
     STAGE_KEY_BY_NUMBER,
+    accepted_species_for_stage_key,
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
     designated_stage_number,
     is_designated_for_stage,
+    species_accepted_on_stage,
 )
 from simulator.state import (
     CampaignPhase,
@@ -362,6 +367,10 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     3: 'sio_stage3',
     4: 'alkali_stage4',
     7: 'terminal',
+}
+# The K trap shares stage number 4, so it cannot use the integer area map.
+STAGE_AREA_KEY_BY_STAGE_KEY = {
+    K_TRAP_STAGE_KEY: 'k_stage4b',
 }
 SUPPORTED_CARRIER_GAS_LABELS = (
     'He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2'
@@ -2730,7 +2739,12 @@ class CondensationModel:
         self,
         wall_temperature_C: float,
     ) -> list[PipeSegment]:
-        stages = sorted(self.train.stages, key=lambda stage: stage.stage_number)
+        # Ducts follow public stage numbers. The K trap shares stage 4 and
+        # has no duct of its own. Visit order is stage_visit_key in route().
+        stages = sorted(
+            (stage for stage in self.train.stages if int(stage.sub_order) == 0),
+            key=lambda stage: stage.stage_number,
+        )
         if len(stages) < 2:
             return []
         diameter_m = require_lab_pipe_diameter(
@@ -2762,13 +2776,38 @@ class CondensationModel:
         return segments
 
     def _stage_area_m2_for_stage_number(self, stage_number: int) -> float | None:
-        for key in (STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number)),
-                    f'stage_{stage_number}', str(stage_number)):
-            if key is None or key not in self.stage_area_m2_by_stage:
+        return self._stage_area_m2_for_keys((
+            STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number)),
+            f'stage_{stage_number}',
+            str(stage_number),
+        ))
+
+    def _stage_area_m2_for_stage(self, stage: CondensationStage) -> float | None:
+        """Area for this stage object. The K trap does not inherit stage 4."""
+
+        stage_key = getattr(stage, 'stage_key', '') or ''
+        mapped = STAGE_AREA_KEY_BY_STAGE_KEY.get(stage_key)
+        if mapped is not None:
+            keys = (mapped, stage_key, str(stage.stage_number))
+        else:
+            keys = (
+                STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage.stage_number)),
+                f'stage_{stage.stage_number}',
+                str(stage.stage_number),
+            )
+        return self._stage_area_m2_for_keys(keys)
+
+    def _stage_area_m2_for_keys(self, keys: tuple[object, ...]) -> float | None:
+        for key in keys:
+            if not isinstance(key, str) or key not in self.stage_area_m2_by_stage:
                 continue
-            area_m2 = _deposition_finite_scalar('stage_area_m2', self.stage_area_m2_by_stage[key])
+            area_m2 = _deposition_finite_scalar(
+                'stage_area_m2', self.stage_area_m2_by_stage[key],
+            )
             if area_m2 < 0.0:
-                raise DepositionInputRefusal('stage_area_m2', area_m2, 'must be nonnegative')
+                raise DepositionInputRefusal(
+                    'stage_area_m2', area_m2, 'must be nonnegative',
+                )
             return area_m2
         return None
 
@@ -3132,16 +3171,21 @@ class CondensationModel:
         # The train is causal: each entering wall and then its stage consume
         # one shared inlet mixture. Recompute Dalton partials only AFTER all
         # species at that location have been evaluated, preserving carrier flow.
-        for stage in sorted(self.train.stages, key=lambda item: item.stage_number):
+        for stage in sorted(self.train.stages, key=stage_visit_key):
             # Validate this destination's coefficient before its incoming wall
             # can consume the supply; a clean stage cannot hide missing alpha.
+            alpha_surface = _stage_alpha_surface_key(stage)
             for species, route in stage_route_by_species.items():
-                if flowing_rates.get(species, 0.0) <= 1e-15 or _cr_stage_isolation_blocks(stage, species):
+                if flowing_rates.get(species, 0.0) <= 1e-15 or _stage_isolation_blocks(stage, species):
                     continue
                 record = _stage_alpha_record(stage, species, self.materials)
                 _required_record_alpha_s(record, species=species, site='stage_deposition')
-                route['stage_alpha_records_by_stage'][stage.stage_number] = record
+                route['stage_alpha_records_by_stage'][alpha_surface] = record
             for segment in self.pipe_segments:
+                # The K trap shares stage number 4 and has no duct. The
+                # stage_3_to_stage_4 wall belongs to the Na collector only.
+                if int(stage.sub_order) != 0:
+                    break
                 if (
                     not (
                         _segment_stage_number(segment.downstream_stage) == stage.stage_number
@@ -3191,9 +3235,9 @@ class CondensationModel:
             stage_removed: dict[str, float] = {}
             for species, route in stage_route_by_species.items():
                 supply = flowing_rates.get(species, 0.0)
-                if supply <= 1e-15 or _cr_stage_isolation_blocks(stage, species):
+                if supply <= 1e-15 or _stage_isolation_blocks(stage, species):
                     continue
-                alpha_record = route['stage_alpha_records_by_stage'][stage.stage_number]
+                alpha_record = route['stage_alpha_records_by_stage'][alpha_surface]
                 try:
                     eta = self._condensation_efficiency(
                         stage=stage, species=species, T_cond_C=route['T_cond_C'],
@@ -3233,6 +3277,10 @@ class CondensationModel:
                 deposit = supply * eta
                 if deposit > 1e-15:
                     route['hkl_condensed_by_stage'][stage.stage_number] = deposit
+                    if not species_accepted_on_stage(stage, species):
+                        route.setdefault('impurity_stage_numbers', set()).add(
+                            stage.stage_number,
+                        )
                     stage_removed[species] = deposit
             for species, deposit in stage_removed.items():
                 flowing_rates[species] = max(0.0, flowing_rates[species] - deposit)
@@ -3383,8 +3431,8 @@ class CondensationModel:
                         transport_notice)
             wall_hkl_kg = sum(wall_hkl_by_segment.values())
             alpha_provenance = wall_sticking_alpha_provenance_by_species.setdefault(species, {})
-            for stage_number, record in stage_alpha_records_by_stage.items():
-                alpha_provenance[f'stage_{stage_number}'] = copy.deepcopy(record)
+            for surface_key, record in stage_alpha_records_by_stage.items():
+                alpha_provenance[str(surface_key)] = copy.deepcopy(record)
 
             if wall_hkl_kg > 1e-15:
                 wall_deposit_by_species[species] = wall_hkl_kg
@@ -3398,9 +3446,10 @@ class CondensationModel:
                         wall_deposit_by_segment_species, species, wall_hkl_kg, self.pipe_segments,
                     )
                 )
+            impurity_stages = stage_route.get('impurity_stage_numbers', ())
             for stage_number, deposit in hkl_condensed_by_stage.items():
                 condensed_by_stage_species.setdefault(stage_number, {})[species] = deposit
-                if not is_designated_for_stage(species, stage_number):
+                if stage_number in impurity_stages:
                     impurity_by_stage_species.setdefault(stage_number, {})[species] = deposit
             remaining_by_species[species] = flowing_rates[species]
 
@@ -4159,7 +4208,7 @@ class CondensationModel:
             raise DepositionInputRefusal('flowing_pressure_pa', p_in, 'must be nonnegative')
         if p_in == 0.0:
             return _mint_zero('nonpositive_local_pressure', P_local_pa=p_in)
-        area = self._stage_area_m2_for_stage_number(stage.stage_number)
+        area = self._stage_area_m2_for_stage(stage)
         if area is None and (
             self.lab_geometry is not None
             or (stage.stage_number in (0, 5, 6) and not stage.target_species)
@@ -7191,6 +7240,47 @@ def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
 
 
 
+def stage_visit_key(stage: CondensationStage) -> tuple[int, int]:
+    """Visit order for route(). sub_order is 0 except the K trap, which is 1.
+
+    Sorting by stage_number alone would visit the K trap with stage 4, but
+    could not place it after stage 7: (4, any sub_order) stays before 5.
+    A mutation that sets the trap's stage_number above 7 moves it after
+    stage 7 and turns the visit-order pin red.
+    """
+
+    return (int(stage.stage_number), int(stage.sub_order))
+
+
+def _stage_alpha_surface_key(stage: CondensationStage) -> str:
+    if int(stage.sub_order) != 0 and getattr(stage, 'stage_key', ''):
+        return str(stage.stage_key)
+    return f'stage_{int(stage.stage_number)}'
+
+
+def _cold_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
+    """Own taps on the cold alkali stages only. Not applied to stage 1.
+
+    The Na collector rejects K. The K trap accepts only species designated
+    to that key. Mg and every other species stage 4 captures stay on stage 4.
+    """
+
+    key = getattr(stage, 'stage_key', '') or ''
+    designated = DESIGNATED_STAGE.get(species)
+    if key == NA_COLLECTOR_STAGE_KEY:
+        return designated == K_TRAP_STAGE_KEY
+    if key == K_TRAP_STAGE_KEY:
+        return designated != K_TRAP_STAGE_KEY
+    return False
+
+
+def _stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
+    return (
+        _cr_stage_isolation_blocks(stage, species)
+        or _cold_stage_isolation_blocks(stage, species)
+    )
+
+
 def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
     chromium_stage = 'CrO2' in stage.target_species
     designated_stage = designated_stage_number(species)
@@ -7425,7 +7515,8 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
     report: dict[str, dict[str, Any]] = {}
     for stage in train.stages:
         stage_number = int(stage.stage_number)
-        stage_key = STAGE_KEY_BY_NUMBER.get(
+        explicit_key = getattr(stage, 'stage_key', '') or ''
+        stage_key = explicit_key or STAGE_KEY_BY_NUMBER.get(
             stage_number, f'stage_{stage_number}')
         collected_kg = {
             species: _finite_nonnegative_value(
@@ -7434,8 +7525,15 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             )
             for species, raw_kg in stage.collected_kg.items()
         }
-        accepted_species = accepted_species_for_stage_number(stage_number)
-        coproduct_species = coproduct_species_for_stage_number(stage_number)
+        if explicit_key:
+            accepted_species = accepted_species_for_stage_key(explicit_key)
+            coproduct_species = frozenset(
+                species for species in coproduct_species_for_stage_number(stage_number)
+                if species in accepted_species
+            )
+        else:
+            accepted_species = accepted_species_for_stage_number(stage_number)
+            coproduct_species = coproduct_species_for_stage_number(stage_number)
         designated_species_kg: dict[str, float] = {}
         coproduct_species_kg: dict[str, float] = {}
         impurity_species_kg: dict[str, float] = {}
@@ -7449,7 +7547,7 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
                 continue
             if species in coproduct_species:
                 coproduct_species_kg[species] = kg
-            elif is_designated_for_stage(species, stage_number):
+            elif species in accepted_species:
                 designated_species_kg[species] = kg
             else:
                 impurity_species_kg[species] = kg

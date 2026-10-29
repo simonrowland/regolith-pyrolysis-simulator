@@ -638,8 +638,14 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
 
 def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback():
     def route_calcium(vapor_pressure_data=None):
+        train = CondensationTrain.create_default()
+        # The shipped 250 C Na wall selects a Ca coefficient segment other
+        # than pure_component_antoine, so both curves saturate and the route
+        # masses match. This wiring check keeps the wall where that A is
+        # the curve route() evaluates.
+        train.stages[4].temp_range_C = (350.0, 700.0)
         model = CondensationModel(
-            CondensationTrain.create_default(),
+            train,
             vapor_pressure_data=vapor_pressure_data,
             wall_temperature_C=900.0,
         )
@@ -918,7 +924,8 @@ def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
     setpoints = load_config_bundle().setpoints
     expected = (
         (1400, 1600), (1150, 1150), (1100, 1300), (900, 1200),
-        (350, 700), (200, 350), (50, 200), (20, 50),
+        (250, 250), (200, 350), (50, 200), (20, 50),
+        (40, 40),
     )
     sim = _collector_sim(setpoints)
     for reset in (False, True, True):
@@ -933,7 +940,9 @@ def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
         'stage_0_hot_duct', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
         'stage_3_sio_zone', 'stage_4_alkali_mg_cyclone', 'stage_5_vortex_dust_filter',
     )) == expected[:6]
-    assert condensation_stage_windows_K(setpoints)['K'] == (623.15, 973.15)
+    assert condensation_stage_windows_K(setpoints)['Na'] == (523.15, 523.15)
+    assert condensation_stage_windows_K(setpoints)['Mg'] == (523.15, 523.15)
+    assert condensation_stage_windows_K(setpoints)['K'] == (313.15, 313.15)
     schema = RecipeSchema(setpoints=setpoints)
     assert tuple(
         (schema.spec_for(tuple(
@@ -944,7 +953,7 @@ def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
             .split('.')
         )).high)
         for name in ('stage_4_to_stage_5', 'stage_5_to_stage_6', 'stage_6_to_stage_7')
-    ) == ((200.0, 700.0), (50.0, 350.0), (20.0, 200.0))
+    ) == ((200.0, 250.0), (50.0, 350.0), (20.0, 200.0))
 
 
 @pytest.mark.parametrize('initialize_before_reset', [False, True])
@@ -957,7 +966,7 @@ def test_yaml_only_collector_band_reaches_all_consumers(
 
     source = Path(__file__).resolve().parents[1] / 'data' / 'setpoints.yaml'
     changed = source.read_text().replace(
-        'temp_range_C: [350, 700]', 'temp_range_C: [150, 250]', 1,
+        'temp_range_C: [250, 250]', 'temp_range_C: [150, 250]', 1,
     )
     assert changed != source.read_text()
     path = tmp_path / 'setpoints.yaml'
@@ -975,13 +984,17 @@ def test_yaml_only_collector_band_reaches_all_consumers(
 
     def observed_band(stage):
         result = original_band(stage)
-        if stage.stage_number == 4:
+        if stage.stage_number == 4 and int(getattr(stage, 'sub_order', 0) or 0) == 0:
             seen['hkl_band'].append(result)
         return result
 
     def observed_capture(self, *args, **kwargs):
         stage = kwargs.get('stage')
-        if stage is not None and stage.stage_number == 4:
+        if (
+            stage is not None
+            and stage.stage_number == 4
+            and int(getattr(stage, 'sub_order', 0) or 0) == 0
+        ):
             seen['capture'].append(stage.temp_range_C)
         return original_capture(self, *args, **kwargs)
 
@@ -1007,13 +1020,15 @@ def test_yaml_only_collector_band_reaches_all_consumers(
         assert model.train.stages[4].temp_range_C == band
         for calls in seen.values():
             calls.clear()
+        # K is isolated off the Na collector, and the band spy only records
+        # sub_order 0. Na is what still walks stage 4's capture law.
         model.configure_operating_conditions(
-            overhead_pressure_mbar=1.0,
-            species_partial_pressures_mbar={'K': 1.0},
+            overhead_pressure_mbar=2.0,
+            species_partial_pressures_mbar={'K': 1.0, 'Na': 1.0},
             stage_area_m2_by_stage={str(s.stage_number): 1.0 for s in model.train.stages},
         )
         route = model.route(
-            EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
+            EvaporationFlux(species_kg_hr={'K': 1.0, 'Na': 1.0}, total_kg_hr=2.0),
             MeltState(temperature_C=1650.0),
         )
         for consumer, calls in seen.items():
@@ -1021,13 +1036,15 @@ def test_yaml_only_collector_band_reaches_all_consumers(
         allocations.append(route.condensed_by_stage_species)
         # The YAML experiment must affect capture, beyond reporting the band.
         assert route.condensed_by_stage_species[4]['K'] != 0.069231258147549
-        assert independent.train.stages[4].temp_range_C == (350, 700)
+        assert independent.train.stages[4].temp_range_C == (250, 250)
         assert independent.condensation_model.train is independent.train
     assert allocations[0] == allocations[1]
 
     windows = condensation_stage_windows_K(setpoints)
-    for species in ('Na', 'K', 'Mg'):
+    for species in ('Na', 'Mg'):
         assert windows[species] == tuple(value + 273.15 for value in band)
+    # K follows the K-trap band, which this experiment does not edit.
+    assert windows['K'] == (313.15, 313.15)
     schema = RecipeSchema(setpoints=setpoints)
     spec = schema.spec_for(tuple(
         'overhead_headspace.pipe_segment_temperatures_C.segments.stage_4_to_stage_5.default_C'

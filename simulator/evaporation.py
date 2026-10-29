@@ -4941,18 +4941,20 @@ class EvaporationMixin:
             for product, kg in product_kg_by_species.items()
             if kg > 1e-12
         }
-        stages_by_number = {
-            stage.stage_number: stage for stage in self.train.stages
-        }
+        from simulator.condensation_routing import collection_stage_index
+
         for stage_number, stage_species in (
             route_result.condensed_by_stage_species.items()
         ):
             projected_kg = stage_species.get(species, 0.0) * scale
             if projected_kg <= 1e-12:
                 continue
-            stage = stages_by_number.get(stage_number)
-            if stage is None:
+            stage_idx = collection_stage_index(
+                self.train, int(stage_number), species,
+            )
+            if stage_idx is None:
                 continue
+            stage = self.train.stages[stage_idx]
             is_impurity = (
                 route_result.impurity_by_stage_species
                 .get(stage_number, {})
@@ -4963,7 +4965,7 @@ class EvaporationMixin:
                 stage_product_kg = projected_kg * product_fraction
                 if stage_product_kg <= 1e-12:
                     continue
-                delta_key = (stage_number, product)
+                delta_key = (int(stage.stage_number), product)
                 deltas = self._last_condensed_by_stage_species_delta
                 deltas[delta_key] = deltas.get(delta_key, 0.0) + stage_product_kg
                 if is_impurity:
@@ -4977,7 +4979,7 @@ class EvaporationMixin:
                 })
                 self._record_stage_collection_source(
                     'process.condensation_train',
-                    stage_number,
+                    stage_idx,
                     product,
                     stage_product_kg,
                 )
