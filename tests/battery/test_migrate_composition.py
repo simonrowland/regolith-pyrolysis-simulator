@@ -1104,17 +1104,70 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     )
     composition = row.identity.composition
     assert composition is not None and composition.is_unknown
-    assert "unsupported numeric component(s): XxO" in composition.reason
+    assert "per-run composition is not published" in composition.reason
     printed = row.point_conditions["printed_composition"]
     assert printed.state.is_value and printed.state.value["XxO"] == Decimal("10")
     condition = row.point_conditions["composition"]
     assert condition.state.is_unknown
-    assert "unsupported numeric component(s): XxO" in condition.state.reason
+    assert "per-run composition is not published" in condition.state.reason
     waypoint = normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
     )
     assert waypoint.selected is None
     assert waypoint.absence is not None
+
+
+def test_markova_initial_charge_stays_context_under_refusal_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Dropping a component refusal cannot promote the initial charge to a datum."""
+    from simulator.battery.waypoints import normalized_composition
+    from tests.battery.test_waypoints import _bench
+
+    path = REPO_ROOT / "data/literature/extracts/kems-025-markova-1983.yaml"
+    doc = migrate_module.load_yaml(path)
+    raw = next(
+        observation
+        for body in doc["species"].values()
+        for observation in body.get("observations", [])
+        if any(
+            "composition_wt_pct" in point
+            for point in observation.get("values", {}).get("points", [])
+        )
+    )
+    point = next(
+        point
+        for point in raw["values"]["points"]
+        if "composition_wt_pct" in point
+    )
+    raw["values"]["composition_wt_pct"] = dict(point["composition_wt_pct"])
+    point["composition_wt_pct"] = dict(point["composition_wt_pct"], XxO=10)
+    original_parse = migrate_module._oxide_map_from_mapping
+
+    def discard_refusal(obj, *, refusal_reason=None, declared_map=False):
+        return original_parse(obj, declared_map=declared_map)
+
+    monkeypatch.setattr(migrate_module, "_oxide_map_from_mapping", discard_refusal)
+    original_load_yaml = migrate_module.load_yaml
+    monkeypatch.setattr(
+        migrate_module,
+        "load_yaml",
+        lambda candidate: doc if candidate == path else original_load_yaml(candidate),
+    )
+    target_t = migrate_module.as_decimal(point["T_C"]) + Decimal("273.15")
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    prefix = f"{doc['source_id']}::{raw['observation_id']}"
+    row = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.startswith(prefix)
+        and observation.identity.temperature_K.value == target_t
+    )
+    assert row.identity.composition.is_unknown
+    assert "per-run composition is not published" in row.identity.composition.reason
+    assert normalized_composition(
+        migrator.result.experiments[row.experiment_id], _bench(), row
+    ).selected is None
 
 
 def test_plante_declared_map_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -2638,18 +2691,15 @@ def test_markova_1983_initial_charge_maps_reach_their_own_rows(
             if sample_map == printed_wt
         )
         point = row["point_conditions"]["composition"]
-        assert point["state"]["tag"] == "value"
-        assert point["state"]["value"]["proxy_flag"] == "initial_charge_only"
+        assert point["state"]["tag"] == "unknown"
+        assert "per-run composition is not published" in point["state"]["reason"]
         assert point["locator"]["published_page"] == 461
-        assert point["locator"]["table"] == "unnumbered"
+        assert point["locator"]["figure"] == str(expected_sample)
 
-        actual = _identity_composition_components(row)
-        expected = dict(wt_pct_to_mole_fraction(samples[expected_sample]).components)
-        assert actual.keys() == expected.keys(), row["observation_id"]
-        assert all(
-            abs(actual[oxide] - amount) < as_decimal("1e-12")
-            for oxide, amount in expected.items()
-        ), (row["observation_id"], expected_sample, actual)
+        identity = row["identity"]["composition"]
+        assert identity["tag"] == "unknown"
+        assert "per-run composition is not published" in identity["reason"]
+        assert printed_wt == samples[expected_sample]
         temperature_k = as_decimal(row["identity"]["temperature_K"]["value"])
         row_by_temperature_k[temperature_k] = row
 
@@ -2662,9 +2712,6 @@ def test_markova_1983_initial_charge_maps_reach_their_own_rows(
     for temperature_k, sample_number in pinned_samples.items():
         row = row_by_temperature_k[temperature_k]
         assert samples[sample_number] == _printed_wt_map(row)
-        assert _identity_composition_components(row) == dict(
-            wt_pct_to_mole_fraction(samples[sample_number]).components
-        )
 
 
 def test_hashimoto_residue_cells_keep_full_printed_point_compositions(

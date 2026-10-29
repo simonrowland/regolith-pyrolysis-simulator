@@ -2,14 +2,14 @@ source_id: kems-025-markova-1983
 source:
   citation: Markova et al. (1983), lunar material vaporization, p. 461.
 extraction:
-  method: Link each existing figure point to the printed initial composition for its labeled sample; measurement values were not re-extracted.
+  method: Preserve each plotted point's printed initial-sample composition as context; measurement values were not re-extracted.
   review_status: draft
-  identity_composition_repair:
+  printed_composition_context:
     source: Table 1, unnumbered caption "The compositions of initial samples", p. 461.
-    code_path: simulator/battery/migrate.py::_initial_oxide_map_from_values
-    historical_before: The parent-first fallback reused the first point's sample map for every later point in each element series.
-    seat_base_before: The base extract migrated 25 p_partial rows with unknown identity composition because composition_role was initial_charge_only.
-    after: All 25 p_partial rows carry their own sample's initial-charge map in point_conditions.composition and the migrator binds it to identity.composition.
+    quote: "Table. The compositions of initial samples"
+    code_path: simulator/battery/migrate.py::_initial_charge_only_missing_composition
+    composition_role: initial_charge_only
+    migrated_result: Identity and point composition remain unknown because per-run composition is not published; each plotted point retains its labeled initial sample map in printed_composition.
     printed_sample_maps_wt_pct:
       I:
         SiO2: 42.86
@@ -51,120 +51,11 @@ extraction:
         CaO: 10.79
         Na2O: 0.71
         K2O: 0.08
-    historical_wrong_rows:
-      - observation: markova_1983_fe_psat_figs_figure_only
-        temperature_C: 1633.05
-        sample: II
-        before_map_sample: I
-        after_map_sample: II
-        point_locator: {published_page: 461, figure: '2'}
-      - observation: markova_1983_fe_psat_figs_figure_only
-        temperature_C: 1711.32
-        sample: II
-        before_map_sample: I
-        after_map_sample: II
-        point_locator: {published_page: 461, figure: '2'}
-      - observation: markova_1983_fe_psat_figs_figure_only
-        temperature_C: 1616.41
-        sample: III
-        before_map_sample: I
-        after_map_sample: III
-        point_locator: {published_page: 461, figure: '3'}
-      - observation: markova_1983_fe_psat_figs_figure_only
-        temperature_C: 1673.43
-        sample: III
-        before_map_sample: I
-        after_map_sample: III
-        point_locator: {published_page: 461, figure: '3'}
-      - observation: markova_1983_fe_psat_figs_figure_only
-        temperature_C: 1767.92
-        sample: III
-        before_map_sample: I
-        after_map_sample: III
-        point_locator: {published_page: 461, figure: '3'}
-      - observation: markova_1983_fe_psat_figs_figure_only
-        temperature_C: 1503.96
-        sample: IV
-        before_map_sample: I
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_fe_psat_figs_figure_only
-        temperature_C: 1563.76
-        sample: IV
-        before_map_sample: I
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_fe_psat_figs_figure_only
-        temperature_C: 1645.77
-        sample: IV
-        before_map_sample: I
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_mg_psat_figs_figure_only
-        temperature_C: 1818.42
-        sample: III
-        before_map_sample: II
-        after_map_sample: III
-        point_locator: {published_page: 461, figure: '3'}
-      - observation: markova_1983_mg_psat_figs_figure_only
-        temperature_C: 1865.67
-        sample: III
-        before_map_sample: II
-        after_map_sample: III
-        point_locator: {published_page: 461, figure: '3'}
-      - observation: markova_1983_mg_psat_figs_figure_only
-        temperature_C: 1922.69
-        sample: III
-        before_map_sample: II
-        after_map_sample: III
-        point_locator: {published_page: 461, figure: '3'}
-      - observation: markova_1983_mg_psat_figs_figure_only
-        temperature_C: 1814.93
-        sample: IV
-        before_map_sample: II
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_mg_psat_figs_figure_only
-        temperature_C: 1896.94
-        sample: IV
-        before_map_sample: II
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_mg_psat_figs_figure_only
-        temperature_C: 1931.11
-        sample: IV
-        before_map_sample: II
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_feo_psat_figs_figure_only
-        temperature_C: 1481.75
-        sample: IV
-        before_map_sample: III
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_feo_psat_figs_figure_only
-        temperature_C: 1574.01
-        sample: IV
-        before_map_sample: III
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_feo_psat_figs_figure_only
-        temperature_C: 1642.36
-        sample: IV
-        before_map_sample: III
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-      - observation: markova_1983_feo_psat_figs_figure_only
-        temperature_C: 1686.78
-        sample: IV
-        before_map_sample: III
-        after_map_sample: IV
-        point_locator: {published_page: 461, figure: '4'}
-    count: 18
     verification:
       migrated_p_partial_rows: 25
-      identity_maps_matching_their_printed_sample: 25
+      printed_compositions_matching_labeled_sample: 25
+      identity_and_point_compositions_unknown: 25
       pinned_sample_rows:
-        - {sample: II, source_temperature_C: 1633.05, identity_temperature_K: 1906.20, locator: {published_page: 461, table: unnumbered}}
-        - {sample: III, source_temperature_C: 1616.41, identity_temperature_K: 1889.56, locator: {published_page: 461, table: unnumbered}}
-        - {sample: IV, source_temperature_C: 1503.96, identity_temperature_K: 1777.11, locator: {published_page: 461, table: unnumbered}}
+        - {sample: II, source_temperature_C: 1633.05, identity_temperature_K: 1906.20, locator: {published_page: 461, figure: '2'}}
+        - {sample: III, source_temperature_C: 1616.41, identity_temperature_K: 1889.56, locator: {published_page: 461, figure: '3'}}
+        - {sample: IV, source_temperature_C: 1503.96, identity_temperature_K: 1777.11, locator: {published_page: 461, figure: '4'}}
