@@ -535,6 +535,7 @@ def build_run_artifact(
         ("vapour_rail_instrumentation", "vapour_rail_instrumentation"),
         ("shadow_trace", "shadow_trace"),
         ("condensation_refusals_by_species", "condensation_refusals_by_species"),
+        ("shuttle_refusal_history", "shuttle_refusal_history"),
         ("yield_disposition", "yield_disposition"),
     ):
         if payload_key in runner_payload:

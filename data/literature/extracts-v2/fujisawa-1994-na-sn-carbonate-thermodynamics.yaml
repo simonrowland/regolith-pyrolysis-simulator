@@ -1,0 +1,3082 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
+observations:
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_1_log_a_NaO05::points:h=9b7e898c8982
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: NaO0.5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq.
+        (5): log a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '20000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise inputs are
+      not stored separately.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 4; represents Table 2 run rows 1-5.
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 4; represents Table 2 run rows 1-5.
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.08'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 4; represents Table 2 run rows 1-5.
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '20000'
+      locator:
+        page: 2
+        published_page: 415
+        section: II. Activity of NaO0.5(l)
+        note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+      inference:
+        relation: MPa_to_Pa
+        inputs:
+        - P_Pa = P_MPa × 1e6
+        - original_unit=MPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+              note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+              note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 4; represents Table 2 run rows 1-5.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 415
+        section: II. Activity of NaO0.5(l)
+      inference:
+        relation: MPa_to_Pa
+        inputs:
+        - P_Pa = P_MPa × 1e6
+        - original_unit=MPa
+        - as_published=0.02 MPa
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+        output_unit: Pa
+        references: []
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_2_log_a_NaO05::points:h=b068d26ca4eb
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: NaO0.5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq.
+        (5): log a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '20000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise inputs are
+      not stored separately.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 7; represents Table 2 run rows 6.
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 7; represents Table 2 run rows 6.
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.03'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 7; represents Table 2 run rows 6.
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '20000'
+      locator:
+        page: 2
+        published_page: 415
+        section: II. Activity of NaO0.5(l)
+        note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+      inference:
+        relation: MPa_to_Pa
+        inputs:
+        - P_Pa = P_MPa × 1e6
+        - original_unit=MPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+              note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+              note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 7; represents Table 2 run rows 6.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 415
+        section: II. Activity of NaO0.5(l)
+      inference:
+        relation: MPa_to_Pa
+        inputs:
+        - P_Pa = P_MPa × 1e6
+        - original_unit=MPa
+        - as_published=0.02 MPa
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+        output_unit: Pa
+        references: []
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_3_log_a_NaO05::points:h=84e70d18cd50
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: NaO0.5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq.
+        (5): log a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '20000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise inputs are
+      not stored separately.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 8; represents Table 2 run rows 7-8.
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 8; represents Table 2 run rows 7-8.
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.01'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 8; represents Table 2 run rows 7-8.
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '20000'
+      locator:
+        page: 2
+        published_page: 415
+        section: II. Activity of NaO0.5(l)
+        note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+      inference:
+        relation: MPa_to_Pa
+        inputs:
+        - P_Pa = P_MPa × 1e6
+        - original_unit=MPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+              note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+              note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 8; represents Table 2 run rows 7-8.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 415
+        section: II. Activity of NaO0.5(l)
+      inference:
+        relation: MPa_to_Pa
+        inputs:
+        - P_Pa = P_MPa × 1e6
+        - original_unit=MPa
+        - as_published=0.02 MPa
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 2
+              published_page: 415
+              section: II. Activity of NaO0.5(l)
+        output_unit: Pa
+        references: []
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r1::points:h=b93108d8b925
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '0.427'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.08'
+      locator:
+        page: 5
+        table: '2'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.427'
+      locator:
+        page: 5
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        table: '2'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.427'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r2::points:h=f70d59a198fe
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '1.07'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.08'
+      locator:
+        page: 5
+        table: '2'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '1.07'
+      locator:
+        page: 5
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        table: '2'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.07'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r3::points:h=02e581f1afe7
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '1.26'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.08'
+      locator:
+        page: 5
+        table: '2'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '1.26'
+      locator:
+        page: 5
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        table: '2'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.26'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r4::points:h=a9dd167aef10
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '0.562'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.08'
+      locator:
+        page: 5
+        table: '2'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.562'
+      locator:
+        page: 5
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        table: '2'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.562'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r5::points:h=72e1e66e50e8
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '0.55'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.08'
+      locator:
+        page: 5
+        table: '2'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.55'
+      locator:
+        page: 5
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        table: '2'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.55'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r6::points:h=810fd3185f4d
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '0.014'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.03'
+      locator:
+        page: 5
+        table: '2'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.014'
+      locator:
+        page: 5
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        table: '2'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.014'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r7::points:h=2feae6b87aca
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '0.021'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.01'
+      locator:
+        page: 5
+        table: '2'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.021'
+      locator:
+        page: 5
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        table: '2'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.021'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r8::points:h=8928185c97c3
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+    fO2_Pa:
+      tag: value
+      value: '0.019'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 2
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 418
+        table: '2'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 5
+    table: '2'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.01'
+      locator:
+        page: 5
+        table: '2'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.019'
+      locator:
+        page: 5
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+      locator:
+        page: 5
+        table: '2'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.019'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r1::points:h=7e320eee27ce
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0091'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.08'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0091'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0091'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r2::points:h=5e7a03a219f7
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0091'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.08'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0091'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0091'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r3::points:h=2c2bfa838dae
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0091'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.03'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0091'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0091'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r4::points:h=9889f0a7c034
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0081'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.03'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0081'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0081'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r5::points:h=f3b94142f7e9
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0123'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.03'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0123'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0123'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r6::points:h=a64dc0935bf9
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0112'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.03'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0112'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0112'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r7::points:h=4f40f56ff8d8
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0977'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.03'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0977'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0977'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r8::points:h=7874f6b3b504
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0832'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.03'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0832'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0832'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+- observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r9::points:h=d7e5f128dbab
+  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+    fO2_Pa:
+      tag: value
+      value: '0.0195'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: value, phase, table_row_number, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fujisawa et al. (1994), Table 3
+  admission:
+    status: rejected
+    reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
+      stored as observations and the schema has no log-activity form.
+    decided_by:
+      worker: w1027na7b-fuji94
+      date: '2026-10-27'
+      evidence:
+        page: 6
+        published_page: 419
+        table: '3'
+  notices: []
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  locator:
+    page: 6
+    table: '3'
+  read_from: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+    CO2_partial_pressure_MPa:
+      state:
+        tag: value
+        value: '0.01'
+      locator:
+        page: 6
+        table: '3'
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0195'
+      locator:
+        page: 6
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+      locator:
+        page: 6
+        table: '3'
+        note: No complete run-wise slag composition is printed.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0195'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'

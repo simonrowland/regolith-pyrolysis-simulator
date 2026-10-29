@@ -2800,6 +2800,101 @@ def test_ca2_compiled_oxide_extrapolation_keeps_source_reason_and_certified_band
     ] == notice
 
 
+def test_compiled_source_activity_floor_is_reported_without_changing_pressure(
+    vapor_pressure_data, monkeypatch
+):
+    activity = {"value": 1.0e-310}
+
+    def with_activity(*args, **kwargs):
+        from simulator.chemistry.melt_activity import MeltOxideActivity
+
+        parent = args[0]
+        return MeltOxideActivity(
+            parent_oxide=parent,
+            single_cation_component=parent,
+            gamma=1.0,
+            x_single_cation=activity["value"],
+            activity=activity["value"],
+            citation="test activity injection",
+        )
+
+    monkeypatch.setattr(
+        vapor_pressure_module, "_high_t_activity_for_parent", with_activity
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    out_of_band_temperature = 1300.0
+    out_of_band = provider.dispatch(
+        _request_for_oxide_at_T_K("Al2O3", out_of_band_temperature)
+    )
+    assert out_of_band.status == "ok"
+    out_of_band_notice = out_of_band.diagnostic[
+        "extrapolated_beyond_valid_range_K"
+    ]["AlO"]
+    assert out_of_band_notice["reason"] == (
+        "oxide_vapor_pressure_out_of_validated_range"
+    )
+    assert tuple(out_of_band_notice["certified_band"]["temperature_K"]) == (
+        1400.0,
+        2273.15,
+    )
+    out_of_band_provenance = out_of_band.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["AlO"]
+    assert out_of_band_provenance["source_activity_floor_notice"]["reason"] == (
+        vapor_pressure_module.COMPILED_SOURCE_ACTIVITY_FLOOR_REASON
+    )
+    assert out_of_band_provenance["extrapolation_notice"] == out_of_band_notice
+
+    in_band_temperature = 1836.58
+    activity["value"] = 1.0e-310
+    in_band = provider.dispatch(
+        _request_for_oxide_at_T_K("Al2O3", in_band_temperature)
+    )
+    assert in_band.status == "ok"
+    in_band_provenance = in_band.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["AlO"]
+    floor_notice = in_band_provenance["source_activity_floor_notice"]
+    threshold = vapor_pressure_module.COMPILED_SOURCE_ACTIVITY_FLOOR
+    assert floor_notice == {
+        "authority_level": "extrapolated",
+        "reason": vapor_pressure_module.COMPILED_SOURCE_ACTIVITY_FLOOR_REASON,
+        "certified_band": {"source_activity": (threshold, 1.0)},
+        "source_activity_used": 1.0e-310,
+    }
+    assert in_band_provenance["extrapolation_notice"] == floor_notice
+    evaluator = provider._vapour_rail_catalog.evaluator_for_hot_train(
+        "AlO", process_phase=None
+    )
+    assert evaluator is not None
+    floor_pressure = evaluator.evaluate(
+        in_band_temperature, source_activity=threshold, pO2_bar=1.0e-9
+    ).pressure_pa
+    raw_pressure = evaluator.evaluate(
+        in_band_temperature, source_activity=activity["value"], pO2_bar=1.0e-9
+    ).pressure_pa
+    provider_pressure = in_band.diagnostic["vapor_pressures_Pa"]["AlO"]
+    assert provider_pressure.hex() == floor_pressure.hex()
+    assert provider_pressure.hex() != raw_pressure.hex()
+    source = in_band.diagnostic["vapor_pressures_source"]["AlO"]
+    assert source.endswith(":" + floor_notice["reason"])
+    from simulator.grind_preflight import _is_noncertifying_vapor_extrapolation
+
+    assert _is_noncertifying_vapor_extrapolation("AlO", source)
+
+    activity["value"] = 2.0e-300
+    above = provider.dispatch(
+        _request_for_oxide_at_T_K("Al2O3", in_band_temperature)
+    )
+    above_provenance = above.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["AlO"]
+    assert "source_activity_floor_notice" not in above_provenance
+    assert not above.diagnostic["vapor_pressures_source"]["AlO"].endswith(
+        ":" + vapor_pressure_module.COMPILED_SOURCE_ACTIVITY_FLOOR_REASON
+    )
+
+
 def test_sio_extrapolation_notice_reaches_public_numeric_answer(vapor_pressure_data):
     import json
     from simulator.vapour_rail.batch import (

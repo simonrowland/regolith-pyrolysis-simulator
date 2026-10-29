@@ -2317,7 +2317,7 @@ def _tick_payload(
         ),
         'pressure_mbar': snapshot.overhead.pressure_mbar,
         'atmosphere': sim.melt.atmosphere.name,
-        'p_total_mbar': round(sim.melt.p_total_mbar, 3),
+        'p_total_mbar': sim.melt.p_total_mbar,
         'pO2_mbar': round(sim.melt.pO2_mbar, 6),
         'ambient_pressure_mbar': round(
             sim.melt.ambient_pressure_mbar, 3),

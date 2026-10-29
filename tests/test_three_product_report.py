@@ -177,15 +177,63 @@ def test_silica_glass_reads_stage_3_collected_kg():
     }
 
 
-def test_silica_glass_zero_when_stage_3_missing():
-    """No stage 3 in the train → zero capture, no crash."""
+def test_silica_glass_capture_is_unavailable_when_stage_3_is_missing():
     sim = SimpleNamespace(
         product_ledger=lambda: {},
         train=SimpleNamespace(stages=[]),
         atom_ledger=None,
     )
     result = classify_products(sim)
-    assert result['pure_silica_glass']['stage_3_capture_kg'] == 0.0
+
+    silica = result['pure_silica_glass']
+    assert silica['stage_3_capture_kg'] is None
+    assert silica['class_total_kg'] is None
+    assert silica['flag']['status'] == 'unavailable'
+    assert silica['flag']['reason'] == 'stage_3_missing'
+    assert silica['stage_3_kg_by_species'] == {}
+    assert result['glass']['class_total_kg'] is None
+    assert result['glass']['pure_silica_glass_kg'] is None
+
+
+@pytest.mark.parametrize(
+    ('stage_3', 'reason'),
+    [
+        (SimpleNamespace(), 'stage_3_collection_missing'),
+        (SimpleNamespace(collected_kg=None), 'stage_3_collection_missing'),
+        (SimpleNamespace(collected_kg=[]), 'stage_3_collection_malformed'),
+    ],
+)
+def test_silica_glass_capture_is_unavailable_when_stage_3_collection_is_unknown(
+    stage_3, reason
+):
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[None, None, None, stage_3]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+
+    silica = result['pure_silica_glass']
+    assert silica['stage_3_capture_kg'] is None
+    assert silica['class_total_kg'] is None
+    assert silica['flag']['status'] == 'unavailable'
+    assert silica['flag']['reason'] == reason
+    assert result['glass']['pure_silica_glass_kg'] is None
+
+
+def test_silica_glass_capture_is_zero_when_stage_3_exists_with_no_collection():
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(
+            stages=[None, None, None, SimpleNamespace(collected_kg={})],
+        ),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+
+    silica = result['pure_silica_glass']
+    assert silica['stage_3_capture_kg'] == 0.0
+    assert 'flag' not in silica
     assert result['pure_silica_glass']['stage_3_kg_by_species'] == {}
 
 
@@ -599,7 +647,10 @@ def test_classifier_handles_empty_product_ledger():
     )
     result = classify_products(sim)
     assert result['metals_plus_O2']['class_total_kg'] == 0.0
-    assert result['pure_silica_glass']['class_total_kg'] == 0.0
+    assert result['pure_silica_glass']['stage_3_capture_kg'] is None
+    assert result['pure_silica_glass']['class_total_kg'] is None
+    assert result['pure_silica_glass']['flag']['reason'] == 'stage_3_missing'
+    assert result['glass']['pure_silica_glass_kg'] is None
     assert result['refractory_ceramic_rump']['class_total_kg'] == 0.0
     assert result['unclassified']['total_kg'] == 0.0
 
@@ -612,12 +663,17 @@ def test_classifier_handles_missing_product_ledger_method():
         atom_ledger=None,
     )
     result = classify_products(sim)
-    # Empty everything.
+    # Missing Stage 3 is unavailable; the unrelated empty classes remain zero.
     for bucket in (
-        'metals_plus_O2', 'pure_silica_glass',
+        'metals_plus_O2',
         'industrial_mixed_glass', 'refractory_ceramic_rump',
     ):
         assert result[bucket]['class_total_kg'] == 0.0
+    assert result['pure_silica_glass']['stage_3_capture_kg'] is None
+    assert result['pure_silica_glass']['class_total_kg'] is None
+    assert result['pure_silica_glass']['flag']['reason'] == 'stage_3_missing'
+    assert result['glass']['class_total_kg'] is None
+    assert result['glass']['pure_silica_glass_kg'] is None
 
 
 def test_classifier_handles_non_coercible_product_kg():

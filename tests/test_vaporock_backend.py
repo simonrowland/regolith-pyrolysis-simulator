@@ -27,7 +27,16 @@ from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.state import OXIDE_SPECIES
 
 
+def _allow_fake_native_loader(monkeypatch):
+    monkeypatch.setattr(
+        vaporock_module,
+        "_load_thermoengine_phaseobjc_library",
+        lambda: Path("/fake/libphaseobjc.dylib"),
+    )
+
+
 def _install_fake_import(monkeypatch, fake_module):
+    _allow_fake_native_loader(monkeypatch)
     calls = []
 
     def fake_import_module(name):
@@ -100,6 +109,8 @@ def _assert_h2_melt_envelope(diagnostics, *, temperature_K, status):
 
 
 def test_missing_vaporock_import_marks_backend_unavailable(monkeypatch):
+    _allow_fake_native_loader(monkeypatch)
+
     def fake_import_module(name):
         raise ImportError(name)
 
@@ -1231,6 +1242,8 @@ def test_vaporock_table_boundary_propagates_local_errors_and_reports_engine_type
 
 
 def test_vaporock_import_boundary_handles_library_failures_only(monkeypatch):
+    _allow_fake_native_loader(monkeypatch)
+
     def fail_import(_name):
         raise KeyError("local import wrapper bug")
 
@@ -2317,7 +2330,6 @@ def test_warm_pool_owns_system_lifecycle_live():
 
     Skips when the real vaporock package is not importable in a spawn child.
     """
-    pytest.importorskip("vaporock")
     backend = VapoRockBackend()
     try:
         ok = backend.initialize({
@@ -2328,8 +2340,11 @@ def test_warm_pool_owns_system_lifecycle_live():
             "warm_call_timeout_s": 60.0,
         })
     except Exception as exc:  # noqa: BLE001
+        if isinstance(exc, NameError) or getattr(exc, "exc_name", None) == "NameError":
+            raise
         pytest.skip(f"warm pool failed to start: {exc}")
     if not ok:
+        assert "NameError" not in str(backend._last_error)
         pytest.skip(
             f"warm pool unavailable: {backend._last_error}"
         )
@@ -3607,6 +3622,7 @@ def test_system_call_warm_and_cold_paths_match_float_hex_golden():
 def test_provider_selection_falls_back_with_native_init_failure_reason(
     monkeypatch,
 ):
+    _allow_fake_native_loader(monkeypatch)
     instances = []
     backend_class = VapoRockBackend
 
@@ -3636,6 +3652,8 @@ def test_provider_selection_falls_back_with_native_init_failure_reason(
 
 
 def test_warm_worker_native_import_failure_is_typed(monkeypatch):
+    _allow_fake_native_loader(monkeypatch)
+
     def native_load_failure(_name):
         raise OSError("dlopen failed for libphaseobjc")
 
@@ -3648,6 +3666,35 @@ def test_warm_worker_native_import_failure_is_typed(monkeypatch):
 
     assert caught.value.external_exception == "OSError"
     assert caught.value.external_message == "dlopen failed for libphaseobjc"
+
+
+def test_warm_worker_missing_phaseobjc_precedes_objc_import(monkeypatch):
+    imported = []
+
+    def missing_library():
+        raise ImportError("libphaseobjc missing from configured DYLD paths")
+
+    def unreachable_objc_import(name):
+        imported.append(name)
+        raise NameError("ObjC Class b'LiquidMelts' couldn't be found.")
+
+    monkeypatch.setattr(
+        vaporock_module,
+        "_load_thermoengine_phaseobjc_library",
+        missing_library,
+    )
+    monkeypatch.setattr(
+        vaporock_module.importlib,
+        "import_module",
+        unreachable_objc_import,
+    )
+
+    with pytest.raises(vaporock_module.VapoRockCallError) as caught:
+        vaporock_module._bootstrap_vaporock_worker("C", "bar", False)
+
+    assert caught.value.external_exception == "ImportError"
+    assert "libphaseobjc missing" in caught.value.external_message
+    assert imported == []
 
 
 def test_warm_worker_exit_before_ready_is_typed(monkeypatch):

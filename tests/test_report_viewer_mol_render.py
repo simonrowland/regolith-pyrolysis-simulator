@@ -70,6 +70,50 @@ def _render_report_contract() -> dict:
     return json.loads(completed.stdout)
 
 
+def _render_line_chart(values: list[float | None]) -> str:
+    harness = r"""
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+const scriptPath = process.argv[1];
+const context = {
+  console,
+  document: { querySelector: () => ({ innerHTML: "" }) },
+  fetch: () => new Promise(() => {}),
+  URLSearchParams,
+  window: { location: { search: "" } },
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(path.join(path.dirname(scriptPath), "labels.js"), "utf8"), context);
+vm.runInContext(
+  fs.readFileSync(scriptPath, "utf8") + `\nglobalThis.__chart = lineChart("oxygen", "Oxygen", [
+    {label: "pO2", color: "#123456", values: ${JSON.stringify(JSON.parse(fs.readFileSync(0, "utf8")))}}
+  ], {log: true});`,
+  context,
+);
+process.stdout.write(context.__chart);
+"""
+    completed = subprocess.run(
+        ["node", "-e", harness, str(_SCRIPT)],
+        input=json.dumps(values),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return completed.stdout
+
+
+def test_one_point_positive_chart_segments_render_point_markers():
+    html = _render_line_chart([1.0e-6, None, 1.0e-12])
+
+    assert html.count('<circle class="series-point"') == 2
+    assert 'fill:#123456' in html
+    assert '<polyline class="series"' not in html
+
+
 # Regression: WEBQA-002 — JS coercion could fabricate boolean/array mol cells.
 # Found by /qa on 2026-07-19
 # Report: docs-private/research/2026-07-19-webqa/report.md

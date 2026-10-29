@@ -1,14 +1,14 @@
 # Battery v2.1 migration report
 
-rows in: 83452
-records out (observations): 171592
-works: 677
-experiments: 6448
-queue size: 111120
+rows in: 84429
+records out (observations): 172655
+works: 698
+experiments: 6588
+queue size: 112746
 identical-payload dedupe aliases: 342
 metadata files: 48
-index sources: 676
-hard issues: 1953
+index sources: 697
+hard issues: 1920
 
 ## Unavailable input work census
 
@@ -211,29 +211,29 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 675 (mismatch) |
-| doi_works | 56 | 366 (mismatch) |
-| no_doi_works | 91 | 311 (mismatch) |
-| admission_statuses | 374 | 27840 (mismatch) |
+| citations | 147 | 696 (mismatch) |
+| doi_works | 56 | 376 (mismatch) |
+| no_doi_works | 91 | 322 (mismatch) |
+| admission_statuses | 374 | 28299 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1271 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1876 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
-| formulas | 1625 | 20470 (mismatch) |
-| equipment_payloads | 670 | 930 (mismatch) |
-| absent_admissions | 3511 | 13416 (mismatch) |
-| absent_classes | 2174 | 2095 (mismatch) |
-| range_only_T | 3125 | 2787 (mismatch) |
-| system_like_phases | 1065 | 3779 (mismatch) |
-| missing_phases | 237 | 1340 (mismatch) |
+| formulas | 1625 | 20929 (mismatch) |
+| equipment_payloads | 670 | 935 (mismatch) |
+| absent_admissions | 3511 | 13934 (mismatch) |
+| absent_classes | 2174 | 2127 (mismatch) |
+| range_only_T | 3125 | 2789 (mismatch) |
+| system_like_phases | 1065 | 4109 (mismatch) |
+| missing_phases | 237 | 1354 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
 
 | source method_class | count |
 |---|---:|
-| `absent` | 432 |
+| `absent` | 464 |
 | `method_only` | 34 |
 | `third_law_kems` | 10 |
 | `derived_from_kems_equilibrium_constants` | 8 |
@@ -259,7 +259,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 ## Unrecognised polymorph tokens
 
-degradations: 104
+degradations: 108
 
 Unrecognised printed spellings become State.unknown with the original spelling in the reason; they are never dropped and never invented. Each degradation is queued on species.polymorph.
 
@@ -270,6 +270,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `TiO2` | 18 |
 | `MgO·2TiO2` | 15 |
 | `MgO·SiO2` | 15 |
+| `hexagonal` | 4 |
 | `enstatite` | 2 |
 
 ## Per source
@@ -17523,8 +17524,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0298-tephroite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0299-willemite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0300-zircon.json` | 1 | 1 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0301-wollastonite.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0302-pseudowollastonite.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0301-wollastonite.json` | 1 | 4 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0302-pseudowollastonite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0303-ca-al-pyroxene.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0304-diopside.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0305-spodumene.json` | 1 | 1 | 0 |
@@ -17533,7 +17534,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0308-jadeite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0309-tremolite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0310-anorthite.json` | 1 | 4 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0311-hexagonal-anorthite.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0311-hexagonal-anorthite.json` | 1 | 4 | 4 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0312-leonhardite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0313-microcline.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0314-high-sanidine.json` | 1 | 0 | 0 |
@@ -18177,6 +18178,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/sgte-unary/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/extracts/1997jonesthermo.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml` | 8 | 9 | 33 |
+| `data/literature/extracts/abdeyazdan-2026-na-sn-si-phase-thermodynamics.yaml` | 452 | 452 | 452 |
 | `data/literature/extracts/abdul-2023-cao-sio2-calphad.yaml` | 2 | 13 | 2 |
 | `data/literature/extracts/abdul-2023-clinker-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/abdullah-2013-redox-acid-base-soda-lime-silicate-thesis.yaml` | 0 | 0 | 1 |
@@ -18196,6 +18198,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/arxiv-1602-00658-fegley-rock-steam-solubility.yaml` | 5 | 5 | 28 |
 | `data/literature/extracts/arxiv-1902-05005.yaml` | 2 | 41 | 58 |
 | `data/literature/extracts/arxiv-2509-sio-flame-nucleation.yaml` | 11 | 11 | 57 |
+| `data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml` | 32 | 32 | 128 |
 | `data/literature/extracts/avarmaa-2022-cr-don-smelting.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/babaian-2024-fe-mg-si-air-equilibria.yaml` | 165 | 165 | 165 |
 | `data/literature/extracts/babaian-2026-fe-mg-si-reassessment.yaml` | 213 | 213 | 213 |
@@ -18239,6 +18242,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 9 | 9 | 36 |
 | `data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml` | 3 | 3 | 14 |
 | `data/literature/extracts/boulliung-wood-2023-sulfur-solubility.yaml` | 2 | 2 | 0 |
+| `data/literature/extracts/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml` | 2 | 8 | 12 |
 | `data/literature/extracts/brillo-2025-al-ti-thermophysical.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 35 |
 | `data/literature/extracts/burcat-third-millennium.yaml` | 42 | 42 | 42 |
@@ -18302,6 +18306,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/fray-schmitt-2009-co-1.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/fujisawa-1990-cao-al2o3-activities.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml` | 20 | 20 | 43 |
 | `data/literature/extracts/fuyuki-2007-sio-recombination.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/gaillard-2003-hydrogen-iron-redox-rate.yaml` | 52 | 52 | 65 |
 | `data/literature/extracts/gaillard-2003-hydrous-silicic-melt-activity.yaml` | 32 | 260 | 232 |
@@ -18339,12 +18344,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/itoh-1989-zno-solid-zinc-silicate.yaml` | 67 | 67 | 67 |
 | `data/literature/extracts/itoh-hino-banya-1997-mg-deoxidation.yaml` | 3 | 39 | 52 |
 | `data/literature/extracts/itoh-hino-banya-1998-spinel.yaml` | 2 | 2 | 2 |
-| `data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml` | 2 | 2 | 3 |
 | `data/literature/extracts/iupac-o2-solid-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ivanova-2018-spinel-rich-cai-evaporation.yaml` | 1 | 32 | 1 |
 | `data/literature/extracts/ivtan-cro2-g.yaml` | 4 | 64 | 70 |
 | `data/literature/extracts/ivtan-mno-coo-thermo.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/jackson-2005-ferrous-glass-multispectroscopy.yaml` | 6 | 6 | 0 |
+| `data/literature/extracts/jacquet-2026-alkali-recondensation.yaml` | 10 | 32 | 55 |
 | `data/literature/extracts/jaggi-2021-mercury-atmosphere.yaml` | 3 | 7 | 4 |
 | `data/literature/extracts/jakobsson-tangstad-2015-ca-mg-activities.yaml` | 68 | 68 | 0 |
 | `data/literature/extracts/janaf-4th.yaml` | 51 | 51 | 224 |
@@ -18457,6 +18463,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility.yaml` | 80 | 80 | 0 |
 | `data/literature/extracts/kido-2004-mn-cr-high-temperature-glass-spectra.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml` | 21 | 21 | 42 |
 | `data/literature/extracts/kim-2014-carbon-fe-v-mo-ni.yaml` | 233 | 233 | 0 |
 | `data/literature/extracts/kim-2018-sulfur-fe-v-mo-ni.yaml` | 208 | 208 | 9 |
 | `data/literature/extracts/kirschen-1998-silicate-miscibility-thesis.yaml` | 21 | 21 | 0 |
@@ -18491,6 +18498,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lh87-mgo-g.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/lh87-pbo-g.yaml` | 1 | 1 | 7 |
 | `data/literature/extracts/lh87-sno-g.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/li-2005-na-al-phosphate-fe-activities.yaml` | 324 | 370 | 644 |
 | `data/literature/extracts/li-kato-kobayashi-2021-cr-solubility.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/liu-2023-chromium-oxide-activity.yaml` | 38 | 72 | 39 |
 | `data/literature/extracts/liu-2024-cao-al2o3-vox-phase.yaml` | 72 | 72 | 5 |
@@ -18516,6 +18524,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lunarsurface-2020-5029.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/majzlan-2021-magnesium-silicate-glass-cp.yaml` | 23 | 23 | 28 |
 | `data/literature/extracts/mamiya-2000-sio-disproportionation.yaml` | 2 | 2 | 0 |
+| `data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml` | 13 | 13 | 13 |
 | `data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml` | 421 | 421 | 209 |
 | `data/literature/extracts/matousek-1998-silicate-vaporization-reactions.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/matsumaru-1999-plasma-arc-silicate-evaporation.yaml` | 1 | 1 | 1 |
@@ -18541,6 +18550,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/morris-2006-gusev-mossbauer.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/morris-2006-meridiani-mossbauer.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/muan-1959-manganese-silica-air.yaml` | 57 | 57 | 7 |
+| `data/literature/extracts/mueller-2004-alkali-oxide-activity-coal-ash.yaml` | 4 | 4 | 0 |
 | `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 105 |
 | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 42 | 83 |
 | `data/literature/extracts/myers-jacobson-2015-volatile-metal-hydroxides-presentation.yaml` | 4 | 4 | 4 |
@@ -18575,6 +18585,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ottonello-2000-polymeric-cao-feo-silica.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/ozawa-2012-forsterite-vacuum-evaporation.yaml` | 5 | 134 | 42 |
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 16 |
+| `data/literature/extracts/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml` | 46 | 46 | 160 |
 | `data/literature/extracts/panda-2019-ten-oxide-thermodynamics.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/park-2021-vanadium-thermodynamics-thesis.yaml` | 14 | 14 | 0 |
 | `data/literature/extracts/park-min-2004-carbide-capacity-fluoride-soda-slags.yaml` | 111 | 111 | 0 |
@@ -18653,6 +18664,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/senior-1991-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1992-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sesko-2022-tum-thesis.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/seto-2010-na2o-activity-glass-emf-summary.yaml` | 5 | 5 | 10 |
 | `data/literature/extracts/sf04-magma-companion-workbook.yaml` | 7 | 56 | 77 |
 | `data/literature/extracts/shaw-2023-vacuum-thermal-sublimation-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shi-2024-cr-activity-slag-polymerisation.yaml` | 36 | 36 | 0 |
@@ -18699,11 +18711,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2014-sodium-silicate-model.yaml` | 17 | 17 | 34 |
 | `data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics-metsoc.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics.yaml` | 27 | 27 | 42 |
-| `data/literature/extracts/shornikov-2015-cai-vaporization-coefficients.yaml` | 53 | 53 | 114 |
+| `data/literature/extracts/shornikov-2015-cai-vaporization-coefficients.yaml` | 53 | 53 | 110 |
 | `data/literature/extracts/shornikov-2015-complex-oxide-vapor.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2016-ca-al-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2016-cao-mgo-silicate.yaml` | 50 | 85 | 68 |
-| `data/literature/extracts/shornikov-2017-cai-mgo-sio-fugacity.yaml` | 4 | 4 | 20 |
+| `data/literature/extracts/shornikov-2017-cai-mgo-sio-fugacity.yaml` | 4 | 4 | 12 |
 | `data/literature/extracts/shornikov-2017-spinel-evaporation.yaml` | 25 | 144 | 25 |
 | `data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml` | 18 | 30 | 13 |
 | `data/literature/extracts/shornikov-2018-cai-complex-gas-species.yaml` | 0 | 0 | 1 |
@@ -18749,6 +18761,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shults-1994-mullite-evaporation.yaml` | 45 | 45 | 53 |
 | `data/literature/extracts/shults-1995-calcium-aluminate-thermodynamics.yaml` | 1 | 1 | 2 |
 | `data/literature/extracts/shyrokykh-2021-vanadium-vaporization.yaml` | 2 | 2 | 2 |
+| `data/literature/extracts/simeonov-sano-1985-na-bearing-mno-activities.yaml` | 5 | 5 | 6 |
 | `data/literature/extracts/sineva-2023-ni-sn-zn-slag-copper.yaml` | 696 | 696 | 696 |
 | `data/literature/extracts/slag-001-banya-1993.yaml` | 48 | 67 | 346 |
 | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 155 |
@@ -18798,8 +18811,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/tranell-2002-titanium-valence.yaml` | 57 | 57 | 0 |
 | `data/literature/extracts/ts1985.yaml` | 16 | 19 | 36 |
 | `data/literature/extracts/tsuchiyama-1998-forsterite-mg2sio4-h2.yaml` | 18 | 18 | 18 |
+| `data/literature/extracts/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/tsukihashi-1985-v-nb-sb-soda-silicate-distribution.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/tsukihashi-1988-na2o-v-nb-mn-ti-partition.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml` | 1 | 1 | 2 |
 | `data/literature/extracts/tyurnina-2023-sro-al2o3-sio2-vaporization.yaml` | 60 | 60 | 79 |
 | `data/literature/extracts/tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems.yaml` | 91 | 181 | 3 |
 | `data/literature/extracts/ueshima-1982-fe-mo-thermal.yaml` | 4 | 61 | 5 |
@@ -18812,6 +18827,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/van-limpt-2006-sodium-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/vanbuchem-2023-lavatmos.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/vanbuchem-2025-lavatmos2.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/vanlimpt-2011-boron-evaporation-part1.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/vickerfalt-2020-mgo-v2o3.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/vickerfalt-2024-al-si-v-phase-diagram.yaml` | 39 | 39 | 0 |
 | `data/literature/extracts/vickerfalt-2024-autogenous-slag-thesis.yaml` | 150 | 150 | 0 |
@@ -18822,9 +18838,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml` | 1 | 2 | 4 |
 | `data/literature/extracts/wang-2001-solar-melt-evaporation-residues.yaml` | 38 | 538 | 0 |
 | `data/literature/extracts/wang-2017-cao-sio2-vox-tables-s1-s32.yaml` | 516 | 516 | 516 |
+| `data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 65 |
 | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 |
+| `data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 66 |
 | `data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/woermann-1969-mg-fe-ti-oxides.yaml` | 17 | 17 | 3 |
@@ -18834,8 +18852,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/xiao-reuter-holappa-2000-chromium-slag-oxidation-review.yaml` | 84 | 84 | 0 |
 | `data/literature/extracts/xu-2026-excess-oxygen-magma.yaml` | 1462 | 1462 | 1462 |
 | `data/literature/extracts/yakovlev-2017-cai-acidity.yaml` | 97 | 166 | 20 |
+| `data/literature/extracts/yakovlev-2021-chondrule-alkali.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yakovlev-2024-cai-vaporization.yaml` | 11 | 167 | 11 |
 | `data/literature/extracts/yam1983.yaml` | 3 | 16 | 33 |
+| `data/literature/extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml` | 1 | 1 | 0 |
 | `data/literature/extracts/yan-2009-cr-ti-nb-v-slag-thermodynamics-review.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.yaml` | 230 | 230 | 250 |
 | `data/literature/extracts/yang-teng-seetharaman-2012-vanadium-evaporation.yaml` | 3 | 3 | 3 |
@@ -18847,6 +18867,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/zaitsev-1999-na2o-sio2-pccp.yaml` | 11 | 116 | 8 |
 | `data/literature/extracts/zaitsev-2000-ms2000-045.yaml` | 4 | 32 | 0 |
 | `data/literature/extracts/zaitsev-2000-sodium-silicate-thermodynamics.yaml` | 7 | 110 | 4 |
+| `data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml` | 9 | 9 | 18 |
+| `data/literature/extracts/zhang-2021-acsesc-si.yaml` | 25 | 25 | 39 |
 | `data/literature/extracts/zhang-2024-alkali-evaporation-ti-thesis.yaml` | 23 | 257 | 23 |
 | `data/literature/extracts/zhinkina-2024-ce-gd-kems-poster.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/zigo-1987-gehlenite-fusion.yaml` | 13 | 37 | 64 |
@@ -18860,16 +18882,15 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 1953
+hard issues: 1920
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1444 |
-| `conditional_field:derivation` | 259 |
-| `conditional_field:inputs` | 238 |
-| `conditional_field:raw_inputs` | 8 |
+| `conditional_field:derived_from` | 1436 |
+| `conditional_field:derivation` | 251 |
+| `conditional_field:inputs` | 229 |
 | `invalid_source:initial_composition` | 4 |
 
 ## Hard issues (first 50)
@@ -18927,8 +18948,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 287215
+advisory issues: 288968
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 287215 |
+| `identity_incomplete` | 288968 |

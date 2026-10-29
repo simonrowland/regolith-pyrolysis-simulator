@@ -1,0 +1,71 @@
+source_id: jacquet-2026-alkali-recondensation
+included_tables:
+- table: '2'
+  page: 27
+  printed_rows: 7
+  row_key: E
+  column_mapping:
+    E: canonical_element_species
+    chd/CI: printed_context_ratio
+    i: numerator_isotope_mass
+    j: denominator_isotope_mass
+    delta_CI: quoted_isotope_delta_permil
+    delta_chd: quoted_isotope_delta_permil
+    MDF: author_calculated_context_only
+    Reference: original_source_attribution
+  units: permil_for_delta_columns
+  phase: whole_chondrule_and_CI_compositions
+  method_class: quoted_attributed_for_delta_cells
+  row_refusal: no compatible evaporation identity; preserve cited deltas without scoring
+- table: '3'
+  page: 34
+  printed_rows: 5
+  row_key: Group
+  column_mapping:
+    Group: chondrite_group
+    Na/Al: ci_normalized_alkali_ratio_schema_gap
+    K/Al: ci_normalized_alkali_ratio_schema_gap
+    n: number_of_analyses
+  units: CI_normalized_ratio_and_count_as_printed
+  phase: type_I_chondrules
+  method_class: quoted_attributed_aggregate
+  uncertainty: one_standard_error_of_mean
+  row_refusal: no quantity token for group-level CI-normalized Na/Al and K/Al
+- table: A.4
+  page: 37
+  printed_rows: 1
+  row_key: oxide
+  column_mapping:
+    oxide: oxide_component
+    Lambda: optical_basicity_schema_gap
+  units: dimensionless_as_printed
+  phase: not_stated
+  method_class: quoted_attributed
+  attribution: Mathieu_2009
+  row_refusal: no optical_basicity quantity token
+- table: A.5
+  page: 37
+  printed_rows: 2
+  data_pairs: 5
+  row_key: Lambda
+  column_mapping:
+    Lambda: optical_basicity_as_published
+    gamma_NaO0.5: activity_coefficient
+  units: dimensionless
+  phase: melt
+  method_class: quoted_attributed
+  attribution: Mathieu_2009_Table_V.5_via_Jacquet_2026_Eq_A.3
+  conditions:
+    T_C: 1400
+    fO2_as_printed: '2.11e-6'
+    oxygen_buffer: NNO
+    total_pressure_Pa: not_printed
+    full_melt_composition: not_printed
+  row_refusal: optical-basicity-only composition cannot satisfy full activity-coefficient identity
+excluded_tables:
+- table: '1'
+  page: 14
+  reason: symbol glossary, not observations
+- table: B.6
+  page: 41
+  reason: model parameters and calculated recondensation temperatures, context only

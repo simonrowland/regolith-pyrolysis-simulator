@@ -658,6 +658,7 @@ def _is_noncertifying_vapor_extrapolation(_species: Any, source: Any) -> bool:
             "pure_component_extrapolated",
             "extrapolated_beyond_valid_range_K",
             "melt_dissociation_pO2_floor_inverted_through_mass_action",
+            "source_activity_floored",
             "out_of_gamma_domain",
         }
     )

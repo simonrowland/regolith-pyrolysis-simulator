@@ -3869,8 +3869,13 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         item.get("method") == "extrapolated_first_order_ln_gamma"
         for item in items
     )
-    bridged = any(
-        item.get("method") == "same_composition_T_bridge" for item in items
+    nearest_neighbor = any(
+        item.get("method") == "nearest_converged_temperature_neighbor"
+        for item in items
+    )
+    interpolated_neighbors = any(
+        item.get("method") == "interpolated_converged_temperature_neighbors"
+        for item in items
     )
     projected = any(
         item.get("method") == "projected_composition_solve" for item in items
@@ -3882,16 +3887,34 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         item.get("code") == "hold_last_certified_effective_gamma"
         for item in items
     )
+    far_anchor = next(
+        (
+            str(item.get("message"))
+            for item in items
+            if item.get("method") in {
+                "nearest_converged_temperature_neighbor",
+                "interpolated_converged_temperature_neighbors",
+            }
+            and "schedule-derived" in str(item.get("message", ""))
+        ),
+        None,
+    )
     if projected:
         prediction = "projected-composition extrapolated predictions"
-        if bridged:
-            prediction += ", with a temperature bridge on the projected composition"
-    elif bridged:
-        prediction = "same-composition temperature-bridge predictions"
+        if interpolated_neighbors:
+            prediction += ", using bracketed 1/T temperature neighbours"
+        elif nearest_neighbor:
+            prediction += ", using the nearest solved temperature neighbour"
+    elif interpolated_neighbors:
+        prediction = "bracketed same-composition temperature-neighbour predictions"
+        if nearest_neighbor:
+            prediction += ", with nearest-neighbour holds where only one side solved"
         if first_order or frozen:
-            prediction += (
-                ", with a capped ln-gamma continuation where the bridge had no points"
-            )
+            prediction += ", with certified-gamma continuation where no neighbour solved"
+    elif nearest_neighbor:
+        prediction = "nearest same-composition temperature-neighbour predictions"
+        if first_order or frozen:
+            prediction += ", with certified-gamma continuation where no neighbour solved"
     elif first_order or frozen:
         prediction = "first-order ln-gamma extrapolated predictions"
         if frozen:
@@ -3900,6 +3923,8 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         prediction = "held effective-gamma/table extrapolated predictions"
     else:
         prediction = "a constant-gamma extrapolated prediction"
+    if far_anchor:
+        prediction += f"; {far_anchor}"
     return (
         f"**High-temperature melt activity**: OpenIMCC refusal `{reason}` "
         f"used {prediction} for "
@@ -6427,8 +6452,8 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
     if args.lab_oxygen_diagnostics_output:
         report, diagnostics = result
         diagnostics_path = Path(args.lab_oxygen_diagnostics_output)
@@ -6542,27 +6567,34 @@ def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
+        t_low_grid_c = _parse_float_grid(
+            args.t_low_grid, label="--t-low-grid"
+        )
+        t_hold_grid_c = _parse_float_grid(
+            args.t_hold_grid, label="--t-hold-grid"
+        )
+        ramp_grid_c_per_hr = _parse_float_grid(
+            args.ramp_grid, label="--ramp-grid"
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    try:
         summary = run_sio_tsweep(
             feedstock_id=args.feedstock,
             campaign=args.campaign,
             hours=int(args.hours),
             mass_kg=float(args.mass_kg),
-            t_low_grid_c=_parse_float_grid(
-                args.t_low_grid, label="--t-low-grid"
-            ),
-            t_hold_grid_c=_parse_float_grid(
-                args.t_hold_grid, label="--t-hold-grid"
-            ),
-            ramp_grid_c_per_hr=_parse_float_grid(
-                args.ramp_grid, label="--ramp-grid"
-            ),
+            t_low_grid_c=t_low_grid_c,
+            t_hold_grid_c=t_hold_grid_c,
+            ramp_grid_c_per_hr=ramp_grid_c_per_hr,
             output_dir=Path(args.output_dir),
             allow_unmeasured_alpha_fallback=(
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
 
     if args.report_output:
         report_path = Path(args.report_output)
@@ -6675,22 +6707,27 @@ def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
         )
 
     try:
+        wall_t_grid_c = _parse_float_grid(
+            args.wall_t_grid, label="--wall-t-grid"
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    try:
         summary = run_sio_wall_sweep(
             feedstock_ids=feedstock_ids,
             campaign=args.campaign,
             hours=int(args.hours),
             mass_kg=float(args.mass_kg),
-            wall_t_grid_c=_parse_float_grid(
-                args.wall_t_grid, label="--wall-t-grid"
-            ),
+            wall_t_grid_c=wall_t_grid_c,
             pO2_modes=pO2_modes,
             output_dir=Path(args.output_dir),
             allow_unmeasured_alpha_fallback=(
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
 
     if args.report_output:
         report_path = Path(args.report_output)
