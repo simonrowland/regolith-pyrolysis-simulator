@@ -327,14 +327,20 @@ def _faraday_reduced_extent(
 
 
 def _mre_inventory_capped_extent(
-    uncapped_kg: float,
-    available_kg: float,
+    uncapped_mol: float,
+    available_mol: float,
     oxide_molar_mass_gmol: float,
 ) -> tuple[float, float, bool]:
-    """Share the existing kg-first cap between both MRE execution paths."""
-    reduced_kg = min(uncapped_kg, available_kg)
-    reduced_mol = reduced_kg * 1000.0 / oxide_molar_mass_gmol
-    return reduced_mol, reduced_kg, available_kg < uncapped_kg
+    """Cap Faraday extent at the caller's authoritative mol inventory."""
+    # Premise: the ledger stores mol, so n_removed=min(n_Faraday,n_available).
+    # Project kg only afterward: mol * (g/mol) / (1000 g/kg) = kg.
+    # A mol->kg->mol cap can turn 1.1 mol Fe2O3 into a 1.1000000000000003
+    # mol debit; exact exhaustion must instead leave zero mol, not signed dust.
+    # At zero inventory the extent is zero; with excess inventory Faraday's
+    # extent and its charge billing remain unchanged.
+    reduced_mol = min(uncapped_mol, available_mol)
+    reduced_kg = reduced_mol * oxide_molar_mass_gmol / 1000.0
+    return reduced_mol, reduced_kg, available_mol < uncapped_mol
 
 
 class MREElectrolysisRefusal(RuntimeError):
@@ -1112,7 +1118,9 @@ class ElectrolysisModel:
             available = melt_state.composition_kg.get(oxide, 0.0)
             moles_reduced, kg_oxide_reduced, species_capped = (
                 _mre_inventory_capped_extent(
-                    kg_oxide_reduced, available, M_oxide_gmol,
+                    uncapped_moles_reduced,
+                    available * 1000.0 / M_oxide_gmol,
+                    M_oxide_gmol,
                 )
             )
             any_capped = any_capped or species_capped

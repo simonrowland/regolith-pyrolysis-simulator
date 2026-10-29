@@ -1830,7 +1830,7 @@ def _dispatch_provider_and_legacy_for_pure_oxide(
 def test_ferric_inventory_cap_current_numeric_pin(
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
-    """Pin both existing callers before consolidating the inventory cap."""
+    """Keep each existing caller capped at its own input inventory basis."""
     sim = _build_sim(
         "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
     )
@@ -1839,7 +1839,7 @@ def test_ferric_inventory_cap_current_numeric_pin(
         voltage_V=5.0, current_A=1.0e9, temperature_C=1575.0,
     )
     assert legacy["oxides_reduced_mol"]["Fe2O3"] == 1.1000000000000003
-    assert result.diagnostic["oxides_reduced_mol"]["Fe2O3"] == 1.1000000000000003
+    assert result.diagnostic["oxides_reduced_mol"]["Fe2O3"] == 1.1
 
 
 def test_ferric_depletion_preserves_exact_inventory_and_intrinsic_redox(

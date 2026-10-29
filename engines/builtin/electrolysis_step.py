@@ -828,10 +828,10 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 )
             uncapped_moles_reduced, kg_oxide_reduced = extent
 
-            available_kg = composition_kg.get(oxide, 0.0)
             moles_reduced, kg_oxide_reduced, species_capped = (
                 _mre_inventory_capped_extent(
-                    kg_oxide_reduced, available_kg, M_oxide_gmol,
+                    uncapped_moles_reduced, float(melt_mol.get(oxide, 0.0)),
+                    M_oxide_gmol,
                 )
             )
             any_capped = any_capped or species_capped
