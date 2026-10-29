@@ -79,11 +79,22 @@ def test_b692_migrate_emits_typed_hard_issue_not_partial_composition(
     assert matches[0].detail == "malformed declared amount: 'not-a-number'"
 
 
+@pytest.mark.parametrize(
+    ("quantity", "units", "obs_type"),
+    [
+        ("p_partial", "Pa", "rate_series"),
+        ("activity", "dimensionless", "activity_coefficient"),
+        ("activity_coefficient", "dimensionless", "activity_coefficient"),
+    ],
+)
 def test_b744_malformed_amount_takes_precedence_over_point_oxide_map(
     tmp_path: Path,
+    quantity: str,
+    units: str,
+    obs_type: str,
 ) -> None:
     values = {
-        "quantity": "p_partial",
+        "quantity": quantity,
         "method_class": "measured_direct",
         "admission_status": "admitted",
         "series": [
@@ -96,10 +107,10 @@ def test_b744_malformed_amount_takes_precedence_over_point_oxide_map(
         ],
     }
     extract = _scalar_extract(
-        quantity="p_partial", units="Pa", values=values, obs_type="rate_series"
+        quantity=quantity, units=units, values=values, obs_type=obs_type
     )
     extract["species"]["Na"]["observations"][0]["observation_id"] = (
-        "b744_malformed_p_partial"
+        f"b744_malformed_{quantity}"
     )
     root = _write_min_tree(tmp_path, extract)
 
@@ -108,7 +119,7 @@ def test_b744_malformed_amount_takes_precedence_over_point_oxide_map(
         item
         for item in result.observations.values()
         if item.observation_id.startswith(
-            "fixture-source::b744_malformed_p_partial::"
+            f"fixture-source::b744_malformed_{quantity}::"
         )
     )
 
