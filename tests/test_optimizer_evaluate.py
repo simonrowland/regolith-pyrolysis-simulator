@@ -5105,13 +5105,8 @@ def _typed_refusal_execution(reason: str) -> SimpleNamespace:
 
 
 def _typed_refusal_cases() -> tuple[tuple[str, str, Exception | None, object | None], ...]:
-    from simulator.engine_pool import EngineWorkerTimeout
-
     campaign_pressure = CampaignPressureSetpointRefusal(
         {"status": "refused", "detail": "empty pN2 operating band"}
-    )
-    compute_timeout = EngineWorkerTimeout(
-        "liquidus finder", 0.001, phase="job"
     )
     return (
         (
@@ -5168,12 +5163,6 @@ def _typed_refusal_cases() -> tuple[tuple[str, str, Exception | None, object | N
             TransportRegimeRefusal("invalid_transport_regime_input", "bad Kn"),
             None,
         ),
-        (
-            "engine_compute_timeout",
-            "engine_compute_timeout",
-            compute_timeout,
-            None,
-        ),
     )
 
 
@@ -5205,6 +5194,28 @@ def test_typed_physics_refusals_are_infeasible_trials_with_reason(
     assert expected_reason in result.notes
     assert result.failing_gates == ("physics_refusal",)
     assert result.feasibility_margins["physics_refusal"].detail == expected_reason
+
+
+def test_engine_compute_timeout_is_an_infeasible_physics_refusal() -> None:
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(
+            exc=EngineWorkerTimeout(
+                "liquidus finder", 0.001, phase="job"
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.run_reference is not None
+    assert result.run_reference.status == "refused"
+    assert result.run_reference.reason == "engine_compute_timeout"
 
 
 def test_untyped_executor_exception_still_aborts_as_engine_bug() -> None:

@@ -961,7 +961,12 @@ def test_melt_redox_gate_marks_environment_remote_error_as_refusal(
     assert caught.value.timeout_kind == 'WorkerStartupError'
 
 
-def test_environment_timeout_diagnostic_cannot_select_a_gate_curve(
+@pytest.mark.parametrize(
+    'failure_kind',
+    ('TimeoutExpired', 'PermissionError'),
+)
+def test_engine_failure_diagnostic_cannot_select_a_gate_curve(
+    failure_kind,
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -971,8 +976,7 @@ def test_environment_timeout_diagnostic_cannot_select_a_gate_curve(
         lambda *_args, **_kwargs: SimpleNamespace(
             status='not_converged',
             diagnostic={
-                'backend_failure_disposition': 'environment',
-                'backend_failure_exception': 'TimeoutExpired',
+                'backend_failure_exception': failure_kind,
             },
         ),
     )
@@ -982,5 +986,60 @@ def test_environment_timeout_diagnostic_cannot_select_a_gate_curve(
 
     assert caught.value.reason == 'engine_compute_timeout'
     assert caught.value.diagnostic['reason_code'] == 'engine_compute_timeout'
-    assert caught.value.diagnostic['timeout_kind'] == 'TimeoutExpired'
+    assert caught.value.diagnostic['timeout_kind'] == failure_kind
+    assert caught.value.terminal_refusal is True
+
+
+def test_kernel_liquidus_does_not_fall_back_after_terminal_provider_failure(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.chemistry.kernel import ProviderUnavailableError
+    from simulator.engine_pool import _mark_engine_compute_refusal
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    monkeypatch.setattr(
+        sim._chem_registry,
+        'authoritative_for',
+        lambda _intent: object(),
+    )
+    failure = ProviderUnavailableError('MAGEMin liquidus worker timed out')
+    _mark_engine_compute_refusal(failure, 'EngineWorkerTimeout')
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(failure),
+    )
+
+    with pytest.raises(ProviderUnavailableError) as caught:
+        sim._freeze_gate_curve_from_kernel_liquidus([], fO2_log=-8.0)
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+
+
+def test_kernel_liquidus_result_diagnostic_refuses_before_curve_fallback(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    monkeypatch.setattr(
+        sim._chem_registry,
+        'authoritative_for',
+        lambda _intent: object(),
+    )
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status='not_converged',
+            diagnostic={'backend_failure_exception': 'PermissionError'},
+        ),
+    )
+
+    with pytest.raises(EvaporationFluxRefusal) as caught:
+        sim._freeze_gate_curve_from_kernel_liquidus([], fO2_log=-8.0)
+
+    assert caught.value.reason == 'engine_compute_timeout'
+    assert caught.value.diagnostic['reason_code'] == 'engine_compute_timeout'
+    assert caught.value.diagnostic['timeout_kind'] == 'PermissionError'
     assert caught.value.terminal_refusal is True

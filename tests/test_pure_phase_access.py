@@ -290,6 +290,47 @@ def test_magemin_pure_phase_timeout_remains_a_timeout(monkeypatch, tmp_path):
     }
 
 
+def test_magemin_pure_phase_launch_error_remains_terminal_and_typed(
+    monkeypatch, tmp_path,
+):
+    from contextlib import nullcontext
+
+    import simulator.melt_backend.magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    backend._binary_path = tmp_path / 'MAGEMin'
+    backend._database = 'ig'
+    backend._config = {'timeout_s': 0.25}
+    monkeypatch.setattr(
+        backend,
+        '_resolve_buffer',
+        lambda **_kwargs: ('QFM', 0.0, []),
+    )
+    monkeypatch.setattr(
+        magemin_module,
+        '_magemin_subprocess_slot',
+        lambda _timeout: nullcontext(),
+    )
+    failure = PermissionError('MAGEMin executable permission denied')
+    monkeypatch.setattr(
+        magemin_module.subprocess,
+        'run',
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(failure),
+    )
+
+    with pytest.raises(PermissionError) as raised:
+        backend._run_pure_phase_probe(
+            bulk_wt_ig={'MgO': 100.0},
+            temperature_C=1000.0,
+            pressure_kbar=0.001,
+        )
+
+    assert raised.value is failure
+    assert raised.value.terminal_refusal is True
+    assert raised.value.reason_code == 'engine_compute_timeout'
+    assert raised.value.timeout_kind == 'PermissionError'
+
+
 # --- MAGEMin: KLB1 bulk-echo guard -----------------------------------------
 
 

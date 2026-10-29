@@ -2155,8 +2155,9 @@ def test_magemin_warm_worker_environment_error_keeps_remote_type(
         lambda self, *, requested: ('subprocess', None),
     )
     failure = EngineWorkerRemoteError(
-        'PermissionError', 'worker could not read MAGEMin database', 'trace',
-        failure_disposition='environment',
+        '_MAGEMinEngineCallError',
+        'PermissionError: worker could not read MAGEMin database',
+        'trace',
     )
     monkeypatch.setattr(
         magemin_module,
@@ -2173,6 +2174,29 @@ def test_magemin_warm_worker_environment_error_keeps_remote_type(
     assert raised.value.reason_code == 'engine_compute_timeout'
     assert raised.value.timeout_kind == 'PermissionError'
     assert raised.value.diagnostic['timeout_kind'] == 'PermissionError'
+
+
+def test_magemin_remote_launch_environment_error_is_a_terminal_refusal():
+    failure = EngineWorkerRemoteError(
+        '_MAGEMinEngineCallError',
+        'PermissionError: MAGEMin binary could not be executed',
+        'worker traceback',
+    )
+    backend = _make_pooled_subprocess_backend(failure)
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == 'PermissionError'
+    assert result.diagnostics['backend_failure_disposition'] == 'environment'
+    assert result.diagnostics['terminal_refusal'] is True
+    assert result.diagnostics['reason_code'] == 'engine_compute_timeout'
+    assert result.diagnostics['timeout_kind'] == 'PermissionError'
 
 
 @pytest.mark.parametrize(
