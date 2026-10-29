@@ -232,8 +232,9 @@ def test_pressure_isolated_efficiency_uses_declared_time_constant(monkeypatch):
         alpha_s=1.0,
     )
 
-    # delta_T/T_cond = 0.5, so tau = 2.0 s / 0.5 = 4.0 s.
-    assert efficiency == pytest.approx(1.0 - math.exp(-2.0 / 4.0))
+    # Numeric identity pin for the behavior-preserving move into the shared
+    # first-order capture kernel.
+    assert efficiency.hex() == "0x1.92e9a0720d3ecp-2"
 
 
 def test_sticking_yaml_rejects_boolean_numeric_value(tmp_path: Path):
