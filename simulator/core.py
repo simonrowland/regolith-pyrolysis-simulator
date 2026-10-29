@@ -662,6 +662,7 @@ def _canonicalize_condenser_geometry_stage_keys(
     for stage_map_key in (
         'stage_area_ratios',
         'stage_area_ratio_sources',
+        'stage_hydraulic_diameter_m',
     ):
         raw_stage_map = resolved.get(stage_map_key)
         if not isinstance(raw_stage_map, Mapping):
@@ -3798,6 +3799,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # segment temperatures are liner-wall states, not gas states.
             gas_temperature_C=transport['conductance_temperature_C'],
             stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
+            stage_hydraulic_diameter_m_by_stage=transport[
+                'stage_hydraulic_diameter_m_by_stage'
+            ],
             stage_area_geometry_provenance_notice=transport.get(
                 'stage_area_geometry_provenance_notice', {}),
             pipe_segment_temperatures_C=(

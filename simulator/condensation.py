@@ -18,9 +18,10 @@ Train topology (metals train, active C2A onward):
              admits species whose routing temperature sits in the
              default 1400-1600°C band (Ti at 1500°C in
              ``CONDENSATION_TEMPS_C``).
-    Stage 1  Fe condenser (1100-1400°C) — designated Fe stage. This
-             module does not model Fe phase or a sump. Elemental Fe
-             melts at 1538°C (1811 K), above this window.
+    Stage 1  Fe condenser (1150°C wall) — designated Fe stage. This
+             module does not model Fe phase or a sump. Equal band
+             endpoints are that wall. Elemental Fe melts at 1538°C
+             (1811 K), above this wall.
     Stage 2  Cr oxide harvester (1100-1300°C) — Cr2O3 product cartridge
     Stage 3  SiO zone (900-1200°C)   — fused silica on removable baffles.
              SiO capture here is *operator-controlled*.
@@ -48,17 +49,16 @@ Key physics:
     at its location and the remainder goes to terminal offgas.
 
 The Fe → SiO separation (Stage 1 → Stage 3):
-    Default Stage 1 window is 1100-1400°C; Stage 3 is 900-1200°C
+    Default Stage 1 wall is 1150°C; Stage 3 is 900-1200°C
     (``CondensationTrain.create_default``). Stage 2 is the Cr/CrO2/Mn
     harvester and isolates non-Cr species
     (``_cr_stage_isolation_blocks``); SiO's designated destination is
     Stage 3, not Stage 2.
     This module does not model Fe melting, a sump, a chevron droplet
     separator, or a radiation-gap thermal break.
-    The SiO routing-temperature band 900-1200°C overlaps Stage 1
-    1100-1400°C by 100 K. The live gate is the point routing
-    temperature plus the midpoint P_sat contract, not a claim that
-    the SiO band sits entirely below Stage 1.
+    A Stage-1 wall at or above 1100°C keeps SiO off the Fe tap. The
+    live gate is the point routing temperature plus the midpoint
+    P_sat contract.
     Capture and impurity fractions are outputs of flux, physical area,
     residence time, pressure, and inlet rate; this module does not impose
     fixed Fe-carryover or early-SiO percentages.
@@ -2150,6 +2150,7 @@ class CondensationModel:
         ] = {}
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
         self.stage_area_m2_by_stage: dict[str, float] = {}
+        self.stage_hydraulic_diameter_m_by_stage: dict[str, float] = {}
         self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
         self.gas_temperature_C = float(wall_temperature_C)
         self.carrier_gas = DEFAULT_CARRIER_GAS
@@ -2259,6 +2260,7 @@ class CondensationModel:
         pipe_diameter_m: float | None = None,
         gas_temperature_C: float | None = None,
         stage_area_m2_by_stage: Mapping[str, float] | None = None,
+        stage_hydraulic_diameter_m_by_stage: Mapping[str, float] | None = None,
         stage_area_geometry_provenance_notice: Mapping[str, Any] | None = None,
         pipe_segment_temperatures_C: Mapping[str, float] | None = None,
         stir_factor: float | None = None,
@@ -2286,6 +2288,11 @@ class CondensationModel:
         diagnostic-only in ``engines/builtin/evaporation_flux.py``; its
         live numerical effect is metal cross-pool relaxation. It is not
         consumed here.
+
+        ``stage_hydraulic_diameter_m_by_stage`` is the capture-law
+        gas-side length. It is stored beside the stage areas and is
+        not written onto duct ``inner_diameter_m``. Stages absent from
+        the map keep ``pipe_diameter_m`` (the throat).
         """
 
         # Validate the complete candidate first. A late invalid pressure,
@@ -2315,6 +2322,22 @@ class CondensationModel:
                 area = float(raw_area)
                 if not math.isfinite(area) or area < 0.0:
                     raise ValueError(f'stage area {stage!r} must be finite and non-negative')
+        if stage_hydraulic_diameter_m_by_stage is not None:
+            for stage, raw_diameter in stage_hydraulic_diameter_m_by_stage.items():
+                if isinstance(raw_diameter, bool):
+                    raise ValueError(
+                        f'stage hydraulic diameter {stage!r} must be finite and positive'
+                    )
+                try:
+                    diameter = float(raw_diameter)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f'stage hydraulic diameter {stage!r} must be finite and positive'
+                    ) from exc
+                if not math.isfinite(diameter) or diameter <= 0.0:
+                    raise ValueError(
+                        f'stage hydraulic diameter {stage!r} must be finite and positive'
+                    )
         if overhead_pressure_mbar is not None:
             if not is_declared_real_scalar(
                 overhead_pressure_mbar,
@@ -2398,6 +2421,11 @@ class CondensationModel:
                 for stage, area_m2 in stage_area_m2_by_stage.items()
             }
             self._apply_stage_area_m2_to_pipe_segments()
+        if stage_hydraulic_diameter_m_by_stage is not None:
+            self.stage_hydraulic_diameter_m_by_stage = {
+                str(stage): float(diameter_m)
+                for stage, diameter_m in stage_hydraulic_diameter_m_by_stage.items()
+            }
         if stage_area_geometry_provenance_notice is not None:
             self.stage_area_geometry_provenance_notice = dict(
                 stage_area_geometry_provenance_notice)
@@ -2530,6 +2558,7 @@ class CondensationModel:
                 pipe_diameter_m,
                 gas_temperature_C,
                 stage_area_m2_by_stage,
+                stage_hydraulic_diameter_m_by_stage,
                 stage_area_geometry_provenance_notice,
                 pipe_segment_temperatures_C,
                 carrier_gas,
@@ -2548,6 +2577,9 @@ class CondensationModel:
                     for segment in self.pipe_segments
                 },
                 "stage_area_m2_by_stage": dict(self.stage_area_m2_by_stage),
+                "stage_hydraulic_diameter_m_by_stage": dict(
+                    self.stage_hydraulic_diameter_m_by_stage
+                ),
                 "stage_area_geometry_provenance_notice": dict(
                     self.stage_area_geometry_provenance_notice),
                 "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
@@ -2739,6 +2771,26 @@ class CondensationModel:
                 raise DepositionInputRefusal('stage_area_m2', area_m2, 'must be nonnegative')
             return area_m2
         return None
+
+    def _hydraulic_diameter_m_for_stage_number(self, stage_number: int) -> float:
+        """Capture-law gas-side length. Absent stages keep the throat."""
+
+        for key in (STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number)),
+                    f'stage_{stage_number}', str(stage_number)):
+            if key is None or key not in self.stage_hydraulic_diameter_m_by_stage:
+                continue
+            diameter_m = _deposition_finite_scalar(
+                'stage_hydraulic_diameter_m',
+                self.stage_hydraulic_diameter_m_by_stage[key],
+            )
+            if diameter_m <= 0.0:
+                raise DepositionInputRefusal(
+                    'stage_hydraulic_diameter_m',
+                    diameter_m,
+                    'must be positive',
+                )
+            return diameter_m
+        return self.pipe_diameter_m
 
     def _apply_stage_area_m2_to_pipe_segments(self) -> None:
         if not self.pipe_segments:
@@ -4153,9 +4205,18 @@ class CondensationModel:
         if driving_pressure <= 0.0:
             return _mint_zero('no_supersaturation', P_local_pa=p_in)
 
+        # Gas-side length: a configured stage hydraulic diameter, else the
+        # throat diameter. Parallel plates of gap g have Dh = 4*A/P = 2*g.
+        # The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.
+        # k_g [m/s] = Sh * D_AB [m2/s] / Dh [m]. The molar coefficient per
+        # pascal is k_g / (R * T_gas) [mol/(m2*s*Pa)]. Sherwood is 3.66 at
+        # radial stir 1. This length is not written onto duct inner_diameter_m,
+        # so throat Poiseuille flow stays on the ~0.12 m throat.
+        gas_side_length_m = self._hydraulic_diameter_m_for_stage_number(
+            stage.stage_number)
         flux = _series_resistance_deposition_flux_mol_m2_s(
             species, p_in, T_surface_K, alpha_s_value,
-            pipe_diameter_m=self.pipe_diameter_m,
+            pipe_diameter_m=gas_side_length_m,
             stir_factor=self.stir_factor,
             radial_stir_factor=self.radial_stir_factor,
             regime_factor=self.regime_factor,

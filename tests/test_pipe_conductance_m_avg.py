@@ -55,6 +55,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
             "pressure_mbar": 2.0,
             "vapor_pressure_mbar": 1.0,
             "stage_area_m2_by_stage": {},
+            "stage_hydraulic_diameter_m_by_stage": {},
         },
         species_partial_pressures=lambda _flux, vapor_pressure_mbar: {
             "SiO": vapor_pressure_mbar
@@ -90,6 +91,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
         "duct_a": 850.0,
         "duct_b": 875.0,
     }
+    assert configured["stage_hydraulic_diameter_m_by_stage"] == {}
 
 
 # ---------------------------------------------------------------------------
@@ -627,6 +629,9 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
 
     assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.12)
     assert model.pipe_diameter_m == pytest.approx(0.12)
+    assert model.stage_area_m2("fe_stage1") == pytest.approx(0.236, abs=0.0)
+    assert model.stage_hydraulic_diameter_m["fe_stage1"] == pytest.approx(0.020)
+    assert "cr_stage2" not in model.stage_hydraulic_diameter_m
     for stage, ratio in ratios.items():
         assert float(ratio) >= 1.0
         assert model.stage_area_m2(stage) == pytest.approx(
@@ -722,6 +727,7 @@ def test_stage_area_map_propagates_to_kn_and_coating_segments():
         pipe_diameter_m=0.12,
         gas_temperature_C=1500.0,
         stage_area_m2_by_stage=stage_areas,
+        stage_hydraulic_diameter_m_by_stage={"fe_stage1": 0.020},
     )
 
     by_name = {segment.name: segment for segment in condensation.pipe_segments}
@@ -734,6 +740,13 @@ def test_stage_area_map_propagates_to_kn_and_coating_segments():
         condensation.last_knudsen_regime_diagnostic["stage_area_m2_by_stage"]
         == stage_areas
     )
+    assert condensation.pipe_diameter_m == pytest.approx(0.12)
+    assert all(
+        segment.inner_diameter_m == pytest.approx(0.12)
+        for segment in condensation.pipe_segments
+    )
+    assert condensation._hydraulic_diameter_m_for_stage_number(1) == pytest.approx(0.020)
+    assert condensation._hydraulic_diameter_m_for_stage_number(3) == pytest.approx(0.12)
 
 
 def test_default_stage_geometry_provenance_reaches_coating_authority():
@@ -790,10 +803,12 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
     surface_geometry = authority["surface_geometry_provenance"]
     assert surface_geometry["provisional"] is True
     assert surface_geometry["source_class"] == "engineering-default"
-    assert "engineering-default" in (
+    fe_source = (
         surface_geometry["stage_area_ratio_provenance_by_stage"]
         ["fe_stage1"]["source"]
     )
+    assert fe_source.startswith("owner-ruling-d137:")
+    assert "0.236 m2" in fe_source
 
 
 def test_legacy_headspace_conductance_alias_survives_new_none_key():

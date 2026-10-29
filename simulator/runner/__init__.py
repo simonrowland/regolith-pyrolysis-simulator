@@ -4371,6 +4371,9 @@ def _apply_sio_wall_sweep_controls(
             pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
             gas_temperature_C=float(sim.melt.temperature_C),
             stage_area_m2_by_stage=sim.overhead_model.stage_area_m2_by_stage(),
+            stage_hydraulic_diameter_m_by_stage=dict(
+                sim.overhead_model.stage_hydraulic_diameter_m
+            ),
             stage_area_geometry_provenance_notice=(
                 sim.overhead_model.stage_area_geometry_provenance_notice()),
             pipe_segment_temperatures_C={

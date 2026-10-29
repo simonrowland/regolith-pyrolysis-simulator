@@ -1108,7 +1108,10 @@ condensation_train:
 
     stage_1_fe_condenser:
       label: "Fe Condenser"
-      temp_range_C: [1100, 1400]
+      # Owner ruling d-137 (2026-10-29): parallel-plate collector, 10 mm gap,
+      # wall 1150 C. Wall >= 1100 C keeps SiO off the Fe tap. Equal endpoints
+      # are the wall temperature the capture law uses (band midpoint).
+      temp_range_C: [1150, 1150]
       coating: "MZO (MgO-ZrO2)"
       max_service_T_C: 1450
       product: "liquid Fe draining to sump"
@@ -1178,17 +1181,23 @@ condenser_geometry:
   # at or above throat area and expose conservative baffle/cyclone surface
   # multipliers for later per-stage Kn/coating work.
   stage_area_ratios:
-    fe_stage1: 4.0
+    fe_stage1: 20.866981427604056
     cr_stage2: 4.5
     sio_stage3: 6.0
     alkali_stage4: 5.0
     terminal: 2.0
   stage_area_ratio_sources:
-    fe_stage1: "engineering-default: baffled Fe condenser presents multiple throat areas downstream of the constriction"
+    fe_stage1: "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window"
     cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
     sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
     alkali_stage4: "engineering-default: cyclone separator effective wall area exceeds throat but stays below SiO baffle cartridge"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
+  # Capture-law gas-side length only. Parallel plates of gap g have
+  # Dh = 2*g. The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.
+  # Sherwood 3.66 is the laminar value at radial stir 1. Stages without
+  # an entry keep the throat diameter. This map is not the duct or throat.
+  stage_hydraulic_diameter_m:
+    fe_stage1: 0.020
 
 
 # ============================================================================

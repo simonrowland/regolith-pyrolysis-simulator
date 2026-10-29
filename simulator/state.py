@@ -821,7 +821,7 @@ class CondensationTrain:
     The complete metals condensation train (8 stages, indexed 0-7).
 
     Stage 0: Hot duct (>1400°C) — IR spectroscopy, no condensation
-    Stage 1: Fe condenser (1100-1400°C)
+    Stage 1: Fe condenser (1150°C wall)
     Stage 2: Cr oxide harvester (1100-1300°C)
     Stage 3: SiO zone (900-1200°C) — removable fused silica baffles
     Stage 4: Alkali/Mg cyclone (350-700°C)
