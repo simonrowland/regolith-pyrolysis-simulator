@@ -63,7 +63,8 @@ condition_prose:
   published_page: 127
   section: Disproportionation reactions in a liquid state
   printed: unbuffered with respect to P_O2 (e.g., vacuum condition)
-  state: unknown; no run fO2 or numerical pO2 printed
+  state: not_applicable / oxygen_unbuffered_vacuum; the stored during_run token none is mapped by simulator/battery/migrate.py::_emit_exploded_point
+  printed_numeric_value: no run fO2 or numerical pO2 printed
 render_checks:
 - pdf_page: 3
   published_page: 113
