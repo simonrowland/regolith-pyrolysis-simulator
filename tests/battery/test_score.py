@@ -14842,7 +14842,7 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
     monkeypatch.setattr(
         bench_module,
         "activity_request_for_engine",
-        lambda *_args: SimpleNamespace(
+        lambda *_args, **_kwargs: SimpleNamespace(
             payload={
                 "composition_mol": {
                     "SiO2": Decimal("0.55"),
