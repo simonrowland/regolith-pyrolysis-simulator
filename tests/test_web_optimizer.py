@@ -1004,7 +1004,7 @@ def test_optimizer_reader_renders_not_run_backend_labels(client, tmp_path) -> No
     assert run["latest_result"]["backend"]["evidence_class"] == "melts"
     assert run["latest_result"]["backend"]["runtime_status"] == "not_run"
     assert run["latest_result"]["backend"]["backend_real_active"] is False
-    assert run["latest_result"]["backend"]["certification_allowed"] is True
+    assert run["latest_result"]["backend"]["certification_allowed"] is False
 
 
 def test_optimizer_reader_replays_legacy_no_compared_results_status(client, tmp_path) -> None:
@@ -1110,6 +1110,7 @@ def test_optimizer_tier_label_requires_backend_authority_for_certified_cache() -
     )
 
     assert label["tier"] == "cached_exact"
+    assert label["canonical"]["runtime_status"] == "ok"
     assert label["certification_allowed"] is True
     assert label["ux_label"] == "UNVERIFIED"
 

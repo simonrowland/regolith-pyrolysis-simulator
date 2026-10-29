@@ -24,6 +24,16 @@ from tests.mre_reproduction_fixtures import synthetic_voltage_documents
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
+def test_every_shipped_vacuum_pyrolysis_preset_loads() -> None:
+    preset_paths = sorted(
+        (REPO_ROOT / "data" / "presets" / "vacuum_pyrolysis").glob("*.yaml")
+    )
+
+    assert preset_paths
+    for preset_path in preset_paths:
+        runner_module._load_preset_run_spec(preset_path, "faithful")
+
+
 def _write_bridge_preset(
     tmp_path: Path,
     *,

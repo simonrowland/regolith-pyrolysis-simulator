@@ -97,7 +97,11 @@ from simulator.session import (
     normalize_mre_policy,
 )
 from simulator.state import MOLAR_MASS
-from simulator.three_product_report import METAL_PRODUCT_SPECIES, classify_products
+from simulator.three_product_report import (
+    METAL_PRODUCT_SPECIES,
+    _terminal_rump_classes_from_species,
+    classify_products,
+)
 from simulator.trace import PhysicsTrace
 from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
 # Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
@@ -2317,7 +2321,7 @@ def _tick_payload(
         ),
         'pressure_mbar': snapshot.overhead.pressure_mbar,
         'atmosphere': sim.melt.atmosphere.name,
-        'p_total_mbar': round(sim.melt.p_total_mbar, 3),
+        'p_total_mbar': sim.melt.p_total_mbar,
         'pO2_mbar': round(sim.melt.pO2_mbar, 6),
         'ambient_pressure_mbar': round(
             sim.melt.ambient_pressure_mbar, 3),
@@ -2456,6 +2460,8 @@ def _product_story_soundness(product_story: object) -> str:
         if 'class_total_kg' not in bucket:
             return 'incomplete'
         raw_total = bucket['class_total_kg']
+        if raw_total is None:
+            return 'unavailable'
         if isinstance(raw_total, bool):
             return 'invalid'
         try:
@@ -2595,16 +2601,41 @@ def _completion_payload(sim):
         sim,
         account_kg=product_story_account_kg,
     )
+    extracted_product_kg = _extracted_product_kg(
+        extracted_product_projection
+    )
+    classification: Mapping[str, Any] = {}
     try:
+        classification = classify_products(sim)
         product_story = _product_story_payload(
             sim,
             terminal_rump_by_species=terminal_rump_by_species,
+            classification=classification,
+            account_kg=product_story_account_kg,
+            extracted_projection=extracted_product_projection,
         )
         product_story_status = _product_story_soundness(product_story)
     except Exception as exc:  # noqa: BLE001 -- optional presentation boundary
         _safe_log(f'Product story unavailable; raw completion retained: {exc}')
         product_story = None
         product_story_status = 'unavailable'
+    ceramic_panel = ceramic_rump_payload(refractory_rump_composition_wt_pct)
+    rump_class = classification.get('refractory_ceramic_rump')
+    if isinstance(rump_class, Mapping):
+        estimated_contributions = rump_class.get('estimated_contributions')
+        if estimated_contributions:
+            ceramic_panel['estimated_contributions'] = list(
+                estimated_contributions
+            )
+        rump_status = rump_class.get('status')
+        if rump_status in {'partial', 'unavailable'}:
+            ceramic_panel['product_class_status'] = rump_status
+            availability_flag = (
+                rump_class.get('availability_flag') or rump_class.get('flag')
+            )
+            if isinstance(availability_flag, Mapping):
+                ceramic_panel['availability_flag'] = dict(availability_flag)
+            ceramic_panel['excluded'] = list(rump_class.get('excluded', ()))
     payload = {
         'total_hours': sim.melt.hour,
         'energy_electrical_plus_evaporation_kWh': (
@@ -2629,9 +2660,7 @@ def _completion_payload(sim):
             final_snapshot.inventory.stage0_mass_balance_delta_kg, 3),
         'products': {k: round(v, 2)
                      for k, v in sim.product_ledger().items()},
-        'extracted_product_kg': _extracted_product_kg(
-            extracted_product_projection
-        ),
+        'extracted_product_kg': extracted_product_kg,
         'product_story': product_story,
         'product_story_status': product_story_status,
         'terminal_slag_kg': round(sim._terminal_slag_kg(), 2),
@@ -2646,9 +2675,7 @@ def _completion_payload(sim):
         'terminal_residual_buckets': sim._terminal_residual_buckets(),
         'terminal_rump_composition_wt_pct': terminal_rump_composition_wt_pct,
         'terminal_rump_by_class': terminal_rump_by_class,
-        'ceramic_rump_panel': ceramic_rump_payload(
-            refractory_rump_composition_wt_pct
-        ),
+        'ceramic_rump_panel': ceramic_panel,
         'glass_panel': industrial_glass_payload(
             industrial_glass_view,
             pO2_mbar=max(float(sim.melt.pO2_mbar), 0.0),
@@ -2705,13 +2732,25 @@ def _product_story_bucket(species_kg, **details):
     }
 
 
-def _product_story_payload(sim, *, terminal_rump_by_species):
-    classify_products(sim)
-    account_kg = _product_story_account_kg(sim)
-    extracted_projection = _product_story_extracted_projection(
-        sim,
-        account_kg=account_kg,
-    )
+def _product_story_payload(
+    sim,
+    *,
+    terminal_rump_by_species,
+    classification=None,
+    account_kg=None,
+    extracted_projection=None,
+):
+    # Keep web's stage-provenance mapping; the shared classifier owns refusal
+    # status and excluded quantities for these existing product totals.
+    if classification is None:
+        classification = classify_products(sim)
+    if account_kg is None:
+        account_kg = _product_story_account_kg(sim)
+    if extracted_projection is None:
+        extracted_projection = _product_story_extracted_projection(
+            sim,
+            account_kg=account_kg,
+        )
     metal_ingots = dict(extracted_projection['metal_ingots'])
     glass = dict(extracted_projection['glass'])
     captured_volatiles = dict(extracted_projection['captured_volatiles'])
@@ -2799,6 +2838,7 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
     )
 
     refractory_ceramic_bucket = _product_story_bucket(refractory_ceramic)
+    metal_ingots_bucket = _product_story_bucket(metal_ingots)
     try:
         refractory_ceramic_bucket['ree_enrichment_extent'] = (
             AccountingQueries(sim).terminal_ree_enrichment_extent()
@@ -2807,13 +2847,13 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         _safe_log(f'REE enrichment projection unavailable: {exc}')
         refractory_ceramic_bucket['ree_enrichment_extent'] = {}
 
-    return {
+    story = {
         'input': {
             'feedstock': sim.record.feedstock_key,
             'feedstock_label': sim.record.feedstock_label,
             'batch_mass_kg': round(float(sim.record.batch_mass_kg), 2),
         },
-        'metal_ingots': _product_story_bucket(metal_ingots),
+        'metal_ingots': metal_ingots_bucket,
         'glass': _product_story_bucket(glass),
         'oxygen': oxygen,
         'captured_volatiles': _product_story_bucket(captured_volatiles),
@@ -2828,26 +2868,63 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         'off_spec_condensate': _product_story_bucket(off_spec_condensate),
         'unclassified': _product_story_bucket(unclassified),
     }
-
-
-def _terminal_rump_classes_from_species(species_kg):
-    classes = {
-        'refractory_oxides': 0.0,
-        'silicate_residual': 0.0,
-        'unextracted_metals': 0.0,
-        'other': 0.0,
-    }
-    for species, mass in species_kg.items():
-        if species in TERMINAL_RUMP_REFRACTORY_OXIDES:
-            key = 'refractory_oxides'
-        elif species in TERMINAL_RUMP_SILICATE_RESIDUAL:
-            key = 'silicate_residual'
-        elif species in TERMINAL_RUMP_UNEXTRACTED_METALS:
-            key = 'unextracted_metals'
-        else:
-            key = 'other'
-        classes[key] += float(mass)
-    return classes
+    for name, source_name in (
+        ('metal_ingots', 'ingots_metals'),
+        ('glass', 'glass'),
+        ('oxygen', 'oxygen'),
+        ('captured_volatiles', 'captured_volatiles'),
+        ('refractory_ceramic', 'refractory_ceramic_rump'),
+    ):
+        source = classification.get(source_name)
+        if not isinstance(source, Mapping):
+            continue
+        estimated_contributions = source.get('estimated_contributions')
+        if estimated_contributions:
+            story[name]['estimated_contributions'] = list(
+                estimated_contributions
+            )
+        availability_flag = source.get('availability_flag')
+        flag = source.get('flag')
+        if not isinstance(availability_flag, Mapping) and not isinstance(flag, Mapping):
+            continue
+        if isinstance(flag, Mapping):
+            story[name]['flag'] = dict(flag)
+        if isinstance(availability_flag, Mapping):
+            story[name]['availability_flag'] = dict(availability_flag)
+        story[name]['status'] = source.get('status') or (
+            availability_flag or flag
+        ).get('status')
+        story[name]['excluded'] = list(source.get('excluded', ()))
+        if story[name]['status'] == 'unavailable':
+            story[name]['class_total_kg'] = None
+    if story['oxygen'].get('class_total_kg') is None:
+        story['oxygen']['partition_kg'] = dict.fromkeys(
+            story['oxygen']['partition_kg']
+        )
+    rump = classification.get('refractory_ceramic_rump')
+    if isinstance(rump, Mapping):
+        estimated_contributions = rump.get('estimated_contributions')
+        if estimated_contributions:
+            story['terminal_residue']['estimated_contributions'] = list(
+                estimated_contributions
+            )
+        rump_flag = rump.get('availability_flag') or rump.get('flag')
+        if (
+            isinstance(rump_flag, Mapping)
+            and rump_flag.get('status') in {'partial', 'unavailable'}
+        ):
+            story['terminal_residue']['availability_flag'] = dict(rump_flag)
+            story['terminal_residue']['status'] = rump_flag.get('status')
+            story['terminal_residue']['excluded'] = list(rump.get('excluded', ()))
+            for field, source_field in (
+                ('silicate_residual_kg', 'rump_silicate_residual_kg'),
+                ('unextracted_metals_kg', 'rump_unextracted_metals_kg'),
+            ):
+                if source_field in rump and rump[source_field] is None:
+                    if rump_flag.get('status') == 'unavailable':
+                        story['terminal_residue'][field] = None
+                        story['terminal_residue']['class_total_kg'] = None
+    return story
 
 
 def _knudsen_regime_diagnostic_from_sim(sim):

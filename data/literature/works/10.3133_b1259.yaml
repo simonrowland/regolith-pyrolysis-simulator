@@ -12860,6 +12860,80 @@ experiments:
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0300-zircon.json
     record: b1259-298k-0300-zircon
+- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0301-wollastonite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3133/b1259
+  locator:
+    published_page: 23
+    pdf_page_index: 29
+    table: b1259-298k-0301-wollastonite
+    note: as_published='19.60'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0301-wollastonite.json
+    record: b1259-298k-0301-wollastonite
+- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0302-pseudowollastonite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3133/b1259
+  locator:
+    published_page: 23
+    pdf_page_index: 29
+    table: b1259-298k-0302-pseudowollastonite
+    note: as_published='20.90'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0302-pseudowollastonite.json
+    record: b1259-298k-0302-pseudowollastonite
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0304-diopside:tabulation
   kind: literature
   method:
@@ -13047,6 +13121,43 @@ experiments:
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0310-anorthite.json
     record: b1259-298k-0310-anorthite
+- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0311-hexagonal-anorthite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3133/b1259
+  locator:
+    published_page: 24
+    pdf_page_index: 30
+    table: b1259-298k-0311-hexagonal-anorthite
+    note: as_published='45.84'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0311-hexagonal-anorthite.json
+    record: b1259-298k-0311-hexagonal-anorthite
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0315-adularia:tabulation
   kind: literature
   method:
@@ -17571,7 +17682,8 @@ experiments:
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
       atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-      elemental_reference_state_tables=Si=B1259 reference-state table p.68/PDF p.74
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0112-quartz.json
     record: b1259-ht-0112-quartz
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0113-cristobalite:tabulation

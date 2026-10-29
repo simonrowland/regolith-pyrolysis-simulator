@@ -9,19 +9,20 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 689
-  extracts: 687
+  sources: 710
+  extracts: 708
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 77
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 687
-  alias_groups_needing_resolution: 75
+  extracts_without_pdf: 708
+  alias_groups_needing_resolution: 78
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
   - 1997jonesthermo
   - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  - abdeyazdan-2026-na-sn-si-phase-thermodynamics
   - abdul-2023-cao-sio2-calphad
   - abdul-2023-clinker-thesis
   - abdullah-2013-redox-acid-base-soda-lime-silicate-thesis
@@ -41,6 +42,7 @@ gaps:
   - arxiv-1602-00658-fegley-rock-steam-solubility
   - arxiv-1902-05005
   - arxiv-2509-sio-flame-nucleation
+  - asai-yokokawa-maekawa-1982-na-borate-activity
   - avarmaa-2022-cr-don-smelting
   - babaian-2024-fe-mg-si-air-equilibria
   - babaian-2026-fe-mg-si-reassessment
@@ -83,6 +85,7 @@ gaps:
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
   - boulliung-wood-2023-sulfur-solubility
+  - brewer-margrave-1952-alkali-oxides-ucrl1864
   - brillo-2025-al-ti-thermophysical
   - britt-2019-asteroid-simulants
   - burcat-third-millennium
@@ -146,6 +149,7 @@ gaps:
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
   - fujisawa-1990-cao-al2o3-activities
+  - fujisawa-1994-na-sn-carbonate-thermodynamics
   - fuyuki-2007-sio-recombination
   - gaillard-2003-hydrogen-iron-redox-rate
   - gaillard-2003-hydrous-silicic-melt-activity
@@ -189,6 +193,7 @@ gaps:
   - ivtan-cro2-g
   - ivtan-mno-coo-thermo
   - jackson-2005-ferrous-glass-multispectroscopy
+  - jacquet-2026-alkali-recondensation
   - jaggi-2021-mercury-atmosphere
   - jakobsson-tangstad-2015-ca-mg-activities
   - janaf-4th
@@ -302,6 +307,7 @@ gaps:
   - khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
   - khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
   - kido-2004-mn-cr-high-temperature-glass-spectra
+  - kim-2004-na2o-float-glass-emf
   - kim-2014-carbon-fe-v-mo-ni
   - kim-2018-sulfur-fe-v-mo-ni
   - kirschen-1998-silicate-miscibility-thesis
@@ -340,6 +346,7 @@ gaps:
   - lh87-mgo-g
   - lh87-pbo-g
   - lh87-sno-g
+  - li-2005-na-al-phosphate-fe-activities
   - li-kato-kobayashi-2021-cr-solubility
   - liu-2023-chromium-oxide-activity
   - liu-2024-cao-al2o3-vox-phase
@@ -365,6 +372,7 @@ gaps:
   - lunarsurface-2020-5029
   - majzlan-2021-magnesium-silicate-glass-cp
   - mamiya-2000-sio-disproportionation
+  - masuda-tanaka-1979-vacuum-condensates
   - mathieu-2009-sodium-solubility-thesis
   - matousek-1998-silicate-vaporization-reactions
   - matsumaru-1999-plasma-arc-silicate-evaporation
@@ -390,6 +398,7 @@ gaps:
   - morris-2006-gusev-mossbauer
   - morris-2006-meridiani-mossbauer
   - muan-1959-manganese-silica-air
+  - mueller-2004-alkali-oxide-activity-coal-ash
   - murchison-degassing-2023-springer
   - murchison-hydropyrolysis-1990s-gca
   - myers-jacobson-2015-volatile-metal-hydroxides-presentation
@@ -425,6 +434,7 @@ gaps:
   - ottonello-2000-polymeric-cao-feo-silica
   - ozawa-2012-forsterite-vacuum-evaporation
   - pahlevan-2026-protolunar-volatile-outflows
+  - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   - panda-2019-ten-oxide-thermodynamics
   - park-2021-vanadium-thermodynamics-thesis
   - park-min-2004-carbide-capacity-fluoride-soda-slags
@@ -507,6 +517,7 @@ gaps:
   - senior-1991-vacuum-pyrolysis
   - senior-1992-vacuum-pyrolysis
   - sesko-2022-tum-thesis
+  - seto-2010-na2o-activity-glass-emf-summary
   - sf04-magma-companion-workbook
   - shaw-2023-vacuum-thermal-sublimation-thesis
   - shi-2024-cr-activity-slag-polymerisation
@@ -604,6 +615,7 @@ gaps:
   - shults-1994-mullite-evaporation
   - shults-1995-calcium-aluminate-thermodynamics
   - shyrokykh-2021-vanadium-vaporization
+  - simeonov-sano-1985-na-bearing-mno-activities
   - sineva-2023-ni-sn-zn-slag-copper
   - slag-001-banya-1993
   - slag-002-banya-hino-nagasaka-1993
@@ -654,8 +666,10 @@ gaps:
   - tranell-2002-titanium-valence
   - ts1985
   - tsuchiyama-1998-forsterite-mg2sio4-h2
+  - tsukihashi-1985-na-silicate-mn-p-nitrogen
   - tsukihashi-1985-v-nb-sb-soda-silicate-distribution
   - tsukihashi-1988-na2o-v-nb-mn-ti-partition
+  - tsukihashi-sano-1997-alkali-fluoride-slag-activities
   - tyurnina-2023-sro-al2o3-sio2-vaporization
   - tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems
   - ueshima-1982-fe-mo-thermal
@@ -668,6 +682,7 @@ gaps:
   - van-limpt-2006-sodium-evaporation
   - vanbuchem-2023-lavatmos
   - vanbuchem-2025-lavatmos2
+  - vanlimpt-2011-boron-evaporation-part1
   - vickerfalt-2020-mgo-v2o3
   - vickerfalt-2024-al-si-v-phase-diagram
   - vickerfalt-2024-autogenous-slag-thesis
@@ -678,9 +693,11 @@ gaps:
   - wadhwa-2008-redox-small-bodies
   - wang-2001-solar-melt-evaporation-residues
   - wang-2017-cao-sio2-vox-tables-s1-s32
+  - wang-2017-sodium-stannate-formation-emf
   - wetzel-gail-2013-sio-arrhenius
   - wilkerson-2021-jsc1a-tga-ms-poster
   - wilkerson-2023-jsc1a-outgassing
+  - willenborg-2006-alkali-removal-thermodynamics
   - wimpenny-2019-zn-isotope-evaporation-extreme-t
   - witthohn-2000-coal-slag-alkali-vaporisation
   - woermann-1969-mg-fe-ti-oxides
@@ -690,9 +707,11 @@ gaps:
   - xiao-reuter-holappa-2000-chromium-slag-oxidation-review
   - xu-2026-excess-oxygen-magma
   - yakovlev-2017-cai-acidity
+  - yakovlev-2021-chondrule-alkali
   - yakovlev-2024-cai-vaporization
   - yakovleva-2022-alkali-chondrule-evaporation
   - yam1983
+  - yamaguchi-1984-na2o-activity-sodium-beta-alumina
   - yan-2009-cr-ti-nb-v-slag-thermodynamics-review
   - yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
   - yang-teng-seetharaman-2012-vanadium-evaporation
@@ -704,6 +723,8 @@ gaps:
   - zaitsev-1999-na2o-sio2-pccp
   - zaitsev-2000-ms2000-045
   - zaitsev-2000-sodium-silicate-thermodynamics
+  - zhang-2011-boron-sodium-f-free-evaporation
+  - zhang-2021-acsesc-si
   - zhang-2024-alkali-evaporation-ti-thesis
   - zhinkina-2024-ce-gd-kems-poster
   - zigo-1987-gehlenite-fusion
@@ -1370,10 +1391,22 @@ gaps:
     - sossi-2020-magma-ocean-redox
     resolution: owner/controller
   - type: source_id_alias
+    key: tsukihashi-1985
+    source_ids:
+    - tsukihashi-1985-na-silicate-mn-p-nitrogen
+    - tsukihashi-1985-v-nb-sb-soda-silicate-distribution
+    resolution: owner/controller
+  - type: source_id_alias
     key: vickerfalt-2024
     source_ids:
     - vickerfalt-2024-al-si-v-phase-diagram
     - vickerfalt-2024-autogenous-slag-thesis
+    resolution: owner/controller
+  - type: source_id_alias
+    key: wang-2017
+    source_ids:
+    - wang-2017-cao-sio2-vox-tables-s1-s32
+    - wang-2017-sodium-stannate-formation-emf
     resolution: owner/controller
   - type: source_id_alias
     key: yamada-1980
@@ -1386,6 +1419,12 @@ gaps:
     source_ids:
     - zaitsev-2000-ms2000-045
     - zaitsev-2000-sodium-silicate-thermodynamics
+    resolution: owner/controller
+  - type: source_id_alias
+    key: zhang-2021
+    source_ids:
+    - kems-006-zhang-2021
+    - zhang-2021-acsesc-si
     resolution: owner/controller
 sources:
 - source_id: 1997jonesthermo
@@ -1504,6 +1543,65 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: abdeyazdan-2026-na-sn-si-phase-thermodynamics
+  aliases: []
+  citation: Abdeyazdan, H., Shevchenko, M. & Jak, E. (2026). Experimental Phase Equilibria Study and Thermodynamic
+    Modeling of the Na₂O–SnO–SnO₂–SiO₂ System. Journal of the American Ceramic Society, 109(7), e71038.
+    DOI 10.1111/jace.71038.
+  doi: 10.1111/jace.71038
+  report_number: null
+  identifier: 10.1111/jace.71038
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/abdeyazdan-2026-na-sn-si-phase-thermodynamics.yaml
+    review_status: draft
+    rows: 452
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/abdeyazdan-2026-na-sn-si-phase-thermodynamics.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/abdeyazdan-2026-na-sn-si-phase-thermodynamics
+      exists: true
+      file_count: 1
+    tables:
+      path: tables/abdeyazdan-2026-na-sn-si-phase-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/abdeyazdan-2026-na-sn-si-phase-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/abdeyazdan-2026-na-sn-si-phase-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: abdul-2023-cao-sio2-calphad
   aliases: []
@@ -2613,6 +2711,64 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  aliases: []
+  citation: Asai, K., Yokokawa, T. & Maekawa, T. (1982). Na2O activity in Na2O–B2O3–Al2O3 melts. Nippon
+    Kagaku Kaishi 1982(6), 1005–1009.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
+    review_status: draft
+    rows: 32
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/asai-yokokawa-maekawa-1982-na-borate-activity/asai-yokokawa-maekawa-1982-na-borate-activity.pdf
+      present: true
+      sha256: ec6f5f79d587c75eb8db64f5163135f3786a0cb00cb8ed485910bf2646fa3ad3
+      matches_simulator: null
+    sidecar:
+      path: raw/asai-yokokawa-maekawa-1982-na-borate-activity/sidecar.yaml
+      present: true
+    text:
+      path: text/asai-yokokawa-maekawa-1982-na-borate-activity
+      exists: true
+      file_count: 23
+    tables:
+      path: tables/asai-yokokawa-maekawa-1982-na-borate-activity
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
+      present: true
+      error: null
+      last_stage: acquired
+      date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: avarmaa-2022-cr-don-smelting
   aliases: []
@@ -5063,6 +5219,64 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-05'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  aliases: []
+  citation: Brewer, L. and Margrave, J. (1952), Vaporization of Alkali Metal Oxides, University of California
+    Radiation Laboratory report UCRL-1864.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/brewer-margrave-1952-alkali-oxides-ucrl1864/brewer-margrave-1952-alkali-oxides-ucrl1864.pdf
+      present: true
+      sha256: f36be7e9a9323786a4acb9223748d1dd545f9bb2febe5adc7ff7b7477f2e1d6a
+      matches_simulator: null
+    sidecar:
+      path: raw/brewer-margrave-1952-alkali-oxides-ucrl1864/sidecar.yaml
+      present: true
+    text:
+      path: text/brewer-margrave-1952-alkali-oxides-ucrl1864
+      exists: true
+      file_count: 63
+    tables:
+      path: tables/brewer-margrave-1952-alkali-oxides-ucrl1864
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: brillo-2025-al-ti-thermophysical
   aliases: []
@@ -7985,7 +8199,7 @@ sources:
     extract:
       path: extracts/fegley-2016-rock-steam-solubility.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/fegley-2016-rock-steam-solubility.yaml
       present: true
@@ -8750,6 +8964,65 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-04'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  aliases: []
+  citation: Fujisawa, Toshiharu; Fukuyama, Hiroyuki; Shimotori, Jun; Yamauchi, Chikabumi (1994). Thermodynamics
+    of NaO0.5-CO2-SnO2 Slag and Estimation of Distribution Ratio of Sn between the Slag and Molten Copper.
+    Materials Transactions, JIM 35(6), 414-422.
+  doi: 10.2320/matertrans1989.35.414
+  report_number: null
+  identifier: 10.2320/matertrans1989.35.414
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
+    review_status: draft
+    rows: 20
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/fujisawa-1994-na-sn-carbonate-thermodynamics/fujisawa-1994-na-sn-carbonate-thermodynamics.pdf
+      present: true
+      sha256: ef5dfdc0b94b015494cbab8f65c3a6d680ffdae9b686da0d0e5d1c4b60a2d238
+      matches_simulator: null
+    sidecar:
+      path: raw/fujisawa-1994-na-sn-carbonate-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/fujisawa-1994-na-sn-carbonate-thermodynamics
+      exists: true
+      file_count: 64
+    tables:
+      path: tables/fujisawa-1994-na-sn-carbonate-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: fuyuki-2007-sio-recombination
   aliases: []
@@ -10941,7 +11214,7 @@ sources:
   extracts:
   - path: data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml
     review_status: draft
-    rows: 0
+    rows: 2
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -11260,6 +11533,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/jackson-2005-ferrous-glass-multispectroscopy.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: jacquet-2026-alkali-recondensation
+  aliases: []
+  citation: Jacquet, E., Marrocchi, Y., and Charnoz, S. (2026), Alkali recondensation into chondrules,
+    Icarus 449:116970.
+  doi: 10.1016/j.icarus.2026.116970
+  report_number: null
+  identifier: 10.1016/j.icarus.2026.116970
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/jacquet-2026-alkali-recondensation.yaml
+    review_status: draft
+    rows: 10
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/jacquet-2026-alkali-recondensation/jacquet-2026-alkali-recondensation.pdf
+      present: true
+      sha256: e11c3626bb3a2c00bcc358021b0903d8f72d8eaa54e554dfeda6fcc605242d68
+      matches_simulator: null
+    sidecar:
+      path: raw/jacquet-2026-alkali-recondensation/sidecar.yaml
+      present: true
+    text:
+      path: text/jacquet-2026-alkali-recondensation
+      exists: true
+      file_count: 123
+    tables:
+      path: tables/jacquet-2026-alkali-recondensation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/jacquet-2026-alkali-recondensation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/jacquet-2026-alkali-recondensation.yaml
       present: false
       error: null
       last_stage: null
@@ -17765,6 +18096,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kim-2004-na2o-float-glass-emf
+  aliases: []
+  citation: Kim, Woo-Sung; Cho, Do-Hyung; Lim, Sung-Ki (2004). The activity of sodium oxide in molten
+    float glass by EMF measurements. Thermochimica Acta 414(2), 191–195.
+  doi: 10.1016/j.tca.2003.12.022
+  report_number: null
+  identifier: 10.1016/j.tca.2003.12.022
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml
+    review_status: draft
+    rows: 21
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kim-2004-na2o-float-glass-emf/kim-2004-na2o-float-glass-emf.pdf
+      present: true
+      sha256: 2d53e47361d998028bebd8d0a70f5319b64854f5360501cb8bd570d595bd9700
+      matches_simulator: null
+    sidecar:
+      path: raw/kim-2004-na2o-float-glass-emf/sidecar.yaml
+      present: true
+    text:
+      path: text/kim-2004-na2o-float-glass-emf
+      exists: true
+      file_count: 19
+    tables:
+      path: tables/kim-2004-na2o-float-glass-emf
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kim-2004-na2o-float-glass-emf.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kim-2004-na2o-float-glass-emf.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: kim-2014-carbon-fe-v-mo-ni
   aliases: []
   citation: Kim, D.-H., Paek, M.-K., Kim, T.-J., Won, S.-Y. and Pak, J.-J. (2014), “Carbon Solubility
@@ -19995,6 +20384,65 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: li-2005-na-al-phosphate-fe-activities
+  aliases: []
+  citation: Li, Guangqiang; Hamano, Tasuku; Tsukihashi, Fumitaka (2005). “The Effect of Na2O and Al2O3
+    on Dephosphorization of Molten Steel by High Basicity MgO Saturated CaO–FeOx–SiO2 Slag.” ISIJ International
+    45(1):12–18.
+  doi: 10.2355/isijinternational.45.12
+  report_number: null
+  identifier: 10.2355/isijinternational.45.12
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/li-2005-na-al-phosphate-fe-activities.yaml
+    review_status: draft
+    rows: 324
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/li-2005-na-al-phosphate-fe-activities/li-2005-na-al-phosphate-fe-activities.pdf
+      present: true
+      sha256: 282b3c45059d21a2ba081d1d873e80fddda77264beb6e777a79ac5d355e12f00
+      matches_simulator: null
+    sidecar:
+      path: raw/li-2005-na-al-phosphate-fe-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/li-2005-na-al-phosphate-fe-activities
+      exists: true
+      file_count: 42
+    tables:
+      path: tables/li-2005-na-al-phosphate-fe-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/li-2005-na-al-phosphate-fe-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/li-2005-na-al-phosphate-fe-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: li-kato-kobayashi-2021-cr-solubility
   aliases: []
   citation: Li, Z., Kato, C. & Kobayashi, Y. (2021), Determination of Solubility of Chromium Oxide in
@@ -21452,6 +21900,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/mamiya-2000-sio-disproportionation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: masuda-tanaka-1979-vacuum-condensates
+  aliases: []
+  citation: Masuda, A. and Tanaka, T. (1979). Experimental Studies on Behaviors of Major and Minor Lithophile
+    Elements in Vaporization Under Evacuated Condition. Meteoritics, 14(1), 13–28.
+  doi: 10.1111/j.1945-5100.1979.tb00475.x
+  report_number: null
+  identifier: 10.1111/j.1945-5100.1979.tb00475.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml
+    review_status: draft
+    rows: 13
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/masuda-tanaka-1979-vacuum-condensates/masuda-tanaka-1979-vacuum-condensates.pdf
+      present: true
+      sha256: 12c19c532d1c5a89e348de7145790f9602b240c037506fe11ac166e1d80e93a9
+      matches_simulator: null
+    sidecar:
+      path: raw/masuda-tanaka-1979-vacuum-condensates/sidecar.yaml
+      present: true
+    text:
+      path: text/masuda-tanaka-1979-vacuum-condensates
+      exists: true
+      file_count: 27
+    tables:
+      path: tables/masuda-tanaka-1979-vacuum-condensates
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/masuda-tanaka-1979-vacuum-condensates.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/masuda-tanaka-1979-vacuum-condensates.yaml
       present: false
       error: null
       last_stage: null
@@ -22918,6 +23424,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/muan-1959-manganese-silica-air.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: mueller-2004-alkali-oxide-activity-coal-ash
+  aliases: []
+  citation: Mueller, M., Willenborg, W., Hilpert, K. & Singheiser, L. (2004), "Structural dependence of
+    alkali oxide activity in coal ash slags", VII International Conference on Molten Slags, Fluxes and
+    Salts, pp. 615–618.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mueller-2004-alkali-oxide-activity-coal-ash.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mueller-2004-alkali-oxide-activity-coal-ash/mueller-2004-alkali-oxide-activity-coal-ash.pdf
+      present: true
+      sha256: 534310b3b1fbf4c6adf4498c0a926dc21fc4e9956a8c3d7c27bfe021f8e85497
+      matches_simulator: null
+    sidecar:
+      path: raw/mueller-2004-alkali-oxide-activity-coal-ash/sidecar.yaml
+      present: true
+    text:
+      path: text/mueller-2004-alkali-oxide-activity-coal-ash
+      exists: true
+      file_count: 17
+    tables:
+      path: tables/mueller-2004-alkali-oxide-activity-coal-ash
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mueller-2004-alkali-oxide-activity-coal-ash.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mueller-2004-alkali-oxide-activity-coal-ash.yaml
       present: false
       error: null
       last_stage: null
@@ -25040,6 +25605,64 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
+  aliases: []
+  citation: Pak J.J., Ito K., and Fruehan R.J. (1989). Activities of Na2O in CaO-based Slags Used for
+    Dephosphorization of Steel. ISIJ International 29(4):318–323.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml
+    review_status: draft
+    rows: 46
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.pdf
+      present: true
+      sha256: ff5586a6bc98274f6261a734178fc0fa5ac57b4f1c02ea49e4e1f083340cc8ba
+      matches_simulator: null
+    sidecar:
+      path: raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/sidecar.yaml
+      present: true
+    text:
+      path: text/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
+      exists: true
+      file_count: 22
+    tables:
+      path: tables/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: panda-2019-ten-oxide-thermodynamics
   aliases: []
@@ -27830,7 +28453,7 @@ sources:
     extract:
       path: extracts/robie-hemingway-wilson-1980-usgs-of-80-908.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/robie-hemingway-wilson-1980-usgs-of-80-908.yaml
       present: true
@@ -29822,6 +30445,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: seto-2010-na2o-activity-glass-emf-summary
+  aliases: []
+  citation: Seto, M., Sugawara, T., Kato, M., Yoshida, S., Miura, Y. and Matsuoka, J. (2010), “Na2O activity
+    in Glass melts by EMF measurement” (起電力法による ガラス融液におけるNa2O活量の測定), 51st Symposium on Glass and Photonics
+    Materials, 16–17 December 2010, two-page research summary.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/seto-2010-na2o-activity-glass-emf-summary.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/seto-2010-na2o-activity-glass-emf-summary/seto-2010-na2o-activity-glass-emf-summary.pdf
+      present: true
+      sha256: fa03fb192846e50959f62a9a24b7628c1e48e2cf4ab96debddc8a36b73ccde04
+      matches_simulator: null
+    sidecar:
+      path: raw/seto-2010-na2o-activity-glass-emf-summary/sidecar.yaml
+      present: true
+    text:
+      path: text/seto-2010-na2o-activity-glass-emf-summary
+      exists: true
+      file_count: 11
+    tables:
+      path: tables/seto-2010-na2o-activity-glass-emf-summary
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/seto-2010-na2o-activity-glass-emf-summary.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/seto-2010-na2o-activity-glass-emf-summary.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: sf04-magma-companion-workbook
   aliases:
   - kems-008-schaefer-fegley-2004
@@ -31102,7 +31784,7 @@ sources:
     text:
       path: text/shornikov-2001-mgalumina-silica-vaporization
       exists: true
-      file_count: 2
+      file_count: 3
     tables:
       path: tables/shornikov-2001-mgalumina-silica-vaporization
       exists: false
@@ -35496,6 +36178,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: simeonov-sano-1985-na-bearing-mno-activities
+  aliases: []
+  citation: Simeonov, S. R. & Sano, N. (1985), “Manganese Equilibrium Distribution between Carbon-saturated
+    Iron Melts and Lime Based Slags Containing MnO, BaO, and Na2O”, Transactions of the Iron and Steel
+    Institute of Japan 25, 1116–1121.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/simeonov-sano-1985-na-bearing-mno-activities.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/simeonov-sano-1985-na-bearing-mno-activities/simeonov-sano-1985-na-bearing-mno-activities.pdf
+      present: true
+      sha256: 1df06f7dc18711681a4b0a2e595fb1c9132c9cdba6388a73a5adfaf4e5836844
+      matches_simulator: null
+    sidecar:
+      path: raw/simeonov-sano-1985-na-bearing-mno-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/simeonov-sano-1985-na-bearing-mno-activities
+      exists: true
+      file_count: 35
+    tables:
+      path: tables/simeonov-sano-1985-na-bearing-mno-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/simeonov-sano-1985-na-bearing-mno-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/simeonov-sano-1985-na-bearing-mno-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: sineva-2023-ni-sn-zn-slag-copper
   aliases: []
   citation: Sineva, E., Shishin, D., Prostakova, E., Lindgren, K., Starykh, R., Chen, J., and Jak, E.
@@ -36293,7 +37034,7 @@ sources:
     text:
       path: text/stolyarova-1996-cao-alumina-silica-kems
       exists: true
-      file_count: 2
+      file_count: 3
     tables:
       path: tables/stolyarova-1996-cao-alumina-silica-kems
       exists: true
@@ -37593,7 +38334,7 @@ sources:
     extract:
       path: extracts/ta-yamanaka-1997-metsoc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ta-yamanaka-1997-metsoc.yaml
       present: true
@@ -38419,6 +39160,65 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: tsukihashi-1985-na-silicate-mn-p-nitrogen
+  aliases: []
+  citation: Tsukihashi F, Matsumoto F, Hyodo T, Yukinobu M, Sano N (1985). Phosphorus and Manganese Distribution
+    between Carbon-saturated Iron and Na2O-SiO2 Melts and Nitrogen Solubility in the Melts. Tetsu-to-Hagane
+    71(7):823-830.
+  doi: 10.2355/tetsutohagane1955.71.7_823
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.71.7_823
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/tsukihashi-1985-na-silicate-mn-p-nitrogen/tsukihashi-1985-na-silicate-mn-p-nitrogen.pdf
+      present: true
+      sha256: 1e5f914d77cc0cfe7fcf700fe0b24557d2b2b6ce39e5a8e09cb8babda1275f09
+      matches_simulator: null
+    sidecar:
+      path: raw/tsukihashi-1985-na-silicate-mn-p-nitrogen/sidecar.yaml
+      present: true
+    text:
+      path: text/tsukihashi-1985-na-silicate-mn-p-nitrogen
+      exists: true
+      file_count: 70
+    tables:
+      path: tables/tsukihashi-1985-na-silicate-mn-p-nitrogen
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: tsukihashi-1985-v-nb-sb-soda-silicate-distribution
   aliases: []
   citation: Tsukihashi F, Werme A, Kasahara A, Okada M, Sano N (1985). Vanadium, Niobium and Antimony
@@ -38531,6 +39331,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/tsukihashi-1988-na2o-v-nb-mn-ti-partition.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: tsukihashi-sano-1997-alkali-fluoride-slag-activities
+  aliases: []
+  citation: Tsukihashi F. and Sano N. (1997). Thermodynamics of Na2O and K2O in the Molten CaO-CaF2-SiO2
+    System. Molten Slags, Fluxes and Salts '97 Conference, 729-734.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/tsukihashi-sano-1997-alkali-fluoride-slag-activities/tsukihashi-sano-1997-alkali-fluoride-slag-activities.pdf
+      present: true
+      sha256: 1b224854e110bb1bc3ac1e9dee81735209fbcc0385d801600686c686b4a697af
+      matches_simulator: null
+    sidecar:
+      path: raw/tsukihashi-sano-1997-alkali-fluoride-slag-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/tsukihashi-sano-1997-alkali-fluoride-slag-activities
+      exists: true
+      file_count: 33
+    tables:
+      path: tables/tsukihashi-sano-1997-alkali-fluoride-slag-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml
       present: false
       error: null
       last_stage: null
@@ -39239,6 +40097,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: vanlimpt-2011-boron-evaporation-part1
+  aliases: []
+  citation: 'van Limpt, H., Beerkens, R., Cook, S., O''Connor, R., and Simon, J. (2011), "Modelling the
+    evaporation of boron species. Part 1. Alkali-free borosilicate glass melts", Glass Technology: European
+    Journal of Glass Science and Technology Part A, 52(3), 77–87.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/vanlimpt-2011-boron-evaporation-part1.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/vanlimpt-2011-boron-evaporation-part1/vanlimpt-2011-boron-evaporation-part1.pdf
+      present: true
+      sha256: ba7244fb564d20a3192c67c47e0a9dcd172410f7a9ce9455464605abb2447b6c
+      matches_simulator: null
+    sidecar:
+      path: raw/vanlimpt-2011-boron-evaporation-part1/sidecar.yaml
+      present: true
+    text:
+      path: text/vanlimpt-2011-boron-evaporation-part1
+      exists: true
+      file_count: 22
+    tables:
+      path: tables/vanlimpt-2011-boron-evaporation-part1
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/vanlimpt-2011-boron-evaporation-part1.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/vanlimpt-2011-boron-evaporation-part1.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: vickerfalt-2020-mgo-v2o3
   aliases: []
   citation: Vickerfält A, Martinsson J, Yan B, Sichen D (2020). Phase relationship in the system MgO-V2O3
@@ -39825,6 +40742,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: wang-2017-sodium-stannate-formation-emf
+  aliases: []
+  citation: Wang Z-M, Xie H-W, Zhang Y, Zhai Y-C (2017). Formation free energy of sodium stannate measured
+    using beta-beta''-Al2O3 ceramic electrolyte. Rare Metals 36(11), 905-911. Online 9 May 2016.
+  doi: 10.1007/s12598-016-0717-4
+  report_number: null
+  identifier: 10.1007/s12598-016-0717-4
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/wang-2017-sodium-stannate-formation-emf/wang-2017-sodium-stannate-formation-emf.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/wang-2017-sodium-stannate-formation-emf/sidecar.yaml
+      present: true
+    text:
+      path: text/wang-2017-sodium-stannate-formation-emf
+      exists: true
+      file_count: 1
+    tables:
+      path: tables/wang-2017-sodium-stannate-formation-emf
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/wang-2017-sodium-stannate-formation-emf.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/wang-2017-sodium-stannate-formation-emf.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: wetzel-gail-2013-sio-arrhenius
   aliases:
   - kems-011-wetzel-gail-2013
@@ -40004,6 +40979,65 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-12'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: willenborg-2006-alkali-removal-thermodynamics
+  aliases: []
+  citation: Willenborg, W., Müller, M., & Hilpert, K. (2006). Alkali Removal at About 1400 °C for the
+    Pressurized Pulverized Coal Combustion Combined Cycle. 1. Thermodynamics and Concept. Energy & Fuels,
+    20(6), 2593–2598.
+  doi: 10.1021/ef060305k
+  report_number: null
+  identifier: 10.1021/ef060305k
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/willenborg-2006-alkali-removal-thermodynamics/willenborg-2006-alkali-removal-thermodynamics.pdf
+      present: true
+      sha256: 13ed9f4739a866634bb4fe298734f43a92bf2b8a41ae953b6df49143f3da316b
+      matches_simulator: null
+    sidecar:
+      path: raw/willenborg-2006-alkali-removal-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/willenborg-2006-alkali-removal-thermodynamics
+      exists: true
+      file_count: 12
+    tables:
+      path: tables/willenborg-2006-alkali-removal-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/willenborg-2006-alkali-removal-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/willenborg-2006-alkali-removal-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   aliases: []
@@ -40579,6 +41613,64 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: yakovlev-2021-chondrule-alkali
+  aliases: []
+  citation: Yakovlev, O. I., & Shornikov, S. I. (2021). Experimental Data of Alkali Component Evaporation
+    from Chondrule Melts. Experiment in Geosciences 27(1), 25–28.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/yakovlev-2021-chondrule-alkali.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/yakovlev-2021-chondrule-alkali/yakovlev-2021-chondrule-alkali.pdf
+      present: true
+      sha256: d766a39acd8b6ace1dec780d40eee5d4489df41b393984b0f4aa223bc0e2d063
+      matches_simulator: null
+    sidecar:
+      path: raw/yakovlev-2021-chondrule-alkali/sidecar.yaml
+      present: true
+    text:
+      path: text/yakovlev-2021-chondrule-alkali
+      exists: true
+      file_count: 26
+    tables:
+      path: tables/yakovlev-2021-chondrule-alkali
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/yakovlev-2021-chondrule-alkali.yaml
+      present: true
+      matches_simulator: false
+    ledger:
+      path: ledger/yakovlev-2021-chondrule-alkali.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-05'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: yakovlev-2024-cai-vaporization
   aliases: []
   citation: Yakovlev, O.I. & Shornikov, S.I. (2024), Evaporation features of the outer zones of Ca-Al-inclusions
@@ -40753,6 +41845,65 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: yamaguchi-1984-na2o-activity-sodium-beta-alumina
+  aliases: []
+  citation: Yamaguchi, S. and Goto, K. S. (1984). Measurement of Activity of Na2O in Na2O-SiO2-P2O5 Ternary
+    Melt Using Sodium Beta-Alumina as a Solid Electrolyte. Journal of the Japan Institute of Metals 48(1),
+    43-49.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/yamaguchi-1984-na2o-activity-sodium-beta-alumina.pdf
+      present: true
+      sha256: 8e1f6480f26b52b3988b598c2957bb25e3bfb1f82bbc0c13ebdb2be7156db965
+      matches_simulator: null
+    sidecar:
+      path: raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/sidecar.yaml
+      present: true
+    text:
+      path: text/yamaguchi-1984-na2o-activity-sodium-beta-alumina
+      exists: true
+      file_count: 59
+    tables:
+      path: tables/yamaguchi-1984-na2o-activity-sodium-beta-alumina
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: yan-2009-cr-ti-nb-v-slag-thermodynamics-review
   aliases: []
@@ -41396,6 +42547,124 @@ sources:
       error: null
       last_stage: null
       date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: zhang-2011-boron-sodium-f-free-evaporation
+  aliases: []
+  citation: Zhang, Zuo Tai; Sridhar, Seetharaman; Cho, Jung Wook (2011). An Investigation of the Evaporation
+    of B2O3 and Na2O in F-Free Mold Slags. ISIJ International 51(1), 80–87.
+  doi: 10.2355/isijinternational.51.80
+  report_number: null
+  identifier: 10.2355/isijinternational.51.80
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml
+    review_status: draft
+    rows: 9
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/zhang-2011-boron-sodium-f-free-evaporation/zhang-2011-boron-sodium-f-free-evaporation.pdf
+      present: true
+      sha256: 40aa1a814231e218f114499eeadc1b3c99fc8690a6a897efa0cb8df4031b3a92
+      matches_simulator: null
+    sidecar:
+      path: raw/zhang-2011-boron-sodium-f-free-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/zhang-2011-boron-sodium-f-free-evaporation
+      exists: true
+      file_count: 28
+    tables:
+      path: tables/zhang-2011-boron-sodium-f-free-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/zhang-2011-boron-sodium-f-free-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: zhang-2021-acsesc-si
+  aliases: []
+  citation: 'Zhang, Z., Nie, N. X., Mendybaev, R. A., Liu, M.-C., Hu, J. J., Hopp, T., Alp, E. E., Lavina,
+    B., Bullock, E. S., McKeegan, K. D. & Dauphas, N. (2021), Supporting Information for “Loss and isotopic
+    fractionation of alkali elements during diffusion-limited evaporation from molten silicate: theory
+    and experiments”, ACS Earth and Space Chemistry 5, 755–784.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/zhang-2021-acsesc-si.yaml
+    review_status: draft
+    rows: 25
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
+      present: true
+      sha256: c0499ea7d6b5bae37e72b81f5474c9e00a8c159855086fff9847e582dbd95d7b
+      matches_simulator: null
+    sidecar:
+      path: raw/zhang-2021-acsesc-si/sidecar.yaml
+      present: true
+    text:
+      path: text/zhang-2021-acsesc-si
+      exists: true
+      file_count: 26
+    tables:
+      path: tables/zhang-2021-acsesc-si
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/zhang-2021-acsesc-si.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/zhang-2021-acsesc-si.yaml
+      present: true
+      error: null
+      last_stage: acquired
+      date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: zhang-2024-alkali-evaporation-ti-thesis
   aliases: []

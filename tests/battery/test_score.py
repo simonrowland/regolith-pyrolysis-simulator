@@ -4327,6 +4327,12 @@ def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unk
         review="reviewed",
     )
 
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+        return
+
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.score_eligible is False
@@ -4631,6 +4637,40 @@ def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
     assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
 
 
+def test_comparison_ratio_does_not_flag_unverified_activity_coefficient_regime() -> None:
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+    )
+    experiment = F.kems_experiment(
+        orifice_area=Decimal("3.14e-7"),
+        clausing=Decimal("0.9"),
+        kn=None,
+        calibrated=True,
+    )
+    reference = replace(
+        F.observation(
+            "comparison-activity-coefficient-unverified-regime",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.2"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+    )
+
+    residual, _candidate = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
 @pytest.mark.parametrize(
     "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
 )
@@ -4662,6 +4702,20 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
         ),
     )
     gates = run_validity_gates(experiment, reference)
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        assert gates.passed is False
+        assert gates.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+        residual, _ = _compile(
+            reference,
+            experiment,
+            _predict(Decimal("0.2"), identity),
+            review="reviewed",
+        )
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+        return
+
     calibration_check = next(
         check for check in gates.checks if check.name == "kems_calibration"
     )
@@ -13023,6 +13077,34 @@ def test_unnamed_silica_reference_phase_does_not_select_a_janaf_table() -> None:
     )
 
 
+def test_kang_silica_unprinted_reference_phase_has_typed_refusal() -> None:
+    source = "kang-2007-sio2-activity-cas-low-silica"
+    context = load_score_context(sources=(source,))
+    rows = [
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == source
+        and isinstance(observation.identity, Identity)
+        and quantity_token(observation.identity) is Quantity.ACTIVITY
+    ]
+    assert len(rows) == 22
+
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
+        for reference in rows:
+            residual, _candidate = compile_residual(
+                reference, engine, context=context
+            )
+
+            assert residual.status is ResidualStatus.REFUSED
+            assert residual.execution.state is ExecutionState.NOT_PROBED
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert (
+                residual.refusal.detail["reason"]
+                == "fusion_source_reference_phase_unprinted"
+            )
+
+
 def _quartz_silica_activity_observation():
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -15862,6 +15944,32 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             )
             for row in allibert_cao_rows
         )
+        unprinted_cao_references = {
+            "kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h="
+            + suffix
+            for suffix in (
+                "089e4f903141",
+                "0a68381c8d07",
+                "3816d169fbf5",
+                "803c6b10f6a7",
+                "98d5192921f6",
+                "b3b06405be2e",
+                "d5945aa87c1c",
+            )
+        }
+        affected_cao_rows = [
+            row
+            for row in allibert_cao_rows
+            if row.reference in unprinted_cao_references
+        ]
+        assert {row.reference for row in affected_cao_rows} == unprinted_cao_references
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+            and "fusion_source_reference_phase_unprinted"
+            in row.refusal.detail.get("secondary_reasons", ())
+            for row in affected_cao_rows
+        )
         assert len(allibert_alumina_rows) == 8
         for row in allibert_alumina_rows:
             polymorph = (
@@ -16065,6 +16173,82 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     assert not any(
         notice.kind is NoticeKind.UNVERIFIED_APPARATUS
         for notice in residual.notices
+    )
+
+
+def test_ms2000_admitted_alkali_activities_score_with_liquid_sample_phase(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.validity import comparison_method_cell_constant_cancels
+
+    _migrate_real_extract(
+        tmp_path,
+        "kems-ms2000-044.yaml",
+        write=True,
+        use_repository_index_row=True,
+    )
+    context = load_score_context(
+        tmp_path / "tree",
+        sources=("kems-ms2000-044",),
+    )
+    alkali_rows = {
+        observation.observation_id: observation
+        for observation in context.observations.values()
+        if observation.source_id == "kems-ms2000-044"
+        and isinstance(observation.identity, Identity)
+        and quantity_token(observation.identity) is Quantity.ACTIVITY
+        and observation.identity.species.formula in {"Na2O", "K2O"}
+        and observation.admission.status is AdmissionStatus.ADMITTED
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    }
+    assert len(alkali_rows) == 24
+    assert Counter(
+        context.observations[key].identity.species.formula for key in alkali_rows
+    ) == {"Na2O": 12, "K2O": 12}
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.L
+        and comparison_method_cell_constant_cancels(observation.provenance)
+        for observation in alkali_rows.values()
+    )
+
+    def predict_same_activity(engine, point, *, handles, experiment):
+        return EnginePrediction(
+            engine=engine,
+            channel=score_mod.ENGINE_CHANNELS[engine],
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="test:reported-activity",
+            ),
+            value=point.value.point,
+            unit=QUANTITY_UNITS[Quantity.ACTIVITY],
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=point.identity,
+        )
+
+    experiment = context.experiments[
+        next(iter(alkali_rows.values())).experiment_id
+    ]
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        work_id=experiment.work_id,
+        rail=Rail.MELT_ACTIVITY,
+        predict=predict_same_activity,
+    )
+    scored_rows = [row for row in residuals if row.reference in alkali_rows]
+    assert {row.reference for row in scored_rows} == set(alkali_rows)
+    assert all(
+        row.numeric is not None and row.status is ResidualStatus.NO_BAND
+        for row in scored_rows
+    )
+    assert all(
+        any(notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in row.notices)
+        for row in scored_rows
     )
 
 

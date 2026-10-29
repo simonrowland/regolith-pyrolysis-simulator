@@ -23,6 +23,7 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
     numeric_token,
     validate_record_source_tokens,
 )
+from simulator.battery.score import parse_species_formula
 
 
 IMAGE_VERIFIED_OCR_SWEEP = (
@@ -74,6 +75,42 @@ IMAGE_VERIFIED_NONMONOTONE_GIBBS = (
     "gibbs_function",
     "154.78",
     "112.22",
+)
+
+ENGINE_CARRIED_FORMULA_PINS = (
+    ("b1259-298k-0122-corundum", "Al2O3", "A1 2°3", 22),
+    ("b1259-298k-0147-hematite", "Fe2O3", "Fe 2°3", 23),
+    ("b1259-298k-0182-a-quartz", "SiO2", "Si02", 24),
+    ("b1259-298k-0184-o-cristobalite", "SiO2", "Si02", 24),
+    ("b1259-298k-0185-o-tridymite", "SiO2", "Si°2", 24),
+    ("b1259-298k-0193-rutile", "TiO2", "Ti0 2", 24),
+    ("b1259-298k-0203-chromite", "FeCr2O4", "FeCr204", 25),
+    ("b1259-298k-0207-spinel", "MgAl2O4", "MgAl204", 25),
+    ("b1259-298k-0239-magnesite", "MgCO3", "MgC0 3", 27),
+    ("b1259-298k-0281-kyanite", "Al2SiO5", "A1 2 Si°5", 29),
+    ("b1259-298k-0282-andalusite", "Al2SiO5", "Al 2 Si0 5", 29),
+    ("b1259-298k-0283-sillimanite", "Al2SiO5", "A12 Si°5", 29),
+    ("b1259-298k-0288-gehlenite", "Ca2Al2SiO7", "Ca 2 Al2 Si0 7", 29),
+    ("b1259-298k-0293-akermanite", "Ca2MgSi2O7", "Ca 2 MgSi20 7", 29),
+    ("b1259-298k-0295-fayalite", "Fe2SiO4", "Fe 2 Si04", 29),
+    ("b1259-298k-0301-wollastonite", "CaSiO3", "CaSiOj", 29),
+    ("b1259-298k-0310-anorthite", "CaAl2Si2O8", "CaAl2 Si20 8", 30),
+    ("b1259-ht-0068-corundum", "Al2O3", "Al O", 99),
+    ("b1259-ht-0086-hematite", "Fe2O3", "Fe 2 0 3", 117),
+    ("b1259-ht-0112-quartz", "SiO2", "Si0 2", 143),
+    ("b1259-ht-0113-cristobalite", "SiO2", "SiO", 144),
+    ("b1259-ht-0114-tridymite", "SiO2", "SiO_", 145),
+    ("b1259-ht-0129-chromite", "FeCr2O4", "FeCr.O,", 160),
+    ("b1259-ht-0133-spinel", "MgAl2O4", "MgAl2 0 4", 164),
+    ("b1259-ht-0159-magnesite", "MgCO3", "MgCO", 190),
+    ("b1259-ht-0177-kyanite", "Al2SiO5", "Al 2 Si0 5", 208),
+    ("b1259-ht-0178-andalusite", "Al2SiO5", "Al 2 Si0 5", 209),
+    ("b1259-ht-0179-sillimanite", "Al2SiO5", "Al Si0 5", 210),
+    ("b1259-ht-0183-gehlenite", "Ca2Al2SiO7", "Ca 2 Al Si0 7", 214),
+    ("b1259-ht-0186-akermanite", "Ca2MgSi2O7", "Ca 2 MgSi 20 7", 217),
+    ("b1259-ht-0188-fayalite", "Fe2SiO4", "Fe 2 Si0 4", 219),
+    ("b1259-ht-0193-wollastonite", "CaSiO3", "CaSi0 3", 224),
+    ("b1259-ht-0201-anorthite", "CaAl2Si2O8", "CaAl Si_0 0", 232),
 )
 
 
@@ -187,6 +224,60 @@ def test_clinoenstatite_formula_matches_image_verified_page_228(layout_pages):
         "printed_token": "MgSiO3",
         "evidence": "PDF page 228 image visibly prints 'MgSiO3'",
     }
+
+
+def test_engine_carried_formulas_match_image_verified_pages(corpus):
+    manifest, records = corpus
+    by_id = {record["record_id"]: record for record in records}
+    corrections = {
+        correction["correction_id"]: correction
+        for correction in manifest["corrections"]
+    }
+
+    for record_id, printed, raw, pdf_page in ENGINE_CARRIED_FORMULA_PINS:
+        record = by_id[record_id]
+        assert record["pdf_page"] == pdf_page
+        assert record["formula_as_published"] == printed
+        assert record["formula"] == printed
+        assert parse_species_formula(record["formula"]) is not None
+        correction = next(
+            item
+            for item in record["corrections"]
+            if item["field"] == "formula_as_published"
+            and item["printed_token"] == printed
+        )
+        assert correction == corrections[correction["correction_id"]]
+        assert correction["layout_as_extracted"] == raw
+        assert correction["pdf_page"] == pdf_page
+
+    engine_carried_ht_pages = {
+        99, 117, 143, 144, 145, 160, 164, 190,
+        208, 209, 210, 214, 217, 219, 224, 232,
+    }
+    for pdf_page, metadata in loader.IMAGE_VERIFIED_METADATA.items():
+        printed = metadata.get("formula_as_published")
+        if printed is None or pdf_page not in engine_carried_ht_pages:
+            continue
+        record = next(
+            record
+            for record in records
+            if record["table_kind"] == "high_temperature"
+            and record["pdf_page"] == pdf_page
+        )
+        assert record["formula_as_published"] == printed
+        assert record["formula"] == printed
+        assert parse_species_formula(record["formula"]) is not None
+        raw = loader.IMAGE_VERIFIED_LAYOUT_RAWS[(pdf_page, "formula_as_published")]
+        correction = next(
+            correction
+            for correction in record["corrections"]
+            if correction["field"] == "formula_as_published"
+            and correction["printed_token"] == printed
+        )
+        assert correction["layout_as_extracted"] == raw
+        assert correction["evidence"] == (
+            f"PDF page {pdf_page} image visibly prints {printed!r}"
+        )
 
 
 def test_source_grounded_mutation_probe(corpus, layout_pages):

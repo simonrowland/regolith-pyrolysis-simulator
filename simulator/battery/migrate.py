@@ -5614,6 +5614,25 @@ def _explicit_point_conditions(raw: object) -> dict[str, Located[Any]]:
     }
 
 
+def _located_explicit_point_composition(
+    located: object,
+) -> Located[Composition] | None:
+    """A point-condition composition that carries its own printed locator.
+
+    The observation locator is not a substitute. Callers use this composition
+    as the identity and leave its locator in place.
+    """
+
+    if not isinstance(located, Located) or located.locator is None:
+        return None
+    state = located.state
+    if not isinstance(state, State) or not state.is_value:
+        return None
+    if not isinstance(state.value, Composition):
+        return None
+    return located
+
+
 def _source_standard_state_phase(raw: object, phase: str) -> str | None:
     text = " ".join(str(raw).split())
     match = re.search(
@@ -16855,6 +16874,24 @@ class Migrator:
                 token = janaf_extract_phase(source_id, unmapped_phase)
                 if token is not None:
                     phase, unmapped_phase = State.of(token), None
+        condensed_form = obs.get("condensed_form")
+        if (
+            source_id == "kems-ms2000-044"
+            and q_token is Quantity.ACTIVITY
+            and formula in {"Na2O", "K2O"}
+            and phase_raw
+            in {
+                "Na2O-SiO2_binary_silicate_melt",
+                "K2O-SiO2_binary_silicate_melt",
+            }
+            and isinstance(condensed_form, Mapping)
+            and condensed_form.get("state") == "liquid_melt"
+            and condensed_form.get("basis") == "explicit_author"
+        ):
+            # This source explicitly labels these alkali activity samples as
+            # liquid melts. The K2O token also labels Plante partial-pressure
+            # reservoirs, so keep this identity reading scoped to MS2000.
+            phase, unmapped_phase = State.of(Phase.L), None
         if q_token in {Quantity.P_PARTIAL, Quantity.P_SAT}:
             source_standard_state = obs.get("standard_state") or values.get(
                 "standard_state"
@@ -17965,7 +18002,16 @@ class Migrator:
                     for key, value in raw_point_conditions.items()
                 },
             }
-        if composition_located is not None:
+        # b-1052: an explicit point composition already carries its printed
+        # locator. A values map is anchored at the observation and must not
+        # replace it. Without an explicit point composition, the values map
+        # remains the composition.
+        explicit_composition = _located_explicit_point_composition(
+            (point_conditions or {}).get("composition")
+        )
+        if explicit_composition is not None:
+            ident_kwargs["composition"] = explicit_composition.state
+        elif composition_located is not None:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": composition_located,
@@ -17987,7 +18033,7 @@ class Migrator:
                     ),
                 ),
             }
-        if malformed_composition_amount is not None:
+        if explicit_composition is None and malformed_composition_amount is not None:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": Located(
@@ -18830,7 +18876,11 @@ class Migrator:
             has_non_yield_points = any(
                 name in {"points", "tests"} for name, _items in row_point_containers
             )
-            if has_non_yield_points and initial_oxide_map != rowless_initial_map:
+            if (
+                explicit_composition is None
+                and has_non_yield_points
+                and initial_oxide_map != rowless_initial_map
+            ):
                 # A nested row may be identified as the initial charge for
                 # its own point. It does not become the parent identity or a
                 # default condition on every sibling point.

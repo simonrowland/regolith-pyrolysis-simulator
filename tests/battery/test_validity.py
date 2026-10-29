@@ -6,7 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import AdmissionStatus, EvidenceClass, RefusalReason
+from simulator.battery.enums import (
+    AdmissionStatus,
+    EvidenceClass,
+    Quantity,
+    RefusalReason,
+)
 from simulator.battery.migrate import (
     experiment_from_plain,
     iter_observation_store_paths,
@@ -17,6 +22,7 @@ from simulator.battery.records import Experiment, Observation
 from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
+    underdetermined_apparatus,
 )
 from tests.battery import factories as F
 
@@ -46,6 +52,39 @@ def test_comparison_ratio_kind_cancellation_golden_pin(
     }
 
     assert comparison_method_cell_constant_cancels(provenance) is True
+
+
+def test_comparison_ratio_does_not_admit_activity_coefficient() -> None:
+    provenance = {
+        "comparison_method": {"kind": "comparison_ratio"},
+        "common_knudsen_cell_constant": {"cancels": True},
+        "melt_reference_pairing": {"kind": "same_effective_setup"},
+    }
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=True
+    )
+    reference = replace(
+        F.observation(
+            "comparison-activity-coefficient",
+            experiment.experiment_id,
+            replace(F.activity_identity(), quantity=Quantity.ACTIVITY_COEFFICIENT),
+            "0.2",
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        provenance=provenance,
+    )
+
+    gate = underdetermined_apparatus(
+        experiment, Quantity.ACTIVITY_COEFFICIENT, observation=reference
+    )
+
+    assert gate.passed is False
+    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert gate.primary_check == "geometry_determinants"
+    assert not any(
+        check.name == "comparison_method_cell_constant_cancels" and check.passed
+        for check in gate.checks
+    )
 
 
 _VALIDITY_BUCKET_COUNT = 8

@@ -462,7 +462,7 @@ def underdetermined_apparatus(
             and pairing.get("kind") == "different_cells_or_geometry"
         )
         comparison_activity = (
-            quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            quantity is Quantity.ACTIVITY
             and observation is not None
             and comparison_method_cell_constant_cancels(observation.provenance)
         )
@@ -519,7 +519,9 @@ def underdetermined_apparatus(
         ungrounded_detail = (
             None if calibrated else _calibration_not_grounded_detail(calibration)
         )
-        calibration_flagged = activity_quantity and ungrounded_detail is not None
+        calibration_flagged = (
+            quantity is Quantity.ACTIVITY and ungrounded_detail is not None
+        )
         if activity_quantity:
             checks.append(
                 GateCheck(

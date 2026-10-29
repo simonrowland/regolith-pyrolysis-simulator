@@ -1,0 +1,217 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168
+  citation: Mueller, M., Willenborg, W., Hilpert, K. & Singheiser, L. (2004), "Structural dependence of alkali oxide activity
+    in coal ash slags", VII International Conference on Molten Slags, Fluxes and Salts, pp. 615–618.
+  source_ids:
+  - mueller-2004-alkali-oxide-activity-coal-ash
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:mueller-2004-alkali-oxide-activity-coal-ash
+      role: pdf
+      path: raw/mueller-2004-alkali-oxide-activity-coal-ash/mueller-2004-alkali-oxide-activity-coal-ash.pdf
+      sha256:
+        tag: value
+        value: 534310b3b1fbf4c6adf4498c0a926dc21fc4e9956a8c3d7c27bfe021f8e85497
+    - asset_id: pdftotext:mueller-2004-alkali-oxide-activity-coal-ash
+      role: pdftotext
+      path: text/mueller-2004-alkali-oxide-activity-coal-ash
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:mueller-2004-alkali-oxide-activity-coal-ash
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '27'
+          CO2: '0.154'
+          CaO: '9.1'
+          Fe2O3: '14.4'
+          K2O: '1.2'
+          MgO: '2.5'
+          Na2O: '2.1'
+          P2O5: '0.4'
+          SO3: '0.082'
+          SiO2: '36.2'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168
+  locator:
+    page: 2
+    published_page: 616
+    table: I
+  bench_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::bench::mueller-2004-kems
+- experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-plus-5-mass-percent-tio2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168
+  locator:
+    page: 2
+    published_page: 616
+    section: Results and discussion
+  bench_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::bench::mueller-2004-kems
+benches:
+- id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::bench::mueller-2004-kems
+  work_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 1
+      published_page: 615
+      section: Experimental
+  other_facts: []
+context:
+- observation_id: mueller_2004_table_i_boiler_slag_composition
+  type: composition
+  locator:
+    page: 2
+    published_page: 616
+    table: I
+  units: mass percent
+  values:
+    quantity: starting_material_composition
+    method_class: method_only
+    material: boiler slag
+    components_as_printed:
+      SiO2: '36.2'
+      Al2O3: '27'
+      Fe2O3: '14.4'
+      CaO: '9.1'
+      MgO: '2.5'
+      Na2O: '2.1'
+      K2O: '1.2'
+      P2O5: '0.4'
+      CO2: '0.154'
+      SO3: '0.082'
+  context_id: mueller-2004-alkali-oxide-activity-coal-ash::context::mueller_2004_table_i_boiler_slag_composition
+  work_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168
+  source_id: mueller-2004-alkali-oxide-activity-coal-ash
+  species: Slag
+- observation_id: mueller_2004_table_ii_model_slag_composition_and_structure
+  type: composition
+  locator:
+    page: 2
+    published_page: 616
+    table: II
+  units: mass percent for composition; dimensionless as printed for structural ratios
+  values:
+    quantity: composition_and_structural_parameters_without_closed_structure_quantity
+    method_class: method_only
+    admission_status: typed_refused_for_structural_parameters
+    schema_gap: no closed scored quantity token for base/acid or NBO/T
+    structural_parameter_definition:
+      base_acid: (Na2O + K2O + FeO + MgO + CaO) / (SiO2 + TiO2 + Fe2O3 + Al2O3)
+      NBO_T: (Na2O + K2O + FeO + MgO + CaO - (Fe2O3 + Al2O3)) / (SiO2 + TiO2 + 2*(Fe2O3 + Al2O3))
+    rows:
+    - sample: M1
+      composition_as_printed:
+        SiO2: '51.76'
+        Al2O3: '28.2'
+        CaO: '15.29'
+        Na2O: '4.74'
+      base_acid_as_printed: '0.307'
+      NBO_T_as_printed: '0.051'
+    - sample: M2
+      composition_as_printed:
+        SiO2: '55.91'
+        Al2O3: '19.64'
+        CaO: '19.99'
+        Na2O: '4.46'
+      base_acid_as_printed: '0.381'
+      NBO_T_as_printed: '0.179'
+    - sample: M3
+      composition_as_printed:
+        SiO2: '56.22'
+        Al2O3: '24'
+        CaO: '15.04'
+        Na2O: '4.75'
+      base_acid_as_printed: '0.294'
+      NBO_T_as_printed: '0.078'
+    - sample: M4
+      composition_as_printed:
+        SiO2: '56.02'
+        Al2O3: '29.46'
+        CaO: '9.88'
+        Na2O: '4.63'
+      base_acid_as_printed: '0.205'
+      NBO_T_as_printed: '-0.025'
+    - sample: Boiler slag red.
+      composition_as_printed: not_printed
+      base_acid_as_printed: '0.543'
+      NBO_T_as_printed: '0.182'
+    - sample: Boiler slag ox.
+      composition_as_printed: not_printed
+      base_acid_as_printed: '0.283'
+      NBO_T_as_printed: '-0.064'
+  context_id: mueller-2004-alkali-oxide-activity-coal-ash::context::mueller_2004_table_ii_model_slag_composition_and_structure
+  work_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168
+  source_id: mueller-2004-alkali-oxide-activity-coal-ash
+  species: Slag
