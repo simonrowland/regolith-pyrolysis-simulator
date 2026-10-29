@@ -17,20 +17,20 @@ extraction:
   worker: fam17-1019
   table_disposition:
     Table I: CSV1/CSV2 starting compositions are bound to the corresponding text-reported yield bounds
-      by sample ID; CSV3 remains context because its outcomes are figure-only. The text-reported >77
-      and >45 mass pct yields migrate as mass-loss fraction bounds.
+      by sample ID; CSV3 remains context because its outcomes are figure-only. The >77 and >45 mass pct
+      yields are printed context because their denominator is V2O5 extracted from the starting slag.
     Table II: Treatment matrix retained in context; it contains conditions but no measured outcome column.
     Table III: All 25 selected-element EDX atomic-percent cells retained in context because no token fits
       this partial elemental composition table.
 review_status: draft
 fidelity_samples:
-- path: species.V2O5.observations[shyrokykh_2021_csv1_text_extraction_bound].values.mass_loss_pct
+- path: species.V2O5.context[shyrokykh_2021_csv1_text_extraction_bound].values.mass_loss_pct
   value:
     kind: bound
     bound_operator: '>'
     bound_value: '77'
   note: Textual lower bound, physical PDF page 3; Figure 5 is separately deferred.
-- path: species.V2O5.observations[shyrokykh_2021_csv2_text_extraction_bound].values.mass_loss_pct
+- path: species.V2O5.context[shyrokykh_2021_csv2_text_extraction_bound].values.mass_loss_pct
   value:
     kind: bound
     bound_operator: '>'
