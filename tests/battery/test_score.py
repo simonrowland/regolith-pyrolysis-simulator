@@ -5657,8 +5657,10 @@ def _context_for_sibling_oxygen(
     The regenerated sibling is ``quoted_attributed`` and its observation
     ids match a fresh migration of ``extract_name``. Anything else is
     stale: ``model_derived``, or a quoted relabel that kept the previous
-    ``:h=`` ids (stable_ids.py hashes the extract row). Series stems,
-    that suffix stripped, must still match.
+    ``:h=`` ids (stable_ids.py hashes the extract row). Every store
+    series stem, that suffix stripped, must still be in the fresh
+    migration. A fresh stem the store does not have is allowed only when
+    every observation on it is figure-only evidence.
     """
     from simulator.battery.migrate import load_migrated_context
     from tests.battery.test_migrate import _migrate_real_extract
@@ -5691,9 +5693,22 @@ def _context_for_sibling_oxygen(
         and set(fresh.observations) == set(context.observations)
     ):
         return context
-    assert {_series_stem(observation_id) for observation_id in fresh.observations} == {
+    store_stems = {
         _series_stem(observation_id) for observation_id in context.observations
     }
+    fresh_stems = {
+        _series_stem(observation_id) for observation_id in fresh.observations
+    }
+    missing = store_stems - fresh_stems
+    assert not missing, missing
+    extra = fresh_stems - store_stems
+    for observation_id, observation in fresh.observations.items():
+        if _series_stem(observation_id) not in extra:
+            continue
+        evidence = observation.evidence.class_
+        assert (
+            evidence.is_value and evidence.value is EvidenceClass.FIGURE_ONLY
+        ), observation_id
     validation = validate_corpus(
         context.works,
         context.experiments,
@@ -6014,14 +6029,16 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
             for notice in residual.notices
         )
     }
+    # The :h= suffixes moved when the Table 2 run conditions were recorded.
+    # len(selected) is 29 and the slope below is still 5.19.
     assert unverified_keys == {
-        "h=2b0d96585c1f",
-        "h=70d0b48ae622",
-        "h=77e8a8961618",
-        "h=8e2834e7ce16",
-        "h=8fb519888bcb",
-        "h=9482b6cd970a",
-        "h=b8e8d996ef46",
+        "h=15e3aebeca85",
+        "h=1b65d2b9485a",
+        "h=29181d3aa8bb",
+        "h=306f8c55d11e",
+        "h=485a267bf37a",
+        "h=63f27b05b715",
+        "h=e37db2ee7220",
     }
     e15_residual = selected[0][0]
     e15_observation = context.observations[e15_residual.reference]
