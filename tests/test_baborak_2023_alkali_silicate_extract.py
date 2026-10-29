@@ -163,7 +163,7 @@ def test_baborak_page_pins_compound_identity_and_quench_conditions() -> None:
         )
         source_row = _row(document, observation_id)
         assert source_row["values"]["composition_as_published"] == printed_formulas[observation_id]
-        assert source_row["values"]["composition_mol"]["basis"] == "printed_formula_stoichiometry"
+        assert source_row["values"]["composition_mol"]["basis"] == "printed_mole_fraction"
 
     for observation_id in (
         "baborak_2023_ls2_tg_table1",

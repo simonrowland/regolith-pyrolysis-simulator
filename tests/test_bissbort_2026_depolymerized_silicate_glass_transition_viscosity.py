@@ -126,7 +126,15 @@ def test_all_table_observations_migrate_with_species_composition_and_temperature
                     for oxide, amount in inventory.items()
                 }
                 assert normalized == expected_mole_fractions_by_sample[sample]
-                assert observation.identity.composition.is_not_applicable
+                identity_composition = observation.identity.composition
+                assert identity_composition.is_value
+                assert identity_composition.value.amount_basis.value == "mol_inventory"
+                assert dict(identity_composition.value.components) == expected_inventory
+                identity_normalized = {
+                    oxide: amount / sum(identity_composition.value.components.values())
+                    for oxide, amount in identity_composition.value.components.items()
+                }
+                assert identity_normalized == expected_mole_fractions_by_sample[sample]
             assert observation.point_conditions["sample_id"].locator.pdf_page_index == 8
         else:
             assert observation.point_conditions["temperature_K"].state.is_unknown
