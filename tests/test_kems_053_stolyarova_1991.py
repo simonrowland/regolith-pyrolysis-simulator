@@ -209,4 +209,3 @@ def test_printed_caosio2_melt_phase_maps_on_all_59_observations(
         (2, "IIb", None),
         (4, None, "3"),
     } <= phase_locators
-
