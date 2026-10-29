@@ -3843,7 +3843,7 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
 
 
 def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_shape(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import subprocess
 
@@ -3930,6 +3930,16 @@ def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_sh
     second = run_script()
     assert second.returncode == 0, second.stderr
     assert output_path.read_bytes() == first_bytes
+
+    # A content edit without regenerating the record must make the cheap
+    # migrated-store check report stale data, even when git-derived metadata
+    # and the validation counts have not changed.
+    store_path.write_bytes(
+        store_path.read_bytes() + b"\n# changed without regenerating validation\n"
+    )
+    monkeypatch.setitem(globals(), "REPO_ROOT", root)
+    with pytest.raises(AssertionError, match="stale store validation record"):
+        test_validate_corpus_zero_hard_issues_on_migrated_store()
 
     observations[1]["experiment_id"] = "missing-fixture-experiment"
     store_path.write_text(yaml.safe_dump(store, sort_keys=False), encoding="utf-8")
