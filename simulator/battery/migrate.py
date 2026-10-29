@@ -17781,6 +17781,13 @@ class Migrator:
             ident_kwargs["temperature_K"] = State.unknown(
                 f"source {name} [{lo}, {hi}]; no midpoint invented"
             )
+        elif (
+            t_known is None
+            and t_sel.field_name is not None
+            and t_sel.reason
+            and q_token is not Quantity.TRANSITION_TEMPERATURE
+        ):
+            ident_kwargs["temperature_K"] = State.unknown(t_sel.reason)
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
         if (

@@ -5894,9 +5894,15 @@ def test_celsius_temperature_from_observation_point_conditions_reaches_identity(
 ) -> None:
     from tests.battery.test_migrate import _migrate_real_extract
 
-    result = _migrate_real_extract(
-        tmp_path, "holzheid-lodders-2001-copper-solubility.yaml"
+    name = "holzheid-lodders-2001-copper-solubility.yaml"
+    source = yaml.safe_load((EXTRACTS / name).read_text())
+    source_row = next(
+        row
+        for row in source["species"]["CuO0.5"]["observations"]
+        if row["observation_id"] == "hl01_g_cuo05_fe0_s0"
     )
+    source_row["values"].pop("T_C")
+    result = _migrate_real_extract(tmp_path, name, extract_doc=source)
     observation = next(
         row
         for row in result.observations.values()
@@ -5956,6 +5962,7 @@ def test_ambiguous_point_condition_temperature_stays_unknown(
         for row in source["species"]["CuO0.5"]["observations"]
         if row["observation_id"] == "hl01_g_cuo05_fe0_s0"
     )
+    row["values"].pop("T_C")
     condition = row["point_conditions"]["temperature_C"]
     condition["state"] = {
         "tag": "unknown",
