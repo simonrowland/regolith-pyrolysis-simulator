@@ -6699,7 +6699,7 @@ def test_ok_gate_curve_with_informational_reason_is_reused(
         pytest.param(
             'out_of_domain',
             {'backend_status': 'out_of_domain', 'backend_status_reason': 'timeout'},
-            id='declared-gate-timeout-out-of-domain',
+            id='declared-gate-timeout-terminal-refusal',
         ),
     ],
 )
@@ -6718,14 +6718,28 @@ def test_core_gate_curve_memo_recomputes_after_provider_failure(
         enabled=True,
     )
     provider_calls = []
+    timeout_case = initial_diagnostic.get('backend_status_reason') == 'timeout'
+    shared_cache = {}
+    captures = []
+    if timeout_case:
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        capture_store = SimpleNamespace(
+            capture_enabled=True,
+            capture_gate_curve=lambda *args, **kwargs: captures.append(
+                (args, kwargs)
+            ),
+        )
+        monkeypatch.setattr(sim, '_pt0_store', lambda: capture_store)
+    cache_before = sim._freeze_gate_liquid_fraction_cache
+    memo_before = dict(sim._freeze_gate_liquid_fraction_curve_memo)
+    shared_cache_before = dict(shared_cache)
+    captures_before = list(captures)
+    key = _freeze_gate_key_for_current_state(sim)
 
     def injected_provider_result(intent, *args, **kwargs):
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             provider_calls.append(intent)
-            failure_attempts = (
-                2 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 1
-            )
-            if len(provider_calls) <= failure_attempts:
+            if len(provider_calls) == 1:
                 return IntentResult(
                     intent=intent,
                     status=initial_status,
@@ -6755,6 +6769,19 @@ def test_core_gate_curve_memo_recomputes_after_provider_failure(
         None,
         raising=False,
     )
+    if timeout_case:
+        with pytest.raises(EvaporationFluxRefusal) as excinfo:
+            sim._melt_redox_liquidus_gate_curve()
+        assert excinfo.value.reason == 'engine_compute_timeout'
+        assert excinfo.value.diagnostic['reason_code'] == 'engine_compute_timeout'
+        assert sim._freeze_gate_liquid_fraction_cache is cache_before
+        assert sim._freeze_gate_liquid_fraction_curve_memo == memo_before
+        assert shared_cache == shared_cache_before
+        assert captures == captures_before
+        assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+        assert len(provider_calls) == 1
+        return
+
     first = sim._melt_redox_liquidus_gate_curve()
     assert first['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
     assert first['gate_provider_refusal']['authority'] == 'extrapolated (lower-rung)'
@@ -7478,7 +7505,7 @@ def test_freeze_gate_wrapper_passes_buffer_offset_redox_state(
                     (1300.0, 1.0),
                 ),
             },
-            id='ok-timeout-retries-provider',
+            id='ok-timeout-terminal-refusal',
         ),
         pytest.param(
             'unavailable',
@@ -7491,7 +7518,7 @@ def test_freeze_gate_wrapper_passes_buffer_offset_redox_state(
                 'backend_status': 'out_of_domain',
                 'backend_status_reason': 'timeout',
             },
-            id='timeout-retries-provider',
+            id='timeout-terminal-refusal',
         ),
         pytest.param(
             'out_of_domain',
@@ -7532,10 +7559,7 @@ def test_failed_gate_provider_refusal_does_not_enter_any_memo(
     def injected_provider_result(intent, *args, **kwargs):
         assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
         provider_calls.append(intent)
-        failure_attempts = (
-            2 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 1
-        )
-        if len(provider_calls) <= failure_attempts:
+        if len(provider_calls) == 1:
             return IntentResult(
                 intent=intent,
                 status=initial_status,
@@ -7559,23 +7583,31 @@ def test_failed_gate_provider_refusal_does_not_enter_any_memo(
 
     monkeypatch.setattr(sim, '_dispatch_only', injected_provider_result)
 
-    if initial_diagnostic.get('backend_status_reason') == 'timeout':
-        first = sim._melt_redox_liquidus_gate_curve()
-        assert first['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
-        assert first['gate_provider_refusal']['authority'] == 'extrapolated (lower-rung)'
-        sim.melt.hour += 1
+    timeout_case = initial_diagnostic.get('backend_status_reason') == 'timeout'
+    cache_before = sim._freeze_gate_liquid_fraction_cache
+    memo_before = dict(sim._freeze_gate_liquid_fraction_curve_memo)
+    shared_cache_before = dict(shared_cache)
+    captures_before = list(captures)
+    key = _freeze_gate_key_for_current_state(sim)
+    if timeout_case:
+        with pytest.raises(EvaporationFluxRefusal) as excinfo:
+            sim._melt_redox_liquidus_gate_curve()
+        assert excinfo.value.reason == 'engine_compute_timeout'
+        assert excinfo.value.diagnostic['reason_code'] == 'engine_compute_timeout'
     else:
         with pytest.raises(EvaporationFluxRefusal):
             sim._melt_redox_liquidus_gate_curve()
-    key = _freeze_gate_key_for_current_state(sim)
-    assert sim._freeze_gate_liquid_fraction_cache is None
-    assert shared_cache == {}
-    assert captures == []
+    assert sim._freeze_gate_liquid_fraction_cache is cache_before
+    assert sim._freeze_gate_liquid_fraction_curve_memo == memo_before
+    assert shared_cache == shared_cache_before
+    assert captures == captures_before
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+    if timeout_case:
+        assert len(provider_calls) == 1
+        return
+
     second = sim._melt_redox_liquidus_gate_curve()
-    assert len(provider_calls) == (
-        3 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 2
-    )
+    assert len(provider_calls) == 2
     assert second['source'] == 'gate_liquid_fraction'
     assert second['solidus_T_C'] == 1000.0
     assert second['liquidus_T_C'] == 1300.0
