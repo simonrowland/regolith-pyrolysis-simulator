@@ -11,6 +11,7 @@ from simulator.account_ids import METAL_PHASE_ACCOUNTS
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.core import PyrolysisSimulator
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.sso_r_owner_surface import (
@@ -103,27 +104,46 @@ def build_sso2_owner_recipe_execution(
     backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
 ) -> RunExecution:
     setpoints_patch = sso2_owner_recipe_setpoints_patch()
-    dose_kg = _certified_full_feo_equiv_na_dose_kg(
-        mass_kg=float(mass_kg),
-        backend_name=backend_name,
-        setpoints_patch=setpoints_patch,
-    )
-    run = PyrolysisRun(
-        feedstock_id=SSO2_FEEDSTOCK_ID,
-        campaign="C2A_staged",
-        hours=int(hours),
-        mass_kg=float(mass_kg),
-        backend_name=backend_name,
-        additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: dose_kg},
-        allow_unmeasured_alpha_fallback=True,
-        unmeasured_alpha_fallback_species=(
+    run_options = {
+        "feedstock_id": SSO2_FEEDSTOCK_ID,
+        "campaign": "C2A_staged",
+        "hours": int(hours),
+        "mass_kg": float(mass_kg),
+        "backend_name": backend_name,
+        "allow_unmeasured_alpha_fallback": True,
+        "unmeasured_alpha_fallback_species": (
             SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES
         ),
-        setpoints_patch=setpoints_patch,
+        "setpoints_patch": setpoints_patch,
+    }
+    executor = RunExecutor()
+    try:
+        dose_kg = _certified_full_feo_equiv_na_dose_kg(
+            mass_kg=float(mass_kg),
+            backend_name=backend_name,
+            setpoints_patch=setpoints_patch,
+        )
+    except EvaporationFluxRefusal as exc:
+        session = SimSession().start(PyrolysisRun(**run_options)._session_config())
+        return executor.execute_session(
+            session,
+            hours=int(hours),
+            initial_refusal=exc,
+        )
+    run = PyrolysisRun(
+        **run_options,
+        additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: dose_kg},
     )
     session = SimSession().start(run._session_config())
-    _apply_certified_na_dose(session.simulator)
-    return RunExecutor().execute_session(session, hours=int(hours))
+    try:
+        _apply_certified_na_dose(session.simulator)
+    except EvaporationFluxRefusal as exc:
+        return executor.execute_session(
+            session,
+            hours=int(hours),
+            initial_refusal=exc,
+        )
+    return executor.execute_session(session, hours=int(hours))
 
 
 def _certified_full_feo_equiv_na_dose_kg(
