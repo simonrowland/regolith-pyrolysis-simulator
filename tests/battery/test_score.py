@@ -13077,37 +13077,32 @@ def test_unnamed_silica_reference_phase_does_not_select_a_janaf_table() -> None:
     )
 
 
-def test_kang_silica_solid_without_polymorph_uses_stable_phase_at_temperature() -> None:
-    from simulator.battery.score import fusion_comparison_reference, load_score_context
-
+def test_kang_silica_unprinted_reference_phase_has_typed_refusal() -> None:
     source = "kang-2007-sio2-activity-cas-low-silica"
     context = load_score_context(sources=(source,))
-    reference = context.observations[
-        f"{source}::kang_2007_t2_sample_301_sio2_activity"
+    rows = [
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == source
+        and isinstance(observation.identity, Identity)
+        and quantity_token(observation.identity) is Quantity.ACTIVITY
     ]
-    polymorph = reference.identity.reference_state.value.endmember.polymorph
-    assert polymorph.is_unknown
-    assert polymorph.reason == "source does not state polymorph"
+    assert len(rows) == 22
 
-    inferred = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    explicit_reference = replace(
-        reference,
-        identity=_with_activity_reference_polymorph(
-            reference.identity, "cristobalite_high"
-        ),
-    )
-    explicit = fusion_comparison_reference(
-        explicit_reference, engine=Engine.OPENIMCC
-    )
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
+        for reference in rows:
+            residual, _candidate = compile_residual(
+                reference, engine, context=context
+            )
 
-    assert inferred.value.point == explicit.value.point
-    assert inferred.value.point != reference.value.point
-    assert inferred.identity.reference_state.value.endmember.phase.value is Phase.L
-    assert any(
-        notice.reason.startswith("polymorph_assumed_stable_at_T:")
-        and polymorph.reason in notice.reason
-        for notice in inferred.notices
-    )
+            assert residual.status is ResidualStatus.REFUSED
+            assert residual.execution.state is ExecutionState.NOT_PROBED
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert (
+                residual.refusal.detail["reason"]
+                == "fusion_source_reference_phase_unprinted"
+            )
 
 
 def _quartz_silica_activity_observation():
