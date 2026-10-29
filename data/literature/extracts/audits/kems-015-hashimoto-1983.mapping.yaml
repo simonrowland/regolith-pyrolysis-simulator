@@ -1,6 +1,14 @@
 source_id: kems-015-hashimoto-1983
 citation: Hashimoto (1983), Geochemical Journal 17:111-145
 tables:
+- table: '1'
+  page: 3
+  published_page: 113
+  role: starting melt composition linked from every printed run
+  row: (1) Ave.
+  numeric_cells_audited: 5
+  cell_audit_file: kems-015-hashimoto-1983.table1-starting-composition-cell-audit.csv
+  verification: MinerU and pdftotext digits agree; row and column assignment checked against PDF p3 render
 - table: '2'
   page: 4
   published_page: 114
@@ -11,8 +19,9 @@ tables:
     time_min: Table 2 time (min)
     run_id: run notation
   row_count_printed: 19
-  verification: MinerU and pdftotext numeric agreement; row/column layout checked
-    against PDF p4 render
+  numeric_cells_audited: 38
+  cell_audit_file: kems-015-hashimoto-1983.table2-cell-audit.csv
+  verification: MinerU and pdftotext numeric agreement; row/column layout checked against PDF p4 render
 - table: '3'
   page: 6
   published_page: 116
@@ -29,8 +38,19 @@ tables:
     CaO_wt_pct: CaO
     n_analyses: n.a.
   row_count_printed: 31
-  verification: MinerU and pdftotext numeric agreement; row/column layout checked
-    against PDF p6 render
+  numeric_cells_audited: 174
+  cell_audit_file: kems-015-hashimoto-1983.table3-cell-audit.csv
+  crosswalk_file: kems-015-hashimoto-1983.table3-run-crosswalk.csv
+  verification: MinerU and pdftotext digits agree; row/column layout checked against PDF p6 render
+  row_assignment_note: MinerU labels the first two body rows as headers; the PDF p6 render confirms samples 17C1 and C3 (1) as body rows 1 and 2
+  cell_note: Parenthesized VF values were checked against the PDF p6 render and retained as numeric VF plus the separate splash flag
+- table: '6'
+  page: 14
+  published_page: 124
+  role: pre-existing JANAF context pins; values retained
+  numeric_cells_audited: 3
+  cell_audit_file: kems-015-hashimoto-1983.table6-context-cell-audit.csv
+  verification: Printed Table 6 caption and the three stored AH°/z pins checked against PDF p14 render; no values changed
 condition_prose:
 - quantity: total_pressure_Pa
   page: 8
@@ -44,3 +64,37 @@ condition_prose:
   section: Disproportionation reactions in a liquid state
   printed: unbuffered with respect to P_O2 (e.g., vacuum condition)
   state: unknown; no run fO2 or numerical pO2 printed
+render_checks:
+- pdf_page: 3
+  published_page: 113
+  table: '1'
+  checked: Table 1 row (1) Ave. and starting-composition column assignment
+- pdf_page: 4
+  published_page: 114
+  table: '2'
+  checked: run-code, temperature and duration row/column assignment
+- pdf_page: 6
+  published_page: 116
+  table: '3'
+  checked: all 31 sample rows, element headings and VF splash parentheses
+- pdf_page: 8
+  published_page: 118
+  checked: approximate chamber pressure wording; transient p114 spike excluded
+- pdf_page: 14
+  published_page: 124
+  table: '6'
+  checked: caption, 20-row table layout and the three stored context pins
+- pdf_page: 17
+  published_page: 127
+  checked: qualitative unbuffered P_O2 statement; no numeric run fO2 or pO2 printed
+migrator_fields:
+  point_conditions: simulator/battery/migrate.py::_explicit_point_conditions
+  identity_binding: simulator/battery/migrate.py::fill_identity
+  experiment_sample: simulator/battery/migrate.py::_sample_from_plain
+  pressure_environment: simulator/battery/migrate.py::_pressure_env_from_plain
+  printed_oxygen: simulator/battery/migrate.py::printed_oxygen_decision
+table_tool:
+  compare_output: kems-015-hashimoto-1983.table-compare.csv
+  compare_summary: matched=0 no-match=0 mismatch=0 presence-only=0 needs_mapping=0 locator-error=0 unverifiable=0 total=0
+  compare_note: The tool found no structured body cells in the extract; Table 2 and Table 3 cells are audited row-by-row in the linked CSV files.
+  qa_summary: Table 2 and Table 3 have no QA flags; other reported flags are outside the condition-recovery tables, and the three stored Table 6 context pins are render-verified.
