@@ -65,8 +65,8 @@ def test_shornikov_2018_tables_and_conditions_migrate_with_page_coordinates() ->
     assert sum(_identity_complete(row) for row in by_quantity["activity"]) == 60
     assert sum(_identity_complete(row) for row in by_quantity["p_partial"]) == 0
 
-    # The source reduces all Table 1 pressures from ion-current inputs that it
-    # does not tabulate, so those authors' results retain attribution.
+    # Table 1 is this paper's own KEMS result; preserve the green evidence
+    # classes for its tabulated and reduced series.
     pressure_series = [
         observation
         for species in document["species"].values()
@@ -75,11 +75,22 @@ def test_shornikov_2018_tables_and_conditions_migrate_with_page_coordinates() ->
         and observation.get("values", {}).get("quantity") == "partial_pressure"
     ]
     assert len(pressure_series) == 8
-    assert all(
-        row["values"]["method_class"] == "quoted_attributed"
-        and row["values"]["attribution"]
+    assert {
+        row["observation_id"]: row["values"].get(
+            "evidence_class", row["values"]["method_class"]
+        )
         for row in pressure_series
-    )
+    } == {
+        "shornikov_2018_t1_p_mg": "measured_tabulated",
+        "shornikov_2018_t1_p_mgo": "measured_tabulated",
+        "shornikov_2018_t1_p_al": "measured_tabulated",
+        "shornikov_2018_t1_p_alo": "measured_tabulated",
+        "shornikov_2018_t1_p_al2o": "measured_tabulated",
+        "shornikov_2018_t1_p_mgalo": "measured_tabulated",
+        "shornikov_2018_t1_p_o": "measured_reduced",
+        "shornikov_2018_t1_p_o2": "measured_reduced",
+    }
+    assert all("attribution" not in row["values"] for row in pressure_series)
 
     for row in observations:
         conditions = row.point_conditions

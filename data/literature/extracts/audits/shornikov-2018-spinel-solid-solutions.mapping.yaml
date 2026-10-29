@@ -87,8 +87,15 @@ tables:
     draft_key: p006-t01
     type: partial_pressure
     quantity: partial_pressure
-    evidence_class: quoted_attributed
-    attribution: "Shornikov and Yakovlev (2018), Table 1 (authors' KEMS results)"
+    evidence_class_by_series:
+      shornikov_2018_t1_p_mg: measured_tabulated
+      shornikov_2018_t1_p_mgo: measured_tabulated
+      shornikov_2018_t1_p_al: measured_tabulated
+      shornikov_2018_t1_p_alo: measured_tabulated
+      shornikov_2018_t1_p_al2o: measured_tabulated
+      shornikov_2018_t1_p_mgalo: measured_tabulated
+      shornikov_2018_t1_p_o: measured_reduced
+      shornikov_2018_t1_p_o2: measured_reduced
     unit: atm
     phase: gas
     per: mol_species
