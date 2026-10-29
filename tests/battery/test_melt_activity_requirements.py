@@ -1190,6 +1190,47 @@ def test_feo_parent_row_is_ready_only_for_imcc_when_oxygen_is_printed(basis):
         _assert_melts_parent_oxide_refused(results[engine], "FeO")
 
 
+def test_oneill_feo_activity_coefficient_refusal_is_typed_per_engine():
+    from simulator.battery.enums import Engine, ExecutionState, RefusalReason
+    from simulator.battery.score import predict_with_engine
+
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("CaO", "0.2395"),
+            ("MgO", "0.1465"),
+            ("Al2O3", "0.0874"),
+            ("SiO2", "0.4973"),
+            ("FeO", "0.0293"),
+        ),
+        oxygen=Decimal("-12.61"),
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        formula="FeO",
+        basis="FeO",
+    )
+
+    alpha = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment, isolated=False,
+    )
+    assert alpha.value is None
+    assert alpha.execution.state is ExecutionState.NOT_PROBED
+    assert alpha.refusal_reason is RefusalReason.UNSUPPORTED
+    assert alpha.refusal_detail["reason"] == "reference_state_mismatch"
+    assert alpha.refusal_detail["engine_convention"].startswith(
+        "typed-refusal:melts_endmember_not_parent_oxide:FeO:"
+    )
+    assert "pure-FeO liquid standard state the model does not define" in (
+        alpha.refusal_detail["engine_convention"]
+    )
+
+    magemin = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+    )
+    assert magemin.value is None
+    assert magemin.execution.state is ExecutionState.NOT_PROBED
+    assert magemin.refusal_reason is RefusalReason.UNSUPPORTED
+    assert magemin.refusal_detail["reason"] == "engine_does_not_report_melt_activity"
+
+
 def test_single_cation_formula_with_oxide_token_is_not_scored_as_parent_oxide(monkeypatch):
     """NaO0.5 is single-cation even when the basis token says oxide. It is not a(Na2O)."""
     opened: list[str] = []
