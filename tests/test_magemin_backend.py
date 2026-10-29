@@ -52,7 +52,6 @@ from simulator.melt_backend.magemin import (
     COMPOSITION_PROJECTED,
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
-    MAGEMIN_WARM_LIQUIDUS_BUDGET_S,
     MAGEMinBackend,
 )
 
@@ -1205,14 +1204,12 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
 
 
 @pytest.mark.parametrize(
-    ('pooled', 'expected_budget_s'),
-    ((True, MAGEMIN_WARM_LIQUIDUS_BUDGET_S),
-     (False, liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S)),
+    'pooled',
+    (True, False),
 )
 def test_magemin_liquidus_uses_same_hang_guard_for_all_modes(
     monkeypatch,
     pooled,
-    expected_budget_s,
 ):
     import simulator.melt_backend.magemin as magemin_module
 
@@ -1237,7 +1234,9 @@ def test_magemin_liquidus_uses_same_hang_guard_for_all_modes(
     backend.find_liquidus_solidus(
         composition_mol={'SiO2': 1.0, 'MgO': 1.0},
     )
-    assert captured['budget_s'] == pytest.approx(expected_budget_s)
+    assert captured['budget_s'] == pytest.approx(
+        liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S
+    )
 
 
 def test_magemin_liquidus_budget_is_a_generous_hang_guard():
