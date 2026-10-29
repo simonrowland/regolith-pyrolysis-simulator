@@ -223,3 +223,47 @@ def test_wu_reported_solidus_rows_migrate_temperature_and_composition_axis():
         assert observation.value.point == Decimal(
             expected[str(composition.state.value)]
         )
+
+
+def test_yamada_interaction_parameters_migrate_with_solute_and_temperature():
+    tokens = (
+        "yamada_1983_epsilon_P_i_this_work_1600C",
+        "yamada_1983_table2_quoted_interaction_coefficients",
+        "yamada_1983_epsilon_P_Al_body_4p0_printed",
+        "yamada_1983_epsilon_P_Si_fruehan_aFe_12p6",
+    )
+    candidates = _observations("kems-105-yamada-1983.yaml", "yamada_1983_")
+    observations = [
+        observation
+        for observation in candidates
+        if any(token in observation.observation_id for token in tokens)
+    ]
+    expected = {
+        Decimal("4.6"): ("Al", Decimal("1873.0")),
+        Decimal("11.9"): ("Si", Decimal("1873.0")),
+        Decimal("-8.0"): ("Ti", Decimal("1873.0")),
+        Decimal("-4.9"): ("V", Decimal("1873.0")),
+        Decimal("-3.8"): ("Cr", Decimal("1873.0")),
+        Decimal("0.9"): ("Co", Decimal("1873.0")),
+        Decimal("0.7"): ("Ni", Decimal("1873.0")),
+        Decimal("-5.4"): ("Nb", Decimal("1873.0")),
+        Decimal("-0.4"): ("Mo", Decimal("1873.0")),
+        Decimal("4.0"): ("Al", Decimal("1873.0")),
+        Decimal("12.6"): ("Si", Decimal("1873.0")),
+        Decimal("21.0"): ("Si", Decimal("1873.0")),
+        Decimal("14.2"): ("Si", Decimal("1788.15")),
+        Decimal("11.0"): ("Si", Decimal("1873.0")),
+        Decimal("18.8"): ("Cr", Decimal("1873.0")),
+        Decimal("-6.3"): ("Cr", Decimal("1873.0")),
+        Decimal("0.0"): ("Ni", Decimal("1873.0")),
+    }
+    assert len(observations) == len(expected)
+    for observation in observations:
+        assert observation.value.kind is ValueKind.POINT
+        solute = (observation.point_conditions or {})["solute"]
+        temperature = (observation.point_conditions or {})["temperature_K"]
+        assert solute.state.is_value and solute.locator is not None
+        assert temperature.state.is_value and temperature.locator is not None
+        assert (solute.state.value, temperature.state.value) == expected[
+            observation.value.point
+        ]
