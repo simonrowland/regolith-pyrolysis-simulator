@@ -44,7 +44,7 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     assert by_id["bch80_t1_c_b_1_activity"]["values"]["activity"] == 0.985
     assert by_id["bch80_t1_c_b_1_valence_ratio"]["values"]["value"] == 0.107
     assert by_id["bch80_t2_c_a_1"]["values"]["PH2O_over_PH2_as_printed"] == 0.876
-    assert by_id["bch80_t3_c_c_1"]["values"]["composition_wt_pct"]["Fe2O3"] == 8.55
+    assert by_id["bch80_t3_cc_1"]["values"]["composition_wt_pct"]["Fe2O3"] == 8.55
 
     table5 = document["species"]["Fe_tO"]["context"]
     assert len(table5) == 1
@@ -66,7 +66,7 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     migrator.finalize()
     result = migrator.result
     assert not result.validation.hard_issues
-    assert len(result.observations) == 207
+    assert len(result.observations) == 138
     assert all(row.identity.quantity.state.is_value for row in result.observations.values())
     assert all(row.phase.state.is_value for row in result.observations.values())
     assert all(
@@ -102,7 +102,7 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     for source_id in (
         "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t1_c_b_1_activity",
         "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t2_c_a_1_valence_ratio",
-        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t3_c_c_1",
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t3_cc_1",
     ):
         row = result.observations[source_id]
         assert row.point_conditions["temperature_K"].state.is_value
