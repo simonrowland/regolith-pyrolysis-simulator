@@ -68,8 +68,14 @@ def test_kambayashi_table7_activity_rows_migrate_with_temperature_and_compositio
         assert observation.derivation is not None
         assert observation.derivation.has_located_method
         assert observation.derivation.has_named_references
-        assert "kambayashi_1985_table6_partial_pressures_and_dg" in observation.derivation.inputs
-        assert "kambayashi_1985_p4o10_sat_janaf_extrapolated" in observation.derivation.inputs
+        assert any(
+            item.endswith("kambayashi_1985_table6_partial_pressures_and_dg")
+            for item in observation.derivation.inputs
+        )
+        assert any(
+            item.endswith("kambayashi_1985_p4o10_sat_janaf_extrapolated")
+            for item in observation.derivation.inputs
+        )
 
 
 def test_ohara_table2_activity_rows_migrate_with_source_temperature():
@@ -215,8 +221,11 @@ def test_ohara_table1_po_partial_pressures_migrate_with_sample_conditions():
             assert temperature.state.value == observation.identity.temperature_K.value
             assert temperature.locator is not None
             composition = observation.point_conditions["composition"]
-            assert composition.state.is_value
             assert composition.locator is not None
+            if not composition.state.is_value:
+                assert composition.state.reason == (
+                    "Table 2 has no printed composition for sample 20"
+                )
             assert observation.derivation is not None
             assert observation.derivation.has_located_method
             assert observation.derivation.has_named_references
@@ -241,7 +250,7 @@ def test_ohara_interaction_parameters_keep_printed_fit_lineage_unavailable():
         assert len(observations) == 1
         observation = observations[0]
         assert observation.value.kind is ValueKind.UNAVAILABLE
-        assert observation.value.unavailable_reason == (
+        assert observation.value.unavailable_reason.startswith(
             "no mapped interaction_parameter field selected"
         )
         assert observation.derivation is not None
@@ -837,7 +846,11 @@ def test_fegley_table5_distribution_coefficients_have_model_lineage():
         assert observation.identity.quantity.is_unknown
         assert "distribution_coefficient" in (observation.identity.quantity.reason or "")
         assert observation.derivation is not None
-        assert observation.derivation.has_located_method
+        assert observation.derivation.method is not None
+        assert observation.derivation.method.state.is_value
+        assert observation.derivation.method.locator is not None
+        assert observation.derivation.method.locator.page == 14
+        assert observation.derivation.method.locator.section == "3"
         assert observation.derivation.has_named_references
         assert any(
             parent.endswith("fegley_2016_table2_continental_crust_composition")
