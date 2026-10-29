@@ -977,7 +977,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 "Cr": Cr_produced_kg,
                 "Ti": Ti_produced_kg,
             },
-            "spent_reductant_residue_account": "process.cleaned_melt",
+            "na2o_credit_account": "process.cleaned_melt",
             "spent_reductant_residue_kg": {
                 "Na2O": Na2O_added_kg,
             },
