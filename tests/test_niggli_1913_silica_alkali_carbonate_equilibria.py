@@ -63,6 +63,42 @@ def test_render_pins_context_data_and_migrated_transition_points():
     assert all(point["locator"]["page"] == 8 for point in table_ii_points)
     assert all(point["locator"]["table"] == "II" for point in table_ii_points)
     assert table_ii_by_key[("I", "898")]["SiO2_mol_percent_as_printed"] == "6.9"
+    expected_wt_percent = {
+        "I": ("96.9", "3.1"),
+        "II": ("96.2", "3.8"),
+        "III": ("95.3", "4.7"),
+        "IV": ("94.9", "5.1"),
+        "V": ("92.5", "7.5"),
+        "VI": ("90.3", "9.7"),
+        "VII": ("88.1", "11.9"),
+        "VIII": ("83.1", "16.9"),
+        "IX": ("80.4", "19.6"),
+        "X": ("79.5", "20.5"),
+        "XI": ("70.7", "29.3"),
+        "XII": ("69.7", "30.3"),
+        "XIII": ("67.5", "32.5"),
+        "XIV": ("61.5", "38.5"),
+        "XV": ("61.0", "39.0"),
+        "unnumbered-3": ("53.4", "46.6"),
+    }
+    assert {
+        point["row"]: (
+            point["composition_wt_percent_as_printed"]["K2CO3"],
+            point["composition_wt_percent_as_printed"]["SiO2"],
+        )
+        for point in table_ii_points
+    } == expected_wt_percent
+    assert all(
+        point["initial_mixture_as_printed"].startswith(
+            f"{expected_wt_percent[point['row']][0]} wt% K2CO3 + "
+        )
+        and point["point_conditions"]["CO2_partial_pressure_Pa"]["state"]
+        == {"tag": "value", "value": "101325"}
+        and point["point_conditions"]["CO2_partial_pressure_Pa"]["locator"]
+        == point["locator"]
+        and "total_pressure_Pa" not in point["point_conditions"]
+        for point in table_ii_points
+    )
 
     # PDF page 23 render: Table VI's displaced-mole values and the separate
     # 956 °C mol-percentage CO2-loss column remain context on their printed bases.
@@ -95,6 +131,28 @@ def test_render_pins_context_data_and_migrated_transition_points():
     assert all(point["locator"]["page"] == 23 for point in table_vi)
     assert all(point["locator"]["table"] == "VI" for point in table_vi)
     assert table_vi_by_key[("I", "898")]["SiO2_mol_percent_as_printed"] == "7.1"
+    assert {
+        key: table_vi_by_key[key]["SiO2_mol_percent_as_printed"]
+        for key in (
+            ("II", "956"),
+            ("III", "956"),
+            ("V", "956"),
+            ("VII", "956"),
+            ("VIII", "956"),
+            ("IX", "956"),
+            ("X", "956"),
+            ("XII", "956"),
+        )
+    } == {
+        ("II", "956"): "8.0",
+        ("III", "956"): "10.1",
+        ("V", "956"): "12.5",
+        ("VII", "956"): "22.3",
+        ("VIII", "956"): "23.2",
+        ("IX", "956"): "25.6",
+        ("X", "956"): "26.1",
+        ("XII", "956"): "33.1",
+    }
 
     # PDF page 33 render: historical comparisons and Mallard retain their rows.
     table_viii_k = _context(
@@ -128,6 +186,7 @@ def test_render_pins_context_data_and_migrated_transition_points():
 
     k2si2o5_estimate = document["species"]["K2Si2O5"]["observations"][0]
     assert k2si2o5_estimate["values"]["method_class"] == "author_estimate"
+    assert k2si2o5_estimate["uncertainty"]["value"] == "10"
     assert "1005 °C" in k2si2o5_estimate["values"]["model"]
     assert "1025 °C" in k2si2o5_estimate["values"]["model"]
     assert [sample["value"] for sample in document["fidelity_samples"]] == [

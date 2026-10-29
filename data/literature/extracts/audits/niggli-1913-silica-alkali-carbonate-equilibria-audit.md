@@ -33,7 +33,7 @@ Column (a) is mol per cent of the initial CO2 content lost, not mass loss as a f
 
 The table's theoretical columns 11–12 are excluded. They are the calculated weight loss assuming one mole SiO2 displaces one mole CO2. Three unnumbered charges remain in the row count, including the final numeric context point. The prose on PDF pages 17–18 says the exact K2CO3:SiO2 = 1:2 charge remains solid through 1000 °C and yields K2Si2O5 crystals; K2Si2O5 remains solid at 1005 °C and melts at 1025 °C. The 29 other numeric charges are liquid-bearing.
 
-The conditions prose on PDF page 7 states a current of CO2 and that its partial pressure was kept at 1 atm. The extract records that printed CO2 partial pressure, while total pressure and fO2 remain unknown. It does not turn pCO2 into total pressure. The composition axes preserve the printed wt% and SiO2 mol%; binary K2CO3 mole fraction is completed from the stated binary system for identity mapping.
+The conditions prose on PDF page 7 states a current of CO2 and that its partial pressure was kept at 1 atm. The Table II context points record that printed CO2 partial pressure as 101325 Pa with the table-row locator; total pressure and fO2 remain unknown. It does not turn pCO2 into total pressure. The context points retain the printed initial-mixture wt% pairs and SiO2 mol% values.
 
 ## Schema-gap evidence
 
