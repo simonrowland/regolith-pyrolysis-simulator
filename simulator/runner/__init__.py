@@ -6427,8 +6427,8 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
     if args.lab_oxygen_diagnostics_output:
         report, diagnostics = result
         diagnostics_path = Path(args.lab_oxygen_diagnostics_output)
@@ -6542,27 +6542,34 @@ def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
+        t_low_grid_c = _parse_float_grid(
+            args.t_low_grid, label="--t-low-grid"
+        )
+        t_hold_grid_c = _parse_float_grid(
+            args.t_hold_grid, label="--t-hold-grid"
+        )
+        ramp_grid_c_per_hr = _parse_float_grid(
+            args.ramp_grid, label="--ramp-grid"
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    try:
         summary = run_sio_tsweep(
             feedstock_id=args.feedstock,
             campaign=args.campaign,
             hours=int(args.hours),
             mass_kg=float(args.mass_kg),
-            t_low_grid_c=_parse_float_grid(
-                args.t_low_grid, label="--t-low-grid"
-            ),
-            t_hold_grid_c=_parse_float_grid(
-                args.t_hold_grid, label="--t-hold-grid"
-            ),
-            ramp_grid_c_per_hr=_parse_float_grid(
-                args.ramp_grid, label="--ramp-grid"
-            ),
+            t_low_grid_c=t_low_grid_c,
+            t_hold_grid_c=t_hold_grid_c,
+            ramp_grid_c_per_hr=ramp_grid_c_per_hr,
             output_dir=Path(args.output_dir),
             allow_unmeasured_alpha_fallback=(
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
 
     if args.report_output:
         report_path = Path(args.report_output)
@@ -6675,22 +6682,27 @@ def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
         )
 
     try:
+        wall_t_grid_c = _parse_float_grid(
+            args.wall_t_grid, label="--wall-t-grid"
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    try:
         summary = run_sio_wall_sweep(
             feedstock_ids=feedstock_ids,
             campaign=args.campaign,
             hours=int(args.hours),
             mass_kg=float(args.mass_kg),
-            wall_t_grid_c=_parse_float_grid(
-                args.wall_t_grid, label="--wall-t-grid"
-            ),
+            wall_t_grid_c=wall_t_grid_c,
             pO2_modes=pO2_modes,
             output_dir=Path(args.output_dir),
             allow_unmeasured_alpha_fallback=(
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
 
     if args.report_output:
         report_path = Path(args.report_output)
