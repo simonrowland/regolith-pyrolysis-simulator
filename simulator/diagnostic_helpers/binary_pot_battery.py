@@ -49,7 +49,7 @@ from simulator.melt_regime import (
     legacy_raw_liquid_fraction_is_zero,
     liquid_fraction_invalidity,
 )
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import Engine, IMCC_ENGINE_NAMES, NoticeKind
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerRemoteError,
@@ -76,10 +76,9 @@ BATTERY_ENGINE_NAMES: tuple[str, ...] = (
     "vaporock",
     "magemin",
     "cached-real",
-    "openimcc",
+    *IMCC_ENGINE_NAMES,
 )
-OPENIMCC_ENGINE_NAMES: tuple[str, ...] = ("openimcc",)
-IMCC_ENGINE_NAMES: tuple[str, ...] = OPENIMCC_ENGINE_NAMES
+OPENIMCC_ENGINE_NAMES: tuple[str, ...] = IMCC_ENGINE_NAMES
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
 
 
@@ -185,7 +184,7 @@ _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
     "vaporock": 70.0,
     "magemin": 20.0,
     "cached-real": 30.0,
-    "openimcc": 15.0,
+    **{engine: 15.0 for engine in IMCC_ENGINE_NAMES},
 }
 
 # MELTS backend construction can outlast the warm-call timeout; initialize it
@@ -2298,6 +2297,18 @@ def _carried_ferric_fold_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
     return row
 
 
+def openimcc_pack_name_for_engine(engine_name: str) -> str:
+    """Resolve the battery OpenIMCC identity to its melt datapack."""
+
+    from simulator.melt_backend import openimcc_bridge
+
+    if engine_name == Engine.OPENIMCC.value:
+        return openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+    if engine_name == Engine.OPENIMCC_SP.value:
+        return openimcc_bridge.OPENIMCC_SP_EXTENSION_PACK_NAME
+    raise BinaryPotBatteryError(f"unknown openimcc engine {engine_name!r}")
+
+
 class _OpenImccBatteryBackend:
     """Battery-only producer for the optional openimcc package.
 
@@ -2316,7 +2327,7 @@ class _OpenImccBatteryBackend:
 
         self._bridge = openimcc_bridge
         self._package = openimcc_bridge._require_openimcc()
-        self._pack_name = openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+        self._pack_name = openimcc_pack_name_for_engine(engine_name)
         self._pack = openimcc_bridge._load_pack(self._pack_name)
         self.model_id = str(getattr(self._pack, "model_id", "openimcc"))
         self._gas: Any = None

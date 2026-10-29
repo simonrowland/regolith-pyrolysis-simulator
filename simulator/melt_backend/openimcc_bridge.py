@@ -160,6 +160,10 @@ def imported_openimcc_commit() -> str | None:
         return commit_id or None
     return None
 DEFAULT_BACKEND_PACK_NAME = "default"
+OPENIMCC_SP_EXTENSION_PACK_NAME = "d066-ext"
+_SP_EXTENSION_PACK_NAMES = frozenset(
+    {"published-ext", OPENIMCC_SP_EXTENSION_PACK_NAME}
+)
 
 # Retained domain metadata for typed fallback when the optional package is absent.
 _UNAVAILABLE_TEMPERATURE_DOMAIN_K = (1700.0, 3000.0)
@@ -168,7 +172,7 @@ _PACK_RESOURCE_NAMES = {
     "default": None,
     "published-core": "imcc-sf04-v1.0.2.json",
     "published-ext": "imcc-sf04-ext-v4.json",
-    "d066-ext": "imcc-sf04-d066-ext-v1.json",
+    OPENIMCC_SP_EXTENSION_PACK_NAME: "imcc-sf04-d066-ext-v1.json",
     "d066-kca-sensitivity": "imcc-sf04-d066-v1-kcaalsi2o7.json",
 }
 
@@ -968,7 +972,7 @@ def evaluate(
         float(temperature_K),
         loaded_pack,
         basis_type=basis_type,
-        enable_sp_extension=pack in {"published-ext", "d066-ext"},
+        enable_sp_extension=pack in _SP_EXTENSION_PACK_NAMES,
         allow_extrapolation=allow_extrapolation,
         allow_out_of_envelope=allow_out_of_envelope,
     )
@@ -1165,6 +1169,7 @@ class OpenImccMeltBackend(MeltBackend):
 
 __all__ = [
     "OPENIMCC_INSTALL_HINT",
+    "OPENIMCC_SP_EXTENSION_PACK_NAME",
     "OpenImccBridgeResult",
     "OpenImccMeltBackend",
     "OpenImccCleanedMeltResult",

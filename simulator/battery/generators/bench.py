@@ -14,9 +14,18 @@ from simulator.battery.records import (
 )
 from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
-    ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
-    ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES, Waypoint, WaypointFlag,
-    WaypointResult, _prediction_pressure_waypoint, pure_substance_engine_point_gap,
+    ConsumerReadiness,
+    ENGINE_POINT_CONSUMERS,
+    GapReason,
+    IMCC_ENGINE_NAMES,
+    MELT_ACTIVITY_ENGINES,
+    ReadinessGap,
+    ReadinessStatus,
+    Waypoint,
+    WaypointFlag,
+    WaypointResult,
+    _prediction_pressure_waypoint,
+    pure_substance_engine_point_gap,
     is_invalid_row_composition_gap,
 )
 from simulator.melt_backend.base import multivalent_components
@@ -151,11 +160,14 @@ _ENGINE_REPORTED_ACTIVITY = {
     )
     for engine in ("alphamelts", "thermoengine")
 }
-_ENGINE_REPORTED_ACTIVITY["openimcc"] = EngineReportedActivity(
+_IMCC_REPORTED_ACTIVITY = EngineReportedActivity(
     "raoultian_pure_liquid_oxide_parent",
     ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
     Phase.L,
     _PARENT_OXIDE_COMPONENT_BASES,
+)
+_ENGINE_REPORTED_ACTIVITY.update(
+    {engine: _IMCC_REPORTED_ACTIVITY for engine in IMCC_ENGINE_NAMES}
 )
 _ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
     "raoultian_pure_liquid_endmember",
@@ -222,7 +234,7 @@ def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
         return False, f"typed-refusal:magemin_no_native_activity:{formula}"
     if engine in ("alphamelts", "thermoengine"):
         return _melts_reports_oxide_endmember(formula)
-    if engine == "openimcc":
+    if engine in IMCC_ENGINE_NAMES:
         return _imcc_reports_parent_oxide(formula)
     if engine == "internal-analytical":
         from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
@@ -548,7 +560,7 @@ def melt_activity_requests(
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
         single_cation = (
             inputs.activity_quantity == "activity_coefficient"
-            and engine == "openimcc"
+            and engine in IMCC_ENGINE_NAMES
             and state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
             and phase_token(state.endmember) is Phase.L
             and state.component_basis == state.endmember.formula

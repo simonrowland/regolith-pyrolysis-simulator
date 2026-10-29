@@ -8,7 +8,13 @@ from enum import StrEnum
 from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
-from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
+from simulator.battery.enums import (
+    IMCC_ENGINE_NAMES,
+    AmountBasis,
+    MethodToken,
+    Quantity,
+    ValueKind,
+)
 from simulator.battery.migrate import (
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
@@ -190,14 +196,14 @@ ENGINE_POINT_CONSUMERS = (
     "vaporock",
     "magemin",
     "cached-real",
-    "openimcc",
+    *IMCC_ENGINE_NAMES,
 )
 # Engines whose equilibrate result carries per-species activities. This list
 # does not imply gamma support; coefficients stay on their separate result map.
 MELT_ACTIVITY_ENGINES = (
     "alphamelts",
     "thermoengine",
-    "openimcc",
+    *IMCC_ENGINE_NAMES,
     "internal-analytical",
     "magemin",
 )

@@ -49,6 +49,7 @@ class PinChannel(StrEnum):
     THERMOENGINE = "thermoengine"
     MAGEMIN = "magemin"
     OPENIMCC = "openimcc"
+    OPENIMCC_SP = "openimcc-sp"
     TABLE_SELF_CHECK = "table_self_check"
 
 
@@ -63,6 +64,7 @@ PIN_CHANNEL_ENGINES: Mapping[PinChannel, Engine] = {
     PinChannel.THERMOENGINE: Engine.THERMOENGINE,
     PinChannel.MAGEMIN: Engine.MAGEMIN,
     PinChannel.OPENIMCC: Engine.OPENIMCC,
+    PinChannel.OPENIMCC_SP: Engine.OPENIMCC_SP,
 }
 PIN_COMPILATION_CHANNEL_ENGINES: Mapping[PinChannel, Engine] = {
     PinChannel.NASA_CEA_9: Engine.NASA_CEA_9,

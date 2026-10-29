@@ -17,9 +17,10 @@ has ``schema_version`` and, per rail and engine, the scorer's numeric count,
 RMS and median |dex|, attempted refusal count and scorer-reason counts,
 non-observable count, and open predict-and-flag notice counts by kind. Each row
 also carries all-rail attempted-refusal and non-observable counts per engine.
-Same-row benchmark RMS is stored separately for openimcc and internal-analytical
-against the best comparison engine (vaporock, thermoengine, alphamelts, or
-magemin); unavailable benchmarks have a null engine and RMS with ``n=0``.
+Same-row benchmark RMS is stored separately for openimcc, openimcc-sp, and
+internal-analytical against the best comparison engine (vaporock, thermoengine,
+alphamelts, or magemin); unavailable benchmarks have a null engine and RMS
+with ``n=0``.
 """
 
 from __future__ import annotations
@@ -107,7 +108,7 @@ HERO_RAILS = (Rail.VAPOUR.value, Rail.REDOX.value, Rail.MELT_ACTIVITY.value)
 HERO_AND_DECK_SOURCE_RAILS = frozenset(HERO_RAILS) | frozenset(
     _BATTERY_HERO_DECK_SOURCE_RAILS
 )
-HERO_PRIMARY_ENGINES = ("openimcc", "internal-analytical")
+HERO_PRIMARY_ENGINES = ("openimcc", "openimcc-sp", "internal-analytical")
 HERO_COMPARISON_ENGINES = ("vaporock", "thermoengine", "alphamelts", "magemin")
 HERO_MINOR_FACETS = (
     ("minor:P", "P"),
@@ -1734,6 +1735,7 @@ _HERO_OXYGEN_MODE_LABELS = {
 }
 _HERO_ENGINE_COLORS = {
     "openimcc": "#0072b2",
+    "openimcc-sp": "#56b4e9",
     "internal-analytical": "#d55e00",
     "vaporock": "#8f7868",
     "thermoengine": "#777777",

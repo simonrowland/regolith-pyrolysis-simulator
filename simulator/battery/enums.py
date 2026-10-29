@@ -37,6 +37,11 @@ class Engine(StrEnum):
     VAPOROCK = "vaporock"
     MAGEMIN = "magemin"
     OPENIMCC = "openimcc"
+    OPENIMCC_SP = "openimcc-sp"
+
+
+IMCC_ENGINE_ORDER: tuple[Engine, ...] = (Engine.OPENIMCC, Engine.OPENIMCC_SP)
+IMCC_ENGINE_NAMES: tuple[str, ...] = tuple(engine.value for engine in IMCC_ENGINE_ORDER)
 
 
 class Fo2Mode(StrEnum):

@@ -6,6 +6,7 @@ from collections.abc import Mapping, Sequence
 
 
 OPENIMCC_PROVENANCE_PREFIXES: tuple[str, ...] = (
+    "openimcc-pack-id:",
     "openimcc-pack-version:",
     "openimcc-pack-digest:",
     "openimcc-engine-binding:",

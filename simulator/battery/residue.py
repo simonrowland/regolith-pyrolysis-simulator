@@ -17,6 +17,7 @@ from typing import Any
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting.formulas import parse_formula
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
+from simulator.battery.enums import Engine, IMCC_ENGINE_NAMES
 from simulator.battery.oxygen_balance import (
     OxygenBalanceBracketBoundary,
     _VacuumOxygenChannel,
@@ -1314,14 +1315,16 @@ def _make_residue_pressure_model(
         )
         for species, reaction in gas_channels
     }
-    if engine == "openimcc":
+    if engine in IMCC_ENGINE_NAMES:
         from openimcc import evaluate_gas
         from openimcc.kernel import ImccNonconvergenceError
 
         from simulator.diagnostic_helpers.binary_pot_battery import (
             _ENGINE_OUTER_TIMEOUT_S,
+            openimcc_pack_name_for_engine,
         )
         from simulator.melt_backend import openimcc_bridge
+        pack_name = openimcc_pack_name_for_engine(engine)
 
         pressure_state_cache: dict[
             tuple[tuple[str, float], ...], Mapping[str, float]
@@ -1344,28 +1347,30 @@ def _make_residue_pressure_model(
                         timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
                         composition_mol=current_composition,
                         temperature_K=temperature_K,
+                        pack=pack_name,
                         allow_extrapolation=True,
                         allow_out_of_envelope=True,
                     )
                 except ImccNonconvergenceError as exc:
-                    raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
+                    raise ResidueEngineNonconvergence(engine, str(exc)) from exc
                 except TimeoutError as exc:
                     raise ResidueEngineNonconvergence(
-                        "openimcc",
+                        engine,
                         f"{caller} OpenIMCC timeout: {exc}",
-                        reason=f"engine_timeout:openimcc:{caller.lower().replace(' ', '_')}",
+                        reason=f"engine_timeout:{engine}:{caller.lower().replace(' ', '_')}",
                     ) from exc
                 engine_flags.update(str(flag) for flag in state.flags)
                 if state.extrapolated:
                     engine_flags.add("openimcc_extrapolated")
-                engine_metadata.update(
-                    {
-                        "model_id": state.pack_model_id,
-                        "datapack_version": state.pack_version,
-                        "pack_digest": state.pack_digest,
-                        "openimcc_version": state.openimcc_version,
-                    }
-                )
+                metadata = {
+                    "model_id": state.pack_model_id,
+                    "datapack_version": state.pack_version,
+                    "pack_digest": state.pack_digest,
+                    "openimcc_version": state.openimcc_version,
+                }
+                if engine == Engine.OPENIMCC_SP.value:
+                    metadata["pack"] = pack_name
+                engine_metadata.update(metadata)
                 base_pressure_bar = evaluate_gas(
                     state.parent_oxide_activities,
                     temperature_K,
@@ -1868,7 +1873,7 @@ def predict_knudsen_residue_composition(
     )
     from simulator.battery.validity import effusion_regime_unverified
 
-    if engine not in {"openimcc", "internal-analytical"}:
+    if engine not in {*IMCC_ENGINE_NAMES, "internal-analytical"}:
         raise ResidueInventoryRefusal("engine_capability_unsupported", engine)
     if experiment is None or not experiment.method.is_value or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION:
         raise ResidueInventoryRefusal("knudsen_near_saturation_invalid")
@@ -2046,7 +2051,7 @@ def predict_mass_loss_fraction(
     observation: object | None = None,
 ) -> ResidueMassLossPrediction:
     """Predict one bulk mass-loss point through the existing residue integrator."""
-    if engine not in {"openimcc", "internal-analytical"}:
+    if engine not in {*IMCC_ENGINE_NAMES, "internal-analytical"}:
         raise ResidueInventoryRefusal(
             "engine_capability_unsupported",
             f"engine={engine}; capability=free_evaporation_residue_integrator",
@@ -2696,7 +2701,7 @@ def _predict_hashimoto_residue_cohort(
     _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce both alpha arms and geometry bands, without reading residues."""
-    if engine not in {"openimcc", "internal-analytical"}:
+    if engine not in {*IMCC_ENGINE_NAMES, "internal-analytical"}:
         raise ResidueInventoryRefusal("hashimoto_engine_unsupported", engine)
     experiment_ids = {
         str(experiment.get("experiment_id", "")) for experiment in experiments
@@ -2724,6 +2729,7 @@ def _predict_hashimoto_residue_cohort(
     from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _openimcc_gas_channels_and_omission_notices,
+        openimcc_pack_name_for_engine,
     )
     from simulator.melt_backend import openimcc_bridge
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
@@ -2761,14 +2767,17 @@ def _predict_hashimoto_residue_cohort(
         )
     if not gas_channels:
         raise ResidueInventoryRefusal("hashimoto_openimcc_channels_missing")
+    pack_name = (
+        openimcc_pack_name_for_engine(engine)
+        if engine in IMCC_ENGINE_NAMES
+        else None
+    )
     engine_binding_identity = (
         openimcc_bridge.engine_binding_identity(
-            openimcc_bridge._load_pack(
-                openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
-            ),
+            openimcc_bridge._load_pack(pack_name),
             gas_pack,
         )
-        if engine == "openimcc"
+        if pack_name is not None
         else None
     )
     melt_pack_identity: dict[str, str] = {}
@@ -3359,12 +3368,13 @@ def _predict_sossi_residue_cohort(
     engine: str,
 ) -> tuple[_SossiResiduePrediction, ...]:
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
-    if engine not in {"openimcc", "internal-analytical"}:
+    if engine not in {*IMCC_ENGINE_NAMES, "internal-analytical"}:
         raise ResidueInventoryRefusal("sossi_engine_unsupported", engine)
     from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
     from simulator.condensation import alpha_s
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _openimcc_gas_channels_and_omission_notices,
+        openimcc_pack_name_for_engine,
     )
     from simulator.evaporation import _load_evaporation_alpha_by_species
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
@@ -3379,7 +3389,9 @@ def _predict_sossi_residue_cohort(
     ]
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
     engine_binding_identity: dict[str, str] | None = None
-    if engine == "openimcc":
+    is_openimcc = engine in IMCC_ENGINE_NAMES
+    pack_name = openimcc_pack_name_for_engine(engine) if is_openimcc else None
+    if is_openimcc:
         try:
             import openimcc
             from openimcc import evaluate_gas, load_gas_datapack
@@ -3389,9 +3401,7 @@ def _predict_sossi_residue_cohort(
             raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
         gas_pack = load_gas_datapack()
         engine_binding_identity = openimcc_bridge.engine_binding_identity(
-            openimcc_bridge._load_pack(
-                openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
-            ),
+            openimcc_bridge._load_pack(pack_name),
             gas_pack,
         )
         raw_gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
@@ -3441,7 +3451,7 @@ def _predict_sossi_residue_cohort(
         for element, parent in _SOSSI_TRACE_PARENTS.items():
             available = [
                 item for item in gas_channels if item[1] == parent
-            ] if engine == "openimcc" else [
+            ] if is_openimcc else [
                 (str(row.get("formula")), parent, 1.0, 0.0)
                 for _name, row in catalog_rows
                 if row.get("formula")
@@ -3495,7 +3505,7 @@ def _predict_sossi_residue_cohort(
         melt_pack_identity: dict[str, str] = {}
         melt_activity_input_policy: dict[str, Any] = {}
         melt_activity_extensions: dict[str, dict[str, Any]] = {}
-        if engine == "openimcc":
+        if is_openimcc:
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 _ENGINE_OUTER_TIMEOUT_S,
             )
@@ -3525,16 +3535,17 @@ def _predict_sossi_residue_cohort(
                             timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
                             composition_mol=activity_composition,
                             temperature_K=temperature_K,
+                            pack=pack_name,
                             allow_extrapolation=True,
                             allow_out_of_envelope=True,
                         )
                     except ImccNonconvergenceError as exc:
-                        raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
+                        raise ResidueEngineNonconvergence(engine, str(exc)) from exc
                     except TimeoutError as exc:
                         raise ResidueEngineNonconvergence(
-                            "openimcc",
+                            engine,
                             f"Sossi residue cohort OpenIMCC timeout: {exc}",
-                            reason="engine_timeout:openimcc:sossi_residue_cohort",
+                            reason=f"engine_timeout:{engine}:sossi_residue_cohort",
                         ) from exc
                     gas_parent_oxide_activities = dict(
                         state.parent_oxide_activities
@@ -3595,6 +3606,8 @@ def _predict_sossi_residue_cohort(
                             "openimcc_version": str(state.openimcc_version),
                         }
                     )
+                    if engine == Engine.OPENIMCC_SP.value:
+                        melt_pack_identity["pack"] = pack_name
                     base = dict(gas_result)
                     pressure_cache[key] = base
                 pO2_bar = 10.0**log10_pO2_bar
@@ -3692,7 +3705,7 @@ def _predict_sossi_residue_cohort(
                 ),
                 temperature_K,
             )
-            if engine == "openimcc"
+            if is_openimcc
             else ()
         )
 

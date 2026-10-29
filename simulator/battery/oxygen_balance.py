@@ -9,14 +9,19 @@ from typing import Literal
 
 from scipy.optimize import brentq
 
-from simulator.battery.enums import CellMaterial, Engine, NoticeKind
+from simulator.battery.enums import (
+    IMCC_ENGINE_ORDER,
+    CellMaterial,
+    Engine,
+    NoticeKind,
+)
 from simulator.battery.records import Located, Notice
 from simulator.physical_constants import GAS_CONSTANT
 
-IMCC_ENGINES: frozenset[Engine] = frozenset({Engine.OPENIMCC})
+IMCC_ENGINES: frozenset[Engine] = frozenset(IMCC_ENGINE_ORDER)
 OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
     {
-        Engine.OPENIMCC,
+        *IMCC_ENGINES,
         Engine.INTERNAL_ANALYTICAL,
         Engine.VAPOROCK,
         Engine.ALPHAMELTS,

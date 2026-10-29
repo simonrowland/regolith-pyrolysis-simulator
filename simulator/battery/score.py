@@ -43,6 +43,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     ExecutionState,
     Fo2Mode,
+    IMCC_ENGINE_ORDER,
     FORMATION_QUANTITIES,
     FUSION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
@@ -191,14 +192,14 @@ from simulator.fe_redox import feo_iw_log10_fO2_bar
 from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 
-# Explicit closed set. openimcc is the only IMCC producer. Do not build this from
+# Explicit closed set. Do not build this from
 # resolve_backend, BATTERY_ENGINE_NAMES, or any probe of installed backends.
 SCORE_ENGINE_SET: tuple[Engine, ...] = (
     Engine.VAPOROCK,
     Engine.ALPHAMELTS,
     Engine.THERMOENGINE,
     Engine.MAGEMIN,
-    Engine.OPENIMCC,
+    *IMCC_ENGINE_ORDER,
     Engine.INTERNAL_ANALYTICAL,
 )
 MELTS_ENGINES: frozenset[Engine] = frozenset(
@@ -219,7 +220,7 @@ _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
 # total pressure. The evaluation proof is in test_score's pressure-axis test.
 _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
     {
-        (Engine.OPENIMCC, Quantity.P_PARTIAL),
+        *((engine, Quantity.P_PARTIAL) for engine in IMCC_ENGINE_ORDER),
         (Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL),
     }
 )
@@ -433,7 +434,7 @@ ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.ALPHAMELTS: "alphamelts",
     Engine.THERMOENGINE: "thermoengine",
     Engine.MAGEMIN: "magemin",
-    Engine.OPENIMCC: "openimcc",
+    **{engine: engine.value for engine in IMCC_ENGINE_ORDER},
     Engine.INTERNAL_ANALYTICAL: "internal-analytical",
 }
 ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
@@ -441,7 +442,7 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.ALPHAMELTS: ("alphamelts",),
     Engine.THERMOENGINE: ("thermoengine",),
     Engine.MAGEMIN: ("magemin",),
-    Engine.OPENIMCC: (),
+    **{engine: () for engine in IMCC_ENGINE_ORDER},
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
 
@@ -535,6 +536,53 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.engine is not Engine.OPENIMCC_SP:
+            return
+        authority = self.authority or (
+            Authority.REFUSED if self.value is None else Authority.BRIDGE
+        )
+        pack_source = _openimcc_sp_pack_source()
+        object.__setattr__(self, "authority", authority)
+        object.__setattr__(
+            self,
+            "coefficient_sources",
+            tuple(dict.fromkeys((*self.coefficient_sources, pack_source))),
+        )
+        quantity = (
+            quantity_token(self.identity)
+            if isinstance(self.identity, Identity)
+            else None
+        )
+        object.__setattr__(
+            self,
+            "notices",
+            union_notices(
+                self.notices,
+                (_openimcc_sp_identity_notice(quantity, authority),),
+            )
+        )
+
+
+def _openimcc_sp_pack_source() -> str:
+    from simulator.melt_backend.openimcc_bridge import (
+        OPENIMCC_SP_EXTENSION_PACK_NAME,
+    )
+
+    return f"openimcc-pack-id:{OPENIMCC_SP_EXTENSION_PACK_NAME}"
+
+
+def _openimcc_sp_identity_notice(
+    quantity: Quantity | None, authority: Authority
+) -> Notice:
+    return Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=() if quantity is None else (quantity,),
+        reason=f"{_openimcc_sp_pack_source()}; authority={authority.value}",
+        origin=f"engine:{Engine.OPENIMCC_SP.value}",
+        authority=authority,
+    )
 
 
 def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
@@ -6211,7 +6259,7 @@ def _predict_fe_redox(
 
     if engine not in (
         Engine.INTERNAL_ANALYTICAL,
-        Engine.OPENIMCC,
+        *IMCC_ENGINE_ORDER,
         *_MELTS_FE_REDOX_ENGINES,
     ):
         return EnginePrediction(
@@ -6253,7 +6301,7 @@ def _predict_fe_redox(
             notices=notices,
             coefficient_sources=sources if sources is not None else (
                 melts_sources
-                if melts or engine is Engine.OPENIMCC
+                if melts or engine in IMCC_ENGINES
                 else _KRESS91_SOURCES
             ),
             lineage_complete=False,
@@ -6271,7 +6319,7 @@ def _predict_fe_redox(
     # Offer 20 checks printed fO2 and Fe atoms before any Kress projection.
     # Internal-analytical and MELTS keep the stack's FeOt gate here.
     kress_basis: _FeRedoxKressBasis | None = None
-    if engine is not Engine.OPENIMCC:
+    if engine not in IMCC_ENGINES:
         kress_basis = _fe_redox_kress_basis(material.composition_wt)
         if isinstance(kress_basis, _FeRedoxRefusal):
             return refused(kress_basis.reason, kress_basis.detail)
@@ -6309,7 +6357,7 @@ def _predict_fe_redox(
             {"reason": "missing_input", "input": "printed_fO2"},
         )
 
-    if engine is Engine.OPENIMCC:
+    if engine in IMCC_ENGINES:
         assert fo2_log is not None
         try:
             from simulator.accounting.formulas import parse_formula
@@ -9305,7 +9353,7 @@ def predict_with_engine(
     handle = _open_cached_battery_handle(engine, handle_map)
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
-    if engine is Engine.OPENIMCC:
+    if engine in IMCC_ENGINES:
         identity_block = getattr(handle, "identity", None) or {}
         if isinstance(identity_block, Mapping):
             engine_version = str(identity_block.get("version") or "") or None
@@ -9334,7 +9382,7 @@ def predict_with_engine(
     available = bool(getattr(handle, "available", False))
     if not available:
         unavailable_reason = str(getattr(handle, "unavailable_reason", None) or "")
-        if engine is Engine.OPENIMCC and "openimcc_not_importable" in unavailable_reason:
+        if engine in IMCC_ENGINES and "openimcc_not_importable" in unavailable_reason:
             remedy = unavailable_reason[unavailable_reason.find("remedy:") :]
             return EnginePrediction(
                 engine=engine,
@@ -9633,7 +9681,7 @@ def predict_with_engine(
                 requested_composition=requested,
                 version=engine_version,
             )
-        openimcc_outside_species = engine is Engine.OPENIMCC and any(
+        openimcc_outside_species = engine in IMCC_ENGINES and any(
             token in f"{typed} {engine_side_reason}"
             for token in (
                 "imcc_component_outside_domain",
@@ -9965,7 +10013,7 @@ def predict_with_engine(
         if converter_reason:
             detail["converter"] = converter_reason
         refusal_reason = RefusalReason.UNSUPPORTED
-        if engine is Engine.OPENIMCC and quantity in _VAPOUR_EQUILIBRIUM:
+        if engine in IMCC_ENGINES and quantity in _VAPOUR_EQUILIBRIUM:
             refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
             detail["reason"] = RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
             detail["engine"] = "openimcc gas tables"
@@ -10224,7 +10272,7 @@ def _hashimoto_residue_prediction(
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
     cache_key = (_HASHIMOTO_SOURCE_ID, engine)
     try:
-        if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
+        if engine not in {*IMCC_ENGINES, Engine.INTERNAL_ANALYTICAL}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
         if cache_key not in cache:
             from simulator.battery.residue import (
@@ -10557,7 +10605,7 @@ def _sossi_residue_prediction(
             _predict_sossi_residue_cohort,
         )
 
-        if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
+        if engine not in {*IMCC_ENGINES, Engine.INTERNAL_ANALYTICAL}:
             raise ValueError("sossi_engine_unsupported")
         if cache_key not in cache:
             live_rows = [
@@ -11007,7 +11055,19 @@ def compile_residual(
         source_relation: SourceRelation = SourceRelation.UNKNOWN,
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
-        all_notices = union_notices(notices, extra_notices)
+        sp_identity_notices = (
+            (
+                _openimcc_sp_identity_notice(
+                    quantity,
+                    prediction.authority
+                    if prediction is not None and prediction.authority is not None
+                    else Authority.REFUSED,
+                ),
+            )
+            if engine is Engine.OPENIMCC_SP
+            else ()
+        )
+        all_notices = union_notices(notices, extra_notices, sp_identity_notices)
         result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
         excl = exclusions or ("status_match_or_mismatch",)
         if (
@@ -11429,6 +11489,20 @@ def compile_residual(
         )
 
     notices = union_notices(notices, prediction.notices)
+    if engine is Engine.OPENIMCC_SP:
+        notices = union_notices(
+            notices,
+            (
+                _openimcc_sp_identity_notice(
+                    quantity,
+                    prediction.authority
+                    if prediction.authority is not None
+                    else Authority.REFUSED
+                    if prediction.value is None
+                    else Authority.BRIDGE,
+                ),
+            ),
+        )
     result_mode = fo2_mode or _fo2_mode_from_notices(notices)
     if quantity is not None and _pressure_independent_comparison(
         reference, prediction
@@ -12467,7 +12541,7 @@ def _score_store_with_decisions(
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and point.source_id == _HASHIMOTO_SOURCE_ID
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+                            and engine in {*IMCC_ENGINES, Engine.INTERNAL_ANALYTICAL}
                         ):
                             prediction = _hashimoto_residue_prediction(
                                 context,
@@ -12480,7 +12554,7 @@ def _score_store_with_decisions(
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and point.source_id == _SOSSI_SOURCE_ID
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+                            and engine in {*IMCC_ENGINES, Engine.INTERNAL_ANALYTICAL}
                         ):
                             prediction = _sossi_residue_prediction(
                                 context,
