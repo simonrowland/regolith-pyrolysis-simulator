@@ -15945,7 +15945,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             for row in allibert_cao_rows
         )
         unprinted_cao_references = {
-            "kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h= "
+            "kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h="
             + suffix
             for suffix in (
                 "089e4f903141",
