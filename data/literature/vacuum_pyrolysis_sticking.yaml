@@ -55,15 +55,30 @@ wall_product_class_by_species:
 
 species:
   Fe:
-    value: 0.02
+    value:
+      form: arrhenius
+      # Port of reviewed b-878 (fea5c834f), Tachibana et al. 2001,
+      # LPSC XXXII #1767 p. 2 Fig. 1: ln(alpha_c) = 0.61 - 1127 K/T.
+      # Thus A = exp(0.61), B = 1127 K; B/T and alpha are dimensionless.
+      # At the 1523.15 K stage midpoint alpha_c = 0.878170956 (near the
+      # published ~0.9). This is Fe-pellet backreaction at a pure-Fe interface,
+      # assuming alpha_c = alpha_e there, not olivine evaporation. Per b-808,
+      # continue the fit outside its band, bounded to (0,1] and flagged:
+      # T -> infinity reaches the probability ceiling; T -> 0 tends to zero.
+      A: 1.84043139878164
+      B: 1127.0
+      valid_range_K: [1443.0, 1633.0]
+      uncertainty_envelope: [0.5, 1.0]
+      cite: "Tachibana, Nagahara & Ozawa 2001, LPSC XXXII #1767, p. 2 Fig. 1"
+      status: CITED
     status: CITED
-    source_class: cited_hkl_accommodation
-    source: "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture."
-    source_url: "https://ntrs.nasa.gov/citations/20150002321"
-    temperature_range_K: [1700, 1800]
-    envelope: [0.011, 0.020]
-    uncertainty_flag: collector_surface_proxy_not_cold_wall_measurement
-    output_status: sourced_with_surface_proxy
+    source_class: cited_pure_fe_condensation_kinetics
+    source: "Tachibana, Nagahara & Ozawa 2001, LPSC XXXII #1767, p. 2 Fig. 1: pure-Fe condensation coefficient inferred from Fe-pellet backreaction; their fit assumes alpha_c = alpha_e at the measured interface. Reviewed b-878 value retained. Direct high-supersaturation growth is near unity in Tachibana et al. 2011, ApJ 736:16, p. 6 Fig. 6 and section 4.2; applying the 2001 fit to this collector remains an inference. The Costa & Jacobson olivine figure-only alpha withdrawn in kems-007-costa-2015 is not condensation evidence."
+    source_url: "https://www.lpi.usra.edu/meetings/lpsc2001/pdf/1767.pdf"
+    temperature_range_K: [1443.0, 1633.0]
+    envelope: [0.5, 1.0]
+    uncertainty_flag: "pure-Fe interface; first Fe layer on an oxide liner is unsourced; supersaturation-regime transfer is inferred"
+    output_status: status_bearing
   SiO:
     value:
       form: arrhenius
