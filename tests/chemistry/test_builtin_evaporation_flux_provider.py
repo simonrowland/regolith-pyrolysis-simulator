@@ -597,6 +597,7 @@ def test_evaporation_aux_validation_surfaces_the_accounting_error(
         sim._evaporation_flux_control_inputs(
             SimpleNamespace(vapor_pressures_Pa={}),
             overhead_partials_Pa={},
+            overhead_pressure_pa=0.0,
             vapour_batch_flux_pressures_Pa={"Mystery": 1.0},
         )
 

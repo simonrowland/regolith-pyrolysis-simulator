@@ -238,6 +238,20 @@ socket.on('simulation_tick', (data) => {
     const pipeSat = data.transport_saturation_pct || 0;
     setEl('gt-pipe-sat', pipeSat.toFixed(0));
     updateBar('gt-pipe-bar', pipeSat);
+    const overload = data.transport_overload_notice || {};
+    const requestedPressureBar = Number(overload.requested_pressure_bar);
+    const resolvedPressureBar = Number(overload.resolved_pressure_bar);
+    if (Number.isFinite(requestedPressureBar) && Number.isFinite(resolvedPressureBar)) {
+        const ratio = overload.overload_ratio === 'infinite'
+            ? '∞'
+            : Number(overload.overload_ratio).toFixed(1) + '×';
+        setEl(
+            'gt-pipe-pressure-override',
+            `Pressure override: ${(requestedPressureBar * 1000).toFixed(2)} → ${(resolvedPressureBar * 1000).toFixed(2)} mbar (${ratio} load)`
+        );
+    } else {
+        setEl('gt-pipe-pressure-override', '');
+    }
 
     const turbLoad = data.turbine_utilization_pct || 0;
     setEl('gt-turbine-load', turbLoad.toFixed(0));

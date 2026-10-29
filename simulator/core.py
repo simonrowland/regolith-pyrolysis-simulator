@@ -6940,19 +6940,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return NoColdTrain("runtime_enforcement_disabled"), params.cold_train
         return capacity_from_hardware(params.cold_train), params.cold_train
 
-    def _controlled_o2_transport_capacity(self, evap_flux, *, dt_hr=1.0):
+    def _controlled_o2_transport_capacity(
+        self,
+        evap_flux,
+        *,
+        dt_hr=1.0,
+        retained_holdup_kg=None,
+        retained_holdup_species_kg=None,
+    ):
         """Build the live controlled-flow boundary through canonical policy."""
 
         capacity, _cold_train = self._cold_train_capacity_policy()
-        retained_holdup_kg = sum(
-            max(0.0, float(mass_kg))
-            for mass_kg in self._overhead_holdup_species_kg().values()
-        )
+        if retained_holdup_kg is None:
+            holdup_species_kg = (
+                retained_holdup_species_kg
+                if retained_holdup_species_kg is not None
+                else self._overhead_holdup_species_kg()
+            )
+            retained_holdup_kg = sum(
+                max(0.0, float(mass_kg))
+                for mass_kg in holdup_species_kg.values()
+            )
         return self.overhead_model.controlled_o2_transport_capacity(
             evap_flux,
             self.melt,
             cold_train_capacity=capacity,
             retained_holdup_kg=retained_holdup_kg,
+            retained_holdup_species_kg=retained_holdup_species_kg,
             dt_hr=dt_hr,
         )
 
@@ -7178,6 +7192,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         controls, molar_masses = self._evaporation_flux_control_inputs(
             equilibrium,
             overhead_partials_Pa=initial_partials,
+            overhead_pressure_pa=(
+                self._evaporation_overhead_total_pressure_Pa(
+                    initial_partials
+                )
+            ),
             vapour_batch_flux_pressures_Pa=batch_flux_pressures,
         )
         for species in pre_holdup:
@@ -15615,6 +15634,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     overhead_partials_override_Pa=(
                         capacity_result.partial_pressures_Pa
                     ),
+                    overhead_total_pressure_override_Pa=(
+                        self._evaporation_overhead_total_pressure_Pa(
+                            capacity_result.partial_pressures_Pa
+                        )
+                    ),
                 )
                 live_effective_flux = (
                     self._apply_analytic_evaporation_depletion(live_raw_flux)
@@ -15692,10 +15716,131 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
         overhead_flux = evap_flux
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
-        self._commit_pending_subsolidus_release()
-        effective_transport_capacity = (
-            self._controlled_o2_transport_capacity(inlet_flux)
+        retained_holdup_species_kg = self._overhead_holdup_species_kg()
+        overloaded_pressure_solved = False
+        effective_transport_capacity = self._controlled_o2_transport_capacity(
+            inlet_flux,
+            retained_holdup_species_kg=retained_holdup_species_kg,
         )
+        if (
+            effective_transport_capacity is not None
+            and effective_transport_capacity.binding_cause == 'pressure_driven_pipe'
+            and effective_transport_capacity.overload_notice is not None
+        ):
+            pressure_overlay = dict(
+                getattr(self, '_last_vapour_batch_flux_overlay', {}) or {}
+            )
+            equilibrium_partials_Pa = dict(
+                pressure_overlay.get('selected_runtime_pa_by_species', {}) or {}
+            )
+            if not equilibrium_partials_Pa:
+                from simulator.evaporation import EvaporationFluxRefusal
+
+                raise EvaporationFluxRefusal(
+                    'missing_vapour_batch_flux_pressures_Pa',
+                    {
+                        'reason': 'missing_vapour_batch_flux_pressures_Pa',
+                        'detail': (
+                            'pressure-driven overload requires the admitted '
+                            'equilibrium partial-pressure map'
+                        ),
+                        'evaporation_flux_kg_hr': dict(
+                            evap_flux.species_kg_hr
+                        ),
+                    },
+                )
+            degraded_before = copy.deepcopy(self._degraded_path_engagement)
+
+            def evaporation_flux_at_partials(
+                partials_Pa,
+                total_pressure_Pa,
+            ):
+                return self._apply_analytic_evaporation_depletion(
+                    self._calculate_evaporation(
+                        equilibrium,
+                        overhead_partials_override_Pa=partials_Pa,
+                        overhead_total_pressure_override_Pa=(
+                            total_pressure_Pa
+                        ),
+                    )
+                )
+
+            # The hourly boundary drains retained kg over 1 h into kg/hr;
+            # admitted inlet rates keep any additional gas species separate
+            # from the ordinary evaporation flux for the headspace split.
+            fixed_inlet_species_kg_hr = dict(
+                retained_holdup_species_kg
+            )
+            for species, raw_rate in inlet_flux.species_kg_hr.items():
+                rate = max(0.0, float(raw_rate)) - max(
+                    0.0,
+                    float(evap_flux.species_kg_hr.get(species, 0.0)),
+                )
+                if rate > 0.0:
+                    fixed_inlet_species_kg_hr[species] = (
+                        fixed_inlet_species_kg_hr.get(species, 0.0) + rate
+                    )
+            fixed_inlet_kg_hr = sum(fixed_inlet_species_kg_hr.values())
+            expected_fixed_inlet_kg_hr = max(
+                0.0,
+                effective_transport_capacity.demand_flux_kg_hr
+                - evap_flux.total_kg_hr,
+            )
+            if not math.isclose(
+                fixed_inlet_kg_hr,
+                expected_fixed_inlet_kg_hr,
+                rel_tol=1.0e-9,
+                abs_tol=1.0e-9,
+            ):
+                from simulator.overhead import OverheadConfigurationError
+
+                raise OverheadConfigurationError(
+                    'overloaded evaporation fixed-inlet species do not close to transport demand'
+                )
+
+            try:
+                evap_flux, resolved_pressure_Pa = (
+                    self.overhead_model._solve_overloaded_evaporation_flux(
+                        self.melt,
+                        equilibrium_partials_Pa=equilibrium_partials_Pa,
+                        p_downstream_bar=(
+                            self._headspace_downstream_pressure_bar(
+                                effective_transport_capacity
+                            )
+                        ),
+                        fixed_inlet_species_kg_hr=fixed_inlet_species_kg_hr,
+                        flux_at_partials=evaporation_flux_at_partials,
+                    )
+                )
+            finally:
+                self._degraded_path_engagement = degraded_before
+            overloaded_pressure_solved = True
+            inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
+            effective_transport_capacity = (
+                self._controlled_o2_transport_capacity(
+                    inlet_flux,
+                    retained_holdup_species_kg=retained_holdup_species_kg,
+                )
+            )
+            if (
+                effective_transport_capacity is not None
+                and effective_transport_capacity.binding_cause == 'pressure_driven_pipe'
+                and not math.isclose(
+                    effective_transport_capacity.upstream_pressure_bar * 1.0e5,
+                    resolved_pressure_Pa,
+                    rel_tol=1.0e-9,
+                    abs_tol=1.0e-6,
+                )
+            ):
+                from simulator.overhead import OverheadConfigurationError
+
+                raise OverheadConfigurationError(
+                    'resolved evaporation pressure does not match pipe pressure'
+                )
+            overhead_flux = evap_flux
+        # The joint inlet already includes the pending solid-host gas. Read
+        # prior holdup before committing that source into the same account.
+        self._commit_pending_subsolidus_release()
         self._effective_transport_capacity_this_tick = (
             effective_transport_capacity
         )
@@ -15714,7 +15859,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux = self._ledger_committed_evap_flux_this_tick
             inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
             effective_transport_capacity = (
-                self._controlled_o2_transport_capacity(inlet_flux)
+                self._controlled_o2_transport_capacity(
+                    inlet_flux,
+                    # Reconcile any rejected evaporation parcel against the
+                    # same pre-tick holdup. Post-route overhead already holds
+                    # this tick's source; reading it again counts that source
+                    # twice and changes pressure after condenser routing.
+                    retained_holdup_kg=effective_transport_capacity.retained_holdup_kg,
+                    retained_holdup_species_kg=(
+                        retained_holdup_species_kg
+                        if overloaded_pressure_solved
+                        else None
+                    ),
+                )
+                # Rejection can only reduce the inlet. A pipe inside its
+                # nominal band before routing cannot acquire an overload here.
+                if effective_transport_capacity is not None else None
             )
             self._effective_transport_capacity_this_tick = (
                 effective_transport_capacity

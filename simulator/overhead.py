@@ -50,7 +50,7 @@ populate; turbine speed/capacity is not an input to this model.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.environment import (
@@ -71,6 +71,7 @@ from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C  # °C — default
 from engines.builtin.overhead_bleed import (
     EffectiveTransportCapacity,
     controlled_flow_capacity,
+    transport_overload_notice,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -734,7 +735,7 @@ class OverheadGasModel:
         melt: MeltState,
         p_downstream_bar: Optional[float] = None,
         effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
-    ) -> dict[str, float]:
+    ) -> dict[str, Any]:
         """Estimate pipe pressure/capacity with the existing Poiseuille model."""
 
         conductance_temperature_C = _required_finite_float(
@@ -780,7 +781,7 @@ class OverheadGasModel:
                 'effective_transport_capacity.effective_capacity_kg_hr',
             )
             conductance = pipe_conductance_kg_hr / 3600.0
-            vapor_pressure_mbar = allowed_pressure_Pa / 100.0
+            vapor_pressure_mbar = effective_transport_capacity.upstream_pressure_bar * 1000.0
         else:
             conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
                 allowed_pressure_Pa,
@@ -852,7 +853,37 @@ class OverheadGasModel:
                 if controlled_flow
                 else 'pipe'
             ),
+            'transport_overload_notice': (
+                effective_transport_capacity.overload_notice
+                if controlled_flow
+                else transport_overload_notice(
+                    pipe_capacity_used_pct / 100.0,
+                    allowed_pressure_Pa / 1.0e5,
+                )
+            ),
         }
+
+    @staticmethod
+    def _combine_gas_species_kg_hr(
+        *inflow_species_kg_hr: Optional[Mapping[str, float]],
+    ) -> dict[str, float]:
+        """Sum the species rates from each gas source in the pipe mixture."""
+
+        combined: dict[str, float] = {}
+        for source in inflow_species_kg_hr:
+            for species, raw_rate in (source or {}).items():
+                try:
+                    rate = float(raw_rate)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(rate) and rate > 0.0:
+                    name = str(species)
+                    combined[name] = combined.get(name, 0.0) + rate
+        return combined
+
+    @staticmethod
+    def _pipe_is_overloaded(flow: EffectiveTransportCapacity) -> bool:
+        return flow.demand_flux_kg_hr > flow.pipe_capacity_kg_hr
 
     def controlled_o2_transport_capacity(
         self,
@@ -861,18 +892,42 @@ class OverheadGasModel:
         *,
         cold_train_capacity,
         retained_holdup_kg: float = 0.0,
+        retained_holdup_species_kg: Optional[Mapping[str, float]] = None,
         dt_hr: float = 1.0,
     ) -> Optional[EffectiveTransportCapacity]:
-        """Return the one-tick flow boundary for controlled-pO2 operation."""
+        """Resolve controlled flow or an overloaded pressure-driven pipe."""
 
-        if self._downstream_pressure_override is not None:
+        controlled_flow = (
+            self._downstream_pressure_override is None
+            and getattr(melt.atmosphere, 'name', '') in {
+                'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE',
+            }
+        )
+        if not controlled_flow and evap_flux.total_kg_hr == 0.0 and retained_holdup_kg == 0.0:
             return None
-        if getattr(melt.atmosphere, 'name', '') not in {
-            'CONTROLLED_O2',
-            'CONTROLLED_O2_FLOW',
-            'O2_BACKPRESSURE',
-        }:
+        downstream_pressure_bar = (
+            0.0 if controlled_flow else self._resolve_downstream_pressure(melt, None)
+        )
+        if not controlled_flow and self._conductance_override is not None:
             return None
+        retained_drain_species_kg_hr = {}
+        tick_duration_hr = max(0.0, float(dt_hr))
+        if tick_duration_hr > 0.0:
+            for species, raw_mass_kg in (retained_holdup_species_kg or {}).items():
+                mass_kg = float(raw_mass_kg)
+                if not math.isfinite(mass_kg) or mass_kg < 0.0:
+                    raise OverheadConfigurationError(
+                        'retained overhead species masses must be finite and nonnegative'
+                    )
+                # The pipe mixture is the gas drained this tick: retained kg
+                # divided by tick hours gives the same kg/hr basis as source.
+                drain_kg_hr = mass_kg / tick_duration_hr
+                if drain_kg_hr > 0.0:
+                    retained_drain_species_kg_hr[str(species)] = drain_kg_hr
+        pipe_species_kg_hr = self._combine_gas_species_kg_hr(
+            evap_flux.species_kg_hr,
+            retained_drain_species_kg_hr,
+        )
         allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
         pipe_capacity_kg_hr = (
             max(0.0, float(self._conductance_override)) * 3600.0
@@ -880,22 +935,22 @@ class OverheadGasModel:
             else self._pipe_conductance(
                 allowed_pressure_Pa,
                 float(melt.temperature_C),
-                p_downstream_Pa=0.0,
-                species_kg_for_M_avg=evap_flux.species_kg_hr,
+                p_downstream_Pa=downstream_pressure_bar * 1.0e5,
+                species_kg_for_M_avg=pipe_species_kg_hr,
             ) * 3600.0
         )
         from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
         equipment_capacity = (
             cold_train_capacity.value_kg_hr
-            if isinstance(cold_train_capacity, FiniteCapacity)
+            if controlled_flow and isinstance(cold_train_capacity, FiniteCapacity)
             else None
         )
-        equipment_capacity_required = not (
+        equipment_capacity_required = controlled_flow and not (
             isinstance(cold_train_capacity, NoColdTrain)
             and cold_train_capacity.reason == "runtime_enforcement_disabled"
         )
-        return controlled_flow_capacity(
+        flow = controlled_flow_capacity(
             pipe_capacity_kg_hr=pipe_capacity_kg_hr,
             equipment_capacity_kg_hr=equipment_capacity,
             evolved_flux_kg_hr=evap_flux.total_kg_hr,
@@ -904,6 +959,323 @@ class OverheadGasModel:
             equipment_capacity_required=equipment_capacity_required,
             upstream_pressure_bar=allowed_pressure_Pa / 1.0e5,
         )
+        if retained_drain_species_kg_hr and self._conductance_override is None:
+            legacy_pipe_capacity_kg_hr = self._pipe_conductance(
+                allowed_pressure_Pa,
+                float(melt.temperature_C),
+                p_downstream_Pa=downstream_pressure_bar * 1.0e5,
+                species_kg_for_M_avg=evap_flux.species_kg_hr,
+            ) * 3600.0
+            legacy_flow = controlled_flow_capacity(
+                pipe_capacity_kg_hr=legacy_pipe_capacity_kg_hr,
+                equipment_capacity_kg_hr=equipment_capacity,
+                evolved_flux_kg_hr=evap_flux.total_kg_hr,
+                retained_holdup_kg=retained_holdup_kg,
+                dt_hr=dt_hr,
+                equipment_capacity_required=equipment_capacity_required,
+                upstream_pressure_bar=allowed_pressure_Pa / 1.0e5,
+            )
+            legacy_overloaded = self._pipe_is_overloaded(legacy_flow)
+            mixture_overloaded = self._pipe_is_overloaded(flow)
+            if not legacy_overloaded and not mixture_overloaded:
+                # Keep established non-overloaded outputs byte-identical;
+                # use the complete mixture only when either basis triggers
+                # the pressure-driven path that must resolve its composition.
+                flow = legacy_flow
+                pipe_capacity_kg_hr = legacy_pipe_capacity_kg_hr
+                pipe_species_kg_hr = evap_flux.species_kg_hr
+        if not controlled_flow and flow.overload_notice is None:
+            return None
+        if (
+            self._pipe_is_overloaded(flow)
+            and self._conductance_override is None
+        ):
+            # b-832 ruling A: pressure is the response, not a source throttle.
+            # Leybold, Fundamentals of Vacuum Technology, p.17, eq.1.28a:
+            # C ~ mean(P), so F=C*(P1-P2) ~ P1^2-P2^2. Reuse the pipe
+            # owner's inverse below: P1=sqrt(F/k+P2^2), [kg/hr]/[kg/(hr bar^2)]
+            # = bar^2. Vacuum sanity: 4x flow needs 2x P1 (same law/source);
+            # at 113/3.9 loading, 0.2 mbar becomes 1.0766 mbar. As F tends
+            # back into the nominal band this extension is no longer engaged.
+            pressure_bar = self._vapor_pressure_mbar_from_flux(
+                flow.demand_flux_kg_hr / 3600.0,
+                float(melt.temperature_C),
+                p_downstream_bar=downstream_pressure_bar,
+                species_kg_for_M_avg=pipe_species_kg_hr,
+            ) / 1000.0
+            if not math.isfinite(pressure_bar) or pressure_bar <= 0.0:
+                raise OverheadConfigurationError(
+                    'positive transport demand requires valid pipe geometry and temperature'
+                )
+            pressure_bar = max(pressure_bar, flow.upstream_pressure_bar)
+            # The condenser receives the full source before OVERHEAD_BLEED.
+            # Its O2 equipment/accumulator/relief partition remains the O2
+            # disposition owner; it must not imprison condensable vapour.
+            resolved = controlled_flow_capacity(
+                pipe_capacity_kg_hr=max(
+                    flow.pipe_capacity_kg_hr, flow.demand_flux_kg_hr,
+                ),
+                equipment_capacity_kg_hr=None,
+                equipment_capacity_required=False,
+                evolved_flux_kg_hr=flow.evolved_flux_kg_hr,
+                retained_holdup_kg=flow.retained_holdup_kg,
+                dt_hr=dt_hr,
+                upstream_pressure_bar=pressure_bar,
+            )
+            return replace(
+                resolved,
+                equipment_capacity_kg_hr=flow.equipment_capacity_kg_hr,
+                downstream_pressure_bar=(
+                    resolved.downstream_pressure_bar
+                    if controlled_flow else downstream_pressure_bar
+                ),
+                binding_cause='pressure_driven_pipe',
+                overload_notice={
+                    **flow.overload_notice,
+                    'predicted_pressure_bar': pressure_bar,
+                    'requested_pressure_bar': flow.upstream_pressure_bar,
+                    'resolved_pressure_bar': pressure_bar,
+                },
+            )
+        return flow
+
+    def _solve_overloaded_evaporation_flux(
+        self,
+        melt: MeltState,
+        *,
+        equilibrium_partials_Pa: Mapping[str, float],
+        p_downstream_bar: float,
+        fixed_inlet_species_kg_hr: Mapping[str, float] | None = None,
+        flux_at_partials: Callable[
+            [Mapping[str, float], float], EvaporationFlux
+        ],
+    ) -> tuple[EvaporationFlux, float]:
+        """Solve evaporation back-pressure for an already overloaded pipe."""
+        partials_by_species = {}
+        for species, raw_pressure in equilibrium_partials_Pa.items():
+            pressure = float(raw_pressure)
+            if not math.isfinite(pressure) or pressure < 0.0:
+                raise OverheadConfigurationError(
+                    'overloaded evaporation requires finite nonnegative partial pressures'
+                )
+            if pressure > 0.0:
+                partials_by_species[str(species)] = pressure
+        equilibrium_pressure_Pa = sum(partials_by_species.values())
+        if (
+            not partials_by_species
+            or not math.isfinite(equilibrium_pressure_Pa)
+            or equilibrium_pressure_Pa <= 0.0
+        ):
+            raise OverheadConfigurationError(
+                'overloaded evaporation requires finite equilibrium partial pressures'
+            )
+
+        setpoint_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
+        downstream_pressure_bar = float(p_downstream_bar)
+        if not math.isfinite(downstream_pressure_bar) or downstream_pressure_bar < 0.0:
+            raise OverheadConfigurationError(
+                'overloaded evaporation requires a finite nonnegative downstream pressure'
+            )
+        downstream_Pa = downstream_pressure_bar * 1.0e5
+        fixed_species_kg_hr: dict[str, float] = {}
+        for species, raw_rate in (fixed_inlet_species_kg_hr or {}).items():
+            try:
+                rate = float(raw_rate)
+            except (TypeError, ValueError) as exc:
+                raise OverheadConfigurationError(
+                    'overloaded evaporation requires finite nonnegative fixed-inlet species rates'
+                ) from exc
+            if not math.isfinite(rate) or rate < 0.0:
+                raise OverheadConfigurationError(
+                    'overloaded evaporation requires finite nonnegative fixed-inlet species rates'
+                )
+            if rate > 0.0:
+                name = str(species)
+                fixed_species_kg_hr[name] = (
+                    fixed_species_kg_hr.get(name, 0.0) + rate
+                )
+        fixed_inlet_kg_hr = sum(fixed_species_kg_hr.values())
+        equilibrium_fraction_by_species = {
+            species: pressure / equilibrium_pressure_Pa
+            for species, pressure in partials_by_species.items()
+        }
+
+        def partials_from_inflow(
+            species_kg_hr: Mapping[str, float],
+            pressure_Pa: float,
+        ) -> dict[str, float]:
+            if not species_kg_hr:
+                # With no fixed gas and no trial evaporation, retain the
+                # previous all-vapour split as the zero-flow limit.
+                return {
+                    species: fraction * pressure_Pa
+                    for species, fraction
+                    in equilibrium_fraction_by_species.items()
+                }
+            total_inflow = EvaporationFlux(species_kg_hr=species_kg_hr)
+            total_inflow.update_totals()
+            all_partials_mbar = self.species_partial_pressures(
+                total_inflow,
+                pressure_Pa / 100.0,
+                self.species_formula_registry,
+            )
+            return {
+                species: max(
+                    0.0,
+                    float(all_partials_mbar.get(species, 0.0)) * 100.0,
+                )
+                for species in partials_by_species
+            }
+
+        def evaluate(pressure_Pa: float) -> tuple[EvaporationFlux, float]:
+            trial_partials_Pa = {
+                species: fraction * pressure_Pa
+                for species, fraction in equilibrium_fraction_by_species.items()
+            }
+            previous_trial_partials_Pa = None
+            previous_resolved_partials_Pa = None
+            for _ in range(50):
+                flux = flux_at_partials(trial_partials_Pa, pressure_Pa)
+                inflow_species_kg_hr = self._combine_gas_species_kg_hr(
+                    fixed_species_kg_hr,
+                    flux.species_kg_hr,
+                )
+                resolved_partials_Pa = partials_from_inflow(
+                    inflow_species_kg_hr,
+                    pressure_Pa,
+                )
+                if all(
+                    math.isclose(
+                        resolved_partials_Pa[species],
+                        trial_partials_Pa[species],
+                        rel_tol=1.0e-9,
+                        abs_tol=1.0e-10,
+                    )
+                    for species in partials_by_species
+                ):
+                    break
+                # Near saturation the provider response is steep. Use a
+                # bounded per-species secant step for p_i = p_i(g); the
+                # midpoint fallback keeps each partial inside [0, P_h].
+                next_partials_Pa = {}
+                for species in partials_by_species:
+                    trial = trial_partials_Pa[species]
+                    resolved = resolved_partials_Pa[species]
+                    accelerated = None
+                    if previous_trial_partials_Pa is not None:
+                        prior_trial = previous_trial_partials_Pa[species]
+                        prior_resolved = previous_resolved_partials_Pa[species]
+                        if trial != prior_trial:
+                            slope = (resolved - prior_resolved) / (
+                                trial - prior_trial
+                            )
+                            if math.isfinite(slope) and not math.isclose(
+                                slope,
+                                1.0,
+                                rel_tol=1.0e-12,
+                                abs_tol=1.0e-12,
+                            ):
+                                candidate = (resolved - slope * trial) / (
+                                    1.0 - slope
+                                )
+                                if (
+                                    math.isfinite(candidate)
+                                    and 0.0 <= candidate <= pressure_Pa
+                                ):
+                                    accelerated = candidate
+                    next_partials_Pa[species] = (
+                        accelerated
+                        if accelerated is not None
+                        else (trial + resolved) / 2.0
+                    )
+                previous_trial_partials_Pa = dict(trial_partials_Pa)
+                previous_resolved_partials_Pa = dict(resolved_partials_Pa)
+                trial_partials_Pa = next_partials_Pa
+            else:
+                worst_species = max(
+                    partials_by_species,
+                    key=lambda species: abs(
+                        resolved_partials_Pa[species]
+                        - trial_partials_Pa[species]
+                    ),
+                )
+                raise OverheadConfigurationError(
+                    'overloaded evaporation gas-flow composition did not '
+                    'converge: '
+                    f'{worst_species} trial={trial_partials_Pa[worst_species]:.6g} Pa, '
+                    f'flow-derived={resolved_partials_Pa[worst_species]:.6g} Pa, '
+                    f'flux={flux.species_kg_hr.get(worst_species, 0.0):.6g} kg/hr'
+                )
+            outflow_kg_hr = self._pipe_conductance(
+                pressure_Pa,
+                float(melt.temperature_C),
+                p_downstream_Pa=downstream_Pa,
+                species_kg_for_M_avg=inflow_species_kg_hr,
+            ) * 3600.0
+            inlet_kg_hr = float(flux.total_kg_hr) + fixed_inlet_kg_hr
+            return flux, inlet_kg_hr - outflow_kg_hr
+
+        lower_flux, lower_residual = evaluate(setpoint_Pa)
+        # Premise: a well-mixed headspace has mole fractions equal to each
+        # species' molar inflow divided by the sum of all molar inflows;
+        # Dalton gives p_i = P_h*g_i/sum_j(g_j). The existing partial-pressure
+        # owner converts kg/hr to mol/hr with each species' molar mass, so the
+        # ratios are dimensionless and p_i is in Pa. With no fixed O2 or
+        # carrier inlet, the denominator contains only evaporating species and
+        # reduces to the previous all-vapour flow split. Because p_i controls
+        # evaporation and the resulting flux sets the mixture, each pressure
+        # trial iterates until those two agree. The residual then balances
+        # total inlet and pipe outflow in kg/hr; the pipe owner converts its
+        # conductance from kg/s to kg/hr. The fixed inlet remains constant
+        # during trials, and a non-overloaded hour still bypasses this solver.
+        if lower_residual <= 0.0:
+            return lower_flux, setpoint_Pa
+        if equilibrium_pressure_Pa <= setpoint_Pa:
+            raise OverheadConfigurationError(
+                'overloaded evaporation has no setpoint-to-equilibrium pressure bracket'
+            )
+
+        upper_Pa = equilibrium_pressure_Pa
+        _, upper_residual = evaluate(upper_Pa)
+        for _ in range(50):
+            if upper_residual <= 0.0:
+                break
+            upper_Pa *= 2.0
+            if not math.isfinite(upper_Pa):
+                break
+            _, upper_residual = evaluate(upper_Pa)
+        else:
+            upper_residual = math.inf
+        if upper_residual > 0.0:
+            raise OverheadConfigurationError(
+                'overloaded evaporation did not reach a finite pipe-flow bracket'
+            )
+
+        for _ in range(50):
+            pressure_Pa = (setpoint_Pa + upper_Pa) / 2.0
+            flux, residual = evaluate(pressure_Pa)
+            residual_tolerance_kg_hr = max(
+                1.0e-12,
+                1.0e-9 * max(float(flux.total_kg_hr), abs(residual)),
+            )
+            pressure_tolerance_Pa = max(1.0e-6, 1.0e-10 * pressure_Pa)
+            if (
+                abs(residual) <= residual_tolerance_kg_hr
+                or upper_Pa - setpoint_Pa <= pressure_tolerance_Pa
+            ):
+                return flux, pressure_Pa
+            if residual > 0.0:
+                setpoint_Pa = pressure_Pa
+            else:
+                upper_Pa = pressure_Pa
+
+        pressure_Pa = (setpoint_Pa + upper_Pa) / 2.0
+        flux, residual = evaluate(pressure_Pa)
+        if abs(residual) > max(1.0e-12, 1.0e-9 * float(flux.total_kg_hr)):
+            raise OverheadConfigurationError(
+                'overloaded evaporation pressure solve did not converge'
+            )
+        return flux, pressure_Pa
 
     def _resolve_liner_temperature_value(
         self,
@@ -1132,6 +1504,9 @@ class OverheadGasModel:
         gas.transport_binding_cause = transport_state['transport_binding_cause']
 
         gas.evap_exceeds_transport = gas.transport_saturation_pct > 100.0  # dimensionless bool — transport over-capacity flag
+        gas.transport_overload_notice = dict(
+            transport_state['transport_overload_notice'] or {}
+        )
 
         if self._finite_headspace_enabled:
             self._update_finite_headspace(
@@ -1142,6 +1517,15 @@ class OverheadGasModel:
                 actual_O2_mol_hr=actual_O2_mol_hr,  # mol/hr — melt/offgas O2 molar flow
                 mre_anode_O2_mol_hr=mre_anode_O2_mol_hr,  # mol/hr — MRE anode O2 flow
             )
+            if (
+                effective_transport_capacity is not None
+                and effective_transport_capacity.binding_cause
+                == 'pressure_driven_pipe'
+            ):
+                gas.pressure_mbar = max(
+                    gas.pressure_mbar,
+                    effective_transport_capacity.upstream_pressure_bar * 1000.0,
+                )
             return gas
 
         # ── Overhead pressure ───────────────────────────────────────
@@ -1381,6 +1765,7 @@ class OverheadGasModel:
         gas.evap_exceeds_transport = False  # dimensionless bool — reset transport over-capacity flag
         gas.transport_saturation_pct = 0.0  # percent — reset pipe capacity used
         gas.transport_binding_cause = 'pipe'
+        gas.transport_overload_notice.clear()
         gas.stage_area_geometry_provenance_notice.clear()
 
     @staticmethod
