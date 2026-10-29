@@ -4653,9 +4653,10 @@ class CondensationModel:
     ) -> dict[str, Any]:
         from simulator.chemistry.ellingham_thermo import (
             ellingham_delta_g_kj_per_mol_o2, ellingham_authority_limit,
+            _na_activity_reference_standard_delta_g_kj_per_mol_o2,
         )
         from simulator.chemistry.melt_activity import (
-            melt_oxide_activity, _na_activity_reference_standard_delta_g_kj_per_mol_o2,
+            melt_oxide_activity,
         )
 
         temperature_K = _stage_midpoint_temperature_K(stage)
