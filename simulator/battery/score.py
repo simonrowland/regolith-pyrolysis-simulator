@@ -10878,6 +10878,7 @@ def compile_residual(
     fo2_mode: Fo2Mode | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
+    precomputed_prediction = prediction is not None
     source_reference = reference
     sample_phase_detail = (
         melt_activity_sample_phase_refusal(reference.identity)
@@ -11241,6 +11242,16 @@ def compile_residual(
                 execution=Execution(state=ExecutionState.NOT_PROBED),
                 exclusions=("experiment_method_known", "source_polymorph_printed"),
             )
+        if not precomputed_prediction and predict is None:
+            return _refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": unprinted_reference_phase.reason,
+                    "formula": formula,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("source_reference_polymorph_printed",),
+            )
 
     if sample_phase_detail is not None:
         # Validity gates do not read the row composition. The activity
@@ -11563,16 +11574,17 @@ def compile_residual(
                 extra_notices=prediction.notices,
                 source_relation=source_relation,
             )
-        return _refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {
-                "reason": unprinted_reference_phase.reason,
-                "formula": formula,
-            },
-            execution=Execution(state=ExecutionState.NOT_PROBED),
-            source_relation=source_relation,
-            exclusions=("source_reference_polymorph_printed",),
-        )
+        if not precomputed_prediction:
+            return _refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": unprinted_reference_phase.reason,
+                    "formula": formula,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                source_relation=source_relation,
+                exclusions=("source_reference_polymorph_printed",),
+            )
 
     if prediction.execution.state is not ExecutionState.PRODUCED or prediction.value is None:
         reason = prediction.refusal_reason or RefusalReason.UNSUPPORTED
