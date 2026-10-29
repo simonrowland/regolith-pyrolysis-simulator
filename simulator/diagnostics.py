@@ -1564,7 +1564,18 @@ def _attach_pareto_source_notices(
     for species, records in wall_notice.get("evaporation_transport_notices_by_species", {}).items():
         entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_transport_unavailable"})
         entry["evaporation_transport_notices"] = _plain_mapping(records)
-        authority = "extrapolated" if any(record.get("authority_level") == "extrapolated" for record in records.values()) else "unavailable"
+        levels = {
+            str(record.get("authority_level"))
+            for record in records.values()
+            if isinstance(record, Mapping)
+        }
+        authority = (
+            "extrapolated"
+            if "extrapolated" in levels
+            else "status_bearing"
+            if "status_bearing" in levels
+            else "unavailable"
+        )
         entry["authority_level"] = authority
         if entry.get("status") == "ok":
             entry["status"] = authority

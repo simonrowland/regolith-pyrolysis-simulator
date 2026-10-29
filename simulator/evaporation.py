@@ -1307,22 +1307,35 @@ class EvaporationMixin:
                 flux.carrier_authority_by_species[str(species)] = channel
         continuum_notice = diagnostic.get('continuum_extrapolation_notice')
         condensation_model = getattr(self, 'condensation_model', None)
-        if continuum_notice and condensation_model is not None:
+        alpha_notices = dict(
+            diagnostic.get('alpha_authority_notices_by_species', {}) or {}
+        )
+        if condensation_model is not None:
             from simulator.wall_deposition import _record_wall_pressure_notice
 
-            for species, series in diagnostic.get('evaporation_series_resistance', {}).items():
-                if notice := series.get('continuum_extrapolation_notice'):
+            if continuum_notice:
+                for species, series in diagnostic.get('evaporation_series_resistance', {}).items():
+                    if notice := series.get('continuum_extrapolation_notice'):
+                        _record_wall_pressure_notice(
+                            condensation_model, 'evaporation_transport_notices_by_species',
+                            species, 'evaporation', notice,
+                        )
+                for species, notice in diagnostic.get('missing_transport_parameters', {}).items():
                     _record_wall_pressure_notice(
                         condensation_model, 'evaporation_transport_notices_by_species',
-                        species, 'evaporation', notice,
+                        species, 'evaporation', {
+                            **notice, 'temperature_K': continuum_notice['gas_temperature_K'],
+                        },
                     )
-            for species, notice in diagnostic.get('missing_transport_parameters', {}).items():
-                _record_wall_pressure_notice(
-                    condensation_model, 'evaporation_transport_notices_by_species',
-                    species, 'evaporation', {
-                        **notice, 'temperature_K': continuum_notice['gas_temperature_K'],
-                    },
-                )
+            for species, notice in alpha_notices.items():
+                if isinstance(notice, Mapping):
+                    _record_wall_pressure_notice(
+                        condensation_model,
+                        'evaporation_transport_notices_by_species',
+                        str(species),
+                        'evaporation_alpha',
+                        notice,
+                    )
         alpha_authority_statuses = dict(
             diagnostic.get('alpha_authority_status_by_species', {}) or {}
         )
