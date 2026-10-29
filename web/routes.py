@@ -109,6 +109,7 @@ from simulator.recipe_io import (
     write_recipe_patch,
 )
 from simulator.state import CondensationTrain
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.wall_advisor import WALL_ZONE_TEMPERATURES_C
 from web.feedstock_data import (
     debug_feedstocks_enabled,
@@ -2507,6 +2508,17 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     deposit_known = total_kg is not None
     positive_deposit = deposit_known and total_kg > 0.0
     authority = _mapping_value(result.get('wall_deposit_sticking_authority'))
+    explicit_refusal = _mapping_value(
+        result.get('wall_deposit_refusal') or result.get('coating_refusal')
+    )
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=positive_deposit,
+        authority=authority,
+        refusal=explicit_refusal,
+    )
+    refusal = availability.refusal or {}
+    if refusal.get('authority'):
+        authority = _mapping_value(refusal.get('authority'))
     authoritative = result.get('coating_authoritative')
     if authoritative is None and authority:
         authoritative = authority.get(
@@ -2532,8 +2544,13 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         if parsed_authoritative is None
         else parsed_authoritative
     )
+    if availability.status == 'refused':
+        is_authoritative = False
+        total_kg = None
+        campaigns = None
     warning_reason = str(
         result.get('coating_status_reason')
+        or refusal.get('reason')
         or authority.get('message')
         or (
             # The warning used to fire only on a POSITIVE deposit, so the
@@ -2549,7 +2566,7 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
             )
         )
     )
-    if total_kg is None and campaigns in (None, ''):
+    if total_kg is None and campaigns in (None, '') and not refusal:
         return {
             'status': 'inconclusive',
             'reason': 'coating artifact missing',
@@ -2559,11 +2576,9 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     # authority payloads; surface it on the coating readout AND operator
     # templates (optimizer detail/table) so absence is visible — not
     # producer-only forwarding into an unread payload field.
-    refusal_count = authority.get('status_bearing_refusal_count')
+    refusal_count = refusal.get('count')
     if refusal_count is None:
-        refused_species = authority.get('wall_saturation_pressure_refused_species')
-        if isinstance(refused_species, (list, tuple)):
-            refusal_count = len(refused_species)
+        refusal_count = authority.get('status_bearing_refusal_count')
     if not is_authoritative and refusal_count is not None:
         refusal_clause = f'status-bearing refusals: {refusal_count}'
         if warning_reason:
@@ -2571,7 +2586,7 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
                 warning_reason = f'{warning_reason} ({refusal_clause})'
         else:
             warning_reason = refusal_clause
-    return {
+    readout = {
         'status': 'available' if is_authoritative else 'warning',
         'authoritative': is_authoritative,
         'output_status': str(
@@ -2586,6 +2601,9 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         'segment_count': segment_count,
         'status_bearing_refusal_count': refusal_count,
     }
+    if refusal:
+        readout['refusal'] = refusal
+    return readout
 
 
 def _first_mapping(*values: Any) -> Mapping[str, Any]:

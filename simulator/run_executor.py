@@ -467,11 +467,12 @@ class RunExecutor:
             all_snapshots = tuple(getattr(sim.record, "snapshots", ()))
             snapshots = all_snapshots[snapshot_start:]
             sim.record.cost_rollup = build_cost_rollup_diagnostic(
+                sim=sim,
                 cost_ledger=sim.cost_ledger,
                 per_hour=tuple(per_hour),
                 products_kg=sim.product_ledger(),
                 pumping_context=pumping_context_from_sim(sim, snapshots),
-                snapshots=snapshots,
+                snapshots=all_snapshots,
             )
             trace = _slice_trace(PhysicsTrace.from_simulator(sim), snapshot_start)
             reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)
