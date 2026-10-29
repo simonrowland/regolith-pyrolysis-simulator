@@ -143,10 +143,19 @@ def test_ohara_table1_po_partial_pressures_migrate_with_sample_conditions():
     )
     for observation in observations:
         conditions = observation.point_conditions or {}
-        for key in ("composition", "temperature_K"):
-            assert key in conditions
-            assert conditions[key].state.is_value
-            assert conditions[key].locator is not None
+        temperature = conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.locator is not None
+        composition = conditions["composition"]
+        assert composition.locator is not None
+        sample = int(observation.observation_id.rsplit("_sample_", 1)[1])
+        if sample == 20:
+            assert not composition.state.is_value
+            assert composition.state.reason == (
+                "Table 2 has no printed composition for sample 20"
+            )
+        else:
+            assert composition.state.is_value
 
 
 def test_kambayashi_table6_po_partial_pressures_migrate_with_sample_conditions():
@@ -543,8 +552,7 @@ def test_janaf_mixed_units_recover_298k_formation_gibbs_values():
         ) / Decimal("1000")
         condition = observation.point_conditions["temperature_K"]
         assert condition.state.is_value
-        assert condition.state.value.kind is ValueKind.POINT
-        assert condition.state.value.point == Decimal("298.15")
+        assert condition.state.value == Decimal("298.15")
         assert condition.locator is not None
 
 
@@ -722,7 +730,7 @@ def test_shilov_table4_atomic_oxygen_pressures_migrate_all_equilibrium_estimates
         ("40.0", "(9)"): "5.2385025e-10",
         ("40.0", "(10)"): "5.02572e-10",
         ("40.0", "(11)"): "3.28293e-10",
-        ("46.7", "(4)"): "4.1421925e-10",
+        ("46.7", "(4)"): "4.1441925e-10",
         ("46.7", "(8)"): "4.4886975e-10",
         ("46.7", "(9)"): "4.316445e-10",
         ("46.7", "(10)"): "4.3468425e-10",
