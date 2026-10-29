@@ -195,6 +195,9 @@ entries:
   - printed: sample_oxide_composition_wt_pct
     field: sample.printed_composition
     unit: wt_pct
+  - printed: oxide_wt_pct
+    field: sample.printed_composition
+    unit: wt_pct
   # vessel / cell material → apparatus.cell_material_and_liner (Located[str])
   - printed: cell_material
     field: apparatus.cell_material_and_liner

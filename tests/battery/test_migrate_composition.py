@@ -1504,7 +1504,7 @@ def test_percent_component_identity_validation_is_pinned(
     ) is None
 
 
-def test_mass_percent_nonclosing_map_keeps_existing_conversion_behavior() -> None:
+def test_mass_percent_map_with_small_assay_closure_error_converts() -> None:
     composition = migrate_module._composition_located_from_plain(
         {
             "state": {
@@ -1512,7 +1512,7 @@ def test_mass_percent_nonclosing_map_keeps_existing_conversion_behavior() -> Non
                 "value": {
                     "basis": "printed_oxides",
                     "amount_basis": "mass_percent",
-                    "components": [["SiO2", "45"], ["MgO", "45"]],
+                    "components": [["SiO2", "60"], ["MgO", "39"]],
                 },
             }
         }
@@ -1520,7 +1520,7 @@ def test_mass_percent_nonclosing_map_keeps_existing_conversion_behavior() -> Non
 
     assert composition.state.is_value
     assert composition.state.value == wt_pct_to_mole_fraction(
-        {"SiO2": Decimal("45"), "MgO": Decimal("45")}
+        {"SiO2": Decimal("60"), "MgO": Decimal("39")}
     )
 
 
@@ -1550,27 +1550,6 @@ def test_b704_nonclosing_mass_percent_stays_printed_and_refuses_engine_compositi
     )
 
 
-def test_b704_jsc_partial_oxide_map_keeps_the_old_numeric_golden_before_fix() -> None:
-    path = REPO_ROOT / "data/literature/extracts/jsc-lunar-catalog-12023.yaml"
-    document = yaml.safe_load(path.read_text(encoding="utf-8"))
-    source_row = next(
-        row
-        for species in document["species"].values()
-        for row in species["observations"]
-        if row["observation_id"] == "jsc_12023_table1_warren78_composition"
-    )
-    oxide_map = source_row["values"]["oxide_wt_pct"]
-
-    # Golden from the green converter: partial-map normalization invents a
-    # silica-free composition with this MgO mole fraction.
-    converted = wt_pct_to_mole_fraction(
-        {name: Decimal(str(amount)) for name, amount in oxide_map.items()}
-    )
-    assert converted.as_map()["MgO"] == Decimal(
-        "0.3600460805376726971963691396"
-    )
-
-
 def test_b704_jsc_partial_oxide_map_refuses_engine_composition_with_missing_major() -> None:
     path = REPO_ROOT / "data/literature/extracts/jsc-lunar-catalog-12023.yaml"
     document = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -1580,11 +1559,22 @@ def test_b704_jsc_partial_oxide_map_refuses_engine_composition_with_missing_majo
         for row in species["observations"]
         if row["observation_id"] == "jsc_12023_table1_warren78_composition"
     )
-    assert source_row["values"]["absent_table_entries"].count("SiO2") == 1
+    assert {"SiO2", "P2O5"} <= set(source_row["values"]["absent_table_entries"])
     assert sum(
         Decimal(str(amount))
         for amount in source_row["values"]["oxide_wt_pct"].values()
     ) == Decimal("50.59")
+
+    sample = sample_from_equipment(
+        None,
+        values=source_row["values"],
+        locator=migrate_module.locator_from_mapping(source_row["locator"]),
+    )
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {
+        name: str(amount)
+        for name, amount in source_row["values"]["oxide_wt_pct"].items()
+    }
 
     migrator = migrate_one_extract(REPO_ROOT, path)
     observation = migrator.result.observations[
@@ -1595,7 +1585,7 @@ def test_b704_jsc_partial_oxide_map_refuses_engine_composition_with_missing_majo
     assert observation.identity.composition.is_unknown
     assert observation.identity.composition.reason == (
         "mass-percent composition does not close to 100 (sum=50.59); "
-        "missing major oxides: SiO2"
+        "missing major oxides: SiO2, P2O5"
     )
 
 

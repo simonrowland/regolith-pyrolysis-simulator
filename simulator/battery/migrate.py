@@ -1334,13 +1334,18 @@ def _percent_composition_closure_error(
     *,
     tolerance: Decimal | None = None,
 ) -> str | None:
-    if any(not amount.is_finite() or amount < 0 for amount in components.values()):
+    amounts = tuple(
+        amount
+        for name, amount in components.items()
+        if str(name).strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
+    )
+    if any(not amount.is_finite() or amount < 0 for amount in amounts):
         return f"{basis}-percent composition contains a negative or non-finite amount"
-    total = sum(components.values(), Decimal("0"))
+    total = sum(amounts, Decimal("0"))
     rounding_bound = sum(
         (
             Decimal("0.5").scaleb(amount.as_tuple().exponent)
-            for amount in components.values()
+            for amount in amounts
         ),
         Decimal("0"),
     )
@@ -3716,6 +3721,7 @@ def _is_engine_oxide_component(name: str) -> bool:
 
 _PRINTED_COMPOSITION_MAP_KEYS = (
     "oxides_wt_pct",
+    "oxide_wt_pct",
     "major_oxide_wt_pct",
     "composition_wt_pct",
     "composition_mass_percent",
@@ -3782,10 +3788,13 @@ _BULK_PROPERTY_QUANTITIES = frozenset(
     }
 )
 _COMPOSITION_LOOKED_FOR = (
-    "oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / "
+    "oxides_wt_pct / oxide_wt_pct / major_oxide_wt_pct / composition_wt_pct / "
     "composition_mole_fraction / composition_mass_percent / "
     "sample_oxide_composition_wt_pct / starting_glass_wt_pct / "
     "SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5"
+)
+_MAJOR_OXIDE_COMPONENT_KEYS = frozenset(
+    name for name in _COMPOSITION_LOOKED_FOR.split() if name in _COMPOSITION_COMPONENTS
 )
 _WT_PCT_TO_MOLE_FRACTION_ARITHMETIC = "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
 _FEOT_COMPOSITION_DERIVATION_NOTE = (
@@ -3807,6 +3816,32 @@ def oxide_molar_mass(oxide: str) -> Decimal:
     return as_decimal(
         str(parse_formula(mass_formula, species=mass_formula).molar_mass_g_mol)
     )
+
+
+def _missing_major_oxide_names(values: object) -> tuple[str, ...]:
+    if not isinstance(values, Mapping):
+        return ()
+    absent = values.get("absent_table_entries")
+    names = [str(name) for name in absent] if isinstance(absent, (list, tuple)) else []
+    candidates = [values]
+    candidates.extend(
+        nested
+        for key in _PRINTED_COMPOSITION_MAP_KEYS
+        if isinstance((nested := values.get(key)), Mapping)
+    )
+    names.extend(
+        str(name)
+        for candidate in candidates
+        for name, amount in candidate.items()
+        if _printed_composition_amount(amount) is None
+    )
+    missing: list[str] = []
+    for name in names:
+        token = _canonical_printed_oxide_name(str(name))
+        major = "FeO" if token == "FeOT" else token
+        if major in _MAJOR_OXIDE_COMPONENT_KEYS and major not in missing:
+            missing.append(major)
+    return tuple(missing)
 
 
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
@@ -3851,6 +3886,13 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
         total += n
     if total <= 0:
         raise ValueError("printed oxide wt% map has no positive mass")
+    # The composition sweep used 98–102 wt% as its closure window. Preserve
+    # smaller assay closure error; mole-percent maps keep printed-precision closure.
+    closure_error = _percent_composition_closure_error(
+        wt, "mass", tolerance=Decimal("2")
+    )
+    if closure_error is not None:
+        raise ValueError(closure_error)
     return Composition(
         basis="printed_oxides",
         components=tuple((oxide, n / total) for oxide, n in moles.items()),
@@ -4022,6 +4064,11 @@ def _oxide_map_from_mapping(
         if refusal_reason is not None:
             refusal_reason.append(str(exc))
         return None
+    missing = _missing_major_oxide_names(obj)
+    if missing:
+        if refusal_reason is not None:
+            refusal_reason.append("missing major oxides: " + ", ".join(missing))
+        return None
     return comps
 
 
@@ -4112,6 +4159,8 @@ def _initial_oxide_map_from_values(
         )
     if quantity and "composition" not in quantity and not declared_map:
         return None
+    missing = _missing_major_oxide_names(values)
+    missing_reason = "missing major oxides: " + ", ".join(missing) if missing else None
     ranked = _point_rows(values)
     if ranked and declared_map:
         got = _printed_initial_charge_row_map(
@@ -4120,12 +4169,30 @@ def _initial_oxide_map_from_values(
             declared_map=declared_map,
         )
         if got:
+            if missing_reason:
+                if refusal_reason is not None:
+                    refusal_reason.append(missing_reason)
+                return None
             return got
     got = _oxide_map_from_mapping(
         values, refusal_reason=refusal_reason, declared_map=declared_map
     )
     if got:
+        if missing_reason:
+            if refusal_reason is not None:
+                refusal_reason.append(missing_reason)
+            return None
         return got
+    if refusal_reason is not None and missing_reason:
+        if refusal_reason:
+            if "missing major oxides:" not in refusal_reason[0]:
+                refusal_reason[0] = (
+                    f"{refusal_reason[0]}; {missing_reason}"
+                    if "does not close to 100" in refusal_reason[0]
+                    else missing_reason
+                )
+        else:
+            refusal_reason.append(missing_reason)
     raw_moles = values.get("composition_mole_fraction")
     if isinstance(raw_moles, Mapping):
         try:
