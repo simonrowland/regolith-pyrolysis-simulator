@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=uranium-(reference-state):v=f779fafe22:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=uranium-(reference-state):v=f779fafe22:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -15,7 +15,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -122,7 +122,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1048:col=H_minus_H298:name=uranium-(reference-state):v=a12fe8ac9a:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1048:col=H_minus_H298:name=uranium-(reference-state):v=a12fe8ac9a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -131,11 +131,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -197,21 +198,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='8.460'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -242,7 +230,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1048:col=H_minus_H298:name=uranium-(reference-state):v=bb587e26ac:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1048:col=H_minus_H298:name=uranium-(reference-state):v=bb587e26ac
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -251,11 +239,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -317,21 +306,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='7.330'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -362,7 +338,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=uranium-(reference-state):v=51f7a4863f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=uranium-(reference-state):v=51f7a4863f:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -375,7 +351,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -482,7 +458,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=uranium-(reference-state):v=887deb384b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=uranium-(reference-state):v=887deb384b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -495,7 +471,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -602,7 +578,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=uranium-(reference-state):v=e5b2c8cef7:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=uranium-(reference-state):v=e5b2c8cef7:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -615,7 +591,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -722,7 +698,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=uranium-(reference-state):v=73047da44d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=uranium-(reference-state):v=73047da44d:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -735,7 +711,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -842,7 +818,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1405:col=H_minus_H298:name=uranium-(reference-state):v=061dc399b2:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1405:col=H_minus_H298:name=uranium-(reference-state):v=061dc399b2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -851,11 +827,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -917,21 +894,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='11.730'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -962,7 +926,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1405:col=H_minus_H298:name=uranium-(reference-state):v=93aaf547d1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1405:col=H_minus_H298:name=uranium-(reference-state):v=93aaf547d1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -971,11 +935,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1037,21 +1002,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='14.820'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1082,7 +1034,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=uranium-(reference-state):v=748f14d3f0:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=uranium-(reference-state):v=748f14d3f0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1092,10 +1044,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1202,7 +1154,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=uranium-(reference-state):v=762c07bf3c:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=uranium-(reference-state):v=762c07bf3c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1212,10 +1164,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1322,7 +1274,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=uranium-(reference-state):v=b8aa4692e7:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=uranium-(reference-state):v=b8aa4692e7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1332,10 +1284,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1442,7 +1394,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=uranium-(reference-state):v=ce69085669:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=uranium-(reference-state):v=ce69085669
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1452,10 +1404,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1562,7 +1514,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=uranium-(reference-state):v=4d930c62a9:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=uranium-(reference-state):v=4d930c62a9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1572,10 +1524,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1682,7 +1634,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=uranium-(reference-state):v=e03b2e31e3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=uranium-(reference-state):v=e03b2e31e3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1692,10 +1644,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1802,7 +1754,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1815,7 +1767,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1922,7 +1874,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=uranium-(reference-state):v=a1b1ade56d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=uranium-(reference-state):v=a1b1ade56d:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1935,7 +1887,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2042,7 +1994,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=uranium-(reference-state):v=bd9d0682fc:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=uranium-(reference-state):v=bd9d0682fc:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2055,7 +2007,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2162,7 +2114,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=uranium-(reference-state):v=b7e558b0f4:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=uranium-(reference-state):v=b7e558b0f4:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2175,7 +2127,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2282,7 +2234,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=uranium-(reference-state):v=24ddc30464:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=uranium-(reference-state):v=24ddc30464:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2295,7 +2247,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2402,7 +2354,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=uranium-(reference-state):v=5cee184ce1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=uranium-(reference-state):v=5cee184ce1:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2415,7 +2367,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2522,7 +2474,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=uranium-(reference-state):v=12bf7dbc9b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=uranium-(reference-state):v=12bf7dbc9b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2535,7 +2487,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2642,7 +2594,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=941:col=H_minus_H298:name=uranium-(reference-state):v=196f45e581:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=941:col=H_minus_H298:name=uranium-(reference-state):v=196f45e581
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2651,11 +2603,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2717,21 +2670,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='5.560'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2762,7 +2702,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=941:col=H_minus_H298:name=uranium-(reference-state):v=8ad70ceaa1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=941:col=H_minus_H298:name=uranium-(reference-state):v=8ad70ceaa1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2771,11 +2711,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2837,21 +2778,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='6.230'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2882,7 +2810,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1000:col=entropy:name=uranium-(reference-state):v=c93f267e5d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1000:col=entropy:name=uranium-(reference-state):v=c93f267e5d:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2895,7 +2823,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3002,7 +2930,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1048:col=entropy:name=uranium-(reference-state):v=19eba6b7d3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1048:col=entropy:name=uranium-(reference-state):v=19eba6b7d3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3011,11 +2939,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3077,21 +3006,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='23.260'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3122,7 +3038,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1048:col=entropy:name=uranium-(reference-state):v=809cc4e978:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1048:col=entropy:name=uranium-(reference-state):v=809cc4e978
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3131,11 +3047,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3197,21 +3114,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='24.340'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3242,7 +3146,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1100:col=entropy:name=uranium-(reference-state):v=a58108c5ac:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1100:col=entropy:name=uranium-(reference-state):v=a58108c5ac:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3255,7 +3159,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3362,7 +3266,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1200:col=entropy:name=uranium-(reference-state):v=3dcc600cd0:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1200:col=entropy:name=uranium-(reference-state):v=3dcc600cd0:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3375,7 +3279,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3482,7 +3386,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1300:col=entropy:name=uranium-(reference-state):v=3e2f14deb6:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1300:col=entropy:name=uranium-(reference-state):v=3e2f14deb6:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3495,7 +3399,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3602,7 +3506,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1400:col=entropy:name=uranium-(reference-state):v=158ac17493:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1400:col=entropy:name=uranium-(reference-state):v=158ac17493:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3615,7 +3519,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3722,7 +3626,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1405:col=entropy:name=uranium-(reference-state):v=15a8a508d5:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1405:col=entropy:name=uranium-(reference-state):v=15a8a508d5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3731,11 +3635,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3797,21 +3702,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='29.220'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3842,7 +3734,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1405:col=entropy:name=uranium-(reference-state):v=f7a60bf18c:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1405:col=entropy:name=uranium-(reference-state):v=f7a60bf18c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3851,11 +3743,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3917,21 +3810,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='27.020'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3962,7 +3842,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1500:col=entropy:name=uranium-(reference-state):v=a48f7eccaa:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1500:col=entropy:name=uranium-(reference-state):v=a48f7eccaa
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3972,10 +3852,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4082,7 +3962,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1600:col=entropy:name=uranium-(reference-state):v=10c05fb4ca:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1600:col=entropy:name=uranium-(reference-state):v=10c05fb4ca
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4092,10 +3972,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4202,7 +4082,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1700:col=entropy:name=uranium-(reference-state):v=0532468938:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1700:col=entropy:name=uranium-(reference-state):v=0532468938
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4212,10 +4092,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4322,7 +4202,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1800:col=entropy:name=uranium-(reference-state):v=85058e05db:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1800:col=entropy:name=uranium-(reference-state):v=85058e05db
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4332,10 +4212,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4442,7 +4322,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1900:col=entropy:name=uranium-(reference-state):v=dab353fa8d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1900:col=entropy:name=uranium-(reference-state):v=dab353fa8d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4452,10 +4332,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4562,7 +4442,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=2000:col=entropy:name=uranium-(reference-state):v=0aa25d7cda:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=2000:col=entropy:name=uranium-(reference-state):v=0aa25d7cda
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4572,10 +4452,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4682,7 +4562,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=400:col=entropy:name=uranium-(reference-state):v=fa8dab8694:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=400:col=entropy:name=uranium-(reference-state):v=fa8dab8694:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4695,7 +4575,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4802,7 +4682,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=500:col=entropy:name=uranium-(reference-state):v=17e3d1eec0:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=500:col=entropy:name=uranium-(reference-state):v=17e3d1eec0:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4815,7 +4695,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4922,7 +4802,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=600:col=entropy:name=uranium-(reference-state):v=59c3bdfa0e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=600:col=entropy:name=uranium-(reference-state):v=59c3bdfa0e:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4935,7 +4815,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5042,7 +4922,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=700:col=entropy:name=uranium-(reference-state):v=ce69085669:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=700:col=entropy:name=uranium-(reference-state):v=ce69085669:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5055,7 +4935,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5162,7 +5042,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=800:col=entropy:name=uranium-(reference-state):v=773336b271:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=800:col=entropy:name=uranium-(reference-state):v=773336b271:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5175,7 +5055,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5282,7 +5162,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=900:col=entropy:name=uranium-(reference-state):v=70a9e7e961:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=900:col=entropy:name=uranium-(reference-state):v=70a9e7e961:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5295,7 +5175,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5402,7 +5282,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=941:col=entropy:name=uranium-(reference-state):v=ad3f8ed97d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=941:col=entropy:name=uranium-(reference-state):v=ad3f8ed97d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5411,11 +5291,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5477,21 +5358,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='21.440'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5522,7 +5390,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=941:col=entropy:name=uranium-(reference-state):v=feb2180b7e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=941:col=entropy:name=uranium-(reference-state):v=feb2180b7e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5531,11 +5399,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5597,21 +5466,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 74
-        pdf_page_index: 80
-        table: b1259-ht-0049-uranium-reference-state
-        note: as_published='22.150'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-        record: b1259-ht-0049-uranium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5642,7 +5498,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5655,7 +5511,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -5682,7 +5538,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5802,7 +5658,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1048:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1048:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5811,11 +5667,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5912,7 +5769,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5925,7 +5782,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -5952,7 +5809,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6072,7 +5929,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6085,7 +5942,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -6112,7 +5969,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6232,7 +6089,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6245,7 +6102,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -6272,7 +6129,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6392,7 +6249,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6405,7 +6262,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -6432,7 +6289,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6552,7 +6409,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1405:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1405:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6561,11 +6418,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6662,7 +6520,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6672,10 +6530,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6699,10 +6557,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6822,7 +6680,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6832,10 +6690,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6859,10 +6717,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6982,7 +6840,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6992,10 +6850,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7019,10 +6877,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7142,7 +7000,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7152,10 +7010,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7179,10 +7037,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7302,7 +7160,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7312,10 +7170,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7339,10 +7197,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7462,7 +7320,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7472,10 +7330,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7499,10 +7357,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7622,7 +7480,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7635,7 +7493,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7662,7 +7520,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7782,7 +7640,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7795,7 +7653,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7822,7 +7680,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7942,7 +7800,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7955,7 +7813,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7982,7 +7840,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8102,7 +7960,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8115,7 +7973,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8142,7 +8000,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8262,7 +8120,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8275,7 +8133,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8302,7 +8160,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8422,7 +8280,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8435,7 +8293,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8462,7 +8320,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8582,7 +8440,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8595,7 +8453,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8622,7 +8480,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8742,7 +8600,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=941:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=941:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8751,11 +8609,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8852,7 +8711,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8865,7 +8724,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -8892,7 +8751,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9012,7 +8871,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1048:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1048:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9021,11 +8880,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9122,7 +8982,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9135,7 +8995,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9162,7 +9022,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9282,7 +9142,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9295,7 +9155,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9322,7 +9182,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9442,7 +9302,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9455,7 +9315,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9482,7 +9342,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9602,7 +9462,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9615,7 +9475,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9642,7 +9502,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9762,7 +9622,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1405:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1405:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9771,11 +9631,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9872,7 +9733,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9882,10 +9743,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9909,10 +9770,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10032,7 +9893,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10042,10 +9903,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10069,10 +9930,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10192,7 +10053,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10202,10 +10063,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10229,10 +10090,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10352,7 +10213,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10362,10 +10223,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10389,10 +10250,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10512,7 +10373,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10522,10 +10383,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10549,10 +10410,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10672,7 +10533,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10682,10 +10543,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10709,10 +10570,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10832,7 +10693,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10845,7 +10706,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10872,7 +10733,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10992,7 +10853,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11005,7 +10866,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11032,7 +10893,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11152,7 +11013,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11165,7 +11026,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11192,7 +11053,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11312,7 +11173,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11325,7 +11186,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11352,7 +11213,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11472,7 +11333,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11485,7 +11346,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11512,7 +11373,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11632,7 +11493,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11645,7 +11506,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11672,7 +11533,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11792,7 +11653,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11805,7 +11666,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11832,7 +11693,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11952,7 +11813,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=941:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=941:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11961,11 +11822,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12062,7 +11924,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12075,7 +11937,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -12102,7 +11964,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12213,7 +12075,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1048:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1048:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12222,11 +12084,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1048 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12314,7 +12177,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12327,7 +12190,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12354,7 +12217,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -12465,7 +12328,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12478,7 +12341,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12505,7 +12368,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -12616,7 +12479,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12629,7 +12492,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12656,7 +12519,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -12767,7 +12630,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12780,7 +12643,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12807,7 +12670,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -12918,7 +12781,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1405:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1405:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12927,11 +12790,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1405 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13019,7 +12883,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13029,10 +12893,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13056,10 +12920,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13170,7 +13034,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13180,10 +13044,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13207,10 +13071,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13321,7 +13185,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13331,10 +13195,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13358,10 +13222,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13472,7 +13336,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13482,10 +13346,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13509,10 +13373,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13623,7 +13487,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13633,10 +13497,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13660,10 +13524,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13774,7 +13638,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13784,10 +13648,10 @@ observations:
       formula: U
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13811,10 +13675,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13925,7 +13789,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13938,7 +13802,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13965,7 +13829,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14076,7 +13940,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14089,7 +13953,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14116,7 +13980,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14227,7 +14091,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14240,7 +14104,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14267,7 +14131,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14378,7 +14242,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14391,7 +14255,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14418,7 +14282,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14529,7 +14393,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14542,7 +14406,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14569,7 +14433,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14680,7 +14544,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14693,7 +14557,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14720,7 +14584,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14831,7 +14695,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14844,7 +14708,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14871,7 +14735,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14982,7 +14846,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=941:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=941:col=log_Kf:name=uranium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14991,11 +14855,12 @@ observations:
     species:
       formula: U
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 941 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
