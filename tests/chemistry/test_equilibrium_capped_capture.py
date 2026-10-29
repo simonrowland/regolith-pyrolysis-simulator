@@ -120,6 +120,26 @@ def test_free_molecular_rate_uses_actual_flow_inventory():
     # N_stage=n_dot*tau, so tau cancels for fixed flow/area/pressure.
     assert efficiency(model, 27.18, residence=50.0) == pytest.approx(expected, rel=1e-8)
 
+    # Use a smaller collector so the rate-doubling check is in the linear,
+    # small-exposure regime; its expected value still comes from the ODE above.
+    small_area = 1e-9
+    model.stage_area_m2_by_stage = {"1": small_area}
+    expected_at_small_area = _integrated_pressure_driven_capture(
+        pressure=27.18, psat=psat, temperature=gas_K, coefficient=coefficient,
+        area=small_area, inventory=inventory, residence=5,
+    )
+    expected_at_double_flow = _integrated_pressure_driven_capture(
+        pressure=27.18, psat=psat, temperature=gas_K, coefficient=coefficient,
+        area=small_area, inventory=2 * inventory, residence=5,
+    )
+    actual_at_small_area = efficiency(model, 27.18, flow=1.0)
+    actual_at_double_flow = efficiency(model, 27.18, flow=2.0)
+    assert actual_at_small_area == pytest.approx(expected_at_small_area, rel=1e-8)
+    assert actual_at_double_flow == pytest.approx(expected_at_double_flow, rel=1e-8)
+    # At small exposure, doubling the hourly supply rate doubles n_dot and
+    # halves eta to first order, with area, pressure, alpha and residence fixed.
+    assert actual_at_double_flow == pytest.approx(expected_at_small_area / 2, rel=1e-5)
+
 
 def test_missing_inlet_pressure_is_unavailable():
     model = _configured_model()
