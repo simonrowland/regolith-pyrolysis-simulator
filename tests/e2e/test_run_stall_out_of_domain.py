@@ -100,7 +100,7 @@ def _stall_report(evidence, last_hour: float) -> str:
         "low-pressure transport support"
     ),
 )
-@pytest.mark.timeout(300)
+@pytest.mark.cpu_budget(300)
 def test_run_does_not_stall(page, evidence):
     page.goto(f"{BASE_URL}/", wait_until="domcontentloaded", timeout=PAGE_LOAD_MS)
     select_feedstock(page)
@@ -191,7 +191,7 @@ def test_run_does_not_stall(page, evidence):
     assert last_hour > 0, "watchdog window elapsed without a single hour of progress"
 
 
-@pytest.mark.timeout(300)
+@pytest.mark.cpu_budget(300)
 def test_default_recipe_refusal_reason_is_viscous_p_bulk_transport_out_of_domain(
     page, evidence
 ):
