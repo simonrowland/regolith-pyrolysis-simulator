@@ -11162,7 +11162,7 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         and "_digitized" in obs.observation_id
     ]
     assert len(table_composition_rows) == 300
-    assert len(figure_composition_rows) == 281
+    assert len(figure_composition_rows) == 277
     assert len(composition_rows) == (
         len(table_composition_rows) + len(figure_composition_rows)
     )
@@ -11267,7 +11267,7 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         "melt_activity": 137,
         "vapour": 118,
     }
-    assert _rail_counter(figure_candidates) == {"melt_activity": 281}
+    assert _rail_counter(figure_candidates) == {"melt_activity": 277}
 
 
 def test_comparison_provenance_is_not_inherited_by_unknown_quantity_points(

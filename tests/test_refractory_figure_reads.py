@@ -1,8 +1,9 @@
 """Figure-read pins for Shornikov 2025 Fig. 1 and Stolyarova 1996 Fig. 2.
 
 The stored numbers are the audit CSV. Doubling one stored value must fail the
-pin. Migration has to carry T_C and the printed composition onto every new
-point that has them.
+pin. Panel J and L series identity is the printed legend and the Fig. 2
+caption, not the CSV series cell. Migration has to carry T_C and the printed
+composition onto every new point that has them.
 """
 
 from __future__ import annotations
@@ -35,7 +36,38 @@ SHORNIKOV_PINS = {
 STOLYAROVA_PINS = {
     "A-1-01": ("CaO", "1659.85", "0.99", "2327.00", "1312.00", "2326.63", "1311.40"),
     "E-1-01": ("Al2O3", "1659.85", "0.0013", "1969.00", "3062.00", "1968.76", "3062.20"),
-    "J-2-04": ("SiO2", "1464.85", "0.31", "3064.00", "1220.00", "3070.66", "1238.29"),
+}
+# Panel J legend box on published p. 29: filled circle 1, open square 3,
+# filled triangle 5, filled square 6, open triangle 7. No numeral 2.
+PANEL_J_LEGEND_NUMERALS = {"1", "3", "5", "6", "7"}
+FIGURE2_GLYPH = {
+    "1": "filled circle",
+    "2": "open circle",
+    "3": "open square",
+    "4": "plus",
+    "5": "filled triangle",
+    "6": "filled square",
+    "7": "open triangle",
+    "9": "filled diamond",
+}
+# Fig. 2 caption (published p. 26): (3) EMF, ref. 26, 1903 K;
+# (7) sulfide capacities in the slags, ref. 22, 1873 K.
+CAPTION_SERIES_K = {"3": Decimal("1903"), "7": Decimal("1873")}
+CAPTION_SERIES_REGIME = {
+    "3": "emf_cell",
+    "7": "literature_comparison_figure",
+}
+CAPTION_SERIES_EXPERIMENT = {
+    "3": "stolyarova-1996-fig2-emf-comparison",
+    "7": "stolyarova-1996-fig2-literature-comparison",
+}
+CAPTION_SERIES_METHOD = {
+    "3": "EMF, ref. 26, 1903 K",
+    "7": "sulfide capacities in the slags, ref. 22, 1873 K",
+}
+REBOUND_POINT_SERIES = {"J-7-01": "7", "J-7-02": "7", "L-3-05": "3"}
+REJECTED_SERIES2_POINT_IDS = {
+    "J-2-01", "J-2-02", "J-2-03", "J-2-04", "L-2-01", "L-2-02", "L-2-03",
 }
 
 
@@ -64,6 +96,47 @@ def _stolyarova_observation_id(row: dict[str, str]) -> str:
     )
 
 
+def _jl_digitized(extract: dict) -> list[dict]:
+    found = []
+    for observation in _observations(extract).values():
+        observation_id = observation["observation_id"]
+        if "fig2_J_" not in observation_id and "fig2_L_" not in observation_id:
+            continue
+        if not observation_id.endswith("_digitized") or "figure_only" in observation_id:
+            continue
+        found.append(observation)
+    return found
+
+
+def _assert_jl_legend(extract: dict) -> None:
+    """Series identity for panels J and L comes from the printed legend."""
+    located = {}
+    by_panel = {"J": set(), "L": set()}
+    for observation in _jl_digitized(extract):
+        panel = observation["locator"]["panel"]
+        series = observation["locator"]["series"]
+        by_panel[panel].add(series)
+        assert observation["observation_id"].endswith(f"series{series}_digitized")
+        glyph = FIGURE2_GLYPH[series]
+        if series in CAPTION_SERIES_K:
+            expected_k = int(CAPTION_SERIES_K[series])
+            assert observation["regime"] == CAPTION_SERIES_REGIME[series]
+            assert observation["experiment"] == CAPTION_SERIES_EXPERIMENT[series]
+            assert observation["values"]["method_as_printed"] == CAPTION_SERIES_METHOD[series]
+            assert observation["T_range_K"] == [expected_k, expected_k]
+        for point in observation["values"]["points"]:
+            located[point["point_id"]] = series
+            assert point["marker_symbol"] == glyph
+            assert point["point_conditions"]["composition"]["locator"]["series"] == series
+            if series in CAPTION_SERIES_K:
+                assert Decimal(point["T_C"]) + Decimal("273.15") == CAPTION_SERIES_K[series]
+    assert by_panel["J"] == PANEL_J_LEGEND_NUMERALS
+    assert "2" not in by_panel["L"]
+    assert set(located).isdisjoint(REJECTED_SERIES2_POINT_IDS)
+    for point_id, series in REBOUND_POINT_SERIES.items():
+        assert located[point_id] == series
+
+
 def _assert_figure_reads(shornikov, shornikov_rows, stolyarova, stolyarova_rows) -> None:
     assert len(shornikov_rows) == 95
     assert sum(int(row["flag_dex"]) or int(row["flag_linear"]) for row in shornikov_rows) == 0
@@ -89,8 +162,8 @@ def _assert_figure_reads(shornikov, shornikov_rows, stolyarova, stolyarova_rows)
 
     kept = [row for row in stolyarova_rows if not row["rejected_reason"]]
     assert len(stolyarova_rows) == 284
-    assert len(kept) == 281
-    assert sum(int(row["flag_dex"]) or int(row["flag_linear"]) for row in kept) == 3
+    assert len(kept) == 277
+    assert sum(int(row["flag_dex"]) or int(row["flag_linear"]) for row in kept) == 1
     stolyarova_obs = _observations(stolyarova)
     for row in kept:
         observation = stolyarova_obs[_stolyarova_observation_id(row)]
@@ -130,6 +203,7 @@ def _assert_figure_reads(shornikov, shornikov_rows, stolyarova, stolyarova_rows)
     ]
     assert len(placeholders) == 6
     assert all(item["values"]["reason"] == "figure_not_digitized" for item in placeholders)
+    _assert_jl_legend(stolyarova)
 
 
 def test_refractory_figure_csvs_match_extracts_and_a_doubled_value_fails() -> None:
@@ -151,10 +225,40 @@ def test_refractory_figure_csvs_match_extracts_and_a_doubled_value_fails() -> No
         _assert_figure_reads(mutated, shornikov_rows, stolyarova, stolyarova_rows)
 
     mutated_rows = deepcopy(stolyarova_rows)
-    flagged = next(row for row in mutated_rows if row["point_id"] == "J-2-04")
-    flagged["stored_activity"] = "0.62"
+    flagged = next(row for row in mutated_rows if row["point_id"] == "J-7-01")
+    flagged["stored_activity"] = "0.00096"
     with pytest.raises(AssertionError):
         _assert_figure_reads(shornikov, shornikov_rows, stolyarova, mutated_rows)
+
+    # A coordinated yaml+CSV edit that puts the open triangles back on series 2
+    # still fails. The CSV series cell is not the legend.
+    relabelled = deepcopy(stolyarova)
+    relabelled_rows = deepcopy(stolyarova_rows)
+    observation = next(
+        item
+        for item in relabelled["species"]["SiO2"]["observations"]
+        if item["observation_id"] == "stolyarova_1996_fig2_J_sio2_series7_digitized"
+    )
+    observation["observation_id"] = "stolyarova_1996_fig2_J_sio2_series2_digitized"
+    observation["locator"]["series"] = "2"
+    observation["regime"] = "emf_cell"
+    observation["experiment"] = "stolyarova-1996-fig2-emf-comparison"
+    observation["T_range_K"] = [1738, 1738]
+    observation["values"]["method_as_printed"] = "EMF, ref. 25, 1738 K"
+    for point in observation["values"]["points"]:
+        point["marker_symbol"] = "open circle"
+        point["T_C"] = "1464.85"
+        point["point_conditions"]["composition"]["locator"]["series"] = "2"
+    for row in relabelled_rows:
+        if row["point_id"] in {"J-7-01", "J-7-02"}:
+            row["series"] = "2"
+            row["marker"] = "open circle"
+            row["T_C"] = "1464.85"
+            row["T_K"] = "1738"
+            row["experiment"] = "stolyarova-1996-fig2-emf-comparison"
+            row["attribution"] = "EMF, ref. 25, 1738 K"
+    with pytest.raises(AssertionError):
+        _assert_figure_reads(shornikov, shornikov_rows, relabelled, relabelled_rows)
 
 
 def _migrate(path: Path):
