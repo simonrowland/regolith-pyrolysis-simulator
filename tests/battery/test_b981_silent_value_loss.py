@@ -195,6 +195,44 @@ def test_kambayashi_table6_po_partial_pressures_migrate_with_sample_conditions()
             assert conditions[key].locator is not None
 
 
+def test_kambayashi_henry_activity_coefficients_migrate_by_temperature():
+    solid_standard = _observations(
+        "kems-057-kambayashi-1985.yaml",
+        "kambayashi_1985_gamma_p2o5_solid_std_henry",
+    )
+    liquid_standard = _observations(
+        "kems-057-kambayashi-1985.yaml",
+        "kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson",
+    )
+    expected = {
+        "solid": {
+            Decimal("1643.15"): Decimal("2.2e-15"),
+            Decimal("1653.15"): Decimal("2.5e-15"),
+            Decimal("1663.15"): Decimal("2.8e-15"),
+        },
+        "liquid": {
+            Decimal("1643.15"): Decimal("3.4e-13"),
+            Decimal("1653.15"): Decimal("4.0e-13"),
+            Decimal("1663.15"): Decimal("4.7e-13"),
+        },
+    }
+    assert len(solid_standard) == len(expected["solid"])
+    assert len(liquid_standard) == len(expected["liquid"])
+    for group, expected_points in (
+        (solid_standard, expected["solid"]),
+        (liquid_standard, expected["liquid"]),
+    ):
+        for observation in group:
+            temperature = observation.identity.temperature_K.value
+            assert observation.identity.quantity.value.value == Quantity.ACTIVITY_COEFFICIENT.value
+            assert observation.value.kind is ValueKind.POINT
+            assert observation.value.point == expected_points[temperature]
+            condition = (observation.point_conditions or {})["temperature_K"]
+            assert condition.state.is_value
+            assert condition.state.value == temperature
+            assert condition.locator is not None
+
+
 def test_wu_reported_solidus_rows_migrate_temperature_and_composition_axis():
     observations = _observations(
         "kems-190-wu-1993.yaml",
