@@ -16,8 +16,7 @@ tables:
   published_page: 854
   observation_type: activity_coefficient
   quantity: activity
-  evidence_class: quoted_attributed
-  evidence_class_note: Per-row H2O/H2 ratio and temperature are stored as conditions, but the migrator has no generic ratio observation alias for an independent lineage parent.
+  evidence_class: measured_tabulated
   species: Fe_tO
   component_as_printed: FetO
   standard_state: FetO(l) as printed (Fe_tO component; FeO + Fe2O3 oxide basis)
@@ -30,7 +29,17 @@ tables:
     '4': Fe2O3_wt_percent_as_printed
     '5': SiO2_wt_percent_as_printed
     '6': MnO_wt_percent_as_printed
+    '7': Fe3_over_Fe2
     '8': a_FetO_as_printed
+  extracted_observables:
+  - observation_type: concentration_series
+    quantity: fe3_fe2_ratio
+    species: Fe
+    evidence_class: measured_tabulated
+    value_column: '7'
+    value_field: Fe3_over_Fe2
+    phase: l
+    rows: 30
   unprinted_components:
     CaO: typed unknown, not present in the Table 1 analysis
     MgO: typed unknown, not present in the Table 1 analysis
