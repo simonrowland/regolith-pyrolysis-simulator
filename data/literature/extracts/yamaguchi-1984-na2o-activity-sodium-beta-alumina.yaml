@@ -1,0 +1,110 @@
+schema_version: literature_extract.v1
+source_id: yamaguchi-1984-na2o-activity-sodium-beta-alumina
+source:
+  citation: Yamaguchi, S. and Goto, K. S. (1984). Measurement of Activity of Na2O in Na2O-SiO2-P2O5 Ternary Melt Using Sodium Beta-Alumina as a Solid Electrolyte. Journal of the Japan Institute of Metals 48(1), 43-49.
+  year: 1984
+  corpus_asset: raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/yamaguchi-1984-na2o-activity-sodium-beta-alumina.pdf
+extraction:
+  method: Machine-text transcription of the abstract and MinerU table draft, with source page renders used to verify locators and all Table 1 numeric cells.
+  date: '2026-10-27'
+  worker: w1027naA2-yamaguchi-1984-na2o-activity-sod
+  provenance_path: extracts/audits/yamaguchi-1984-na2o-activity-sodium-beta-alumina.md
+review_status: draft
+fidelity_samples:
+  - species: Na2O
+    observation_id: yamaguchi_1984_abstract_na2o_activity_1573k
+    observable: activity_coefficient
+    field: activity
+    value: '1e-13'
+    locator: {page: 1, published_page: 43, section: Abstract}
+experiments:
+  - experiment_id: yamaguchi-1984-na2o-p2o5-emf
+    series: Na2O-P2O5 binary melt activity
+    method: emf_cell
+    locator:
+      page: 1
+      published_page: 43
+      section: Abstract
+      note: Activity determined by the EMF method using sodium beta-alumina.
+species:
+  Na2O:
+    observations:
+      - observation_id: yamaguchi_1984_abstract_na2o_activity_1573k
+        type: activity_coefficient
+        locator:
+          page: 1
+          published_page: 43
+          section: Abstract
+          note: The abstract reports about 10^-13 for the binary Na2O-P2O5 melt at XNa2O=0.5 and 1573 K.
+        experiment: yamaguchi-1984-na2o-p2o5-emf
+        regime: emf_cell
+        T_range_K: ['1573', '1573']
+        phase: l
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: l}
+              component_basis: Na2O
+          inferred: false
+          note: The abstract states that Na2O activity is referred to its pure liquid state.
+          locator: {page: 1, published_page: 43, section: Abstract}
+        units: dimensionless activity
+        uncertainty:
+          note: The abstract says about 10^-13; no numeric uncertainty or confidence level is stated.
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          activity: '1e-13'
+          activity_as_printed: about 10^-13
+          attribution: Present work; abstract summary of the authors' EMF measurements.
+          measurement_method_as_printed: EMF method with sodium beta-alumina solid electrolyte and reference melt.
+          reduction_note: >-
+            The authors derive activity from the measured EMF using the Nernst
+            relation and a reference melt. The underlying EMF points are plotted
+            only; they are not transcribed here. The abstract's approximate
+            activity is retained as reported because those point inputs are not
+            stored.
+          reduction_locator:
+            page: 2
+            published_page: 44
+            equation: '1'
+            note: Nernst relation for the cell EMF.
+          T_K: '1573'
+          composition_mol:
+            Na2O: '0.5'
+            P2O5: '0.5'
+          composition_as_printed: Na2O-P2O5 binary melt; XNa2O=0.5
+          points:
+            - T_K: '1573'
+              activity: '1e-13'
+              activity_as_printed: about 10^-13
+              composition_mol:
+                Na2O: '0.5'
+                P2O5: '0.5'
+              method_class: quoted_attributed
+              evidence_class: quoted_attributed
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1573'}
+                  locator: {page: 1, published_page: 43, section: Abstract}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_mole_fraction_with_binary_complement
+                      amount_basis: mole_fraction
+                      components: [[Na2O, '0.5'], [P2O5, '0.5']]
+                  locator: {page: 1, published_page: 43, section: Abstract}
+                fO2_Pa:
+                  state: {tag: unknown, reason: not_published_for_this_point}
+                  locator: {page: 1, published_page: 43, section: Abstract}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: not_published_for_this_point}
+                  locator: {page: 1, published_page: 43, section: Abstract}
+              locator: {page: 1, published_page: 43, section: Abstract}

@@ -86,6 +86,23 @@ TABLE_298K_RECORD_ID = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1_RECORD_ID = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 TABLE2_RECORD_ID = "robie-hemingway-fisher-1978-usgs-b1452-0002"
 REFERENCE_TEMPERATURE_K = Decimal("298.15")
+B1452_RECORD_POLYMORPHS = {
+    # Printed p. 301 is aragonite; the captured heading is OCR-damaged.
+    f"{SOURCE_ID}-0275": Polymorph.ARAGONITE,
+    # Printed pp. 405–406 split KAlSiO4 into low and high kaliophillite.
+    f"{SOURCE_ID}-0379": Polymorph.KALIOPHILLITE_LOW,
+    # Printed p. 405 gives the high form from 810 to 1800 K.
+    f"{SOURCE_ID}-0379-phase-02": Polymorph.KALIOPHILLITE_HIGH,
+    f"{SOURCE_ID}-0380": Polymorph.KALIOPHILLITE_LOW,
+    f"{SOURCE_ID}-0380-phase-02": Polymorph.KALIOPHILLITE_HIGH,
+}
+B1452_ROW_POLYMORPHS = {
+    # Printed p. 28 summary's 298.15 K value matches the low-form interval on p. 405.
+    (
+        f"{SOURCE_ID}-0003",
+        "KALIOPHILLITE $KAlSiO_{4}$",
+    ): Polymorph.KALIOPHILLITE_LOW,
+}
 
 # Page-header units. Captured units_as_published on B1452 are OCR-destroyed
 # (J/aol•K, kJ/1101, …). Never map a stored unit from the captured string.
@@ -1293,6 +1310,8 @@ def _charge_for_name(name: str) -> int:
 
 def _phase_from_text(text: str) -> tuple[State[Phase], State[Polymorph]]:
     lowered = text.lower()
+    if "glass" in lowered:
+        return State.of(Phase.GLASS), State.not_applicable("not crystal")
     if "aqueous" in lowered or "aq." in lowered or "ion std" in lowered:
         return State.of(Phase.AQ), State.not_applicable("not crystal")
     if "ideal" in lowered and "gas" in lowered:
@@ -1334,6 +1353,12 @@ def _polymorph_from_text(text: str) -> State[Polymorph]:
 def _phase_state(
     record: Mapping[str, Any], *, name: str | None = None, row_index: int | None = None
 ) -> tuple[State[Phase], State[Polymorph]]:
+    record_id = str(record.get("record_id") or "")
+    row_polymorph = B1452_ROW_POLYMORPHS.get((record_id, name or ""))
+    if row_polymorph is not None:
+        return State.of(Phase.CR), State.of(row_polymorph)
+    if record_id in B1452_RECORD_POLYMORPHS:
+        return State.of(Phase.CR), State.of(B1452_RECORD_POLYMORPHS[record_id])
     kind = _table_kind(record)
     if kind == "table_298k":
         return _phase_from_text(name or "")

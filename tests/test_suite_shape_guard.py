@@ -33,6 +33,7 @@ def _make_guard_suite(pytester, *, source: str, roster: tuple[tuple[str, str], .
         "    serial: synthetic serial test\n"
         "    xdist_group(name): synthetic worker group\n"
         "    timeout(seconds): synthetic timeout\n"
+        "    cpu_budget(seconds): synthetic CPU budget\n"
     )
     repo_root = Path(__file__).resolve().parents[1]
     pytester.makeconftest(
@@ -72,7 +73,7 @@ def test_suite_shape_collection_audit_catches_deselected_phantom_and_unrostered_
 
             @pytest.mark.nightly
             @pytest.mark.xdist_group("magemin_fullrun_a")
-            @pytest.mark.timeout(600)
+            @pytest.mark.cpu_budget(600)
             def test_unrostered_heavy_node():
                 pass
             """
@@ -123,6 +124,29 @@ def test_suite_shape_collection_audit_skips_phantoms_for_focused_run(
 
     assert result.ret == pytest.ExitCode.OK
     assert "phantom row" not in result.stderr.str()
+
+
+def test_suite_shape_uses_cpu_budget_instead_of_wall_timeout(pytester) -> None:
+    _make_guard_suite(
+        pytester,
+        roster=(),
+        source=textwrap.dedent(
+            """\
+            import pytest
+
+            @pytest.mark.timeout(900)
+            def test_wall_guard_override():
+                pass
+            """
+        ),
+    )
+
+    result = pytester.runpytest_subprocess(
+        "--collect-only",
+        "tests/test_synthetic.py",
+    )
+
+    assert result.ret == pytest.ExitCode.OK, result.stderr.str()
 
 
 def test_suite_shape_collection_audit_skips_phantoms_for_dot_from_subdirectory(

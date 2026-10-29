@@ -11,12 +11,12 @@ counts:
   sources: 2279
   by_stage:
     located: 209
-    inbox: 1303
+    inbox: 1283
     in_progress: 177
-    ingested_partial: 143
-    ingested_complete: 130
+    ingested_partial: 147
+    ingested_complete: 136
     wired: 0
-    unknown: 317
+    unknown: 327
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -40,9 +40,10 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 301
+      count: 321
       ids:
       - 1997jonesthermo
+      - abdeyazdan-2026-na-sn-si-phase-thermodynamics
       - abdul-2023-clinker-thesis
       - abdullah-2013-redox-acid-base-soda-lime-silicate-thesis
       - albertsson-2013-cr-slag-thesis
@@ -53,6 +54,7 @@ anti_loss:
       - arias-2025-polyhedron-oxide-heat-capacity
       - ariyo-holappa-2000-titanium-activity
       - arutyunyan-2005-magnesium-silicate-activities
+      - asai-yokokawa-maekawa-1982-na-borate-activity
       - avarmaa-2022-cr-don-smelting
       - babaian-2024-fe-mg-si-air-equilibria
       - babaian-2026-fe-mg-si-reassessment
@@ -86,6 +88,7 @@ anti_loss:
       - borisov-borisovskiy-2024-ti-zircon
       - borisov-veksler-2021-k-fe-supplement
       - bouhifd-2007-basalt-thermochemistry
+      - brewer-margrave-1952-alkali-oxides-ucrl1864
       - brillo-2025-al-ti-thermophysical
       - burnham-2015-europium-redox
       - cacciatore-zajacz-2026-v-sc-oxybarometer
@@ -124,6 +127,7 @@ anti_loss:
       - ferguson-nuth-2012-sio-vapor-pressure-mixture
       - ferkl-2026-waste-glass-thermal-redox
       - florin-2025-cu-silicate-evaporation
+      - fujisawa-1994-na-sn-carbonate-thermodynamics
       - fuyuki-2007-sio-recombination
       - gaillard-2003-hydrogen-iron-redox-rate
       - gca-366-210-berry-2024
@@ -147,6 +151,7 @@ anti_loss:
       - itoh-1985-beta-alumina-na2o-emf
       - itoh-1989-zno-solid-zinc-silicate
       - jackson-2005-ferrous-glass-multispectroscopy
+      - jacquet-2026-alkali-recondensation
       - jakobsson-tangstad-2015-ca-mg-activities
       - janz-1979-nsrds61-part2-molten-salt-properties
       - jayasuriya-2004-iron-mossbauer
@@ -168,6 +173,7 @@ anti_loss:
       - khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
       - khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
       - kido-2004-mn-cr-high-temperature-glass-spectra
+      - kim-2004-na2o-float-glass-emf
       - kim-2014-carbon-fe-v-mo-ni
       - kim-2018-sulfur-fe-v-mo-ni
       - kirschen-1998-silicate-miscibility-thesis
@@ -188,6 +194,7 @@ anti_loss:
       - leister-1999-v-sodium-silicate-high-temperature
       - leister-ehrt-2000-polyvalent-redox
       - leuthold-2023-basalt-partition-fo2
+      - li-2005-na-al-phosphate-fe-activities
       - li-kato-kobayashi-2021-cr-solubility
       - liu-2023-chromium-oxide-activity
       - liu-2024-cao-al2o3-vox-phase
@@ -201,6 +208,7 @@ anti_loss:
       - lu-2026-mercury-sulfur-liquidus
       - majzlan-2021-magnesium-silicate-glass-cp
       - mamiya-2000-sio-disproportionation
+      - masuda-tanaka-1979-vacuum-condensates
       - matousek-1998-silicate-vaporization-reactions
       - matsumaru-1999-plasma-arc-silicate-evaporation
       - matsuzaki-1997-feo-tio2-sio2-activities
@@ -215,6 +223,7 @@ anti_loss:
       - morris-2006-gusev-mossbauer
       - morris-2006-meridiani-mossbauer
       - muan-1959-manganese-silica-air
+      - mueller-2004-alkali-oxide-activity-coal-ash
       - myers-jacobson-2015-volatile-metal-hydroxides-presentation
       - naess-2014-liquid-silicon-oxidation-fume-flux
       - nagata-1989-emf-calcium-aluminates
@@ -230,6 +239,7 @@ anti_loss:
       - oneill-2005-alkali-oxide-activities
       - ottonello-2000-polymeric-cao-feo-silica
       - ozawa-2012-forsterite-vacuum-evaporation
+      - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
       - panda-2019-ten-oxide-thermodynamics
       - park-2021-vanadium-thermodynamics-thesis
       - park-min-2004-carbide-capacity-fluoride-soda-slags
@@ -267,6 +277,7 @@ anti_loss:
       - seki-2011-ca-o-solubility-fe-cao-al2o3
       - semkow-haskin-1984-redox-diopsidic-melt
       - sesko-2022-tum-thesis
+      - seto-2010-na2o-activity-glass-emf-summary
       - shaw-2023-vacuum-thermal-sublimation-thesis
       - shi-2024-cr-activity-slag-polymerisation
       - shilov-2025-sro-al2o3-sio2-kems-supplement
@@ -285,6 +296,7 @@ anti_loss:
       - shugurov-2024-gaseous-cerates-si
       - shugurov-2026-ceo2-tio2-kems
       - shyrokykh-2021-vanadium-vaporization
+      - simeonov-sano-1985-na-bearing-mno-activities
       - sineva-2023-ni-sn-zn-slag-copper
       - smythe-brenan-2015-cerium-redox
       - sossi-2020-magma-ocean-redox
@@ -308,13 +320,16 @@ anti_loss:
       - tranell-1999-unsw-thesis
       - tranell-2000-silica-activity-titanium
       - tranell-2002-titanium-valence
+      - tsukihashi-1985-na-silicate-mn-p-nitrogen
       - tsukihashi-1985-v-nb-sb-soda-silicate-distribution
       - tsukihashi-1988-na2o-v-nb-mn-ti-partition
+      - tsukihashi-sano-1997-alkali-fluoride-slag-activities
       - tyurnina-2023-sro-al2o3-sio2-vaporization
       - tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems
       - van-der-waal-2023-volatile-loss-isotope-fractionation
       - van-ende-2008-mn-cr-slag-steel
       - van-limpt-2006-sodium-evaporation
+      - vanlimpt-2011-boron-evaporation-part1
       - vickerfalt-2020-mgo-v2o3
       - vickerfalt-2024-al-si-v-phase-diagram
       - vickerfalt-2024-autogenous-slag-thesis
@@ -324,6 +339,8 @@ anti_loss:
       - wadhwa-2008-redox-small-bodies
       - wang-2001-solar-melt-evaporation-residues
       - wang-2017-cao-sio2-vox-tables-s1-s32
+      - wang-2017-sodium-stannate-formation-emf
+      - willenborg-2006-alkali-removal-thermodynamics
       - witthohn-2000-coal-slag-alkali-vaporisation
       - woermann-1969-mg-fe-ti-oxides
       - wright-okamura-1977-makaopuhi-cooling
@@ -331,6 +348,7 @@ anti_loss:
       - xiao-holappa-1993-isij-crox-slag-activities
       - xiao-reuter-holappa-2000-chromium-slag-oxidation-review
       - xu-2026-excess-oxygen-magma
+      - yamaguchi-1984-na2o-activity-sodium-beta-alumina
       - yan-2009-cr-ti-nb-v-slag-thermodynamics-review
       - yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
       - yang-teng-seetharaman-2012-vanadium-evaporation
@@ -341,10 +359,12 @@ anti_loss:
       - zaitsev-1997-cas-caf2-melts
       - zaitsev-1999-na2o-sio2-pccp
       - zaitsev-2000-sodium-silicate-thermodynamics
+      - zhang-2011-boron-sodium-f-free-evaporation
+      - zhang-2021-acsesc-si
       - zhang-2024-alkali-evaporation-ti-thesis
       - zhinkina-2024-ce-gd-kems-poster
     corpus_only:
-      count: 62
+      count: 61
       ids:
       - 1997jonesthermo-jones-1997
       - allen-1994-reduction-lunar-mare-soil
@@ -404,12 +424,11 @@ anti_loss:
       - yakovlev-2018-cai-isotope-fractionation
       - yakovlev-2018-hasp-mg-si-volatility
       - yakovlev-2018-meteoritic-kems
-      - yakovlev-2021-chondrule-alkali
       - yakovleva-2019-mg-si-isotope-fractionation
       - yang-2025-na2o-cao-silica-thermodynamics
       - yu-hewins-1997-lpsc28-1613
     byte_mismatch:
-      count: 329
+      count: 333
       ids:
       - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
       - adamkovicova-1980-casio3-heat-of-fusion
@@ -444,6 +463,7 @@ anti_loss:
       - deguzman-2026-simulant-physicochemical
       - di-donato-granati-2000
       - engelschion-2020-eac1a-simulant
+      - fegley-2016-rock-steam-solubility
       - fegley-2023-chemical-equilibrium-calculations-bu
       - filiberto-lpsc2011-2064-volatiles
       - folstad-2024-metals-cao-dissolution-cas
@@ -638,6 +658,7 @@ anti_loss:
       - renggli-2022-te-evaporation
       - richter-2008-cai-like-liquids-lpsc-abstract
       - richter-et-al-2007
+      - robie-hemingway-wilson-1980-usgs-of-80-908
       - robinot-2025-promes-review
       - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
       - schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -722,6 +743,7 @@ anti_loss:
       - ta-flemetakis-2024
       - ta-mendybaev-2002-lpsc
       - ta-shirai-2000-lpsc
+      - ta-yamanaka-1997-metsoc
       - tachibana-tsuchiyama-1998-forsterite-dust-lpsc
       - thomas-2022-chlorine-bonding-silicate-melts
       - thomas-wood-2021-chlorine-silicate-melts
@@ -736,12 +758,13 @@ anti_loss:
       - wilkerson-2023-jsc1a-outgassing
       - wimpenny-2019-zn-isotope-evaporation-extreme-t
       - yakovlev-2017-cai-acidity
+      - yakovlev-2021-chondrule-alkali
       - yakovlev-2024-cai-vaporization
       - yam1983
       - zaitsev-2000-ms2000-045
       - zigo-1987-gehlenite-fusion
   stale_inbox:
-    count: 972
+    count: 966
     ids:
     - abdelkarim-1977-ferrous-oxide-activities
     - ackermann-thorn-1958-volatile-oxides-anl5824
@@ -769,7 +792,6 @@ anti_loss:
     - arkhipin-2025-oxide-glass-thermodynamics-thesis
     - armatys-2011-cement-gas-circulation-thesis
     - arxiv-1602-00658
-    - asai-yokokawa-maekawa-1982-na-borate-activity
     - awaya-2023-feo-sulfide-capacity
     - baedecker-1971-apollo12-trace-elements-proceedings
     - baedecker-1972-nasa-cr-115570-trace-elements
@@ -846,7 +868,6 @@ anti_loss:
     - bowen-schairer-1932-system-feo-sio2
     - bradtmuller-2025-metasilicate-structure
     - brazdova-2023-cu-ca-zn-metaphosphate
-    - brewer-margrave-1952-alkali-oxides-ucrl1864
     - brewer-mastick-1949-gaseous-feo-ucrl534
     - brewer-searcy-1949-ucrl552-al-al2o3
     - brunfelt-1974-apollo17-elemental-chemistry
@@ -1384,7 +1405,6 @@ anti_loss:
     - osadchii-2017-chondrite-fo2-electrochemistry
     - ostrovski-parry-2009-solid-metal-slag-reactions
     - pack-2010-aerodynamic-levitation-apparatus
-    - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
     - pan-eric-2004-chromium-slag-metal-co-equilibria
     - panda-2013-ca-mg-mn-o-optimization-thesis
     - panda-jung-2020-al-ti-oxide-equilibria
@@ -1631,7 +1651,6 @@ anti_loss:
     - van-kan-parker-2010-opx-melt-partitioning
     - van-westrenen-1999-garnet-melt-trace-partitioning
     - van-wijngaarden-dippenaar-1986-feo-emf
-    - vanlimpt-2011-boron-evaporation-part1
     - vanwestrenen-draper-2007-garnet
     - vegas-2012-salt-thermochemistry
     - vermaak-2000-ferrovanadium-thesis
@@ -1689,7 +1708,6 @@ anti_loss:
     - yakovleva-2019-ca-al-isotope-fractionation
     - yakovleva-2022-alkali-chondrule-evaporation
     - yamada-2004-lpsc35-forsterite-evaporation-mg-isotopes
-    - yamaguchi-1984-na2o-activity-sodium-beta-alumina
     - yamashita-2008-redox-glass-thesis
     - yang-2016-investigation-vanadium-oxide-systems-thesis
     - yang-2016-vanadium-thesis
@@ -1706,7 +1724,6 @@ anti_loss:
     - zeng-2022-basicity-chromium-occurrence-stainless-slag
     - zhang-1986-cao-activity-cas
     - zhang-2012-cao-na2o-sio2-assessment
-    - zhang-2021-acsesc-si
     - zhang-2021-alkali-evaporation-correction
     - zhang-2024-chang-e5-reduced-mantle-fo2
     - zhang-2024-ferric-iron-deep-magma-ocean
@@ -1820,102 +1837,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: abdeyazdan-2026-na-sn-si-phase-thermodynamics
-  stage: inbox
+  stage: ingested_complete
   evidence:
-    decided_by: inbox
+    decided_by: ingested_complete
     artefacts:
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/SOURCE.md
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/abdeyazdan-2026-na-sn-si-phase-thermodynamics.html
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/asset-manifest.json
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0001-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0001-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0002-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0002-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0003-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0003-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0004-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0004-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0005-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0005-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0006-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0006-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0007-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0007-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0008-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0008-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0009-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0009-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0010-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0010-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0011a-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0011a-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0011b-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0011b-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0012-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0012-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0013-m.jpg
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-fig-0013-m.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-gra-0001.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0001.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0002.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0003.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0004.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0005.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0006.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0007.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0008.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0009.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0010.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0011.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0012.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0013.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0014.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0015.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0016.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0017.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0018.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0019.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0020.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0021.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0022.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0023.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0024.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0025.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0026.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0027.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0028.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0029.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0030.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0031.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0032.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0033.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0034.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0035.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0036.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0037.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0038.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0039.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0040.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0041.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0042.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0043.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0044.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0045.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0046.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0047.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/assets/jace71038-math-0048.png
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/abdeyazdan-allfile-dedup.json
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/abdeyazdan-content-review.md
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/abdeyazdan-derivative-review.md
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/abdeyazdan-large-figure-review.md
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/asset-http-receipts.json
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/dom-export-extent.json
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/offline-highres-final-check.json
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/original-publisher-article-dom.html
-    - raw/abdeyazdan-2026-na-sn-si-phase-thermodynamics/provenance/publisher-identity-license.json
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/abdeyazdan-2026-na-sn-si-phase-thermodynamics.yaml
+    reason: v2.1 store present; 452/452 rows battery-usable
+  usable_rows: 452
+  total_rows: 452
   inbox_exclusion_reason: null
 - source_id: abdul-2023-cao-sio2-calphad
   stage: ingested_complete
@@ -2941,14 +2870,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: asai-yokokawa-maekawa-1982-na-borate-activity
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/asai-yokokawa-maekawa-1982-na-borate-activity/asai-yokokawa-maekawa-1982-na-borate-activity.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
+    reason: v2.1 store present but 0 of 32 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 32
   inbox_exclusion_reason: null
 - source_id: ashida-2014-analysis
   stage: inbox
@@ -5700,32 +5630,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/.url
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/SOURCE.md
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/brewer-margrave-1952-alkali-oxides-ucrl1864.pdf
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru/qt3d09h4k9/p025-p025/DONE
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru/qt3d09h4k9/p025-p025/mineru.log
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru/qt3d09h4k9/p025-p025/out/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025/vlm/images/0b04426756f6ff78f7c07e8199c58032b961c44050425efbeec2fb07989e9358.jpg
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru/qt3d09h4k9/p025-p025/out/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025/vlm/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025.md
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru/qt3d09h4k9/p025-p025/out/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025/vlm/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025_content_list.json
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru/qt3d09h4k9/p025-p025/out/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025/vlm/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025_content_list_v2.json
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru/qt3d09h4k9/p025-p025/out/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025/vlm/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025_middle.json
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru/qt3d09h4k9/p025-p025/out/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025/vlm/src-brewer-margrave-1952-alkali-oxides-ucrl1864-p025-p025_model.json
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-qt3d09h4k9/p025-p025/DONE
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-qt3d09h4k9/p025-p025/mineru.log
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-qt3d09h4k9/p025-p025/out/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025/vlm/images/0b04426756f6ff78f7c07e8199c58032b961c44050425efbeec2fb07989e9358.jpg
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-qt3d09h4k9/p025-p025/out/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025/vlm/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025.md
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-qt3d09h4k9/p025-p025/out/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025/vlm/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025_content_list.json
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-qt3d09h4k9/p025-p025/out/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025/vlm/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025_content_list_v2.json
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-qt3d09h4k9/p025-p025/out/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025/vlm/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025_middle.json
-    - raw/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-qt3d09h4k9/p025-p025/out/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025/vlm/src--brewer-margrave-1952-alkali-oxides-ucrl1864--qt3d09h4k9-p025-p025_model.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml
+    reason: v2.1 store present but 0 of 8 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 8
   inbox_exclusion_reason: null
 - source_id: brewer-mastick-1949-gaseous-feo-ucrl534
   stage: inbox
@@ -9071,15 +8984,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/fujisawa-1994-na-sn-carbonate-thermodynamics/SOURCE.md
-    - raw/fujisawa-1994-na-sn-carbonate-thermodynamics/fujisawa-1994-na-sn-carbonate-thermodynamics.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
+    reason: v2.1 store present but 0 of 20 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 20
   inbox_exclusion_reason: null
 - source_id: fujita-maruhashi-1969-tetsu-iron-oxide-silica-slag-activities
   stage: inbox
@@ -12600,14 +12513,14 @@ sources:
   total_rows: 2
   inbox_exclusion_reason: null
 - source_id: itoh-yokokawa-1984-sodium-activity-nas
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/itoh-yokokawa-1984-sodium-activity-nas.yaml
+    reason: v2.1 store present; 1/2 rows battery-usable
+  usable_rows: 1
+  total_rows: 2
   inbox_exclusion_reason: null
 - source_id: iupac-o2-solid-psat
   stage: unknown
@@ -12804,15 +12717,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: jacquet-2026-alkali-recondensation
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/jacquet-2026-alkali-recondensation/SOURCE.md
-    - raw/jacquet-2026-alkali-recondensation/jacquet-2026-alkali-recondensation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/jacquet-2026-alkali-recondensation.yaml
+    reason: v2.1 store present but 0 of 32 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 32
   inbox_exclusion_reason: null
 - source_id: jacquinot-1992-joint
   stage: inbox
@@ -19913,15 +19826,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kim-2004-na2o-float-glass-emf
-  stage: inbox
+  stage: ingested_complete
   evidence:
-    decided_by: inbox
+    decided_by: ingested_complete
     artefacts:
-    - raw/kim-2004-na2o-float-glass-emf/SOURCE.md
-    - raw/kim-2004-na2o-float-glass-emf/kim-2004-na2o-float-glass-emf.pdf
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/kim-2004-na2o-float-glass-emf.yaml
+    reason: v2.1 store present; 21/21 rows battery-usable
+  usable_rows: 21
+  total_rows: 21
   inbox_exclusion_reason: null
 - source_id: kim-2014-carbon-fe-v-mo-ni
   stage: ingested_partial
@@ -21636,21 +21548,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: li-2005-na-al-phosphate-fe-activities
-  stage: inbox
+  stage: ingested_partial
   evidence:
-    decided_by: inbox
+    decided_by: ingested_partial
     artefacts:
-    - raw/li-2005-na-al-phosphate-fe-activities/SOURCE.md
-    - raw/li-2005-na-al-phosphate-fe-activities/li-2005-na-al-phosphate-fe-activities.pdf
-    - raw/li-2005-na-al-phosphate-fe-activities/provenance/doi-prefix-preflight.json
-    - raw/li-2005-na-al-phosphate-fe-activities/provenance/download-receipt.json
-    - raw/li-2005-na-al-phosphate-fe-activities/provenance/independent-review.md
-    - raw/li-2005-na-al-phosphate-fe-activities/provenance/pdf-checks.json
-    - raw/li-2005-na-al-phosphate-fe-activities/provenance/three-store-byte-dedup.json
-    - raw/li-2005-na-al-phosphate-fe-activities/provenance/title-held-preflight.json
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/li-2005-na-al-phosphate-fe-activities.yaml
+    reason: v2.1 store present; 320/370 rows battery-usable
+  usable_rows: 320
+  total_rows: 370
   inbox_exclusion_reason: null
 - source_id: li-2017-numerical-modeling
   stage: inbox
@@ -22957,15 +22862,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: masuda-tanaka-1979-vacuum-condensates
-  stage: inbox
+  stage: ingested_complete
   evidence:
-    decided_by: inbox
+    decided_by: ingested_complete
     artefacts:
-    - raw/masuda-tanaka-1979-vacuum-condensates/SOURCE.md
-    - raw/masuda-tanaka-1979-vacuum-condensates/masuda-tanaka-1979-vacuum-condensates.pdf
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/masuda-tanaka-1979-vacuum-condensates.yaml
+    reason: v2.1 store present; 13/13 rows battery-usable
+  usable_rows: 13
+  total_rows: 13
   inbox_exclusion_reason: null
 - source_id: mathieu-2009-sodium-solubility-molten-silicates
   stage: inbox
@@ -24330,15 +24234,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: mueller-2004-alkali-oxide-activity-coal-ash
-  stage: inbox
+  stage: ingested_complete
   evidence:
-    decided_by: inbox
+    decided_by: ingested_complete
     artefacts:
-    - raw/mueller-2004-alkali-oxide-activity-coal-ash/SOURCE.md
-    - raw/mueller-2004-alkali-oxide-activity-coal-ash/mueller-2004-alkali-oxide-activity-coal-ash.pdf
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/mueller-2004-alkali-oxide-activity-coal-ash.yaml
+    reason: v2.1 store present; 4/4 rows battery-usable
+  usable_rows: 4
+  total_rows: 4
   inbox_exclusion_reason: null
 - source_id: muhammadieh-2007-lignite-ash-deposition-thesis
   stage: inbox
@@ -27097,57 +27000,14 @@ sources:
   total_rows: 51
   inbox_exclusion_reason: null
 - source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
-  stage: inbox
+  stage: ingested_partial
   evidence:
-    decided_by: inbox
+    decided_by: ingested_partial
     artefacts:
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/SOURCE.md
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/DONE
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/mineru.log
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/08fe36e1e24b5ea4ddc296cd07b5beadd77d451452a00bcddacf7bec50be30a7.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/1937ea7815a454b5d5f6bffeced7be66ae415ae46ade92734bc95a3b6fdb6cc9.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/519627c126ee4c652a21bbc8ea8ba4b6422627f08141c340ae1df848c1fadc06.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/5bffa452e8e8d28edcfda9e88d8cf9192246a68b902d12774255042c490075be.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/618a775a3dc32f7720d4456e0d570c1cb32b593fae923d4b03c88ee0d8d7fa6e.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/6e2c70801e6ff3d067a6ac619cabd7a9bc08f65b2cd529ab912d59a7b04802bc.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/77cabd2a97083dbdb72cfed76930567a6f34a501341712d43c0550f40fcaed53.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/7c41b6def2acf27dc21a3bceaaf8c0a8082138e30f9a6a723bd1f627eae9f647.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/86b249d0a940ecc6ac3d033d313b840c2c2d497fc944be7e40270c10af14c2de.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/8caf4547e793568bcc1485cdde0bafb1c26634c7e09eca75933b139db2548d00.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/8d73e80783f295b50dcc79d5e53ab32e2eb4e256f5db3a7e7829c4009cb10059.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/c04b0c06d3d8b8dcaa7730027c0a893376511fd00c0f3688915524dea897c655.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/e6f96f2f85acaa1f320ae79e0317c8b8e0bef52b4cfe8aeee3129c912b96ee2b.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/images/fefa87b351d6ac5543aa7c1df21c8b689744976bf97462d188afd75c9c0614fd.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006.md
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006_content_list.json
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006_content_list_v2.json
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006_middle.json
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru/Pak1989_ISIJInt29_318/p001-p006/out/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006/vlm/src-pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-p001-p006_model.json
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/DONE
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/mineru.log
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/08fe36e1e24b5ea4ddc296cd07b5beadd77d451452a00bcddacf7bec50be30a7.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/11dce0ef4af560db2156f9db0d4a550fad44b862ffede0fee504beab47ab4a59.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/24d4f5308814c9e373bfeb990435e3817af0ae4ebfb9611d556f335534e1f8a6.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/4efd0e6f867e7ac0df51658ff97e75a321b987a97a69d9f5c0fd0c881e5baea6.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/53a9e590e042b09259bfa1475518c5f79e8a4c4e07872df1cbbc1899271e68f8.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/5bffa452e8e8d28edcfda9e88d8cf9192246a68b902d12774255042c490075be.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/618a775a3dc32f7720d4456e0d570c1cb32b593fae923d4b03c88ee0d8d7fa6e.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/77cabd2a97083dbdb72cfed76930567a6f34a501341712d43c0550f40fcaed53.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/7804aa875b98bf1f893389ccc28cccc2572d452d96c5e4ef3ce9e6d76783501b.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/7c41b6def2acf27dc21a3bceaaf8c0a8082138e30f9a6a723bd1f627eae9f647.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/8caf4547e793568bcc1485cdde0bafb1c26634c7e09eca75933b139db2548d00.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/9efe3bd893085d6d6aa68758caa8fd221249688bdaa9af963c8d68cba55d444f.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/e6f96f2f85acaa1f320ae79e0317c8b8e0bef52b4cfe8aeee3129c912b96ee2b.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/images/fefa87b351d6ac5543aa7c1df21c8b689744976bf97462d188afd75c9c0614fd.jpg
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006.md
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006_content_list.json
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006_content_list_v2.json
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006_middle.json
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/mineru-Pak1989_ISIJInt29_318/p001-p006/out/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006/vlm/src--pak-ito-fruehan-1989-isij-na2o-activity-cao-slags--Pak1989_ISIJInt29_318-p001-p006_model.json
-    - raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.pdf
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml
+    reason: v2.1 store present; 22/46 rows battery-usable
+  usable_rows: 22
+  total_rows: 46
   inbox_exclusion_reason: null
 - source_id: paknezhad-2013-third-harmonic
   stage: inbox
@@ -29696,11 +29556,14 @@ sources:
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0298-tephroite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0299-willemite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0300-zircon.yaml
+    - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0301-wollastonite.yaml
+    - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0302-pseudowollastonite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0304-diopside.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0305-spodumene.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0306-clinoenstatite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0308-jadeite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0310-anorthite.yaml
+    - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0311-hexagonal-anorthite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0315-adularia.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0317-kaliophilite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0318-leucite.yaml
@@ -29909,10 +29772,10 @@ sources:
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-ht-0209-nepheline.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-ht-0210-muscovite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-ht-0212-talc.yaml
-    reason: v2.1 store present but 0 of 14808 rows are battery-usable (measured evidence class AND known
+    reason: v2.1 store present but 0 of 14820 rows are battery-usable (measured evidence class AND known
       quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 14808
+  total_rows: 14820
   inbox_exclusion_reason: 'compilation-path: source reaches the store through data/literature/compilations/
     rather than a per-source extract; not counted as inbox'
 - source_id: robinot-2025-promes-review
@@ -31884,22 +31747,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: seto-2010-na2o-activity-glass-emf-summary
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/seto-2010-na2o-activity-glass-emf-summary/SOURCE.md
-    - raw/seto-2010-na2o-activity-glass-emf-summary/provenance/download-receipt.json
-    - raw/seto-2010-na2o-activity-glass-emf-summary/provenance/held-preflight.json
-    - raw/seto-2010-na2o-activity-glass-emf-summary/provenance/independent-review.md
-    - raw/seto-2010-na2o-activity-glass-emf-summary/provenance/institutional-2010-activity-original.html
-    - raw/seto-2010-na2o-activity-glass-emf-summary/provenance/observed-activity-links.json
-    - raw/seto-2010-na2o-activity-glass-emf-summary/provenance/pdf-checks.json
-    - raw/seto-2010-na2o-activity-glass-emf-summary/provenance/three-store-byte-dedup.json
-    - raw/seto-2010-na2o-activity-glass-emf-summary/seto-2010-na2o-activity-glass-emf-summary.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/seto-2010-na2o-activity-glass-emf-summary.yaml
+    reason: v2.1 store present but 0 of 5 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 5
   inbox_exclusion_reason: null
 - source_id: sf04-magma-companion-workbook
   stage: unknown
@@ -33514,15 +33370,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: simeonov-sano-1985-na-bearing-mno-activities
-  stage: inbox
+  stage: ingested_complete
   evidence:
-    decided_by: inbox
+    decided_by: ingested_complete
     artefacts:
-    - raw/simeonov-sano-1985-na-bearing-mno-activities/SOURCE.md
-    - raw/simeonov-sano-1985-na-bearing-mno-activities/simeonov-sano-1985-na-bearing-mno-activities.pdf
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/simeonov-sano-1985-na-bearing-mno-activities.yaml
+    reason: v2.1 store present; 5/5 rows battery-usable
+  usable_rows: 5
+  total_rows: 5
   inbox_exclusion_reason: null
 - source_id: simon-sutton-2017-apollo14-redox
   stage: inbox
@@ -36093,15 +35948,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tsukihashi-1985-na-silicate-mn-p-nitrogen
-  stage: inbox
+  stage: ingested_complete
   evidence:
-    decided_by: inbox
+    decided_by: ingested_complete
     artefacts:
-    - raw/tsukihashi-1985-na-silicate-mn-p-nitrogen/SOURCE.md
-    - raw/tsukihashi-1985-na-silicate-mn-p-nitrogen/tsukihashi-1985-na-silicate-mn-p-nitrogen.pdf
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml
+    reason: v2.1 store present; 2/2 rows battery-usable
+  usable_rows: 2
+  total_rows: 2
   inbox_exclusion_reason: null
 - source_id: tsukihashi-1985-v-nb-sb-soda-silicate-distribution
   stage: in_progress
@@ -36124,15 +35978,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tsukihashi-sano-1997-alkali-fluoride-slag-activities
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/tsukihashi-sano-1997-alkali-fluoride-slag-activities/SOURCE.md
-    - raw/tsukihashi-sano-1997-alkali-fluoride-slag-activities/tsukihashi-sano-1997-alkali-fluoride-slag-activities.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: turkdogan-1984-physicochemical-aspects-review
   stage: inbox
@@ -36498,12 +36352,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: vanlimpt-2011-boron-evaporation-part1
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/vanlimpt-2011-boron-evaporation-part1/vanlimpt-2011-boron-evaporation-part1.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/vanlimpt-2011-boron-evaporation-part1.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -37155,61 +37009,15 @@ sources:
   total_rows: 516
   inbox_exclusion_reason: null
 - source_id: wang-2017-sodium-stannate-formation-emf
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/wang-2017-sodium-stannate-formation-emf/SOURCE.md
-    - raw/wang-2017-sodium-stannate-formation-emf/asset-manifest.json
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0001-m.jpg
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0001-m.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0002-m.jpg
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0002-m.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0003-m.jpg
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0003-m.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0004-m.jpg
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0004-m.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0005-m.jpg
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-fig-0005-m.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0001.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0003.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0005.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0007.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0009.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0011.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0013.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0015.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0017.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0019.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0021.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0023.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0025.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0027.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0029.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0031.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0033.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0035.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0037.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0039.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0041.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0043.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0045.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0047.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0049.png
-    - raw/wang-2017-sodium-stannate-formation-emf/assets/rar2bf03816-math-0051.png
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/asset-http-receipts.json
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/original-publisher-article-dom.html
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/wang-content-review.md
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/wang-dom-extent.json
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/wang-final-dedup.json
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/wang-markup-review.json
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/wang-observed-inventory.json
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/wang-offline-browser-check.json
-    - raw/wang-2017-sodium-stannate-formation-emf/provenance/wang-parent-arithmetic-check.json
-    - raw/wang-2017-sodium-stannate-formation-emf/wang-2017-sodium-stannate-formation-emf.html
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/wang-2017-sodium-stannate-formation-emf.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: wang-2022-super-high-alumina-slag-viscosity
   stage: inbox
@@ -37833,21 +37641,15 @@ sources:
   total_rows: 15
   inbox_exclusion_reason: null
 - source_id: willenborg-2006-alkali-removal-thermodynamics
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/willenborg-2006-alkali-removal-thermodynamics/SOURCE.md
-    - raw/willenborg-2006-alkali-removal-thermodynamics/provenance/acquisition-receipt.json
-    - raw/willenborg-2006-alkali-removal-thermodynamics/provenance/held-preflight.json
-    - raw/willenborg-2006-alkali-removal-thermodynamics/provenance/independent-review.md
-    - raw/willenborg-2006-alkali-removal-thermodynamics/provenance/pdf-checks.json
-    - raw/willenborg-2006-alkali-removal-thermodynamics/provenance/repository-metadata.json
-    - raw/willenborg-2006-alkali-removal-thermodynamics/provenance/three-store-byte-dedup.json
-    - raw/willenborg-2006-alkali-removal-thermodynamics/willenborg-2006-alkali-removal-thermodynamics.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/willenborg-2006-alkali-removal-thermodynamics.yaml
+    reason: v2.1 store present but 0 of 2 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 2
   inbox_exclusion_reason: null
 - source_id: williams-1971-fe-mgo-sio2-o2-reaction-constants
   stage: inbox
@@ -38481,7 +38283,7 @@ sources:
   evidence:
     decided_by: in_progress
     artefacts:
-    - extracts/yakovlev-2021-chondrule-alkali.yaml
+    - data/literature/extracts/yakovlev-2021-chondrule-alkali.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -38569,73 +38371,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: yamaguchi-1984-na2o-activity-sodium-beta-alumina
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/SOURCE.md
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/DONE
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/mineru.log
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/04c55e908780348a8689c87463ac5d8f8a8fbc69a83ff1f1c7319b27efa67d6d.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/0da4a1f6af257eea39d947e3777e50125c80886f0e33212f7528e84453c5a1bf.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/0f725b525912e84049636d0054c5ac95964d5d4ee9b9a4b33667a1c9b3f4c2a8.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/115277c06c8afacfc828599ab0a740615448e365fcec40af279388e1cc4e17f2.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/14210719206ad777f7e1dee79ac1a23ef0a04e801694b702bfa7e6788229b2ae.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/18fab99cb0aefcc98c8c616eaa28c49ecc66b4f612a9834f3a56c0796d372c53.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/206bf38bdb040170226528c0a7b9fe0fde0dda252a5a21de8d691c4e58d08d12.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/243c6c067ed8821042ea774e3c0429ae21ca9d19a60228bf02fb360efc875589.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/2a23007ea0f8ae4cf075ad722446162be749fd11881ba39b09ea665978404b1c.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/41364987b603f6c10584b43de7a1e1f557b66c506a35a51758c1da8d07649cd4.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/50cf05644cc422b68da055b78d4d5b062ffe3483420985c611ed077152e0bef9.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/5d8f20286e43cbc7586ff378ce7accd4e5879b45c141fba65fbaa4f034bdefb6.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/6a1d5e99fab00b41273a0e03d85b7caf080373165c88356adb0ea5cee6689667.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/7f57d52b76445e7622732a71e7972bde6b1b4fcef554fd2ab5c40ed8f36e416d.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/82ea0fbb236d9fb411e84bd2aab829d23c98abc086fa764f5a400f7cb0c4083a.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/85f6cc7745cd07cb5b48b823b16f92764ae31d9a1a8b28c01da863fd6147decd.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/a0e887e8c135a4d84d70c867954e0d95349010b15857ccca612dd7829bdb7751.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/ab9c53c56a8d0083992ad820eb3753cc5c5c65e6dad5d2898acfda33a5950a2d.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/b7ec0202cb4087e51c071c4c9eb9d2207017171b0e9c33eaed835460a12d5e85.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/cea694d853bb7a6141977019a0d63d08acb4e5c6f4e238a2e9eb5aaaceec0c96.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/d82d813bb58c6f6d74f7510c71b11b317e6dba0ae86dfefe0eccd7f847d5eabf.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/images/febc1343465f6a4e9b938c79f521c7c1d6e914fe09675d6613b4525189294889.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007.md
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007_content_list.json
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007_content_list_v2.json
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007_middle.json
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/p001-p007/out/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007/vlm/src--shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta-p001-p007_model.json
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/DONE
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/mineru.log
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/04c55e908780348a8689c87463ac5d8f8a8fbc69a83ff1f1c7319b27efa67d6d.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/0da4a1f6af257eea39d947e3777e50125c80886f0e33212f7528e84453c5a1bf.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/0f725b525912e84049636d0054c5ac95964d5d4ee9b9a4b33667a1c9b3f4c2a8.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/115277c06c8afacfc828599ab0a740615448e365fcec40af279388e1cc4e17f2.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/14210719206ad777f7e1dee79ac1a23ef0a04e801694b702bfa7e6788229b2ae.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/18fab99cb0aefcc98c8c616eaa28c49ecc66b4f612a9834f3a56c0796d372c53.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/206bf38bdb040170226528c0a7b9fe0fde0dda252a5a21de8d691c4e58d08d12.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/243c6c067ed8821042ea774e3c0429ae21ca9d19a60228bf02fb360efc875589.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/2a23007ea0f8ae4cf075ad722446162be749fd11881ba39b09ea665978404b1c.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/41364987b603f6c10584b43de7a1e1f557b66c506a35a51758c1da8d07649cd4.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/50cf05644cc422b68da055b78d4d5b062ffe3483420985c611ed077152e0bef9.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/5d8f20286e43cbc7586ff378ce7accd4e5879b45c141fba65fbaa4f034bdefb6.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/6a1d5e99fab00b41273a0e03d85b7caf080373165c88356adb0ea5cee6689667.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/7f57d52b76445e7622732a71e7972bde6b1b4fcef554fd2ab5c40ed8f36e416d.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/82ea0fbb236d9fb411e84bd2aab829d23c98abc086fa764f5a400f7cb0c4083a.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/85f6cc7745cd07cb5b48b823b16f92764ae31d9a1a8b28c01da863fd6147decd.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/a0e887e8c135a4d84d70c867954e0d95349010b15857ccca612dd7829bdb7751.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/ab9c53c56a8d0083992ad820eb3753cc5c5c65e6dad5d2898acfda33a5950a2d.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/b7ec0202cb4087e51c071c4c9eb9d2207017171b0e9c33eaed835460a12d5e85.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/cea694d853bb7a6141977019a0d63d08acb4e5c6f4e238a2e9eb5aaaceec0c96.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/d82d813bb58c6f6d74f7510c71b11b317e6dba0ae86dfefe0eccd7f847d5eabf.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/images/febc1343465f6a4e9b938c79f521c7c1d6e914fe09675d6613b4525189294889.jpg
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007.md
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007_content_list.json
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007_content_list_v2.json
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007_middle.json
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/mineru/shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-melt-using-sodium-beta/p001-p007/out/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007/vlm/src-shu-yamaguchi-1984-measurement-of-activity-of-na2o-in-na2o-sio2-p2o5-ternary-mel-p001-p007_model.json
-    - raw/yamaguchi-1984-na2o-activity-sodium-beta-alumina/yamaguchi-1984-na2o-activity-sodium-beta-alumina.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: yamashita-2008-redox-glass-thesis
   stage: inbox
@@ -39153,15 +38897,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: zhang-2011-boron-sodium-f-free-evaporation
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
-    - raw/zhang-2011-boron-sodium-f-free-evaporation/SOURCE.md
-    - raw/zhang-2011-boron-sodium-f-free-evaporation/zhang-2011-boron-sodium-f-free-evaporation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts-v2/zhang-2011-boron-sodium-f-free-evaporation.yaml
+    reason: v2.1 store present but 0 of 9 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 9
   inbox_exclusion_reason: null
 - source_id: zhang-2012-cao-na2o-sio2-assessment
   stage: inbox
@@ -39174,14 +38918,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: zhang-2021-acsesc-si
-  stage: inbox
+  stage: ingested_partial
   evidence:
-    decided_by: inbox
+    decided_by: ingested_partial
     artefacts:
-    - raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/zhang-2021-acsesc-si.yaml
+    reason: v2.1 store present; 12/25 rows battery-usable
+  usable_rows: 12
+  total_rows: 25
   inbox_exclusion_reason: null
 - source_id: zhang-2021-alkali-evaporation-correction
   stage: inbox

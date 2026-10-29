@@ -1,0 +1,193 @@
+schema_version: literature_extract.v1
+source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+source:
+  citation: Brewer, L. and Margrave, J. (1952), Vaporization of Alkali Metal Oxides, University of California Radiation Laboratory report UCRL-1864.
+  year: 1952
+extraction:
+  method: Table 3 transcribed from MinerU redo variants and checked against the rendered page; prose pressure range transcribed from pdftotext and checked against its page.
+  date: '2026-10-27'
+  worker: codex-resume-70279-1793145815
+review_status: draft
+schema_gaps: []
+species:
+  Na2O:
+    observations:
+    - observation_id: brewer_margrave_1952_table3_total_mass_loss
+      type: rate_series
+      locator:
+        table: '3'
+        page: 17
+        pdf_page_index: 16
+        note: Table 3, Vaporization Data on Na2O; absolute PDF page 17.
+      regime: Knudsen effusion
+      units: as printed; total weight loss in mg, duration in sec, orifice area in cm2; no mass-loss rate is printed
+      values:
+        quantity: mass_loss_rate
+        method_class: measured_direct
+        material: Na2O sample; sample purity is reported as greater than 95% before vaporization and as high as 97% after runs, without a per-run composition
+        vapour_species_split: not measured; the authors assumed Na/O = 2/1 in calculations
+        printed_columns:
+          run: Run No.
+          T_K: T°K
+          total_weight_loss_mg: Total Weight Loss (mg)
+          duration_s: Time (sec)
+          effusion_hole_area_cm2: Hole Area (cm2)
+        points:
+        - row: '2'
+          T_K: '918'
+          total_weight_loss_mg: '6.2'
+          duration_s: '11,640'
+          effusion_hole_area_cm2: '0.1156'
+          note: Vapour species split was not measured; authors assumed Na/O = 2/1 in calculations.
+          value: '6.2'
+          table_row_number: 2
+          table_column_number: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '918'
+              locator: {table: '3', row: '2', page: 17, pdf_page_index: 16}
+          locator: {table: '3', row: '2', page: 17, pdf_page_index: 16}
+        - row: '5'
+          T_K: '943'
+          total_weight_loss_mg: '7.8'
+          duration_s: '64,980'
+          effusion_hole_area_cm2: '0.0314'
+          note: Vapour species split was not measured; authors assumed Na/O = 2/1 in calculations.
+          value: '7.8'
+          table_row_number: 3
+          table_column_number: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '943'
+              locator: {table: '3', row: '5', page: 17, pdf_page_index: 16}
+          locator: {table: '3', row: '5', page: 17, pdf_page_index: 16}
+        - row: '7'
+          T_K: '998'
+          total_weight_loss_mg: '22.7'
+          duration_s: '59,820'
+          effusion_hole_area_cm2: '0.0314'
+          note: Vapour species split was not measured; authors assumed Na/O = 2/1 in calculations.
+          value: '22.7'
+          table_row_number: 4
+          table_column_number: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '998'
+              locator: {table: '3', row: '7', page: 17, pdf_page_index: 16}
+          locator: {table: '3', row: '7', page: 17, pdf_page_index: 16}
+        - row: '6'
+          T_K: '1006'
+          total_weight_loss_mg: '21.3'
+          duration_s: '73,260'
+          effusion_hole_area_cm2: '0.0314'
+          note: Vapour species split was not measured; authors assumed Na/O = 2/1 in calculations.
+          value: '21.3'
+          table_row_number: 5
+          table_column_number: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1006'
+              locator: {table: '3', row: '6', page: 17, pdf_page_index: 16}
+          locator: {table: '3', row: '6', page: 17, pdf_page_index: 16}
+        - row: '4'
+          T_K: '1241'
+          total_weight_loss_mg: '21.7'
+          duration_s: '1,500'
+          effusion_hole_area_cm2: '0.0855'
+          note: Vapour species split was not measured; authors assumed Na/O = 2/1 in calculations.
+          value: '21.7'
+          table_row_number: 6
+          table_column_number: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1241'
+              locator: {table: '3', row: '4', page: 17, pdf_page_index: 16}
+          locator: {table: '3', row: '4', page: 17, pdf_page_index: 16}
+        - row: '3'
+          T_K: '1260'
+          total_weight_loss_mg: '134.4'
+          duration_s: '1,320'
+          effusion_hole_area_cm2: '0.0855'
+          note: Vapour species split was not measured; authors assumed Na/O = 2/1 in calculations.
+          value: '134.4'
+          table_row_number: 7
+          table_column_number: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1260'
+              locator: {table: '3', row: '3', page: 17, pdf_page_index: 16}
+          locator: {table: '3', row: '3', page: 17, pdf_page_index: 16}
+        - row: '1'
+          T_K: '1467'
+          total_weight_loss_mg: '641.1'
+          duration_s: '600'
+          effusion_hole_area_cm2: '0.0804'
+          note: Vapour species split was not measured; authors assumed Na/O = 2/1 in calculations.
+          value: '641.1'
+          table_row_number: 8
+          table_column_number: 3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1467'
+              locator: {table: '3', row: '1', page: 17, pdf_page_index: 16}
+          locator: {table: '3', row: '1', page: 17, pdf_page_index: 16}
+  Na:
+    observations:
+    - observation_id: brewer_margrave_1952_approximate_high_temperature_na_pressure
+      type: partial_pressure
+      locator:
+        page: 19
+        pdf_page_index: 18
+        section: Discussion of Na2O vaporization
+        note: Approximate high-temperature metal partial-pressure statement; absolute PDF page 19.
+      standard_state: Na(g) partial pressure during Na2O vaporization
+      units: atm as printed
+      values:
+        quantity: partial_pressure
+        gas_species: Na(g)
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        pressure_range_atm_as_printed: 10^-3–10^-4
+        attribution: Authors' discussion of their Na2O experiments; approximate high-temperature metal partial pressure.
+        assumption_as_printed: it is believed that the Na/O ratio ≈ 2/1, particularly at the higher temperatures, and this value was assumed in all the calculations for Na2O.
+        T_condition: not specified beyond higher temperatures
+        quote: >-
+          No experimental checks were made on the Na2O during its vaporization; it is believed that the Na/O ratio ≈ 2/1, particularly at the higher temperatures where the partial pressure of metal was 10^-3 - 10^-4 atm, and this value was assumed in all the calculations for Na2O.
+fidelity_samples:
+- path: species.Na2O.observations[brewer_margrave_1952_table3_total_mass_loss].values.points[0].total_weight_loss_mg
+  value: '6.2'
+  locator: {table: '3', page: 17}
+- path: species.Na2O.observations[brewer_margrave_1952_table3_total_mass_loss].values.points[5].total_weight_loss_mg
+  value: '134.4'
+  locator: {table: '3', page: 17}
+- path: species.Na2O.observations[brewer_margrave_1952_table3_total_mass_loss].values.points[6].effusion_hole_area_cm2
+  value: '0.0804'
+  locator: {table: '3', page: 17}
