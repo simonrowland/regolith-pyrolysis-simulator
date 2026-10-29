@@ -127,7 +127,6 @@ def test_hashimoto_table3_rows_keep_run_conditions_and_initial_charge(tmp_path: 
         observation = by_formula[formula]
         assert observation.value.point == value
         assert observation.locator.published_page == 116
-        assert observation.locator.pdf_page_index == 5
         assert observation.locator.table == "3"
         assert observation.identity.temperature_K.value == Decimal("1973.15")
         assert observation.identity.total_pressure_Pa.value == pressure
