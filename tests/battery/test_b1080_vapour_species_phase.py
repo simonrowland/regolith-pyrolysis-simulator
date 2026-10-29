@@ -1,4 +1,4 @@
-"""b-1080: pressure-bearing vapour species use gas as their phase."""
+"""b-1080: vapour-species quantities use gas as their phase."""
 
 from __future__ import annotations
 
