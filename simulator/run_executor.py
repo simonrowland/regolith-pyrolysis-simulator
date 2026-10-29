@@ -63,7 +63,7 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
 )
 
 def _typed_refusal_reason(exc: BaseException) -> str:
-    for attr in ("reason", "category"):
+    for attr in ("reason", "reason_code", "category"):
         value = getattr(exc, attr, None)
         if value:
             return str(value)
@@ -73,6 +73,13 @@ def _typed_refusal_reason(exc: BaseException) -> str:
         return "certified_point_refused"
     prefix = str(exc).partition(":")[0].strip().lower().replace(" ", "_")
     return prefix or "typed_physics_refusal"
+
+
+def _is_terminal_refusal(exc: BaseException) -> bool:
+    return bool(
+        getattr(exc, "terminal_refusal", False)
+        or getattr(type(exc), "terminal_refusal", False)
+    )
 
 
 def _snapshot_atom_ledger(ledger: Any) -> Any:
@@ -228,6 +235,14 @@ class RunExecutor:
                 hours=hours,
                 initial_refusal=exc,
             )
+        except Exception as exc:
+            if not _is_terminal_refusal(exc):
+                raise
+            return self.execute_session(
+                session,
+                hours=hours,
+                initial_refusal=exc,
+            )
         kwargs: dict[str, Any] = {"hours": hours}
         if bool(config.stop_at_stage0_exit):
             kwargs["stop_at_stage0_exit"] = True
@@ -239,13 +254,7 @@ class RunExecutor:
         *,
         hours: int,
         stop_at_stage0_exit: bool | None = None,
-        initial_refusal: (
-            CampaignPressureSetpointRefusal
-            | CampaignSetpointMissingRefusal
-            | EvaporationFluxRefusal
-            | _LiquidusFinderBudgetExceeded
-            | None
-        ) = None,
+        initial_refusal: Exception | None = None,
     ) -> RunExecution:
         sim = session.simulator
         condensation_model = getattr(sim, "_condensation_model", None)
@@ -442,11 +451,25 @@ class RunExecutor:
             error_message = _safe_exception_text(exc)
         except BACKEND_FALLBACK_EXCEPTIONS as exc:
             failure_exc = exc
-            status = "failed"
-            error_message = f"backend failure: {_safe_exception_text(exc)}"
+            if _is_terminal_refusal(exc):
+                status = "refused"
+                reason = _typed_refusal_reason(exc)
+                diagnostic = getattr(exc, "diagnostic", None)
+                if isinstance(diagnostic, Mapping):
+                    refusal_diagnostic = dict(diagnostic)
+                error_message = _safe_exception_text(exc)
+            else:
+                status = "failed"
+                error_message = f"backend failure: {_safe_exception_text(exc)}"
         except Exception as exc:  # noqa: BLE001 -- envelope the error
             failure_exc = exc
-            status = "failed"
+            terminal_refusal = _is_terminal_refusal(exc)
+            status = "refused" if terminal_refusal else "failed"
+            if terminal_refusal:
+                reason = _typed_refusal_reason(exc)
+                diagnostic = getattr(exc, "diagnostic", None)
+                if isinstance(diagnostic, Mapping):
+                    refusal_diagnostic = dict(diagnostic)
             error_message = _safe_exception_text(exc)
 
         try:
@@ -813,7 +836,7 @@ def _backend_status_from_honest_exception(
     from simulator.backends import BackendUnavailableError
     from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
 
-    if isinstance(exc, _LiquidusFinderBudgetExceeded):
+    if _is_terminal_refusal(exc):
         return "refused"
     if isinstance(
         exc, (ImportError, EngineWorkerUnavailable, BackendUnavailableError)

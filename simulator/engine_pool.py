@@ -150,6 +150,9 @@ class EngineWorkerDied(RuntimeError):
 class EngineWorkerTimeout(TimeoutError):
     """Typed hard-wall expiry for an isolated engine worker."""
 
+    terminal_refusal = True
+    reason_code = 'engine_compute_timeout'
+
     def __init__(
         self,
         worker_name: str,

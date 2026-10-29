@@ -52,10 +52,10 @@ LIQUIDUS_LIQUID_EPSILON = 1.0e-3
 #
 # NOT widened with not_attempted, unsupported or non_authoritative: those are
 # provider or intent-level tokens describing whether a probe ran at all, not
-# how a frac_M sample refused. A compute timeout raises
-# _LiquidusFinderBudgetExceeded, which the run boundary records as a typed
-# engine_compute_timeout refusal; it is not a LiquidusSampleError status or a
-# kernel-vocabulary token.
+# how a frac_M sample refused. The finder's own wall expiry raises
+# _LiquidusFinderBudgetExceeded. Engine timeouts keep their original typed
+# error and are refused at the run boundary; neither is a LiquidusSampleError
+# status or a kernel-vocabulary token.
 LIQUIDUS_REFUSAL_STATUSES = frozenset({
     'not_converged',
     'out_of_domain',
@@ -450,44 +450,10 @@ def find_liquidus_solidus_by_fraction(
                 diagnostics=_budget_diagnostics(),
             )
 
-    def _raise_budget_if_engine_exhausted(exc: BaseException) -> None:
-        """Promote engine timeouts and exhausted residuals to run refusal.
-
-        Between-call budget checks alone lose structure when the *engine*
-        path burns the residual (subprocess timeout clamped to remaining,
-        or a cancel for a non-positive residual). A typed engine timeout is
-        a run refusal even when the aggregate residual remains positive.
-        Otherwise a worker wall could silently select the liquidus-floor
-        branch instead of completing the same deterministic evaluation path.
-        """
-        if isinstance(exc, TimeoutError):
-            diagnostics = {
-                'reason': 'engine_timeout',
-                'exception_class': type(exc).__name__,
-                'exception_message': str(exc),
-            }
-            if deadline is not None:
-                diagnostics.update(_budget_diagnostics())
-                diagnostics['reason'] = 'engine_timeout'
-            raise _LiquidusFinderBudgetExceeded(
-                f'liquidus sample timed out: {exc}',
-                diagnostics=diagnostics,
-            ) from exc
-        if deadline is None:
-            return
-        message = str(exc).lower()
-        residual_exhausted = remaining_budget_s() is not None and (
-            remaining_budget_s() <= 0.0
-        )
-        explicit_cancel = (
-            'aggregate liquidus budget exhausted' in message
-            or 'aggregate budget' in message
-        )
-        if residual_exhausted or explicit_cancel or time.monotonic() >= deadline:
-            raise _LiquidusFinderBudgetExceeded(
-                budget_warning(),
-                diagnostics=_budget_diagnostics(),
-            ) from exc
+    def mark_engine_timeout_refusal(exc: BaseException) -> None:
+        """Keep the engine exception type while making its timeout terminal."""
+        exc.terminal_refusal = True
+        exc.reason_code = 'engine_compute_timeout'
 
     def sample(T_C: float) -> MeltFractionSample:
         nonlocal last_T_C
@@ -512,30 +478,26 @@ def find_liquidus_solidus_by_fraction(
             except _LiquidusFinderBudgetExceeded:
                 raise
             except LiquidusSampleError as exc:
-                _raise_budget_if_engine_exhausted(exc)
                 raise _sample_error_with_exception_context(exc) from exc
             except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
-                _raise_budget_if_engine_exhausted(exc)
+                if isinstance(exc, TimeoutError):
+                    mark_engine_timeout_refusal(exc)
+                    raise
                 projected = _sample_error_for_declared_engine_failure(exc)
                 if projected is None:
                     raise
                 raise projected from exc
             except MeltBackendError as exc:
-                _raise_budget_if_engine_exhausted(exc)
+                if isinstance(exc, TimeoutError):
+                    mark_engine_timeout_refusal(exc)
+                    raise
                 projected = liquidus_sample_error_from_exception(exc)
                 if projected is None:
                     raise
                 raise projected from exc
             except TimeoutError as exc:
-                _raise_budget_if_engine_exhausted(exc)
-                raise _LiquidusFinderBudgetExceeded(
-                    f'liquidus sample timed out: {exc}',
-                    diagnostics={
-                        'reason': 'engine_timeout',
-                        'exception_class': type(exc).__name__,
-                        'exception_message': str(exc),
-                    },
-                ) from exc
+                mark_engine_timeout_refusal(exc)
+                raise
             raw_fraction_by_temperature[temperature_C] = raw
         frac = _clamp_fraction(raw)
         point = _monotone_point(

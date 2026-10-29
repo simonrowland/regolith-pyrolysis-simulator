@@ -15401,7 +15401,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 len(self.atom_ledger.transitions) - transition_count_before,
             )
             terminal_refusal = bool(
-                getattr(type(exc), 'terminal_refusal', False)
+                getattr(exc, 'terminal_refusal', False)
+                or getattr(type(exc), 'terminal_refusal', False)
             )
             if terminal_refusal:
                 wall_refusals = self.condensation_model.last_sticking_alpha_provenance_notice.get(
