@@ -418,6 +418,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: Mg(g)
@@ -481,6 +482,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -701,6 +703,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: Mg(g)
@@ -755,6 +758,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -857,6 +861,7 @@ species:
       regime: kems_effusion
       units: as published (I+T proportional to partial pressure; no absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: Fe(g)
@@ -906,6 +911,7 @@ species:
       regime: kems_effusion
       units: as published (I+T proportional to partial pressure; no absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: Fe(g)
@@ -945,6 +951,7 @@ species:
       regime: kems_effusion
       units: as published (I+T proportional to partial pressure; no absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: SiO(g)
@@ -989,6 +996,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: SiO(g)
@@ -1021,6 +1029,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -1075,6 +1084,7 @@ species:
       regime: kems_effusion
       units: as published (I+T proportional to partial pressure; no absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: SiO(g)
@@ -1122,6 +1132,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: SiO(g)
@@ -1163,6 +1174,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -1202,6 +1214,7 @@ species:
       regime: kems_effusion
       units: abundance relative to SiO (not absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: SiO2(g)
@@ -1265,6 +1278,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: SiO2(g)
@@ -1297,6 +1311,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -1356,6 +1371,7 @@ species:
       regime: kems_effusion
       units: abundance relative to SiO (not absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: SiO2(g)
@@ -1417,6 +1433,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: SiO2(g)
@@ -1458,6 +1475,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -1589,6 +1607,7 @@ species:
       regime: kems_effusion
       units: not quantitative
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: O(g)
@@ -1630,6 +1649,7 @@ species:
       regime: kems_effusion
       units: not quantitative
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: O(g)
@@ -1665,6 +1685,7 @@ species:
       regime: kems_effusion
       units: not quantitative
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: O2(g)
@@ -1707,6 +1728,7 @@ species:
       regime: kems_effusion
       units: not quantitative
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: O2(g)

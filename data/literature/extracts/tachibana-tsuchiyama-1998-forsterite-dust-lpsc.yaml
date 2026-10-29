@@ -30,6 +30,7 @@ species:
       regime: free_or_buffered_evaporation_model
       units: mol cm^-2 s^-1
       values:
+        system_class: silicate_melt
         quantity: evaporation_rate
         method_class: model_derived
         generator: Hertz-Knudsen equation coupled to forsterite stoichiometry and equilibrium vapor pressures

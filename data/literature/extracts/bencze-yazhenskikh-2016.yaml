@@ -95,6 +95,7 @@ species:
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; equation coefficients as printed'
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: model_derived
         generator: author-fitted KEMS vapor-pressure relation ln(p(Na(g))/Pa)=A+B/T; a(Na2O) obtained from the authors' KEMS calibration
@@ -174,6 +175,7 @@ species:
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; uncertainty as printed'
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: model_derived
         generator: author mean of selected KEMS vapor-pressure fits
@@ -196,6 +198,7 @@ species:
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; equation coefficients as printed'
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: model_derived
         generator: author-fitted KEMS vapor-pressure relation ln(p(K(g))/Pa)=A+B/T; a(K2O) obtained from the authors' KEMS calibration
@@ -213,6 +216,7 @@ species:
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; uncertainty as printed'
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: model_derived
         generator: author mean of selected KEMS vapor-pressure fits

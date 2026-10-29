@@ -209,6 +209,7 @@ species:
       regime: kems_effusion
       units: atm as printed (P_Ca · 10^7)
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: measured
         admission_status: admitted
@@ -683,6 +684,7 @@ species:
         printed value at X(SiO2)=0.50; reconciling that ratio with JANAF
         requires about 141 kJ/mol.
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         gas_species: CaO
         method_class: measured
@@ -1149,6 +1151,7 @@ species:
       regime: kems_effusion
       units: atm as printed (P_SiO · 10^6)
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         gas_species: SiO
         method_class: measured
@@ -1728,6 +1731,7 @@ species:
       regime: kems_effusion
       units: atm as printed (P_O · 10^10)
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         gas_species: O
         method_class: quoted_attributed
@@ -3055,6 +3059,7 @@ species:
       regime: kems_effusion
       units: Lg P_O2, atm as plotted
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         gas_species: O2
         method_class: derived

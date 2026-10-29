@@ -442,6 +442,7 @@ species:
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha: 1.0
         alpha_range:
         - 0.98
@@ -482,6 +483,7 @@ species:
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
+        system_class: silicate_melt
         alpha: 0.98
         alpha_range:
         - 0.96
@@ -524,6 +526,7 @@ species:
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha: 1.0
         alpha_range:
         - 0.9
@@ -565,6 +568,7 @@ species:
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha_lower_bound: 0.92
         printed: '>0.92'
         semantics: bound_not_point_ordering
@@ -644,6 +648,7 @@ species:
       regime: condensation_high_supersaturation_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha_lower_bound: 0.998
         printed: '>0.998'
         semantics: bound_not_point_ordering
@@ -682,6 +687,7 @@ species:
       regime: condensation_high_supersaturation_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha_lower_bound: 0.99
         printed: '>0.99'
         semantics: bound_not_point_ordering
@@ -719,6 +725,7 @@ species:
       regime: condensation_high_supersaturation_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha: 0.998
         alpha_range:
         - 0.9975
