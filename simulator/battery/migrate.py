@@ -5061,13 +5061,27 @@ def _converted_temperature(
     trail: str | None,
     original: object,
     locator: Locator | None,
+    *,
+    source_inference: Derivation | None = None,
+    read_from: str = "",
 ) -> Located[Decimal]:
-    """Kelvin point condition. A unit conversion keeps its printed original."""
+    """Kelvin point condition. A unit conversion keeps its printed original.
 
+    An inference on the selected field stays beside that conversion. A field
+    with no inference stays the conversion alone, so a printed Celsius value
+    does not change.
+    """
+
+    conversion = conversion_derivation(trail, original, locator)
+    inference = conversion
+    if source_inference is not None:
+        inference = _merge_source_conversion_derivation(
+            source_inference, conversion, read_from
+        )
     return Located(
         State.of(amount),
         locator=locator,
-        inference=conversion_derivation(trail, original, locator),
+        inference=inference,
     )
 
 
@@ -5078,6 +5092,22 @@ def _temperature_field_raw(payload: Mapping[str, Any], field_name: str | None) -
     if isinstance(raw, Mapping):
         return raw.get("value")
     return raw
+
+
+def _temperature_field_inference(
+    payload: Mapping[str, Any], field_name: str | None
+) -> Derivation | None:
+    """Inference declared on the selected temperature field. Absent means none."""
+
+    if not field_name:
+        return None
+    raw = payload.get(field_name)
+    if not isinstance(raw, Mapping):
+        return None
+    inference = raw.get("inference")
+    if not isinstance(inference, Mapping):
+        return None
+    return _derivation_from_plain(inference, allow_mapping_inputs=True)
 
 
 # Extractor-written Kelvin sitting next to the printed Celsius. A field named
@@ -18199,6 +18229,10 @@ class Migrator:
                     t_sel.unit_trail,
                     _temperature_field_raw(t_payload, t_sel.field_name),
                     temperature_locator,
+                    source_inference=_temperature_field_inference(
+                        t_payload, t_sel.field_name
+                    ),
+                    read_from=choose_read_from(work, temperature_locator),
                 )
             }
         raw_point_conditions = obs.get("point_conditions")
@@ -20370,7 +20404,16 @@ class Migrator:
         if coord is not None:
             point_conditions = {
                 "temperature_K": _converted_temperature(
-                    coord, t_trail, t_original, point_locator
+                    coord,
+                    t_trail,
+                    t_original,
+                    point_locator,
+                    source_inference=(
+                        _temperature_field_inference(raw_item, t_sel.field_name)
+                        if isinstance(raw_item, Mapping)
+                        else None
+                    ),
+                    read_from=read_from,
                 )
             }
         if (

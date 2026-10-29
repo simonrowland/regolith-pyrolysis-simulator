@@ -72,6 +72,49 @@ def _assert_migrated_ditto(located, source_row: str) -> None:
     assert located.inference.inputs == (DITTO, _source_row(source_row))
 
 
+def _assert_conversion_only(located, original: Decimal) -> None:
+    """Printed Celsius becomes kelvin and does not carry a table-blank ditto."""
+
+    inference = located.inference
+    assert inference is not None
+    assert inference.relation == "celsius_to_kelvin"
+    assert inference.output_unit == "K"
+    assert DITTO not in inference.inputs
+    printed = dict(inference.parameters)["original"]
+    assert printed.state.value == original
+    assert printed.inference is None
+
+
+def _assert_ditto_and_conversion(located, source_row: str, original: Decimal) -> None:
+    """A blank temperature keeps the ditto and the Celsius-to-kelvin conversion."""
+
+    inference = located.inference
+    assert inference is not None
+    assert inference.relation == "extract_inference"
+    assert inference.inputs == (DITTO, _source_row(source_row))
+    assert inference.output_unit == "K"
+    printed = dict(inference.parameters)["original"]
+    assert printed.state.value == original
+    conversion = printed.inference
+    assert conversion is not None
+    assert conversion.relation == "celsius_to_kelvin"
+    assert conversion.output_unit == "K"
+    assert dict(conversion.parameters)["original"].state.value == original
+
+
+def _assert_migrated_temperature(located, sample: str) -> None:
+    if sample == "13":
+        _assert_conversion_only(located, Decimal("1550"))
+    elif sample == "14":
+        _assert_ditto_and_conversion(located, "13", Decimal("1550"))
+    elif sample == "15":
+        _assert_conversion_only(located, Decimal("1600"))
+    elif sample == "16":
+        _assert_ditto_and_conversion(located, "15", Decimal("1600"))
+    else:
+        raise AssertionError(sample)
+
+
 def _assert_grid(document: dict, grid=RENDER_GRID) -> None:
     rows = _rows(document)
     for sample, phase, species, expected in grid:
@@ -169,7 +212,9 @@ def test_isolated_migration_preserves_every_point_species_temperature_and_condit
                 assert source_temperature == 1550
             else:
                 assert source_temperature == 1600
-            assert item.point_conditions["temperature_K"].inference.relation == "celsius_to_kelvin"
+            _assert_migrated_temperature(
+                item.point_conditions["temperature_K"], sample
+            )
         elif sample == "12":
             composition = item.point_conditions["composition"]
             assert composition.state.value.components == ROW_12_RATIO
@@ -182,6 +227,43 @@ def test_isolated_migration_preserves_every_point_species_temperature_and_condit
     assert migrated["jeon23_s1_r3_mgo"].value.point == Decimal("85.4")
     assert migrated["jeon23_s1_r3_zno"].value.point == Decimal("14.6")
     assert migrated["jeon23_s7_r15_cao"].value.point == Decimal("1.3")
+
+    # Dropping the blank-temperature inference must turn this pin red.
+    # The printed Celsius and the kelvin conversion stay.
+    mutated = deepcopy(_document())
+    blank_ids: list[str] = []
+    for row in _rows(mutated).values():
+        sample = row["point_conditions"]["sample_id"]["state"]["value"]
+        if sample not in {"14", "16"}:
+            continue
+        temperature = row["values"]["T_C"]
+        assert isinstance(temperature, dict)
+        del temperature["inference"]
+        blank_ids.append(row["observation_id"])
+    assert set(blank_ids) == {
+        row["observation_id"]
+        for row in _rows(_document()).values()
+        if row["point_conditions"]["sample_id"]["state"]["value"] in {"14", "16"}
+    }
+    dropped = _migrate_real_extract(
+        tmp_path / "dropped-temperature-inference",
+        "jeon-lindberg-2023-mg-ca-zn-oxide-equilibria.yaml",
+        extract_doc=mutated,
+    )
+    dropped_rows = {
+        item.observation_id.rsplit("::", 1)[-1]: item
+        for item in dropped.observations.values()
+    }
+    for key in blank_ids:
+        item = dropped_rows[key]
+        sample = str(item.point_conditions["sample_id"].state.value)
+        located = item.point_conditions["temperature_K"]
+        original = Decimal("1550") if sample == "14" else Decimal("1600")
+        _assert_conversion_only(located, original)
+        with pytest.raises(AssertionError):
+            _assert_ditto_and_conversion(
+                located, "13" if sample == "14" else "15", original
+            )
 
 
 def _assert_table1_ditto(document: dict) -> None:
