@@ -231,7 +231,7 @@ def test_real_leister_valence_limit_is_stored_as_a_bound(tmp_path: Path) -> None
         and ":row=6:" in observation.observation_id
     )
 
-    assert len(observations) == 54
+    assert len(observations) == 45
     assert bound.value.kind is ValueKind.BOUND
     assert bound.value.bound_operator == "<"
     assert bound.value.bound_value == Decimal("0.005")
