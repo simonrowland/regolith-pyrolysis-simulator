@@ -28,7 +28,7 @@ def test_kambayashi_table7_activity_rows_migrate_with_temperature_and_compositio
     )
     assert len(observations) == 22
     assert all(
-        observation.identity.quantity.value.value is Quantity.ACTIVITY
+        observation.identity.quantity.value.value == Quantity.ACTIVITY.value
         and observation.value.kind is ValueKind.POINT
         for observation in observations
     )
@@ -96,7 +96,7 @@ def test_ohara_table2_activity_rows_migrate_with_source_temperature():
     assert len(observations) == len(expected)
     for observation in observations:
         sample = int(observation.observation_id.rsplit("_sample_", 1)[1])
-        assert observation.identity.quantity.value.value is Quantity.ACTIVITY
+        assert observation.identity.quantity.value.value == Quantity.ACTIVITY.value
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(expected[sample])
         temperature = (observation.point_conditions or {})["temperature_K"]
@@ -134,7 +134,53 @@ def test_ohara_table1_po_partial_pressures_migrate_with_sample_conditions():
     )
     assert len(observations) == len(expected_pa)
     assert all(
-        observation.identity.quantity.value.value is Quantity.P_PARTIAL
+        observation.identity.quantity.value.value == Quantity.P_PARTIAL.value
+        and observation.value.kind is ValueKind.POINT
+        for observation in observations
+    )
+    assert sorted(observation.value.point for observation in observations) == sorted(
+        Decimal(value) for value in expected_pa
+    )
+    for observation in observations:
+        conditions = observation.point_conditions or {}
+        for key in ("composition", "temperature_K"):
+            assert key in conditions
+            assert conditions[key].state.is_value
+            assert conditions[key].locator is not None
+
+
+def test_kambayashi_table6_po_partial_pressures_migrate_with_sample_conditions():
+    observations = _observations(
+        "kems-057-kambayashi-1985.yaml",
+        "kambayashi_1985_table6_partial_pressures_and_dg",
+    )
+    expected_pa = (
+        "0.028978950",
+        "0.035058450",
+        "0.045393600",
+        "0.057653925",
+        "0.070724850",
+        "0.092104425",
+        "0.077108325",
+        "0.098791875",
+        "0.1215900",
+        "0.085518300",
+        "0.108620400",
+        "0.134964900",
+        "0.109228350",
+        "0.119158200",
+        "0.149454375",
+        "0.187755225",
+        "0.121792650",
+        "0.153912675",
+        "0.19657050",
+        "0.154216650",
+        "0.193733400",
+        "0.234871350",
+    )
+    assert len(observations) == len(expected_pa)
+    assert all(
+        observation.identity.quantity.value.value == Quantity.P_PARTIAL.value
         and observation.value.kind is ValueKind.POINT
         for observation in observations
     )
