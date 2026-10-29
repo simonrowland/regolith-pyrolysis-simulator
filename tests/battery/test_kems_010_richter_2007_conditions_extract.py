@@ -1,4 +1,5 @@
 from collections import Counter
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
@@ -20,6 +21,37 @@ SCHEMA_GAP_QUANTITIES = {
     "published_reduced_silicon_flux_time_series",
     "qualitative_non_loss_bound",
 }
+
+CONTINUATION_EXPERIMENT_IDS = {
+    "cai-r2-8",
+    "cai-r2-9",
+    "cai-r2-13",
+    "cai-r2-14",
+    "cai-r2-15",
+    "cai-r3-1",
+    "cai-r3-2",
+    "cai-r3-4",
+    "cai-r3-5",
+    "cai-r3-7",
+    "cai-r3-8",
+    "cai-r3-18",
+    "cai-r3-19",
+    "cai-r3-20",
+    "cai-r3-21",
+}
+
+
+def _assert_continuation_end_temperature_locator(experiment):
+    end_temperature = experiment["thermal_schedule"]["ramps"][1][
+        "end_temperature_K"
+    ]
+    locator = end_temperature["locator"]
+    assert locator["page"] == 7
+    assert locator["published_page"] == 5550
+    assert locator["table"] == "1"
+    assert locator["row"] == experiment["locator"]["row"]
+    temperature = experiment["conditions"]["temperature_K"]["state"]["value"]
+    assert end_temperature["state"]["value"]["point"] == temperature
 
 
 def _migrate_extract():
@@ -156,6 +188,31 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         5549: 36,
         5550: 15,
     }
+    continuation_experiments = [
+        experiment
+        for experiment in run_experiments
+        if experiment["experiment_id"] in CONTINUATION_EXPERIMENT_IDS
+    ]
+    assert {
+        experiment["experiment_id"] for experiment in continuation_experiments
+    } == CONTINUATION_EXPERIMENT_IDS
+    for experiment in continuation_experiments:
+        _assert_continuation_end_temperature_locator(experiment)
+    mutated_continuation = deepcopy(
+        next(
+            experiment
+            for experiment in continuation_experiments
+            if experiment["experiment_id"] == "cai-r3-1"
+        )
+    )
+    mutated_locator = mutated_continuation["thermal_schedule"]["ramps"][1][
+        "end_temperature_K"
+    ]["locator"]
+    mutated_locator["page"] = 6
+    mutated_locator["published_page"] = 5549
+    with pytest.raises(AssertionError):
+        _assert_continuation_end_temperature_locator(mutated_continuation)
+
     for experiment in run_experiments:
         page = experiment["locator"]["published_page"]
         physical_page = page - 5543
