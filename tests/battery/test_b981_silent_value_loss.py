@@ -65,6 +65,11 @@ def test_kambayashi_table7_activity_rows_migrate_with_temperature_and_compositio
             assert key in conditions
             assert conditions[key].state.is_value
             assert conditions[key].locator is not None
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert "kambayashi_1985_table6_partial_pressures_and_dg" in observation.derivation.inputs
+        assert "kambayashi_1985_p4o10_sat_janaf_extrapolated" in observation.derivation.inputs
 
 
 def test_ohara_table2_activity_rows_migrate_with_source_temperature():
@@ -103,6 +108,17 @@ def test_ohara_table2_activity_rows_migrate_with_source_temperature():
         assert temperature.state.is_value
         assert temperature.state.value == Decimal("1643.0")
         assert temperature.locator is not None
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert any(
+            parent.endswith("ohara_1987_table1_partial_pressures_1643k")
+            for parent in observation.derived_from or ()
+        )
+        assert any(
+            parent.endswith("ohara_1987_p4o10_sat_janaf_1643k")
+            for parent in observation.derived_from or ()
+        )
 
 
 def test_ohara_table1_po_partial_pressures_migrate_with_sample_conditions():
@@ -153,10 +169,158 @@ def test_ohara_table1_po_partial_pressures_migrate_with_sample_conditions():
             assert composition.state.reason == (
                 "Table 2 has no printed composition for sample 20"
             )
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert any(
+            parent.endswith("ohara_1987_table1_ion_current_ratios_1643k")
+            for parent in observation.derived_from or ()
+        )
     assert sum(
         not (observation.point_conditions or {})["composition"].state.is_value
         for observation in observations
     ) == 1
+    for observation_id in (
+        "ohara_1987_po2_table1_partial_pressure",
+        "ohara_1987_p2_table1_partial_pressure",
+    ):
+        expected_pa = {
+            "ohara_1987_po2_table1_partial_pressure": (
+                "0.007680435", "0.01098363", "0.014246295", "0.013476225",
+                "0.01102416", "0.01074045", "0.01130787", "0.0123312525",
+                "0.0143780175", "0.0070623525", "0.0124528425", "0.013638345",
+                "0.0145806675", "0.01645518", "0.0089469975", "0.0146617275",
+                "0.0149049075", "0.0178838625", "0.0095549475", "0.013151985",
+            ),
+            "ohara_1987_p2_table1_partial_pressure": (
+                "0.0025027275", "0.0055830075", "0.007639905", "0.0052689",
+                "0.0016515975", "0.0043265775", "0.0035159775", "0.0056843325",
+                "0.00599844", "0.0025432575", "0.00231021", "0.003708495",
+                "0.0050561175", "0.008572095", "0.0008612625", "0.004721745",
+                "0.00579579", "0.00713328", "0.00308028", "0.0061098975",
+            ),
+        }
+        derived_pressures = _observations(
+            "kems-058-ohara-1987.yaml", observation_id
+        )
+        assert len(derived_pressures) == 20
+        assert sorted(o.value.point for o in derived_pressures) == sorted(
+            Decimal(value) for value in expected_pa[observation_id]
+        )
+        for observation in derived_pressures:
+            assert observation.identity.quantity.value.value == Quantity.P_PARTIAL.value
+            assert observation.value.kind is ValueKind.POINT
+            temperature = observation.point_conditions["temperature_K"]
+            assert temperature.state.is_value
+            assert temperature.state.value == observation.identity.temperature_K.value
+            assert temperature.locator is not None
+            composition = observation.point_conditions["composition"]
+            assert composition.state.is_value
+            assert composition.locator is not None
+            assert observation.derivation is not None
+            assert observation.derivation.has_located_method
+            assert observation.derivation.has_named_references
+            assert any(
+                parent.endswith("ohara_1987_table1_ion_current_ratios_1643k")
+                for parent in observation.derived_from or ()
+            )
+
+
+def test_ohara_interaction_parameters_keep_printed_fit_lineage_unavailable():
+    ids = (
+        "ohara_1987_interaction_parameters_1643k",
+        "ohara_1987_cao_epsilon_p2o5",
+        "ohara_1987_mgo_epsilon_p2o5",
+        "ohara_1987_mno_epsilon_p2o5",
+        "ohara_1987_sio2_epsilon_p2o5",
+    )
+    for observation_id in ids:
+        observations = _observations(
+            "kems-058-ohara-1987.yaml", observation_id
+        )
+        assert len(observations) == 1
+        observation = observations[0]
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.unavailable_reason == (
+            "no mapped interaction_parameter field selected"
+        )
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert len(observation.derived_from or ()) == 18
+
+
+def test_kambayashi_table6_p2_po2_rows_migrate_with_values_and_conditions():
+    expected_pa = {
+        Decimal("0.008376120687"): {
+            Decimal("1643.15"): {"PO2": Decimal("0.003830085"), "P2": Decimal("0.001155105")},
+            Decimal("1653.15"): {"PO2": Decimal("0.0045900225"), "P2": Decimal("0.00141855")},
+            Decimal("1663.15"): {"PO2": Decimal("0.00559314"), "P2": Decimal("0.0018339825")},
+        },
+        Decimal("0.022459868353"): {
+            Decimal("1643.15"): {"PO2": Decimal("0.0070218225"), "P2": Decimal("0.0030701475")},
+            Decimal("1653.15"): {"PO2": Decimal("0.0085822275"), "P2": Decimal("0.0038199525")},
+            Decimal("1663.15"): {"PO2": Decimal("0.01078098"), "P2": Decimal("0.00478254")},
+        },
+        Decimal("0.030152487955"): {
+            Decimal("1643.15"): {"PO2": Decimal("0.0095752125"), "P2": Decimal("0.001519875")},
+            Decimal("1653.15"): {"PO2": Decimal("0.0119664825"), "P2": Decimal("0.0019555725")},
+            Decimal("1663.15"): {"PO2": Decimal("0.014084175"), "P2": Decimal("0.00235074")},
+        },
+        Decimal("0.047032894998"): {
+            Decimal("1643.15"): {"PO2": Decimal("0.0110342925"), "P2": Decimal("0.00571473")},
+            Decimal("1653.15"): {"PO2": Decimal("0.0135066225"), "P2": Decimal("0.00709275")},
+            Decimal("1663.15"): {"PO2": Decimal("0.0167692875"), "P2": Decimal("0.00879501")},
+        },
+        Decimal("0.054853396862"): {
+            Decimal("1643.15"): {"PO2": Decimal("0.012868275"), "P2": Decimal("0.00713328")},
+        },
+        Decimal("0.075561170773"): {
+            Decimal("1643.15"): {"PO2": Decimal("0.0140740425"), "P2": Decimal("0.0069407625")},
+            Decimal("1653.15"): {"PO2": Decimal("0.017529225"), "P2": Decimal("0.00863289")},
+            Decimal("1663.15"): {"PO2": Decimal("0.021379575"), "P2": Decimal("0.0112977375")},
+        },
+        Decimal("0.083407986819"): {
+            Decimal("1643.15"): {"PO2": Decimal("0.0144185475"), "P2": Decimal("0.008774745")},
+            Decimal("1653.15"): {"PO2": Decimal("0.0176812125"), "P2": Decimal("0.01098363")},
+            Decimal("1663.15"): {"PO2": Decimal("0.021420105"), "P2": Decimal("0.0138511275")},
+        },
+        Decimal("0.108572450085"): {
+            Decimal("1643.15"): {"PO2": Decimal("0.01856274"), "P2": Decimal("0.00725487")},
+            Decimal("1653.15"): {"PO2": Decimal("0.0231730275"), "P2": Decimal("0.0090483225")},
+            Decimal("1663.15"): {"PO2": Decimal("0.0303671025"), "P2": Decimal("0.01155105")},
+        },
+    }
+    for observation_id in (
+        "kambayashi_1985_po2_table6_partial_pressure",
+        "kambayashi_1985_p2_table6_partial_pressure",
+    ):
+        observations = _observations(
+            "kems-057-kambayashi-1985.yaml", observation_id
+        )
+        assert len(observations) == 22
+        for observation in observations:
+            assert observation.identity.quantity.value.value == Quantity.P_PARTIAL.value
+            assert observation.value.kind is ValueKind.POINT
+            temperature = observation.point_conditions["temperature_K"]
+            assert temperature.state.is_value
+            assert temperature.state.value == observation.identity.temperature_K.value
+            assert temperature.locator is not None
+            composition = observation.point_conditions["composition"]
+            assert composition.state.is_value
+            assert composition.locator is not None
+            p2o5 = dict(composition.state.value.components)["P2O5"]
+            species = observation.identity.species.formula
+            assert observation.value.point == expected_pa[p2o5][temperature.state.value][species]
+            assert observation.derivation is not None
+            assert observation.derivation.has_located_method
+            assert observation.derivation.has_named_references
+            assert any(
+                parent.endswith(
+                    "kambayashi_1985_table5_feto_p2o5_ion_current_ratios"
+                )
+                for parent in observation.derived_from or ()
+            )
 
 
 def test_kambayashi_table6_po_partial_pressures_migrate_with_sample_conditions():
@@ -203,6 +367,13 @@ def test_kambayashi_table6_po_partial_pressures_migrate_with_sample_conditions()
             assert key in conditions
             assert conditions[key].state.is_value
             assert conditions[key].locator is not None
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert any(
+            parent.endswith("kambayashi_1985_table5_feto_p2o5_ion_current_ratios")
+            for parent in observation.derived_from or ()
+        )
 
 
 def test_kambayashi_henry_activity_coefficients_migrate_by_temperature():
@@ -241,6 +412,14 @@ def test_kambayashi_henry_activity_coefficients_migrate_by_temperature():
             assert condition.state.is_value
             assert condition.state.value == temperature
             assert condition.locator is not None
+            if group is liquid_standard:
+                assert observation.derivation is not None
+                assert observation.derivation.has_located_method
+                assert observation.derivation.has_named_references
+                assert any(
+                    parent.endswith("kambayashi_1985_gamma_p2o5_solid_std_henry")
+                    for parent in observation.derived_from or ()
+                )
 
 
 def test_kambayashi_janaf_p4o10_saturation_pressures_migrate_with_temperature():
@@ -263,6 +442,9 @@ def test_kambayashi_janaf_p4o10_saturation_pressures_migrate_with_temperature():
         assert condition.state.is_value
         assert condition.state.value == temperature
         assert condition.locator is not None
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
 
 
 def test_wu_reported_solidus_rows_migrate_temperature_and_composition_axis():
@@ -337,6 +519,13 @@ def test_yamada_interaction_parameters_migrate_with_solute_and_temperature():
         assert (solute.state.value, temperature.state.value) == expected[
             observation.value.point
         ]
+        if observation.value.point == Decimal("12.6"):
+            assert observation.derivation is not None
+            assert observation.derivation.has_located_method
+            assert observation.derivation.has_located_unprinted_raw_inputs
+            assert observation.derivation.references == (
+                "R. J. Fruehan, Metallurgical Transactions 1 (1970), 865, ref. 4",
+            )
 
 
 def test_nanjo_second_law_vaporization_enthalpies_migrate_in_kj_per_mol():
@@ -530,6 +719,10 @@ def test_fegley_table4_hydroxide_pressures_migrate_with_conditions():
         assert temperature.state.is_value
         assert temperature.state.value == key[1]
         assert temperature.locator is not None
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert observation.derivation.has_located_unprinted_raw_inputs
 
 
 def test_janaf_mixed_units_recover_298k_formation_gibbs_values():
@@ -557,42 +750,17 @@ def test_janaf_mixed_units_recover_298k_formation_gibbs_values():
         assert condition.locator is not None
 
 
-def test_steurer_table10_exact_pressure_cells_migrate_with_temperature():
+def test_steurer_calculated_pressures_remain_unavailable_without_printed_method():
     observations = _observations(
         "steurer-1992-vapor-phase-pyrolysis.yaml",
         "steurer_1992_table10_mixture_psat",
     )
-    expected = {
-        ("O2", Decimal("2000.0")): Decimal("0.32"),
-        ("O2", Decimal("2500.0")): Decimal("150"),
-        ("O2", Decimal("3000.0")): Decimal("8100"),
-        ("AlO", Decimal("3000.0")): Decimal("1.8"),
-        ("AlO2", Decimal("3000.0")): Decimal("5.8"),
-        ("SiO", Decimal("2000.0")): Decimal("0.65"),
-        ("SiO", Decimal("2500.0")): Decimal("300"),
-        ("SiO", Decimal("3000.0")): Decimal("16000"),
-        ("SiO2", Decimal("2500.0")): Decimal("14"),
-        ("SiO2", Decimal("3000.0")): Decimal("1100"),
-        ("TiO", Decimal("2500.0")): Decimal("0.1"),
-        ("TiO", Decimal("3000.0")): Decimal("10"),
-        ("TiO2", Decimal("3000.0")): Decimal("1.3"),
-        ("FeO", Decimal("2000.0")): Decimal("0.1"),
-        ("FeO", Decimal("2500.0")): Decimal("20"),
-        ("FeO", Decimal("3000.0")): Decimal("590"),
-    }
-    assert len(observations) == len(expected)
+    assert len(observations) == 10
     for observation in observations:
-        key = (observation.identity.species.formula, observation.identity.temperature_K.value)
-        assert key in expected
         assert observation.identity.quantity.value.value == Quantity.P_PARTIAL.value
         assert observation.identity.species.phase.value is Phase.G
-        assert observation.value.kind is ValueKind.POINT
-        assert observation.value.point == expected[key]
-        temperature = observation.point_conditions["temperature_K"]
-        assert temperature.state.is_value
-        assert temperature.state.value == key[1]
-        assert temperature.locator is not None
-        assert temperature.locator.table == "10"
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.unavailable_reason == "pressure value is not numeric"
 
 
 def test_fegley_table1_silicate_gas_pressures_migrate_with_conditions():
@@ -648,7 +816,37 @@ def test_fegley_table1_silicate_gas_pressures_migrate_with_conditions():
         assert total_pressure.locator.table == "1"
         condensed_phase = point_conditions["condensed_phase_as_printed"]
         assert condensed_phase.state.value == expected_condition[3]
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert observation.derivation.has_located_unprinted_raw_inputs
         assert condensed_phase.locator is not None
+
+
+def test_fegley_table5_distribution_coefficients_have_model_lineage():
+    observations = _observations(
+        "fegley-2016-rock-steam-solubility.yaml",
+        "fegley_2016_table5_gas_magma_distribution_coefficients",
+    )
+    assert len(observations) == 32
+    for observation in observations:
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.unavailable_reason == (
+            "declared quantity is unknown; refusing to pick a number"
+        )
+        assert observation.identity.quantity.is_unknown
+        assert "distribution_coefficient" in (observation.identity.quantity.reason or "")
+        assert observation.derivation is not None
+        assert observation.derivation.has_located_method
+        assert observation.derivation.has_named_references
+        assert any(
+            parent.endswith("fegley_2016_table2_continental_crust_composition")
+            for parent in observation.derived_from or ()
+        )
+        assert any(
+            parent.endswith("fegley_2016_table3_bse_composition")
+            for parent in observation.derived_from or ()
+        )
 
 
 def test_sossi_table3_log_k_star_cells_migrate_as_temperature_points():
