@@ -50,11 +50,18 @@ def _offending_vapour_phase_rows() -> list[str]:
             if isinstance(node, MappingNode):
                 row = _mapping(node)
                 phase = row.get("phase")
+                phase_name = (
+                    phase.value.strip().casefold()
+                    if isinstance(phase, ScalarNode)
+                    else None
+                )
                 values = _mapping(row.get("values"))
                 gas_species = values.get("gas_species") or row.get("gas_species")
                 if (
                     isinstance(phase, ScalarNode)
-                    and phase.value.strip().casefold() not in {"gas", "g"}
+                    # highT_compiled is a compilation/temperature-range tag,
+                    # not a sample, apparatus, or condensed-phase context.
+                    and phase_name not in {"gas", "g", "hight_compiled"}
                     and _has_value(gas_species)
                     and _is_pressure_quantity(row, values)
                 ):
