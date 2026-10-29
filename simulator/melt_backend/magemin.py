@@ -167,24 +167,13 @@ from simulator.feedstock_composition import iron_oxide_values, total_fe
 # (the coating-SHA / split_path[lunar] drift class). The timeout value does
 # NOT touch physics: warm and cold subprocess results are byte-identical
 # (tests/test_engine_worker_live_determinism.py A/B), so this only moves
-# when the hard wall fires. 15.0 s gives ~8x headroom over the measured p99
-# while staying well inside the 60.0 s finder aggregate budget below.
+# when the hard wall fires. 15.0 s gives ~8x headroom over the measured p99.
 MAGEMIN_WARM_CALL_TIMEOUT_S = 15.0
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS = 8192
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES = 16
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS = 64
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
-# 2026-07-23 B1 gate-2 (same drift class as the call wall above): the warm
-# liquidus-finder aggregate budget raised 15.0 -> 60.0 s. Measured full
-# freeze-gate curve scans under the same 6-way + full-gate load: p50 =
-# 12.7 s, p90 = max = 14.8 s completing, with 3/15 scans exhausting the
-# 15.0 s budget at ~15.3 s -> 'not_converged' -> silent freeze-gate curve
-# source fallback. 60.0 s is ~4x the measured scan max while still far
-# below the cold/diagnostic DEFAULT_LIQUIDUS_FINDER_BUDGET_S (300 s) that
-# bounds the spinel-hang class; like the call wall it moves only when the
-# budget fires, never the physics of a completed scan.
-MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 60.0
 _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
     tempfile.gettempdir(),
     'regolith-pyrolysis-simulator',
@@ -1906,23 +1895,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         sample_warnings: list[str] = []
 
-        # Mandatory aggregate budget: generic finder default is unbounded so
-        # AlphaMELTS is not silently capped; MAGEMin always applies a finite
-        # wall and rejects an explicit None config (boundedness is invariant).
-        if 'liquidus_finder_budget_s' in self._config:
-            raw_budget = self._config.get('liquidus_finder_budget_s')
-        else:
-            raw_budget = (
-                MAGEMIN_WARM_LIQUIDUS_BUDGET_S
-                if self._subprocess_pool is not None
-                else DEFAULT_LIQUIDUS_FINDER_BUDGET_S
-            )
+        # MAGEMin uses a finite hang guard; sample count, not wall time,
+        # bounds the search work. A per-call engine timeout remains separate.
+        raw_budget = self._config.get(
+            'liquidus_finder_budget_s',
+            DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
+        )
         if raw_budget is None:
             return LiquidusSolidusResult(
                 status='refused',
                 warnings=(
                     'liquidus_finder_budget_s=None is rejected; '
-                    'MAGEMin requires a finite aggregate liquidus budget',
+                    'MAGEMin requires a finite liquidus hang guard',
                 ),
                 diagnostics={
                     'reason': 'invalid_input',
@@ -1955,7 +1939,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         def sample_fraction(
             temperature_C: float,
-            remaining_budget_s: Optional[float] = None,
         ) -> float:
             sample_fO2_log = (
                 fO2_log
@@ -1970,7 +1953,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 composition_mol=composition_mol,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_formula_registry,
-                call_timeout_s=remaining_budget_s,
                 projected_oxide_wt_pct=projected_oxide_wt_pct,
             )
             if result.status != 'ok':

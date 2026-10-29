@@ -2713,6 +2713,7 @@ class EvaporationMixin:
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
+            gate_curve_provider_diagnostic_reasons,
             gate_curve_provider_outcome_for_status,
             gate_curve_provider_timed_out,
             mark_uncacheable_replay_disposition,
@@ -2741,35 +2742,60 @@ class EvaporationMixin:
                     f'gate provider registration failed: {type(exc).__name__}',
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
-        for attempt in range(2):
-            try:
-                result = self._dispatch_only(
-                    ChemistryIntent.GATE_LIQUID_FRACTION,
-                    control_inputs={},
-                    fO2_log=fO2_log,
-                    redox_state=redox_state,
-                    fe_redox_policy='intrinsic',
+        try:
+            result = self._dispatch_only(
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                control_inputs={},
+                fO2_log=fO2_log,
+                redox_state=redox_state,
+                fe_redox_policy='intrinsic',
+            )
+        except (
+            ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
+        ) as exc:
+            diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
+            if isinstance(exc, EngineWorkerTimeout):
+                diagnostic['reason'] = 'engine_worker_timeout'
+            diagnostic['exception_class'] = type(exc).__name__
+            diagnostic['exception_message'] = str(exc)
+            status = str(getattr(exc, 'status', 'unavailable'))
+            warnings = list(getattr(exc, 'warnings', ()) or ())
+        else:
+            diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+            status = str(
+                getattr(result, 'status', None)
+                or diagnostic.get('backend_status')
+                or 'unavailable'
+            )
+            warnings = list(getattr(result, 'warnings', ()) or ())
+
+        if gate_curve_provider_timed_out(diagnostic):
+            timeout_reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+            timeout_kind = (
+                'liquidus_finder_hang_guard'
+                if 'aggregate_budget_exceeded' in timeout_reasons
+                else next(
+                    (
+                        reason
+                        for reason in timeout_reasons
+                        if 'timeout' in reason
+                    ),
+                    'engine_worker_timeout',
                 )
-            except (
-                ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
-            ) as exc:
-                diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
-                if isinstance(exc, EngineWorkerTimeout):
-                    diagnostic['reason'] = 'engine_worker_timeout'
-                diagnostic['exception_class'] = type(exc).__name__
-                diagnostic['exception_message'] = str(exc)
-                status = str(getattr(exc, 'status', 'unavailable'))
-                warnings = list(getattr(exc, 'warnings', ()) or ())
-            else:
-                diagnostic = dict(getattr(result, 'diagnostic', None) or {})
-                status = str(
-                    getattr(result, 'status', None)
-                    or diagnostic.get('backend_status')
-                    or 'unavailable'
-                )
-                warnings = list(getattr(result, 'warnings', ()) or ())
-            if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
-                break
+            )
+            raise EvaporationFluxRefusal(
+                'engine_compute_timeout',
+                {
+                    'reason': 'engine_compute_timeout',
+                    'reason_code': 'engine_compute_timeout',
+                    'timeout_kind': timeout_kind,
+                    'backend_failure_disposition': 'environment',
+                    'provider': self._liquid_fraction_provider,
+                    'status': status,
+                    'provider_diagnostic': diagnostic,
+                    'warnings': warnings,
+                },
+            )
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
@@ -2792,15 +2818,10 @@ class EvaporationMixin:
                 'provider_diagnostic': diagnostic,
                 'status': status,
                 'warnings': warnings,
-                **({'backend_failure_disposition': 'environment'}
-                   if gate_curve_provider_timed_out(diagnostic) else {}),
                 **({'detail': diagnostic['exception_message']}
                    if diagnostic.get('exception_message') else {}),
             }
-            if (
-                status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
-                or gate_curve_provider_timed_out(diagnostic)
-            ):
+            if status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE:
                 held = self._hold_freeze_gate_provider_curve(failure)
                 if held is not None:
                     return held
