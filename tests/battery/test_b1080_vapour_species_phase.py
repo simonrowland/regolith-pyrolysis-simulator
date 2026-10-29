@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import yaml
@@ -28,12 +29,37 @@ def _has_value(node: object) -> bool:
     return isinstance(node, MappingNode) and bool(node.value)
 
 
-def _is_pressure_quantity(row: dict[str, object], values: dict[str, object]) -> bool:
-    quantity = values.get("quantity") or row.get("type")
-    if not isinstance(quantity, ScalarNode):
-        return False
-    name = quantity.value.casefold().replace("-", "_")
-    return "pressure" in name or name in {"p_sat", "psat_series", "p_partial"}
+def _has_quantity(row: dict[str, object], values: dict[str, object]) -> bool:
+    return any(
+        isinstance(quantity, ScalarNode) and _has_value(quantity)
+        for quantity in (
+            values.get("quantity"),
+            row.get("quantity"),
+            row.get("type"),
+        )
+    )
+
+
+def _has_gas_phase_identity(node: object) -> bool:
+    if isinstance(node, ScalarNode):
+        return re.search(r"\(\s*g\s*\)", node.value, re.IGNORECASE) is not None
+    if isinstance(node, SequenceNode):
+        return any(_has_gas_phase_identity(item) for item in node.value)
+    if isinstance(node, MappingNode):
+        return any(_has_gas_phase_identity(value) for _, value in node.value)
+    return False
+
+
+def _has_vapour_species(row: dict[str, object], values: dict[str, object]) -> bool:
+    for owner in (values, row):
+        if _has_value(owner.get("gas_species")):
+            return True
+        if any(
+            _has_gas_phase_identity(owner.get(field))
+            for field in ("species", "formula", "pressure_species")
+        ):
+            return True
+    return False
 
 
 def _offending_vapour_phase_rows() -> list[str]:
@@ -56,14 +82,13 @@ def _offending_vapour_phase_rows() -> list[str]:
                     else None
                 )
                 values = _mapping(row.get("values"))
-                gas_species = values.get("gas_species") or row.get("gas_species")
                 if (
                     isinstance(phase, ScalarNode)
                     # highT_compiled is a compilation/temperature-range tag,
                     # not a sample, apparatus, or condensed-phase context.
                     and phase_name not in {"gas", "g", "hight_compiled"}
-                    and _has_value(gas_species)
-                    and _is_pressure_quantity(row, values)
+                    and _has_quantity(row, values)
+                    and _has_vapour_species(row, values)
                 ):
                     findings.append(
                         f"{path.relative_to(REPO_ROOT).as_posix()}:{phase.start_mark.line + 1}"
