@@ -29,6 +29,7 @@ def test_table1_activities_are_reduced_from_rendered_log_values():
     input_rows = [
         row for row in source_rows if row["observation_id"].endswith("_printed_log_input")
     ]
+    input_rows_by_id = {row["observation_id"]: row for row in input_rows}
     assert len(activity_rows) == 22
     assert len(input_rows) == 22
 
@@ -66,6 +67,15 @@ def test_table1_activities_are_reduced_from_rendered_log_values():
 
     for source_row in activity_rows:
         observation = activity[source_row["observation_id"]]
+        input_id = f"{source_row['observation_id']}_printed_log_input"
+        input_row = input_rows_by_id[input_id]
+        assert source_row["values"]["printed_header_as_published"] == "-log a_Na2O"
+        assert "printed_form" not in source_row["values"]
+        assert input_row["values"]["printed_header_as_published"] == "-log a_Na2O"
+        assert input_row["values"]["printed_form"] == "neg_log10"
+        printed_negative_log = Decimal(input_row["values"]["value_as_published"])
+        expected_activity = Decimal("10") ** -printed_negative_log
+        assert abs(observation.value.point - expected_activity) < expected_activity * Decimal("1e-15")
         assert observation.identity.temperature_K.is_value
         assert observation.identity.composition.is_value
         assert observation.point_conditions["T_C"].state.is_value
