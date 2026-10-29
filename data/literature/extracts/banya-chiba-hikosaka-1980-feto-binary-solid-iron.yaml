@@ -11441,6 +11441,69 @@ species:
             published_page: 1488
             table: '4'
             row: heat C D-7
+  context:
+  - observation_id: bch80_table5_activity_grid
+    type: author_summary_table
+    locator:
+      page: 6
+      published_page: 1489
+      table: '5'
+    units: dimensionless activity; composition coordinate N_MxOy as printed
+    values:
+      label: Author summary of the four FetO-MxOy binary systems at 1400 °C; Table 5 gives no run IDs, gas ratios,
+        or interpolation method.
+      temperature_C_as_printed: 1400
+      activity_grid_as_printed:
+      - N_MxOy_as_printed: '0.05'
+        Fe_tO-CaO: '0.970'
+        Fe_tO-SiO2: '0.980'
+        Fe_tO-TiO2: '0.954'
+        'Fe_tO-Al2O3*': '0.995'
+      - N_MxOy_as_printed: '0.10'
+        Fe_tO-CaO: '0.920'
+        Fe_tO-SiO2: '0.950'
+        Fe_tO-TiO2: '0.902'
+        'Fe_tO-Al2O3*': '0.988'
+      - N_MxOy_as_printed: '0.15'
+        Fe_tO-CaO: '0.828'
+        Fe_tO-SiO2: '0.913'
+        Fe_tO-TiO2: '0.848'
+        'Fe_tO-Al2O3*': '0.976'
+      - N_MxOy_as_printed: '0.20'
+        Fe_tO-CaO: '0.742'
+        Fe_tO-SiO2: '0.848'
+        Fe_tO-TiO2: '0.792'
+        'Fe_tO-Al2O3*': '0.948'
+      - N_MxOy_as_printed: '0.25'
+        Fe_tO-CaO: '0.666'
+        Fe_tO-SiO2: '0.755'
+        Fe_tO-TiO2: '0.736'
+        'Fe_tO-Al2O3*': '0.929'
+      - N_MxOy_as_printed: '0.30'
+        Fe_tO-CaO: '0.580'
+        Fe_tO-SiO2: '0.650'
+        Fe_tO-TiO2: '0.674'
+        'Fe_tO-Al2O3*': '0.912'
+      - N_MxOy_as_printed: '0.35'
+        Fe_tO-CaO: '0.512'
+        Fe_tO-SiO2: '0.540'
+        Fe_tO-TiO2: '0.590'
+        'Fe_tO-Al2O3*': '0.898'
+      - N_MxOy_as_printed: '0.40'
+        Fe_tO-CaO: '0.438'
+        Fe_tO-SiO2: '0.430'
+        Fe_tO-TiO2: '0.499'
+        'Fe_tO-Al2O3*': '0.886'
+      - N_MxOy_as_printed: '0.45'
+        Fe_tO-CaO: '0.374'
+        Fe_tO-SiO2: null
+        Fe_tO-TiO2: '0.408'
+        Fe_tO-Al2O3: null
+      - N_MxOy_as_printed: '0.50'
+        Fe_tO-CaO: '0.312'
+        Fe_tO-SiO2: null
+        Fe_tO-TiO2: '0.320'
+        Fe_tO-Al2O3: null
   Fe:
     observations:
     - observation_id: bch80_t1_c_b_1_valence_ratio

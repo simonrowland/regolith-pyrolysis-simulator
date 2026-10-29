@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity
-from simulator.battery import migrate as battery_migrate
+from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.migrate import wt_pct_to_mole_fraction
 from tests.battery import factories as battery_factories
 from tools import validate_literature_extracts as vle
 
@@ -45,6 +46,19 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     assert by_id["bch80_t2_c_a_1"]["values"]["PH2O_over_PH2_as_printed"] == 0.876
     assert by_id["bch80_t3_c_c_1"]["values"]["composition_wt_pct"]["Fe2O3"] == 8.55
 
+    table5 = document["species"]["Fe_tO"]["context"]
+    assert len(table5) == 1
+    grid = table5[0]["values"]["activity_grid_as_printed"]
+    assert len(grid) == 10
+    assert grid[0] == {
+        "N_MxOy_as_printed": "0.05",
+        "Fe_tO-CaO": "0.970",
+        "Fe_tO-SiO2": "0.980",
+        "Fe_tO-TiO2": "0.954",
+        "Fe_tO-Al2O3*": "0.995",
+    }
+    assert grid[-1]["Fe_tO-SiO2"] is None
+
     assert vle.validate_extract_document(
         document, expected_source_id="banya-chiba-hikosaka-1980-feto-binary-solid-iron"
     ) == []
@@ -55,16 +69,49 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     assert len(result.observations) == 207
     assert all(row.identity.quantity.state.is_value for row in result.observations.values())
     assert all(row.phase.state.is_value for row in result.observations.values())
+    assert all(
+        row.value.kind is not ValueKind.UNAVAILABLE
+        for row in result.observations.values()
+    )
+    assert all(
+        row.point_conditions["temperature_K"].state.is_value
+        and row.point_conditions["composition"].state.is_value
+        for row in result.observations.values()
+    )
+    assert all(
+        not experiment.pressure_environment.total_pressure_Pa.state.is_value
+        for experiment in result.experiments.values()
+    )
+
+    migrated_t1 = result.observations[
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t1_c_b_1"
+    ]
+    expected_composition = wt_pct_to_mole_fraction(
+        {"FeO": 85.66, "Fe2O3": 10.18, "CaO": 4.33}
+    )
+    assert (
+        migrated_t1.point_conditions["composition"].state.value.as_map()
+        == expected_composition.as_map()
+    )
+
+    gas_ratio = result.experiments[
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t2_c_a_1_run"
+    ].fO2_control.gas_ratio.value.state.value
+    assert gas_ratio == Decimal("0.876")
 
     for source_id in (
-        "bch80_t1_c_b_1_activity",
-        "bch80_t2_c_a_1_valence_ratio",
-        "bch80_t3_c_c_1",
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t1_c_b_1_activity",
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t2_c_a_1_valence_ratio",
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t3_c_c_1",
     ):
-        row = result.observations[f"banya-chiba-hikosaka-1980-feto-binary-solid-iron::{source_id}"]
+        row = result.observations[source_id]
         assert row.point_conditions["temperature_K"].state.is_value
         assert row.point_conditions["composition"].state.is_value
         assert "total_pressure_Pa" not in row.point_conditions
+        assert row.identity.composition is not None and row.identity.composition.is_value
+        assert row.identity.temperature_K is not None and row.identity.temperature_K.is_value
+        assert row.identity.total_pressure_Pa is None or not row.identity.total_pressure_Pa.is_value
+        assert row.identity.fO2_Pa is None or not row.identity.fO2_Pa.is_value
 
     assert all("pressure_environment" not in experiment for experiment in document["experiments"])
 
