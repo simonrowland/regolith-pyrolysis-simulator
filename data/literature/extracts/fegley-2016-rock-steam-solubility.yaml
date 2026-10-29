@@ -40,6 +40,33 @@ species:
         quantity: partial_pressure
         method_class: model_derived
         model: IVTAN chemical-equilibrium calculations using experimental or estimated Si-O-H thermodynamic data
+        derivation:
+          relation: "IVTAN Gibbs-energy minimization chemical-equilibrium calculation; Table 1 reports the resulting Si-bearing gas partial pressures for conditions A-D."
+          output_unit: bar
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 14
+              published_page: 116
+              pdf_page_index: 14
+              equation: '2'
+              section: 4. Chemical Equilibrium Calculations
+              note: The paper names the thermodynamic data sources but does not tabulate their numerical species inputs.
+          method:
+            state: {tag: value, value: IVTAN Gibbs-energy minimization for ideal-gas and real-gas chemical equilibrium}
+            locator:
+              page: 14
+              published_page: 116
+              pdf_page_index: 14
+              equation: '2'
+              section: 4. Chemical Equilibrium Calculations
+          references:
+          - van Zeggern and Storey (1970)
+          - NIST-JANAF Tables, Chase et al. (1999)
+          - IVTAN database, Gurvich et al. (1983, 1989-1994)
+          - Plyasunov (2011a, 2012)
+          - Krikorian (1970)
+          - Allendorf et al. (1995)
         points:
         - {species_as_printed: SiO, gas_species_as_printed: SiO, condition_label: A, T_K: 2000, p_bar: 8.6e-6, locator: {pdf_page_index: 119, table: '1'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '4'}}, locator: {pdf_page_index: 119, table: '1'}}, sweep_gas_as_printed: {state: {tag: value, value: steam}, locator: {pdf_page_index: 119, table: '1'}}, condensed_phase_as_printed: {state: {tag: value, value: liquid silica}, locator: {pdf_page_index: 119, table: '1'}}}}
         - {species_as_printed: SiO, gas_species_as_printed: SiO, condition_label: B, T_K: 1573, p_bar: 1.6e-13, locator: {pdf_page_index: 119, table: '1'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {pdf_page_index: 119, table: '1'}}, sweep_gas_as_printed: {state: {tag: value, value: '90% steam - 10% O2'}, locator: {pdf_page_index: 119, table: '1'}}, condensed_phase_as_printed: {state: {tag: value, value: cristobalite}, locator: {pdf_page_index: 119, table: '1'}}}}
@@ -84,6 +111,30 @@ species:
         quantity: partial_pressure
         method_class: model_derived
         model: IVTAN chemical-equilibrium calculations
+        derivation:
+          relation: "IVTAN Gibbs-energy minimization chemical-equilibrium calculation; Table 4 reports the resulting metal-hydroxide gas partial pressures at 220.64 bars steam."
+          output_unit: bar
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 14
+              published_page: 116
+              pdf_page_index: 14
+              equation: '2'
+              section: 4. Chemical Equilibrium Calculations
+              note: The paper names the thermodynamic data sources but does not tabulate their numerical species inputs.
+          method:
+            state: {tag: value, value: IVTAN Gibbs-energy minimization for ideal-gas and real-gas chemical equilibrium}
+            locator:
+              page: 14
+              published_page: 116
+              pdf_page_index: 14
+              equation: '2'
+              section: 4. Chemical Equilibrium Calculations
+          references:
+          - van Zeggern and Storey (1970)
+          - NIST-JANAF Tables, Chase et al. (1999)
+          - IVTAN database, Gurvich et al. (1983, 1989-1994)
         points:
         - {species_as_printed: SiH4O4, gas_species_as_printed: Si(OH)4, T_K: 1000, p_bar: 0.029, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
         - {species_as_printed: SiH4O4, gas_species_as_printed: Si(OH)4, T_K: 1500, p_bar: 0.20, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
@@ -137,6 +188,23 @@ species:
         - {oxide: total, mole_percent: 100.00}
       uncertainty: {note: none printed}
     - observation_id: fegley_2016_table5_gas_magma_distribution_coefficients
+      derived_from:
+      - fegley_2016_table2_continental_crust_composition
+      - fegley_2016_table3_bse_composition
+      derivation:
+        relation: Table 5 log10 D values use D = moles in gas divided by moles in magma after the source's ideal-gas and real-gas chemical-equilibrium calculations.
+        inputs:
+        - fegley_2016_table2_continental_crust_composition
+        - fegley_2016_table3_bse_composition
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: 'IVTAN Gibbs-energy minimization for ideal-gas and real-gas chemical equilibrium'}
+          locator: {page: 14, pdf_page_index: 13, section: '3'}
+        references:
+        - van Zeggern and Storey (1970), as cited in section 3
+        - Chase et al. (1999), NIST-JANAF Thermochemical Tables
+        - Gurvich et al. (1983, 1989-1994), IVTAN database
+        - Robie and Hemingway (1995)
       type: activity_coefficient
       locator: {pdf_page_index: 123, table: '5'}
       T_range_K: [2000.0, 3000.0]
