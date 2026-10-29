@@ -267,12 +267,21 @@ def test_magemin_pure_phase_timeout_remains_a_timeout(monkeypatch, tmp_path):
 
     monkeypatch.setattr(magemin_module.subprocess, "run", timeout_run)
 
-    with pytest.raises(TimeoutError, match="pure-phase probe timed out"):
+    with pytest.raises(Exception) as raised:
         backend._run_pure_phase_probe(
             bulk_wt_ig={"MgO": 100.0},
             temperature_C=1000.0,
             pressure_kbar=0.001,
         )
+
+    assert raised.value.terminal_refusal is True
+    assert raised.value.reason_code == 'engine_compute_timeout'
+    assert raised.value.timeout_kind == 'TimeoutExpired'
+    assert raised.value.diagnostic == {
+        'reason': 'engine_compute_timeout',
+        'terminal_refusal': True,
+        'timeout_kind': 'TimeoutExpired',
+    }
 
 
 # --- MAGEMin: KLB1 bulk-echo guard -----------------------------------------

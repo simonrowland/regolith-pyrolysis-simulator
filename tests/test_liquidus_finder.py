@@ -647,7 +647,7 @@ def test_liquidus_finder_stops_on_aggregate_budget(monkeypatch):
 
     monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
 
-    with pytest.raises(_LiquidusFinderBudgetExceeded) as expired:
+    with pytest.raises(TimeoutError) as expired:
         find_liquidus_solidus_by_fraction(
             sample,
             min_T_C=800.0,
@@ -738,7 +738,7 @@ def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
 
     monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
 
-    with pytest.raises(_LiquidusFinderBudgetExceeded) as expired:
+    with pytest.raises(TimeoutError) as expired:
         find_liquidus_solidus_by_fraction(
             sample,
             min_T_C=800.0,
@@ -754,13 +754,19 @@ def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
     assert diagnostics['last_T_C'] == pytest.approx(800.0)
     assert diagnostics['budget_s'] == pytest.approx(0.05)
     assert diagnostics['elapsed_s'] == pytest.approx(0.05)
+    assert diagnostics['reason_code'] == 'engine_compute_timeout'
+    assert diagnostics['terminal_refusal'] is True
+    assert diagnostics['timeout_kind'] == 'liquidus_scan'
+    assert diagnostics['budget'] == 'liquidus_scan'
 
 
 def test_liquidus_finder_worker_timeout_is_a_run_refusal():
-    def sample(_temperature_C: float) -> float:
-        raise TimeoutError('synthetic engine hard timeout')
+    timeout = TimeoutError('synthetic engine hard timeout')
 
-    with pytest.raises(_LiquidusFinderBudgetExceeded) as expired:
+    def sample(_temperature_C: float) -> float:
+        raise timeout
+
+    with pytest.raises(TimeoutError) as expired:
         find_liquidus_solidus_by_fraction(
             sample,
             min_T_C=800.0,
@@ -768,10 +774,14 @@ def test_liquidus_finder_worker_timeout_is_a_run_refusal():
             scan_step_C=100.0,
         )
 
-    assert expired.value.diagnostics == {
-        'reason': 'engine_timeout',
-        'exception_class': 'TimeoutError',
-        'exception_message': 'synthetic engine hard timeout',
+    assert expired.value is timeout
+    assert expired.value.terminal_refusal is True
+    assert expired.value.reason_code == 'engine_compute_timeout'
+    assert expired.value.timeout_kind == 'TimeoutError'
+    assert expired.value.diagnostic == {
+        'reason': 'engine_compute_timeout',
+        'terminal_refusal': True,
+        'timeout_kind': 'TimeoutError',
     }
 
 

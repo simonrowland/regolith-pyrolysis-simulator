@@ -425,6 +425,10 @@ def find_liquidus_solidus_by_fraction(
         assert budget is not None
         return {
             'reason': 'aggregate_budget_exceeded',
+            'reason_code': 'engine_compute_timeout',
+            'terminal_refusal': True,
+            'timeout_kind': 'liquidus_scan',
+            'budget': 'liquidus_scan',
             'elapsed_s': _elapsed_s(),
             'call_count': len(samples),
             'last_T_C': last_T_C,
@@ -454,6 +458,12 @@ def find_liquidus_solidus_by_fraction(
         """Keep the engine exception type while making its timeout terminal."""
         exc.terminal_refusal = True
         exc.reason_code = 'engine_compute_timeout'
+        exc.timeout_kind = type(exc).__name__
+        exc.diagnostic = {
+            'reason': 'engine_compute_timeout',
+            'terminal_refusal': True,
+            'timeout_kind': exc.timeout_kind,
+        }
 
     def sample(T_C: float) -> MeltFractionSample:
         nonlocal last_T_C
@@ -478,6 +488,19 @@ def find_liquidus_solidus_by_fraction(
             except _LiquidusFinderBudgetExceeded:
                 raise
             except LiquidusSampleError as exc:
+                engine_timeout = (
+                    exc.diagnostics.get('reason') == 'engine_compute_timeout'
+                    and exc.diagnostics.get('terminal_refusal') is True
+                )
+                if (
+                    deadline is not None
+                    and time.monotonic() >= deadline
+                    and not engine_timeout
+                ):
+                    raise _LiquidusFinderBudgetExceeded(
+                        budget_warning(),
+                        diagnostics=_budget_diagnostics(),
+                    ) from exc
                 raise _sample_error_with_exception_context(exc) from exc
             except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
                 if isinstance(exc, TimeoutError):

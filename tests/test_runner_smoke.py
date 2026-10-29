@@ -2513,6 +2513,7 @@ def test_runner_envelopes_poisoned_hour_error_loudly(
     )
     sim._establish_melt_redox_gate_authority_for_current_hour()
     sim._apply_fe_redox_respeciation()
+    ledger_before_step = sim.atom_ledger.mol_by_account()
 
     original_step_one_hour = sim._step_one_hour
     committed_deltas = []
@@ -2546,15 +2547,17 @@ def test_runner_envelopes_poisoned_hour_error_loudly(
     assert len(committed_deltas) == 1
     assert committed_deltas[0] > 0
     assert len(observed_errors) == 1
-    assert type(observed_errors[0]) is type(failure)
+    assert observed_errors[0] is failure
     assert payload["status"] == expected_status
     assert payload["reason"] == expected_reason
     assert payload["run_metadata"]["hours_completed"] == 0
     assert payload["per_hour_summary"] == []
 
     if compute_timeout:
-        assert observed_errors[0] is failure
+        assert sim.atom_ledger.mol_by_account() == ledger_before_step
         assert sim._poisoned_hour is None
+        assert failure.terminal_refusal is True
+        assert failure.reason_code == 'engine_compute_timeout'
         refusal_diagnostic = payload["run_metadata"]["refusal_diagnostic"]
         assert refusal_diagnostic["reason"] == "engine_compute_timeout"
         assert refusal_diagnostic["budget"]["budget"] == "liquidus_scan"

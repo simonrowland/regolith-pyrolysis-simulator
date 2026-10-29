@@ -350,6 +350,20 @@ _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES = frozenset({
 })
 
 
+def _mark_magemin_compute_timeout_refusal(
+    exc: BaseException,
+    timeout_kind: str,
+) -> None:
+    exc.terminal_refusal = True
+    exc.reason_code = 'engine_compute_timeout'
+    exc.timeout_kind = str(timeout_kind)
+    exc.diagnostic = {
+        'reason': 'engine_compute_timeout',
+        'terminal_refusal': True,
+        'timeout_kind': exc.timeout_kind,
+    }
+
+
 class _MAGEMinEngineCallError(RuntimeError):
     """An exception raised by a MAGEMin engine call, with its source type."""
 
@@ -369,7 +383,7 @@ class _MAGEMinEngineCallError(RuntimeError):
         ):
             self.terminal_refusal = True
         if exception_type in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES:
-            self.reason_code = 'engine_compute_timeout'
+            _mark_magemin_compute_timeout_refusal(self, exception_type)
         super().__init__(f'{exception_type}: {message}')
 
 
@@ -1423,8 +1437,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             except EngineWorkerRemoteError as exc:
                 if exc.exc_name in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES:
-                    exc.terminal_refusal = True
-                    exc.reason_code = 'engine_compute_timeout'
+                    _mark_magemin_compute_timeout_refusal(
+                        exc,
+                        exc.exc_name,
+                    )
                     raise
                 self._warn(
                     'MAGEMin warm pool failed to initialize: '
@@ -1700,8 +1716,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     # bounded slot guard before reporting the timeout.
                     timeout_retry_used = True
         except TimeoutError as exc:
-            exc.terminal_refusal = True
-            exc.reason_code = 'engine_compute_timeout'
+            _mark_magemin_compute_timeout_refusal(exc, type(exc).__name__)
             raise
         except _MAGEMinEngineCallError as exc:
             if (
@@ -1720,6 +1735,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_failure_exception': exc.exception_type,
                 'backend_failure_message': exc.engine_message,
             })
+            if exc.exception_type in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES:
+                failure_diagnostics.update(exc.diagnostic)
             if exc.failure_disposition is not None:
                 failure_diagnostics['backend_failure_disposition'] = (
                     exc.failure_disposition
@@ -2952,7 +2969,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     ):
                         exc.terminal_refusal = True
                         if exc.exc_name in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES:
-                            exc.reason_code = 'engine_compute_timeout'
+                            _mark_magemin_compute_timeout_refusal(
+                                exc,
+                                exc.exc_name,
+                            )
                         raise
 
                     remote_exception = getattr(builtins, exc.exc_name, None)
@@ -3792,12 +3812,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     )
         except _MAGEMinEngineCallError as exc:
             if exc.exception_type in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES:
-                exc.terminal_refusal = True
-                exc.reason_code = 'engine_compute_timeout'
+                _mark_magemin_compute_timeout_refusal(
+                    exc,
+                    exc.exception_type,
+                )
             raise
         except subprocess.TimeoutExpired as exc:
-            exc.terminal_refusal = True
-            exc.reason_code = 'engine_compute_timeout'
+            _mark_magemin_compute_timeout_refusal(exc, type(exc).__name__)
             raise
         except OSError as exc:
             raise PurePhaseAccessError(

@@ -165,6 +165,15 @@ class EngineWorkerTimeout(TimeoutError):
         self.timeout_s = float(timeout_s)
         self.phase = str(phase)
         self.failed_slots = tuple(int(slot) for slot in failed_slots)
+        self.timeout_kind = 'EngineWorkerTimeout'
+        self.diagnostic = {
+            'reason': self.reason_code,
+            'terminal_refusal': True,
+            'timeout_kind': self.timeout_kind,
+            'worker_name': self.worker_name,
+            'phase': self.phase,
+            'timeout_s': self.timeout_s,
+        }
         super().__init__(
             f'{self.worker_name} {self.phase} exceeded hard timeout of '
             f'{self.timeout_s:g}s'

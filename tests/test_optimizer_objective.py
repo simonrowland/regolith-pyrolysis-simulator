@@ -2055,6 +2055,10 @@ def test_sso2_owner_execution_refuses_without_native_fe_split_count_on_timeout(
 
     assert execution.status == "refused"
     assert execution.reason == "engine_compute_timeout"
+    assert execution.failure_exception.terminal_refusal is True
+    assert execution.failure_exception.reason_code == 'engine_compute_timeout'
+    assert execution.refusal_diagnostic['reason'] == 'engine_compute_timeout'
+    assert execution.refusal_diagnostic['budget']['budget'] == 'liquidus_scan'
     partition = sso2_owner_recipe_evidence(execution)[
         "fe_drain_vapor_partition_dependency"
     ]
