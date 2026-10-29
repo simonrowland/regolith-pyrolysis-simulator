@@ -33,10 +33,7 @@ fidelity_samples:
     published_page: 1917
     pdf_page_index: 7
     note: Table 7 sample 1, 1370 C, a_P2O5 x 10^17 = 1.2
-- species: P2O5
-  observable: activity_coefficient
-  observation_id: kambayashi_1985_gamma_p2o5_solid_std_henry
-  field: gamma_1370C
+- path: species.P2O5.observations[kambayashi_1985_gamma_p2o5_solid_std_henry].values.points[0].gamma
   value: 2.2e-15
   locator:
     published_page: 1911
