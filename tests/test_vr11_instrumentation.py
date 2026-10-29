@@ -1025,6 +1025,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
             host,
             equilibrium,
             overhead_partials_override_Pa={},
+            overhead_total_pressure_override_Pa=0.0,
         )
 
     assert flux.species_kg_hr == {}
@@ -1155,6 +1156,7 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
         host,
         equilibrium,
         overhead_partials_Pa={"Na": 0.0},
+        overhead_pressure_pa=0.0,
         vapour_batch_flux_pressures_Pa={"Na": 5.0},
         vapour_batch_report={"schema": "vapour_batch.v1", "n_requested": 1},
         vapour_batch_flux_overlay={
