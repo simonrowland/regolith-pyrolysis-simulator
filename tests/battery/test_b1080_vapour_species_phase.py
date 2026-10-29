@@ -10,6 +10,25 @@ from yaml.nodes import MappingNode, ScalarNode, SequenceNode
 
 from simulator.battery.migrate import REPO_ROOT
 
+_NON_VAPOUR_QUANTITIES = {
+    "ab_initio_enthalpy_of_formation",
+    "calibration_reference_gas_composition",
+    "condensed_sample_mass",
+    "deposit_edx_wt_pct_ranges",
+    "equilibrium_molecular_oxygen_yield",
+    "gibbs_table",
+    "major_gas_speciation_by_environment",
+    "not_reported_among_detected_species",
+    "one_percent_evaporation_temperature",
+    "open_furnace_residue_composition_vs_time",
+    "reduced_partition_function_ratio_prefactor",
+    "relation",
+    "residue_component_composition",
+    "residue_composition_vs_time",
+    "solar_wind_helium_inventory",
+    "free_evap_sio2_loss_with_vf",
+}
+
 
 def _mapping(node: object) -> dict[str, object]:
     if not isinstance(node, MappingNode):
@@ -38,6 +57,27 @@ def _has_quantity(row: dict[str, object], values: dict[str, object]) -> bool:
             row.get("type"),
         )
     )
+
+
+def _is_vapour_measurement(row: dict[str, object], values: dict[str, object]) -> bool:
+    quantity = next(
+        (
+            candidate
+            for candidate in (
+                values.get("quantity"),
+                row.get("quantity"),
+                row.get("type"),
+            )
+            if isinstance(candidate, ScalarNode) and _has_value(candidate)
+        ),
+        None,
+    )
+    if not isinstance(quantity, ScalarNode):
+        return False
+    name = quantity.value.strip().casefold().replace("-", "_")
+    # These quantities describe condensed samples, reference-gas fixtures, or
+    # thermochemical/model records; gas_species is context in those rows.
+    return name not in _NON_VAPOUR_QUANTITIES
 
 
 def _has_gas_phase_identity(node: object) -> bool:
@@ -88,6 +128,7 @@ def _offending_vapour_phase_rows() -> list[str]:
                     # not a sample, apparatus, or condensed-phase context.
                     and phase_name not in {"gas", "g", "hight_compiled"}
                     and _has_quantity(row, values)
+                    and _is_vapour_measurement(row, values)
                     and _has_vapour_species(row, values)
                 ):
                     findings.append(
