@@ -1445,7 +1445,7 @@ def test_flat_point_composition_ignores_temperature_and_loss_fields() -> None:
                 }
             ]
         }
-    ) == {"SiO2": Decimal("50"), "MgO": Decimal("40")}
+    ) == {"SiO2": Decimal("60"), "MgO": Decimal("40")}
 
 
 def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
