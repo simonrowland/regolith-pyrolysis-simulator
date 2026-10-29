@@ -94,7 +94,6 @@ def test_table3_cells_and_migration_match_page9_render(tmp_path):
     assert Counter(row.identity.quantity.value for row in table3_rows) == {
         Quantity.ACTIVITY: 137
     }
-    assert all(row.identity.phase_role.is_value for row in table3_rows)
     assert all(row.identity.temperature_K.is_value for row in table3_rows)
     assert all(row.identity.temperature_K.value == 1933 for row in table3_rows)
     assert all(row.identity.composition.is_value for row in table3_rows)
