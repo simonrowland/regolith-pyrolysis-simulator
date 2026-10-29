@@ -2008,6 +2008,37 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     }
 
 
+def test_sso2_owner_gate_timeout_is_a_terminal_refusal(monkeypatch):
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+    from simulator.core import PyrolysisSimulator
+    from simulator.evaporation import EvaporationFluxRefusal
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    original_dispatch = PyrolysisSimulator._dispatch_only
+    gate_calls = []
+
+    def timeout_gate(self, intent, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            gate_calls.append(intent)
+            raise EngineWorkerTimeout('magemin', 0.01, phase='call')
+        return original_dispatch(self, intent, **kwargs)
+
+    monkeypatch.setattr(PyrolysisSimulator, '_dispatch_only', timeout_gate)
+    execution = build_sso2_owner_recipe_execution(hours=9)
+
+    assert gate_calls
+    assert execution.status == 'refused'
+    assert execution.reason == 'engine_compute_timeout'
+    assert isinstance(execution.failure_exception, EvaporationFluxRefusal)
+    assert execution.refusal_diagnostic['reason_code'] == (
+        'engine_compute_timeout'
+    )
+    assert execution.refusal_diagnostic['timeout_kind'] == (
+        'engine_worker_timeout'
+    )
+    assert execution.simulator._melt_redox_liquidus_gate_fallback_count == 0
+
+
 def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
     from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
 

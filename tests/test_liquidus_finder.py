@@ -143,6 +143,37 @@ def test_liquidus_finder_is_deterministic():
     assert first == second
 
 
+def test_liquidus_finder_result_and_sample_count_ignore_wall_clock(monkeypatch):
+    def sample(temperature_C: float) -> float:
+        return max(0.0, min(1.0, (temperature_C - 1000.0) / 300.0))
+
+    budget_s = liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S
+    kwargs = {
+        'min_T_C': 400.0,
+        'max_T_C': 2200.0,
+        'scan_step_C': 50.0,
+        'tolerance_C': 2.0,
+        'budget_s': budget_s,
+    }
+    unloaded = find_liquidus_solidus_by_fraction(sample, **kwargs)
+
+    elapsed = {'seconds': 0.0}
+
+    def loaded_monotonic():
+        elapsed['seconds'] += 3.0
+        return elapsed['seconds']
+
+    monkeypatch.setattr(liquidus_module.time, 'monotonic', loaded_monotonic)
+    loaded = find_liquidus_solidus_by_fraction(sample, **kwargs)
+
+    assert loaded.status == unloaded.status == 'ok'
+    assert loaded.samples == unloaded.samples
+    assert loaded.iterations == unloaded.iterations
+    assert loaded.liquidus_T_C == unloaded.liquidus_T_C
+    assert loaded.solidus_T_C == unloaded.solidus_T_C
+    assert elapsed['seconds'] > 300.0
+
+
 def test_finder_propagates_internal_monotone_error(monkeypatch):
     def fail_local(*_args, **_kwargs):
         raise KeyError('monotone bookkeeping defect')
@@ -287,12 +318,12 @@ def test_ec_path_preserves_typed_backend_sample_failure():
 
 def test_liquidus_finder_reuses_duplicate_bisection_temperatures(monkeypatch):
     sampled_temperatures: list[float] = []
-    remaining_seen: list[float] = []
+    remaining_seen: list[float | None] = []
     clock = {'t': 0.0}
 
     def step_fraction(temperature_C: float, remaining_budget_s=None) -> float:
         sampled_temperatures.append(float(temperature_C))
-        remaining_seen.append(float(remaining_budget_s))
+        remaining_seen.append(remaining_budget_s)
         clock['t'] += 0.01
         return 0.0 if temperature_C < 1250.0 else 1.0
 
@@ -313,8 +344,7 @@ def test_liquidus_finder_reuses_duplicate_bisection_temperatures(monkeypatch):
     assert len(result.samples) == 22
     assert len(sampled_temperatures) == 15
     assert len(set(sampled_temperatures)) == 15
-    assert remaining_seen[0] == pytest.approx(1.0)
-    assert remaining_seen[-1] == pytest.approx(0.86)
+    assert remaining_seen == [None] * len(sampled_temperatures)
     assert result.diagnostics == {}
 
 
@@ -631,16 +661,16 @@ def test_liquidus_result_validates_nested_samples(sample):
         LiquidusSolidusResult(status='unavailable', samples=(sample,))
 
 
-def test_liquidus_finder_stops_on_aggregate_budget(monkeypatch):
+def test_liquidus_finder_stops_on_wall_clock_hang_guard(monkeypatch):
     clock = {'t': 0.0}
-    remaining_seen: list[float] = []
+    remaining_seen: list[float | None] = []
 
     def fake_monotonic():
         return clock['t']
 
     def sample(temperature_C: float, remaining_budget_s=None) -> float:
         remaining_seen.append(remaining_budget_s)
-        # Each engine call burns wall time after the residual is observed.
+        # Simulate a sample that completes after the hang guard expires.
         clock['t'] += 0.1
         return 0.0
 
@@ -667,19 +697,19 @@ def test_liquidus_finder_stops_on_aggregate_budget(monkeypatch):
     assert diagnostics['last_T_C'] == pytest.approx(800.0)
     assert diagnostics['budget_s'] == pytest.approx(0.05)
     assert diagnostics['elapsed_s'] == pytest.approx(0.1)
-    # Residual budget threaded into the call that then overran.
-    assert remaining_seen == [pytest.approx(0.05)]
+    # The hang guard does not reduce the next engine call's timeout.
+    assert remaining_seen == [None]
 
 
-def test_liquidus_finder_threads_remaining_budget_into_each_call(monkeypatch):
+def test_liquidus_finder_does_not_thread_hang_guard_into_samples(monkeypatch):
     clock = {'t': 0.0}
-    remaining_seen: list[float] = []
+    remaining_seen: list[float | None] = []
 
     def fake_monotonic():
         return clock['t']
 
     def sample(temperature_C: float, remaining_budget_s=None) -> float:
-        remaining_seen.append(float(remaining_budget_s))
+        remaining_seen.append(remaining_budget_s)
         clock['t'] += 0.2
         # Monotone liquidus-ish curve so the finder keeps sampling.
         return max(0.0, min(1.0, (temperature_C - 850.0) / 100.0))
@@ -691,55 +721,35 @@ def test_liquidus_finder_threads_remaining_budget_into_each_call(monkeypatch):
         min_T_C=800.0,
         max_T_C=1000.0,
         scan_step_C=100.0,
-        budget_s=0.55,
+        budget_s=5.0,
         tolerance_C=50.0,  # avoid deep bisection; grid alone may finish
         max_bisection_iterations=0,
     )
-    # At least two residual observations, strictly decreasing by call cost.
-    assert len(remaining_seen) >= 2
-    assert remaining_seen[0] == pytest.approx(0.55)
-    assert remaining_seen[1] == pytest.approx(0.35)
-    assert all(
-        earlier > later
-        for earlier, later in zip(remaining_seen, remaining_seen[1:])
-    )
-    # Either ok (with max_bisection 0 path) or not_converged; budget must not
-    # have been the failure mode for the first two cheap calls.
-    if result.status == 'not_converged':
-        assert result.diagnostics.get('reason') != 'aggregate_budget_exceeded' or len(
-            result.samples
-        ) >= 2
+    assert len(remaining_seen) == 3
+    assert remaining_seen == [None, None, None]
+    assert result.diagnostics.get('reason') != 'aggregate_budget_exceeded'
 
 
-def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
+def test_liquidus_finder_preserves_sample_timeout_over_hang_guard(
     monkeypatch,
 ):
-    """Engine path that burns the residual must not fall through as generic fail.
-
-    Simulates the subprocess residual-timeout shape: the sample callable
-    observes the residual, burns wall equal to it, then raises a timeout-
-    shaped error (never returns a fraction). Structured
-    ``aggregate_budget_exceeded`` diagnostics must still be attached.
-    """
+    """A per-sample timeout stays distinct from aggregate hang detection."""
     clock = {'t': 0.0}
-    remaining_seen: list[float] = []
+    remaining_seen: list[float | None] = []
 
     def fake_monotonic():
         return clock['t']
 
     def sample(temperature_C: float, remaining_budget_s=None) -> float:
-        remaining = float(remaining_budget_s)
-        remaining_seen.append(remaining)
-        # Burn residual wall as a real residual-clamped subprocess would.
-        clock['t'] += remaining
+        remaining_seen.append(remaining_budget_s)
+        clock['t'] += 0.05
         raise LiquidusSampleError(
             'not_converged',
-            (f'MAGEMin binary timed out after {remaining:g}s',),
+            ('MAGEMin worker call timed out',),
             {
-                'exception_class': 'RuntimeError',
-                'exception_message': (
-                    f'MAGEMin binary timed out after {remaining:g}s'
-                ),
+                'backend_status_reason': 'engine_worker_timeout',
+                'exception_class': 'EngineWorkerTimeout',
+                'exception_message': 'MAGEMin worker call timed out',
             },
         )
 
@@ -754,24 +764,12 @@ def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
     )
 
     assert result.status == 'not_converged'
-    assert result.samples == ()  # timed out before a sample was recorded
-    assert remaining_seen == [pytest.approx(0.05)]
-    assert any(
-        'liquidus finder exceeded aggregate budget 0.05s after 0 calls'
-        in warning
-        for warning in result.warnings
-    )
+    assert result.samples == ()
+    assert remaining_seen == [None]
     diagnostics = dict(result.diagnostics)
-    assert diagnostics['reason'] == 'aggregate_budget_exceeded'
-    assert diagnostics['call_count'] == 0
-    assert diagnostics['last_T_C'] == pytest.approx(800.0)
-    assert diagnostics['budget_s'] == pytest.approx(0.05)
-    assert diagnostics['elapsed_s'] == pytest.approx(0.05)
-    # Must not be the generic Exception envelope.
-    assert not any(
-        warning.startswith('liquidus finder failed:')
-        for warning in result.warnings
-    )
+    assert diagnostics['backend_status_reason'] == 'engine_worker_timeout'
+    assert diagnostics['exception_class'] == 'EngineWorkerTimeout'
+    assert diagnostics.get('reason') != 'aggregate_budget_exceeded'
 
 
 def test_finder_projects_tagged_external_failure():
