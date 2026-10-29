@@ -4125,6 +4125,18 @@ def _printed_initial_charge_row_map(
     only"); any other row map is that row's own state.
     """
 
+    def checked(got: dict[str, Decimal] | None) -> dict[str, Decimal] | None:
+        if not got:
+            return None
+        _composition, refusal = _wt_percent_conversion_or_refusal(got)
+        if refusal is not None:
+            if refusal_reason is not None:
+                refusal_reason.append(
+                    refusal.removeprefix("mass-percent composition is not usable: ")
+                )
+            return None
+        return got
+
     ranked = _point_rows(values)
     for item in ranked:
         if item.get("T_C_is_initial_composition") is True:
@@ -4138,7 +4150,7 @@ def _printed_initial_charge_row_map(
                     declared_map=declared_map,
                 )
             if got:
-                return got
+                return checked(got)
     for item in ranked:
         t_c = _as_dec_or_none(item.get("T_C"))
         loss_raw = (
@@ -4152,7 +4164,7 @@ def _printed_initial_charge_row_map(
                 item, refusal_reason=refusal_reason, declared_map=declared_map
             )
             if got:
-                return got
+                return checked(got)
     return None
 
 
@@ -4192,6 +4204,7 @@ def _initial_oxide_map_from_values(
     missing_reason = "missing major oxides: " + ", ".join(missing) if missing else None
     ranked = _point_rows(values)
     if ranked and declared_map:
+        refusal_count = len(refusal_reason) if refusal_reason is not None else 0
         got = _printed_initial_charge_row_map(
             values,
             refusal_reason=refusal_reason,
@@ -4203,6 +4216,8 @@ def _initial_oxide_map_from_values(
                     refusal_reason.append(missing_reason)
                 return None
             return got
+        if refusal_reason is not None and len(refusal_reason) > refusal_count:
+            return None
     got = _oxide_map_from_mapping(
         values, refusal_reason=refusal_reason, declared_map=declared_map
     )
@@ -13287,7 +13302,7 @@ def sample_from_equipment(
             declared_map=declared_map,
         )
         printed, _ = _located_printed_and_initial(oxide_map, locator)
-        if oxide_map is None and refusal_reason and role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+        if oxide_map is None and refusal_reason:
             initial = Located(
                 State.unknown(
                     f"mass-percent composition is not usable: {refusal_reason[0]}"
