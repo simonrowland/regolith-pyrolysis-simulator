@@ -1402,6 +1402,20 @@ species:
           Fe+ and PO2+ 2-5%, PO+ about 0.2%.'
       equipment: *id001
     - observation_id: kambayashi_1985_table7_raoultian_a_p2o5
+      derived_from:
+      - kambayashi_1985_table6_partial_pressures_and_dg
+      - kambayashi_1985_p4o10_sat_janaf_extrapolated
+      derivation:
+        relation: Raoultian a_P2O5 from the printed Table 6 PO and PO2 pressures and the JANAF P4O10(g) saturation pressure using equations (12)-(14).
+        inputs:
+        - kambayashi_1985_table6_partial_pressures_and_dg
+        - kambayashi_1985_p4o10_sat_janaf_extrapolated
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: P2O5 activity from P4O10(g) pressure and the JANAF P4O10(s) standard free energy}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3}
+        references:
+        - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
       type: activity_coefficient
       locator:
         table: '7'
@@ -1719,6 +1733,18 @@ species:
         gamma_1390C: 1.0e-15
         as_printed: twice the standard deviation of the activity coefficients obtained at each temperature
     - observation_id: kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
+      derived_from:
+      - kambayashi_1985_gamma_p2o5_solid_std_henry
+      derivation:
+        relation: The printed liquid-standard gamma is the solid-standard Henry gamma converted using the reported P2O5(s)-to-P2O5(l) standard free-energy change.
+        inputs:
+        - kambayashi_1985_gamma_p2o5_solid_std_henry
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: Conversion from P2O5(s) to P2O5(l) standard state using the reported standard free-energy change}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: 'P2O5(s) = P2O5(l)', section: 4.3.3}
+        references:
+        - Turkdogan and Pearson, JISI 175 (1953), 398, ref. 17
       type: activity_coefficient
       locator:
         published_page: 1917
@@ -1979,6 +2005,20 @@ species:
         as_printed: +/- 0.5 eV on each literature cell
         note: quoted from refs 6-8 as printed in Table 2
     - observation_id: kambayashi_1985_table6_partial_pressures_and_dg
+      derived_from: &kb85_table6_lineage_inputs
+      - kambayashi_1985_table5_feto_p2o5_ion_current_ratios
+      derivation: &kb85_table6_lineage_derivation
+        relation: Table 6 partial pressures were reduced from the printed Table 5 ion-current ratios using equation (10); P_Fe is from JANAF. The reaction free-energy values use equation (11).
+        inputs:
+        - kambayashi_1985_table5_feto_p2o5_ion_current_ratios
+        output_unit: atm
+        method:
+          state: {tag: value, value: 'Partial-pressure reduction of ion-current ratios with isotope, ionization-cross-section and SEM-gain corrections'}
+          locator: {page: 6, published_page: 1916, pdf_page_index: 6, equation: '10', section: 4.3.2}
+        references:
+        - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+        - J. F. Mann, J. Chem. Phys. 46 (1967), 1646, ref. 12
+        - Stanton, Chupka and Inghram, Rev. Sci. Instrum. 27 (1956), 109, ref. 15
       type: psat_series
       locator:
         table: '6'
@@ -2080,7 +2120,7 @@ species:
           P_P2_x1e8_atm_as_printed: 3.77
           p_atm: 6.98e-07
           P_PO_x1e7_atm_as_printed: 6.98
-          P_PO2_atm: 8.470000000000001e-08
+          P_PO2_atm: 8.47e-08
           P_PO2_x1e8_atm_as_printed: 8.47
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 97
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2094,7 +2134,7 @@ species:
           P_P2_x1e8_atm_as_printed: 4.72
           p_atm: 9.09e-07
           P_PO_x1e7_atm_as_printed: 9.09
-          P_PO2_atm: 1.0640000000000001e-07
+          P_PO2_atm: 1.064e-07
           P_PO2_x1e8_atm_as_printed: 10.64
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2104,11 +2144,11 @@ species:
           point_conditions: *kb85_sample_3_conditions
           T_C: 1370
           X_P2O5: 0.0271
-          P_P2_atm: 1.5000000000000002e-08
+          P_P2_atm: 1.5e-08
           P_P2_x1e8_atm_as_printed: 1.5
           p_atm: 7.61e-07
           P_PO_x1e7_atm_as_printed: 7.61
-          P_PO2_atm: 9.449999999999999e-08
+          P_PO2_atm: 9.45e-08
           P_PO2_x1e8_atm_as_printed: 9.45
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 82
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2136,7 +2176,7 @@ species:
           P_P2_x1e8_atm_as_printed: 2.32
           p_atm: 1.2e-06
           P_PO_x1e7_atm_as_printed: 12.0
-          P_PO2_atm: 1.3900000000000001e-07
+          P_PO2_atm: 1.39e-07
           P_PO2_x1e8_atm_as_printed: 13.9
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 74
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2146,7 +2186,7 @@ species:
           point_conditions: *kb85_sample_4_conditions
           T_C: 1370
           X_P2O5: 0.0427
-          P_P2_atm: 5.6399999999999995e-08
+          P_P2_atm: 5.64e-08
           P_P2_x1e8_atm_as_printed: 5.64
           p_atm: 8.44e-07
           P_PO_x1e7_atm_as_printed: 8.44
@@ -2178,7 +2218,7 @@ species:
           P_P2_x1e8_atm_as_printed: 8.68
           p_atm: 1.332e-06
           P_PO_x1e7_atm_as_printed: 13.32
-          P_PO2_atm: 1.6550000000000002e-07
+          P_PO2_atm: 1.655e-07
           P_PO2_x1e8_atm_as_printed: 16.55
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2188,11 +2228,11 @@ species:
           point_conditions: *kb85_sample_5_conditions
           T_C: 1370
           X_P2O5: 0.0499
-          P_P2_atm: 7.040000000000001e-08
+          P_P2_atm: 7.04e-08
           P_P2_x1e8_atm_as_printed: 7.04
           p_atm: 1.078e-06
           P_PO_x1e7_atm_as_printed: 10.78
-          P_PO2_atm: 1.2699999999999999e-07
+          P_PO2_atm: 1.27e-07
           P_PO2_x1e8_atm_as_printed: 12.7
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2230,11 +2270,11 @@ species:
           point_conditions: *kb85_sample_6_conditions
           T_C: 1390
           X_P2O5: 0.0691
-          P_P2_atm: 1.1150000000000001e-07
+          P_P2_atm: 1.115e-07
           P_P2_x1e8_atm_as_printed: 11.15
           p_atm: 1.853e-06
           P_PO_x1e7_atm_as_printed: 18.53
-          P_PO2_atm: 2.1100000000000002e-07
+          P_PO2_atm: 2.11e-07
           P_PO2_x1e8_atm_as_printed: 21.1
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 84
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2244,7 +2284,7 @@ species:
           point_conditions: *kb85_sample_7_conditions
           T_C: 1370
           X_P2O5: 0.0764
-          P_P2_atm: 8.660000000000001e-08
+          P_P2_atm: 8.66e-08
           P_P2_x1e8_atm_as_printed: 8.66
           p_atm: 1.202e-06
           P_PO_x1e7_atm_as_printed: 12.02
@@ -2329,6 +2369,8 @@ species:
   PO2:
     observations:
     - observation_id: kambayashi_1985_po2_table6_partial_pressure
+      derived_from: *kb85_table6_lineage_inputs
+      derivation: *kb85_table6_lineage_derivation
       type: psat_series
       locator:
         table: '6'
@@ -2381,21 +2423,21 @@ species:
           T_C: 1380
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 8.47
-          P_atm: 8.470000000000001e-08
+          P_atm: 8.47e-08
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1390
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 10.64
-          P_atm: 1.0640000000000001e-07
+          P_atm: 1.064e-07
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1370
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 9.45
-          P_atm: 9.449999999999999e-08
+          P_atm: 9.45e-08
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
@@ -2409,7 +2451,7 @@ species:
           T_C: 1390
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 13.9
-          P_atm: 1.3900000000000001e-07
+          P_atm: 1.39e-07
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
@@ -2430,14 +2472,14 @@ species:
           T_C: 1390
           X_P2O5: 0.0427
           P_PO2_x1e8_atm_as_printed: 16.55
-          P_atm: 1.6550000000000002e-07
+          P_atm: 1.655e-07
         - sample_no: 5
           composition_mol: *kb85_sample_5_mol
           point_conditions: *kb85_sample_5_conditions
           T_C: 1370
           X_P2O5: 0.0499
           P_PO2_x1e8_atm_as_printed: 12.7
-          P_atm: 1.2699999999999999e-07
+          P_atm: 1.27e-07
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
@@ -2458,7 +2500,7 @@ species:
           T_C: 1390
           X_P2O5: 0.0691
           P_PO2_x1e8_atm_as_printed: 21.1
-          P_atm: 2.1100000000000002e-07
+          P_atm: 2.11e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
@@ -2506,6 +2548,8 @@ species:
   P2:
     observations:
     - observation_id: kambayashi_1985_p2_table6_partial_pressure
+      derived_from: *kb85_table6_lineage_inputs
+      derivation: *kb85_table6_lineage_derivation
       type: psat_series
       locator:
         table: '6'
@@ -2573,7 +2617,7 @@ species:
           T_C: 1370
           X_P2O5: 0.0271
           P_P2_x1e8_atm_as_printed: 1.5
-          P_atm: 1.5000000000000002e-08
+          P_atm: 1.5e-08
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
@@ -2594,7 +2638,7 @@ species:
           T_C: 1370
           X_P2O5: 0.0427
           P_P2_x1e8_atm_as_printed: 5.64
-          P_atm: 5.6399999999999995e-08
+          P_atm: 5.64e-08
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
@@ -2615,7 +2659,7 @@ species:
           T_C: 1370
           X_P2O5: 0.0499
           P_P2_x1e8_atm_as_printed: 7.04
-          P_atm: 7.040000000000001e-08
+          P_atm: 7.04e-08
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
@@ -2636,14 +2680,14 @@ species:
           T_C: 1390
           X_P2O5: 0.0691
           P_P2_x1e8_atm_as_printed: 11.15
-          P_atm: 1.1150000000000001e-07
+          P_atm: 1.115e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1370
           X_P2O5: 0.0764
           P_P2_x1e8_atm_as_printed: 8.66
-          P_atm: 8.660000000000001e-08
+          P_atm: 8.66e-08
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
@@ -2684,6 +2728,17 @@ species:
   P4O10:
     observations:
     - observation_id: kambayashi_1985_p4o10_sat_janaf_extrapolated
+      derivation:
+        relation: P4O10(g) saturation pressure from P4O10(s) standard free energies in JANAF, extrapolated from 1500 K to the printed measurement temperatures using equations (12)-(14).
+        output_unit: atm
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3, note: JANAF standard free-energy values above 1500 K are not printed in this paper.}
+        method:
+          state: {tag: value, value: Extrapolation of JANAF P4O10(s) standard free energy to the measurement temperatures and solution of equation (14)}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3}
+        references:
+        - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
       type: psat_series
       locator:
         published_page: 1917
