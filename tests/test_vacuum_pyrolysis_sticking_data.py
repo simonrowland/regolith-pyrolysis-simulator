@@ -24,6 +24,12 @@ def _load_sticking_data() -> dict:
     return yaml.safe_load(DATA_PATH.read_text(encoding="utf-8"))
 
 
+def _published_fe_condensation_alpha(temperature_K: float) -> float:
+    """Tachibana ln(alpha_c) = 0.61 - 1127/T, as stored A*exp(-B/T)."""
+    spec = _load_sticking_data()["species"]["Fe"]["condensation"]["value"]
+    return float(spec["A"]) * math.exp(-float(spec["B"]) / float(temperature_K))
+
+
 def _assert_synthetic_sio_route_authority(route) -> None:
     authority = route.condensation_authority_by_species["SiO"]
     stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
@@ -96,10 +102,14 @@ def test_fe_stage_one_capture_uses_the_condensation_fit_at_its_midpoint():
     )
 
     record = condensation._stage_alpha_record(stage, "Fe")
+    midpoint_K = condensation._stage_midpoint_temperature_K(stage)
 
-    assert record["alpha_s_temperature_K"] == pytest.approx(1523.15)
-    assert record["alpha_s"] == pytest.approx(0.878170956)
+    assert stage.temp_range_C == (1150.0, 1150.0)
+    assert midpoint_K == pytest.approx(1150.0 + condensation.CELSIUS_TO_KELVIN_OFFSET)
+    assert record["alpha_s_temperature_K"] == pytest.approx(midpoint_K)
+    assert record["alpha_s"] == pytest.approx(_published_fe_condensation_alpha(midpoint_K))
     assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["alpha_s_extrapolated"] is True
     assert record["citation_status"] == "CITED"
 
 
@@ -288,7 +298,10 @@ def test_fe_stage_one_uses_reviewed_metal_condensation_fit():
     # Reviewed b-878 pin; Tachibana et al. 2001, LPSC #1767, p. 2 Fig. 1.
     stage = next(s for s in CondensationTrain.create_default().stages if s.stage_number == 1)
     record = condensation._stage_alpha_record(stage, "Fe")
-    assert record["alpha_s"] == pytest.approx(0.878170956)
+    midpoint_K = condensation._stage_midpoint_temperature_K(stage)
+    assert record["alpha_s"] == pytest.approx(_published_fe_condensation_alpha(midpoint_K))
+    assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_extrapolation_method"] == "bounded_arrhenius"
     assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
     assert record["citation_status"] == "CITED"
     assert record["output_status"] == "status_bearing"
@@ -310,9 +323,13 @@ def test_fe_extrapolation_keeps_published_trend_and_probability_bounds(temperatu
         assert record["alpha_s"] == 1.0
         assert record["alpha_s_raw_arrhenius"] > 1.0
     elif temperature == 1200.0:
-        assert record["alpha_s"] < condensation.alpha_s("Fe", 1443.0, {})
+        lower_edge = condensation._wall_alpha_record("Fe", T_K=1443.0)
+        assert lower_edge["alpha_s_extrapolated"] is False
+        assert record["alpha_s"] < lower_edge["alpha_s"]
     elif temperature == 1700.0:
-        assert record["alpha_s"] > condensation.alpha_s("Fe", 1633.0, {})
+        upper_edge = condensation._wall_alpha_record("Fe", T_K=1633.0)
+        assert upper_edge["alpha_s_extrapolated"] is False
+        assert record["alpha_s"] > upper_edge["alpha_s"]
 
 
 @pytest.mark.parametrize("missing", ["A", "B", "valid_range_K", "cite", "status"])
