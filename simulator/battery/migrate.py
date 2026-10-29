@@ -3900,6 +3900,35 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     )
 
 
+def _wt_percent_conversion_or_refusal(
+    wt: Mapping[str, Decimal],
+) -> tuple[Composition | None, str | None]:
+    try:
+        return wt_pct_to_mole_fraction(wt), None
+    except (ArithmeticError, ValueError) as exc:
+        return None, f"mass-percent composition is not usable: {exc}"
+
+
+def _mass_percent_composition_state(
+    wt: Mapping[str, Decimal], *, basis: str
+) -> State[Composition]:
+    """Keep a printed wt% map only when the reader's converter accepts it."""
+
+    converted, refusal = _wt_percent_conversion_or_refusal(wt)
+    if converted is None:
+        assert refusal is not None
+        return State.unknown(refusal)
+    return State.of(
+        Composition(
+            basis=basis,
+            components=tuple(
+                (str(name), as_decimal(amount)) for name, amount in wt.items()
+            ),
+            amount_basis=AmountBasis.MASS_PERCENT,
+        )
+    )
+
+
 def _total_iron_reported_as_feo_notice(
     wt: Mapping[str, Decimal] | None,
     quantity: Quantity | None,
@@ -4594,16 +4623,18 @@ def _located_printed_and_initial(
     if not oxide_map:
         return None, None
     printed = located_value(_printed_map_payload(oxide_map), locator)
-    try:
+    converted, refusal = _wt_percent_conversion_or_refusal(oxide_map)
+    if converted is None:
+        assert refusal is not None
         initial = Located(
-            State.of(wt_pct_to_mole_fraction(oxide_map)),
+            State.unknown(refusal),
+            locator=locator,
+        )
+    else:
+        initial = Located(
+            State.of(converted),
             locator=locator,
             inference=wt_pct_to_mole_fraction_derivation(oxide_map, locator),
-        )
-    except (ArithmeticError, ValueError) as exc:
-        initial = Located(
-            State.unknown(f"mass-percent composition is not usable: {exc}"),
-            locator=locator,
         )
     return printed, initial
 
@@ -18385,19 +18416,17 @@ class Migrator:
                 ):
                     # The run's printed phase vector is identity context, not
                     # an inferred starting charge or a second scored value.
-                    composition = Composition(
-                        basis="printed_phase_composition",
-                        components=components,
-                        amount_basis=AmountBasis.MASS_PERCENT,
+                    composition_state = _mass_percent_composition_state(
+                        dict(components), basis="printed_phase_composition"
                     )
                     located_composition = Located(
-                        State.of(composition), locator=printed.locator
+                        composition_state, locator=printed.locator
                     )
                     point_conditions = {
                         **(point_conditions or {}),
                         "composition": located_composition,
                     }
-                    ident_kwargs["composition"] = State.of(composition)
+                    ident_kwargs["composition"] = composition_state
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
@@ -20331,12 +20360,8 @@ class Migrator:
                                 for formula, amount in components.items()
                                 if amount is not None
                             }
-                            composition = State.of(
-                                Composition(
-                                    basis="printed_oxides",
-                                    components=tuple(components.items()),
-                                    amount_basis=AmountBasis.MASS_PERCENT,
-                                )
+                            composition = _mass_percent_composition_state(
+                                components, basis="printed_oxides"
                             )
                     mass = run_experiment.sample.mass_kg
                     mass_value = (
