@@ -11241,15 +11241,6 @@ def compile_residual(
                 execution=Execution(state=ExecutionState.NOT_PROBED),
                 exclusions=("experiment_method_known", "source_polymorph_printed"),
             )
-        return _refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {
-                "reason": unprinted_reference_phase.reason,
-                "formula": formula,
-            },
-            execution=Execution(state=ExecutionState.NOT_PROBED),
-            exclusions=("source_reference_polymorph_printed",),
-        )
 
     if sample_phase_detail is not None:
         # Validity gates do not read the row composition. The activity
@@ -11544,6 +11535,43 @@ def compile_residual(
                     origin=reference.observation_id,
                 ),
             ),
+        )
+
+    if unprinted_reference_phase is not None:
+        if (
+            prediction.execution.state is not ExecutionState.PRODUCED
+            or prediction.value is None
+        ) and prediction.refusal_reason in {
+            RefusalReason.IDENTITY_INCOMPLETE,
+            RefusalReason.IDENTITY_MISMATCH,
+            RefusalReason.IDENTITY_UNKNOWN,
+            RefusalReason.INVALID_IDENTITY,
+        }:
+            detail = dict(prediction.refusal_detail)
+            secondary_reasons = detail.get("secondary_reasons", ())
+            if isinstance(secondary_reasons, str):
+                secondary_reasons = (secondary_reasons,)
+            detail["secondary_reasons"] = list(
+                dict.fromkeys(
+                    (*secondary_reasons, unprinted_reference_phase.reason)
+                )
+            )
+            return _refused(
+                prediction.refusal_reason,
+                detail,
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+                source_relation=source_relation,
+            )
+        return _refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": unprinted_reference_phase.reason,
+                "formula": formula,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            source_relation=source_relation,
+            exclusions=("source_reference_polymorph_printed",),
         )
 
     if prediction.execution.state is not ExecutionState.PRODUCED or prediction.value is None:
