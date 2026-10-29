@@ -40,10 +40,14 @@ from simulator.backends import (
     requires_stage0_subprocess,
     resolve_backend,
 )
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
+)
 from simulator.chemistry.kernel import (
     CHEMISTRY_KERNEL_RUN_INPUT_KEYS,
     DEFAULT_LIQUID_FRACTION_PROVIDER,
+    OXYGEN_SINK_CHANNEL_MODE_KEY,
     ProposalRejected,
 )
 from simulator.condensation import (
@@ -219,6 +223,7 @@ _RUN_REFERENCE_CANONICAL_FIELDS = (
 _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES = (
     _LiquidusFinderBudgetExceeded,
     CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
     CertifiedPointRefusedError,
     KnudsenRegimeRefusal,
     TransportRegimeRefusal,

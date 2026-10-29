@@ -17,6 +17,10 @@ from simulator.cost_energy import (
 from simulator.pumping_cost import EXTRAPOLATED_AUTHORITY
 from simulator.cost_parameters import canonical_energy_cost_block
 from simulator.engine_local_config import cache_version_for
+from simulator.transport_constants import (
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    VISCOUS_KNUDSEN_MAX,
+)
 
 
 ARTIFACT_SCHEMA_VERSION = "0.2.0"
@@ -497,7 +501,15 @@ def build_run_artifact(
     per_hour_ledger = runner_payload.get("per_hour_ledger")
     timesteps = []
     for row in per_hour:
-        timestep = {"hour": row.get("hour"), "summary": row}
+        summary = row
+        if "Kn" in row:
+            # Keep the status-strip scale with the emitted Kn value in the artifact.
+            summary = {
+                **row,
+                "VISCOUS_KNUDSEN_MAX": VISCOUS_KNUDSEN_MAX,
+                "FREE_MOLECULAR_KNUDSEN_MIN": FREE_MOLECULAR_KNUDSEN_MIN,
+            }
+        timestep = {"hour": row.get("hour"), "summary": summary}
         if isinstance(per_hour_ledger, Mapping):
             ledger = per_hour_ledger.get(str(row.get("hour")))
             if isinstance(ledger, Mapping):
