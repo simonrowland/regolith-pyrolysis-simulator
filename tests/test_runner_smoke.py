@@ -3123,7 +3123,7 @@ def test_per_hour_summary_includes_pressure_and_mass_balance():
         )
 
 
-def test_hourly_metadata_keeps_alpha_only_fe_edge_hold_flag() -> None:
+def test_hourly_metadata_keeps_alpha_only_fe_extrapolation() -> None:
     train = CondensationTrain.create_default()
     model = CondensationModel(train, wall_temperature_C=1426.85)
     model.configure_operating_conditions(
@@ -3184,10 +3184,9 @@ def test_hourly_metadata_keeps_alpha_only_fe_edge_hold_flag() -> None:
     ]
     assert alpha["alpha_s_valid_range_K"] == [1443.0, 1633.0]
     assert alpha["alpha_s_temperature_above_valid_range"] is True
-    assert alpha["alpha_s_extrapolation_method"] == (
-        "hold_nearest_certified_band_edge"
-    )
+    assert alpha["alpha_s_extrapolation_method"] == "bounded_arrhenius"
     assert alpha["output_status"] == "status_bearing"
+    assert authority["authoritative_for_deposit_mass"] is False
 
 
 def test_session_per_hour_summary_event_uses_runner_builder():

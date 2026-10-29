@@ -564,7 +564,9 @@ def test_predict_flag_wall_history_keeps_both_source_band_misses():
 
 
 def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
-    out_context: dict[str, object] = {}
+    # Exercise an explicit scalar independently of the live Fe condensation fit.
+    spec = {"form": "scalar", "value": 0.02, "temperature_range_K": [1700, 1800]}
+    out_context: dict[str, object] = {"coefficient_spec": spec}
     out_value = condensation.alpha_s("Fe", 1600.0, out_context)
     out_eval = out_context["alpha_s_evaluation"]
 
@@ -579,7 +581,7 @@ def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
     ]
     assert "[1700, 1800]" in out_eval["alpha_s_extrapolation_warning"]
 
-    in_context: dict[str, object] = {}
+    in_context: dict[str, object] = {"coefficient_spec": spec}
     in_value = condensation.alpha_s("Fe", 1750.0, in_context)
     in_eval = in_context["alpha_s_evaluation"]
 
@@ -589,28 +591,28 @@ def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
     assert "alpha_s_extrapolation_warning" not in in_eval
 
 
-def test_fe_condensation_edge_hold_range_travels_through_stage_provenance():
+def test_fe_alpha_s_range_travels_through_stage_provenance():
     stage = CondensationStage(
         stage_number=1,
-        label="Fe below condensation-fit range",
-        temp_range_C=(1100.0, 1100.0),
+        label="Fe below source range",
+        temp_range_C=(926.85, 926.85),
         target_species=["Fe"],
     )
 
     record = condensation._stage_alpha_record(stage, "Fe")
+    wall = condensation._wall_alpha_record("Fe", T_K=1200.0)
 
-    assert record["alpha_s"] == pytest.approx(
-        condensation._wall_alpha_record("Fe", T_K=1373.15)["alpha_s"]
-    )
+    assert record["alpha_s"] == pytest.approx(wall["alpha_s"])
     assert record["temperature_range_K"] == [1443.0, 1633.0]
     assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
     assert record["alpha_s_extrapolated"] is True
     assert record["alpha_s_temperature_below_valid_range"] is True
     assert record["alpha_s_domain_status"] == "out_of_domain"
     assert record["output_status"] == "status_bearing"
-    assert record["alpha_s_extrapolation_method"] == (
-        "hold_nearest_certified_band_edge"
-    )
+    assert record["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert "Fe alpha_s arrhenius coefficient extrapolated" in record[
+        "alpha_s_extrapolation_warning"
+    ]
 
 
 def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
