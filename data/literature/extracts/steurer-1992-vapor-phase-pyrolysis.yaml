@@ -51,7 +51,7 @@ species:
       T_range_K:
       - 2000.0
       - 3000.0
-      phase: gas
+      phase: mixture_of_oxides_representative_of_lunar_soil
       standard_state: partial pressure; atmospheres as printed (1 atm = 10^5 N/m^2)
       regime: equilibrium_calculation_not_measured
       units: atm as published
@@ -76,160 +76,117 @@ species:
         feedstock_composition_table:
           status: omitted
           reason: not_printed_in_this_source
-        pressure_conversion_as_published: 1 atm = 10^5 N/m^2
-        points:
-        - species_as_printed: O2
-          T_K: 2000.0
-          p_atm_as_printed: '3.2 x 10^{-6}'
-          p_Pa: 0.32
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: O2
-          T_K: 2500.0
-          p_atm_as_printed: '1.5 x 10^{-3}'
-          p_Pa: 150
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: O2
-          T_K: 3000.0
-          p_atm_as_printed: '8.1 x 10^{-2}'
-          p_Pa: 8100
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: AlO
-          T_K: 3000.0
-          p_atm_as_printed: '1.8 x 10^{-5}'
-          p_Pa: 1.8
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: AlO2
-          T_K: 3000.0
-          p_atm_as_printed: '5.8 x 10^{-5}'
-          p_Pa: 5.8
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: SiO
-          T_K: 2000.0
-          p_atm_as_printed: '6.5 x 10^{-6}'
-          p_Pa: 0.65
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: SiO
-          T_K: 2500.0
-          p_atm_as_printed: '3.0 x 10^{-3}'
-          p_Pa: 300
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: SiO
-          T_K: 3000.0
-          p_atm_as_printed: '1.6 x 10^{-1}'
-          p_Pa: 16000
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: SiO2
-          T_K: 2500.0
-          p_atm_as_printed: '1.4 x 10^{-4}'
-          p_Pa: 14
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: SiO2
-          T_K: 3000.0
-          p_atm_as_printed: '1.1 x 10^{-2}'
-          p_Pa: 1100
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: TiO
-          T_K: 2500.0
-          p_atm_as_printed: '1.0 x 10^{-6}'
-          p_Pa: 0.1
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: TiO
-          T_K: 3000.0
-          p_atm_as_printed: '1.0 x 10^{-4}'
-          p_Pa: 10
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: TiO2
-          T_K: 3000.0
-          p_atm_as_printed: '1.3 x 10^{-5}'
-          p_Pa: 1.3
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: FeO
-          T_K: 2000.0
-          p_atm_as_printed: '1 x 10^{-6}'
-          p_Pa: 0.1
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: FeO
-          T_K: 2500.0
-          p_atm_as_printed: '2.0 x 10^{-4}'
-          p_Pa: 20
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: FeO
-          T_K: 3000.0
-          p_atm_as_printed: '5.9 x 10^{-3}'
-          p_Pa: 590
-          locator: {table: '10', published_page: 212, pdf_page_index: 3}
-        - species_as_printed: AlO
-          T_K: 2000.0
-          p_atm_as_printed: '(10^{-12})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: AlO
-          T_K: 2500.0
-          p_atm_as_printed: '(10^{-8})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: AlO2
-          T_K: 2000.0
-          p_atm_as_printed: '(10^{-11})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: AlO2
-          T_K: 2500.0
-          p_atm_as_printed: '(10^{-7})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: Al2O
-          T_K: 2000.0
-          p_atm_as_printed: '(10^{-16})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: Al2O
-          T_K: 2500.0
-          p_atm_as_printed: '(10^{-11})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: Al2O
-          T_K: 3000.0
-          p_atm_as_printed: '(10^{-8})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: Al2O2
-          T_K: 2000.0
-          p_atm_as_printed: '(10^{-17})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: Al2O2
-          T_K: 2500.0
-          p_atm_as_printed: '(10^{-12})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: Al2O2
-          T_K: 3000.0
-          p_atm_as_printed: '(10^{-9})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: SiO2
-          T_K: 2000.0
-          p_atm_as_printed: '(10^{-7})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: TiO
-          T_K: 2000.0
-          p_atm_as_printed: '(10^{-10})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: TiO2
-          T_K: 2000.0
-          p_atm_as_printed: '(10^{-11})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        - species_as_printed: TiO2
-          T_K: 2500.0
-          p_atm_as_printed: '(10^{-7})'
-          order_of_magnitude_only: true
-          omitted_reason: approximate order-of-magnitude only cell
-        units_as_published:
-          p_Pa: Pa
+        rows:
+        - species: O2
+          P_atm:
+          - P_atm_as_printed: 3.2 x 10^{-6}
+            P_atm: 3.2e-06
+            order_of_magnitude_only: false
+          - P_atm_as_printed: 1.5 x 10^{-3}
+            P_atm: 0.0015
+            order_of_magnitude_only: false
+          - P_atm_as_printed: 8.1 x 10^{-2}
+            P_atm: 0.081
+            order_of_magnitude_only: false
+        - species: AlO
+          P_atm:
+          - P_atm_as_printed: (10^{-12})
+            P_atm: 1.0e-12
+            order_of_magnitude_only: true
+          - P_atm_as_printed: (10^{-8})
+            P_atm: 1.0e-08
+            order_of_magnitude_only: true
+          - P_atm_as_printed: 1.8 x 10^{-5}
+            P_atm: 1.8e-05
+            order_of_magnitude_only: false
+        - species: AlO2
+          P_atm:
+          - P_atm_as_printed: (10^{-11})
+            P_atm: 1.0e-11
+            order_of_magnitude_only: true
+          - P_atm_as_printed: (10^{-7})
+            P_atm: 1.0e-07
+            order_of_magnitude_only: true
+          - P_atm_as_printed: 5.8 x 10^{-5}
+            P_atm: 5.8e-05
+            order_of_magnitude_only: false
+        - species: Al2O
+          P_atm:
+          - P_atm_as_printed: (10^{-16})
+            P_atm: 1.0e-16
+            order_of_magnitude_only: true
+          - P_atm_as_printed: (10^{-11})
+            P_atm: 1.0e-11
+            order_of_magnitude_only: true
+          - P_atm_as_printed: (10^{-8})
+            P_atm: 1.0e-08
+            order_of_magnitude_only: true
+        - species: Al2O2
+          P_atm:
+          - P_atm_as_printed: (10^{-17})
+            P_atm: 1.0e-17
+            order_of_magnitude_only: true
+          - P_atm_as_printed: (10^{-12})
+            P_atm: 1.0e-12
+            order_of_magnitude_only: true
+          - P_atm_as_printed: (10^{-9})
+            P_atm: 1.0e-09
+            order_of_magnitude_only: true
+        - species: SiO
+          P_atm:
+          - P_atm_as_printed: 6.5 x 10^{-6}
+            P_atm: 6.5e-06
+            order_of_magnitude_only: false
+          - P_atm_as_printed: 3.0 x 10^{-3}
+            P_atm: 0.003
+            order_of_magnitude_only: false
+          - P_atm_as_printed: 1.6 x 10^{-1}
+            P_atm: 0.16
+            order_of_magnitude_only: false
+        - species: SiO2
+          P_atm:
+          - P_atm_as_printed: (10^{-7})
+            P_atm: 1.0e-07
+            order_of_magnitude_only: true
+          - P_atm_as_printed: 1.4 x 10^{-4}
+            P_atm: 0.00014
+            order_of_magnitude_only: false
+          - P_atm_as_printed: 1.1 x 10^{-2}
+            P_atm: 0.011
+            order_of_magnitude_only: false
+        - species: TiO
+          P_atm:
+          - P_atm_as_printed: (10^{-10})
+            P_atm: 1.0e-10
+            order_of_magnitude_only: true
+          - P_atm_as_printed: 1.0 x 10^{-6}
+            P_atm: 1.0e-06
+            order_of_magnitude_only: false
+          - P_atm_as_printed: 1.0 x 10^{-4}
+            P_atm: 0.0001
+            order_of_magnitude_only: false
+        - species: TiO2
+          P_atm:
+          - P_atm_as_printed: (10^{-11})
+            P_atm: 1.0e-11
+            order_of_magnitude_only: true
+          - P_atm_as_printed: (10^{-7})
+            P_atm: 1.0e-07
+            order_of_magnitude_only: true
+          - P_atm_as_printed: 1.3 x 10^{-5}
+            P_atm: 1.3e-05
+            order_of_magnitude_only: false
+        - species: FeO
+          P_atm:
+          - P_atm_as_printed: 1 x 10^{-6}
+            P_atm: 1.0e-06
+            order_of_magnitude_only: false
+          - P_atm_as_printed: 2.0 x 10^{-4}
+            P_atm: 0.0002
+            order_of_magnitude_only: false
+          - P_atm_as_printed: 5.9 x 10^{-3}
+            P_atm: 0.0059
+            order_of_magnitude_only: false
         vs_steurer_1985_table2_note: Same T grid and many identical printed values as Steurer 1985 Table
           2, but 1992 rounds small pressures to orders of magnitude and prints FeO at 2000 K as 1 x 10^{-6}
           atm (1985 Table 2 prints 8.1 x 10^{-7}). Transcribed independently; not copied from the 1985
