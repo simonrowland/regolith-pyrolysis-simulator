@@ -18048,6 +18048,18 @@ class Migrator:
                     temperature_locator,
                 )
             }
+        elif (
+            not t_sel.condition_ranges
+            and t_sel.field_name is not None
+            and t_sel.reason
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                "temperature_K": Located(
+                    State.unknown(t_sel.reason),
+                    locator=temperature_locator or locator,
+                ),
+            }
         raw_point_conditions = obs.get("point_conditions")
         if (
             q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -20233,6 +20245,20 @@ class Migrator:
                         locator=point_locator,
                     ),
                 }
+        elif (
+            isinstance(raw_item, Mapping)
+            and coord is None
+            and not t_sel.condition_ranges
+            and t_sel.field_name is not None
+            and t_sel.reason
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                "temperature_K": Located(
+                    State.unknown(t_sel.reason),
+                    locator=temperature_locator or point_locator,
+                ),
+            }
         lab_pc = point_lab_conditions(
             series_item=raw_item if isinstance(raw_item, Mapping) else None,
             equipment=equipment,

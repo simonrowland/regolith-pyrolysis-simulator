@@ -5933,6 +5933,7 @@ def test_celsius_temperature_at_observation_level_reaches_identity(
     )
     condition = row["point_conditions"].pop("temperature_C")
     row["T_C"] = condition["state"]["value"]
+    row["values"].pop("T_C")
 
     result = _migrate_real_extract(
         tmp_path,
