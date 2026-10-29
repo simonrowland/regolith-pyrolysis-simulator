@@ -4,11 +4,11 @@ rows in: 83452
 records out (observations): 171592
 works: 677
 experiments: 6448
-queue size: 111120
+queue size: 111108
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 676
-hard issues: 1953
+hard issues: 1920
 
 ## Unavailable input work census
 
@@ -18699,11 +18699,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2014-sodium-silicate-model.yaml` | 17 | 17 | 34 |
 | `data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics-metsoc.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics.yaml` | 27 | 27 | 42 |
-| `data/literature/extracts/shornikov-2015-cai-vaporization-coefficients.yaml` | 53 | 53 | 114 |
+| `data/literature/extracts/shornikov-2015-cai-vaporization-coefficients.yaml` | 53 | 53 | 110 |
 | `data/literature/extracts/shornikov-2015-complex-oxide-vapor.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2016-ca-al-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2016-cao-mgo-silicate.yaml` | 50 | 85 | 68 |
-| `data/literature/extracts/shornikov-2017-cai-mgo-sio-fugacity.yaml` | 4 | 4 | 20 |
+| `data/literature/extracts/shornikov-2017-cai-mgo-sio-fugacity.yaml` | 4 | 4 | 12 |
 | `data/literature/extracts/shornikov-2017-spinel-evaporation.yaml` | 25 | 144 | 25 |
 | `data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml` | 18 | 30 | 13 |
 | `data/literature/extracts/shornikov-2018-cai-complex-gas-species.yaml` | 0 | 0 | 1 |
@@ -18860,16 +18860,15 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 1953
+hard issues: 1920
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1444 |
-| `conditional_field:derivation` | 259 |
-| `conditional_field:inputs` | 238 |
-| `conditional_field:raw_inputs` | 8 |
+| `conditional_field:derived_from` | 1436 |
+| `conditional_field:derivation` | 251 |
+| `conditional_field:inputs` | 229 |
 | `invalid_source:initial_composition` | 4 |
 
 ## Hard issues (first 50)

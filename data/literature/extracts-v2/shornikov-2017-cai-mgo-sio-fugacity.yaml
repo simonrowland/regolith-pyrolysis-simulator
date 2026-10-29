@@ -132,14 +132,26 @@ observations:
     raw_inputs:
       state:
         tag: value
-        value: printed_unresolved
+        value: not_printed
       locator:
         page: 1
         pdf_page_index: 0
         paragraph: CaO–MgO–SiO2 at 50 mol% CaO
-        note: Printed a(MgO) = 0.61 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read
-          from the text on the 600 dpi page, not from the curve.; abstract=1134
-    references: []
+        note: The abstract prints the calculated activities in this paragraph but does not print the numeric input activities.
+    method:
+      state:
+        tag: value
+        value: The used thermodynamic model was based on the theory of ideal associated solutions and the experimental data
+          of oxide activities in melts of the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system found by Knudsen mass-spectrometric effusion
+          method in the temperature range of 1600–2500 K.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Thermodynamic model basis
+        equation: unnumbered method sentence
+        note: The abstract states the model method; no row-specific equation is printed.
+    references:
+    - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
 - observation_id: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_cms_50cao_sio2_activity
   experiment_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e::shornikov-2017-cai-mgo-sio-fugacity
   identity:
@@ -270,14 +282,26 @@ observations:
     raw_inputs:
       state:
         tag: value
-        value: printed_unresolved
+        value: not_printed
       locator:
         page: 1
         pdf_page_index: 0
         paragraph: CaO–MgO–SiO2 at 50 mol% CaO
-        note: Printed a(SiO2) = 0.0032 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a).
-          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
-    references: []
+        note: The abstract prints the calculated activities in this paragraph but does not print the numeric input activities.
+    method:
+      state:
+        tag: value
+        value: The used thermodynamic model was based on the theory of ideal associated solutions and the experimental data
+          of oxide activities in melts of the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system found by Knudsen mass-spectrometric effusion
+          method in the temperature range of 1600–2500 K.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Thermodynamic model basis
+        equation: unnumbered method sentence
+        note: The abstract states the model method; no row-specific equation is printed.
+    references:
+    - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
 - observation_id: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_mas_50al2o3_mgo_activity
   experiment_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e::shornikov-2017-cai-mgo-sio-fugacity
   identity:
@@ -408,14 +432,26 @@ observations:
     raw_inputs:
       state:
         tag: value
-        value: printed_unresolved
+        value: not_printed
       locator:
         page: 1
         pdf_page_index: 0
         paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
-        note: Printed a(MgO) = 0.066 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b).
-          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
-    references: []
+        note: The abstract prints the calculated activities in this paragraph but does not print the numeric input activities.
+    method:
+      state:
+        tag: value
+        value: The used thermodynamic model was based on the theory of ideal associated solutions and the experimental data
+          of oxide activities in melts of the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system found by Knudsen mass-spectrometric effusion
+          method in the temperature range of 1600–2500 K.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Thermodynamic model basis
+        equation: unnumbered method sentence
+        note: The abstract states the model method; no row-specific equation is printed.
+    references:
+    - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
 - observation_id: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_mas_50al2o3_sio2_activity
   experiment_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e::shornikov-2017-cai-mgo-sio-fugacity
   identity:
@@ -546,11 +582,23 @@ observations:
     raw_inputs:
       state:
         tag: value
-        value: printed_unresolved
+        value: not_printed
       locator:
         page: 1
         pdf_page_index: 0
         paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
-        note: Printed a(SiO2) = 0.11 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b).
-          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
-    references: []
+        note: The abstract prints the calculated activities in this paragraph but does not print the numeric input activities.
+    method:
+      state:
+        tag: value
+        value: The used thermodynamic model was based on the theory of ideal associated solutions and the experimental data
+          of oxide activities in melts of the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system found by Knudsen mass-spectrometric effusion
+          method in the temperature range of 1600–2500 K.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Thermodynamic model basis
+        equation: unnumbered method sentence
+        note: The abstract states the model method; no row-specific equation is printed.
+    references:
+    - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
