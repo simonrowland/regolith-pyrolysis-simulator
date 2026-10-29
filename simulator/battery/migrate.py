@@ -4682,6 +4682,8 @@ def _keeps_existing_composition(state: object) -> bool:
 
     Missing, unknown, and the mass-percent printed-phase stamp are not
     usable engine inputs. Any other value stays as the row stated it.
+    A printed unknown on the row is refused earlier, by
+    ``_row_printed_composition_unknown``.
     """
 
     if not isinstance(state, State) or not state.is_value:
@@ -4689,6 +4691,29 @@ def _keeps_existing_composition(state: object) -> bool:
     if _is_printed_phase_mass_stamp(state):
         return False
     return True
+
+
+def _row_printed_composition_unknown(
+    point_conditions: Mapping[str, Located[Any]] | None,
+) -> bool:
+    """The row prints its composition cell as unknown.
+
+    That is a printed blank, with a reason. It is this row's statement.
+    An experiment-level, group-level, or neighbouring starting bulk must
+    not fill it. A missing key is not this refusal: the starting bulk may
+    still be this row's printed start.
+    """
+
+    conditions = point_conditions or {}
+    for key in ("composition", "initial_composition_as_published"):
+        located = conditions.get(key)
+        if (
+            isinstance(located, Located)
+            and isinstance(located.state, State)
+            and located.state.is_unknown
+        ):
+            return True
+    return False
 
 
 def _apply_equilibrium_starting_bulk(
@@ -4708,7 +4733,10 @@ def _apply_equilibrium_starting_bulk(
     anhydrous normalization still carries the oxide bulk and says that
     identity.composition omits H2O. A missing or
     unusable start, including a dash or blank the loader did not accept as
-    a component, stays missing. Residue quantities do not call this.
+    a component, stays missing. A row that already prints ``composition``
+    or ``initial_composition_as_published`` as unknown keeps that blank:
+    the experiment bulk is not this row's printed start. Residue quantities
+    do not call this.
     """
 
     if experiment is None:
@@ -4725,6 +4753,8 @@ def _apply_equilibrium_starting_bulk(
         AmountBasis.MOLE_FRACTION,
         AmountBasis.MOL_INVENTORY,
     }:
+        return point_conditions, []
+    if _row_printed_composition_unknown(point_conditions):
         return point_conditions, []
     if _keeps_existing_composition(ident_kwargs.get("composition")):
         return point_conditions, []

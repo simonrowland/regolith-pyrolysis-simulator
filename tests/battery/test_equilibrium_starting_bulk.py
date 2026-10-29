@@ -372,3 +372,62 @@ def test_wang_2001_residue_keeps_the_starting_charge_contextual() -> None:
             continue
         assert composition.value.components != starting.components
         assert composition.value.proxy_flag != "initial_charge_only"
+
+
+_BLANK_REASON = (
+    "Table 1 leaves the initial-composition cell blank for this sample group."
+)
+
+
+def test_explicit_unknown_wins_over_shared_starting_bulk(tmp_path: Path) -> None:
+    """A printed blank stays unknown. A row without one still takes the bulk.
+
+    Both rows share one experiment starting composition. The blank row prints
+    that cell as unknown. The other row does not print a composition, so the
+    shared bulk is its starting composition.
+    """
+
+    document = _extract(_initial())
+    document["species"]["Al2O3"]["observations"].append(
+        {
+            "observation_id": "glass-blank",
+            "experiment": "run-1",
+            "type": "concentration_series",
+            "units": "wt.%",
+            "locator": {"page": 6, "table": "3", "row": "blank"},
+            "point_conditions": {
+                "initial_composition_as_published": {
+                    "state": {"tag": "unknown", "reason": _BLANK_REASON},
+                    "locator": {"page": 2, "table": "1", "row": "blank"},
+                },
+                "composition": {
+                    "state": {"tag": "unknown", "reason": _BLANK_REASON},
+                    "locator": {"page": 2, "table": "1", "row": "blank"},
+                },
+            },
+            "values": {
+                "quantity": "equilibrium_phase_composition",
+                "phase_label": "glass",
+                "basis": "wt_percent",
+                "T_C": 1100,
+                "component_amount": "19.00",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        }
+    )
+    root = _write_min_tree(tmp_path, extract=document)
+    result = migrate(root, write=False)
+    filled = result.observations["fixture-source::glass-al"]
+    blank = result.observations["fixture-source::glass-blank"]
+    starting = _starting_mole_fraction()
+    assert filled.identity.composition is not None
+    assert filled.identity.composition.is_value
+    assert filled.identity.composition.value.components == starting.components
+    for field in ("initial_composition_as_published", "composition"):
+        state = blank.point_conditions[field].state
+        assert state.is_unknown
+        assert state.reason == _BLANK_REASON
+    identity = blank.identity.composition
+    assert identity is not None and identity.is_unknown
+    assert identity.reason == _BLANK_REASON
