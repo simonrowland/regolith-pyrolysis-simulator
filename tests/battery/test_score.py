@@ -14812,7 +14812,9 @@ def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
         bench_module,
         "activity_request_for_engine",
         lambda *_args, **_kwargs: SimpleNamespace(
-            payload={"composition_mol": {"SiO2": Decimal("0.1"), "MgO": Decimal("0.9")}}
+            # Positive SiO2 beyond the calibration window is extrapolated
+            # with a notice; zero silica remains a typed domain refusal.
+            payload={"composition_mol": {"SiO2": Decimal("0"), "MgO": Decimal("1")}}
         ),
     )
 
