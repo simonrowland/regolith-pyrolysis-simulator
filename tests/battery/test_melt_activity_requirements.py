@@ -1228,7 +1228,10 @@ def test_oneill_feo_activity_coefficient_refusal_is_typed_per_engine():
     assert magemin.value is None
     assert magemin.execution.state is ExecutionState.NOT_PROBED
     assert magemin.refusal_reason is RefusalReason.UNSUPPORTED
-    assert magemin.refusal_detail["reason"] == "engine_does_not_report_melt_activity"
+    assert magemin.refusal_detail["reason"] == "reference_state_mismatch"
+    assert magemin.refusal_detail["engine_convention"] == (
+        "typed-refusal:magemin_no_native_activity:FeO"
+    )
 
 
 def test_single_cation_formula_with_oxide_token_is_not_scored_as_parent_oxide(monkeypatch):
