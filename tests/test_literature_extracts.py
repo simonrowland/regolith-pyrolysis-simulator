@@ -6004,6 +6004,41 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
+def test_yakovleva_2022_table1_context_survives_migration(tmp_path):
+    """Printed starting compositions remain unscored context, pinned to Table 1."""
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(
+        tmp_path, "yakovleva-2022-alkali-chondrule-evaporation.yaml"
+    )
+    assert not result.observations
+    assert not result.validation.issues
+    (rows,) = result.context_by_work.values()
+    assert len(rows) == 6  # five composition columns plus figure-candidate note
+    compositions = rows[:5]
+    assert [row["locator"] for row in compositions] == [
+        {"published_page": 402, "table": "1"}
+    ] * 5
+    assert [row["values"]["sample_label"] for row in compositions] == [
+        "Composition 1 (IIAB1)",
+        "Composition 2 (IIAB2)",
+        "Composition 3 (granite)",
+        "Composition 4 (basalt)",
+        "Composition 5 (pyroxene chondrules of the Saratov chondrite)",
+    ]
+    # Exact printed cells checked on the PDF page render, published p. 402.
+    assert compositions[0]["values"]["SiO2"] == "59.9"
+    assert compositions[1]["values"]["MgO"] == "27.9"
+    assert compositions[1]["values"]["Na2O"] == "1.8"
+    assert compositions[2]["values"]["MgO"] == "0.5"
+    assert compositions[2]["values"]["FeO"] == "–"
+    assert compositions[3]["values"]["TiO2"] == "6.0"
+    assert compositions[4]["values"]["K2O"] == "0.4"
+    assert all(
+        row["values"]["table_footnote"]
+        == "Analytical results are rounded and normalized to 100 wt %."
+        for row in compositions
+    )
 
 
 @pytest.mark.parametrize(

@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 697
-  extracts: 695
+  sources: 710
+  extracts: 708
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 74
+  extracts_with_private_locators: 77
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 695
+  extracts_without_pdf: 708
   alias_groups_needing_resolution: 78
 gaps:
   pdfs_without_extract: []
@@ -213,6 +213,7 @@ gaps:
   - kassis-frischat-1981-silicate-glass-vapour
   - kawashima-1984-soda-flux-chemical-sensors
   - kayahara-1981-liquid-cu-o
+  - kelley-1953-alkali-aluminosilicate-thermodynamics
   - kemori-1980-oxygen-liquid-copper
   - kems-001-homma-1966
   - kems-002-ohno-1967
@@ -315,13 +316,17 @@ gaps:
   - klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
   - konar-2018-alkali-cmas-thesis
   - kor-1967-thesis-sulphur-oxides-slags
+  - kozhina-2000-na-glassforming-thermodynamics
   - kramer-1991-glass-basicity-gas-solubility
   - krawczynski-grove-2012-high-ti-lunar-melts
   - kress-carmichael-1988-iron-oxidation-stoichiometry
   - kress-carmichael-1991-iron-redox-calibration
   - kroger-fingas-1935-alkali-silicate-equilibria
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry
   - kropf-2009-alkalis-chondrules-thesis
   - kume-2000-cao-activities
+  - kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
   - lamoreaux-hildenbrand-1984
   - lamoreaux-hildenbrand-hildenbrand-1987
   - le-losq-2023-alkali-aluminosilicate-glasses
@@ -408,6 +413,7 @@ gaps:
   - nasa-cea-thermo
   - nasa-tm-2024-simulant-guide
   - nazarov-2015-dhofar-silicides
+  - nbs-1981-tn270-8-alkali-thermochemistry
   - nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
   - neubert-2025-vanadium-slag-evaporation
   - neuman-2026-levitation-k-isotopes
@@ -447,8 +453,11 @@ gaps:
   - pending-pages-wo3-polymer-vp
   - pending-re2o7-second-series
   - pending-teo2-vp
+  - pickrell-1994-gaseous-alkali-corrosion
+  - powell-1971-alkali-sulfate-metasilicate-vapour
   - qi-1987-fe-c-v-interaction
   - raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  - ramteke-2026-alkali-vapor-corrosion-spinels
   - rau-1974-se-vp
   - rb86-capobianco-navrotsky-1982
   - rb86-neuvonen-1952
@@ -501,6 +510,7 @@ gaps:
   - schreiber-1986-oxygen-diffusion-redox
   - schreiber-1996-fe-mn-cr-redox-interactions
   - schreiber-haskin-1976-plsc7-chromium-in-basalts
+  - schumm-1981-alkali-aluminosilicate-thermochemical-tables
   - seki-2011-ca-o-solubility-fe-cao-al2o3
   - semkow-haskin-1984-redox-diopsidic-melt
   - senior-1991-solar-heating-jbis
@@ -599,6 +609,7 @@ gaps:
   - shornikov-2026-hatrurite-evaporation
   - shornikov-2026-wollastonite-kems
   - shornikova-2019-perovskite-thermodynamics
+  - shtenberg-2020-alkaline-oxide-thermodynamic-regression
   - shugurov-2024-gaseous-cerates-si
   - shugurov-2026-ceo2-tio2-kems
   - shults-1994-mullite-evaporation
@@ -624,6 +635,7 @@ gaps:
   - street-2010-thermal-properties-simulants
   - su-2024-lunar-volatiles-thesis
   - sublimation-kinetics-2023-minerals
+  - sugawara-2024-na-silicate-molybdate-miscibility
   - sugawara-akaogi-2003-ni-co-fusion
   - sugawara-akaogi-2004-liquid-calorimetry
   - sugie-2021-sioc-mixed-bond-calorimetry
@@ -697,6 +709,7 @@ gaps:
   - yakovlev-2017-cai-acidity
   - yakovlev-2021-chondrule-alkali
   - yakovlev-2024-cai-vaporization
+  - yakovleva-2022-alkali-chondrule-evaporation
   - yam1983
   - yamaguchi-1984-na2o-activity-sodium-beta-alumina
   - yan-2009-cr-ti-nb-v-slag-thermodynamics-review
@@ -721,6 +734,7 @@ gaps:
   - ammin-73-470-oneill-1988
   - ammin-75-781-hemingway-1990
   - ammin-76-904
+  - beerkens-2003-sulfate-decomposition-na2o-activity
   - bencze-yazhenskikh-2016
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
@@ -781,11 +795,13 @@ gaps:
   - rusiecka-2026-chlorine-data
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
   - shornikov-2013-potassium-silicate-thermodynamics
+  - shtenberg-2020-alkaline-oxide-thermodynamic-regression
   - smales-1971-lpsc-12022
   - stebbins-carmichael-weill-1983
   - ta-badro-2021
   - ta-flemetakis-2024
   - thomas-2022-chlorine-bonding-silicate-melts
+  - van-limpt-2006-sodium-evaporation
   - vickerfalt-2024-al-si-v-phase-diagram
   - wetzel-gail-2013-sio-arrhenius
   - yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
@@ -3593,7 +3609,8 @@ sources:
   extracts:
   - path: data/literature/extracts/beerkens-2003-sulfate-decomposition-na2o-activity.yaml
     review_status: draft
-    rows: 0
+    rows: 1
+    locator_status: private_path
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -8182,7 +8199,7 @@ sources:
     extract:
       path: extracts/fegley-2016-rock-steam-solubility.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/fegley-2016-rock-steam-solubility.yaml
       present: true
@@ -12692,6 +12709,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/kayahara-1981-liquid-cu-o.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
+  aliases: []
+  citation: Kelley, K. K., Todd, S. S., Orr, R. L., King, E. G., and Bonnickson, K. R. (1953), Thermodynamic
+    Properties of Sodium-Aluminum and Potassium-Aluminum Silicates, U.S. Bureau of Mines Report of Investigations
+    4955.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
+    review_status: draft
+    rows: 55
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kelley-1953-alkali-aluminosilicate-thermodynamics/kelley-1953-alkali-aluminosilicate-thermodynamics.pdf
+      present: true
+      sha256: 121b4ea4d78ae0d8f2246725b9a134d610bb5e558478b88e78c11f480657902a
+      matches_simulator: null
+    sidecar:
+      path: raw/kelley-1953-alkali-aluminosilicate-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/kelley-1953-alkali-aluminosilicate-thermodynamics
+      exists: true
+      file_count: 106
+    tables:
+      path: tables/kelley-1953-alkali-aluminosilicate-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
       present: false
       error: null
       last_stage: null
@@ -18544,6 +18620,64 @@ sources:
       last_stage: acquired
       date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kozhina-2000-na-glassforming-thermodynamics
+  aliases: []
+  citation: Kozhina, Elena L.; Shultz, Mikhail M. (2000). Thermodynamic Properties of Sodium-Containing
+    Glassforming Oxide Melts. Ceramics–Silikáty 44(3):91–97.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kozhina-2000-na-glassforming-thermodynamics/kozhina-2000-na-glassforming-thermodynamics.pdf
+      present: true
+      sha256: 570afa76000acf3811f15c909dc06edfe8bbffad5a2cbee70e569a9222185e00
+      matches_simulator: null
+    sidecar:
+      path: raw/kozhina-2000-na-glassforming-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/kozhina-2000-na-glassforming-thermodynamics
+      exists: true
+      file_count: 34
+    tables:
+      path: tables/kozhina-2000-na-glassforming-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kozhina-2000-na-glassforming-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kozhina-2000-na-glassforming-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: kramer-1991-glass-basicity-gas-solubility
   aliases: []
   citation: Krämer FW (1991). Contribution to basicity of technical glass melts in relation to redox equilibria
@@ -18837,6 +18971,123 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  aliases: []
+  citation: Carl Kröger, Wilhelm Janetzko and Gerhard Kreitlow (1958), “Der Wärmebedarf der Silikatglasbildung”,
+    Glastechnische Berichte 31(6), 221–228. DOI 10.34657/16750 is the modern TIB repository deposit, not
+    a historical journal DOI.
+  doi: 10.34657/16750
+  report_number: null
+  identifier: 10.34657/16750
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+    review_status: draft
+    rows: 35
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kroger-janetzko-kreitlow-1958-glass-formation-heat/kroger-janetzko-kreitlow-1958-glass-formation-heat.pdf
+      present: true
+      sha256: 3c32489409a9344b005cd4018c8839fda9c0f1f82e7082b380faa4853980d722
+      matches_simulator: null
+    sidecar:
+      path: raw/kroger-janetzko-kreitlow-1958-glass-formation-heat/sidecar.yaml
+      present: true
+    text:
+      path: text/kroger-janetzko-kreitlow-1958-glass-formation-heat
+      exists: true
+      file_count: 54
+    tables:
+      path: tables/kroger-janetzko-kreitlow-1958-glass-formation-heat
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  aliases: []
+  citation: Kröger, C. & Kreitlow, G. (1956), Die Lösungs- und Bildungswärmen der Natronkalksilikate,
+    Glastechnische Berichte, 29(10), 393–400.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+    review_status: draft
+    rows: 36
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kroger-kreitlow-1956-soda-lime-silicate-calorimetry/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.pdf
+      present: true
+      sha256: 4cf6b850d5171dd3589142bfac1400471bb6420d02e2992fe0f264a600e7ce34
+      matches_simulator: null
+    sidecar:
+      path: raw/kroger-kreitlow-1956-soda-lime-silicate-calorimetry/sidecar.yaml
+      present: true
+    text:
+      path: text/kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+      exists: true
+      file_count: 69
+    tables:
+      path: tables/kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: kropf-2009-alkalis-chondrules-thesis
   aliases: []
   citation: Kropf A. (2009), Alkalien in Chondren – offenes oder geschlossenes System? Doctoral dissertation,
@@ -18952,6 +19203,65 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-03'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  aliases: []
+  citation: Kupčák, J. and Mališ, A. (1992). Use of oxygen probes in the study of thermodynamic properties
+    of the system Na2O-SiO2 and the effect of electron conductivity of solid electrolyte on EMF of the
+    concentration cell. Ceramics-Silikáty 36(1):1–6.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+    review_status: draft
+    rows: 21
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.pdf
+      present: true
+      sha256: c3a19ffc1425901c8c812556b7ed92427b988648e85073476e2c29f981b6c169
+      matches_simulator: null
+    sidecar:
+      path: raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/sidecar.yaml
+      present: true
+    text:
+      path: text/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+      exists: true
+      file_count: 26
+    tables:
+      path: tables/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: lamoreaux-hildenbrand-1984
   aliases:
@@ -24000,6 +24310,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  aliases: []
+  citation: 'Wagman, D. D., Evans, W. H., Parker, V. B., Schumm, R. H. & Nuttall, R. L. (1981), Selected
+    Values of Chemical Thermodynamic Properties: Compounds of Uranium, Protactinium, Thorium, Actinium,
+    and the Alkali Metals, NBS Technical Note 270-8.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+    review_status: draft
+    rows: 51
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/nbs-1981-tn270-8-alkali-thermochemistry/nbs-1981-tn270-8-alkali-thermochemistry.pdf
+      present: true
+      sha256: 2ba4a03d541ce2db7cf6803fa0aa5fc9388cd824fa9bdd4270f0b374adee8825
+      matches_simulator: null
+    sidecar:
+      path: raw/nbs-1981-tn270-8-alkali-thermochemistry/sidecar.yaml
+      present: true
+    text:
+      path: text/nbs-1981-tn270-8-alkali-thermochemistry
+      exists: true
+      file_count: 180
+    tables:
+      path: tables/nbs-1981-tn270-8-alkali-thermochemistry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
   aliases: []
   citation: E. Nekhoroshev, M. Shevchenko, Siyu Cheng, D. Shishin, E. Jak (2024), Thermodynamic re-optimization
@@ -26338,6 +26707,122 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: pickrell-1994-gaseous-alkali-corrosion
+  aliases: []
+  citation: Pickrell, G. R. (1994). High temperature alkali corrosion kinetics of low expansion ceramics.
+    PhD dissertation, Virginia Polytechnic Institute and State University.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/pickrell-1994-gaseous-alkali-corrosion.yaml
+    review_status: draft
+    rows: 24
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/pickrell-1994-gaseous-alkali-corrosion/pickrell-1994-gaseous-alkali-corrosion.pdf
+      present: true
+      sha256: 2dc30aaa5ad48a14d03759fa10a68d236740a4e6306e6b14893e554118290493
+      matches_simulator: null
+    sidecar:
+      path: raw/pickrell-1994-gaseous-alkali-corrosion/sidecar.yaml
+      present: true
+    text:
+      path: text/pickrell-1994-gaseous-alkali-corrosion
+      exists: true
+      file_count: 108
+    tables:
+      path: tables/pickrell-1994-gaseous-alkali-corrosion
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/pickrell-1994-gaseous-alkali-corrosion.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/pickrell-1994-gaseous-alkali-corrosion.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: powell-1971-alkali-sulfate-metasilicate-vapour
+  aliases: []
+  citation: Powell, D. G. (1971), A thermodynamic study of the sulphates and related compounds of alkali
+    and alkaline earth metals at high temperatures, PhD thesis, University of St Andrews.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
+    review_status: draft
+    rows: 290
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/powell-1971-alkali-sulfate-metasilicate-vapour/powell-1971-alkali-sulfate-metasilicate-vapour.pdf
+      present: true
+      sha256: ec7903145cf9fa2d21f1b35f68a6183c4c2e7978dcf0fa23942f9720c843ad74
+      matches_simulator: null
+    sidecar:
+      path: raw/powell-1971-alkali-sulfate-metasilicate-vapour/sidecar.yaml
+      present: true
+    text:
+      path: text/powell-1971-alkali-sulfate-metasilicate-vapour
+      exists: true
+      file_count: 320
+    tables:
+      path: tables/powell-1971-alkali-sulfate-metasilicate-vapour
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: qi-1987-fe-c-v-interaction
   aliases: []
   citation: Qi, G., Ji, C. and Che, Y. (1987), “Thermodynamic Activity Interaction Coefficients in Fe-C-V
@@ -26449,6 +26934,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/raberg-2007-salt-stability-na2s-thermochemistry-thesis.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: ramteke-2026-alkali-vapor-corrosion-spinels
+  aliases: []
+  citation: Ramteke, Rajat Durgesh, James G. Hemrick, and Manoj K. Mahapatra (2026). Alkali Vapor Corrosion
+    of Spinel (MgAl2O4) and Gahnite (ZnAl2O4) Refractories—A Comparative Study. Journal of the American
+    Ceramic Society 109, e70773.
+  doi: 10.1111/jace.70773
+  report_number: null
+  identifier: 10.1111/jace.70773
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ramteke-2026-alkali-vapor-corrosion-spinels.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+      present: true
+      sha256: 05ddb5c929da0c3badc1d95e380500c8f11fe7779ba4a6fe1c48f1a6edeeddf5
+      matches_simulator: null
+    sidecar:
+      path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/sidecar.yaml
+      present: true
+    text:
+      path: text/ramteke-2026-alkali-vapor-corrosion-spinels
+      exists: true
+      file_count: 64
+    tables:
+      path: tables/ramteke-2026-alkali-vapor-corrosion-spinels
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ramteke-2026-alkali-vapor-corrosion-spinels.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ramteke-2026-alkali-vapor-corrosion-spinels.yaml
       present: false
       error: null
       last_stage: null
@@ -27909,7 +28453,7 @@ sources:
     extract:
       path: extracts/robie-hemingway-wilson-1980-usgs-of-80-908.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/robie-hemingway-wilson-1980-usgs-of-80-908.yaml
       present: true
@@ -29483,6 +30027,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/schreiber-haskin-1976-plsc7-chromium-in-basalts.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: schumm-1981-alkali-aluminosilicate-thermochemical-tables
+  aliases: []
+  citation: Schumm, R. H. (1981). Thermodynamic Properties of Solid Alkali Aluminosilicates at Elevated
+    Temperatures. NBSIR 81-2343. National Bureau of Standards.
+  doi: 10.6028/NBS.IR.81-2343
+  report_number: NBSIR 81-2343
+  identifier: 10.6028/NBS.IR.81-2343
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml
+    review_status: draft
+    rows: 52
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/schumm-1981-alkali-aluminosilicate-thermochemical-tables/schumm-1981-alkali-aluminosilicate-thermochemical-tables.pdf
+      present: true
+      sha256: 288183b38d160b917cf44b57c915a5178b35f7e9da53467afc2f568cae440fa0
+      matches_simulator: null
+    sidecar:
+      path: raw/schumm-1981-alkali-aluminosilicate-thermochemical-tables/sidecar.yaml
+      present: true
+    text:
+      path: text/schumm-1981-alkali-aluminosilicate-thermochemical-tables
+      exists: true
+      file_count: 106
+    tables:
+      path: tables/schumm-1981-alkali-aluminosilicate-thermochemical-tables
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml
       present: false
       error: null
       last_stage: null
@@ -31182,7 +31784,7 @@ sources:
     text:
       path: text/shornikov-2001-mgalumina-silica-vaporization
       exists: true
-      file_count: 2
+      file_count: 3
     tables:
       path: tables/shornikov-2001-mgalumina-silica-vaporization
       exists: false
@@ -35221,6 +35823,66 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  aliases: []
+  citation: Shtenberg, M. V., Bychinsky, V. A., Tupitsyn, A. A., and Koroleva, O. N. (2020). Evaluation
+    of Thermodynamic Properties of Alkaline Borogermanates and Germanosilicates Using the Regression Analysis
+    Method. International Journal of Thermodynamics, 23(4), 252–258.
+  doi: 10.5541/ijot.764760
+  report_number: null
+  identifier: 10.5541/ijot.764760
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+    review_status: draft
+    rows: 46
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+      present: true
+      sha256: 885a2505deb465f8a43bb9e85a1420095d6c2a240b8cfcf5d5b18424d0460aa4
+      matches_simulator: null
+    sidecar:
+      path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/sidecar.yaml
+      present: true
+    text:
+      path: text/shtenberg-2020-alkaline-oxide-thermodynamic-regression
+      exists: true
+      file_count: 40
+    tables:
+      path: tables/shtenberg-2020-alkaline-oxide-thermodynamic-regression
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: shugurov-2024-gaseous-cerates-si
   aliases: []
   citation: 'Shugurov SM, Lopatin SI, Zhinkina OA, Panin AI, Panina NS (2024). Thermodynamics of gaseous
@@ -36372,7 +37034,7 @@ sources:
     text:
       path: text/stolyarova-1996-cao-alumina-silica-kems
       exists: true
-      file_count: 2
+      file_count: 3
     tables:
       path: tables/stolyarova-1996-cao-alumina-silica-kems
       exists: true
@@ -36681,6 +37343,65 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: sugawara-2024-na-silicate-molybdate-miscibility
+  aliases: []
+  citation: Sugawara, T., Ohira, T., Kondo, R., and Jin, K. (2025; online 2024). Phase equilibria and
+    thermodynamic analysis of liquid-liquid immiscibility in the system SiO2-Na2O-MoO3. Journal of Thermal
+    Analysis and Calorimetry, 150, 7199-7206.
+  doi: 10.1007/s10973-024-13659-7
+  report_number: null
+  identifier: 10.1007/s10973-024-13659-7
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml
+    review_status: draft
+    rows: 48
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sugawara-2024-na-silicate-molybdate-miscibility/sugawara-2024-na-silicate-molybdate-miscibility.pdf
+      present: true
+      sha256: 196ffb5b0cc0f95232106dfa7397b4666f5cf9d5d38c408087eebee0a9e1453b
+      matches_simulator: null
+    sidecar:
+      path: raw/sugawara-2024-na-silicate-molybdate-miscibility/sidecar.yaml
+      present: true
+    text:
+      path: text/sugawara-2024-na-silicate-molybdate-miscibility
+      exists: true
+      file_count: 28
+    tables:
+      path: tables/sugawara-2024-na-silicate-molybdate-miscibility
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sugawara-2024-na-silicate-molybdate-miscibility.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: sugawara-akaogi-2003-ni-co-fusion
   aliases: []
@@ -37613,7 +38334,7 @@ sources:
     extract:
       path: extracts/ta-yamanaka-1997-metsoc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ta-yamanaka-1997-metsoc.yaml
       present: true
@@ -39224,7 +39945,8 @@ sources:
   extracts:
   - path: data/literature/extracts/van-limpt-2006-sodium-evaporation.yaml
     review_status: draft
-    rows: 0
+    rows: 4
+    locator_status: private_path
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -40401,7 +41123,7 @@ sources:
   extracts:
   - path: data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml
     review_status: draft
-    rows: 0
+    rows: 7
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -41006,6 +41728,64 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-05'
+    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: yakovleva-2022-alkali-chondrule-evaporation
+  aliases: []
+  citation: Yakovleva, O.I. and Shornikov, S.I. (2022), Effect of Acid-Base Interaction at the Evaporation
+    of Alkaline Components from Chondrule Melts, Geochemistry International 60(5):401-410.
+  doi: 10.1134/S0016702922050111
+  report_number: null
+  identifier: 10.1134/S0016702922050111
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/yakovleva-2022-alkali-chondrule-evaporation.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/yakovleva-2022-alkali-chondrule-evaporation/yakovleva-2022-alkali-chondrule-evaporation.pdf
+      present: true
+      sha256: 62db512fea4b54ae9f70e141e8aec0a045e8c5e8a558466a7ffee48b015dffaf
+      matches_simulator: null
+    sidecar:
+      path: raw/yakovleva-2022-alkali-chondrule-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/yakovleva-2022-alkali-chondrule-evaporation
+      exists: true
+      file_count: 25
+    tables:
+      path: tables/yakovleva-2022-alkali-chondrule-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/yakovleva-2022-alkali-chondrule-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/yakovleva-2022-alkali-chondrule-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
 - source_id: yam1983
   aliases: []

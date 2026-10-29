@@ -1,0 +1,105 @@
+source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+source_type: scanned historical journal article
+machine_reads:
+  primary: MinerU table HTML and markdown
+  independent: Tesseract eng, 300 dpi, psm 6
+  render_policy: Used rendered source pages to check row and column assignment for every stored table locator and to resolve source/OCR conflicts.
+table_tool_compare: >-
+  tools/mineru_table_draft.py compare output is committed beside this mapping. All 118 records are unverifiable because scanned MinerU
+  blocks lack printed-caption evidence, so the comparator cannot confirm table locators; independent OCR agreement and render checks resolve
+  the cell content and row/column assignments.
+tables:
+  prose_measurements:
+    page: 222
+    printed_locator: section 2 prose and equations (no table number)
+    columns: [glass, direct mean, uncertainty, reducing correction]
+    typed_as: gibbs_table, heat_of_glass_formation_from_batch, glass
+    observations: [3 direct Tafelglas means, 2 reducing corrections]
+    audit: Tesseract and MinerU agree on the printed values; page render checked each number and its attribution. Table 2 is the raw-material analysis table and is not the locator for these prose values.
+  "3":
+    page: 222
+    columns: [batch recipe, analyzed glass oxide mass percentages]
+    typed_as: printed_composition point condition on glass heat rows
+    audit: Both machine reads and page render checked composition-to-glass row assignment. R2O3 aggregate retained as printed; no individual oxides inferred.
+  "4":
+    page: 223
+    columns: [component, heat cal/g, heat kcal/mol, corrected heat cal/g]
+    typed_as: measured_direct solution_component observations
+    observations: 5
+    audit: Both machine reads agree on signed cells and uncertainties; page render confirms the component/column assignment.
+  "5":
+    page: 223
+    columns: [glass, heat of solution cal/g, uncertainty]
+    typed_as: measured_direct glass-dissolution inputs
+    observations: 3
+    audit: Both machine reads agree; page render confirms three glass rows and signs.
+  "6a":
+    page: 223
+    disposition: calculation inputs retained as source method context, not observations in this heat extract
+    audit: Both machine reads and page render confirm table layout. The input quantities are the printed amounts used by Table 6b.
+  "6b":
+    page: 223
+    columns: [glass, mixture formation heat raw kcal/kg, glass dissolution heat kcal/kg, corrected formation heat kcal/kg]
+    typed_as: printed auxiliary table values attached to the corresponding three solution-calorimetry observations
+    observations: [Detag 120.30, Delog 172.18 and 132.60, Libbey-Owens 148.03 and 116.70]
+    audit: Both machine reads agree; page render confirms row/column mapping and values.
+  "7":
+    page: 224
+    columns: [glass, direct determination kcal/100 kg, solution calorimetry kcal/100 kg]
+    typed_as: printed summary values attached to detailed direct or solution observations
+    observations: [direct Tafelglas rows and four solution results]
+    audit: Both machine reads agree; page render confirms every Tafelglas row and oxidising/reducing column. Direct reducing LO value is 12428.
+  "8a":
+    page: 224
+    columns: [bottle glass, direct calorimetry mean cal/g, uncertainty]
+    typed_as: measured_direct
+    observations: 4
+    audit: Both machine reads and page render agree on all four rows. Green glass is 113.80 ± 0.9 cal/g.
+  "8b":
+    page: 224
+    columns: [bottle glass, analyzed glass oxide mass percentages]
+    typed_as: printed_composition point condition
+    observations: [brown, chrom-green, green, white]
+    audit: Both machine reads and page render confirm row assignment. Cr2O3 in chrom-green is 0.29; aggregate R2O3 retained literally.
+  "9":
+    page: 225
+    columns: [tube glass I/II compositions, direct mean, uncertainty, solution heat]
+    typed_as: measured_direct
+    observations: [Rohr I 130.2 ± 1.7 cal/g, Rohr II 121.1 ± 3.1 cal/g, Rohr I solution heat -566.6 ± 1.0 cal/g]
+    audit: Both machine reads and page render confirm rows, values, signs and uncertainties. Röhrenglas II Na2SO4 0.14 and Sb2O3 0.05 are in the calculated column; their analysed cells remain printed as —.
+  "10":
+    page: 226
+    pdf_page_index: 5
+    columns: [Speiser glass, direct mean, uncertainty, composition]
+    typed_as: measured_direct
+    observations: 1
+    audit: Both machine reads and page render confirm 109.6 ± 2.8 cal/g and composition row.
+  "11":
+    page: 226
+    columns: [Geräteglas, Kristallglas, Bleikristallglas, direct means, uncertainties, compositions]
+    typed_as: measured_direct
+    observations: 3
+    audit: Both machine reads and page render confirm 107.0 ± 2.4, 123.7 ± 1.8 and 90.3 ± 2.9 cal/g, in heading order.
+  "12a":
+    page: 226
+    columns: [Sulfatglas I/II/III, direct means, uncertainties, compositions]
+    typed_as: measured_direct
+    observations: 3
+    audit: Both machine reads and page render confirm 209.5 ± 3.8, 175.8 ± 4.3 and 203.5 ± 3.3 cal/g, in heading order.
+  "13":
+    page: 227
+    disposition: excluded; author-calculated comparison from assumed individual reactions, not a measured glass-formation heat
+  "16":
+    page: 228
+    columns: [glass, direct kcal/100 kg, solution calorimetry kcal/100 kg, older calculated comparison]
+    typed_as: printed summary attached to corresponding measured observations
+    audit: Both machine reads and page render confirm every stored direct and solution cell. The third “aus Bildungswärmen” column is excluded as an older calculated comparator, not a measurement.
+cross_reference_1956:
+  source: Kröger and Kreitlow, Glastechn. Ber. 29 (1956), 393–400 (reference [2]); Kröger and Janetzko, Z. anorg. allg. Chem. 284 (1956), 83–96 (reference [3])
+  result: No exact glass/batch measurement duplicated. The 1956 direct 1:1:6 batch result (117.8 ± 2.5 cal/g; 100 kg basis 11780 kcal) is a different composition and is not a 1958 technical-glass row. The 1958 article cites the Kröger and Kreitlow paper [2] for prior soda, quartz and limestone solution heats; those values are auxiliary inputs, not repeated glass-formation observations. No Table 16 “aus Bildungswärmen” comparator is admitted as measured data.
+schema_gap:
+  observation_type: tools/validate_literature_extracts.py:96-99 OBSERVATION_TYPES includes gibbs_table, so the measured rows have an observation type.
+  quantity: simulator/battery/migrate.py:442 TYPE_QUANTITY maps gibbs_table by default to delta_fG; :460 QUANTITY_ALIASES has no exact batch-to-glass-plus-gas reaction heat token. The extract supplies explicit heat_of_glass_formation_from_batch so it migrates quantity-unknown instead of incorrectly inheriting delta_fG.
+  rejected_near_miss: simulator/battery/enums.py:89 Quantity.DELTA_FH is formation from elements, not the printed batch → glass + gas reaction. No delta_fH or delta_fG was assigned.
+  phase: simulator/battery/migrate.py:399 PHASE_MAP contains glass; simulator/battery/enums.py:322 includes GLASS as a phase role. No phase gap is claimed.
+  printed_composition: Tabelle 12a prints Sulfatglas compositions in kilograms; retained as plain printed maps without a percent or mole-fraction basis.

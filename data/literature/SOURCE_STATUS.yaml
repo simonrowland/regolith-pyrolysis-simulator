@@ -11,12 +11,12 @@ counts:
   sources: 2279
   by_stage:
     located: 209
-    inbox: 1285
-    in_progress: 195
-    ingested_partial: 143
-    ingested_complete: 130
+    inbox: 1272
+    in_progress: 188
+    ingested_partial: 147
+    ingested_complete: 136
     wired: 0
-    unknown: 317
+    unknown: 327
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -40,7 +40,7 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 319
+      count: 332
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -164,6 +164,7 @@ anti_loss:
       - kassis-frischat-1981-silicate-glass-vapour
       - kawashima-1984-soda-flux-chemical-sensors
       - kayahara-1981-liquid-cu-o
+      - kelley-1953-alkali-aluminosilicate-thermodynamics
       - kemori-1980-oxygen-liquid-copper
       - kems-055-kambayashi-1983
       - kems-214-hastie-1980-nbsir-80-2178
@@ -181,11 +182,15 @@ anti_loss:
       - klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
       - konar-2018-alkali-cmas-thesis
       - kor-1967-thesis-sulphur-oxides-slags
+      - kozhina-2000-na-glassforming-thermodynamics
       - kramer-1991-glass-basicity-gas-solubility
       - krawczynski-grove-2012-high-ti-lunar-melts
       - kress-carmichael-1991-iron-redox-calibration
       - kroger-fingas-1935-alkali-silicate-equilibria
+      - kroger-janetzko-kreitlow-1958-glass-formation-heat
+      - kroger-kreitlow-1956-soda-lime-silicate-calorimetry
       - kropf-2009-alkalis-chondrules-thesis
+      - kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
       - lead-25-wetzel-2012a
       - lee-bruckner-1984-cr-mn-glass-redox
       - lee-bruckner-1986-borate-redox-series
@@ -228,6 +233,7 @@ anti_loss:
       - nagata-1989-emf-calcium-aluminates
       - nam-2025-cmas-vanadium-thesis
       - nazarov-2015-dhofar-silicides
+      - nbs-1981-tn270-8-alkali-thermochemistry
       - nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
       - neubert-2025-vanadium-slag-evaporation
       - neuman-2026-levitation-k-isotopes
@@ -242,8 +248,11 @@ anti_loss:
       - park-2021-vanadium-thermodynamics-thesis
       - park-min-2004-carbide-capacity-fluoride-soda-slags
       - park-morita-2025-vanadium-activity
+      - pickrell-1994-gaseous-alkali-corrosion
+      - powell-1971-alkali-sulfate-metasilicate-vapour
       - qi-1987-fe-c-v-interaction
       - raberg-2007-salt-stability-na2s-thermochemistry-thesis
+      - ramteke-2026-alkali-vapor-corrosion-spinels
       - rb86-capobianco-navrotsky-1982
       - rb86-neuvonen-1952
       - rb86-takahashi-yoshio-1970
@@ -272,6 +281,7 @@ anti_loss:
       - schreiber-1986-oxygen-diffusion-redox
       - schreiber-1996-fe-mn-cr-redox-interactions
       - schreiber-haskin-1976-plsc7-chromium-in-basalts
+      - schumm-1981-alkali-aluminosilicate-thermochemical-tables
       - seki-2011-ca-o-solubility-fe-cao-al2o3
       - semkow-haskin-1984-redox-diopsidic-melt
       - sesko-2022-tum-thesis
@@ -291,6 +301,7 @@ anti_loss:
       - shornikov-2019-lunar-meteorite-evaporation-model
       - shornikov-2019-perovskite-evaporation-thermodynamics
       - shornikov-2026-wollastonite-kems
+      - shtenberg-2020-alkaline-oxide-thermodynamic-regression
       - shugurov-2024-gaseous-cerates-si
       - shugurov-2026-ceo2-tio2-kems
       - shyrokykh-2021-vanadium-vaporization
@@ -301,6 +312,7 @@ anti_loss:
       - stolyarova-2021-ti-al-kems-ru
       - stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
       - su-2024-lunar-volatiles-thesis
+      - sugawara-2024-na-silicate-molybdate-miscibility
       - sugawara-akaogi-2003-ni-co-fusion
       - sugawara-akaogi-2004-liquid-calorimetry
       - sugie-2021-sioc-mixed-bond-calorimetry
@@ -346,6 +358,7 @@ anti_loss:
       - xiao-holappa-1993-isij-crox-slag-activities
       - xiao-reuter-holappa-2000-chromium-slag-oxidation-review
       - xu-2026-excess-oxygen-magma
+      - yakovleva-2022-alkali-chondrule-evaporation
       - yamaguchi-1984-na2o-activity-sodium-beta-alumina
       - yan-2009-cr-ti-nb-v-slag-thermodynamics-review
       - yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
@@ -427,7 +440,7 @@ anti_loss:
       - yang-2025-na2o-cao-silica-thermodynamics
       - yu-hewins-1997-lpsc28-1613
     byte_mismatch:
-      count: 329
+      count: 332
       ids:
       - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
       - adamkovicova-1980-casio3-heat-of-fusion
@@ -462,6 +475,7 @@ anti_loss:
       - deguzman-2026-simulant-physicochemical
       - di-donato-granati-2000
       - engelschion-2020-eac1a-simulant
+      - fegley-2016-rock-steam-solubility
       - fegley-2023-chemical-equilibrium-calculations-bu
       - filiberto-lpsc2011-2064-volatiles
       - folstad-2024-metals-cao-dissolution-cas
@@ -655,6 +669,7 @@ anti_loss:
       - renggli-2022-te-evaporation
       - richter-2008-cai-like-liquids-lpsc-abstract
       - richter-et-al-2007
+      - robie-hemingway-wilson-1980-usgs-of-80-908
       - robinot-2025-promes-review
       - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
       - schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -739,6 +754,7 @@ anti_loss:
       - ta-flemetakis-2024
       - ta-mendybaev-2002-lpsc
       - ta-shirai-2000-lpsc
+      - ta-yamanaka-1997-metsoc
       - tachibana-tsuchiyama-1998-forsterite-dust-lpsc
       - thomas-2022-chlorine-bonding-silicate-melts
       - thomas-wood-2021-chlorine-silicate-melts
@@ -759,15 +775,18 @@ anti_loss:
       - zaitsev-2000-ms2000-045
       - zigo-1987-gehlenite-fusion
   stale_inbox:
-    count: 763
+    count: 965
     ids:
     - abdelkarim-1977-ferrous-oxide-activities
+    - ackermann-thorn-1958-volatile-oxides-anl5824
     - ackerson-2020-ti-nmr-xafs
     - aguilar-ayala-2025-msolo-viper
     - aithala-2026-drum-regression-data
     - aithala-2026-martian-fe-redox
     - akyuzlu-eric-1992-carbon-saturated-slag-metal-equilibria
     - alcock-itkin-horrigan-1984
+    - alderman-2017-fayalitic-melts
+    - alderman-2017-levitated-melts-xanes
     - allen-1992-lunar-oxygen-from-rocks-soil
     - allen-2014-taurus-littrow-pyroclastic
     - allendorf-2005-sand1196-refractory-corrosion
@@ -795,22 +814,33 @@ anti_loss:
     - banya-1991-cao-sat-cao-al2o3-feto
     - banya-1993-quadratic-formalism-slag-metal
     - banya-1994-hafnium-deoxidation-fe-ni
+    - banya-chiba-hikosaka-1980-feto-binary-solid-iron
+    - banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
     - banya-matoba-1962-carbon-oxygen-liquid-iron
     - barber-2018-prospa-lpsc
     - barber-2024-prospect-frontiers
+    - bartie-2004-chromium-melter-thesis
     - baud-2003-sic-alumina-vaporization-condensation
     - bauschlicher-1999-pon-ponh-formation-enthalpies
     - bauschlicher-2021-yb-gd-hydroxide-si
     - bauschlicher-2022-cr-mn-la-hydroxide-si
     - bauschlicher-jacobson-bodenschatz-2024-metal-hydroxide-database
     - baxter-2022-pyopam-lepr-test-dataset
+    - beattie-1994-olivine-partitioning
     - beckett-1988-hibonite-ti3-esr
+    - bedard-2006-plagioclase
     - beerkens-1999-redox-sulphur-reactions
     - beerkens-2003-fe-s-amber-redox
     - beerkens-2008-glass-elementary-process-steps
+    - bell-2014-am-cr-valence-olivine
+    - bell-2014-ntrs-cr-oxidation-state-planetary-basalts
+    - bell-2017-goldschmidt-temperature-cr-redox
     - bell-2023-angrite-core-6136
     - bell-2023-angrite-redox-accepted-manuscript
     - bell-2024-angrite-cr-6074
+    - bell-cr-xanes-anisotropy-olivine-oxybarometer
+    - bell-mao-weeks-1976-lunar-glass-optical-epr
+    - bell-osas-oxybarometer-am-2023-9021
     - bell-vaci-lanzirotti-2021-cr-xanes
     - belov-2018-ivtanthermo-online
     - benalia-2023-alkali-mo-cr-salt-model
@@ -825,12 +855,18 @@ anti_loss:
     - berman-1988-chnosz-transcription
     - berman-brown-1986-mineral-heat-capacity-erratum
     - berry-2008-komatiite-iron-oxidation
+    - berry-2015-goldschmidt-abstract
     - berry-2017-hibonite-oxybarometer-limitations
+    - berry-2023-titanium-redox-extraterrestrial-melts
     - betts-ustunisik-nielsen-2025-opx-partition-database
     - birch-2025-ices-roxy-pilot-plant
+    - blacha-2013-amm-mn-evaporation-ot4
     - blazek-1991-anorthite-diopside-oxygen-redox-diffusion
     - bliss-2013-gaseous-sulfate-solubility-method
+    - blundy-2020-olivine-melt-redox
+    - blundy-wood-2003-partitioning
     - bonamici-2017-glassy-fallout-debris
+    - borisov-2006-sodium-metal-solubilities
     - borisov-2010-silica-ferric-ferrous
     - borisov-2018-cmp-article
     - borisov-veksler-2021-k-fe-miscibility
@@ -840,12 +876,18 @@ anti_loss:
     - botcharnikov-2008-hydrous-ferrobasalt-phase-relations
     - botinha-2026-chromium-steelmaking-review
     - bouchet-kaplan-1971-lunar-spark-spectrometry
+    - bowen-schairer-1932-system-feo-sio2
+    - bradtmuller-2025-metasilicate-structure
     - brazdova-2023-cu-ca-zn-metaphosphate
+    - brewer-mastick-1949-gaseous-feo-ucrl534
+    - brewer-searcy-1949-ucrl552-al-al2o3
     - brunfelt-1974-apollo17-elemental-chemistry
+    - bryson-2019-olivine-melt-oxygen-fugacity
     - burnham-berry-2014-cerium-redox
     - bychkov-2019-silicate-melt-enthalpy-method
     - calas-2006-cr3-crystal-field-glasses
     - cannon-2019-mgs1-mars-global-simulant
+    - caplan-cohen-1961-chromium-volatilization
     - cardiff-2005-vacuum-pyrolysis-demonstration
     - chamberlin-beckett-stolper-1995-spinel-oxide-activities
     - chappell-green-1973-astromat-data
@@ -858,15 +900,20 @@ anti_loss:
     - chen-2019-co2-atmosphere-phase-chemistry
     - chen-2019-sfc-phase-equilibria-air
     - cheng-2020-iron-rich-fe-ca-si-phase-equilibria
+    - chernonozhkin-2021-microtektite-fe-isotopes
+    - chou-1978-oxygen-buffer-calibration-hydrogen-sensor
     - chowdhury-2023-shergotty-apatite-sulfur
     - chuayboon-2022-solar-mgo-zno-carbothermal-methanothermal
+    - cicconi-2010-plinius-eu-silicate-glasses-xas
     - cicconi-2012-europium-redox-silicate-glasses
     - cicconi-2020-vanadium-aluminosilicate-glasses
+    - cicconi-2021-agu-redox-behavior-ree
     - claussen-russel-1997-sulfur-iron-voltammetry
     - cohen-2006-iron-silicate-reduction-isotopes
     - colaprete-2010-lcross-water-detection
     - colaprete-viper-pip
     - colson-1997-cr-dimer-electrochemistry
+    - colson-2000-lpsc-1774-oxide-activities
     - colson-2020-cl-nio-diffusion
     - colson-haskin-1991-electrolytic-smelting-lunar-soil
     - compston-1970-apollo11-chemistry-age
@@ -882,6 +929,8 @@ anti_loss:
     - costa-2017-nasa-cmas-coating-thermochemistry
     - costa-2018-yb-silicate-activity-corrigendum
     - coughlin-obrien-1957-calcium-orthosilicate-heat-content
+    - creech-2021-tektite-volatility-goldschmidt
+    - cronenberg-1994-offgas-tracer-molten-basalt
     - cuttitta-1971-apollo12-elemental-composition
     - cymes-2023-lunar-pyroxene-ferric-eels
     - dachs-2025-orthopyroxene-heat-capacity-entropic-mixing
@@ -896,24 +945,36 @@ anti_loss:
     - delgado-2016-magnesium-combustion-thesis
     - derin-2016-p-n-c-capacity-models
     - desai-1987-manganese-molybdenum-thermodynamics
+    - desai-2016-se-copper-slag
     - dhaliwal-2024-eucrite-cu-zn-isotopes
     - dickinson-1989-lunar-basalt-germanium
+    - dingwell-1988-nfs-density-redox
+    - dingwell-1991-redox-viscometry
+    - dingwell-brearley-1988-cfs-density-redox
+    - dingwell-scarfe-1985-fluorine-diffusion
+    - distl-stein-2024-ti-al-mo
     - dohmen-1998-olivine-fe-gas
     - dohmen-blundy-2014-plagioclase-melt-partitioning
     - dominguez-2023-ices-extraterrestrial-mining
     - donatini-2025-ce-fe-cooling-xanes
     - dottori-2025-low-t-carbothermal-test-campaign
+    - drowart-1964-mgo-cao-sro-wadd-tr60-782-pt22
     - drowart-1984-vaporization-far-from-equilibrium
     - dubiel-1999-desy-vanadium-xanes-report
     - duchesne-2016-vanadium-xas-slags
     - duncan-1974-titaniferous-mare-basalts
     - dunham-2019-lar-12095-12240
     - duval-2026-polyvalent-redox-quantification
+    - dyar-1987-quench-mossbauer-wetchem
+    - dygert-2020-lunar-partitioning
     - eagle-engineering-1988-lunar-oxygen-pilot-plant
     - el-hayek-2026-calcium-aluminate-iron
+    - elhadj-2011-silica-evaporation-llnl-jrnl-489847
     - eliasova-1978-akermanite-diopside-gibbs-part2
     - eppich-2014-fallout-melt-glass
+    - eret-2026-re-glass-retention
     - erstfield-1979-lunar-anorthite-electrolysis
+    - ewing-1963-high-temperature-sodium-potassium
     - faber-2002-silicate-glass-redox-optical
     - fabian-2021-lanthanide-glasses
     - faircloth-2020-lunar-sulfur-chlorine-thesis
@@ -922,6 +983,7 @@ anti_loss:
     - filsinger-1990-silica-silicon-carbothermic-kinetics
     - fleet-2005-sulfur-k-edge-glass-xanes
     - flemetakis-2024-boron-evaporation-supplement
+    - floss-1998-corundum-hibonite-evaporation-residues
     - floss-2003-angrites
     - folomeikin-2024-yttria-carbon-kems
     - fonseca-2026-lunar-mantle-metal-saturation
@@ -930,6 +992,11 @@ anti_loss:
     - fraser-rammensee-1987-kems-melt-mixing
     - fruchter-1973-apollo15-clastic-materials
     - fujisawa-1985-cas-solubility-cao-al2o3
+    - fujita-maruhashi-1969-tetsu-iron-oxide-silica-slag-activities
+    - fujita-maruhashi-1970-fe-mn-si
+    - gail-2013-sio-nucleation-silicate-dust
+    - gaillard-2002-iron-redox-kinetics
+    - gaillard-2003-chemical-transfer-h2-silicate-melts
     - gal-2018-pnas-calcium-storage
     - garai-2020-chromium-glass-nucleation
     - garenne-2019-chondrite-fe-xanes-speciation
@@ -944,6 +1011,8 @@ anti_loss:
     - gervasio-2025-cr-glass-supplement
     - gibson-1971-lunar-gas-release
     - gibson-1993-first-oxygen-lunar-basalt
+    - gilles-1969-ms-thermodynamics-titanium-oxides-coo-1140-180
+    - giordano-2020-raman-main
     - glasser-2014-salt-hydrate-pairs-si
     - glasser-2022-atom-sums-I
     - glasser-2024-atom-sums-III
@@ -960,6 +1029,7 @@ anti_loss:
     - gonna-russel-2000-binary-silicate-redox
     - gooding-muenow-1977-meteoritics12-401
     - gopalan-1970-apollo11-rbsr-uthpb-ages
+    - goso-2019-titaniferous-slag-equilibria-beneficiation
     - gott-2024-card-gas-analysis
     - gravanis-1989-glass-cooling-redox-esr
     - green-1975-apollo17-experimental-petrology
@@ -970,19 +1040,28 @@ anti_loss:
     - guerrero-gonzalez-2025-ices-low-temp-mse
     - gunther-1958-vapor-pressure-evaporation
     - guo-2022-lunar-magnetite-eels
+    - gupta-2021-al3sc-thermodynamic-assessment
     - gurvich-ivtanthermo
     - hack-jantzen-2013-gtt-mes-mnox
     - hager-2021-ices-isru-thermal-design
     - haggerty-2025-carbothermal-reactor-environmental-testing
+    - haghdani-2024-mn-slag-structure
     - hallstedt-2025-sgte-binary-datasets
+    - hara-1988-feo-fe2o3-cao-melt-densities
+    - hasapis-panish-rosen-1960-refractory-vaporization
+    - hasegawa-2012-htmp-fexo-activity-na2o-al2o3-sio2
+    - hasegawa-2024-sulfide-capacities
     - hashimoto-1990-forsterite-evaporation-kinetics
     - haskin-1970-apollo11-rare-earths-trace-elements
     - haskin-1971-apollo12-rare-earths
     - hastie-1979-characterization-of-high-temperature
     - hastie-1987-graphite-laser-vaporization
+    - hastie-2001-nistir6793-laser-vaporization-ms
     - haworth-2002-phosphorus-si001
     - haworth-2002-phosphorus-si002
+    - hayakawa-1982-tisij-fe-cu-evaporation
     - hayashi-1994-hydrogen-liquid-iron-oxide-fines
+    - hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3
     - he-chen-yang-2023-vanadium-distribution
     - hecht-2009-phoenix-perchlorate
     - hemingway-1987-quartz-heat-capacity
@@ -993,14 +1072,17 @@ anti_loss:
     - herd-benaroya-2025-mars-meteorite-fo2
     - hertzog-2019-murchison-soluble-organics
     - herzel-2020-calcium-alkali-phosphates
+    - hewitt-1978-fmq-redetermination
     - heyrman-2006-alco-oxycarbide-enthalpies
     - heyrman-2006-alumina-graphite-kems
     - hilpert-2000-htmc10-abstract-volume
     - hils-2009-titanium-extraction-thermodynamics
     - hino-kitagawa-banya-1993-sulphide
     - hirashima-1988-redox-constitution
+    - hirschmann-2022-magma-ocean-redox
     - hodges-kushiro-1974-apollo17-model-moon-petrology
     - hoffman-2022-moxie-sciadv
+    - holcomb-2008-chromia-reactive-evaporation
     - holland-powell-2011-thermodynamic-dataset
     - hollist-2022-ices-psr-ice-processing
     - holquist-2020-ices-cold-trap-purification
@@ -1010,17 +1092,23 @@ anti_loss:
     - holquist-2023-ices-isru-electrolyzer
     - holquist-2024-ices-lunar-cold-trap
     - holte-2018-coo-silicate-activities
+    - holycross-2022-vanadium-eclogite-partitioning
     - hota-2024-ices-thermal-management-ice-extraction
     - hou-2012-binary-oxide-subregular-activity
     - hovis-1982-calorimetry-interlaboratory-discrepancy
     - hovis-1997-anorthite-k-na-mixing
     - hovis-roux-1993-ajs293-1108
+    - huang-1999-sio-vapor-pressure
     - hubert-2017-industrial-glass-redox-control
+    - huebner-1975-furnace-gas-fo2-iron-wustite
+    - huebner-1976-chromium-crystal-melt-partitioning
     - huebner-mukherjee-2015-photorates
+    - huebner-sato-1970-oxygen-fugacity-mn-ni-oxide-buffers
     - hughes-stolper-2026-sulfur-dilution
     - hummel-schwiete-1959-solution-calorimetry-part1
     - ilatovskaia-2022-al-ti-si-immiscibility
     - inada-2024-dissociative-evaporation-theory
+    - iosilevskiy-2013-silica-high-t-phase-diagram-arxiv
     - irgashev-1984-cao-enthalpy-heat-capacity
     - ishii-1991-ni-cu-co-si-deoxidation
     - ito-1972-mn-mg-metasilicate
@@ -1034,6 +1122,7 @@ anti_loss:
     - jacobson-2012-mass-spectrometric-oxides
     - jacobson-2023-hydroxide-gas-database-poster
     - jahanshahi-sun-zhang-2004-ferroalloy-slag-review
+    - jahanshahi-wright-1993-slag-redox
     - jamieson-masson-1962-decarbonization
     - janaf-2nd-ed-1971-nsrds-nbs-37
     - janaf-3rd-ed-1985-chase-jpcrd-14-s1
@@ -1041,6 +1130,7 @@ anti_loss:
     - janz-1978-nsrds61-part1-eutectics
     - jaxa-ishikawa-refractory-metal-thermophysical-graphs
     - jia-2026-lunar-simulant-phase-transformation-volatilization
+    - jing-2024-imct-ti-v-slag
     - johannson-thorvaldson-1934-calcium-silicate-formation
     - jones-2004-lunar-basalt-redox
     - jones-2021-apollo-grains-water-hydrogen-thermal-evolution
@@ -1050,24 +1140,29 @@ anti_loss:
     - jsc1a-msds-orbitec
     - jung-2000-p2o5-activity
     - jung-2003-multicomponent-oxide-thesis
+    - jung-fruehan-2001-isij-tiox-ladle-slags
     - jurewicz-2004-devolatilized-allende-1417
     - kamperman-1996-cr-ti-oxide-fugacity-thesis
     - kang-jung-2004-cao-mno-al2o3-sio2
     - karner-2006-vanadium-oxybarometer
     - karner-2008-v-pyroxene-melt-xanes
     - karner-2010-eu-augite-xanes
+    - karner-2017-eucritic-basalt-cr-v-partitioning
     - karton-2007-w4-phosphorus-thermochemistry
     - kassis-frischat-1981-mixed-alkali-vapor-pressures
+    - katahira-2016-isij-feo133-activity-feox-cao-sio2
     - kato-2015-moon-volatile-loss
     - kaur-2024-carbothermal-jsc1a-metals
     - kautz-1970-sodium-silicate-stability
     - kawaguchi-2018-sodium-concrete-thermophysical-products
     - kegler-2006-ni-co-metal-silicate-partitioning
+    - kelley-1935-usbm-bull383-vapor-pressures
     - kelley-1939-sodium-silicate-low-temperature-cp
     - keltie-2018-chromitites-thesis
     - keltie-brenan-2025-chromite-parent
     - keltie-brenan-2025-data-description
     - keltie-brenan-2025-journal-supplement
+    - kemori-1976-oxygen-liquid-ni
     - kikuchi-2016-sodium-oxide-silica-reaction
     - kim-2017-k2o-sio2-eutectic
     - kim-lee-2010-sb-ce-redox-diffusion
@@ -1079,7 +1174,10 @@ anti_loss:
     - king-2015-ci-chondrite-modal-mineralogy
     - kipfer-2024-67p-volatile-sublimation
     - kiyabu-2018-hydration-screening-si
+    - klemettinen-2020-te-copper-slag
+    - klevenz-2009-heidelberg-diss-sio-vapour-pressure
     - knight-2009-cai-silicon-isotope-fractionation
+    - koch-2025-doped-ceria-thesis
     - kono-2024-peridotite-viscosity-abstract
     - konta-1975-moldavite-oxide-volatility
     - korobeinichev-2007-phosphorus-thermochemistry-review
@@ -1089,6 +1187,7 @@ anti_loss:
     - kowalski-2021-lu-silicate-thermodynamics
     - kracek-1930-na2o-sio2-phase-diagram
     - kraus-2012-silica-liquid-vapour
+    - krawczynski-2009-lpsc40-ti-oxidation-lunar-high-ti
     - krawczynski-2010-lpsc41-ti-valence
     - kruesi-2011-vacuum-carbothermal-alumina-solar
     - krupka-1979-high-t-heat-capacities-glasses
@@ -1100,12 +1199,16 @@ anti_loss:
     - kurosawa-2010-shock-emission-spectra
     - kushiro-nakamura-1970-apollo11-petrology
     - kuwahara-nakada-2026-majorite-ferric-18gpa
+    - kwatara-2006-cr-matte-slag
+    - labaj-2012-amm-cu-evaporation-fe-cu
     - lambotte-2012-aluminosilicate-corrosion-thesis
     - lamoreaux-hildenbrand-1984-t383
     - landis-2011-calcium-reduction-oxygen
     - lange-carmichael-stebbins-1986-am71-937
+    - larche-1968-mcmaster-oxygen-solubility-liquid-iron
     - laul-1972-bulk-ree-apollo14-15-luna16-preprint
     - lavrentiev-2019-lithium-oxide-monte-carlo
+    - le-losq-sossi-2023-peridotite-glasses
     - lead-01-riebe-2017
     - lead-05-mcdade-2002
     - lead-06-vlach-2019
@@ -1117,6 +1220,7 @@ anti_loss:
     - lead-39-ichise-1974-sulfur-activity
     - lead-42-ross-1948
     - lee-1976-chromium-oxide-vaporization
+    - lee-1978-mgo-cr2o3-langmuir-knudsen-vaporization
     - lee-2021-ices-thermal-management-lunar-ice-miners
     - lee-2022-ices-thermal-corer
     - lee-2023-ices-ice-extraction-system
@@ -1124,11 +1228,16 @@ anti_loss:
     - leitzke-2018-lpsc2110-poster
     - leitzke-2018-lpsc49-ti-xanes
     - leitzke-2018-lunar-magmatism-thesis
+    - lelosq-2022-water-cas-polymerisation
     - lerner-2021-fe-s-xanes-beam-damage
+    - lester-2012-immiscible-thesis
     - lewis-2010-promoted-combustion-data-reexamined
     - li-2025-change5-impact-generated-magnetite
     - lidman-olsson-2023-phosphorus-thermal-conversion-review
+    - lin-2020-boron-cr-slag
+    - lindberg-2007-alkali-salt-thesis
     - lindsay-stebbings-2005-charge-transfer
+    - lindvall-2017-vanadium-extraction-thesis
     - liu-2020-cr-valence-xps
     - liu-2022-change5-water
     - liu-2023-potassium-calcium-silicate-polymorph-heat-capacity
@@ -1163,10 +1272,14 @@ anti_loss:
     - machacek-2024-mo-phosphate-redox
     - machida-2023-vanadium-glass
     - madivate-1996-glass-melting-calorimetry
+    - maeda-1978-magnesia-transpiration-o2-h2o
     - mahaffy-1998-galileo-probe-dh-3he
     - mahaffy-2012-sam-instrument-suite
+    - makrovets-2021-sr-al-phase-model
     - malheiros-ferreira-1990-phosphate-kems-thesis
+    - mallmann-oneill-2009-vanadium
     - mama-toulou-2025-borosilicate-md-dataset
+    - mamiya-2000-silicon-monoxide-disproportionation
     - mao-2005-thesis-aluminosilicate
     - maramba-2007-thesis-appendix
     - maramba-2007-thesis-procedure
@@ -1175,12 +1288,18 @@ anti_loss:
     - marcial-2023-broborg-glass-thermal-redox
     - marcq-2017-magma-ocean-radiation
     - mare-2020-divalent-ge-silicate-melts
+    - marrs-2022-impact-glass-thesis
+    - maruhashi-1972-fe-mn-al-activities
+    - masiero-2021-sodium-allende
     - masson-1965-proc-roy-soc-a287-201
     - mathieu-2009-sodium-solubility-molten-silicates
     - matlack-2010-high-alumina-glass-dm100
+    - matoba-kuwana-1965-oxygen-alloys
+    - matsushita-goto-1966-emf-fe-fexo-zirconia
     - matsuzaki-1998-multicomponent-feo-activity
     - maxwell-1970-apollo11-primary-analyses
     - mccanta-2021-pds-xas-synthesized-glasses
+    - mccanta-am-cr-oxybarometry-am-2024-9602
     - mccanta-rutherford-snc-progress-report-undated
     - mccloy-2026-optical-basicity-95-oxides
     - mccloy-2026-optical-basicity-supplement
@@ -1197,9 +1316,16 @@ anti_loss:
     - metal-pub
     - metsoc-2024-6397
     - mgs1-spec-sheet-2022
+    - miike-1974-feo-activity-silicate-melts
     - miller-1974-apollo17-regolith-composition
+    - miller-armatys-2013-kems-inventory-si
     - mills-1993-slag-structure-properties
+    - milushin-1987-al2o-al2o2-enthalpies-tvt
+    - milyushin-1986-aloh-formation-enthalpy
     - mojarro-2025-bennu-prebiotic-pnas
+    - mori-suzuki-1968-iron-oxide-melt-co2-co-density
+    - morita-1988-chromite-solubility-silicate-slags
+    - morita-1988-tetsu-mgcr2o4-solubility-reducing
     - morris-1976-lunar-soil-maturity-is-feo
     - morris-1978-lunar-soil-is-feo-compilation
     - morris-1980-lunar-soil-metallic-fe
@@ -1208,30 +1334,46 @@ anti_loss:
     - moussallam-2023-swir-melt-inclusions-redox
     - moussallam-2023-swir-supplement-s1
     - moussallam-2023-swir-table-s2
+    - muan-1958-oxide-phase-equilibria-oxidation-states
     - mudenda-2017-na2o-titanate-emf
     - muller-2014-laser-ignition-iron-oxygen
     - muller-2015-liquid-phase-iron-combustion
+    - muramatsu-vacuum-oxygen-iron-nickel
     - murck-campbell-1986-chromium-melts
     - murthy-1970-apollo11-k-rb-sr-ba
     - muscatello-gustafson-2011-solar-resistance-carbothermal-comparison
+    - myers-gunter-1979-co-coo-iw-nno
     - myers-jacobson-2015-volatile-metal-hydroxides-ntrs-poster
+    - mysen-1980-structure-redox
+    - mysen-1984-alkaline-earth-redox
+    - mysen-1985-cmas-redox
+    - mysen-kushiro-1988-condensation-evaporation-am-min
+    - mysen-virgo-1989-nas-redox
+    - nagahara-1993-sio2-evaporation-equilibrium-vacuum
+    - nagai-2011-dicalcium-phosphate-kems
     - nagasaka-1985-liquid-wustite-co-reduction
     - nagasaka-1989-additives-co-reduction
+    - nakada-2020-martian-glass-inclusion-vanadium
     - nakada-2026-fe-inverse-fluorescence-calibration
+    - nakagiri-2004-sio2-evaporation-moist-gas
+    - nakamura-1993-bao-fe-redox
     - nakamura-2014-fresnoite-glass-crystal-heat-capacity
     - naraoka-2023-science-ryugu-som
     - narasimhan-2013-kems-tellurium-thermodynamics
     - nasa-2025-automated-carbothermal-reactor
     - nasa-std-6001b
+    - nash-2019-sulfur-silicate-melts
     - nava-1974-lunar-sites-chemical-compositions
     - nava-1974-lunar-sites-chemistry-abstract
     - navrotsky-1987-hydrous-calorimetry
     - navrotsky-1994-volatiles-lead-borate-calorimetry
     - navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
     - nbs-sp305-supp18-1986-catalog
+    - nea-2024-ancillary-thermodynamics
     - neal-2001-lunar-mantle-trace-elements
     - nekhoroshev-2019-oxide-thermodynamic-optimization
     - nerad-2000-titanite-fusion-enthalpy
+    - nesmeyanov-firsova-1960-jprs2570-vapor-pressure-oxides
     - neuman-2021-k-cu-evaporation-isotope-fractionation
     - neuman-2023-goldschmidt-18648
     - neumann-1954-liquid-k-evaporation-coefficient
@@ -1239,7 +1381,9 @@ anti_loss:
     - neuvonen-1952-merwinite-monticellite-formation-enthalpy
     - newsom-1986-siderophile-origin-of-moon
     - nguyen-2014-titania-water-transpiration
+    - nguyen-2023-sio2-vapour-deposition-alloy-corrosion
     - ni-2021-laser-levitation-evaporation
+    - niemi-2021-superheater-deposits-corrosion
     - nilson-2003-silica-refractory-corrosion
     - nist-jpcrd-120
     - nist-jpcrd-423
@@ -1263,6 +1407,10 @@ anti_loss:
     - okelley-1970-apollo11-radionuclides-proceedings
     - okelley-1971-apollo12-primordial-radionuclides
     - omori-1961-cao-activity-cas
+    - omori-sanbongi-jjim-25-sio2-al2o3-activity
+    - oneill-1987-qfi-qfm-fayalite-magnetite-emf
+    - oneill-1988-fe-o-cu-o-emf
+    - oneill-2018-morb-fe-oxidation
     - oneill-berry-2006-cro-nio-coo-activities
     - ortega-2026-lunar-aluminum-oxygen-extraction-review
     - osadchii-2017-chondrite-fo2-electrochemistry
@@ -1272,6 +1420,7 @@ anti_loss:
     - panda-2013-ca-mg-mn-o-optimization-thesis
     - panda-jung-2020-al-ti-oxide-equilibria
     - pankratz-1982-usbm-b672
+    - papike-2013-vanadium-oxybarometers-martian-basalts
     - papike-2014-vanadium-pyroxene-melt-martian
     - papike-2016-pyroxene-valence-systematics
     - paque-2013-cai-spinel-ti-v-xanes
@@ -1279,8 +1428,10 @@ anti_loss:
     - pei-2026-alkali-vanadate-binary
     - pei-2026-alkali-vanadate-ternary
     - pei-2026-kvo3-thermodynamics
+    - peng-2016-al-cr-mo-ni-thesis
     - peplowski-2011-messenger-mercury-k-th
     - perkins-1992-fe-mg-olivine-clinopyroxene
+    - peterman-2015-olivine-melt-oxygen-fugacity
     - philpotts-schnetzler-1970-apollo11-elements
     - piacente-matousek-1973-sodium-disilicate-kems
     - pilorget-2025-bennu-ryugu-ir
@@ -1289,11 +1440,14 @@ anti_loss:
     - plante-hastie-1986-radionuclide-vaporization
     - poppe-2017-lunar-proton-scattering
     - poppe-2017-supplement-description
+    - porter-1953-gaseous-oxides-thesis-ucrl2416
     - potiszil-2026-ryugu-organic-matter
     - poustovetov-roeder-2001-cr-geobarometer
     - pretorius-muan-1992-chromium-oxide-activities
     - pringle-2014-angrite-si-isotopes
     - pringle-2017-rb-volatile-loss
+    - psi-nagra-2024-tp-methods
+    - psi-nagra-2026-tdb
     - qi-2024-alkali-chloride-carbonate-thermodynamics-thesis
     - qian-2022-boron-removal-slag-structure
     - qin-2026-vanadium-model-waste-glass-redox
@@ -1322,12 +1476,18 @@ anti_loss:
     - rein-chipman-1963-sic-free-energy
     - related-beerkens-1986-deposits-condensation-thesis
     - related-carmichael-etal-1981-silicate-properties-lbl12100
+    - renno-2023-vanadium-bos
     - rhodes-1974-apollo17-soil-geology-chemistry
+    - richter-2009-lpsc40-chondrule-liquid-evaporation-vacuum
     - rietmeijer-1999-metastable-eutectic-condensation
+    - rietmeijer-2007-lpsc-1121
     - rigby-2023-hlw-reductants-redox-foam
     - rigby-2024-boron-nitride-reductant
     - rigby-2026-ceramic-carbon-reductants
     - righter-1990-pallasite-redox
+    - righter-2005-lpsc36-v-spinel-melt-xanes
+    - righter-2013-am-martian-redox-preprint
+    - righter-2015-spinels-v-xanes-meteorite-redox
     - robie-1984-ni-co-silicate-heat-capacity
     - robie-1987-andradite-heat-capacity
     - robie-finch-hemingway-1982-fayalite-cp-entropy
@@ -1347,16 +1507,21 @@ anti_loss:
     - rosenberg-1996-carbothermal-simulants-methane-lpsc
     - ross-1948-optical-properties-alamogordo-glass
     - roush-2018-nirvss
+    - rusiecka-wood-2026-chlorine-hcl
     - russel-1989-glass-redox-cooling-model
     - russel-kohl-schaeffer-1988-oxygen-activity-glass
     - ryder-schuraytz-2001-apollo15-chemical-variation
     - rys-muller-2010-na4sio4-liquidus
     - rzehak-2022-lunar-ti-redox-isotope-fractionation
     - saito-2012-lunar-electron-ion
+    - saito-2024-fe-phosphate-solid-solution
     - sakai-suito-1996-nitride-capacities
     - sakao-sano-1962-fe-cr-oxygen
+    - sakao-sano-1962-oxygen-alloys
     - sakawa-1978-feo-mgo-sio2-activities-english
     - samoshkin-2024-leucite-heat-capacity
+    - sanbongi-1959-blast-furnace-slag-activities
+    - sanbongi-ohmori-jjim-21-4-silica-activity
     - sanders-1998-isru-development-program
     - sanders-2025-nasa-isru-progress
     - sandford-2008-stardust-wild2-iau251
@@ -1365,11 +1530,18 @@ anti_loss:
     - sargeant-2021-h2-reduction-lunar
     - saridikmen-2011-ferroalloy-capacities-thesis
     - saridikmen-kucukkaragoz-eric-2009-phosphide-sulphide-capacity
+    - sasaki-2000-fe3-sodium-silicate-structure
+    - sasaki-2014-double-knudsen-methods
+    - sasamoto-1974-magnesia-vacuum-vaporization-porosity
     - sato-1968-fe-nb-oxygen
     - sato-1973-lunar-fo2-apollo-12-14-15
     - sato-1979-orange-glass-fo2
     - sato-valenza-1980-skaergaard-oxygen-fugacities
     - saulov-2007-potassium-silicate-mqsm-assessment
+    - schick-1958-avco-silica-ablation-ad0606246
+    - schreiber-1979-ni-cr-olivine-partitioning
+    - schreiber-balazs-1982-vanadium-oxygen-geobarometer
+    - schuiling-1976-zircon-thorite-phenacite
     - segnit-1953-na2o-cao-sio2-phase-equilibria
     - seidel-2022-ices-roxy-process
     - seidel-2025-ices-mini-roxy
@@ -1382,11 +1554,15 @@ anti_loss:
     - shannon-1976-effective-ionic-radii
     - shartsis-newman-1948-nbs
     - shaw-2021-astrometallurgy-review
+    - shaw-2023-swinburne-phd-vacuum-thermal-sublimation
     - sheikh-2016-molten-salt-cementitious-thesis
+    - sheldon-gilles-1976-tio-vaporization-coo-1140-219
+    - shi-2020-molten-iron-oxides
     - shibaev-2005-oxygen-fesi-solubility
     - shibaev-2008-fesi-oxygen-reanalysis
     - shibata-undated-green-magnesium
     - shibuya-2020-cathodic-thermal-calcium-chloride
+    - shiraishi-1966-mcmaster-fe-cr-o-levitation
     - shornikov-2018-cai-fugacity-inversion
     - shornikov-2022-saratov-chondrule-evaporation
     - shornikov-yakovlev-2025-ca2sio4-conference
@@ -1404,6 +1580,8 @@ anti_loss:
     - smorchkov-2024-oxide-vaporization-dissertation
     - smythe-2013-cerium-thesis
     - snyder-1997-apollo12-parental-basalt-chemistry
+    - snyder-taylor-neal-1992-mare-basalts
+    - somerville-2014-cu-fe-redox
     - sossi-2018-zn-isotope-accretion
     - spear-1998-nuclear-waste-glass-thermochemistry
     - srt-lhs1-spec-sheet-2025
@@ -1418,20 +1596,35 @@ anti_loss:
     - stolyarova-2023-rcr5059-cs-sr-ba
     - stolyarova-2025-rcr5156-high-temperature-review
     - streckel-2025-doped-ceria-volatility
+    - su-2026-high-ti-melt-model
+    - sugawara-1999-fe-na-loss-gas-mixing-furnace
+    - sugawara-2004-liquid-calorimetry
     - sugawara-akaogi-2003-silicate-liquid-mixing-enthalpies
     - suito-1991-al-o-equilibrium-cao-al2o3
+    - sun-2014-dissertation
+    - sun-graff-liang-2017-plagioclase
+    - sutherland-2025-volatile-loss-lunar-mare
     - sutton-1993-lunar-chromium-xanes
+    - suzuki-2026-vacuum-induced-oxygen-extraction
     - suzuki-ishikawa-2008-vanadium-oxide-calcium-chloride
+    - svehla-1962-nasa-tr-r-132
     - swisher-1965-metals-liquid-potassium
     - szczepan-2020-silicate-corrosion
     - szczepan-brix-petitjean-panteix-vilasi-2020-chromia-dissolution-model
+    - tachibana-2001-iron-condensation
+    - tachibana-2002-evaporation-condensation-review
     - tachibana-2011-fe-condensation
     - tachibana-takigawa-2013-mg-silicate-condensation
     - tachibana-takigawa-2014-forsterite-condensation
+    - tailby-2023-am-eu-apatite-melt-xanes
+    - takahashi-1973-alkali-silicate-thermodynamics
+    - takeda-nakazawa-yazawa-1980-calcium-ferrite-abstract
+    - takigawa-2015-corundum-kinetics
     - tanaka-2021-ices-laser-alumina-reduction
     - tangeman-lange-1998-configurational-cp
     - tarrago-2022-in-situ-ti-xanes
     - tashiro-1956-glass-salt-heat-content
+    - tatsumi-2004-iron-condensation
     - tatsumoto-1970-apollo11-uthpb-systematics-ii
     - tatsumoto-1971-apollo12-uthpb
     - taylor-wells-1938-calcium-magnesium-oxide-solution-heats
@@ -1439,6 +1632,7 @@ anti_loss:
     - tequi-1992-li-silicate-heat-capacity
     - tera-1970-apollo11-alkali-alkaline-earths
     - thomas-2022-halogen-thermodynamics-thesis
+    - thomas-wood-2023-chlorine-composition
     - thomas-wood-2026-sulfur-high-pressure
     - thompson-2016-lunar-nanophase-iron-oxidation
     - thublaor-2025-chromia-volatilisation
@@ -1449,49 +1643,69 @@ anti_loss:
     - townsend-2020-forsterite-eos
     - treiman-essene-1983-cao-sio2-co2-assessment
     - trombka-2000-near-eros-xrs
+    - tsuchiyama-fujimoto-1995-iron-evaporation
+    - tsuchiyama-nagahara-1981-precooling
     - turkdogan-1984-physicochemical-aspects-review
     - turner-2017-xas-proton-damaged-glass
     - tuset-1992-silicon-ferrosilicon-refining
     - tyurnina-lopatin-2023-sro-al2o3-sio2-vaporization
+    - udaeta-2024-carbonate-redox
     - ueda-2000-caf2-melt-phase-activity
+    - ueda-2008-sr-aluminate-gibbs
     - urata-2026-molten-feo-cao-co-reduction
     - usgs-lunar-sourcebook-tab8-3
     - uskov-2023-sodium-nanoparticles-porous-glass
     - ustunisik-2011-lunar-apatite-degassing
     - ustunisik-2019-cai-mineral-melt-trace-partitioning
+    - vachet-1966-al-fe-co-ni-liquid-activities
+    - van-der-merwe-2020-ferrovanadium-thesis
     - van-kan-parker-2010-opx-melt-partitioning
     - van-westrenen-1999-garnet-melt-trace-partitioning
     - van-wijngaarden-dippenaar-1986-feo-emf
+    - vanwestrenen-draper-2007-garnet
     - vegas-2012-salt-thermochemistry
+    - vermaak-2000-ferrovanadium-thesis
     - villain-2007-chromium-xanes-optical
     - vira-2026-lunar-ilmenite-ti3
     - viswanathan-2014-te-se-vaporization
+    - vorozhtcov-2025-sro-tio2-hfo2-kems
     - vosicki-zankel-1974-na-sticking
     - w067-2012
     - wadhwa-2004-nakhlite-redox
     - wadhwa-borg-2006-alh84001-eu
+    - wahlbeck-1971-effusion-thermodynamics-final-report-coo-1029-39
     - wakita-schmitt-rey-1970-apollo11-elemental-abundances
+    - walnsch-kriegel-2025-intermetallic-heat-capacities
     - wang-2009-slag-thermophysical-thermochemical-thesis
     - wang-2010-cr-oxidation-manuscript-partial
     - wang-2010-fe-cr-v-oxidation-thesis
+    - wang-2022-super-high-alumina-slag-viscosity
     - wang-2025-particuology-lunar-redox-review
     - wang-2025-wustcr-thermodynamic-database
     - wang-2026-mercury-boundary-protons
+    - wanibe-1972-emf-feo-sio2-liquid-slag
     - wanke-1970-lunar-major-trace-elements
     - wanke-1971-apollo12-bulk-metal-chemistry
     - wanke-1974-apollo16-apollo17-chemistry
+    - washburn-1963-vaporization-iron-oxides
+    - watt-2011-tektite-thesis
     - wcsar9311-3
     - webster-2025-gd-silicate-kems-presentation
+    - wen-2018-isij-cao-activity-cao-sio2-al2o3-mgo
     - west-2015-ices-consumables-vs-isru
     - wetzel-2012-heidelberg-thesis
     - wetzel-pucci-gail-2012-sio-evaporation-coefficient
+    - white-2011-magnesium-regolith-combustion
     - white-haggerty-2023-carbothermal-system-overview
     - wiencke-2020-iron-oxide-molten-electrolysis
     - wilcox-rohsenow-1970-k-film-condensation
+    - williams-1971-fe-mgo-sio2-o2-reaction-constants
     - williams-2025-lunar-volcanic-gas-cloud-chemistry
     - willis-1971-apollo12-interelement-chemistry
     - wilson-2025-gadolinium-silicate-xrd
     - wojcik-2022-niobate-glass-crucible-dissolution
+    - wones-gilbert-1969-fmq-600-800
+    - wood-blundy-1997-clinopyroxene
     - wrigley-quaide-1970-apollo11-al26-na22
     - wu-eriksson-pelton-1993-na2o-sio2-assessment
     - wunderlich-2021-vanadium-bof-slag
@@ -1503,10 +1717,11 @@ anti_loss:
     - yakovlev-1983-lpsc14-knudsen-technique
     - yakovlev-2016-ca-al-evaporation
     - yakovleva-2019-ca-al-isotope-fractionation
-    - yakovleva-2022-alkali-chondrule-evaporation
+    - yamada-2004-lpsc35-forsterite-evaporation-mg-isotopes
     - yamashita-2008-redox-glass-thesis
     - yang-2016-investigation-vanadium-oxide-systems-thesis
     - yang-2016-vanadium-thesis
+    - yang-2024-ti-v-slag-desulfurization
     - yazhenskikh-2005-alkali-aluminosilicate-database
     - ye-2025-cao-tio2-sio2-calphad
     - yierpan-2021-se-te-degassing
@@ -1521,6 +1736,9 @@ anti_loss:
     - zhang-2012-cao-na2o-sio2-assessment
     - zhang-2021-alkali-evaporation-correction
     - zhang-2024-chang-e5-reduced-mantle-fo2
+    - zhang-2024-ferric-iron-deep-magma-ocean
+    - zhang-2025-lunar-spa-basin-mantle-redox
+    - zhao-2006-mno-cmas-phase-equilibria
     - zhou-2013-strong-diffusion
     - zhu-2019-vesta-cr-isotopes
     - zou-1982-thermodynamics-of-melts
@@ -1629,14 +1847,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: abdeyazdan-2026-na-sn-si-phase-thermodynamics
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/abdeyazdan-2026-na-sn-si-phase-thermodynamics.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/abdeyazdan-2026-na-sn-si-phase-thermodynamics.yaml
+    reason: v2.1 store present; 452/452 rows battery-usable
+  usable_rows: 452
+  total_rows: 452
   inbox_exclusion_reason: null
 - source_id: abdul-2023-cao-sio2-calphad
   stage: ingested_complete
@@ -2662,14 +2880,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: asai-yokokawa-maekawa-1982-na-borate-activity
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
+    reason: v2.1 store present but 0 of 32 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 32
   inbox_exclusion_reason: null
 - source_id: ashida-2014-analysis
   stage: inbox
@@ -5421,14 +5640,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml
+    reason: v2.1 store present but 0 of 8 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 8
   inbox_exclusion_reason: null
 - source_id: brewer-mastick-1949-gaseous-feo-ucrl534
   stage: inbox
@@ -8777,14 +8997,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
+    reason: v2.1 store present but 0 of 20 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 20
   inbox_exclusion_reason: null
 - source_id: fujita-maruhashi-1969-tetsu-iron-oxide-silica-slag-activities
   stage: inbox
@@ -12305,14 +12526,14 @@ sources:
   total_rows: 2
   inbox_exclusion_reason: null
 - source_id: itoh-yokokawa-1984-sodium-activity-nas
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/itoh-yokokawa-1984-sodium-activity-nas.yaml
+    reason: v2.1 store present; 1/2 rows battery-usable
+  usable_rows: 1
+  total_rows: 2
   inbox_exclusion_reason: null
 - source_id: iupac-o2-solid-psat
   stage: unknown
@@ -12509,14 +12730,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: jacquet-2026-alkali-recondensation
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/jacquet-2026-alkali-recondensation.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/jacquet-2026-alkali-recondensation.yaml
+    reason: v2.1 store present but 0 of 32 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 32
   inbox_exclusion_reason: null
 - source_id: jacquinot-1992-joint
   stage: inbox
@@ -17202,22 +17424,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/SOURCE.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/kelley-1953-alkali-aluminosilicate-thermodynamics.pdf
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/final-custody.json
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/http-receipt.json
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/kelley-access-provenance.json
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/kelley1953-independent-review.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/kelley1953-qualification.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/parent-nepheline-entropy-conflict.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/pdf-review-receipt.json
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/schumm-kelley-nephelite-entropy-conflict.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/three-root-dedup.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -19617,14 +19829,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kim-2004-na2o-float-glass-emf
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/kim-2004-na2o-float-glass-emf.yaml
+    reason: v2.1 store present; 21/21 rows battery-usable
+  usable_rows: 21
+  total_rows: 21
   inbox_exclusion_reason: null
 - source_id: kim-2014-carbon-fe-v-mo-ni
   stage: ingested_partial
@@ -20113,19 +20325,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kozhina-2000-na-glassforming-thermodynamics
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kozhina-2000-na-glassforming-thermodynamics/SOURCE.md
-    - raw/kozhina-2000-na-glassforming-thermodynamics/kozhina-2000-na-glassforming-thermodynamics.pdf
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/download-receipt.json
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/exact-identity-recheck.json
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/independent-review.md
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/metadata-held-preflight.json
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/pdf-checks.json
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/three-store-byte-dedup.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -20276,24 +20481,22 @@ sources:
   total_rows: 194
   inbox_exclusion_reason: null
 - source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kroger-janetzko-kreitlow-1958-glass-formation-heat/SOURCE.md
-    - raw/kroger-janetzko-kreitlow-1958-glass-formation-heat/kroger-janetzko-kreitlow-1958-glass-formation-heat.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kroger-kreitlow-1956-soda-lime-silicate-calorimetry/SOURCE.md
-    - raw/kroger-kreitlow-1956-soda-lime-silicate-calorimetry/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -20388,13 +20591,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/SOURCE.md
-    - raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -21339,14 +21541,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: li-2005-na-al-phosphate-fe-activities
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - data/literature/extracts/li-2005-na-al-phosphate-fe-activities.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/li-2005-na-al-phosphate-fe-activities.yaml
+    reason: v2.1 store present; 320/370 rows battery-usable
+  usable_rows: 320
+  total_rows: 370
   inbox_exclusion_reason: null
 - source_id: li-2017-numerical-modeling
   stage: inbox
@@ -22653,14 +22855,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: masuda-tanaka-1979-vacuum-condensates
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/masuda-tanaka-1979-vacuum-condensates.yaml
+    reason: v2.1 store present; 13/13 rows battery-usable
+  usable_rows: 13
+  total_rows: 13
   inbox_exclusion_reason: null
 - source_id: mathieu-2009-sodium-solubility-molten-silicates
   stage: inbox
@@ -23958,6 +24160,48 @@ sources:
     - raw/muan-1958-oxide-phase-equilibria-oxidation-states/mineru-AJS_256_171/p001-p037/out/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037/vlm/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037_middle.json
     - raw/muan-1958-oxide-phase-equilibria-oxidation-states/mineru-AJS_256_171/p001-p037/out/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037/vlm/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037_model.json
     - raw/muan-1958-oxide-phase-equilibria-oxidation-states/muan-1958-oxide-phase-equilibria-oxidation-states.pdf
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/051933a97fe9615690bd10d1140527da84661102bfa3f7ab2e1c5d5a1c84f37c.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/089eaec939da37c2a3d6a5159edcd7492a514c2b4b4d1048629228929f4e0f8c.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/1079d690e01b7a86dc7555251e6dc5b7be186b9d9fa5e089d978cf03af0d4e34.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/184804eda7b176016c594ac4a469163c835870c32230ce37d9ca0267cb70e04e.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/2a3f72082323abcfac1e6bb24818084d52dad6aa2dcf8f935602de0757a62b29.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/313e3acac43736bd4aa5c967ae7df5342563d1b2174387409eb3d3ddb8e11cfd.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/3368567b2b50fdfb2c945cd2f2e0a468a70bfbbf0223d870f99febaf09abbc65.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/367b05fd6cf11132fdf29f99ddc484fe5018ff5dc2d0ae738f83bd18a4287aa6.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/389a3c22a684a2eda472583e1cfec662ffb2bb7e53f83166e8013a8d50571714.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/403a05fc8f2084a41a09779b833776163816d2437ad8306b97acb0799dda4a6c.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/4a5b1276bba0bcc23795f0461c3180b2dc45f53704a886fc79776600f800ce91.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/5795582ebd4a5040a6061fcb55f40cdc030e84ccbd336736655457eb7486e139.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/5eab6ed539540e82fc985262005c43a30052bd502f4ec6fb6f47090f8f765313.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/5f28d0ad5c59021fa5bdc9f080619760b7f2f455df458d4bc039ec78185bf13a.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/695adf26a493267d805dac36dc6045ea53e034a1572f108aa54f60cd5535d90e.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/6994a75581a2325805f00f74a683bcdfe451ffa98c813b4d10c8c05e0301467f.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/6e1b8428c42f7ecb430d0a7c30b280df27c7b0edf8eecd6186c833a73d346115.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/737ca7c639d4b33976b0b4aa276dc7ce42ae33bd4001d8206ee1454c772018cb.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/7a1395d11e12e925d5f8b9dedb6e6d1b62aa251d078bb75daced4dbfe9cb8b3d.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/7ed00371df7f10d384534e4e8d2c7c82aed3181a6cc6ec93670814cddd7182a6.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/87c94fef698442ad2b50358e06e2da56f85b65bd5a951f0462db4b737d6e14e5.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/9c1a91406b765e5c7fec8f9b7bb64f60ca9e66f8d772644e0c341eb431543cfd.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/a9046aa88aeb727fd5075c97efa7d4a7c351cea9eb525c832ebce7a13194851b.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/b942cde340788f7822057830d17b4f617b01f95164f77f09e51d96f690a4a480.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/b9cd607c931027f18db8f78cab427395d4814915ecb74a327529945a7226e071.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/c18783041ae8fd62fd05e1742f756d55d021b427a946aef396e6e4d899774649.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/c271c726fa9049fe6dfc02f8f81d4585337027c2c12038cf490e8db174b6caf5.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/c389b446b8056b04039c3659b4f53a7b822ffe60e063c241eaa2f36bacaa599f.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/ca095565f633b9b64e9fb1cb25e12b681fac403e4841071c8d5d2b2cd5917847.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/cf46a1a72b65fcf415dc915f2a2cc2ef74dd73980bef5bc61cfad0ff616f9a89.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/d405d0d9e125c68897b58f1f5e04614e117d72c7c8ce30b09845524692167927.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/d452e9b13cbcd95f631f76ce8abfd2fda241094de8294c11e022513f6bdaaf3f.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/d4f22751f0a4e19e3f1d844fecc139ff43108c06813bebdbf88f89b259f0fb33.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/dabd1393d033e17f7575be62dd5370681fee40c0b560e3a9b01056b5b2aaaa19.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/f00472f2f47f94f0f2b33c8fc1c3025d2b63b6bf922547100f05664d92cc520a.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/f45b9bb40ba7fd8184a7c8863660c0cd6a57128ba28636fc66e9a469a8f56390.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/images/f95c1cadc52dd27e68ff77cbf983fc08f63d621e999515cdeead794c2652d519.jpg
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037.md
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037_content_list.json
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037_content_list_v2.json
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037_middle.json
+    - raw/muan-1958-oxide-phase-equilibria-oxidation-states/ocr-mineru/src--muan-1958-oxide-phase-equilibria-oxidation-states--AJS_256_171-p001-p037_model.json
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
@@ -23983,14 +24227,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: mueller-2004-alkali-oxide-activity-coal-ash
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/mueller-2004-alkali-oxide-activity-coal-ash.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/mueller-2004-alkali-oxide-activity-coal-ash.yaml
+    reason: v2.1 store present; 4/4 rows battery-usable
+  usable_rows: 4
+  total_rows: 4
   inbox_exclusion_reason: null
 - source_id: muhammadieh-2007-lignite-ash-deposition-thesis
   stage: inbox
@@ -25383,13 +25627,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: nbs-1981-tn270-8-alkali-thermochemistry
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/nbs-1981-tn270-8-alkali-thermochemistry/SOURCE.md
-    - raw/nbs-1981-tn270-8-alkali-thermochemistry/nbs-1981-tn270-8-alkali-thermochemistry.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -26750,14 +26993,14 @@ sources:
   total_rows: 51
   inbox_exclusion_reason: null
 - source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - data/literature/extracts/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml
+    reason: v2.1 store present; 22/46 rows battery-usable
+  usable_rows: 22
+  total_rows: 46
   inbox_exclusion_reason: null
 - source_id: paknezhad-2013-third-harmonic
   stage: inbox
@@ -27251,13 +27494,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: pickrell-1994-gaseous-alkali-corrosion
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/pickrell-1994-gaseous-alkali-corrosion/SOURCE.md
-    - raw/pickrell-1994-gaseous-alkali-corrosion/pickrell-1994-gaseous-alkali-corrosion.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/pickrell-1994-gaseous-alkali-corrosion.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -27465,14 +27707,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: powell-1971-alkali-sulfate-metasilicate-vapour
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/powell-1971-alkali-sulfate-metasilicate-vapour/SOURCE.md
-    - raw/powell-1971-alkali-sulfate-metasilicate-vapour/powell-1971-alkali-sulfate-metasilicate-vapour.pdf
-    - raw/powell-1971-alkali-sulfate-metasilicate-vapour/receipt.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -27629,14 +27869,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: ramteke-2026-alkali-vapor-corrosion-spinels
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/ramteke-2026-alkali-vapor-corrosion-spinels/SOURCE.md
-    - raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
-    - raw/ramteke-2026-alkali-vapor-corrosion-spinels/supplement.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/ramteke-2026-alkali-vapor-corrosion-spinels.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -29306,11 +29544,14 @@ sources:
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0298-tephroite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0299-willemite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0300-zircon.yaml
+    - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0301-wollastonite.yaml
+    - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0302-pseudowollastonite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0304-diopside.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0305-spodumene.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0306-clinoenstatite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0308-jadeite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0310-anorthite.yaml
+    - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0311-hexagonal-anorthite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0315-adularia.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0317-kaliophilite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-298k-0318-leucite.yaml
@@ -29519,10 +29760,10 @@ sources:
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-ht-0209-nepheline.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-ht-0210-muscovite.yaml
     - data/literature/observations-v2/compilations-robie-waldbaum-1968-usgs-b1259/b1259-ht-0212-talc.yaml
-    reason: v2.1 store present but 0 of 14808 rows are battery-usable (measured evidence class AND known
+    reason: v2.1 store present but 0 of 14820 rows are battery-usable (measured evidence class AND known
       quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 14808
+  total_rows: 14820
   inbox_exclusion_reason: 'compilation-path: source reaches the store through data/literature/compilations/
     rather than a per-source extract; not counted as inbox'
 - source_id: robinot-2025-promes-review
@@ -31341,13 +31582,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: schumm-1981-alkali-aluminosilicate-thermochemical-tables
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/schumm-1981-alkali-aluminosilicate-thermochemical-tables/SOURCE.md
-    - raw/schumm-1981-alkali-aluminosilicate-thermochemical-tables/schumm-1981-alkali-aluminosilicate-thermochemical-tables.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -31494,14 +31734,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: seto-2010-na2o-activity-glass-emf-summary
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/seto-2010-na2o-activity-glass-emf-summary.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/seto-2010-na2o-activity-glass-emf-summary.yaml
+    reason: v2.1 store present but 0 of 5 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 5
   inbox_exclusion_reason: null
 - source_id: sf04-magma-companion-workbook
   stage: unknown
@@ -32999,13 +33240,12 @@ sources:
   total_rows: 119
   inbox_exclusion_reason: null
 - source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/SOURCE.md
-    - raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -33116,14 +33356,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: simeonov-sano-1985-na-bearing-mno-activities
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/simeonov-sano-1985-na-bearing-mno-activities.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/simeonov-sano-1985-na-bearing-mno-activities.yaml
+    reason: v2.1 store present; 5/5 rows battery-usable
+  usable_rows: 5
+  total_rows: 5
   inbox_exclusion_reason: null
 - source_id: simon-sutton-2017-apollo14-redox
   stage: inbox
@@ -34026,13 +34266,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: sugawara-2024-na-silicate-molybdate-miscibility
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/sugawara-2024-na-silicate-molybdate-miscibility/SOURCE.md
-    - raw/sugawara-2024-na-silicate-molybdate-miscibility/sugawara-2024-na-silicate-molybdate-miscibility.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -35694,14 +35933,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tsukihashi-1985-na-silicate-mn-p-nitrogen
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml
+    reason: v2.1 store present; 2/2 rows battery-usable
+  usable_rows: 2
+  total_rows: 2
   inbox_exclusion_reason: null
 - source_id: tsukihashi-1985-v-nb-sb-soda-silicate-distribution
   stage: in_progress
@@ -35724,14 +35963,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tsukihashi-sano-1997-alkali-fluoride-slag-activities
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: turkdogan-1984-physicochemical-aspects-review
   stage: inbox
@@ -36754,14 +36994,15 @@ sources:
   total_rows: 516
   inbox_exclusion_reason: null
 - source_id: wang-2017-sodium-stannate-formation-emf
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/wang-2017-sodium-stannate-formation-emf.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: wang-2022-super-high-alumina-slag-viscosity
   stage: inbox
@@ -37385,14 +37626,15 @@ sources:
   total_rows: 15
   inbox_exclusion_reason: null
 - source_id: willenborg-2006-alkali-removal-thermodynamics
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/willenborg-2006-alkali-removal-thermodynamics.yaml
+    reason: v2.1 store present but 0 of 2 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 2
   inbox_exclusion_reason: null
 - source_id: williams-1971-fe-mgo-sio2-o2-reaction-constants
   stage: inbox
@@ -38062,12 +38304,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: yakovleva-2022-alkali-chondrule-evaporation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/yakovleva-2022-alkali-chondrule-evaporation/yakovleva-2022-alkali-chondrule-evaporation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/yakovleva-2022-alkali-chondrule-evaporation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -38114,14 +38356,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: yamaguchi-1984-na2o-activity-sodium-beta-alumina
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: yamashita-2008-redox-glass-thesis
   stage: inbox
@@ -38639,14 +38882,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: zhang-2011-boron-sodium-f-free-evaporation
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/zhang-2011-boron-sodium-f-free-evaporation.yaml
+    reason: v2.1 store present but 0 of 9 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 9
   inbox_exclusion_reason: null
 - source_id: zhang-2012-cao-na2o-sio2-assessment
   stage: inbox
@@ -38659,14 +38903,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: zhang-2021-acsesc-si
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - data/literature/extracts/zhang-2021-acsesc-si.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/zhang-2021-acsesc-si.yaml
+    reason: v2.1 store present; 12/25 rows battery-usable
+  usable_rows: 12
+  total_rows: 25
   inbox_exclusion_reason: null
 - source_id: zhang-2021-alkali-evaporation-correction
   stage: inbox

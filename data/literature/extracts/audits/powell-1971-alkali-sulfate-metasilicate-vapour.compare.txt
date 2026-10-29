@@ -1,0 +1,4 @@
+Command: tools/mineru_table_draft.py compare <extract> <MinerU table index>
+Result: matched=0 no-match=0 mismatch=0 presence-only=0 locator-error=0 unverifiable=0 total=0
+
+The comparer reads numeric values only from values.points[].value. Powell's printed tables are stored as scalar observation rows with named value fields, so the comparer generated no candidate points. This zero-row result is not a successful cell comparison; the manual full-cell audit records the table-by-table render and machine-read checks in the companion audit report.
