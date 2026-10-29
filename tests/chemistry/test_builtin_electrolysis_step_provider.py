@@ -1827,6 +1827,47 @@ def _dispatch_provider_and_legacy_for_pure_oxide(
     return legacy, result
 
 
+def test_ferric_inventory_cap_current_numeric_pin(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Pin both existing callers before consolidating the inventory cap."""
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
+        sim=sim, oxide="Fe2O3", oxide_kg=0.17565570000000005,
+        voltage_V=5.0, current_A=1.0e9, temperature_C=1575.0,
+    )
+    assert legacy["oxides_reduced_mol"]["Fe2O3"] == 1.1000000000000003
+    assert result.diagnostic["oxides_reduced_mol"]["Fe2O3"] == 1.1000000000000003
+
+
+def test_ferric_depletion_preserves_exact_inventory_and_intrinsic_redox(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    _legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
+        sim=sim, oxide="Fe2O3", oxide_kg=0.17565570000000005,
+        voltage_V=5.0, current_A=1.0e9, temperature_C=1575.0,
+    )
+    available = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
+    assert available == 1.1
+    proposal = result.transition
+    assert proposal is not None
+    assert proposal.debits["process.cleaned_melt"]["Fe2O3"] <= available
+    bound_proposal = _dispatch_bound_proposal(sim._chem_kernel, proposal)
+    sim._chem_kernel.commit_batch(ChemistryIntent.ELECTROLYSIS_STEP, bound_proposal)
+    remaining = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    assert remaining.get("Fe2O3", 0.0) == 0.0
+    # Fe2O3 -> 2FeO + 0.5O2 conserves 2 Fe and 3 O atoms per formula.
+    assert remaining["FeO"] == 2.2
+    assert sim.atom_ledger.mol_by_account("terminal.oxygen_mre_anode_stored")["O2"] == 0.55
+    assert math.isfinite(sim._current_melt_redox_fO2_log(1575.0 + 273.15))
+    sim.atom_ledger.assert_balanced()
+
+
 def test_energy_stays_commanded_when_oxide_does_not_deplete(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
