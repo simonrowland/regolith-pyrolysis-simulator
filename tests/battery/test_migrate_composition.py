@@ -1061,7 +1061,7 @@ def test_declared_unknown_label_counts_as_dropped_mass_and_stays_printed() -> No
     }
     refusal: list[str] = []
     assert migrate_module._oxide_map_from_mapping(
-        printed, declared_map=True, refusal_reason=refusal
+        {"composition_wt_pct": printed}, refusal_reason=refusal
     ) is None
     assert refusal == [
         "partial analysis contains unsupported component(s) above 0.5 wt%: "
@@ -1113,16 +1113,36 @@ def test_declared_unknown_trace_projects_and_flat_row_conditions_do_not() -> Non
     flat_row = {
         "SiO2": "60",
         "MgO": "40",
-        "p_atm": "0.2",
-        "run": "7",
-        "sample": "MLS-1",
+        "p_Pa": "101325",
+        "invT_times_1e4_K_inv": "5.2",
+        "residual": "0.03",
     }
-    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
-        {"SiO2": Decimal("60"), "MgO": Decimal("40")},
+    refusal: list[str] = []
+    parsed = migrate_module._oxide_map_from_mapping(
+        flat_row,
+        declared_map=True,
         closure_context=flat_row,
+        refusal_reason=refusal,
     )
-    assert converted is not None
-    assert refusal is None
+    assert parsed == {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    assert refusal == []
+
+    flat_unknown = {
+        "SiO2": "60",
+        "MgO": "40",
+        "XxO": "10",
+        "p_Pa": "101325",
+        "invT_times_1e4_K_inv": "5.2",
+        "residual": "0.03",
+    }
+    refusal = []
+    assert migrate_module._oxide_map_from_mapping(
+        flat_unknown,
+        declared_map=True,
+        closure_context=flat_unknown,
+        refusal_reason=refusal,
+    ) is None
+    assert len(refusal) == 1 and "XxO=10 wt%" in refusal[0]
 
 
 def test_merge_preserves_selected_initial_without_incoming_initial() -> None:

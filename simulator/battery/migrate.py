@@ -4691,15 +4691,14 @@ def _oxide_map_from_mapping(
             continue
         oxide, _factor = equivalent
         comps[oxide] = comps.get(oxide, Decimal("0")) + amount
-    direct_component_map = (
-        {
-            name: value
-            for name, value in obj.items()
-            if not _is_composition_condition_key(str(name))
-        }
-        if declared_map
-        else None
-    )
+    if declared_map:
+        direct_component_map = (
+            _declared_printed_composition_map(row_context)
+            if closure_context is not None
+            else obj
+        )
+    else:
+        direct_component_map = None
     accepted = checked(comps, direct_component_map)
     if not accepted and not preserve_refused_map:
         return None
@@ -4848,7 +4847,10 @@ def _initial_oxide_map_from_values(
         if refusal_reason is not None and len(refusal_reason) > refusal_count:
             return None
     got = _oxide_map_from_mapping(
-        values, refusal_reason=refusal_reason, declared_map=declared_map
+        values,
+        refusal_reason=refusal_reason,
+        declared_map=declared_map,
+        closure_context=values if "quantity" in values else None,
     )
     if got:
         if missing_reason:
