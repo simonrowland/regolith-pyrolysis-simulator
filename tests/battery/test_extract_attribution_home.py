@@ -19,6 +19,7 @@ prose and per-row footnote attributions).
 
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -191,8 +192,8 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         "ammin_76_904_quoted_comparator_enthalpy_values": (
             "CaMgSi2O6",
             Quantity.ENTHALPY_OF_FUSION,
-            ValueKind.UNAVAILABLE,
-            "enthalpy_of_fusion_kJ_per_mol",
+            ValueKind.POINT,
+            "delta_H_fusion_kJ_mol",
             138.1,  # Printed p. 909 / PDF p. 6: Stebbins et al. (1983), diopside.
             "kJ_per_mol",
             "Stebbins et al. (1983)",
@@ -203,8 +204,8 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         "ammin_76_904_quoted_richet_bottinga_diopside_fusion": (
             "CaMgSi2O6",
             Quantity.ENTHALPY_OF_FUSION,
-            ValueKind.UNAVAILABLE,
-            "enthalpy_of_fusion_kJ_per_mol",
+            ValueKind.POINT,
+            "delta_H_fusion_kJ_mol",
             137.7,  # Printed p. 909 / PDF p. 6: Richet and Bottinga (1984), diopside.
             "kJ_per_mol",
             "Richet and Bottinga (1984)",
@@ -215,8 +216,8 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         "ammin_76_904_quoted_ferrier_diopside_fusion": (
             "CaMgSi2O6",
             Quantity.ENTHALPY_OF_FUSION,
-            ValueKind.UNAVAILABLE,
-            "enthalpy_of_fusion_kJ_per_mol",
+            ValueKind.POINT,
+            "delta_H_fusion_kJ_mol",
             128,  # Printed p. 909 / PDF p. 6: Ferrier (1968), diopside.
             "kJ_per_mol",
             "Ferrier (1968)",
@@ -251,8 +252,8 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         "ammin_76_904_quoted_adamkovicova_wollastonite_fusion": (
             "CaSiO3",
             Quantity.ENTHALPY_OF_FUSION,
-            ValueKind.UNAVAILABLE,
-            "enthalpy_of_fusion_kJ_per_mol",
+            ValueKind.POINT,
+            "delta_H_fusion_kJ_mol",
             57.3,  # Printed p. 911 / PDF p. 8: Adamkovicova et al. (1980), wollastonite.
             "kJ_per_mol",
             "Adamkovicova et al. (1980)",
@@ -285,7 +286,12 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         assert raw["locator"]["published_page"] == published_page
         assert raw["locator"]["pdf_page"] == pdf_page
         if fusion_temperature is not None:
-            assert raw["values"]["fusion_temperature_K"] == fusion_temperature
+            # The migrator reads point_conditions, not a private temperature key.
+            located = raw["values"]["point_conditions"]["temperature_K"]
+            assert located["state"]["tag"] == "value"
+            assert located["state"]["value"] == str(fusion_temperature)
+            assert located["locator"]["published_page"] == published_page
+            assert located["locator"]["pdf_page"] == pdf_page
 
         observation = result.observations[f"ammin-76-904::{raw_id}"]
         actual_quantity = observation.identity.quantity
@@ -298,10 +304,7 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
         assert observation.identity.species.formula == species_formula
         assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         assert observation.evidence.attribution == attribution
-        if quantity is Quantity.CP:
-            assert observation.value.point == raw_value
-        else:
-            assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.point == Decimal(str(raw_value))
 
 
 def test_lange_quoted_cp_points_reach_scorer_with_notice(tmp_path: Path) -> None:
