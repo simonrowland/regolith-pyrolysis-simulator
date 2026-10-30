@@ -26,6 +26,13 @@ NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 ACTIVITY_EXPONENT = {1: -7, 2: -8, 3: -7, 4: -8, 5: -9, 6: -9}
 SAMPLE = {1: "1", 2: "2", 3: "1", 4: "2", 5: "3", 6: "3", 7: "1", 8: "2", 9: "3"}
 SAMPLE_COMPOSITION = {"1": "33 mol% SrO", "2": "20 mol% SrO", "3": "10 mol% SrO"}
+# The S7-S9 captions give the SrO fraction for this binary system.
+SAMPLE_MOLE_FRACTIONS = {
+    "1": {"SrO": Decimal("0.33"), "Al2O3": Decimal("0.67")},
+    "2": {"SrO": Decimal("0.20"), "Al2O3": Decimal("0.80")},
+    "3": {"SrO": Decimal("0.10"), "Al2O3": Decimal("0.90")},
+}
+COHORT_COMPOSITION_FORMULAS = {"Al", "AlO", "Al2O"}
 PRESSURE_COLUMNS = (("Sr", 3), ("Al", 4), ("AlO", 5), ("Al2O", 6), ("O", 7))
 IONS = (("Sr", "Sr+", 1), ("Al", "Al+", 2), ("AlO", "AlO+", 3), ("Al2O", "Al2O+", 4))
 PressureCell = tuple[str, int, str, Decimal, Decimal | None, Decimal | None, Decimal]
@@ -137,13 +144,18 @@ def test_printed_table_cells_migrate_with_their_row_conditions() -> None:
             for formula, column in PRESSURE_COLUMNS:
                 raw = row[5 + PRESSURE_COLUMNS.index((formula, column))]
                 if raw and raw != "-":
+                    expected_composition = SAMPLE_MOLE_FRACTIONS.get(sample)
+                    if formula not in COHORT_COMPOSITION_FORMULAS:
+                        expected_composition = None
+                    srO = None if expected_composition is None else expected_composition["SrO"]
+                    al2o3 = None if expected_composition is None else expected_composition["Al2O3"]
                     cell = (
                         formula,
                         table_number,
                         sample,
                         temperature,
-                        None,
-                        None,
+                        srO,
+                        al2o3,
                         source_decimal(raw),
                     )
                     expected_pressure[cell] += 1
@@ -183,7 +195,19 @@ def test_printed_table_cells_migrate_with_their_row_conditions() -> None:
                         srO, al2o3 = Decimal(parts.group(1)), Decimal(parts.group(2))
                     else:
                         assert composition == SAMPLE_COMPOSITION[sample]
-                        srO = al2o3 = None
+                        if formula in COHORT_COMPOSITION_FORMULAS:
+                            expected_composition = SAMPLE_MOLE_FRACTIONS[sample]
+                            assert {
+                                name: Decimal(str(amount))
+                                for name, amount in point["composition_mol"].items()
+                            } == expected_composition
+                            srO, al2o3 = (
+                                expected_composition["SrO"],
+                                expected_composition["Al2O3"],
+                            )
+                        else:
+                            assert "composition_mol" not in point
+                            srO = al2o3 = None
                     cell = (
                         formula,
                         table_number,
@@ -351,9 +375,24 @@ def test_printed_table_cells_migrate_with_their_row_conditions() -> None:
             assert dict(identity.composition.value.components) == actual
             srO, al2o3 = actual["SrO"], actual["Al2O3"]
         else:
-            assert composition.state.is_unknown, observation.observation_id
-            assert SAMPLE_COMPOSITION[SAMPLE[table_number]] in composition.state.reason
-            srO = al2o3 = None
+            if (
+                identity.quantity.value is Quantity.P_PARTIAL
+                and formula in COHORT_COMPOSITION_FORMULAS
+            ):
+                assert composition.state.is_value, observation.observation_id
+                expected_composition = SAMPLE_MOLE_FRACTIONS[SAMPLE[table_number]]
+                actual = dict(composition.state.value.components)
+                assert actual == expected_composition
+                assert identity.composition is not None and identity.composition.is_value
+                assert dict(identity.composition.value.components) == actual
+                srO, al2o3 = (
+                    expected_composition["SrO"],
+                    expected_composition["Al2O3"],
+                )
+            else:
+                assert composition.state.is_unknown, observation.observation_id
+                assert SAMPLE_COMPOSITION[SAMPLE[table_number]] in composition.state.reason
+                srO = al2o3 = None
 
         if identity.quantity.value is Quantity.P_PARTIAL:
             assert identity.species.phase.is_value and identity.species.phase.value is Phase.G
@@ -399,3 +438,39 @@ def test_printed_table_cells_migrate_with_their_row_conditions() -> None:
     assert migrated_pressure == expected_pressure
     assert migrated_activity == expected_activity
     assert migrated_ions == expected_ions
+
+
+def test_s7_s9_row_composition_and_locators_migrate_without_source_docx() -> None:
+    migrator = migrate_one_extract(ROOT, EXTRACT)
+    migrator.finalize()
+    result = migrator.result
+    assert not result.validation.hard_issues
+
+    migrated = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == SID
+    ]
+    affected = 0
+    for observation in migrated:
+        identity = observation.identity
+        assert identity.temperature_K.is_value, observation.observation_id
+        table_number = int(observation.locator.table[1:])
+        composition = (observation.point_conditions or {}).get("composition")
+        assert composition is not None, observation.observation_id
+        assert composition.locator is not None, observation.observation_id
+        assert composition.locator.table == f"S{table_number}"
+        assert composition.locator.note.startswith("supporting-information data row ")
+        if (
+            table_number in {7, 8, 9}
+            and identity.quantity.value is Quantity.P_PARTIAL
+            and identity.species.formula in COHORT_COMPOSITION_FORMULAS
+        ):
+            expected = SAMPLE_MOLE_FRACTIONS[SAMPLE[table_number]]
+            assert composition.state.is_value, observation.observation_id
+            assert dict(composition.state.value.components) == expected
+            assert identity.composition is not None and identity.composition.is_value
+            assert dict(identity.composition.value.components) == expected
+            affected += 1
+
+    assert affected == 102
