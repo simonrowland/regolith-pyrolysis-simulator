@@ -589,11 +589,14 @@ class EnginePrediction:
 
 
 def _openimcc_sp_uses_p2o5_screening_proxy(identity: Identity | None) -> bool:
-    if identity is None or not identity.composition.is_value:
+    if identity is None:
+        return False
+    composition = identity.composition
+    if composition is None or not composition.is_value:
         return False
     return any(
         name == "P2O5" and amount > 0
-        for name, amount in identity.composition.value.components
+        for name, amount in composition.value.components
     )
 
 
