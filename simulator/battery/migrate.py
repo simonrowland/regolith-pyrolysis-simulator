@@ -1321,7 +1321,15 @@ def _percent_components(
 
 
 def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
-    return _percent_components(payload, AmountBasis.MASS_PERCENT)
+    pairs = _mass_percent_pairs(payload)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names):
+        return None
+    # Keep unsupported chemical names until the shared b-704 policy can
+    # distinguish trace projections from material partial analyses.
+    return dict(pairs)
 
 
 def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
@@ -1426,35 +1434,27 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             source = _located_from_plain(payload, lambda value: value)
             locator = source.locator
         try:
-            composition = wt_pct_to_mole_fraction(wt)
+            composition = _composition_from_plain(body, closure_context=payload)
         except (ArithmeticError, ValueError) as exc:
             return Located(
                 State.unknown(f"mass-percent composition is not usable: {exc}"),
                 locator=locator,
             )
-        if isinstance(payload, Mapping):
-            composition = replace(
-                composition,
-                proxy_flag=(
-                    None
-                    if payload.get("proxy_flag") in (None, "")
-                    else str(payload.get("proxy_flag"))
-                ),
-                proxy_source=(
-                    None
-                    if payload.get("proxy_source") in (None, "")
-                    else str(payload.get("proxy_source"))
-                ),
-                analysis_selection_rule=(
-                    None
-                    if payload.get("analysis_selection_rule") in (None, "")
-                    else str(payload.get("analysis_selection_rule"))
-                ),
-            )
         return Located(
             State.of(composition),
             locator=locator,
             inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        )
+    if (
+        isinstance(body, Mapping)
+        and _enum(AmountBasis, body.get("amount_basis")) is AmountBasis.MASS_PERCENT
+    ):
+        source = _located_from_plain(payload, lambda value: value)
+        return Located(
+            State.unknown(
+                "mass-percent composition contains invalid, duplicate, unsupported or ambiguous components"
+            ),
+            locator=source.locator,
         )
     if _mass_percent_pairs(payload) is not None:
         source = _located_from_plain(payload, lambda value: value)
@@ -1666,7 +1666,9 @@ def migrate_species_payload(payload: Mapping[str, Any]) -> Species:
     )
 
 
-def _composition_from_plain(payload: object) -> Composition:
+def _composition_from_plain(
+    payload: object, *, closure_context: object = None
+) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
     amount_basis = _enum(AmountBasis, payload.get("amount_basis"))
@@ -1689,8 +1691,17 @@ def _composition_from_plain(payload: object) -> Composition:
     }
     if amount_basis is AmountBasis.MASS_PERCENT:
         wt = _mass_percent_components(payload)
-        if wt is not None:
-            return replace(wt_pct_to_mole_fraction(wt), **metadata)
+        if wt is None:
+            raise ValueError(
+                "mass-percent composition contains invalid, duplicate, unsupported or ambiguous components"
+            )
+        return replace(
+            _wt_percent_conversion_or_raise(
+                wt,
+                closure_context=payload if closure_context is None else closure_context,
+            ),
+            **metadata,
+        )
     elif amount_basis is AmountBasis.MOLE_PERCENT:
         mole_percent = _mole_percent_components(payload)
         if mole_percent is None:
@@ -3856,6 +3867,16 @@ def _printed_composition_source_map(payload: object) -> Mapping[str, Any] | None
         printed = _printed_composition_map(point_conditions.get("printed_composition"))
         if printed is not None:
             return printed
+    flat_components = {
+        name.removesuffix("_wt_pct"): value
+        for name, value in payload.items()
+        if str(name).endswith("_wt_pct")
+        and _is_printed_chemical_component_name(
+            str(name).removesuffix("_wt_pct")
+        )
+    }
+    if flat_components:
+        return flat_components
     direct = _printed_composition_map(payload)
     if direct is not None and any(
         _is_printed_chemical_component_name(str(key)) for key in direct
@@ -3904,24 +3925,23 @@ def _unrecognized_printed_chemical_components(
 
 def _source_printed_composition_values(
     wt: Mapping[str, Any] | None, closure_context: object
-) -> dict[str, Decimal]:
-    source_map = _printed_composition_source_map(closure_context) or wt or {}
-    printed: dict[str, Decimal] = {
-        str(key): as_decimal(amount)
-        for key, value in source_map.items()
-        if (amount := _printed_mass_percent_number(value)) is not None
-        and (
-            _is_printed_chemical_component_name(str(key))
-            or str(key).strip().casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
-        )
-    }
-    for key, amount in (wt or {}).items():
-        name = str(key).strip()
-        if (
+) -> dict[str, Any]:
+    source_map = _printed_composition_source_map(closure_context)
+    if source_map is None:
+        source_map = wt or {}
+    printed: dict[str, Any] = {}
+    for key, value in source_map.items():
+        name = str(key)
+        if not (
             _is_printed_chemical_component_name(name)
-            or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+            or name.strip().casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         ):
-            printed.setdefault(name, as_decimal(amount))
+            continue
+        amount = _printed_mass_percent_number(value)
+        if amount is not None:
+            printed[name] = value
+        elif value is None or value == "":
+            printed[name] = value
 
     scopes: list[Mapping[str, Any]] = []
     if isinstance(closure_context, Mapping):
@@ -3931,8 +3951,9 @@ def _source_printed_composition_values(
             scopes.append(point_conditions)
     printed_volatile_components = {
         _volatile_closure_component(name)[0]
-        for name in printed
+        for name, amount in printed.items()
         if _volatile_closure_component(name) is not None
+        and _printed_mass_percent_number(amount) is not None
     }
     for scope in scopes:
         for raw_name, raw_amount in scope.items():
@@ -3941,7 +3962,7 @@ def _source_printed_composition_values(
                 continue
             amount = _printed_mass_percent_number(raw_amount)
             if amount is not None:
-                printed[str(raw_name)] = amount
+                printed[str(raw_name)] = raw_amount
                 printed_volatile_components.add(alias[0])
     return printed
 
@@ -3984,8 +4005,9 @@ def _composition_projection_notice(
     printed_total = sum(
         (
             amount
-            for name, amount in source.items()
+            for name, raw_amount in source.items()
             if name.casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
+            and (amount := _printed_mass_percent_number(raw_amount)) is not None
         ),
         Decimal("0"),
     )
@@ -4047,12 +4069,28 @@ def _printed_volatile_mass_percent(*payloads: object) -> dict[str, Decimal]:
 def _oxide_mass_percent_components(
     wt: Mapping[str, Decimal],
 ) -> dict[str, Decimal]:
-    return {
-        str(name): as_decimal(amount)
-        for name, amount in wt.items()
-        if str(name) in _COMPOSITION_COMPONENTS
-        and not _is_closure_only_volatile(str(name))
-    }
+    names = {_canonical_printed_oxide_name(str(name).strip()) for name in wt}
+    if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
+        overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
+        raise ValueError(f"ambiguous total iron components: FeOT with {overlap}")
+
+    components: dict[str, Decimal] = {}
+    for raw_name, amount in wt.items():
+        name = _canonical_printed_oxide_name(str(raw_name).strip())
+        if name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
+            continue
+        component = _COMPOSITION_COMPONENTS.get(name)
+        if component is not None:
+            if _is_closure_only_volatile(name):
+                continue
+            oxide = component[1]
+        else:
+            equivalent = _kume_formula_unit_oxide(name)
+            if equivalent is None:
+                continue
+            oxide, _factor = equivalent
+        components[oxide] = components.get(oxide, Decimal("0")) + as_decimal(amount)
+    return components
 
 
 def _residue_component_subtype(field_name: str) -> str | None:
@@ -4155,11 +4193,6 @@ def _mole_fraction_from_wt_percent_components(
 ) -> Composition:
     """Convert the selected oxide components, after their source total is checked."""
 
-    names = {str(oxide).strip() for oxide in wt}
-    if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
-        overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
-        raise ValueError(f"ambiguous total iron components: FeOT with {overlap}")
-
     unsupported = []
     for oxide, weight in wt.items():
         name = str(oxide).strip()
@@ -4204,11 +4237,7 @@ def _mole_fraction_from_wt_percent_components(
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     """Convert a standalone printed oxide map after applying its kept-mass check."""
 
-    converted = _mole_fraction_from_wt_percent_components(wt)
-    closure_error = _percent_composition_closure_error(wt, "mass")
-    if closure_error is not None:
-        raise ValueError(closure_error)
-    return converted
+    return _wt_percent_conversion_or_raise(wt, closure_context=wt)
 
 
 def _wt_percent_conversion_or_refusal(
@@ -4248,6 +4277,20 @@ def _wt_percent_conversion_or_refusal(
         return converted, None
     except (ArithmeticError, ValueError) as exc:
         return None, f"mass-percent composition is not usable: {exc}"
+
+
+def _wt_percent_conversion_or_raise(
+    wt: Mapping[str, Decimal], *, closure_context: object = None
+) -> Composition:
+    converted, refusal = _wt_percent_conversion_or_refusal(
+        wt, closure_context=closure_context
+    )
+    if converted is None:
+        detail = (refusal or "mass-percent composition is not usable").removeprefix(
+            "mass-percent composition is not usable: "
+        )
+        raise ValueError(detail)
+    return converted
 
 
 def _wt_percent_conversion_state(
@@ -4874,8 +4917,15 @@ def _mole_fraction_composition_from_values(
     )
 
 
-def _printed_map_payload(wt: Mapping[str, Decimal]) -> dict[str, str]:
-    return {str(k): _dec_str(as_decimal(v)) for k, v in wt.items()}
+def _printed_map_payload(wt: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        str(key): (
+            value
+            if value is None or value == "" or isinstance(value, (str, Mapping))
+            else _dec_str(as_decimal(value))
+        )
+        for key, value in wt.items()
+    }
 
 
 def wt_pct_to_mole_fraction_derivation(
