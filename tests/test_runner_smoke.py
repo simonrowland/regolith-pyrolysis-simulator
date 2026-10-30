@@ -34,6 +34,8 @@ from unittest.mock import patch
 
 import pytest
 
+import simulator.diagnostics as diagnostics_module
+import simulator.runner as runner_module
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting import AccountingQueries, AtomLedger
 from simulator.accounting.ledger_api import LedgerAPI
@@ -158,6 +160,24 @@ def test_plain_diagnostic_values_keep_serialized_payload_bytes():
     )
 
 
+def test_plain_value_scalar_fast_path_skips_only_small_scalar_probes(monkeypatch):
+    original_dumps = diagnostics_module.json.dumps
+    probed = []
+
+    def count_json_probe(value, *args, **kwargs):
+        probed.append(value)
+        return original_dumps(value, *args, **kwargs)
+
+    monkeypatch.setattr(diagnostics_module.json, "dumps", count_json_probe)
+
+    assert _plain_value(42) == 42
+    assert probed == []
+
+    large_integer = 1 << 2048
+    assert _plain_value(large_integer) == large_integer
+    assert probed == [large_integer]
+
+
 def test_per_hour_and_p_o2_projections_keep_bytes_and_ownership():
     from simulator.runner import (
         _execution_pO2_enforcement_by_hour,
@@ -189,8 +209,21 @@ def test_per_hour_and_p_o2_projections_keep_bytes_and_ownership():
     assert p_o2_by_hour[0]["details"][0]["limit"] is None
 
 
-def test_completed_run_wires_product_classification_and_markdown() -> None:
+def test_completed_run_wires_product_classification_and_markdown(monkeypatch) -> None:
     """Wiring-only: runner attaches the shared classifier and formatter output."""
+
+    per_hour_projection_calls = []
+    project_per_hour = runner_module._execution_per_hour_summary
+
+    def count_per_hour_projection(execution):
+        per_hour_projection_calls.append(execution)
+        return project_per_hour(execution)
+
+    monkeypatch.setattr(
+        runner_module,
+        "_execution_per_hour_summary",
+        count_per_hour_projection,
+    )
 
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
@@ -215,6 +248,54 @@ def test_completed_run_wires_product_classification_and_markdown() -> None:
     assert "Silica glass" in report["markdown"]
     assert "Industrial mixed glass" in report["markdown"]
     assert "Refractory ceramic rump" in report["markdown"]
+    assert len(per_hour_projection_calls) == 1
+
+
+def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
+    per_hour_projection_calls = []
+    project_per_hour = runner_module._execution_per_hour_summary
+
+    def count_per_hour_projection(execution):
+        per_hour_projection_calls.append(execution)
+        return project_per_hour(execution)
+
+    monkeypatch.setattr(
+        runner_module,
+        "_execution_per_hour_summary",
+        count_per_hour_projection,
+    )
+    execution = SimpleNamespace(
+        status="failed",
+        reason="probe",
+        error_message="probe failure",
+        simulator=None,
+        per_hour=({"pO2_enforcement": {"status": "ok"}},),
+        shadow_trace=(),
+        refusal_diagnostic={},
+    )
+
+    failure = _runner_failure_result(
+        error=RunnerError("probe failure"),
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        mass_kg=1.0,
+        additives_kg={},
+        track="pyrolysis",
+        backend_name="internal-analytical",
+        engines={},
+        metadata_overrides={
+            "started_at_utc": "2026-06-28T00:00:00Z",
+            "kernel_commit_sha": "per-hour-cache-pin",
+        },
+        execution=execution,
+    )
+
+    assert failure["per_hour_summary"] == [
+        {"pO2_enforcement": {"status": "ok"}}
+    ]
+    assert failure["pO2_enforcement_by_hour"] == [{"status": "ok"}]
+    assert per_hour_projection_calls == [execution]
 
 
 def test_default_lunar_c0_product_story_is_numeric_with_si_channel():
