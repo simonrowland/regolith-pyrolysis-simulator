@@ -446,11 +446,11 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
     )
     # b-1057's proxy/bridge CrO alpha moves chromium into the train; pin the
-    # remaining rump from the production inventory with that flag engaged.
+    # reduced rump and Cr ingot from the production inventory with that flag.
     assert rump.get("Cr2O3", 0.0) == pytest.approx(
         0.7042939343693395, rel=1e-9
     )
-    assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
+    assert cr_ingot_kg == pytest.approx(0.08, abs=0.005)
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
     assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
