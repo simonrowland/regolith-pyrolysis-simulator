@@ -265,27 +265,82 @@ def test_113_kg_hr_flash_solves_same_hour_pressure_to_pipe_flow():
 
 
 def test_unbracketed_overload_returns_setpoint_bound_with_notice():
-    model = OverheadGasModel()
+    """A pipe that can carry the fixed inlet is solved; a short pipe is flagged.
+
+    Default throat (12 cm by 1 m), 1150 °C, vacuum downstream, evaporation
+    identically zero, fixed Na inlet 1 kg/h, equilibrium partial 10 Pa.
+    The setpoint is 20 Pa, already above that partial, and the pipe there
+    carries less than the inlet. Vacuum capacity at fixed molar mass grows
+    as P^2, so the balance is setpoint * sqrt(inlet / capacity(setpoint)).
+    A zero-area pipe has no finite root and stays at the setpoint with the
+    finite-search notice.
+    """
     melt = SimpleNamespace(p_total_mbar=0.2, temperature_C=1150.0)
+    setpoint_Pa = melt.p_total_mbar * 100.0
+    inlet_kg_hr = 1.0
+    model = OverheadGasModel()
+    capacity_at_setpoint_kg_hr = model._pipe_conductance(
+        setpoint_Pa,
+        melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg={"Na": inlet_kg_hr},
+    ) * 3600.0
+    assert 0.0 < capacity_at_setpoint_kg_hr < inlet_kg_hr
+    # Premise: vacuum, fixed M, m ∝ P^2. Algebra: P/P_ref = sqrt(m/m_ref).
+    expected_Pa = setpoint_Pa * math.sqrt(
+        inlet_kg_hr / capacity_at_setpoint_kg_hr
+    )
 
     flux, pressure_Pa, notice = model._solve_overloaded_evaporation_flux(
         melt,
         equilibrium_partials_Pa={"Na": 10.0},
         p_downstream_bar=0.0,
-        fixed_inlet_species_kg_hr={"Na": 1.0},
+        fixed_inlet_species_kg_hr={"Na": inlet_kg_hr},
         flux_at_partials=lambda _partials, _pressure: _flux({}),
     )
 
     assert flux.total_kg_hr == 0.0
-    assert pressure_Pa == pytest.approx(20.0)
-    assert notice == {
-        "reason": "evaporation_pressure_bound_no_bracket",
+    assert notice is None
+    assert pressure_Pa > setpoint_Pa
+    _mass_abs, _pressure_rel, pressure_abs = overload_pipe_balance_tolerances(
+        inlet_kg_hr,
+        expected_Pa,
+    )
+    assert abs(pressure_Pa - expected_Pa) <= pressure_abs
+    outflow_kg_hr = model._pipe_conductance(
+        pressure_Pa,
+        melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg={"Na": inlet_kg_hr},
+    ) * 3600.0
+    mass_abs_kg_hr, _, _ = overload_pipe_balance_tolerances(
+        inlet_kg_hr,
+        pressure_Pa,
+    )
+    assert abs(inlet_kg_hr - outflow_kg_hr) <= mass_abs_kg_hr
+
+    short = OverheadGasModel()
+    short.pipe_diameter_m = 0.0
+    short_flux, short_pressure_Pa, short_notice = (
+        short._solve_overloaded_evaporation_flux(
+            melt,
+            equilibrium_partials_Pa={"Na": 10.0},
+            p_downstream_bar=0.0,
+            fixed_inlet_species_kg_hr={"Na": inlet_kg_hr},
+            flux_at_partials=lambda _partials, _pressure: _flux({}),
+        )
+    )
+    assert short_flux.total_kg_hr == 0.0
+    assert short_pressure_Pa == pytest.approx(setpoint_Pa)
+    assert short_notice == {
+        "reason": "evaporation_inlet_exceeds_pipe_at_every_finite_pressure",
         "authority_level": "extrapolated",
         "detail": (
-            "The setpoint is already at or above the summed "
-            "equilibrium vapour pressure, so a higher "
-            "back-pressure cannot reduce evaporation. At that "
-            "bound the pipe still cannot carry the inlet."
+            "The inlet stays above compressible-Poiseuille "
+            "capacity from the setpoint through the largest "
+            "finite trial pressure. No headspace pressure "
+            "carries the flux. The prediction stays at the "
+            "setpoint."
         ),
     }
 

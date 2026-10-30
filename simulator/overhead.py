@@ -1474,23 +1474,6 @@ class OverheadGasModel:
             and lower_residual <= lower_mass_abs_kg_hr
         ):
             return lower_flux, setpoint_Pa, None
-        if equilibrium_pressure_Pa <= setpoint_Pa:
-            # The configured setpoint is already at or above the summed
-            # equilibrium vapour pressure, so no higher pressure trial can
-            # reduce evaporation. Keep the prediction at the setpoint;
-            # the caller carries this out-of-domain result as an
-            # extrapolation notice and the holdup/bleed path accounts
-            # for the overload.
-            return lower_flux, setpoint_Pa, {
-                'reason': 'evaporation_pressure_bound_no_bracket',
-                'authority_level': 'extrapolated',
-                'detail': (
-                    'The setpoint is already at or above the summed '
-                    'equilibrium vapour pressure, so a higher '
-                    'back-pressure cannot reduce evaporation. At that '
-                    'bound the pipe still cannot carry the inlet.'
-                ),
-            }
 
         upper_Pa = equilibrium_pressure_Pa
         try:
