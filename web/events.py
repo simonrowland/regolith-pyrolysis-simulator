@@ -2903,6 +2903,11 @@ def _product_story_payload(
         story[name]['excluded'] = list(source.get('excluded', ()))
         if story[name]['status'] == 'unavailable':
             story[name]['class_total_kg'] = None
+    captured_volatiles = classification.get('captured_volatiles')
+    if isinstance(captured_volatiles, Mapping):
+        capture_flag = captured_volatiles.get('flag')
+        if isinstance(capture_flag, Mapping):
+            story['off_spec_condensate']['flag'] = dict(capture_flag)
     if story['oxygen'].get('class_total_kg') is None:
         story['oxygen']['partition_kg'] = dict.fromkeys(
             story['oxygen']['partition_kg']

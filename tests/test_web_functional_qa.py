@@ -445,7 +445,11 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
         + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
     )
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.320967420348823, rel=1e-9)
+    # b-1057's proxy/bridge CrO alpha moves chromium into the train; pin the
+    # remaining rump from the production inventory with that flag engaged.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(
+        0.7042939343693395, rel=1e-9
+    )
     assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
@@ -462,9 +466,23 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # M(Cr)/M(CrO3) = kg Cr; the molar-mass ratio is dimensionless and tends
     # to 1 as the oxygen mass tends to zero.
     train_kg = sim.atom_ledger.project_account_kg(CONDENSATION_TRAIN_ACCOUNT)
+    train_cro_kg = float(train_kg.get("CrO", 0.0) or 0.0)
+    assert train_cro_kg == pytest.approx(2.44855547, rel=1e-8)
+    assert story["off_spec_condensate"]["species_kg"].get("CrO", 0.0) == (
+        pytest.approx(round(train_cro_kg, 2), abs=0.005)
+    )
+    capture_flag = story["off_spec_condensate"]["flag"]
+    assert capture_flag["status"] == "flagged prediction"
+    assert capture_flag["authority"] == "proxy/bridge"
+    assert "tier-2 evaporation alpha 0.9" in capture_flag["reason"]
+    assert "cannot certify capture" in capture_flag["reason"]
+    # CrO contains one Cr per molecule: kg Cr = kg CrO × M(Cr)/M(CrO).
+    # The molar-mass ratio is dimensionless, and approaches 1 as oxygen mass
+    # tends to zero.
     train_cr_eq_kg = float(train_kg.get("Cr", 0.0) or 0.0) + float(
         train_kg.get("CrO3", 0.0) or 0.0
     ) * (_CR_MW / _CRO3_MW)
+    train_cr_eq_kg += train_cro_kg * (_CR_MW / _CRO_MW)
     assert cr_in_rump_kg + train_cr_eq_kg + cr_offgas_eq_kg == pytest.approx(
         2.46, abs=0.02
     )
