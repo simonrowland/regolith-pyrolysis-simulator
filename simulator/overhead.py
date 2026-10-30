@@ -89,15 +89,14 @@ O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> 
 # → SiO mid → O2 late) — that's a factor-of-2 in conductance, so
 # the live mixture is the canonical source going forward.
 DEFAULT_PIPE_M_AVG_KG_MOL = 0.040  # kg/mol — fallback mole-weighted pipe gas molar mass
-# Relative closure for pressure-driven evaporation composition. The observed
-# K miss is 0.1823% of its partial pressure; the Na trace case is 0.2031% of
-# total pressure. Rounding their maximum up to 0.25% bounds trace-species error
-# against the mixture pressure and covers the provider-scale K closure.
-_OVERLOAD_COMPOSITION_REL_TOL = 2.5e-3
-# The same closure produced a pressure solve of 10.613 Pa and a pipe inversion
-# of 10.586 Pa, a 0.254% difference. A 0.3% relative consistency limit covers
-# that propagated composition error while still rejecting percent-scale drift.
-_OVERLOAD_PRESSURE_MATCH_REL_TOL = 3.0e-3
+# Mole-fraction sums in the overload closure stay under this many terms.
+# The live vapour set is a few dozen carriers; 64 is the next power of two
+# above that, used only as an accumulation bound.
+_OVERLOAD_MIXTURE_TERMS = 64
+# Extra factor on the pipe-law float guard. The forward law multiplies pi,
+# d**4, viscosity (T/300)**0.7, and the molar sum. 2**10 ulps sits above that
+# arithmetic and below any percent-scale residual.
+_OVERLOAD_PIPE_ULP_GUARD = 1024
 # DERIVATION: premise — steady isothermal ideal-gas flow keeps molar flow
 # constant while local volumetric flow varies as 1/P. Integrating circular
 # Poiseuille along the pipe gives pV throughput
@@ -109,6 +108,76 @@ _OVERLOAD_PRESSURE_MATCH_REL_TOL = 3.0e-3
 # kg/s require P1=426.45 Pa against vacuum; the forward law returns
 # 0.003000 kg/s. Both capacity and pressure inversion use this one factor.
 COMPRESSIBLE_POISEUILLE_DENOMINATOR = 256.0  # dimensionless — integrated mean-pressure factor
+
+
+def overload_composition_closure_tolerances(
+    pressure_Pa: float,
+) -> tuple[float, float]:
+    """Return ``(rel_tol, abs_tol_Pa)`` for the fixed point ``p = G(p)``.
+
+    Premise: Dalton's partial is ``p_i = y_i * P``, and ``y_i`` is a ratio
+    of at most ``_OVERLOAD_MIXTURE_TERMS`` float64 molar rates. Summing that
+    many terms accumulates at most that many ulps, and one ulp of a unit
+    fraction is ``math.ulp(1.0)``.
+
+    Algebra: ``rel = 100 * terms * eps``, ``abs = rel * P``. The factor 100
+    keeps the guard above the sum and still far below a 0.1 % stall.
+    ``eps = math.ulp(1.0) = 2**-52``.
+
+    Unit check: ``rel`` is dimensionless; ``abs`` is Pa because ``P`` is Pa.
+
+    Limiting case: one species and a linear Hertz-Knudsen law meet to a
+    few ulps, inside this guard. A 0.18 % partial miss, as left by a
+    truncated diagonal secant, does not.
+    """
+
+    relative = 100.0 * _OVERLOAD_MIXTURE_TERMS * math.ulp(1.0)
+    return relative, relative * max(float(pressure_Pa), 0.0)
+
+
+def overload_pipe_balance_tolerances(
+    mass_kg_hr: float,
+    pressure_Pa: float,
+) -> tuple[float, float, float]:
+    """Return ``(mass_abs_kg_hr, pressure_rel, pressure_abs_Pa)``.
+
+    Premise: vacuum compressible Poiseuille is ``m = C * M * P**2``, so
+    ``dm/m = 2 dP/P`` and ``dP/P = dm/(2m)``. With a downstream pressure,
+    ``m = C*M*(P**2-P2**2)`` and
+    ``dP/P = (dm/m) * (P**2-P2**2)/(2 P**2) <= dm/(2m)``. The vacuum
+    factor 1/2 is therefore the largest pressure error for a given mass
+    error.
+
+    The nested mass floor is the evaporation provider's omission
+    threshold: a species at or below that rate is absent from the
+    mixture. Float accumulation on the pipe law is
+    ``_OVERLOAD_PIPE_ULP_GUARD`` ulps of the mass. The closure is the
+    larger of those two.
+
+    Algebra: ``mass_abs = max(omission, guard * eps * |m|)``,
+    ``pressure_rel = mass_abs / (2 |m|)`` when ``m != 0``, and
+    ``pressure_abs = pressure_rel * P``.
+
+    Unit check: omission and ``m`` are kg/hr, so ``mass_abs`` is kg/hr.
+    ``pressure_rel`` is dimensionless and ``pressure_abs`` is Pa.
+
+    Limiting case: ``P2 = 0`` and the same mixture, the forward law and
+    its algebraic inverse agree to a few ulps, inside this guard.
+    """
+
+    from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
+
+    mass = abs(float(mass_kg_hr))
+    pressure = max(float(pressure_Pa), 0.0)
+    mass_abs = max(
+        float(_NONTRIVIAL_FLUX_KG_HR),
+        _OVERLOAD_PIPE_ULP_GUARD * math.ulp(1.0) * mass,
+    )
+    if mass > 0.0:
+        pressure_rel = mass_abs / (2.0 * mass)
+    else:
+        pressure_rel = _OVERLOAD_PIPE_ULP_GUARD * math.ulp(1.0)
+    return mass_abs, pressure_rel, pressure_rel * pressure
 
 
 def gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
@@ -1136,192 +1205,407 @@ class OverheadGasModel:
                 for species in partials_by_species
             }
 
-        def evaluate(
-            pressure_Pa: float,
-        ) -> tuple[EvaporationFlux, float, dict[str, Any] | None]:
-            trial_partials_Pa = {
-                species: fraction * pressure_Pa
-                for species, fraction in equilibrium_fraction_by_species.items()
+        # Premise: a well-mixed headspace has mole fractions equal to each
+        # species' molar inflow divided by the sum of all molar inflows;
+        # Dalton gives p_i = P_h * n_i / sum_j(n_j). The partial-pressure
+        # owner converts kg/hr to mol/hr with each species' molar mass, so
+        # the ratios are dimensionless and p_i is in Pa. With no fixed O2
+        # or carrier inlet, the denominator contains only evaporating
+        # species. The map is the fixed point p = G(p) at fixed P_h.
+        # G is not a contraction near saturation: the Hertz-Knudsen gain
+        # makes an eigenvalue of dG larger than 1, so a diagonal secant
+        # or midpoint step stalls or oscillates. A scaled Newton solve of
+        # F(u) = (G(s*u) - s*u) / s, with s_i a per-species pressure
+        # scale, converges where that iteration does not. The pipe
+        # residual m_in(P) - m_pipe(P) is then one scalar root. For a
+        # nonincreasing evaporation law, m_in falls or holds as P rises
+        # and m_pipe grows as P^2 - P2^2, so the residual is monotone
+        # and a bracketed Brent solve is the root. The fixed inlet stays
+        # constant during trials. A non-overloaded hour never calls this
+        # solver.
+        species_order = list(partials_by_species)
+        warm_partials: list[float] | None = None
+
+        def composition_notice_for(
+            trial: Mapping[str, float],
+            resolved: Mapping[str, float],
+        ) -> dict[str, str]:
+            worst_species = max(
+                species_order,
+                key=lambda species: abs(
+                    resolved[species] - trial[species]
+                ),
+            )
+            return {
+                'reason': 'evaporation_composition_no_convergence',
+                'authority_level': 'extrapolated',
+                'species': worst_species,
+                'detail': (
+                    'No headspace composition satisfies '
+                    'p_i = y_i(p) * P within the mole-fraction '
+                    'arithmetic guard.'
+                ),
             }
-            previous_trial_partials_Pa = None
-            previous_resolved_partials_Pa = None
-            composition_notice = None
-            for iteration in range(50):
-                flux = flux_at_partials(trial_partials_Pa, pressure_Pa)
-                inflow_species_kg_hr = self._combine_gas_species_kg_hr(
+
+        def composition_is_closed(
+            trial: Mapping[str, float],
+            resolved: Mapping[str, float],
+            pressure_Pa: float,
+        ) -> bool:
+            rel_tol, abs_tol_Pa = overload_composition_closure_tolerances(
+                pressure_Pa,
+            )
+            return all(
+                math.isclose(
+                    resolved[species],
+                    trial[species],
+                    rel_tol=rel_tol,
+                    abs_tol=abs_tol_Pa,
+                )
+                for species in species_order
+            )
+
+        def solve_composition(
+            pressure_Pa: float,
+            initial: list[float],
+        ) -> tuple[
+            dict[str, float],
+            EvaporationFlux,
+            dict[str, float],
+            dict[str, str] | None,
+        ]:
+            import numpy as np
+            from scipy.optimize import root
+
+            _rel_tol, abs_tol_Pa = overload_composition_closure_tolerances(
+                pressure_Pa,
+            )
+            scale = np.array(
+                [
+                    max(abs(value), abs_tol_Pa, math.ulp(pressure_Pa))
+                    for value in initial
+                ],
+                dtype=float,
+            )
+
+            def residual(unscaled: Any) -> Any:
+                trial = {
+                    species: float(unscaled[index] * scale[index])
+                    for index, species in enumerate(species_order)
+                }
+                provider_partials = {
+                    species: min(pressure_Pa, max(0.0, partial))
+                    for species, partial in trial.items()
+                }
+                flux = flux_at_partials(provider_partials, pressure_Pa)
+                inflow = self._combine_gas_species_kg_hr(
                     fixed_species_kg_hr,
                     flux.species_kg_hr,
                 )
-                resolved_partials_Pa = partials_from_inflow(
-                    inflow_species_kg_hr,
-                    pressure_Pa,
+                resolved = partials_from_inflow(inflow, pressure_Pa)
+                return np.array(
+                    [
+                        (resolved[species] - trial[species]) / scale[index]
+                        for index, species in enumerate(species_order)
+                    ],
+                    dtype=float,
                 )
-                if all(
-                    math.isclose(
-                        resolved_partials_Pa[species],
-                        trial_partials_Pa[species],
-                        rel_tol=1.0e-9,
-                        abs_tol=1.0e-10,
+
+            u0 = np.array(
+                [
+                    initial[index] / scale[index]
+                    for index in range(len(species_order))
+                ],
+                dtype=float,
+            )
+            result = root(residual, u0, method='hybr', tol=_rel_tol)
+            solved = {
+                species: min(
+                    pressure_Pa,
+                    max(0.0, float(result.x[index] * scale[index])),
+                )
+                for index, species in enumerate(species_order)
+            }
+            flux = flux_at_partials(solved, pressure_Pa)
+            inflow = self._combine_gas_species_kg_hr(
+                fixed_species_kg_hr,
+                flux.species_kg_hr,
+            )
+            resolved = partials_from_inflow(inflow, pressure_Pa)
+            if composition_is_closed(solved, resolved, pressure_Pa):
+                return solved, flux, inflow, None
+            return solved, flux, inflow, composition_notice_for(
+                solved, resolved,
+            )
+
+        def evaluate(
+            pressure_Pa: float,
+        ) -> tuple[EvaporationFlux, float, dict[str, str] | None, float]:
+            nonlocal warm_partials
+            fraction_start = [
+                equilibrium_fraction_by_species[species] * pressure_Pa
+                for species in species_order
+            ]
+            starts = [fraction_start]
+            if (
+                warm_partials is not None
+                and len(warm_partials) == len(species_order)
+            ):
+                starts.insert(
+                    0,
+                    [
+                        min(pressure_Pa, max(0.0, value))
+                        for value in warm_partials
+                    ],
+                )
+            solved: dict[str, float] | None = None
+            flux: EvaporationFlux | None = None
+            inflow: dict[str, float] | None = None
+            notice: dict[str, str] | None = None
+            for initial in starts:
+                try:
+                    solved, flux, inflow, notice = solve_composition(
+                        pressure_Pa,
+                        initial,
                     )
-                    for species in partials_by_species
-                ):
+                except (ValueError, FloatingPointError, ArithmeticError):
+                    continue
+                if notice is None:
                     break
-                if iteration == 49:
-                    # The observed K miss is 0.1823% of its partial pressure;
-                    # the Na trace case is 0.2031% of total pressure. Accept
-                    # the derived 0.25% relative closure after the usual 50
-                    # evaluations, with the same fraction of total pressure
-                    # (Pa) as the absolute allowance for trace species.
-                    composition_abs_tolerance_Pa = max(
-                        1.0e-10,
-                        _OVERLOAD_COMPOSITION_REL_TOL * pressure_Pa,
-                    )
-                    if not all(
-                        math.isclose(
-                            resolved_partials_Pa[species],
-                            trial_partials_Pa[species],
-                            rel_tol=_OVERLOAD_COMPOSITION_REL_TOL,
-                            abs_tol=composition_abs_tolerance_Pa,
-                        )
-                        for species in partials_by_species
-                    ):
-                        worst_species = max(
-                            partials_by_species,
-                            key=lambda species: abs(
-                                resolved_partials_Pa[species]
-                                - trial_partials_Pa[species]
-                            ),
-                        )
-                        composition_notice = {
-                            'reason': 'evaporation_composition_no_convergence',
-                            'authority_level': 'extrapolated',
-                            'species': worst_species,
-                        }
-                    break
-                # Near saturation the provider response is steep. Use a
-                # bounded per-species secant step for p_i = p_i(g); the
-                # midpoint fallback keeps each partial inside [0, P_h].
-                next_partials_Pa = {}
-                for species in partials_by_species:
-                    trial = trial_partials_Pa[species]
-                    resolved = resolved_partials_Pa[species]
-                    accelerated = None
-                    if previous_trial_partials_Pa is not None:
-                        prior_trial = previous_trial_partials_Pa[species]
-                        prior_resolved = previous_resolved_partials_Pa[species]
-                        if trial != prior_trial:
-                            slope = (resolved - prior_resolved) / (
-                                trial - prior_trial
-                            )
-                            if math.isfinite(slope) and not math.isclose(
-                                slope,
-                                1.0,
-                                rel_tol=1.0e-12,
-                                abs_tol=1.0e-12,
-                            ):
-                                candidate = (resolved - slope * trial) / (
-                                    1.0 - slope
-                                )
-                                if (
-                                    math.isfinite(candidate)
-                                    and 0.0 <= candidate <= pressure_Pa
-                                ):
-                                    accelerated = candidate
-                    next_partials_Pa[species] = (
-                        accelerated
-                        if accelerated is not None
-                        else (trial + resolved) / 2.0
-                    )
-                previous_trial_partials_Pa = dict(trial_partials_Pa)
-                previous_resolved_partials_Pa = dict(resolved_partials_Pa)
-                trial_partials_Pa = next_partials_Pa
+            if solved is None or flux is None or inflow is None:
+                solved = {
+                    species: fraction_start[index]
+                    for index, species in enumerate(species_order)
+                }
+                flux = flux_at_partials(solved, pressure_Pa)
+                inflow = self._combine_gas_species_kg_hr(
+                    fixed_species_kg_hr,
+                    flux.species_kg_hr,
+                )
+                notice = composition_notice_for(
+                    solved,
+                    partials_from_inflow(inflow, pressure_Pa),
+                )
+            if notice is None:
+                warm_partials = [
+                    solved[species] for species in species_order
+                ]
             outflow_kg_hr = self._pipe_conductance(
                 pressure_Pa,
                 float(melt.temperature_C),
                 p_downstream_Pa=downstream_Pa,
-                species_kg_for_M_avg=inflow_species_kg_hr,
+                species_kg_for_M_avg=inflow,
             ) * 3600.0
             inlet_kg_hr = float(flux.total_kg_hr) + fixed_inlet_kg_hr
-            return flux, inlet_kg_hr - outflow_kg_hr, composition_notice
+            return (
+                flux,
+                inlet_kg_hr - outflow_kg_hr,
+                notice,
+                inlet_kg_hr,
+            )
 
-        lower_flux, lower_residual, lower_composition_notice = evaluate(setpoint_Pa)
-        # Premise: a well-mixed headspace has mole fractions equal to each
-        # species' molar inflow divided by the sum of all molar inflows;
-        # Dalton gives p_i = P_h*g_i/sum_j(g_j). The existing partial-pressure
-        # owner converts kg/hr to mol/hr with each species' molar mass, so the
-        # ratios are dimensionless and p_i is in Pa. With no fixed O2 or
-        # carrier inlet, the denominator contains only evaporating species and
-        # reduces to the previous all-vapour flow split. Because p_i controls
-        # evaporation and the resulting flux sets the mixture, each pressure
-        # trial iterates until those two agree. The residual then balances
-        # total inlet and pipe outflow in kg/hr; the pipe owner converts its
-        # conductance from kg/s to kg/hr. The fixed inlet remains constant
-        # during trials, and a non-overloaded hour still bypasses this solver.
+        def pipe_cannot_carry_notice() -> dict[str, str]:
+            return {
+                'reason': (
+                    'evaporation_inlet_exceeds_pipe_at_every_finite_pressure'
+                ),
+                'authority_level': 'extrapolated',
+                'detail': (
+                    'The inlet stays above compressible-Poiseuille '
+                    'capacity from the setpoint through the largest '
+                    'finite trial pressure. No headspace pressure '
+                    'carries the flux. The prediction stays at the '
+                    'setpoint.'
+                ),
+            }
+
+        def pipe_balance_unresolved_notice() -> dict[str, str]:
+            return {
+                'reason': 'evaporation_pipe_balance_unresolved',
+                'authority_level': 'extrapolated',
+                'detail': (
+                    'The pipe-flow residual did not reach the closure '
+                    'set by the evaporation omission floor and the '
+                    'Poiseuille square-law derivative. The prediction '
+                    'stays at the setpoint.'
+                ),
+            }
+
+        def balance_is_closed(
+            residual: float,
+            inlet_kg_hr: float,
+            pressure_Pa: float,
+        ) -> bool:
+            mass_abs_kg_hr, _, _ = overload_pipe_balance_tolerances(
+                inlet_kg_hr,
+                pressure_Pa,
+            )
+            return (
+                math.isfinite(residual)
+                and abs(residual) <= mass_abs_kg_hr
+            )
+
+        class _CompositionUnresolved(Exception):
+            def __init__(self, notice: dict[str, str]) -> None:
+                self.notice = notice
+
+        def mass_residual(pressure_Pa: float) -> float:
+            _flux, residual, notice, _inlet = evaluate(pressure_Pa)
+            if notice is not None:
+                raise _CompositionUnresolved(notice)
+            if not math.isfinite(residual):
+                raise _CompositionUnresolved(pipe_cannot_carry_notice())
+            return residual
+
+        (
+            lower_flux,
+            lower_residual,
+            lower_composition_notice,
+            lower_inlet_kg_hr,
+        ) = evaluate(setpoint_Pa)
         if lower_composition_notice is not None:
             return lower_flux, setpoint_Pa, lower_composition_notice
-        if lower_residual <= 0.0:
+        lower_mass_abs_kg_hr, _, _ = overload_pipe_balance_tolerances(
+            lower_inlet_kg_hr,
+            setpoint_Pa,
+        )
+        if (
+            math.isfinite(lower_residual)
+            and lower_residual <= lower_mass_abs_kg_hr
+        ):
             return lower_flux, setpoint_Pa, None
         if equilibrium_pressure_Pa <= setpoint_Pa:
             # The configured setpoint is already at or above the summed
             # equilibrium vapour pressure, so no higher pressure trial can
-            # reduce evaporation and bracket the pipe-flow residual. Keep the
-            # prediction at the setpoint boundary; the caller carries this
-            # out-of-domain result as an extrapolation notice and lets the
-            # existing holdup/bleed path account for the overload.
+            # reduce evaporation. Keep the prediction at the setpoint;
+            # the caller carries this out-of-domain result as an
+            # extrapolation notice and the holdup/bleed path accounts
+            # for the overload.
             return lower_flux, setpoint_Pa, {
                 'reason': 'evaporation_pressure_bound_no_bracket',
                 'authority_level': 'extrapolated',
+                'detail': (
+                    'The setpoint is already at or above the summed '
+                    'equilibrium vapour pressure, so a higher '
+                    'back-pressure cannot reduce evaporation. At that '
+                    'bound the pipe still cannot carry the inlet.'
+                ),
             }
 
         upper_Pa = equilibrium_pressure_Pa
-        _, upper_residual, upper_composition_notice = evaluate(upper_Pa)
-        if upper_composition_notice is not None:
-            return lower_flux, setpoint_Pa, upper_composition_notice
-        for _ in range(50):
-            if upper_residual <= 0.0:
-                break
-            upper_Pa *= 2.0
-            if not math.isfinite(upper_Pa):
-                break
-            _, upper_residual, upper_composition_notice = evaluate(upper_Pa)
-            if upper_composition_notice is not None:
-                return lower_flux, setpoint_Pa, upper_composition_notice
-        else:
-            upper_residual = math.inf
-        if upper_residual > 0.0:
-            raise OverheadConfigurationError(
-                'overloaded evaporation did not reach a finite pipe-flow bracket'
+        try:
+            upper_residual = mass_residual(upper_Pa)
+            # Premise: capacity scales as P^2. Doubling P multiplies
+            # capacity by 4. 2**62 times a 1 Pa start is ~4e18 Pa;
+            # (4e18)^2 is ~1e37, above any finite kg/hr the pipe formula
+            # can return before P**2 overflows near 1e154. A residual
+            # that is still positive there is not a missed bracket.
+            for _ in range(62):
+                if upper_residual <= 0.0:
+                    break
+                next_Pa = upper_Pa * 2.0
+                if not math.isfinite(next_Pa) or next_Pa > 1.0e150:
+                    break
+                upper_Pa = next_Pa
+                upper_residual = mass_residual(upper_Pa)
+        except _CompositionUnresolved as unresolved:
+            return lower_flux, setpoint_Pa, unresolved.notice
+        if not math.isfinite(upper_residual) or upper_residual > 0.0:
+            return lower_flux, setpoint_Pa, pipe_cannot_carry_notice()
+        if abs(upper_residual) <= overload_pipe_balance_tolerances(
+            max(lower_inlet_kg_hr, 0.0),
+            upper_Pa,
+        )[0]:
+            upper_flux, upper_check, upper_notice, _upper_inlet = evaluate(
+                upper_Pa,
             )
+            if upper_notice is not None:
+                return lower_flux, setpoint_Pa, upper_notice
+            if abs(upper_check) <= overload_pipe_balance_tolerances(
+                _upper_inlet,
+                upper_Pa,
+            )[0]:
+                return upper_flux, upper_Pa, None
 
-        for _ in range(50):
-            pressure_Pa = (setpoint_Pa + upper_Pa) / 2.0
-            flux, residual, composition_notice = evaluate(pressure_Pa)
+        from scipy.optimize import brentq
+
+        _mass_abs, pressure_rel, pressure_abs = (
+            overload_pipe_balance_tolerances(lower_inlet_kg_hr, upper_Pa)
+        )
+
+        def bisect_closed_root(
+            low_Pa: float,
+            high_Pa: float,
+        ) -> tuple[EvaporationFlux, float] | None:
+            # Halving a sign-changing bracket. 80 steps take any finite
+            # double range below one ulp of the upper end, so leaving
+            # the loop is the bracket collapsing, not acceptance of a
+            # stalled iterate.
+            for _ in range(80):
+                if (
+                    not math.isfinite(low_Pa)
+                    or not math.isfinite(high_Pa)
+                    or high_Pa - low_Pa <= math.ulp(max(high_Pa, 1.0))
+                ):
+                    return None
+                mid_Pa = 0.5 * (low_Pa + high_Pa)
+                mid_flux, mid_residual, mid_notice, mid_inlet = evaluate(
+                    mid_Pa,
+                )
+                if mid_notice is not None:
+                    raise _CompositionUnresolved(mid_notice)
+                if not math.isfinite(mid_residual):
+                    raise _CompositionUnresolved(pipe_cannot_carry_notice())
+                if balance_is_closed(mid_residual, mid_inlet, mid_Pa):
+                    return mid_flux, mid_Pa
+                if mid_residual > 0.0:
+                    low_Pa = mid_Pa
+                else:
+                    high_Pa = mid_Pa
+            return None
+
+        # Brent stops on bracket width, not on the mass residual.
+        # Vacuum Poiseuille has |dm| = 2 |m| |dP| / P, so a width of
+        # pressure_abs/16 leaves a mass residual of mass_abs/16.
+        # The divisor 16 is 2**4: two for Brent's xtol+rtol stopping
+        # sum, and two more so the vacuum equality dP/P = dm/(2m)
+        # still lands inside the floor when a downstream pressure
+        # makes the true derivative smaller. A miss falls through to
+        # bisection on the same floor. The 16 is not an observed miss.
+        solved_Pa: float | None = None
+        try:
+            solved_Pa = float(brentq(
+                mass_residual,
+                setpoint_Pa,
+                upper_Pa,
+                xtol=max(
+                    pressure_abs / 16.0,
+                    math.ulp(max(upper_Pa, 1.0)),
+                ),
+                rtol=max(pressure_rel / 16.0, math.ulp(1.0)),
+                maxiter=200,
+            ))
+        except _CompositionUnresolved as unresolved:
+            return lower_flux, setpoint_Pa, unresolved.notice
+        except (ValueError, RuntimeError):
+            solved_Pa = None
+
+        if solved_Pa is not None:
+            flux, residual, composition_notice, inlet_kg_hr = evaluate(
+                solved_Pa,
+            )
             if composition_notice is not None:
                 return lower_flux, setpoint_Pa, composition_notice
-            residual_tolerance_kg_hr = max(
-                1.0e-12,
-                1.0e-9 * max(float(flux.total_kg_hr), abs(residual)),
-            )
-            pressure_tolerance_Pa = max(1.0e-6, 1.0e-10 * pressure_Pa)
-            if (
-                abs(residual) <= residual_tolerance_kg_hr
-                or upper_Pa - setpoint_Pa <= pressure_tolerance_Pa
-            ):
-                return flux, pressure_Pa, None
-            if residual > 0.0:
-                setpoint_Pa = pressure_Pa
-            else:
-                upper_Pa = pressure_Pa
+            if balance_is_closed(residual, inlet_kg_hr, solved_Pa):
+                return flux, solved_Pa, None
 
-        pressure_Pa = (setpoint_Pa + upper_Pa) / 2.0
-        flux, residual, composition_notice = evaluate(pressure_Pa)
-        if composition_notice is not None:
-            return lower_flux, setpoint_Pa, composition_notice
-        if abs(residual) > max(1.0e-12, 1.0e-9 * float(flux.total_kg_hr)):
-            raise OverheadConfigurationError(
-                'overloaded evaporation pressure solve did not converge'
-            )
-        return flux, pressure_Pa, None
+        try:
+            polished = bisect_closed_root(setpoint_Pa, upper_Pa)
+        except _CompositionUnresolved as unresolved:
+            return lower_flux, setpoint_Pa, unresolved.notice
+        if polished is None:
+            return lower_flux, setpoint_Pa, pipe_balance_unresolved_notice()
+        return polished[0], polished[1], None
 
     def _resolve_liner_temperature_value(
         self,

@@ -13,7 +13,11 @@ from engines.builtin.overhead_bleed import (
     controlled_flow_capacity,
 )
 from simulator.core import PyrolysisSimulator
-from simulator.overhead import OverheadGasModel
+from simulator.overhead import (
+    OverheadGasModel,
+    overload_composition_closure_tolerances,
+    overload_pipe_balance_tolerances,
+)
 from simulator.state import Atmosphere, EvaporationFlux
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
@@ -277,6 +281,12 @@ def test_unbracketed_overload_returns_setpoint_bound_with_notice():
     assert notice == {
         "reason": "evaporation_pressure_bound_no_bracket",
         "authority_level": "extrapolated",
+        "detail": (
+            "The setpoint is already at or above the summed "
+            "equilibrium vapour pressure, so a higher "
+            "back-pressure cannot reduce evaporation. At that "
+            "bound the pipe still cannot carry the inlet."
+        ),
     }
 
 
@@ -298,8 +308,143 @@ def test_unresolved_composition_returns_setpoint_bound_with_notice():
 
     assert flux.total_kg_hr == pytest.approx(1.0)
     assert pressure_Pa == pytest.approx(20.0)
+    assert notice is not None
+    assert notice["reason"] == "evaporation_composition_no_convergence"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["species"] in {"Na", "K"}
+    assert notice["detail"] == (
+        "No headspace composition satisfies "
+        "p_i = y_i(p) * P within the mole-fraction "
+        "arithmetic guard."
+    )
+
+
+def test_steep_hertz_knudsen_map_closes_to_arithmetic_guard():
+    """Diagonal secant oscillates when the Hertz-Knudsen gain exceeds one.
+
+    The map is the fixed point measured on K/Na/SiO with equilibrium
+    partials 2 Pa, 1e-3 Pa and 0.5 Pa and rate scales 5, 20 and 8
+    kg/hr/Pa. The scaled Newton solve has to land inside the production
+    mole-fraction guard, which sits far below the retired 2.5e-3 accept.
+    """
+    model = OverheadGasModel()
+    setpoint_Pa = 2.5
+    melt = SimpleNamespace(
+        p_total_mbar=setpoint_Pa / 100.0,
+        temperature_C=1150.0,
+    )
+    equilibrium = {"K": 2.0, "Na": 1.0e-3, "SiO": 0.5}
+    scales = {"K": 5.0, "Na": 20.0, "SiO": 8.0}
+    partials_by_flux_id: dict[int, dict[str, float]] = {}
+
+    def provider(partials, _pressure):
+        flux = _flux({
+            species: scale * max(0.0, equilibrium[species] - partials[species])
+            for species, scale in scales.items()
+        })
+        partials_by_flux_id[id(flux)] = {
+            species: float(partials[species]) for species in equilibrium
+        }
+        return flux
+
+    flux, pressure_Pa, notice = model._solve_overloaded_evaporation_flux(
+        melt,
+        equilibrium_partials_Pa=equilibrium,
+        p_downstream_bar=0.0,
+        flux_at_partials=provider,
+    )
+
+    assert notice is None
+    assert pressure_Pa >= setpoint_Pa
+    trial = partials_by_flux_id[id(flux)]
+    resolved_mbar = model.species_partial_pressures(
+        flux,
+        pressure_Pa / 100.0,
+        model.species_formula_registry,
+    )
+    rel_tol, abs_tol_Pa = overload_composition_closure_tolerances(pressure_Pa)
+    for species in equilibrium:
+        resolved_Pa = float(resolved_mbar.get(species, 0.0)) * 100.0
+        assert math.isclose(
+            resolved_Pa,
+            trial[species],
+            rel_tol=rel_tol,
+            abs_tol=abs_tol_Pa,
+        )
+    outflow_kg_hr = model._pipe_conductance(
+        pressure_Pa,
+        melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=flux.species_kg_hr,
+    ) * 3600.0
+    mass_abs_kg_hr, _, _ = overload_pipe_balance_tolerances(
+        flux.total_kg_hr,
+        pressure_Pa,
+    )
+    assert abs(flux.total_kg_hr - outflow_kg_hr) <= mass_abs_kg_hr
+
+
+def test_fitted_overload_tolerances_stay_removed():
+    """Restoring the rounded-up 0.18 % / 0.25 % accepts must fail."""
+    import simulator.overhead as overhead
+
+    assert not hasattr(overhead, "_OVERLOAD_COMPOSITION_REL_TOL")
+    assert not hasattr(overhead, "_OVERLOAD_PRESSURE_MATCH_REL_TOL")
+
+    # Reported K-partial miss: trial 0.586995 Pa against the flow-derived
+    # 0.588067 Pa. The retired composition accept was 2.5e-3.
+    composition_rel, composition_abs = overload_composition_closure_tolerances(
+        0.588067,
+    )
+    assert composition_rel < 1.0e-6
+    assert not math.isclose(
+        0.586995,
+        0.588067,
+        rel_tol=composition_rel,
+        abs_tol=composition_abs,
+    )
+
+    # Reported pressure miss: solve 10.613 Pa against pipe inversion
+    # 10.586 Pa. 10 kg/hr is above the mass at which the 1e-12 kg/hr
+    # omission floor exceeds the pipe-law ulp guard, so this check is
+    # the guard. The retired pressure accept was 3.0e-3.
+    _mass_abs, pressure_rel, pressure_abs = overload_pipe_balance_tolerances(
+        10.0,
+        10.586,
+    )
+    assert pressure_rel < 1.0e-6
+    assert not math.isclose(
+        10.613,
+        10.586,
+        rel_tol=pressure_rel,
+        abs_tol=pressure_abs,
+    )
+
+
+def test_closed_pipe_keeps_fixed_inlet_at_setpoint_bound():
+    """A pipe with no area cannot carry a fixed inlet at any finite pressure."""
+    model = OverheadGasModel()
+    model.pipe_diameter_m = 0.0
+    melt = SimpleNamespace(p_total_mbar=0.2, temperature_C=1150.0)
+
+    flux, pressure_Pa, notice = model._solve_overloaded_evaporation_flux(
+        melt,
+        equilibrium_partials_Pa={"Na": 1.0e6},
+        p_downstream_bar=0.0,
+        fixed_inlet_species_kg_hr={"O2": 1.0},
+        flux_at_partials=lambda _partials, _pressure: _flux({}),
+    )
+
+    assert flux.total_kg_hr == 0.0
+    assert pressure_Pa == pytest.approx(20.0)
     assert notice == {
-        "reason": "evaporation_composition_no_convergence",
+        "reason": "evaporation_inlet_exceeds_pipe_at_every_finite_pressure",
         "authority_level": "extrapolated",
-        "species": "Na",
+        "detail": (
+            "The inlet stays above compressible-Poiseuille "
+            "capacity from the setpoint through the largest "
+            "finite trial pressure. No headspace pressure "
+            "carries the flux. The prediction stays at the "
+            "setpoint."
+        ),
     }

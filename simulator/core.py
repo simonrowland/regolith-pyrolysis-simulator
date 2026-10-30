@@ -15829,13 +15829,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 effective_transport_capacity is not None
                 and effective_transport_capacity.binding_cause == 'pressure_driven_pipe'
             ):
-                from simulator.overhead import _OVERLOAD_PRESSURE_MATCH_REL_TOL
+                from simulator.overhead import overload_pipe_balance_tolerances
 
+                _mass_abs, pressure_rel, pressure_abs = (
+                    overload_pipe_balance_tolerances(
+                        effective_transport_capacity.demand_flux_kg_hr,
+                        resolved_pressure_Pa,
+                    )
+                )
                 pressure_matches_transport = math.isclose(
                     effective_transport_capacity.upstream_pressure_bar * 1.0e5,
                     resolved_pressure_Pa,
-                    rel_tol=_OVERLOAD_PRESSURE_MATCH_REL_TOL,
-                    abs_tol=1.0e-6,
+                    rel_tol=pressure_rel,
+                    abs_tol=pressure_abs,
                 )
                 if pressure_bound_notice is not None:
                     # At the bound, keep the same pressure for evaporation and
