@@ -11685,11 +11685,15 @@ def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-023-demaria-1973.yaml")
     assert result.validation is not None
-    # Both cross-source whole-sample proxies fail printed-precision closure
-    # (99.79 wt% for 10017 and 99.48 wt% for 12073), so neither is selected
-    # as an initial composition and they cannot conflict with each other.
+    # The 10017 and 12073 proxy totals (99.79 and 99.48 wt%) both lie within ±2,
+    # so selecting both for the shared experiment exposes their source conflict.
     issues = result.validation.hard_issues
-    assert issues == ()
+    conflicts = [
+        issue for issue in issues if "initial_composition_conflict" in issue.detail
+    ]
+    assert len(conflicts) == 1
+    assert "lpi-compendium-10017" in conflicts[0].detail
+    assert "lpi-compendium-12073" in conflicts[0].detail
     rows = [
         obs
         for obs in result.observations.values()
@@ -17614,17 +17618,14 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
             oxide: Decimal(str(amount))
             for oxide, amount in source_experiment["sample"]["printed_composition"]["state"]["value"].items()
         }
-        # The source reports five major oxides totaling 99.75 wt% and no
-        # same-row volatile value that could close the missing mass.
+        # The source reports five major oxides totaling 99.75 wt%, within the shared ±2 wt% rule.
         assert (
             sum(expected_start_composition.values(), Decimal("0"))
             == Decimal("99.75")
         )
-        assert identity.composition.is_unknown
-        assert identity.composition.reason == (
-            "mass-percent composition is not usable: "
-            "mass-percent composition does not close to 100 (sum=99.75)"
-        )
+        assert identity.composition.is_value
+        expected_composition = wt_pct_to_mole_fraction(expected_start_composition)
+        assert identity.composition.value.components == expected_composition.components
         assert identity.temperature_K.value == run_key[1]
         assert identity.sample_mass_kg.value == Decimal(
             source_experiment["sample"]["mass_kg"]["state"]["value"]["point"]

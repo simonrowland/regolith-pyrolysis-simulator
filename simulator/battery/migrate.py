@@ -1331,8 +1331,6 @@ def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
 def _percent_composition_closure_error(
     components: Mapping[str, Decimal],
     basis: str,
-    *,
-    tolerance: Decimal | None = None,
 ) -> str | None:
     amounts = tuple(
         amount
@@ -1349,7 +1347,11 @@ def _percent_composition_closure_error(
         ),
         Decimal("0"),
     )
-    allowed_deviation = rounding_bound if tolerance is None else tolerance
+    allowed_deviation = (
+        _MASS_PERCENT_CLOSURE_TOLERANCE
+        if basis == "mass"
+        else rounding_bound
+    )
     if abs(total - Decimal("100")) > allowed_deviation:
         return f"{basis}-percent composition does not close to 100 (sum={total})"
     return None
@@ -3742,6 +3744,7 @@ _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
         "sum_as_published",
     }
 )
+_MASS_PERCENT_CLOSURE_TOLERANCE = Decimal("2")
 _VOLATILE_CLOSURE_COMPONENTS = {
     "h2o": ("H2O", 2),
     "h2o_empa": ("H2O", 1),
@@ -3774,6 +3777,14 @@ _RESIDUE_COMPONENT_SLOT_FIELDS = (
 
 def _volatile_closure_component(name: str) -> tuple[str, int] | None:
     return _VOLATILE_CLOSURE_COMPONENTS.get(str(name).strip().casefold())
+
+
+def _is_closure_only_volatile(name: str) -> bool:
+    token = _canonical_printed_oxide_name(str(name).strip())
+    return (
+        _volatile_closure_component(token) is not None
+        and token not in _COMPOSITION_COMPONENTS
+    )
 
 
 def _printed_mass_percent_number(value: object) -> Decimal | None:
@@ -3856,7 +3867,7 @@ def _oxide_mass_percent_components(
     return {
         str(name): as_decimal(amount)
         for name, amount in wt.items()
-        if _volatile_closure_component(str(name)) is None
+        if not _is_closure_only_volatile(str(name))
     }
 
 
@@ -3997,11 +4008,9 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
         total += n
     if total <= 0:
         raise ValueError("printed oxide wt% map has no positive mass")
-    # The composition sweep used 98–102 wt% as its closure window. Preserve
-    # smaller assay closure error; mole-percent maps keep printed-precision closure.
-    closure_error = _percent_composition_closure_error(
-        wt, "mass", tolerance=Decimal("2")
-    )
+    # Mass-percent composition uses the same closure window in every path;
+    # mole-percent maps retain their printed-precision closure bound.
+    closure_error = _percent_composition_closure_error(wt, "mass")
     if closure_error is not None:
         raise ValueError(closure_error)
     return Composition(
@@ -4031,7 +4040,11 @@ def _wt_percent_conversion_or_refusal(
                 Decimal("0"),
             )
             conversion_wt = oxide_wt
-            if oxide_total > 0 and abs(oxide_total - Decimal("100")) > Decimal("2"):
+            if (
+                oxide_total > 0
+                and abs(oxide_total - Decimal("100"))
+                > _MASS_PERCENT_CLOSURE_TOLERANCE
+            ):
                 scale = Decimal("100") / oxide_total
                 conversion_wt = {
                     name: (
@@ -4050,10 +4063,21 @@ def _wt_percent_conversion_or_refusal(
         return None, f"mass-percent composition is not usable: {exc}"
 
 
+def _wt_percent_conversion_state(
+    wt: Mapping[str, Decimal], *, closure_context: object = None
+) -> State[Composition]:
+    converted, refusal = _wt_percent_conversion_or_refusal(
+        wt, closure_context=closure_context
+    )
+    if converted is None:
+        return State.unknown(refusal or "mass-percent composition is not usable")
+    return State.of(converted)
+
+
 def _mass_percent_composition_state(
     wt: Mapping[str, Decimal], *, basis: str, closure_context: object = None
 ) -> State[Composition]:
-    """Convert a printed wt% map after its row closes within printed precision."""
+    """Convert a printed wt% map after its row closes within the shared ±2 wt% rule."""
 
     converted, refusal = _wt_percent_conversion_or_refusal(
         wt, closure_context=closure_context
@@ -4151,6 +4175,7 @@ def _oxide_map_from_mapping(
     declared_map: bool = False,
     closure_context: object = None,
     preserve_printed_map_on_refusal: bool = False,
+    strict_declared_map: bool = False,
 ) -> dict[str, Decimal] | None:
     if not isinstance(obj, Mapping):
         return None
@@ -4178,25 +4203,37 @@ def _oxide_map_from_mapping(
             found_nested_map = True
             if key == "composition_mass_percent":
                 comps: dict[str, Decimal] = {}
+                unsupported_components: list[str] = []
                 for name, value in nested.items():
                     token = _canonical_printed_oxide_name(str(name))
                     if (
                         token in _COMPOSITION_CONDITION_KEYS
                         or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
-                        or _volatile_closure_component(token) is not None
+                        or _is_closure_only_volatile(token)
                     ):
                         continue
                     amount = _as_dec_or_none(value)
                     if amount is None:
                         return None
                     equivalent = _kume_formula_unit_oxide(token)
-                    if equivalent is None or token == "FeOT":
+                    if equivalent is None:
+                        unsupported_components.append(token)
+                        continue
+                    if token == "FeOT":
                         comps[token] = amount
                         continue
                     oxide, _factor = equivalent
                     comps[oxide] = comps.get(oxide, Decimal("0")) + amount
+                if unsupported_components:
+                    if refusal_reason is not None:
+                        refusal_reason.append(
+                            "printed oxide wt% map has unsupported numeric component(s): "
+                            + ", ".join(sorted(unsupported_components))
+                        )
+                    if not preserve_refused_map:
+                        return None
                 if len(comps) >= 2:
-                    if not checked(comps) and not preserve_refused_map:
+                    if not unsupported_components and not checked(comps) and not preserve_refused_map:
                         return None
                     return comps
                 continue
@@ -4213,6 +4250,7 @@ def _oxide_map_from_mapping(
                 declared_map=True,
                 closure_context=row_context,
                 preserve_printed_map_on_refusal=preserve_refused_map,
+                strict_declared_map=True,
             )
             if got:
                 for name, value in nested.items():
@@ -4220,7 +4258,7 @@ def _oxide_map_from_mapping(
                     if (
                         token in _COMPOSITION_CONDITION_KEYS
                         or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
-                        or _volatile_closure_component(token) is not None
+                        or _is_closure_only_volatile(token)
                     ):
                         continue
                     amount = (
@@ -4230,11 +4268,10 @@ def _oxide_map_from_mapping(
                     )
                     if amount is not None and token not in got:
                         equivalent = _kume_formula_unit_oxide(token)
-                        if equivalent is not None and token != "FeOT":
+                        if equivalent is not None:
                             oxide, _factor = equivalent
-                            got[oxide] = got.get(oxide, Decimal("0")) + amount
-                        else:
-                            got[token] = amount
+                            if oxide not in got:
+                                got[oxide] = amount
                 if not checked(got) and not preserve_refused_map:
                     return None
                 return got
@@ -4244,6 +4281,7 @@ def _oxide_map_from_mapping(
     if not declared_map or found_nested_map:
         return None
     comps: dict[str, Decimal] = {}
+    unsupported_components: list[str] = []
     for key, value in obj.items():
         name = str(key).strip()
         amount = _as_dec_or_none(value)
@@ -4253,13 +4291,28 @@ def _oxide_map_from_mapping(
         if (
             name in _COMPOSITION_CONDITION_KEYS
             or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
-            or _volatile_closure_component(name) is not None
+            or _is_closure_only_volatile(name)
         ):
             continue
-        comps[_canonical_printed_oxide_name(name)] = amount
+        token = _canonical_printed_oxide_name(name)
+        equivalent = _kume_formula_unit_oxide(token)
+        if equivalent is None:
+            if strict_declared_map:
+                unsupported_components.append(token)
+            continue
+        oxide, _factor = equivalent
+        comps[oxide] = comps.get(oxide, Decimal("0")) + amount
+    if unsupported_components:
+        if refusal_reason is not None:
+            refusal_reason.append(
+                "printed oxide wt% map has unsupported numeric component(s): "
+                + ", ".join(sorted(unsupported_components))
+            )
+        if not preserve_refused_map:
+            return None
     if len(comps) < 2:
         return None
-    if not checked(comps) and not preserve_refused_map:
+    if not unsupported_components and not checked(comps) and not preserve_refused_map:
         return None
     missing = _missing_major_oxide_names(obj)
     if missing:
@@ -4503,12 +4556,11 @@ def _catalogue_composition_located_from_values(
         rule = rule.strip(" .")
     if not rule:
         rule = "source-declared catalogue analysis; no separate selection rule stated"
-    try:
-        converted = wt_pct_to_mole_fraction(wt)
-    except (ArithmeticError, ValueError):
+    converted_state = _wt_percent_conversion_state(wt, closure_context=values)
+    if not converted_state.is_value:
         return None
     composition = replace(
-        converted,
+        converted_state.value,
         basis="sample_catalog_proxy",
         proxy_flag="composition_from_sample_catalog",
         proxy_source=source or "sample catalogue source not named",
@@ -4751,7 +4803,10 @@ def _composition_located_from_values(
             derivation,
             relation="SiO2_wt_pct=100-K2O_wt_pct;" + derivation.relation,
         )
-    composition = wt_pct_to_mole_fraction(wt)
+    composition_state = _wt_percent_conversion_state(wt, closure_context=values)
+    if composition_state.is_unknown:
+        return Located(composition_state, locator=locator, inference=derivation)
+    composition = composition_state.value
     if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
         composition = replace(composition, proxy_flag=role)
     return Located(
@@ -4812,31 +4867,31 @@ def _located_printed_and_initial(
 ) -> tuple[Located[Mapping[str, Any]] | None, Located[Composition] | None]:
     if not isinstance(wt, Mapping) or not wt:
         return None, None
-    oxide_map = {
+    printed_map = {
         str(key): as_decimal(value)
         for key, value in wt.items()
         if str(key) not in _COMPOSITION_CONDITION_KEYS
-        and _volatile_closure_component(str(key)) is None
         and _as_dec_or_none(value) is not None
     }
-    if not oxide_map:
+    conversion_map = {
+        key: amount
+        for key, amount in printed_map.items()
+        if not _is_closure_only_volatile(key)
+    }
+    if not conversion_map:
         return None, None
-    printed = located_value(_printed_map_payload(oxide_map), locator)
-    converted, refusal = _wt_percent_conversion_or_refusal(
-        oxide_map, closure_context=closure_context or wt
+    printed = located_value(_printed_map_payload(printed_map), locator)
+    state = _wt_percent_conversion_state(
+        conversion_map, closure_context=closure_context or wt
     )
-    if converted is None:
-        assert refusal is not None
+    if state.is_value:
         initial = Located(
-            State.unknown(refusal),
+            state,
             locator=locator,
+            inference=wt_pct_to_mole_fraction_derivation(conversion_map, locator),
         )
     else:
-        initial = Located(
-            State.of(converted),
-            locator=locator,
-            inference=wt_pct_to_mole_fraction_derivation(oxide_map, locator),
-        )
+        initial = Located(state, locator=locator)
     return printed, initial
 
 
@@ -16697,7 +16752,9 @@ class Migrator:
             if isinstance(row, Mapping)
             and (row.get("experiment_id") or row.get("id"))
         }
-        sample_compositions: dict[str, tuple[dict[str, Decimal], Locator | None]] = {}
+        sample_compositions: dict[
+            str, tuple[dict[str, Decimal], Locator | None, Mapping[str, Any]]
+        ] = {}
         ambiguous_sample_compositions: set[str] = set()
         for _formula, row in rows:
             row_values = row.get("values")
@@ -16711,7 +16768,11 @@ class Migrator:
             )
             if not oxide_map:
                 continue
-            candidate = (oxide_map, locator_from_mapping(row.get("locator")))
+            candidate = (
+                oxide_map,
+                locator_from_mapping(row.get("locator")),
+                row_values,
+            )
             previous = sample_compositions.get(sample_id)
             if previous is not None and previous[0] != oxide_map:
                 ambiguous_sample_compositions.add(sample_id)
@@ -17057,6 +17118,13 @@ class Migrator:
             sample_composition[0]
             if isinstance(sample_composition, tuple)
             else None
+        )
+        projected_closure_context = (
+            values
+            if row_oxide_map
+            else sample_composition[2]
+            if isinstance(sample_composition, tuple)
+            else values
         )
         projected_oxide_locator = (
             locator_from_mapping(obs.get("locator"))
@@ -17936,11 +18004,12 @@ class Migrator:
         elif composition_located is not None:
             ident_kwargs["composition"] = composition_located.state
         elif initial_oxide_map:
-            initial_composition = wt_pct_to_mole_fraction(initial_oxide_map)
-            ident_kwargs["composition"] = State.of(initial_composition)
+            ident_kwargs["composition"] = _wt_percent_conversion_state(
+                initial_oxide_map, closure_context=values
+            )
         elif isinstance(sample_composition, tuple):
-            ident_kwargs["composition"] = State.of(
-                wt_pct_to_mole_fraction(sample_composition[0])
+            ident_kwargs["composition"] = _wt_percent_conversion_state(
+                sample_composition[0], closure_context=sample_composition[2]
             )
         elif composition_refusal or q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(
@@ -18288,10 +18357,14 @@ class Migrator:
             }
         elif projected_oxide_map and not composition_role_refusal:
             # A refused composition_role is queued and left unstamped (b716).
+            projected_state = _wt_percent_conversion_state(
+                projected_oxide_map,
+                closure_context=projected_closure_context,
+            )
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": Located(
-                    State.of(wt_pct_to_mole_fraction(projected_oxide_map)),
+                    projected_state,
                     locator=projected_oxide_locator or locator,
                     inference=wt_pct_to_mole_fraction_derivation(
                         projected_oxide_map, projected_oxide_locator or locator
@@ -19144,8 +19217,8 @@ class Migrator:
                 # its own point. It does not become the parent identity or a
                 # default condition on every sibling point.
                 if rowless_initial_map:
-                    point_identity_kwargs["composition"] = State.of(
-                        wt_pct_to_mole_fraction(rowless_initial_map)
+                    point_identity_kwargs["composition"] = _wt_percent_conversion_state(
+                        rowless_initial_map, closure_context=rowless_values
                     )
                 else:
                     point_identity_kwargs.pop("composition", None)
@@ -20187,8 +20260,8 @@ class Migrator:
                 composition_unknown_reason(point_composition_refusal)
             )
         elif q_token_point is Quantity.P_PARTIAL and point_oxide_map:
-            ident_kwargs["composition"] = State.of(
-                wt_pct_to_mole_fraction(point_oxide_map)
+            ident_kwargs["composition"] = _wt_percent_conversion_state(
+                point_oxide_map, closure_context=raw_item
             )
         elif (
             point_oxide_map
@@ -20204,8 +20277,8 @@ class Migrator:
             # A row-local printed map supplies identity composition when the
             # identity has no value; keep an already declared composition (for
             # example Guo Table 5's printed mole fractions) authoritative.
-            ident_kwargs["composition"] = State.of(
-                wt_pct_to_mole_fraction(point_oxide_map)
+            ident_kwargs["composition"] = _wt_percent_conversion_state(
+                point_oxide_map, closure_context=raw_item
             )
         elif ident_kwargs.get("composition") is None:
             composition_refusal: list[str] = []
@@ -20215,8 +20288,8 @@ class Migrator:
                 declared_map=point_map_declared,
             )
             if initial_map:
-                ident_kwargs["composition"] = State.of(
-                    wt_pct_to_mole_fraction(initial_map)
+                ident_kwargs["composition"] = _wt_percent_conversion_state(
+                    initial_map, closure_context=parent_values
                 )
             elif composition_refusal or q_token_point in _BULK_PROPERTY_QUANTITIES:
                 ident_kwargs["composition"] = State.unknown(
