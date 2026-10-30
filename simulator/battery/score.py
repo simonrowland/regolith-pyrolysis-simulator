@@ -11178,17 +11178,16 @@ def compile_residual(
         source_relation: SourceRelation = SourceRelation.UNKNOWN,
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
-        sp_identity_notice = _openimcc_sp_identity_notice(
-            quantity,
-            prediction.authority
-            if prediction is not None and prediction.authority is not None
-            else Authority.REFUSED,
-        )
-        sp_identity_notices = (
-            (sp_identity_notice,)
-            if engine is Engine.OPENIMCC_SP and sp_identity_notice not in notices
-            else ()
-        )
+        sp_identity_notices: tuple[Notice, ...] = ()
+        if engine is Engine.OPENIMCC_SP:
+            sp_identity_notice = _openimcc_sp_identity_notice(
+                quantity,
+                prediction.authority
+                if prediction is not None and prediction.authority is not None
+                else Authority.REFUSED,
+            )
+            if sp_identity_notice not in notices:
+                sp_identity_notices = (sp_identity_notice,)
         all_notices = union_notices(notices, extra_notices, sp_identity_notices)
         result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
         excl = exclusions or ("status_match_or_mismatch",)
