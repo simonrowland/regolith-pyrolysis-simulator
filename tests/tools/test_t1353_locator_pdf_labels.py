@@ -32,6 +32,28 @@ CORPUS_ROOTS = tuple(
     if corpus_root and (Path(corpus_root) / "raw").is_dir()
 )
 MINERU_TEXT_ROOT = Path.home() / "Repos/.regolith-main-review/corpus-main/text"
+_REVIEWED_LOCATOR_SKIP_REASONS = {
+    (
+        "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
+        "fidelity_samples.0.locator",
+    ): "T_K value filtered as temperature",
+    (
+        "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
+        "fidelity_samples.1.locator",
+    ): "component_amount is not an *_as_published field; generic parser returns empty",
+    (
+        "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
+        "fidelity_samples.2.locator",
+    ): "component_amount is not an *_as_published field; generic parser returns empty",
+    (
+        "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
+        "species.CaO.context.2.locator",
+    ): "figure_only, no digitized coordinates",
+    (
+        "data/literature/extracts/zigo-1987-gehlenite-fusion.yaml",
+        "species.gehlenite.observations.7.locator",
+    ): "values not found in page text; pending verification (t-1581)",
+}
 
 
 @lru_cache(maxsize=None)
@@ -746,15 +768,20 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                     mineru_matched += 1
                     continue
                 kind, label = next((key, locator[key]) for key in ("table", "figure") if key in locator)
+                locator_label = ".".join(locator_path)
+                verdict = (
+                    "label-present; stored value is not literal page text for this typed locator"
+                    if generic_values else "label-present; no literal printed numeric value to assert"
+                )
+                verdict = _REVIEWED_LOCATOR_SKIP_REASONS.get(
+                    (relative, locator_label), verdict
+                )
                 value_skips.append({
                     "extract": relative,
-                    "locator": ".".join(locator_path) + f" [{kind} {label}, page {page_number}]",
-                        "printed_string": "; ".join(generic_values),
+                    "locator": locator_label + f" [{kind} {label}, page {page_number}]",
+                    "printed_string": "; ".join(generic_values),
                     "class": _skip_class(current, locator_path, locator),
-                        "verdict": (
-                            "label-present; stored value is not literal page text for this typed locator"
-                            if generic_values else "label-present; no literal printed numeric value to assert"
-                        ),
+                    "verdict": verdict,
                 })
                 skipped += 1
     for relative, document in checked_documents.items():
