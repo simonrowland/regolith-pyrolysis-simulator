@@ -10153,12 +10153,16 @@ def _convert_compilation_amount(
             )
         if energy and token in {"j/mol", "j/mole"}:
             return amount / Decimal("1000"), "J_to_kJ_exact"
+        # Printed ``kJ mol−1 CaSiO3`` (Adamkovičová 1980). Fusion quantities
+        # rewrite ``mol−1`` to ``/mol`` before this match; H−H298 does not,
+        # so both tokens are the same printed unit.
         if energy and token in {
             "kj/mol",
             "kj/mole",
             "kjpermol",
             "kjmol^-1",
             "kj/molcasio3",
+            "kjmol−1casio3",
         }:
             return amount, "identity:kJ_per_mol"
     return None

@@ -763,6 +763,55 @@ def iter_activity_comparators(
                             )
                         )
                     continue
+                # Henry coefficients recovered as one point per printed
+                # temperature (values.points[].gamma + T_C). Flat gamma_<T>C
+                # fields below remain the other spelling.
+                points = values.get("points")
+                point_gammas = [
+                    point
+                    for point in points
+                    if isinstance(point, Mapping) and "gamma" in point
+                ] if isinstance(points, list) else []
+                if point_gammas:
+                    for point in point_gammas:
+                        measured = _finite_positive(point.get("gamma"))
+                        temperature = _row_temperature_K(point, obs)
+                        if measured is None or temperature is None:
+                            continue
+                        field_unc = None
+                        t_c = point.get("T_C")
+                        if (
+                            isinstance(uncertainty, Mapping)
+                            and isinstance(t_c, (int, float))
+                            and not isinstance(t_c, bool)
+                            and float(t_c).is_integer()
+                        ):
+                            field_name = f"gamma_{int(t_c)}C"
+                            if field_name in uncertainty:
+                                field_unc = {
+                                    "kind": "absolute",
+                                    "value": uncertainty[field_name],
+                                    "as_printed": uncertainty.get("as_printed"),
+                                }
+                        found.append(
+                            ActivityComparator(
+                                source_id=source_id,
+                                observation_id=observation_id,
+                                species=str(species),
+                                observable="activity_coefficient",
+                                method_class=method,
+                                sample_no=None,
+                                temperature_K=float(temperature),
+                                measured=float(measured),
+                                units="1",
+                                standard_state=None if standard_state is None else str(standard_state),
+                                uncertainty=field_unc or uncertainty,
+                                doi=None if doi is None else str(doi),
+                                row=dict(point),
+                                admission_reason=admission_reason,
+                            )
+                        )
+                    continue
                 for field_name, value in values.items():
                     if not str(field_name).startswith("gamma_"):
                         continue
