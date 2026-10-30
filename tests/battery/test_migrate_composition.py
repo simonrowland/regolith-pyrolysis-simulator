@@ -77,9 +77,10 @@ _SWEPT_COMPOSITION_MAPS = (
     # Zhang repeats a 99.32 wt% starting-glass map in twelve rows, with no
     # printed volatile component to close the difference.
     ("Zhang", "kems-006-zhang-2021", "starting_glass_wt_pct", "Rb2O", 0, 12),
-    # LPI's four S-bearing maps total 99.85, 100.26, 99.21, and 99.47 wt%;
-    # printed S counts, but none closes within the component rounding bound.
-    ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 0, 4),
+    # LPI's sample 10002 map closes at 99.85 wt% within its 0.195 bound.
+    # Samples 14148 (100.26/0.190), 15020 (99.21/0.145), and 74220
+    # (99.47/0.105) remain refused outside their printed rounding bounds.
+    ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 1, 3),
     ("Britt", "britt-2019-asteroid-simulants", "composition_wt_pct", "FeOT", 3, 0),
     ("Hendrix", "hendrix-2024-reactivity-reduced-simulants", "composition_wt_pct", "SO3", 2, 0),
     ("Flemetakis", "ta-flemetakis-2024", "composition_wt_pct", "B2O3", 1, 0),
