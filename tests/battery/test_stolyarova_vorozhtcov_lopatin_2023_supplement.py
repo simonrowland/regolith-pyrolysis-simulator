@@ -26,13 +26,6 @@ NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 ACTIVITY_EXPONENT = {1: -7, 2: -8, 3: -7, 4: -8, 5: -9, 6: -9}
 SAMPLE = {1: "1", 2: "2", 3: "1", 4: "2", 5: "3", 6: "3", 7: "1", 8: "2", 9: "3"}
 SAMPLE_COMPOSITION = {"1": "33 mol% SrO", "2": "20 mol% SrO", "3": "10 mol% SrO"}
-# The S7-S9 captions give the SrO fraction for this binary system.
-SAMPLE_MOLE_FRACTIONS = {
-    "1": {"SrO": Decimal("0.33"), "Al2O3": Decimal("0.67")},
-    "2": {"SrO": Decimal("0.20"), "Al2O3": Decimal("0.80")},
-    "3": {"SrO": Decimal("0.10"), "Al2O3": Decimal("0.90")},
-}
-COHORT_COMPOSITION_FORMULAS = {"Al", "AlO", "Al2O"}
 PRESSURE_COLUMNS = (("Sr", 3), ("Al", 4), ("AlO", 5), ("Al2O", 6), ("O", 7))
 IONS = (("Sr", "Sr+", 1), ("Al", "Al+", 2), ("AlO", "AlO+", 3), ("Al2O", "Al2O+", 4))
 PressureCell = tuple[str, int, str, Decimal, Decimal | None, Decimal | None, Decimal]
@@ -47,6 +40,66 @@ def source_decimal(text: str) -> Decimal:
     if match:
         return Decimal(match.group(1)) * Decimal(10) ** int(match.group(2))
     return Decimal(text)
+
+
+def caption_sro_mole_fraction(sample: str) -> Decimal:
+    match = re.fullmatch(r"(\d+) mol% SrO", SAMPLE_COMPOSITION[sample])
+    assert match
+    return Decimal(match.group(1)) / Decimal(100)
+
+
+def assert_extract_binary_complement(
+    located: dict[str, object], sample: str, table: int
+) -> tuple[Decimal, Decimal]:
+    state = located["state"]
+    assert isinstance(state, dict) and state["tag"] == "value"
+    value = state["value"]
+    assert isinstance(value, dict)
+    assert value["basis"] == "binary_complement"
+    components = {
+        str(name): Decimal(str(amount)) for name, amount in value["components"]
+    }
+    srO = caption_sro_mole_fraction(sample)
+    assert components["SrO"] == srO
+    assert sum(components.values(), Decimal(0)) == Decimal(1)
+
+    inference = located["inference"]
+    assert isinstance(inference, dict)
+    assert inference["relation"] == "binary_complement"
+    assert "SrO-Al2O3 binary; complement of the caption mole percent" in inference[
+        "inputs"
+    ]
+    parameters = dict(inference["parameters"])
+    printed_sro = parameters["printed_SrO_mole_percent"]
+    assert printed_sro["state"]["tag"] == "value"
+    assert Decimal(str(printed_sro["state"]["value"])) == srO * Decimal(100)
+    assert printed_sro["locator"]["table"] == f"S{table}"
+    assert "caption" in printed_sro["locator"]["note"]
+    assert SAMPLE_COMPOSITION[sample].split()[0] in printed_sro["locator"]["note"]
+    return components["SrO"], components["Al2O3"]
+
+
+def assert_migrated_binary_complement(composition, sample: str, table: int) -> None:
+    assert composition.state.is_value
+    assert composition.state.value.basis == "binary_complement"
+    components = dict(composition.state.value.components)
+    srO = caption_sro_mole_fraction(sample)
+    assert components["SrO"] == srO
+    assert sum(components.values(), Decimal(0)) == Decimal(1)
+    assert composition.inference is not None
+    assert composition.inference.relation == "binary_complement"
+    assert (
+        "SrO-Al2O3 binary; complement of the caption mole percent"
+        in composition.inference.inputs
+    )
+    parameters = dict(composition.inference.parameters)
+    printed_sro = parameters["printed_SrO_mole_percent"]
+    assert printed_sro.state.is_value
+    assert printed_sro.state.value == srO * Decimal(100)
+    assert printed_sro.locator is not None
+    assert printed_sro.locator.table == f"S{table}"
+    assert "caption" in (printed_sro.locator.note or "")
+    assert SAMPLE_COMPOSITION[sample].split()[0] in (printed_sro.locator.note or "")
 
 
 def table_cells(source: Path) -> list[list[list[str]]]:
@@ -144,11 +197,8 @@ def test_printed_table_cells_migrate_with_their_row_conditions() -> None:
             for formula, column in PRESSURE_COLUMNS:
                 raw = row[5 + PRESSURE_COLUMNS.index((formula, column))]
                 if raw and raw != "-":
-                    expected_composition = SAMPLE_MOLE_FRACTIONS.get(sample)
-                    if formula not in COHORT_COMPOSITION_FORMULAS:
-                        expected_composition = None
-                    srO = None if expected_composition is None else expected_composition["SrO"]
-                    al2o3 = None if expected_composition is None else expected_composition["Al2O3"]
+                    srO = caption_sro_mole_fraction(sample)
+                    al2o3 = Decimal(1) - srO
                     cell = (
                         formula,
                         table_number,
@@ -195,19 +245,12 @@ def test_printed_table_cells_migrate_with_their_row_conditions() -> None:
                         srO, al2o3 = Decimal(parts.group(1)), Decimal(parts.group(2))
                     else:
                         assert composition == SAMPLE_COMPOSITION[sample]
-                        if formula in COHORT_COMPOSITION_FORMULAS:
-                            expected_composition = SAMPLE_MOLE_FRACTIONS[sample]
-                            assert {
-                                name: Decimal(str(amount))
-                                for name, amount in point["composition_mol"].items()
-                            } == expected_composition
-                            srO, al2o3 = (
-                                expected_composition["SrO"],
-                                expected_composition["Al2O3"],
-                            )
-                        else:
-                            assert "composition_mol" not in point
-                            srO = al2o3 = None
+                        assert "composition_mol" not in point
+                        srO, al2o3 = assert_extract_binary_complement(
+                            point["point_conditions"]["composition"],
+                            sample,
+                            table_number,
+                        )
                     cell = (
                         formula,
                         table_number,
@@ -241,6 +284,11 @@ def test_printed_table_cells_migrate_with_their_row_conditions() -> None:
                 assert values["gas_species"] == formula
                 for point in values["points"]:
                     assert point["composition_as_printed"] == SAMPLE_COMPOSITION[sample]
+                    assert_extract_binary_complement(
+                        point["point_conditions"]["composition"],
+                        sample,
+                        table_number,
+                    )
                     cell = (
                         table_number,
                         formula,
@@ -375,24 +423,12 @@ def test_printed_table_cells_migrate_with_their_row_conditions() -> None:
             assert dict(identity.composition.value.components) == actual
             srO, al2o3 = actual["SrO"], actual["Al2O3"]
         else:
-            if (
-                identity.quantity.value is Quantity.P_PARTIAL
-                and formula in COHORT_COMPOSITION_FORMULAS
-            ):
-                assert composition.state.is_value, observation.observation_id
-                expected_composition = SAMPLE_MOLE_FRACTIONS[SAMPLE[table_number]]
-                actual = dict(composition.state.value.components)
-                assert actual == expected_composition
-                assert identity.composition is not None and identity.composition.is_value
-                assert dict(identity.composition.value.components) == actual
-                srO, al2o3 = (
-                    expected_composition["SrO"],
-                    expected_composition["Al2O3"],
-                )
-            else:
-                assert composition.state.is_unknown, observation.observation_id
-                assert SAMPLE_COMPOSITION[SAMPLE[table_number]] in composition.state.reason
-                srO = al2o3 = None
+            sample = SAMPLE[table_number]
+            assert_migrated_binary_complement(composition, sample, table_number)
+            assert identity.composition is not None
+            assert not identity.composition.is_value
+            actual = dict(composition.state.value.components)
+            srO, al2o3 = actual["SrO"], actual["Al2O3"]
 
         if identity.quantity.value is Quantity.P_PARTIAL:
             assert identity.species.phase.is_value and identity.species.phase.value is Phase.G
@@ -461,16 +497,14 @@ def test_s7_s9_row_composition_and_locators_migrate_without_source_docx() -> Non
         assert composition.locator is not None, observation.observation_id
         assert composition.locator.table == f"S{table_number}"
         assert composition.locator.note.startswith("supporting-information data row ")
-        if (
-            table_number in {7, 8, 9}
-            and identity.quantity.value is Quantity.P_PARTIAL
-            and identity.species.formula in COHORT_COMPOSITION_FORMULAS
-        ):
-            expected = SAMPLE_MOLE_FRACTIONS[SAMPLE[table_number]]
-            assert composition.state.is_value, observation.observation_id
-            assert dict(composition.state.value.components) == expected
-            assert identity.composition is not None and identity.composition.is_value
-            assert dict(identity.composition.value.components) == expected
+        if table_number in {7, 8, 9}:
+            assert identity.quantity.value in {Quantity.P_PARTIAL, Quantity.ION_INTENSITY}
+            assert identity.species.formula in {"Al", "AlO", "Al2O", "Sr", "O"}
+            assert_migrated_binary_complement(
+                composition, SAMPLE[table_number], table_number
+            )
+            assert identity.composition is not None
+            assert not identity.composition.is_value
             affected += 1
 
-    assert affected == 102
+    assert affected == 317
