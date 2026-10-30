@@ -46,8 +46,11 @@ Standard MRE Baseline (root branch alternative).
             w = a * exp(min(max(dV, 0) / (RT/F), 3))
         with dV = applied_V - E_nernst (positive overvoltage).
         Larger overvoltage increases weight; that is not voltage
-        proximity. Multi-oxide current partition uses this same heuristic
-        with an extrapolated notice and remains denied certification.
+        proximity. On that same step_hour() path, more than one
+        oxide_to_metal target is not partitioned: the method returns
+        reason_refused=uncertified_multi_oxide_current_partition
+        and applies no Faraday reduction. A ferric_to_ferrous row
+        is not counted as an oxide_to_metal target by that detector.
 
 DECOMP_VOLTAGES fallback anchors (imported; not the live 1873 K ladder):
     NiO:   0.39 V   Na2O:  0.5 V    K2O:    0.5 V
@@ -688,19 +691,6 @@ def uncertified_multi_oxide_partition_targets(reducible) -> tuple[str, ...]:
     return tuple(targets) if len(targets) > 1 else ()
 
 
-def multi_oxide_partition_notices(reducible) -> tuple[dict, ...]:
-    targets = uncertified_multi_oxide_partition_targets(reducible)
-    if not targets:
-        return ()
-    return ({
-        "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-        "authority_level": "extrapolated",
-        "certified_band": {"oxide_to_metal_target_count": (0, 1)},
-        "reducible_oxide_targets": targets,
-        "source": MRE_CURRENT_PARTITION_SOURCE,
-    },)
-
-
 class ElectrolysisModel:
     """
     Molten Regolith Electrolysis simulator.
@@ -822,8 +812,10 @@ class ElectrolysisModel:
         Inside this method, each oxide whose Nernst voltage is below
         the applied voltage is collected as a reducible row. If more
         than one oxide_to_metal target is in that set, the method
-        uses SEL-1 with an extrapolated current-partition notice.
-        Reducible targets are reduced by Faraday's law. A ferric-to-ferrous row may also be reduced without
+        returns reason_refused=uncertified_multi_oxide_current_partition,
+        omits product and energy quantities, and applies no Faraday reduction.
+        A single oxide_to_metal target is weighted by SEL-1 and reduced by
+        Faraday's law. A ferric-to-ferrous row may also be reduced without
         consuming the oxide-to-metal current partition.
 
         Args:
@@ -1040,9 +1032,11 @@ class ElectrolysisModel:
                 result['energy_kWh'] = voltage_V * current_A / 1000.0
             return result
 
-        partition_notices = multi_oxide_partition_notices(reducible)
-        if partition_notices:
-            result['notices'] = tuple(result.get('notices', ())) + partition_notices
+        refused_targets = uncertified_multi_oxide_partition_targets(reducible)
+        if refused_targets:
+            result['reason_refused'] = MRE_MULTI_OXIDE_PARTITION_REFUSAL
+            result['reducible_oxide_targets'] = refused_targets
+            return _without_mre_quantities(result)
 
         # Partition current among reducible species            [SEL-1]
         # Weight = activity × exp(positive overvoltage / (RT/F)),

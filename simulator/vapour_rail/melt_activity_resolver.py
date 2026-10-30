@@ -2013,6 +2013,14 @@ class MeltActivityResolver:
                 tier=ActivityTier.C,
                 model_row_id=None,
             )
+        if query.out_of_domain and query.continuation_ln_band is None:
+            return self._refusal(
+                query,
+                ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED,
+                "out-of-domain Tier C evaluation needs an explicit continuation band",
+                tier=ActivityTier.C,
+                model_row_id=None,
+            )
         try:
             mole_fraction = float(query.component_mole_fractions[query.component_id])
         except (TypeError, ValueError):
@@ -2090,10 +2098,7 @@ class MeltActivityResolver:
         else:
             ln_band = (None, None)
             band_kind = "unbounded_model_form"
-            domain_status = (
-                "out_of_domain_continuation_status_bearing"
-                if query.out_of_domain else "in_domain_model_form_unbounded"
-            )
+            domain_status = "in_domain_model_form_unbounded"
         return SourceReactionActivity(
             component_id=query.component_id,
             value=mole_fraction,
@@ -2127,13 +2132,6 @@ class MeltActivityResolver:
                 "algebra": "ln(a_i)=ln(X_i)",
                 "composition_basis": query.composition_basis,
                 "certification_ceiling": "never",
-                **({"notice": {
-                    "reason": ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED.value,
-                    "authority_level": "extrapolated",
-                    "certified_band": None,
-                    "matrix_domain_ref": query.matrix_domain_ref,
-                    "detail": "ideal-solution model has no calibrated descriptor or uncertainty band",
-                }} if query.out_of_domain else {}),
             },
         )
 

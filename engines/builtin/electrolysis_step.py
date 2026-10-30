@@ -301,6 +301,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
             MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
             MRE_INVALID_CONTROL_REFUSAL,
+            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
             MRE_RAW_MARGIN_GUARDED_OXIDES,
@@ -318,7 +319,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             current_efficiency_diagnostic,
             mre_control_domain_assessment,
             mre_selectivity_weight,
-            multi_oxide_partition_notices,
+            uncertified_multi_oxide_partition_targets,
         )
         from simulator.state import (
             FARADAY,
@@ -741,9 +742,17 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic=diagnostic,
             )
 
-        partition_notices = multi_oxide_partition_notices(reducible)
-        if partition_notices:
-            diagnostic["notices"] = tuple(diagnostic.get("notices", ())) + partition_notices
+        refused_targets = uncertified_multi_oxide_partition_targets(reducible)
+        if refused_targets:
+            diagnostic["reason_refused"] = MRE_MULTI_OXIDE_PARTITION_REFUSAL
+            diagnostic["reducible_oxide_targets"] = refused_targets
+            return IntentResult(
+                intent=ChemistryIntent.ELECTROLYSIS_STEP,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=_without_mre_quantities(diagnostic),
+            )
 
         # Partition current among reducible species (selectivity:
         # weight by concentration * exp(F*dV/(R*T)), exponent capped at 3).

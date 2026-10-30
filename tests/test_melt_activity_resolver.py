@@ -1136,25 +1136,3 @@ def test_fe_shadow_uses_exact_pressure_and_keeps_source_standard_state() -> None
     assert result.standard_state != result.target_standard_state
     assert result.derivation["pressure_bar"] == pressure_bar
     assert result.derivation["target_conversion_status"] == "mu0_target_pending"
-
-
-@pytest.mark.parametrize("complete", [True, False])
-def test_tier_c_ood_without_uncertainty_preserves_value_or_missing_input_refusal(complete):
-    result = MeltActivityResolver().resolve_tier_c(_query(
-        "LiO0.5", fractions={"LiO0.5": 0.2, "SiO2": 0.8},
-        complete=complete, out_of_domain=True,
-    ))
-    if not complete:
-        assert result.verdict is ActivityVerdictKind.REFUSAL
-        assert result.refusal_code is ActivityRefusalCode.INCOMPLETE_MELT_INVENTORY
-        assert result.value is None
-        return
-    assert result.value == 0.2
-    assert result.domain_status == "out_of_domain_continuation_status_bearing"
-    assert result.ln_band == (None, None)
-    assert result.band_kind == "unbounded_model_form"
-    assert result.authority is False
-    notice = result.derivation["notice"]
-    assert notice["reason"] == "descriptor_hull_exceeded"
-    assert notice["authority_level"] == "extrapolated"
-    assert notice["certified_band"] is None

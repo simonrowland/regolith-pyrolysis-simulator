@@ -163,11 +163,8 @@ def test_domain_gate_flags_sio2_outside_range():
     composition['FeO'] = 2.0
     composition['MgO'] = 1.0
     valid, warnings = MAGEMinDomainGate.validate(composition)
-    assert valid is True
+    assert valid is False
     assert any('SiO2' in w and 'outside' in w for w in warnings)
-    assert 'reason=silicate_window' in warnings[0]
-    assert 'authority=extrapolated' in warnings[0]
-    assert 'certified_band=SiO2 [30, 80] wt%' in warnings[0]
 
 
 # ----------------------------------------------------------------------
@@ -648,31 +645,3 @@ def test_projected_nonfinite_liquid_scalars_are_reported():
     assert diagnostic.solidus_T_C is None
     assert len(diagnostic.backend_warnings) == 4
     assert all('nonfinite' in warning for warning in diagnostic.backend_warnings)
-
-
-@pytest.mark.parametrize('composition', [{}, {'MgO': 100.0}])
-def test_magemin_missing_silicate_still_refuses(composition):
-    valid, _, reason = MAGEMinDomainGate.validate_with_reason(composition)
-    assert not valid
-    assert reason in {'major_sum', 'silicate_window'}
-
-
-def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
-    from simulator.melt_backend.base import EquilibriumResult
-
-    provider = MAGEMinShadowProvider(backend=object())
-    monkeypatch.setattr(provider, '_composition_wt_pct', lambda *_: {'SiO2': 85., 'Al2O3': 10., 'CaO': 5.})
-    monkeypatch.setattr(provider, '_backend_available', lambda _: True)
-    monkeypatch.setattr(provider, '_run_backend', lambda *a, **kw: EquilibriumResult(
-        temperature_C=1500., pressure_bar=0.001, liquid_fraction=1., status='ok',
-    ))
-    request = IntentRequest(
-        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
-        account_view=ProviderAccountView(accounts={}, species_formula_registry={}),
-        temperature_C=1500., pressure_bar=0.001,
-    )
-    result = provider.dispatch(request)
-    assert result.status == 'ok'
-    assert result.diagnostic['liquid_fraction'] == 1.
-    assert result.transition is None
-    assert any('authority=extrapolated' in w for w in result.warnings)

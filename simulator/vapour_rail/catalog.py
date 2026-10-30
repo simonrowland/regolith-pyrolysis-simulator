@@ -970,7 +970,6 @@ class CompiledPressureEvaluator:
         low, high = self.valid_temperature_K
         out_of_range = temperature_K < low or temperature_K > high
 
-        temperature_notice: dict[str, Any] = {}
         if out_of_range:
             if self.extrapolation_policy != DEFAULT_EXTRAPOLATION_POLICY:
                 raise CatalogCompileError(
@@ -984,7 +983,7 @@ class CompiledPressureEvaluator:
             # composite thermo) — never attenuated linear-T slope invention
             # (b-145 composites; t-538 all non-composite families).
             log10_reference = self._out_of_domain_log10_continuation(
-                temperature_K, temperature_notice=temperature_notice,
+                temperature_K
             )
         else:
             log10_reference = self.reference_model.log10_pressure(temperature_K)
@@ -1159,7 +1158,7 @@ class CompiledPressureEvaluator:
         object.__setattr__(
             evaluation,
             "extrapolation_notice",
-            o2_notice or temperature_notice or _pO2_floor_inversion_notice(
+            o2_notice or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1260,11 +1259,8 @@ class CompiledPressureEvaluator:
         temperature = _finite_positive(temperature_K, "temperature_K")
         low, high = self.valid_temperature_K
         out_of_range = temperature < low or temperature > high
-        temperature_notice: dict[str, Any] = {}
         reference_log10 = (
-            self._out_of_domain_log10_continuation(
-                temperature, temperature_notice=temperature_notice,
-            )
+            self._out_of_domain_log10_continuation(temperature)
             if out_of_range
             else self.reference_model.log10_pressure(temperature)
         )
@@ -1322,13 +1318,11 @@ class CompiledPressureEvaluator:
             "activity_verdict": activity.verdict.value,
             "flux_disposition": "instrumented_not_selected",
         }
-        if temperature_notice:
-            payload["extrapolation_notice"] = dict(temperature_notice)
         if self.pO2_exponent and math.isfinite(ln_pressure):
             pressure_pa = math.exp(float(ln_pressure))
             notice = (o2_potential.observation_or_setpoint_receipt or {}).get(
                 "extrapolation_notice"
-            ) or temperature_notice or _pO2_floor_inversion_notice(
+            ) or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1339,9 +1333,7 @@ class CompiledPressureEvaluator:
                 payload["extrapolation_notice"] = dict(notice)
         return MappingProxyType(payload)
 
-    def _out_of_domain_log10_continuation(
-        self, temperature_K: float, *, temperature_notice: dict[str, Any] | None = None,
-    ) -> float:
+    def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
         """Continuous out-of-domain estimate (anti-cliff; not claim authority).
 
         Owner-ratified anti-cliff policy: never drop to silent zero at the
@@ -1369,20 +1361,27 @@ class CompiledPressureEvaluator:
            attenuated linear-T slope that invented multi-dex low-T pressure.
         """
         if self.reference_model.physical_composite_ood:
-            # Compose the landed exchange and base-pressure models while their
-            # constituents accept T. Both scalar and typed consumers share the
-            # fallback and its original constituent-domain reason here.
-            try:
-                return float(self.reference_model.log10_pressure(temperature_K))
-            except (NasaCeaDomainError, ShomateDomainError) as exc:
-                if temperature_notice is not None:
-                    temperature_notice.update({
-                        "reason": str(exc),
-                        "authority_level": "extrapolated",
-                        "certified_band": {"temperature_K": self.valid_temperature_K},
-                        "continuation": "reciprocal_T_tangent",
-                    })
-                return self._reciprocal_T_tangent_log10(temperature_K)
+            # Premise: for composite carrier V, log10 P_V°(T) =
+            #   (1/ν) log10 K_ex(T) + (m/ν) log10 P_base°(T) + O2 term
+            # (see _log10_from_composite). Algebra: K_ex(T)=exp(-ΔG_ex°/RT)
+            # from whatever gas polynomials this row compiled — NASA CEA
+            # segments for some carriers (TiO2_gas), IVTAN-derived Shomate
+            # for others (MnO_gas / CoO_gas target gas). This branch does
+            # not first intersect those constituent domains, so "CEA
+            # 300–6000 K at any campaign T" is not a property of the
+            # branch. P_base° is the liquid-reservoir Antoine
+            #   log10 P_base = A − B/(T+C)
+            # which is van't Hoff / Clausius–Clapeyron in 1/(T+C) with the
+            # fitted reaction dH (B ∝ ΔH/R ln10). Composing at the requested
+            # T therefore evaluates each compiled factor at that T.
+            # Unit check: K_ex and every p/P° ratio are dimensionless;
+            # log10 P is log10(Pa). Sanity: at T=T_low the composite
+            # reproduces the in-domain edge value when every constituent
+            # polynomial accepts T_low (no cliff). MnO_gas / CoO_gas target
+            # Shomate cover [1000, 3000] K; T below that floor raises
+            # ShomateDomainError from the polynomial module rather than a
+            # typed catalog continuation.
+            return float(self.reference_model.log10_pressure(temperature_K))
 
         mode = self._physical_oor_continuation_mode()
         if mode == "direct":
@@ -1442,7 +1441,7 @@ class CompiledPressureEvaluator:
         return "reciprocal_T_tangent"
 
     def _reciprocal_T_tangent_log10(self, temperature_K: float) -> float:
-        """Continue log10 P as linear in 1/T from the supported domain edge.
+        """Continue log10 P as linear in 1/T from the fit-domain edge.
 
         Premise (Clausius–Clapeyron / van 't Hoff): near a local temperature
         where reaction ΔH is slowly varying,
@@ -1483,24 +1482,6 @@ class CompiledPressureEvaluator:
             )
 
         ref = self.reference_model
-
-        if ref.physical_composite_ood:
-            # The fit edge is inside every constituent's contiguous cover
-            # (checked at compile time). Bracket the actual support edge
-            # between that accepted T and the rejected request. Stop at
-            # adjacent floats so the join is the last supported temperature,
-            # not an arbitrary tolerance or the unrelated catalog fit edge.
-            rejected = temperature_K
-            while True:
-                probe = boundary + (rejected - boundary) * 0.5
-                if probe == boundary or probe == rejected:
-                    break
-                try:
-                    ref.log10_pressure(probe)
-                except (NasaCeaDomainError, ShomateDomainError):
-                    rejected = probe
-                else:
-                    boundary = probe
 
         if ref.evaluator_family == "antoine":
             try:
@@ -1559,7 +1540,7 @@ class CompiledPressureEvaluator:
         # reference surface is smooth.
         span = max(high - low, 1.0)
         step = min(max(span * 1.0e-4, 1.0e-3), 1.0)
-        inside = boundary + step if temperature_K < low else boundary - step
+        inside = boundary + step if boundary == low else boundary - step
         if inside <= 0.0:
             inside = boundary + step  # force positive probe
         boundary_log = float(ref.log10_pressure(boundary))
