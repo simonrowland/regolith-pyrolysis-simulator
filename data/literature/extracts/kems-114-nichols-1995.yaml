@@ -252,7 +252,7 @@ species:
           1675-1875 K. Absolute pressures not determined; P proportional
           to I+T (sentence continues onto p.1048).
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -406,7 +406,7 @@ species:
         figure: "1"
         note: Figure 1 van't Hoff plot of log(I+T) vs 1e4/T; Mg series
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -418,6 +418,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: Mg(g)
@@ -469,7 +470,7 @@ species:
         figure: "1"
         note: "Figure 1 printed annotation: Mg slope = 2.76(1)"
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -481,6 +482,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -622,7 +624,7 @@ species:
         down in the range. Mg, Fe, and SiO are the dominant species
         detected in the equilibrium gas-phase between 1675-1875 K.
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -689,7 +691,7 @@ species:
         obtained for Fe. Each data point is an average of up to five
         measurements at a given temperature.
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -701,6 +703,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: Mg(g)
@@ -743,7 +746,7 @@ species:
         figure: "1"
       quote: "Mg slope = 2.76(1)"
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -755,6 +758,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -845,7 +849,7 @@ species:
         paragraph: results
         note: Mg, Fe, and SiO are the dominant species 1675-1875 K
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -857,6 +861,7 @@ species:
       regime: kems_effusion
       units: as published (I+T proportional to partial pressure; no absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: Fe(g)
@@ -894,7 +899,7 @@ species:
         Mg, Fe, and SiO are the dominant species detected in the
         equilibrium gas-phase between 1675-1875 K.
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -906,6 +911,7 @@ species:
       regime: kems_effusion
       units: as published (I+T proportional to partial pressure; no absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: Fe(g)
@@ -933,7 +939,7 @@ species:
         paragraph: results
         note: SiO dominant Si-bearing species; summary p.1048 repeats 1675-1875 K
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -945,6 +951,7 @@ species:
       regime: kems_effusion
       units: as published (I+T proportional to partial pressure; no absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: SiO(g)
@@ -977,7 +984,7 @@ species:
         pdf_page_index: 1
         figure: "1"
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -989,6 +996,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: SiO(g)
@@ -1009,7 +1017,7 @@ species:
         figure: "1"
         note: "Figure 1 printed annotation: SiO slope = -2.13(4)"
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1021,6 +1029,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -1063,7 +1072,7 @@ species:
         most abundant Si-species in the equilibrium vapor of forsterite
         between 1675 and 1875 K.
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1075,6 +1084,7 @@ species:
       regime: kems_effusion
       units: as published (I+T proportional to partial pressure; no absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: SiO(g)
@@ -1110,7 +1120,7 @@ species:
         Figure 1, a van't Hoff plot, shows the linear behavior of I⁺T for
         the Mg, SiO and SiO2 as a function of 1/T.
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1122,6 +1132,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: SiO(g)
@@ -1151,7 +1162,7 @@ species:
         figure: "1"
       quote: "SiO slope = -2.13(4)"
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1163,6 +1174,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -1190,7 +1202,7 @@ species:
         pdf_page_index: 0
         paragraph: results
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1202,6 +1214,7 @@ species:
       regime: kems_effusion
       units: abundance relative to SiO (not absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: SiO2(g)
@@ -1253,7 +1266,7 @@ species:
         pdf_page_index: 1
         figure: "1"
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1265,6 +1278,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: SiO2(g)
@@ -1285,7 +1299,7 @@ species:
         figure: "1"
         note: "Figure 1 printed annotation: SiO2 slope = -2.7(8)"
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1297,6 +1311,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -1344,7 +1359,7 @@ species:
         only in an abundance relative to SiO similar to those observed
         by [9] for solid SiO2.
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1356,6 +1371,7 @@ species:
       regime: kems_effusion
       units: abundance relative to SiO (not absolute P)
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: SiO2(g)
@@ -1405,7 +1421,7 @@ species:
         Figure 1, a van't Hoff plot, shows the linear behavior of I⁺T for
         the Mg, SiO and SiO2 as a function of 1/T.
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1417,6 +1433,7 @@ species:
       regime: kems_effusion
       units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
       values:
+        system_class: silicate_melt
         quantity: I_T_vs_1_over_T
         method_class: measured_direct
         gas_species: SiO2(g)
@@ -1446,7 +1463,7 @@ species:
         figure: "1"
       quote: "SiO2 slope = -2.7(8)"
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1458,6 +1475,7 @@ species:
       regime: kems_effusion
       units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
       values:
+        system_class: silicate_melt
         quantity: vant_hoff_log_IT_slope
         method_class: model_derived
         evidence_kind: model
@@ -1577,7 +1595,7 @@ species:
         pdf_page_index: 0
         paragraph: results
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1589,6 +1607,7 @@ species:
       regime: kems_effusion
       units: not quantitative
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: O(g)
@@ -1618,7 +1637,7 @@ species:
         Oxygen was also abundant as O and O2, but high background
         signals prevented quantitative measurements
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1630,6 +1649,7 @@ species:
       regime: kems_effusion
       units: not quantitative
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: O(g)
@@ -1653,7 +1673,7 @@ species:
         pdf_page_index: 0
         paragraph: results
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1665,6 +1685,7 @@ species:
       regime: kems_effusion
       units: not quantitative
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: O2(g)
@@ -1695,7 +1716,7 @@ species:
         Oxygen was also abundant as O and O2, but high background
         signals prevented quantitative measurements
       T_range_K: [1675.0, 1875.0]
-      phase: vapor_over_Fo90_forsterite
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: forsterite
@@ -1707,6 +1728,7 @@ species:
       regime: kems_effusion
       units: not quantitative
       values:
+        system_class: silicate_melt
         quantity: species_detected_absolute_P_not_tabulated
         method_class: measured_direct
         gas_species: O2(g)
