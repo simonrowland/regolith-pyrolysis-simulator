@@ -64,11 +64,12 @@ observations:
     species:
       formula: Al
       phase:
-        tag: value
-        value: l
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -157,11 +158,12 @@ observations:
     species:
       formula: Ca
       phase:
-        tag: value
-        value: l
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
