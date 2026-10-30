@@ -16840,23 +16840,25 @@ class Migrator:
                 sample = values_raw.get("sample")
                 mg_context = mg_by_sample.get(str(sample))
                 mg_values = mg_context.get("values") if isinstance(mg_context, Mapping) else None
-                if not isinstance(mg_values, Mapping):
-                    continue
+                mg_values = mg_values if isinstance(mg_values, Mapping) else {}
                 t_k, _trail = convert_temperature_to_k(context.get("T_C"), "C")
                 si_flux = _as_dec_or_none(values_raw.get("value_as_printed"))
                 mg_flux = _as_dec_or_none(mg_values.get("value_as_printed"))
-                if t_k is None or si_flux is None or mg_flux is None:
+                if t_k is None or si_flux is None:
                     continue
                 locator = context.get("locator")
                 row_locator = dict(locator) if isinstance(locator, Mapping) else {}
-                pO2 = cls._oxygen_efflux_condition(si_flux, mg_flux, t_k, row_locator)
-                if pO2 is None:
-                    continue
+                pO2 = (
+                    cls._oxygen_efflux_condition(si_flux, mg_flux, t_k, row_locator)
+                    if mg_flux is not None
+                    else None
+                )
                 values = dict(values_raw)
                 values["quantity_as_printed"] = values.get("quantity")
                 values["quantity"] = Quantity.EVAPORATION_FLUX_PER_AREA.value
                 values["J_Si_mol_cm2_s"] = str(si_flux)
-                values["J_Mg_mol_cm2_s"] = str(mg_flux)
+                if mg_flux is not None:
+                    values["J_Mg_mol_cm2_s"] = str(mg_flux)
                 values["T_K"] = str(t_k)
                 experiment = (
                     "b-133-evaporation"
@@ -16873,7 +16875,11 @@ class Migrator:
                         "type": "printed_areal_flux_context",
                         "experiment": experiment,
                         "values": values,
-                        "point_conditions": {**conditions, "fO2_Pa": pO2},
+                        "point_conditions": (
+                            {**conditions, "fO2_Pa": pO2}
+                            if pO2 is not None
+                            else dict(conditions)
+                        ),
                     }
                 )
             species["SiO"] = {
@@ -16953,14 +16959,7 @@ class Migrator:
                 values["composition_basis_as_published"] = "end_of_run_residue"
                 values["flux_time_basis_as_published"] = "interval_average"
                 values["series"] = series
-                pO2 = (
-                    series[0].get("point_conditions", {}).get("fO2_Pa")
-                    if series and isinstance(series[0], Mapping)
-                    else None
-                )
                 point_conditions = dict(observation.get("point_conditions") or {})
-                if pO2 is not None:
-                    point_conditions["fO2_Pa"] = pO2
                 prepared_rows.append(
                     {
                         **dict(observation),

@@ -4,6 +4,7 @@ from dataclasses import replace
 from decimal import Decimal
 
 import pytest
+import yaml
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import (
@@ -22,6 +23,7 @@ from simulator.battery.migrate import (
     REPO_ROOT,
     Migrator,
     convert_evaporation_flux_per_area_to_kg_per_m2_s,
+    load_yaml,
     map_method,
 )
 from simulator.battery.score import (
@@ -60,6 +62,21 @@ def _flux_rows(result, source_id: str):
         and quantity_token(observation.identity)
         is Quantity.EVAPORATION_FLUX_PER_AREA
     )
+
+
+def _migrate_edited_extract(tmp_path, source_file: str, edit_extract):
+    extract_path = REPO_ROOT / "data" / "literature" / "extracts" / source_file
+    document = load_yaml(extract_path)
+    edit_extract(document)
+    edited_path = tmp_path / source_file
+    edited_path.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    migrator = Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(edited_path)
+    migrator.finalize()
+    return migrator.result
 
 
 def test_areal_flux_quantity_has_one_canonical_unit_conversion() -> None:
@@ -220,6 +237,60 @@ def test_missing_efflux_pressure_is_a_typed_refusal(migrated_flux_sources) -> No
 
     prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, without_derived_pressure)
 
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {"reason": "missing_efflux_derived_pO2"}
+
+
+def test_richter_2002_unpaired_si_flux_is_retained_and_refused(tmp_path) -> None:
+    def remove_mg_flux(document):
+        contexts = document["species"]["Mg"]["context"]
+        context = next(
+            row
+            for row in contexts
+            if row.get("values", {}).get("sample") == "B-133-11"
+        )
+        context["values"].pop("value_as_printed")
+
+    result = _migrate_edited_extract(
+        tmp_path, "kems-037-richter-2002.yaml", remove_mg_flux
+    )
+    rows = _flux_rows(result, "kems-037-richter-2002")
+    candidate = next(row for row in rows if "b-133-11" in row.observation_id.casefold())
+
+    assert len(rows) == 10
+    assert candidate.identity.fO2_Pa.is_unknown
+    assert "fO2_Pa" not in candidate.point_conditions
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate)
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {"reason": "missing_efflux_derived_pO2"}
+
+
+def test_richter_2007_unpaired_series_row_does_not_inherit_parent_pressure(
+    tmp_path,
+) -> None:
+    def remove_mg_flux(document):
+        observations = document["species"]["Mg"]["observations"]
+        found = False
+        for observation in observations:
+            values = observation.get("values", {})
+            if values.get("quantity") != "published_mass_loss_and_reduced_flux_time_series":
+                continue
+            for item in values.get("series", ()):
+                if item.get("sample") == "R3-11":
+                    item.pop("J_mol_cm2_s")
+                    found = True
+        assert found
+
+    result = _migrate_edited_extract(
+        tmp_path, "kems-010-richter-2007.yaml", remove_mg_flux
+    )
+    rows = _flux_rows(result, "kems-010-richter-2007")
+    candidate = next(row for row in rows if "r3-11" in row.observation_id.casefold())
+
+    assert len(rows) == 32
+    assert candidate.identity.fO2_Pa.is_unknown
+    assert "fO2_Pa" not in candidate.point_conditions
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate)
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail == {"reason": "missing_efflux_derived_pO2"}
 
