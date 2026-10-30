@@ -22,6 +22,7 @@ from simulator.battery.enums import (
     Rail,
     RefusalReason,
 )
+from simulator.battery.identity import quantity_token
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
