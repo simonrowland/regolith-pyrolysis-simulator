@@ -1350,6 +1350,7 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
             is not None
         )
         or _volatile_closure_component(name) is not None
+        or _is_printed_chemical_component_name(name)
         or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         for name in names
     ):
@@ -5188,7 +5189,7 @@ def _located_printed_and_initial(
     conversion_map = _oxide_mass_percent_components(wt)
     if not conversion_map:
         return None, None
-    printed = located_value(_runtime_printed_composition_values(printed_map), locator)
+    printed = located_value(_printed_map_payload(printed_map), locator)
     state = _wt_percent_conversion_state(
         wt, closure_context=closure_context or wt
     )
@@ -13233,7 +13234,7 @@ def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
 def _runtime_printed_composition_values(
     wt: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Keep printed strings and Decimalize numeric source values for runtime maps."""
+    """Keep numeric values as Decimal in observation-row point conditions."""
 
     return {
         str(name): (
@@ -13250,11 +13251,11 @@ def _printed_composition_candidates(
     vocabulary: tuple[VocabEntry, ...],
     *,
     fallback_locator: Locator | None = None,
-) -> list[tuple[PrintedFingerprint, Locator, str, Mapping[str, Any]]]:
+) -> list[tuple[PrintedFingerprint, Locator, str]]:
     """Every vocabulary-named printed map under ``roots`` that has a locator."""
 
     names = {e.printed for e in vocabulary if e.field == "sample.printed_composition"}
-    found: list[tuple[PrintedFingerprint, Locator, str, Mapping[str, Any]]] = []
+    found: list[tuple[PrintedFingerprint, Locator, str]] = []
 
     def walk(obj: object, parent_loc: Locator | None, depth: int) -> None:
         if depth > 14:
@@ -13268,18 +13269,8 @@ def _printed_composition_candidates(
                         value, loc
                     )
                     fingerprint = _printed_fingerprint(raw_value)
-                    components = (
-                        raw_value.get("components")
-                        if isinstance(raw_value, Mapping)
-                        and isinstance(raw_value.get("components"), Mapping)
-                        else raw_value
-                    )
-                    if (
-                        fingerprint is not None
-                        and value_loc is not None
-                        and isinstance(components, Mapping)
-                    ):
-                        found.append((fingerprint, value_loc, name, components))
+                    if fingerprint is not None and value_loc is not None:
+                        found.append((fingerprint, value_loc, name))
                 if name not in _WALK_SKIP_KEYS and name != "locator":
                     walk(value, loc, depth + 1)
         elif isinstance(obj, list):
@@ -13316,17 +13307,10 @@ def _printed_composition_from_roots(
         preferred_fps = {item[0] for item in preferred}
         if len(preferred_fps) != 1:
             return None
-        fingerprint, loc, _name, components = preferred[0]
+        fingerprint, loc, _name = preferred[0]
     else:
-        fingerprint, loc, _name, components = found[0]
-    numeric_components = {
-        name: components[name]
-        for name, _value in fingerprint
-        if name in components
-    }
-    return located_value(
-        _runtime_printed_composition_values(numeric_components), loc
-    )
+        fingerprint, loc, _name = found[0]
+    return located_value({k: v for k, v in fingerprint}, loc)
 
 
 def _is_printed_initial_charge(
@@ -13378,7 +13362,7 @@ def _printed_map_is_typed_initial(
         return True
     return any(
         fingerprint == target and name == "starting_glass_wt_pct"
-        for fingerprint, _located, name, _components
+        for fingerprint, _located, name
         in _printed_composition_candidates(
             _lab_roots(equipment, values), vocabulary, fallback_locator=locator
         )
@@ -13432,7 +13416,7 @@ def _printed_map_is_observation_level(
     own_roots = _lab_roots(equipment, own_values)
     if any(
         fingerprint == target
-        for fingerprint, _loc, _name, _components
+        for fingerprint, _loc, _name
         in _printed_composition_candidates(
             own_roots, vocabulary, fallback_locator=locator
         )
@@ -17757,6 +17741,15 @@ class Migrator:
         total_iron_notice = _total_iron_reported_as_feo_notice(
             projected_oxide_map, q_token, obs_id
         )
+        projection_notice = _composition_projection_notice(
+            projected_oxide_map or initial_oxide_map,
+            closure_context=projected_closure_context,
+            quantity=q_token if isinstance(q_token, Quantity) else None,
+            origin=obs_id,
+        )
+        projection_notices = (
+            () if projection_notice is None else (projection_notice,)
+        )
         composition_role_refusal: list[str] = []
         composition_role, composition_role_error = _declared_composition_role(values)
         if (
@@ -18807,9 +18800,30 @@ class Migrator:
                     **(point_conditions or {}),
                     "composition": derived,
                 }
+            row_printed_values = row_sample.printed_composition.state.value
+            row_printed_fingerprint = _printed_fingerprint(row_printed_values)
+            for source_values in (values, obs.get("equipment")):
+                candidate_values = _source_printed_composition_values(
+                    None, source_values
+                )
+                if (
+                    row_printed_fingerprint is not None
+                    and _printed_fingerprint(candidate_values)
+                    == row_printed_fingerprint
+                ):
+                    row_printed_values = candidate_values
+                    break
+            row_printed_composition = replace(
+                row_sample.printed_composition,
+                state=State.of(
+                    _runtime_printed_composition_values(
+                        row_printed_values
+                    )
+                ),
+            )
             point_conditions = {
                 **(point_conditions or {}),
-                "printed_composition": row_sample.printed_composition,
+                "printed_composition": row_printed_composition,
             }
             if (
                 not declared_order
@@ -19529,6 +19543,7 @@ class Migrator:
                             if total_iron_notice is None
                             else (total_iron_notice,)
                         ),
+                        *projection_notices,
                         *validity_notices,
                     ),
                     equipment=obs.get("equipment"),
@@ -19700,6 +19715,7 @@ class Migrator:
                                 if total_iron_notice is None
                                 else (total_iron_notice,)
                             ),
+                            *projection_notices,
                             *validity_notices,
                         ),
                         equipment=obs.get("equipment"),
@@ -19770,12 +19786,6 @@ class Migrator:
         )
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)
-        projection_notice = _composition_projection_notice(
-            projected_oxide_map,
-            closure_context=projected_closure_context,
-            quantity=q_token if isinstance(q_token, Quantity) else None,
-            origin=obs_id,
-        )
         if projection_notice is not None:
             observation_notices.append(projection_notice)
         observation_notices.extend(validity_notices)
@@ -21353,7 +21363,7 @@ class Migrator:
                 point_conditions = {
                     **(point_conditions or {}),
                     "printed_composition": located_value(
-                        child_printed_map,
+                        _runtime_printed_composition_values(child_printed_map),
                         point_locator,
                     ),
                 }
