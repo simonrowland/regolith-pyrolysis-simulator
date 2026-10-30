@@ -5758,6 +5758,82 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     assert nacl
     assert nacl[0].experiment_id == table2_experiment.experiment_id
 
+
+def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    cases = (
+        (
+            "shornikov-1997-diopside-vaporization.yaml",
+            "shornikov-1997-diopside-kems",
+            "shornikov-1997-mo-kems",
+            ("Mo",),
+            "molybdenum cells",
+            174,
+            "shornikov_1997_ca_pressure_table1",
+            "orifice_to_sample_area_ratio",
+            "bound",
+            "0.0025",
+        ),
+        (
+            "kems-022-demaria-1971.yaml",
+            "demaria-1971-main-kems",
+            "demaria-1971-re-kems",
+            ("Re",),
+            "rhenium containers having a knife-edge effusion hole 2.3 mm in diameter",
+            1368,
+            "demaria_1971_al2o_psat_table4",
+            "orifice_diameter_m",
+            "point",
+            "0.0023",
+        ),
+    )
+    for (
+        filename,
+        experiment_local,
+        bench_local,
+        expected,
+        quote,
+        page,
+        obs_local,
+        geometry_field,
+        geometry_kind,
+        geometry_value,
+    ) in cases:
+        result = _migrate_real_extract(tmp_path / Path(filename).stem, filename)
+        experiment = next(
+            item
+            for item in result.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{experiment_local}")
+        )
+        assert experiment.bench_id is not None
+        assert experiment.bench_id.endswith(f"::bench::{bench_local}")
+        bench = result.benches[experiment.bench_id]
+        assert bench.cell_materials is not None
+        assert tuple(item.state.value.value for item in bench.cell_materials) == expected
+        assert all(item.locator is not None for item in bench.cell_materials)
+        assert all(item.locator.published_page == page for item in bench.cell_materials)
+        assert all(quote in item.locator.paragraph for item in bench.cell_materials)
+        assert bench.geometry is not None
+        geometry = getattr(bench.geometry, geometry_field)
+        assert geometry is not None and geometry.locator is not None
+        assert geometry.locator.published_page == page
+        assert geometry.state.value.kind.value == geometry_kind
+        assert str(
+            geometry.state.value.bound_value
+            if geometry_kind == "bound"
+            else geometry.state.value.point
+        ) == geometry_value
+        observations = [
+            item
+            for item in result.observations.values()
+            if obs_local in item.observation_id.split("::")
+        ]
+        assert observations
+        assert all(item.experiment_id == experiment.experiment_id for item in observations)
+
     allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
     emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
     mo = experiment_named(allibert, "allibert-1981-mo-kems")
