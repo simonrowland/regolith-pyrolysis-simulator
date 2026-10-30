@@ -77,6 +77,17 @@ KEMS_BACKGROUND_HIGH_PA = Decimal("1e-2")
 # ~10 Pa ceiling alone.
 KEMS_CELL_PRESSURE_MAX_PA = Decimal("10")
 
+_CALIBRATION_STANDARD_FIELDS = frozenset(
+    {
+        "reference_substance",
+        "reference_substances",
+        "calibration_substance",
+        "pressure_reference_substance",
+        "pressure_standard_substance",
+        "standard",
+    }
+)
+
 
 @dataclass(frozen=True)
 class GateCheck:
@@ -188,7 +199,13 @@ def _calibration_not_grounded_detail(calibration: object) -> dict[str, str] | No
             "calibration_notice": "No calibration entry has been recorded yet.",
         }
     if isinstance(calibration, dict):
-        for located in calibration.values():
+        printed_standard = any(
+            field in _CALIBRATION_STANDARD_FIELDS
+            and isinstance(located, Located)
+            and located.state.is_value
+            for field, located in calibration.items()
+        )
+        for field, located in calibration.items():
             if not isinstance(located, Located) or located.state.is_value:
                 continue
             reason = (located.state.reason or "").casefold()
@@ -196,6 +213,8 @@ def _calibration_not_grounded_detail(calibration: object) -> dict[str, str] | No
                 record_status = "not_printed"
                 notice = "The source record says the calibration was not printed."
             elif "not_published" in reason:
+                if field not in _CALIBRATION_STANDARD_FIELDS and printed_standard:
+                    continue
                 record_status = "not_published"
                 notice = "The source record says the calibration standard was not published."
             else:

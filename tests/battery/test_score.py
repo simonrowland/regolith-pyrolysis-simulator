@@ -1084,6 +1084,78 @@ def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag()
     )
 
 
+@pytest.mark.parametrize(
+    ("source", "standard_field", "standard", "auxiliary_fields"),
+    (
+        (
+            "Ostrovski 2000",
+            "reference_substance",
+            "Gold 99.999 wt% and anhydrous CaF2 99.9 wt%",
+            ("multiplier_isotope_corrections",),
+        ),
+        (
+            "Shults 1994",
+            "reference_substance",
+            "silver and gold vapors",
+            ("ionization_cross_sections", "multiplier_or_isotope_corrections"),
+        ),
+        (
+            "Shults 1995",
+            "reference_substances",
+            "pure CaO and Al2O3 oxides; I0 currents measured in vapor over those oxides",
+            ("pressure_conversion",),
+        ),
+    ),
+)
+def test_auxiliary_unpublished_calibration_does_not_flag_printed_standard(
+    source: str,
+    standard_field: str,
+    standard: str,
+    auxiliary_fields: tuple[str, ...],
+) -> None:
+    experiment = F.kems_experiment(calibrated=False)
+    assert experiment.apparatus is not None
+    calibration = {
+        standard_field: Located(
+            State.of(standard), locator=F.loc(page=4)
+        ),
+        **{
+            field: Located(State.unknown("not_published"), locator=F.loc(page=4))
+            for field in auxiliary_fields
+        },
+    }
+    experiment = replace(
+        experiment,
+        apparatus=replace(experiment.apparatus, calibration=calibration),
+    )
+    reference = _uncalibrated_kems_partial_row(
+        experiment,
+        f"{source.casefold().replace(' ', '-')}-partial-pressure",
+        Decimal("1"),
+    )
+
+    def must_not_predict(*_args, **_kwargs):
+        pytest.fail(
+            "an auxiliary not_published reason must not waive calibration refusal"
+        )
+
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        predict=must_not_predict,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert residual.refusal.detail["primary_check"] == "kems_calibration"
+    assert not any(
+        notice.reason.startswith("calibration_not_grounded:")
+        for notice in residual.notices
+    )
+
+
 def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
