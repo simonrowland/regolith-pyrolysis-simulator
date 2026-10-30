@@ -5757,6 +5757,11 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     nacl = observations_named(hastie, "hastie_1981_nacl_liquid_logP_prose")
     assert nacl
     assert nacl[0].experiment_id == table2_experiment.experiment_id
+    allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
+    mo = experiment_named(allibert, "allibert-1981-mo-kems")
+    assert all(item.experiment_id != mo.experiment_id for item in emf)
+    assert allibert.experiments[emf[0].experiment_id].bench_id is None
 
 
 def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
@@ -5833,13 +5838,6 @@ def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
         ]
         assert observations
         assert all(item.experiment_id == experiment.experiment_id for item in observations)
-
-    allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
-    emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
-    mo = experiment_named(allibert, "allibert-1981-mo-kems")
-    assert all(item.experiment_id != mo.experiment_id for item in emf)
-    assert allibert.experiments[emf[0].experiment_id].bench_id is None
-
 
 def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
     source_ids = (
