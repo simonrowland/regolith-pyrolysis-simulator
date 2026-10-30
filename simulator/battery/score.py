@@ -517,6 +517,10 @@ FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
 
+_OPENIMCC_SP_PACK_EVALUATED_STATES = frozenset(
+    {ExecutionState.PRODUCED, ExecutionState.ATTEMPTED_UNAVAILABLE}
+)
+
 
 @dataclass(frozen=True)
 class EnginePrediction:
@@ -562,7 +566,7 @@ class EnginePrediction:
             else None
         )
         identity_notices = []
-        if evaluation_produced:
+        if self.execution.state in _OPENIMCC_SP_PACK_EVALUATED_STATES:
             identity_notices.append(_openimcc_sp_identity_notice(quantity, authority))
         if p2o5_screening_proxy and evaluation_produced and self.value is not None:
             identity_notices.append(
