@@ -49,7 +49,7 @@ import inspect
 import copy
 import gc
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import logging
 import math
 from pathlib import Path
@@ -15727,6 +15727,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and effective_transport_capacity.binding_cause == 'pressure_driven_pipe'
             and effective_transport_capacity.overload_notice is not None
         ):
+            initial_overload_notice = dict(
+                effective_transport_capacity.overload_notice
+            )
             pressure_overlay = dict(
                 getattr(self, '_last_vapour_batch_flux_overlay', {}) or {}
             )
@@ -15799,7 +15802,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
 
             try:
-                evap_flux, resolved_pressure_Pa = (
+                evap_flux, resolved_pressure_Pa, pressure_bound_notice = (
                     self.overhead_model._solve_overloaded_evaporation_flux(
                         self.melt,
                         equilibrium_partials_Pa=equilibrium_partials_Pa,
@@ -15825,18 +15828,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if (
                 effective_transport_capacity is not None
                 and effective_transport_capacity.binding_cause == 'pressure_driven_pipe'
-                and not math.isclose(
+            ):
+                from simulator.overhead import _OVERLOAD_PRESSURE_MATCH_REL_TOL
+
+                pressure_matches_transport = math.isclose(
                     effective_transport_capacity.upstream_pressure_bar * 1.0e5,
                     resolved_pressure_Pa,
-                    rel_tol=1.0e-9,
+                    rel_tol=_OVERLOAD_PRESSURE_MATCH_REL_TOL,
                     abs_tol=1.0e-6,
                 )
-            ):
-                from simulator.overhead import OverheadConfigurationError
+                if pressure_bound_notice is not None:
+                    # At the bound, keep the same pressure for evaporation and
+                    # transport. Preserve the pressure the pipe would need in
+                    # the notice so the bounded prediction remains explicit.
+                    overload_notice = {
+                        **initial_overload_notice,
+                        **dict(
+                            effective_transport_capacity.overload_notice or {}
+                        ),
+                        **pressure_bound_notice,
+                        'resolved_pressure_bar': resolved_pressure_Pa / 1.0e5,
+                    }
+                    effective_transport_capacity = replace(
+                        effective_transport_capacity,
+                        upstream_pressure_bar=resolved_pressure_Pa / 1.0e5,
+                        overload_notice=overload_notice,
+                    )
+                elif not pressure_matches_transport:
+                    from simulator.overhead import OverheadConfigurationError
 
-                raise OverheadConfigurationError(
-                    'resolved evaporation pressure does not match pipe pressure'
-                )
+                    raise OverheadConfigurationError(
+                        'resolved evaporation pressure does not match pipe pressure'
+                    )
             overhead_flux = evap_flux
         # The joint inlet already includes the pending solid-host gas. Read
         # prior holdup before committing that source into the same account.

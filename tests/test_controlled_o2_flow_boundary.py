@@ -238,11 +238,13 @@ def test_113_kg_hr_flash_solves_same_hour_pressure_to_pipe_flow():
         )
         return _flux({"Na": 113.0 * remaining_fraction})
 
-    flux, pressure_Pa = model._solve_overloaded_evaporation_flux(
-        melt,
-        equilibrium_partials_Pa={"Na": equilibrium_pressure_Pa},
-        p_downstream_bar=0.0,
-        flux_at_partials=provider_at_partials,
+    flux, pressure_Pa, pressure_bound_notice = (
+        model._solve_overloaded_evaporation_flux(
+            melt,
+            equilibrium_partials_Pa={"Na": equilibrium_pressure_Pa},
+            p_downstream_bar=0.0,
+            flux_at_partials=provider_at_partials,
+        )
     )
     assert callback_total_pressures_Pa[-1] == pytest.approx(pressure_Pa)
     outflow_kg_hr = model._pipe_conductance(
@@ -255,3 +257,49 @@ def test_113_kg_hr_flash_solves_same_hour_pressure_to_pipe_flow():
     assert pressure_Pa > melt.p_total_mbar * 100.0
     assert 0.0 < flux.total_kg_hr < 113.0
     assert flux.total_kg_hr == pytest.approx(outflow_kg_hr, rel=1.0e-9)
+    assert pressure_bound_notice is None
+
+
+def test_unbracketed_overload_returns_setpoint_bound_with_notice():
+    model = OverheadGasModel()
+    melt = SimpleNamespace(p_total_mbar=0.2, temperature_C=1150.0)
+
+    flux, pressure_Pa, notice = model._solve_overloaded_evaporation_flux(
+        melt,
+        equilibrium_partials_Pa={"Na": 10.0},
+        p_downstream_bar=0.0,
+        fixed_inlet_species_kg_hr={"Na": 1.0},
+        flux_at_partials=lambda _partials, _pressure: _flux({}),
+    )
+
+    assert flux.total_kg_hr == 0.0
+    assert pressure_Pa == pytest.approx(20.0)
+    assert notice == {
+        "reason": "evaporation_pressure_bound_no_bracket",
+        "authority_level": "extrapolated",
+    }
+
+
+def test_unresolved_composition_returns_setpoint_bound_with_notice():
+    model = OverheadGasModel()
+    melt = SimpleNamespace(p_total_mbar=0.2, temperature_C=1150.0)
+
+    def switching_flux(partials, _pressure):
+        if partials["Na"] > partials["K"]:
+            return _flux({"K": 1.0})
+        return _flux({"Na": 1.0})
+
+    flux, pressure_Pa, notice = model._solve_overloaded_evaporation_flux(
+        melt,
+        equilibrium_partials_Pa={"Na": 10.0, "K": 10.0},
+        p_downstream_bar=0.0,
+        flux_at_partials=switching_flux,
+    )
+
+    assert flux.total_kg_hr == pytest.approx(1.0)
+    assert pressure_Pa == pytest.approx(20.0)
+    assert notice == {
+        "reason": "evaporation_composition_no_convergence",
+        "authority_level": "extrapolated",
+        "species": "Na",
+    }
