@@ -1566,23 +1566,45 @@ families:
       condensation_reference_at_1mbar_C: 1250
     vaporisation_coefficients:
       evaporation_alpha:
-        value: 0.02
-        source: REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800
-          K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy
+        # This coefficient prices Fe(g) leaving ferrous silicate melt. No
+        # admissible direct melt measurement is present in the local corpus,
+        # so alpha=1 is the Hertz-Knudsen analytical ceiling over the 1200-2500
+        # K process window, not a tier-1 measured melt coefficient. Pound 1972
+        # Table 1 reports McCabe et al.'s 0.9 for solid electrolytic Fe at
+        # 1358-1520 K; that pure-element-condensed result is fenced from this
+        # melt system. Fedkin/Alexander melt fits of 0.23-0.28 at 1973-2273 K
+        # remain unscored model fits and are the target for future certification.
+        value:
+          form: scalar
+          value: 1.0
+          temperature_range_K: [1200, 2500]
+          notice: 'No measured intrinsic alpha for Fe(g) leaving silicate melt is available. The Pound 1972 / McCabe et al. solid-electrolytic-Fe alpha=0.9 row is fenced as pure-element condensed; unscored Fedkin/Alexander melt fits of 0.23-0.28 at 1973-2273 K are a certification target, not a measurement.'
+        status: analytical_upper_bound
+        source: 'Hertz-Knudsen alpha=1 analytical upper bound for Fe(g) leaving ferrous silicate melt; no admissible direct melt measurement. Pound 1972 Table 1 / McCabe et al. 1956 gives alpha=0.9 for solid electrolytic Fe (pure-element condensed, fenced). Fedkin/Alexander melt fits of 0.23-0.28 at 1973-2273 K are unscored and remain a certification target.'
+        competing_sources:
+        - source: REF-040 Pound 1972 JPCRD 1:135-146 Table 1, reporting McCabe et al. [1956]
+          value: 0.9
+          system_class: pure_element_condensed
+          temperature_range_K: [1358, 1520]
+          envelope: [0.8, 1.0]
+          use: native_metal_pond_only
+          liquid_transition_K: 1811
+          notice: 'Solid electrolytic Fe Langmuir-Knudsen measurement; the liquid-metal pond above 1811 K is outside its phase band and must be flagged.'
         T_band_K:
-        - 1873
-        - 2373
+        - 1200
+        - 2500
         envelope:
-        - 0.011
-        - 0.02
+        - 0.0
+        - 1.0
         tier: 2
+        tag: hkl_ideal_upper_bound_status_bearing
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 1873
-        - 2373
+        - 1200
+        - 2500
         envelope:
-        - 0.011
-        - 0.02
+        - 0.0
+        - 1.0
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
       acquisition_flag: vapour_pressure_out_of_range:Fe

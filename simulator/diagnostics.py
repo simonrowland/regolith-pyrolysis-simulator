@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import math
-from typing import Any, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
@@ -1020,8 +1020,27 @@ def _wall_deposit_authority_payload(
         payload["evaporation_transport_notices_by_species"] = _plain_mapping(
             evaporation_transport_notices_by_species
         )
-        payload["authority_level"] = "extrapolated"
-        payload["message"] += " Evaporation transport includes EXTRAPOLATED or unavailable channels; source domains and reasons remain attached."
+        records = (
+            record
+            for species_records in evaporation_transport_notices_by_species.values()
+            if isinstance(species_records, Mapping)
+            for record in species_records.values()
+        )
+        authority = _evaporation_transport_authority_level(records)
+        if (
+            authority == "extrapolated"
+            or payload.get("authority_level") != "extrapolated"
+        ):
+            payload["authority_level"] = authority
+        authority_description = {
+            "extrapolated": "EXTRAPOLATED",
+            "status_bearing": "status-bearing",
+            "unavailable": "unavailable",
+        }[authority]
+        payload["message"] += (
+            f" Evaporation transport includes {authority_description} channels; "
+            "source domains and reasons remain attached."
+        )
     if surface_geometry_provenance:
         payload["surface_geometry_provenance"] = _plain_mapping(
             surface_geometry_provenance)
@@ -1029,6 +1048,19 @@ def _wall_deposit_authority_payload(
             geometry_status_bearing)
         payload["surface_geometry_code"] = WALL_SURFACE_GEOMETRY_PROVENANCE_CODE
     return payload
+
+
+def _evaporation_transport_authority_level(records: Iterable[Any]) -> str:
+    levels = {
+        str(record.get("authority_level"))
+        for record in records
+        if isinstance(record, Mapping)
+    }
+    if "extrapolated" in levels:
+        return "extrapolated"
+    if "status_bearing" in levels:
+        return "status_bearing"
+    return "unavailable"
 
 
 def _payload_deposited_species(payload: Mapping[str, Any]) -> tuple[str, ...]:
@@ -1564,7 +1596,7 @@ def _attach_pareto_source_notices(
     for species, records in wall_notice.get("evaporation_transport_notices_by_species", {}).items():
         entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_transport_unavailable"})
         entry["evaporation_transport_notices"] = _plain_mapping(records)
-        authority = "extrapolated" if any(record.get("authority_level") == "extrapolated" for record in records.values()) else "unavailable"
+        authority = _evaporation_transport_authority_level(records.values())
         entry["authority_level"] = authority
         if entry.get("status") == "ok":
             entry["status"] = authority

@@ -1617,6 +1617,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         alpha_used_by_species: dict[str, float] = {}
         alpha_evaluations_by_species: dict[str, dict[str, Any]] = {}
         alpha_authority_status_by_species: dict[str, str] = {}
+        alpha_authority_notices_by_species: dict[str, dict[str, Any]] = {}
         flux_uncertainty_pct: dict[str, float] = {}
         series_flux_diagnostics: dict[
             str, dict[str, float | str | bool | None]
@@ -1827,6 +1828,33 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     alpha_authority_status_by_species[species] = (
                         alpha_authority_status
                     )
+                    alpha_notice = (
+                        alpha_spec.get("notice")
+                        if isinstance(alpha_spec, Mapping)
+                        else None
+                    )
+                    if alpha_notice:
+                        alpha_extrapolated = bool(
+                            alpha_evaluation.get("alpha_s_extrapolated")
+                        )
+                        alpha_authority_notices_by_species[species] = {
+                            "status": (
+                                "extrapolated"
+                                if alpha_extrapolated
+                                else ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+                            ),
+                            "authority_level": (
+                                "extrapolated"
+                                if alpha_extrapolated
+                                else "status_bearing"
+                            ),
+                            "alpha_authority_status": alpha_authority_status,
+                            "temperature_K": float(T_K),
+                            "valid_range_K": alpha_evaluation.get(
+                                "alpha_s_valid_range_K"
+                            ),
+                            "reason": str(alpha_notice),
+                        }
                 flux_kg_hr[species] = rate_kg_hr
             else:
                 below_threshold_flux_kg_hr[species] = rate_kg_hr
@@ -1871,6 +1899,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             diagnostic["alpha_authority_status_by_species"] = (
                 alpha_authority_status_by_species
             )
+        if alpha_authority_notices_by_species:
+            diagnostic["alpha_authority_notices_by_species"] = (
+                alpha_authority_notices_by_species
+            )
         _attach_missing_alpha_records(
             diagnostic, missing_alpha, stoich_by_species
         )
@@ -1890,6 +1922,16 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "WARNING: alpha=1.0 prototype fallback used for unmeasured "
                 "evaporation species: "
                 + ", ".join(sorted(unmeasured_alpha_fallback_species))
+            )
+        for species, notice in sorted(alpha_authority_notices_by_species.items()):
+            authority = (
+                "extrapolated analytical upper bound"
+                if notice.get("status") == "extrapolated"
+                else "analytical upper bound"
+            )
+            warning_messages.append(
+                f"WARNING: {species} evaporation alpha is an {authority} "
+                f"(not a measured coefficient): {notice['reason']}"
             )
         if missing_transport_parameters:
             diagnostic["missing_transport_parameters"] = missing_transport_parameters

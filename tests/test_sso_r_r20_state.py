@@ -3205,6 +3205,16 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
 
     vacuum_small = sim._native_fe_partition_diagnostic(0.5)
     vacuum_pool = sim._native_fe_partition_diagnostic(100.0)
+    assert vacuum_small["alpha_s_evaluation"]["alpha_s"] == pytest.approx(0.9)
+    assert vacuum_small["alpha_s_evaluation"]["alpha_authority_status"] == (
+        "out_of_domain"
+    )
+    assert "Fe is liquid" in vacuum_small["alpha_s_evaluation"][
+        "alpha_authority_notice"
+    ]
+    assert vacuum_small["alpha_s_evaluation"]["system_class"] == (
+        "pure_element_condensed"
+    )
     assert vacuum_small["P_reference_Antoine_Pa"].hex() == (
         "0x1.76017513f6704p+5"
     )
