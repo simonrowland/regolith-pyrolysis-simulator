@@ -217,6 +217,12 @@ OBSERVATIONS_V2_DIR = LITERATURE / "observations-v2"
 BATTERY_DIR = REPO_ROOT / "data" / "battery"
 
 
+def iter_work_store_paths(directory: Path) -> list[Path]:
+    """Return all works YAML paths, including the alias registry."""
+
+    return sorted(directory.glob("*.yaml"))
+
+
 def iter_observation_store_paths(
     directory: Path,
     pattern: str = "*.yaml",
@@ -395,6 +401,8 @@ PHASE_MAP: dict[str, Phase] = {
     "liquid sodium": Phase.L,
     "liquid iron oxide": Phase.L,
     "liquid iron oxide in equilibrium with iron": Phase.L,
+    # Distin Table I's printed species phase is a liquid FeO-SiO2 slag.
+    "liquid feo-sio2 slag": Phase.L,
     "aq": Phase.AQ,
     "glass": Phase.GLASS,
     "quenched silicate glass": Phase.GLASS,
@@ -1049,7 +1057,11 @@ def _state_from_plain(payload: object, cast) -> State:
         return State.of(cast(payload))
     tag = StateTag(str(payload.get("tag") or "value"))
     if tag is StateTag.VALUE:
-        return State.of(cast(payload.get("value")))
+        state = State.of(cast(payload.get("value")))
+        reason = payload.get("reason")
+        if isinstance(reason, str) and reason.strip():
+            return State(StateTag.VALUE, value=state.value, reason=reason)
+        return state
     rejection_kind = payload.get("rejection_kind")
     if rejection_kind is not None:
         rejection_kind = PolymorphRejectionKind(str(rejection_kind))
@@ -1573,6 +1585,12 @@ def _located_from_plain(payload: object, cast) -> Located:
         locator=_locator_from_plain(payload.get("locator")),
         inference=inference,
     )
+
+
+def _boolean_from_plain(value: object) -> bool:
+    if not isinstance(value, bool):
+        raise ValueError("expected a boolean source value")
+    return value
 
 
 def _polymorph_from_plain(value: object) -> Polymorph:
@@ -2765,6 +2783,11 @@ def _experiment_from_plain(
         if payload.get("equipment_context_id") is None
         else str(payload["equipment_context_id"]),
         thermal_schedule=_thermal_schedule_from_plain(payload.get("thermal_schedule")),
+        fe_metal_saturated=None
+        if payload.get("fe_metal_saturated") is None
+        else _located_from_plain(
+            payload["fe_metal_saturated"], _boolean_from_plain
+        ),
     )
 
 
@@ -2888,7 +2911,7 @@ def load_migrated_store(
     experiments: dict[str, Experiment] = {}
     observations: dict[str, Observation] = {}
     works_dir = root / "data" / "literature" / "works"
-    for path in sorted(works_dir.glob("*.yaml")):
+    for path in iter_work_store_paths(works_dir):
         if path.name == "ALIASES.yaml":
             continue
         doc = load_yaml(path)
@@ -5612,6 +5635,25 @@ def _explicit_point_conditions(raw: object) -> dict[str, Located[Any]]:
         str(key): _point_condition_from_plain(value, key=str(key))
         for key, value in raw.items()
     }
+
+
+def _located_explicit_point_composition(
+    located: object,
+) -> Located[Composition] | None:
+    """A point-condition composition that carries its own printed locator.
+
+    The observation locator is not a substitute. Callers use this composition
+    as the identity and leave its locator in place.
+    """
+
+    if not isinstance(located, Located) or located.locator is None:
+        return None
+    state = located.state
+    if not isinstance(state, State) or not state.is_value:
+        return None
+    if not isinstance(state.value, Composition):
+        return None
+    return located
 
 
 def _source_standard_state_phase(raw: object, phase: str) -> str | None:
@@ -14811,6 +14853,192 @@ def discover_extracts(directory: Path | None = None) -> list[Path]:
 
 
 # ---------------------------------------------------------------------------
+# Source-printed basis for compilation rows the engine can score
+# ---------------------------------------------------------------------------
+
+_B677_SOURCE_ID = "pankratz-1984-usbm-b677"
+_B592_SOURCE_ID = "kelley-king-1961-usbm-b592"
+_B2131_SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
+_B677_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S, Quantity.H_MINUS_H298})
+_B592_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S})
+_H_MINUS_H298_ANCHOR = "H(T)-H(298.15 K)"
+
+# Pankratz, L. B., 1984, Thermodynamic properties of elements and oxides,
+# USBM Bulletin 677. Mineru text/pankratz-1984-usbm-b677/mineru/chunk-p001-p040/
+# pankratz-1984-usbm-b677-p001-p040.md.
+_B677_GAS_BASIS_REASON = (
+    "pankratz-1984-usbm-b677-p001-p040.md:677 prints the standard state as "
+    "the pure stable element or compound at 1 atm, and for gases the pure gas "
+    "extrapolated to an ideally behaving gas at 1 atm; :130 atm = 101325 pascals; "
+    ":137 mol = gram formula weight or molar mass; :149 H-H298 is the enthalpy "
+    "increment between T and 298.15 K. Table units are cal/mol·K and kcal/mol "
+    "of the substance, not per mole of O2."
+)
+_B677_FORMATION_BASIS_REASON = (
+    "pankratz-1984-usbm-b677-p001-p040.md:175-179 prints Δ as formation from "
+    "the elements in their standard stable states; the MgO(c) example is "
+    "Mg(c)+0.5 O2(g)=MgO(c), one mole of MgO, not per mole of O2. :677 the "
+    "standard state is the pure stable element or compound at 1 atm, and for "
+    "gases an ideally behaving gas at 1 atm. :130 1 atm = 101325 pascals; "
+    ":137 mol = gram formula weight. The element phase changes with temperature "
+    "and the extracted table prints only the product, so the reaction stays unmapped."
+)
+# Kelley, K. K., and King, E. G., 1961, Contributions to the data on
+# theoretical metallurgy, XIV, USBM Bulletin 592.
+_B592_CP_BASIS_REASON = (
+    "kelley-king-1961-usbm-b592-p101-p120.md:263 heads table 6 "
+    "\"Heat capacities, cal./deg.-mole\"."
+)
+_B592_ENTROPY_BASIS_REASON = (
+    "kelley-king-1961-usbm-b592-p001-p040.md:793 prints all selected entropy "
+    "values for a constant pressure of 1 atm at 298.15 K, in defined calories "
+    "per degree per gram formula mass. "
+    "kelley-king-1961-usbm-b592-p101-p120.md:263 heads table 6 "
+    "\"Entropies at 298.15° K., cal./deg.-mole\"."
+)
+# Robie, R. A., and Hemingway, B. S., 1995, Thermodynamic properties of
+# minerals and related substances, USGS Bulletin 2131. pdftotext-layout.txt.
+_B2131_FORMATION_BASIS_REASON = (
+    "robie-hemingway-1995-usgs-b2131 pdftotext-layout.txt:167-169 prints mol "
+    "as identical with the gram formula weight. :170-171 prints "
+    "\"One bar = 1OS Pascals\" and the standard atmosphere equal to "
+    "101325 Pascals. :187-188 the Gibbs energy of formation from the elements "
+    "in their reference states is in J per mol, and Kr is the equilibrium "
+    "constant of formation. :313-315 the reference states for ΔfG and log Kr "
+    "are the elements in their standard states at 1 bar. :332-333 the "
+    "reference pressure adopted for these tables is 1 bar, that is 1OS Pascals. "
+    "The extracted phase is prose and the table prints no element reaction, "
+    "so reaction stays unmapped."
+)
+
+
+def _cited_state(value: Any, reason: str) -> State:
+    return State(StateTag.VALUE, value=value, reason=reason)
+
+
+def _basis_temperatures(
+    value: Value,
+    temperature_K: State | None,
+) -> tuple[Decimal, ...]:
+    if value.kind is ValueKind.SERIES and value.series:
+        return tuple(point[0] for point in value.series)
+    if (
+        isinstance(temperature_K, State)
+        and temperature_K.is_value
+        and temperature_K.value is not None
+    ):
+        return (temperature_K.value,)
+    return ()
+
+
+def _gas_catalog_name(formula: str, phase: State) -> str | None:
+    if not phase.is_value or phase.value is not Phase.G:
+        return None
+    text = formula.strip()
+    if text.endswith("(g)"):
+        return text
+    return f"{text}(g)"
+
+
+def _b677_gas_basis(
+    formula: str,
+    phase: State,
+    quantity: Quantity,
+    temperatures_K: tuple[Decimal, ...],
+) -> dict[str, State]:
+    """Mol-species at 1 atm, only when one series temperature is inside the catalog."""
+
+    species_name = _gas_catalog_name(formula, phase)
+    if species_name is None or not temperatures_K:
+        return {}
+    from simulator.battery.compilation_tier import vaporock_gas_has_one_coefficient_row
+
+    if not vaporock_gas_has_one_coefficient_row(species_name, temperatures_K):
+        return {}
+    cited = {
+        "per": _cited_state(PerBasis.MOL_SPECIES, _B677_GAS_BASIS_REASON),
+        "standard_pressure_Pa": _cited_state(atm_to_pa(1), _B677_GAS_BASIS_REASON),
+    }
+    if quantity is Quantity.H_MINUS_H298:
+        cited["subtype"] = _cited_state(_H_MINUS_H298_ANCHOR, _B677_GAS_BASIS_REASON)
+    return cited
+
+
+def _b592_gas_basis(
+    formula: str,
+    phase: State,
+    quantity: Quantity,
+    temperatures_K: tuple[Decimal, ...],
+) -> dict[str, State]:
+    """Table 6 mol-species. Entropy is at 1 atm. Cp has no printed pressure."""
+
+    if quantity not in _B592_GAS_QUANTITIES:
+        return {}
+    species_name = _gas_catalog_name(formula, phase)
+    if species_name is None or not temperatures_K:
+        return {}
+    from simulator.battery.compilation_tier import vaporock_gas_has_one_coefficient_row
+
+    if not vaporock_gas_has_one_coefficient_row(species_name, temperatures_K):
+        return {}
+    if quantity is Quantity.S:
+        return {
+            "per": _cited_state(PerBasis.MOL_SPECIES, _B592_ENTROPY_BASIS_REASON),
+            "standard_pressure_Pa": _cited_state(atm_to_pa(1), _B592_ENTROPY_BASIS_REASON),
+        }
+    return {"per": _cited_state(PerBasis.MOL_SPECIES, _B592_CP_BASIS_REASON)}
+
+
+def _b2131_formation_basis(formula: str) -> dict[str, State]:
+    """log10 Kf per mole of an Ellingham oxide product, referenced to 1 bar."""
+
+    from simulator.battery.compilation_tier import formula_is_ellingham_oxide_product
+
+    if not formula_is_ellingham_oxide_product(formula):
+        return {}
+    return {
+        "per": _cited_state(PerBasis.MOL_SPECIES, _B2131_FORMATION_BASIS_REASON),
+        "standard_pressure_Pa": _cited_state(bar_to_pa(1), _B2131_FORMATION_BASIS_REASON),
+    }
+
+
+def _b677_formation_basis(formula: str) -> dict[str, State]:
+    """Mol-species at 1 atm for an Ellingham oxide product. No invented reaction."""
+
+    from simulator.battery.compilation_tier import formula_is_ellingham_oxide_product
+
+    if not formula_is_ellingham_oxide_product(formula):
+        return {}
+    return {
+        "per": _cited_state(PerBasis.MOL_SPECIES, _B677_FORMATION_BASIS_REASON),
+        "standard_pressure_Pa": _cited_state(atm_to_pa(1), _B677_FORMATION_BASIS_REASON),
+    }
+
+
+def compilation_source_basis(
+    *,
+    source_id: str,
+    formula: str,
+    phase: State,
+    quantity: Quantity,
+    value: Value,
+    temperature_K: State | None,
+) -> dict[str, State]:
+    """Basis the publication prints for this row. Empty leaves the axis unknown."""
+
+    temperatures = _basis_temperatures(value, temperature_K)
+    if source_id == _B677_SOURCE_ID and quantity in _B677_GAS_QUANTITIES:
+        return _b677_gas_basis(formula, phase, quantity, temperatures)
+    if source_id == _B677_SOURCE_ID and quantity is Quantity.DELTA_FG:
+        return _b677_formation_basis(formula)
+    if source_id == _B592_SOURCE_ID and quantity in _B592_GAS_QUANTITIES:
+        return _b592_gas_basis(formula, phase, quantity, temperatures)
+    if source_id == _B2131_SOURCE_ID and quantity is Quantity.LOG10_KF:
+        return _b2131_formation_basis(formula)
+    return {}
+
+
+# ---------------------------------------------------------------------------
 # Migrator
 # ---------------------------------------------------------------------------
 
@@ -16855,6 +17083,24 @@ class Migrator:
                 token = janaf_extract_phase(source_id, unmapped_phase)
                 if token is not None:
                     phase, unmapped_phase = State.of(token), None
+        condensed_form = obs.get("condensed_form")
+        if (
+            source_id == "kems-ms2000-044"
+            and q_token is Quantity.ACTIVITY
+            and formula in {"Na2O", "K2O"}
+            and phase_raw
+            in {
+                "Na2O-SiO2_binary_silicate_melt",
+                "K2O-SiO2_binary_silicate_melt",
+            }
+            and isinstance(condensed_form, Mapping)
+            and condensed_form.get("state") == "liquid_melt"
+            and condensed_form.get("basis") == "explicit_author"
+        ):
+            # This source explicitly labels these alkali activity samples as
+            # liquid melts. The K2O token also labels Plante partial-pressure
+            # reservoirs, so keep this identity reading scoped to MS2000.
+            phase, unmapped_phase = State.of(Phase.L), None
         if q_token in {Quantity.P_PARTIAL, Quantity.P_SAT}:
             source_standard_state = obs.get("standard_state") or values.get(
                 "standard_state"
@@ -17965,7 +18211,16 @@ class Migrator:
                     for key, value in raw_point_conditions.items()
                 },
             }
-        if composition_located is not None:
+        # b-1052: an explicit point composition already carries its printed
+        # locator. A values map is anchored at the observation and must not
+        # replace it. Without an explicit point composition, the values map
+        # remains the composition.
+        explicit_composition = _located_explicit_point_composition(
+            (point_conditions or {}).get("composition")
+        )
+        if explicit_composition is not None:
+            ident_kwargs["composition"] = explicit_composition.state
+        elif composition_located is not None:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": composition_located,
@@ -17987,7 +18242,7 @@ class Migrator:
                     ),
                 ),
             }
-        if malformed_composition_amount is not None:
+        if explicit_composition is None and malformed_composition_amount is not None:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": Located(
@@ -18830,7 +19085,11 @@ class Migrator:
             has_non_yield_points = any(
                 name in {"points", "tests"} for name, _items in row_point_containers
             )
-            if has_non_yield_points and initial_oxide_map != rowless_initial_map:
+            if (
+                explicit_composition is None
+                and has_non_yield_points
+                and initial_oxide_map != rowless_initial_map
+            ):
                 # A nested row may be identified as the initial charge for
                 # its own point. It does not become the parent identity or a
                 # default condition on every sibling point.
@@ -20938,8 +21197,8 @@ class Migrator:
         value: Value,
         evidence: Evidence,
         temperature_K: Decimal | State[Decimal] | None = None,
-        standard_pressure_Pa: Decimal | None = None,
-        subtype: str | None = None,
+        standard_pressure_Pa: Decimal | State[Decimal] | None = None,
+        subtype: str | State[str] | None = None,
         uncertainty: Uncertainty | None = None,
         method: State[MethodToken] | None = None,
         equipment: object = None,
@@ -20956,9 +21215,13 @@ class Migrator:
             ident_kwargs["temperature_K"] = temperature_K
         elif temperature_K is not None:
             ident_kwargs["temperature_K"] = State.of(temperature_K)
-        if standard_pressure_Pa is not None:
+        if isinstance(standard_pressure_Pa, State):
+            ident_kwargs["standard_pressure_Pa"] = standard_pressure_Pa
+        elif standard_pressure_Pa is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(standard_pressure_Pa)
-        if subtype is not None:
+        if isinstance(subtype, State):
+            ident_kwargs["subtype"] = subtype
+        elif subtype is not None:
             ident_kwargs["subtype"] = State.of(subtype)
         if per is not None:
             ident_kwargs["per"] = per if isinstance(per, State) else State.of(per)
@@ -21962,6 +22225,14 @@ class Migrator:
             reference_temperature = _PANKRATZ_H298_REFERENCE_K.get(source_id)
             for index, series in enumerate(column_series):
                 suffix = _compilation_series_obs_suffix(series)
+                basis = compilation_source_basis(
+                    source_id=source_id,
+                    formula=formula,
+                    phase=phase,
+                    quantity=series.quantity,
+                    value=series.value,
+                    temperature_K=series.temperature_K,
+                )
                 if (
                     series.quantity is Quantity.H_MINUS_H298
                     and reference_temperature is not None
@@ -21984,13 +22255,14 @@ class Migrator:
                     value=series.value,
                     evidence=evidence,
                     temperature_K=series.temperature_K,
-                    standard_pressure_Pa=p_std,
-                    subtype=enthalpy_subtype,
-                    per=(
+                    standard_pressure_Pa=basis.get("standard_pressure_Pa", p_std),
+                    per=basis.get(
+                        "per",
                         enthalpy_per
                         if enthalpy_per is not None
-                        else molar_series_per.get(series.quantity)
+                        else molar_series_per.get(series.quantity),
                     ),
+                    subtype=basis.get("subtype", enthalpy_subtype),
                     method=State.of(MethodToken.TABULATION),
                     derivation=_compilation_conversion_derivation(
                         series.unit_trail,
@@ -22079,6 +22351,21 @@ class Migrator:
                 if isinstance(raw_original, Mapping)
                 else raw_original
             )
+        quantity_value = (
+            quantity.value
+            if isinstance(quantity, State) and quantity.is_value
+            else None
+        )
+        basis = {}
+        if quantity_value is not None and value.kind is not ValueKind.UNAVAILABLE:
+            basis = compilation_source_basis(
+                source_id=source_id,
+                formula=formula,
+                phase=phase,
+                quantity=quantity_value,
+                value=value,
+                temperature_K=t if isinstance(t, State) else None,
+            )
         self._generic_obs(
             work=work,
             source_id=source_id,
@@ -22090,12 +22377,12 @@ class Migrator:
             value=value,
             evidence=evidence,
             temperature_K=t,
-            standard_pressure_Pa=p_std,
-            per=(
-                molar_series_per.get(quantity.value)
-                if quantity.is_value
-                else None
+            standard_pressure_Pa=basis.get("standard_pressure_Pa", p_std),
+            per=basis.get(
+                "per",
+                molar_series_per.get(quantity.value) if quantity.is_value else None,
             ),
+            subtype=basis.get("subtype"),
             method=State.of(MethodToken.TABULATION),
             derivation=_compilation_conversion_derivation(
                 sel.unit_trail,
@@ -23085,7 +23372,7 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
 
     live_work_files = {work_filename(wid) for wid in live_work_ids}
     live_work_files.add("ALIASES.yaml")
-    for path in works_dir.glob("*.yaml"):
+    for path in iter_work_store_paths(works_dir):
         if path.name not in live_work_files:
             path.unlink()
 

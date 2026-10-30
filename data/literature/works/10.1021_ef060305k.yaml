@@ -1,0 +1,173 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1021/ef060305k
+  citation: Willenborg, W., Müller, M., & Hilpert, K. (2006). Alkali Removal at About 1400 °C for the Pressurized Pulverized
+    Coal Combustion Combined Cycle. 1. Thermodynamics and Concept. Energy & Fuels, 20(6), 2593–2598.
+  source_ids:
+  - willenborg-2006-alkali-removal-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:willenborg-2006-alkali-removal-thermodynamics
+      role: pdf
+      path: raw/willenborg-2006-alkali-removal-thermodynamics/willenborg-2006-alkali-removal-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 13ed9f4739a866634bb4fe298734f43a92bf2b8a41ae953b6df49143f3da316b
+    - asset_id: pdftotext:willenborg-2006-alkali-removal-thermodynamics
+      role: pdftotext
+      path: text/willenborg-2006-alkali-removal-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:willenborg-2006-alkali-removal-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1021/ef060305k
+experiments:
+- experiment_id: 10.1021/ef060305k::willenborg-2006-alkali-removal-thermodynamics
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ef060305k
+  locator:
+    page: 5
+    published_page: 2597
+    pdf_page_index: 4
+    section: Results and Discussion
+context:
+- observation_id: willenborg_2006_activity_ratio_sorbent_comparison_typed_refusal
+  type: experiment_series
+  locator:
+    page: 5
+    published_page: 2597
+    pdf_page_index: 4
+    section: Results and Discussion
+  units: relative activity as printed
+  values:
+    quantity: relative activity comparison
+    method_class: quoted_attributed
+    admission_status: typed_refusal
+    reason: 'schema gap: the paper prints only an activity ratio, about two times, without absolute activity values; no activity-ratio
+      quantity is defined.'
+    comparison_as_published: The sodium oxide activity in AlSi8Mg8Na5 is about 2 times higher than in AlSi8Mg4Na5.
+    source_compositions: Table 2 identifies both sorbent compositions, but no absolute activities are printed for this comparison.
+  context_id: willenborg-2006-alkali-removal-thermodynamics::context::willenborg_2006_activity_ratio_sorbent_comparison_typed_refusal
+  work_id: 10.1021/ef060305k
+  source_id: willenborg-2006-alkali-removal-thermodynamics
+  species: Na2O
+- observation_id: willenborg_2006_eq3_assumptions
+  type: method
+  locator:
+    page: 3
+    published_page: 2595
+    pdf_page_index: 2
+    section: Results and Discussion
+    equation: '3'
+  units: equation and assumptions as printed
+  values:
+    quantity: Na2O activity reduction equation
+    method_class: method_only
+    activity_equation_as_published: 'Eq. 3: aNa2O = pNa^2.5/(2 Kp), using Na2O(l,s) ⇌ 2Na(g) + 1/2 O2(g).'
+    assumptions_as_published: Ideal gas behavior; dimers, monoxides, and atomic oxygen negligible; pO2 = pNa/4; Kp from FACT
+      pure-substance database.
+  context_id: willenborg-2006-alkali-removal-thermodynamics::context::willenborg_2006_eq3_assumptions
+  work_id: 10.1021/ef060305k
+  source_id: willenborg-2006-alkali-removal-thermodynamics
+  species: Na2O
+- observation_id: willenborg_2006_kems_method_and_calibration
+  type: method
+  locator:
+    page: 2
+    published_page: 2594
+    pdf_page_index: 1
+    section: Experimental Setup
+  units: method and calibration as printed
+  values:
+    quantity: KEMS partial-pressure and activity method
+    method_class: method_only
+    temperature_range_as_published: 1250–1450 °C
+    ionization_cross_sections_as_published: 'Na: 3.9 × 10^-20 m² (70 eV), 3.39 × 10^-20 m² (55 eV); K: 5.7 × 10^-20 m² (70
+      eV), 6.19 × 10^-20 m² (55 eV).'
+    calibration_as_published: The calibration constant c was determined by a partial pressure measurement with pure silver
+      as reference; σAg = 4.59 × 10^-20 and 4.85 × 10^-20 m².
+    unreported_run_conditions: No KEMS total pressure or oxygen fugacity is reported. The apparatus vacuum statement (<10^-3
+      Pa) is not a run total pressure.
+  context_id: willenborg-2006-alkali-removal-thermodynamics::context::willenborg_2006_kems_method_and_calibration
+  work_id: 10.1021/ef060305k
+  source_id: willenborg-2006-alkali-removal-thermodynamics
+  species: Na2O
+- observation_id: willenborg_2006_slag_additive_activity_summaries_typed_refusal
+  type: experiment_series
+  locator:
+    page: 3
+    published_page: 2595
+    pdf_page_index: 2
+    section: Results and Discussion
+  units: dimensionless activity as printed
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    admission_status: typed_refusal
+    reason: 'identity incomplete: prose groups SiO2 and TiO2 treatments without an individual treatment composition for each
+      value.'
+    temperature_as_published: 1400 °C
+    sodium_oxide_activity_as_published: Untreated slag about 3 × 10^-10; slag with 5% SiO2 or TiO2 about 2 × 10^-10; slag
+      with 10% SiO2 or TiO2 about 6 × 10^-11.
+    potassium_oxide_activity_as_published: Untreated slag about 2.5 × 10^-12; slag with 5% SiO2 or TiO2 1.2 × 10^-12; slag
+      with 10% SiO2 or TiO2 5 × 10^-13.
+    underlying_series_as_published: Figures 3 and 4 show the temperature dependence; plotted values were not digitized.
+  context_id: willenborg-2006-alkali-removal-thermodynamics::context::willenborg_2006_slag_additive_activity_summaries_typed_refusal
+  work_id: 10.1021/ef060305k
+  source_id: willenborg-2006-alkali-removal-thermodynamics
+  species: Na2O
+- observation_id: willenborg_2006_slag_alkali_partial_pressure_typed_refusal
+  type: experiment_series
+  locator:
+    page: 4
+    published_page: 2596
+    pdf_page_index: 3
+    section: Results and Discussion
+  units: Pa as printed
+  values:
+    quantity: partial_pressure
+    method_class: quoted_attributed
+    admission_status: typed_refusal
+    reason: 'species not reported: the source says alkali partial pressures but does not identify a gas species.'
+    partial_pressures_as_published:
+    - about 0.6 Pa over untreated slag
+    - about 0.3 Pa over slag with 10% SiO2
+    relative_change_as_published: decrease of 50%
+  context_id: willenborg-2006-alkali-removal-thermodynamics::context::willenborg_2006_slag_alkali_partial_pressure_typed_refusal
+  work_id: 10.1021/ef060305k
+  source_id: willenborg-2006-alkali-removal-thermodynamics
+  species: Na2O

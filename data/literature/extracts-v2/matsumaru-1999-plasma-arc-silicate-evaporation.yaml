@@ -44,8 +44,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4047611991952702772385045482'
+        - - CaO
+          - '0.4336763224004390730413441654'
+        - - Al2O3
+          - '0.1192587718977959582519787072'
+        - - Fe2O3
+          - '0.04230370650649469146817257921'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source

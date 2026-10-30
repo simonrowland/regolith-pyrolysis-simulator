@@ -167,6 +167,9 @@ class RefusalReason(StrEnum):
     BACKGROUND_PRESSURE_INTERVAL_STRADDLES = "background_pressure_interval_straddles"
     IDENTITY_MISMATCH = "identity_mismatch"
     IDENTITY_UNKNOWN = "identity_unknown"
+    ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH = (
+        "element_reference_state_phase_identity_mismatch"
+    )
     INVALID_IDENTITY = "invalid_identity"
     DECISION_RULE_MISSING = "decision_rule_missing"
     METRIC_DOMAIN = "metric_domain"
@@ -345,6 +348,12 @@ class Polymorph(StrEnum):
     CRISTOBALITE_HIGH = "cristobalite_high"
     CRISTOBALITE_LOW = "cristobalite_low"
     CLINOENSTATITE = "clinoenstatite"
+    # B1452 records 0274/0275, printed pp. 300–301, name aragonite.
+    ARAGONITE = "aragonite"
+    # B1452 record 0003 (p. 28) and records 0379/0380 (pp. 405–406) identify low form.
+    KALIOPHILLITE_LOW = "kaliophillite_low"
+    # B1452 records 0379-phase-02 (p. 405) and 0380-phase-02 (p. 406) name high form.
+    KALIOPHILLITE_HIGH = "kaliophillite_high"
     DIOPSIDE = "diopside"
     ALBITE_HIGH = "albite_high"
     SANIDINE_HIGH = "sanidine_high"

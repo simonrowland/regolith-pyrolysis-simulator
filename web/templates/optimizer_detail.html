@@ -276,6 +276,9 @@
                     {% if result.coating.status_bearing_refusal_count is not none %}
                     <br><span class="range">status-bearing refusals: {{ result.coating.status_bearing_refusal_count }}</span>
                     {% endif %}
+                    {% if result.coating.refusal and result.coating.refusal.authority.code %}
+                    <br><span class="range">authority: {{ result.coating.refusal.authority.code }}</span>
+                    {% endif %}
                     {% if result.coating.status == "warning" and result.coating.reason %}
                     <br><span class="range">{{ result.coating.reason }}</span>
                     {% endif %}

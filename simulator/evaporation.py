@@ -1270,6 +1270,41 @@ class EvaporationMixin:
 
             merge_notes_into_mapping(diagnostic, _partial_sz_notes)
         self._last_evaporation_flux_diagnostic = diagnostic
+        missing_transport = diagnostic.get('missing_transport_parameters', {})
+        if isinstance(missing_transport, Mapping):
+            for species, refusal in missing_transport.items():
+                if not isinstance(refusal, Mapping):
+                    continue
+                refusal_type = refusal.get('refusal_type')
+                if not refusal_type or refusal.get('status') != 'unavailable':
+                    continue
+                channel = dict(
+                    flux.carrier_authority_by_species.get(str(species), {}) or {}
+                )
+                existing_extra = channel.get('extra')
+                extra = (
+                    dict(existing_extra)
+                    if isinstance(existing_extra, Mapping)
+                    else {}
+                )
+                extra.update(refusal)
+                reason = str(refusal.get('reason') or 'transport input unavailable')
+                channel.update({
+                    'species_id': str(species),
+                    'flux': {
+                        'kind': 'refusal',
+                        'code': str(refusal_type),
+                        'detail': reason,
+                    },
+                    'refusal_code': str(refusal_type),
+                    'is_refused': True,
+                    'reason': reason,
+                    'authority_level': str(
+                        refusal.get('authority_level') or 'unavailable'
+                    ),
+                    'extra': extra,
+                })
+                flux.carrier_authority_by_species[str(species)] = channel
         continuum_notice = diagnostic.get('continuum_extrapolation_notice')
         condensation_model = getattr(self, 'condensation_model', None)
         if continuum_notice and condensation_model is not None:
@@ -1311,12 +1346,26 @@ class EvaporationMixin:
                 'unmeasured_alpha_evaporation_fallback',
                 count=len(unmeasured_alpha_species),
             )
-        # Promote EVERY non-OK EVAPORATION_FLUX result to a typed refusal.
-        # Previously only missing_alpha / missing_transport_parameters raised;
-        # other refusals (e.g. uncertified_melt_resistance_model,
-        # viscous_p_bulk_transport_out_of_domain) fell through to empty
-        # flux_kg_hr={} — silent zero evaporation, not a load-bearing refuse.
-        if str(kernel_result.status) != 'ok':
+        # A typed missing-transport channel remains local to that species; keep
+        # the rest of the run available even when every requested channel is
+        # excluded. Other non-OK flux outcomes still fail as a run-level refusal.
+        transport_only_unavailable = (
+            str(kernel_result.status) == 'unavailable'
+            and isinstance(missing_transport, Mapping)
+            and bool(missing_transport)
+            and not any(
+                key in diagnostic
+                for key in ('missing_alpha', 'missing_molar_mass', 'reason')
+            )
+            and all(
+                isinstance(refusal, Mapping)
+                and refusal.get('policy') == 'fail_loud_missing_transport_parameters'
+                and refusal.get('status') == 'unavailable'
+                and bool(refusal.get('refusal_type'))
+                for refusal in missing_transport.values()
+            )
+        )
+        if str(kernel_result.status) != 'ok' and not transport_only_unavailable:
             reason = str(diagnostic.get('reason') or '').strip()
             # A primary refusal wins; secondary records remain diagnostic context.
             if 'missing_alpha' in diagnostic and not reason:
@@ -2142,7 +2191,7 @@ class EvaporationMixin:
         return curve
 
     def _hold_freeze_gate_provider_curve(
-        self, failure: Mapping[str, Any],
+        self, failure: Mapping[str, Any], *, timeout_reason: str | None = None,
     ) -> dict[str, Any] | None:
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
@@ -2162,7 +2211,12 @@ class EvaporationMixin:
         diagnostic = failure['provider_diagnostic']
         curve['gate_provider_refusal'] = {
             **failure,
-            'reason': diagnostic.get('backend_status_reason') or diagnostic.get('reason'),
+            'reason': (
+                timeout_reason
+                or diagnostic.get('backend_status_reason')
+                or diagnostic.get('reason')
+                or failure['reason']
+            ),
             'qualification': 'held_last_good_curve',
             'authority': 'extrapolated (held)',
             'failure_hour': int(self.melt.hour),
@@ -2714,7 +2768,7 @@ class EvaporationMixin:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
-            gate_curve_provider_timed_out,
+            gate_curve_provider_timeout_reason,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
         )
@@ -2741,6 +2795,7 @@ class EvaporationMixin:
                     f'gate provider registration failed: {type(exc).__name__}',
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
+        timeout_reason = None
         for attempt in range(2):
             try:
                 result = self._dispatch_only(
@@ -2768,7 +2823,8 @@ class EvaporationMixin:
                     or 'unavailable'
                 )
                 warnings = list(getattr(result, 'warnings', ()) or ())
-            if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
+            timeout_reason = gate_curve_provider_timeout_reason(diagnostic)
+            if timeout_reason is None or attempt == 1:
                 break
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
@@ -2787,29 +2843,36 @@ class EvaporationMixin:
         ):
             failure = {
                 'provider': self._liquid_fraction_provider,
-                'reason': 'liquid_fraction_provider_failed',
+                'reason': timeout_reason or 'liquid_fraction_provider_failed',
                 'outcome': status_outcome,
                 'provider_diagnostic': diagnostic,
                 'status': status,
                 'warnings': warnings,
                 **({'backend_failure_disposition': 'environment'}
-                   if gate_curve_provider_timed_out(diagnostic) else {}),
+                   if timeout_reason is not None else {}),
                 **({'detail': diagnostic['exception_message']}
                    if diagnostic.get('exception_message') else {}),
             }
             if (
                 status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
-                or gate_curve_provider_timed_out(diagnostic)
+                or timeout_reason is not None
             ):
-                held = self._hold_freeze_gate_provider_curve(failure)
+                held = self._hold_freeze_gate_provider_curve(
+                    failure,
+                    timeout_reason=timeout_reason,
+                )
                 if held is not None:
                     return held
                 curve = self._freeze_gate_kress_floor_curve(None, reasons)
                 if curve is not None:
                     curve['gate_provider_refusal'] = {
                         **failure,
-                        'reason': (diagnostic.get('backend_status_reason')
-                                   or diagnostic.get('reason') or failure['reason']),
+                        'reason': (
+                            timeout_reason
+                            or diagnostic.get('backend_status_reason')
+                            or diagnostic.get('reason')
+                            or failure['reason']
+                        ),
                         'qualification': 'first_call_kress91_floor_prediction',
                         'authority': 'extrapolated (lower-rung)',
                         'failure_hour': int(self.melt.hour),

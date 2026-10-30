@@ -282,6 +282,16 @@ def _efficiency_model() -> CondensationModel:
     return model
 
 
+def _b127_uncovered_na_vapor_data() -> tuple[dict[str, Any], float]:
+    import simulator.condensation as condensation_module
+
+    na_row = dict(condensation_module._species_vapor_data("Na"))
+    valid_range = na_row["pure_component_antoine"]["valid_range_K"]
+    test_temperature_K = math.nextafter(float(valid_range[1]), math.inf)
+    na_row["interval_required"] = True
+    return {"metals": {"Na": na_row}}, test_temperature_K
+
+
 def test_b112_zero_residence_mints_typed_pass_through_outcome() -> None:
     model = _efficiency_model()
     stage = next(s for s in model.train.stages if s.stage_number == 3)
@@ -323,69 +333,128 @@ def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> Non
 
 
 def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
-    """b-127: has Antoine data but no usable segment at T → refuse, never 100 Pa.
-
-    Red-under-reversion: restoring ``return 100.0`` in
-    ``_local_species_pressure_pa`` or treating ``None`` as non-refused makes
-    this fail. Fabricated ~1 mbar drove the capture integral with false
-    authority.
-    """
+    """An uncovered Na segment uses measured flow and records extrapolation authority."""
     import simulator.condensation as condensation_module
 
-    # Standard-reaction row with pure sidecar that poles at 1000 K → wall
-    # selector returns empty coefficients → _antoine_psat_pa returns None
-    # without raising, while _species_has_antoine_data is still True.
-    vapor_data = {
-        "metals": {
-            "Na": {
-                "fit_target": "standard_reaction_term",
-                "interval_required": False,
-                "pure_component_antoine": {
-                    "A": 5.0,
-                    "B": 2000.0,
-                    "C": -1000.0,
-                },
-            }
-        }
-    }
+    vapor_data, test_temperature_K = _b127_uncovered_na_vapor_data()
+    production_row = condensation_module._species_vapor_data("Na")
+    production_fit = production_row["pure_component_antoine"]
+    valid_range = tuple(float(value) for value in production_fit["valid_range_K"])
+    extrapolation_notices: dict[str, dict[str, Any]] = {}
+    extrapolated_psat_pa = condensation_module._antoine_psat_pa(
+        "Na",
+        test_temperature_K,
+        antoine_extrapolations=extrapolation_notices,
+        antoine_extrapolation_warnings=[],
+    )
+    assert math.isfinite(extrapolated_psat_pa)
+    assert extrapolated_psat_pa > 0.0
+    assert extrapolation_notices["Na"]["status"] == "extrapolated"
+    assert extrapolation_notices["Na"]["authority_level"] == "extrapolated"
+    assert tuple(extrapolation_notices["Na"]["valid_range_K"]) == valid_range
+
     assert condensation_module._species_has_antoine_data(
         "Na", vapor_pressure_data=vapor_data
     )
-    T_K = 1000.0
-    raw = condensation_module._antoine_psat_pa(
-        "Na", T_K, vapor_pressure_data=vapor_data
-    )
-    assert raw is None
+    with pytest.raises(condensation_module.WallSaturationPressureRefusal):
+        condensation_module._antoine_psat_pa(
+            "Na", test_temperature_K, vapor_pressure_data=vapor_data
+        )
     pressure_pa, refused = condensation_module._try_antoine_psat_pa(
-        "Na", T_K, vapor_pressure_data=vapor_data
+        "Na", test_temperature_K, vapor_pressure_data=vapor_data
     )
     assert pressure_pa is None
     assert refused is True
     local = condensation_module._local_species_pressure_pa(
         "Na",
-        T_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
+        test_temperature_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_data,
     )
     assert local == 0.0
     assert local != 100.0
 
+    from simulator.overhead import OverheadGasModel
+
     model = _efficiency_model()
     model.vapor_pressure_data = vapor_data
-    stage = next(s for s in model.train.stages if s.stage_number == 3)
+    stage_number = condensation_module.designated_stage_number("Na")
+    assert stage_number is not None
+    stage = next(
+        candidate
+        for candidate in model.train.stages
+        if candidate.stage_number == stage_number
+    )
+    # Use the production geometry defaults. The model itself has no
+    # default Na flowing partial pressure; this is the explicit measured
+    # flow input whose preservation the refusal outcome records.
+    model.configure_operating_conditions(
+        stage_area_m2_by_stage=OverheadGasModel().stage_area_m2_by_stage(),
+    )
+    measured_flowing_pressure_pa = 37.5
+    model.wall_species_partial_pressures_pa = {
+        "Na": measured_flowing_pressure_pa,
+    }
+    model._species_partial_pressures_configured = True
+    stage_alpha_record = condensation_module._stage_alpha_record(
+        stage,
+        "Na",
+        model.materials,
+    )
+    alpha_s_value = condensation_module._required_record_alpha_s(
+        stage_alpha_record,
+        species="Na",
+        site="stage_deposition",
+    )
+    routing_temperature_C = model.condensation_temperatures_C["Na"]
+    residence_s = model.residence_time_s[stage_number]
     outcomes: list[dict[str, Any]] = []
     eta = model._condensation_efficiency(
         stage=stage,
         species="Na",
-        T_cond_C=T_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
-        residence_s=1.0,
+        T_cond_C=routing_temperature_C,
+        residence_s=residence_s,
         available_kg=1.0,
-        alpha_s_value=1.0,
+        alpha_s_value=alpha_s_value,
         efficiency_outcomes=outcomes,
     )
-    assert eta == 0.0
-    assert outcomes[0]["status"] == "pass_through"
-    assert outcomes[0]["reason"] == "antoine_psat_unavailable_at_T"
-    assert outcomes[0]["output_status"] == "status_bearing"
+    assert len(outcomes) == 1
+    outcome = outcomes[0]
+    assert outcome["status"] == "extrapolated"
+    assert outcome["authority_level"] == "extrapolated"
+    assert outcome["output_status"] == "status_bearing"
+    assert outcome["reason"] == "antoine_psat_unavailable_at_T"
+    assert outcome["refusal_type"] == "WallSaturationPressureRefusal"
+    assert tuple(outcome["valid_range_K"]) == valid_range
+    assert outcome["stage_number"] == stage_number
+    assert outcome["routing_reference_temperature_C"] == routing_temperature_C
+    assert outcome["flowing_pressure_pa"] == measured_flowing_pressure_pa
+    assert outcome["flowing_pressure_pa"] != 100.0
+    assert outcome["eta"] == eta
+
+
+def test_b127_uncovered_antoine_missing_flow_is_a_typed_input_refusal() -> None:
+    import simulator.condensation as condensation_module
+
+    vapor_data, test_temperature_K = _b127_uncovered_na_vapor_data()
+    model = _efficiency_model()
+    model.vapor_pressure_data = vapor_data
+    stage = next(s for s in model.train.stages if s.stage_number == 3)
+    outcomes: list[dict[str, Any]] = []
+
+    with pytest.raises(
+        condensation_module.DepositionInputRefusal,
+        match="flowing_pressure_pa",
+    ):
+        model._condensation_efficiency(
+            stage=stage,
+            species="Na",
+            T_cond_C=test_temperature_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
+            residence_s=1.0,
+            available_kg=1.0,
+            alpha_s_value=1.0,
+            efficiency_outcomes=outcomes,
+        )
+    assert outcomes == []
 
 
 def test_b112_nonpositive_reference_flux_mints_typed_outcome(monkeypatch) -> None:

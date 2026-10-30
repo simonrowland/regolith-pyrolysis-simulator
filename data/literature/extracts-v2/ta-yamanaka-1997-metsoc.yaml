@@ -81,6 +81,8 @@ observations:
       tag: value
       value: compilation_assessed
     original_method_class: compilation_assessed
+    attribution: Rego et al. (1985), Metallurgical Transactions 16B:313-323; Chase et al. (1985), JANAF Thermochemical Tables,
+      3rd ed., p. 1577
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -188,12 +190,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_glass_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0

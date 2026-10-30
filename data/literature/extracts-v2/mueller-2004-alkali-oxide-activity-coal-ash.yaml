@@ -1,0 +1,656 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/mueller-2004-alkali-oxide-activity-coal-ash.yaml
+observations:
+- observation_id: mueller-2004-alkali-oxide-activity-coal-ash::mueller_2004_k_pressure_tio2_1400c::T=1673.15:h=129112c01499
+  experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-plus-5-mass-percent-tio2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.375'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-muel04
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+  notices: []
+  source_id: mueller-2004-alkali-oxide-activity-coal-ash
+  locator:
+    page: 2
+    published_page: 616
+    section: Results and discussion
+  read_from: pdf:mueller-2004-alkali-oxide-activity-coal-ash
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 2
+              published_page: 616
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 616
+              section: Results and discussion
+        output_unit: K
+        references: []
+    temperature:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+    composition:
+      state:
+        tag: value
+        value: boiler slag with 5 mass per cent TiO2
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+  derivation:
+    relation: Species partial pressures were calculated from detector signals using the printed relation p_i = c I_i T/(A_i
+      sigma_i); c was calibrated by a partial-pressure measurement with pure silver.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 615
+        section: Experimental
+    references: []
+- observation_id: mueller-2004-alkali-oxide-activity-coal-ash::mueller_2004_k_pressure_untreated_1400c::T=1673.15:h=f40f98576d55
+  experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: 'printed oxide wt% map has unsupported numeric component(s): CO2'
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.59'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-muel04
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+  notices: []
+  source_id: mueller-2004-alkali-oxide-activity-coal-ash
+  locator:
+    page: 2
+    published_page: 616
+    section: Results and discussion
+  read_from: pdf:mueller-2004-alkali-oxide-activity-coal-ash
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '27'
+          CO2: '0.154'
+          CaO: '9.1'
+          Fe2O3: '14.4'
+          K2O: '1.2'
+          MgO: '2.5'
+          Na2O: '2.1'
+          P2O5: '0.4'
+          SO3: '0.082'
+          SiO2: '36.2'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 2
+              published_page: 616
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 616
+              section: Results and discussion
+        output_unit: K
+        references: []
+    temperature:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+    composition:
+      state:
+        tag: value
+        value: boiler slag; Table I composition
+      locator:
+        page: 2
+        published_page: 616
+        table: I
+  derivation:
+    relation: Species partial pressures were calculated from detector signals using the printed relation p_i = c I_i T/(A_i
+      sigma_i); c was calibrated by a partial-pressure measurement with pure silver.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 615
+        section: Experimental
+    references: []
+- observation_id: mueller-2004-alkali-oxide-activity-coal-ash::mueller_2004_na_pressure_tio2_1400c::T=1673.15:h=99de3f18dc44
+  experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-plus-5-mass-percent-tio2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.42'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-muel04
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+  notices: []
+  source_id: mueller-2004-alkali-oxide-activity-coal-ash
+  locator:
+    page: 2
+    published_page: 616
+    section: Results and discussion
+  read_from: pdf:mueller-2004-alkali-oxide-activity-coal-ash
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 2
+              published_page: 616
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 616
+              section: Results and discussion
+        output_unit: K
+        references: []
+    temperature:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+    composition:
+      state:
+        tag: value
+        value: boiler slag with 5 mass per cent TiO2
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+  derivation:
+    relation: Species partial pressures were calculated from detector signals using the printed relation p_i = c I_i T/(A_i
+      sigma_i); c was calibrated by a partial-pressure measurement with pure silver.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 615
+        section: Experimental
+    references: []
+- observation_id: mueller-2004-alkali-oxide-activity-coal-ash::mueller_2004_na_pressure_untreated_1400c::T=1673.15:h=9b4ba2c09bc6
+  experiment_id: 2e907f8f80865e6f5b6ae4b7f5df0b1d9ed4e9a6ecd2544620f737b06268f168::experiment::mueller-2004-boiler-slag-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: 'printed oxide wt% map has unsupported numeric component(s): CO2'
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-muel04
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+  notices: []
+  source_id: mueller-2004-alkali-oxide-activity-coal-ash
+  locator:
+    page: 2
+    published_page: 616
+    section: Results and discussion
+  read_from: pdf:mueller-2004-alkali-oxide-activity-coal-ash
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '27'
+          CO2: '0.154'
+          CaO: '9.1'
+          Fe2O3: '14.4'
+          K2O: '1.2'
+          MgO: '2.5'
+          Na2O: '2.1'
+          P2O5: '0.4'
+          SO3: '0.082'
+          SiO2: '36.2'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 2
+              published_page: 616
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 616
+              section: Results and discussion
+        output_unit: K
+        references: []
+    temperature:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 2
+        published_page: 616
+        section: Results and discussion
+    composition:
+      state:
+        tag: value
+        value: boiler slag; Table I composition
+      locator:
+        page: 2
+        published_page: 616
+        table: I
+  derivation:
+    relation: Species partial pressures were calculated from detector signals using the printed relation p_i = c I_i T/(A_i
+      sigma_i); c was calibrated by a partial-pressure measurement with pure silver.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 615
+        section: Experimental
+    references: []

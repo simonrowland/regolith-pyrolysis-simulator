@@ -1,0 +1,71 @@
+source_id: borisov-2009-alkali-activity-coefficients
+method: MinerU table draft, pdftotext cross-check, and visual layout check against page renders
+printed_tables:
+  - label: '4'
+    pdf_page: 6
+    published_page: 584
+    mineru_table_key: p006-t04
+    type: activity_coefficient
+    species: Na2O
+    row_count: 15
+    retained_columns:
+      - {column: 1, field: row_label}
+      - {column: 2, field: composition_mol.SiO2}
+      - {column: 3, field: composition_mol.Na2O}
+      - {column: 4, field: composition_mol.K2O}
+      - {column: 5, field: composition_mol.Rb2O}
+      - {column: 6, field: relative_gamma_Na2O_as_published}
+    reference_rows:
+      - label: Standard 36
+        reason: retained as printed gamma_st = 1 reference row
+      - label: Standard 39
+        reason: retained as printed gamma_st = 1 reference row
+      - label: Standard 37
+        reason: retained as printed gamma_st = 1 reference row
+    conditions:
+      temperature: series heading in each row group
+      oxygen_fugacity: Table 2 positive -log fO2 as printed
+      total_pressure: abstract, printed 1 atm
+      reference_state: virtual melt at XSiO2 = 0.45; standard alkali oxide mole fractions extrapolated
+    render_verified: true
+    render_verification: >-
+      The row/column layout and the 15 row labels were checked against PDF page 6. All retained
+      numeric cells agree digit-for-digit between MinerU and pdftotext.
+  - label: '5'
+    pdf_page: 8
+    published_page: 586
+    mineru_table_key: p008-t05
+    type: activity_coefficient
+    species: Na2O
+    row_count: 4
+    retained_columns:
+      - {column: 1, field: row_label}
+      - {column: 2, field: composition_mol.Al2O3}
+      - {column: 3, field: composition_mol.Na2O}
+      - {column: 4, field: composition_mol.K2O}
+      - {column: 5, field: composition_mol.Rb2O}
+      - {column: 6, field: relative_gamma_Na2O_as_published}
+    reference_rows:
+      - label: CSA6
+        reason: retained as printed gamma_st = 1 reference row
+    conditions:
+      temperature: 1470°C from series 38, Table 2
+      oxygen_fugacity: Table 2 positive -log fO2 as printed, series 38
+      total_pressure: abstract, printed 1 atm
+      reference_state: CSA6 standard melt
+    render_verified: true
+    render_verification: >-
+      The row/column layout and all 4 rows were checked against PDF page 8. All retained numeric
+      cells agree digit-for-digit between MinerU and pdftotext.
+extraction_decision:
+  absolute_activity: typed_refusal
+  reason: relative to the printed reference melt; absolute activity not printed
+  preserved_value: printed relative gamma_Na2O; no absolute-activity conversion
+  schema_gap: >-
+    The extract schema has no relative-to-reference activity quantity form (t-1563); the printed
+    -log fO2 condition has no identity mapping for typed-refused activity rows.
+  standard_state: preserved verbatim per table
+  method_class: quoted_attributed; the authors calculate relative coefficients from measured compositions using Eq. (1)
+not_extracted:
+  - Table 6 regression coefficients and derivatives
+  - Figures 4–7; plotted curves were not digitized

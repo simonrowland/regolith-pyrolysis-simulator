@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=titanium-(reference-state):v=0f2bc8b5ae:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=titanium-(reference-state):v=0f2bc8b5ae:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -15,7 +15,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -122,7 +122,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=titanium-(reference-state):v=5ff2eda370:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=titanium-(reference-state):v=5ff2eda370:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -135,7 +135,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -242,7 +242,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1155:col=H_minus_H298:name=titanium-(reference-state):v=818a7cec8e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1155:col=H_minus_H298:name=titanium-(reference-state):v=818a7cec8e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -251,11 +251,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -317,21 +318,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 73
-        pdf_page_index: 79
-        table: b1259-ht-0048-titanium-reference-state
-        note: as_published='6.063'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json
-        record: b1259-ht-0048-titanium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -362,7 +350,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1155:col=H_minus_H298:name=titanium-(reference-state):v=f32de0ef99:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1155:col=H_minus_H298:name=titanium-(reference-state):v=f32de0ef99
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -371,11 +359,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -437,21 +426,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 73
-        pdf_page_index: 79
-        table: b1259-ht-0048-titanium-reference-state
-        note: as_published='7.080'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json
-        record: b1259-ht-0048-titanium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -482,7 +458,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=titanium-(reference-state):v=b607689f54:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=titanium-(reference-state):v=b607689f54:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -495,7 +471,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -602,7 +578,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=titanium-(reference-state):v=9179b8c258:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=titanium-(reference-state):v=9179b8c258:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -615,7 +591,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -722,7 +698,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=titanium-(reference-state):v=28f27cbc1c:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=titanium-(reference-state):v=28f27cbc1c:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -735,7 +711,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -842,7 +818,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=titanium-(reference-state):v=68924bd3c3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=titanium-(reference-state):v=68924bd3c3:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -855,7 +831,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -962,7 +938,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=titanium-(reference-state):v=9abb8cfda1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=titanium-(reference-state):v=9abb8cfda1:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -975,7 +951,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -1082,7 +1058,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=titanium-(reference-state):v=5a326e79ef:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=titanium-(reference-state):v=5a326e79ef:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -1095,7 +1071,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -1202,7 +1178,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=titanium-(reference-state):v=936d01c0d1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=titanium-(reference-state):v=936d01c0d1:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -1215,7 +1191,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -1322,7 +1298,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=titanium-(reference-state):v=7d9b64a415:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=titanium-(reference-state):v=7d9b64a415:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -1335,7 +1311,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -1442,7 +1418,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1943:col=H_minus_H298:name=titanium-(reference-state):v=bec09c6469:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1943:col=H_minus_H298:name=titanium-(reference-state):v=bec09c6469
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -1451,11 +1427,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1517,21 +1494,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 73
-        pdf_page_index: 79
-        table: b1259-ht-0048-titanium-reference-state
-        note: as_published='13.358'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json
-        record: b1259-ht-0048-titanium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1562,7 +1526,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1943:col=H_minus_H298:name=titanium-(reference-state):v=ebc17107d2:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=1943:col=H_minus_H298:name=titanium-(reference-state):v=ebc17107d2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -1571,11 +1535,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1637,21 +1602,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 73
-        pdf_page_index: 79
-        table: b1259-ht-0048-titanium-reference-state
-        note: as_published='17.050'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json
-        record: b1259-ht-0048-titanium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -1690,7 +1642,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=titanium-(reference-state):v=b0c8163de1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=titanium-(reference-state):v=b0c8163de1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -1700,10 +1652,10 @@ observations:
       formula: Ti
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1810,7 +1762,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -1823,7 +1775,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1930,7 +1882,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=titanium-(reference-state):v=24f416183f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=titanium-(reference-state):v=24f416183f:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -1943,7 +1895,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2050,7 +2002,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=titanium-(reference-state):v=1aec50ea40:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=titanium-(reference-state):v=1aec50ea40:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -2063,7 +2015,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2170,7 +2122,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=titanium-(reference-state):v=f38cf21a42:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=titanium-(reference-state):v=f38cf21a42:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -2183,7 +2135,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2290,7 +2242,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=titanium-(reference-state):v=f7a7cc6035:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=titanium-(reference-state):v=f7a7cc6035:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -2303,7 +2255,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2410,7 +2362,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=titanium-(reference-state):v=6d6f89a3c3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=titanium-(reference-state):v=6d6f89a3c3:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -2423,7 +2375,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2530,7 +2482,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=titanium-(reference-state):v=db3085843a:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=titanium-(reference-state):v=db3085843a:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -2543,7 +2495,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2650,7 +2602,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1000:col=entropy:name=titanium-(reference-state):v=93eba091e6:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1000:col=entropy:name=titanium-(reference-state):v=93eba091e6:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -2663,7 +2615,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2770,7 +2722,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1100:col=entropy:name=titanium-(reference-state):v=0a02bbc0eb:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1100:col=entropy:name=titanium-(reference-state):v=0a02bbc0eb:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -2783,7 +2735,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2890,7 +2842,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1155:col=entropy:name=titanium-(reference-state):v=631b40e789:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1155:col=entropy:name=titanium-(reference-state):v=631b40e789
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -2899,11 +2851,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2965,21 +2918,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 73
-        pdf_page_index: 79
-        table: b1259-ht-0048-titanium-reference-state
-        note: as_published='17.480'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json
-        record: b1259-ht-0048-titanium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3010,7 +2950,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1200:col=entropy:name=titanium-(reference-state):v=0d4af09ec1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1200:col=entropy:name=titanium-(reference-state):v=0d4af09ec1:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3023,7 +2963,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3130,7 +3070,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1300:col=entropy:name=titanium-(reference-state):v=62ca3ddf5e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1300:col=entropy:name=titanium-(reference-state):v=62ca3ddf5e:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3143,7 +3083,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3250,7 +3190,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1400:col=entropy:name=titanium-(reference-state):v=39d2547dbc:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1400:col=entropy:name=titanium-(reference-state):v=39d2547dbc:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3263,7 +3203,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3370,7 +3310,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1500:col=entropy:name=titanium-(reference-state):v=91eb4576e3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1500:col=entropy:name=titanium-(reference-state):v=91eb4576e3:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3383,7 +3323,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3490,7 +3430,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1600:col=entropy:name=titanium-(reference-state):v=79d546317b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1600:col=entropy:name=titanium-(reference-state):v=79d546317b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3503,7 +3443,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3610,7 +3550,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1700:col=entropy:name=titanium-(reference-state):v=9c4a1db6c9:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1700:col=entropy:name=titanium-(reference-state):v=9c4a1db6c9:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3623,7 +3563,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3730,7 +3670,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1800:col=entropy:name=titanium-(reference-state):v=f320aaa26a:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1800:col=entropy:name=titanium-(reference-state):v=f320aaa26a:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3743,7 +3683,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3850,7 +3790,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1900:col=entropy:name=titanium-(reference-state):v=e662d7ef65:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1900:col=entropy:name=titanium-(reference-state):v=e662d7ef65:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3863,7 +3803,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -3970,7 +3910,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1943:col=entropy:name=titanium-(reference-state):v=03bfca5aca:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1943:col=entropy:name=titanium-(reference-state):v=03bfca5aca
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -3979,11 +3919,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4045,21 +3986,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 73
-        pdf_page_index: 79
-        table: b1259-ht-0048-titanium-reference-state
-        note: as_published='23.460'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json
-        record: b1259-ht-0048-titanium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -4098,7 +4026,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1943:col=entropy:name=titanium-(reference-state):v=ed79c21b23:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=1943:col=entropy:name=titanium-(reference-state):v=ed79c21b23
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -4107,11 +4035,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4173,21 +4102,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 73
-        pdf_page_index: 79
-        table: b1259-ht-0048-titanium-reference-state
-        note: as_published='21.580'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json
-        record: b1259-ht-0048-titanium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4218,7 +4134,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=2000:col=entropy:name=titanium-(reference-state):v=123b6dd7df:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=2000:col=entropy:name=titanium-(reference-state):v=123b6dd7df
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -4228,10 +4144,10 @@ observations:
       formula: Ti
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4338,7 +4254,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=298.15:col=entropy:name=titanium-(reference-state):v=d3d285844b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=298.15:col=entropy:name=titanium-(reference-state):v=d3d285844b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -4351,7 +4267,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4458,7 +4374,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=400:col=entropy:name=titanium-(reference-state):v=cdcef51bba:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=400:col=entropy:name=titanium-(reference-state):v=cdcef51bba:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -4471,7 +4387,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4578,7 +4494,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=500:col=entropy:name=titanium-(reference-state):v=63383ed00f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=500:col=entropy:name=titanium-(reference-state):v=63383ed00f:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -4591,7 +4507,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4698,7 +4614,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=600:col=entropy:name=titanium-(reference-state):v=f205d32d99:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=600:col=entropy:name=titanium-(reference-state):v=f205d32d99:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -4711,7 +4627,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4818,7 +4734,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=700:col=entropy:name=titanium-(reference-state):v=31e1649e73:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=700:col=entropy:name=titanium-(reference-state):v=31e1649e73:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -4831,7 +4747,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4938,7 +4854,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=800:col=entropy:name=titanium-(reference-state):v=58f4b739a6:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=800:col=entropy:name=titanium-(reference-state):v=58f4b739a6:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -4951,7 +4867,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5058,7 +4974,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=900:col=entropy:name=titanium-(reference-state):v=c8b1896d69:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:S:shared:T=900:col=entropy:name=titanium-(reference-state):v=c8b1896d69:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -5071,7 +4987,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5178,7 +5094,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -5191,7 +5107,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5218,7 +5134,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5338,7 +5254,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -5351,7 +5267,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5378,7 +5294,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5498,7 +5414,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1155:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1155:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -5507,11 +5423,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5608,7 +5525,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -5621,7 +5538,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -5648,7 +5565,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5768,7 +5685,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -5781,7 +5698,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -5808,7 +5725,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5928,7 +5845,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -5941,7 +5858,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -5968,7 +5885,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -6088,7 +6005,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -6101,7 +6018,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -6128,7 +6045,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -6248,7 +6165,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -6261,7 +6178,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -6288,7 +6205,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -6408,7 +6325,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -6421,7 +6338,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -6448,7 +6365,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -6568,7 +6485,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -6581,7 +6498,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -6608,7 +6525,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -6728,7 +6645,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -6741,7 +6658,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -6768,7 +6685,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -6888,7 +6805,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1943:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=1943:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -6897,11 +6814,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6998,7 +6916,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -7008,10 +6926,10 @@ observations:
       formula: Ti
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7035,10 +6953,10 @@ observations:
             formula: Ti
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7158,7 +7076,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -7171,7 +7089,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7198,7 +7116,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7318,7 +7236,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -7331,7 +7249,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7358,7 +7276,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7478,7 +7396,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -7491,7 +7409,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7518,7 +7436,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7638,7 +7556,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -7651,7 +7569,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7678,7 +7596,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7798,7 +7716,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -7811,7 +7729,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7838,7 +7756,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7958,7 +7876,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -7971,7 +7889,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7998,7 +7916,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8118,7 +8036,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -8131,7 +8049,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8158,7 +8076,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8278,7 +8196,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -8291,7 +8209,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8318,7 +8236,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8438,7 +8356,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -8451,7 +8369,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8478,7 +8396,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8598,7 +8516,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1155:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1155:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -8607,11 +8525,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8708,7 +8627,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -8721,7 +8640,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -8748,7 +8667,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8868,7 +8787,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -8881,7 +8800,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -8908,7 +8827,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9028,7 +8947,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -9041,7 +8960,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -9068,7 +8987,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9188,7 +9107,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -9201,7 +9120,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -9228,7 +9147,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9348,7 +9267,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -9361,7 +9280,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -9388,7 +9307,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9508,7 +9427,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -9521,7 +9440,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -9548,7 +9467,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9668,7 +9587,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -9681,7 +9600,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -9708,7 +9627,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9828,7 +9747,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -9841,7 +9760,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -9868,7 +9787,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9988,7 +9907,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1943:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=1943:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -9997,11 +9916,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10098,7 +10018,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -10108,10 +10028,10 @@ observations:
       formula: Ti
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10135,10 +10055,10 @@ observations:
             formula: Ti
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10258,7 +10178,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -10271,7 +10191,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10298,7 +10218,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10418,7 +10338,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -10431,7 +10351,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10458,7 +10378,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10578,7 +10498,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -10591,7 +10511,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10618,7 +10538,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10738,7 +10658,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -10751,7 +10671,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10778,7 +10698,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10898,7 +10818,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -10911,7 +10831,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10938,7 +10858,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11058,7 +10978,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -11071,7 +10991,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11098,7 +11018,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11218,7 +11138,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=titanium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -11231,7 +11151,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11258,7 +11178,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11378,7 +11298,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -11391,7 +11311,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11418,7 +11338,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11529,7 +11449,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -11542,7 +11462,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11569,7 +11489,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11680,7 +11600,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1155:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1155:col=log_Kf:name=titanium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -11689,11 +11609,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1155 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11781,7 +11702,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -11794,7 +11715,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -11821,7 +11742,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11932,7 +11853,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -11945,7 +11866,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -11972,7 +11893,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12083,7 +12004,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -12096,7 +12017,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -12123,7 +12044,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12234,7 +12155,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -12247,7 +12168,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -12274,7 +12195,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12385,7 +12306,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -12398,7 +12319,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -12425,7 +12346,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12536,7 +12457,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -12549,7 +12470,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -12576,7 +12497,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12687,7 +12608,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -12700,7 +12621,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -12727,7 +12648,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12838,7 +12759,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -12851,7 +12772,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: beta
       charge:
         tag: value
         value: 0
@@ -12878,7 +12799,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12989,7 +12910,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1943:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=1943:col=log_Kf:name=titanium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -12998,11 +12919,12 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1943 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13090,7 +13012,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=titanium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -13100,10 +13022,10 @@ observations:
       formula: Ti
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13127,10 +13049,10 @@ observations:
             formula: Ti
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13241,7 +13163,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -13254,7 +13176,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13281,7 +13203,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13392,7 +13314,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -13405,7 +13327,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13432,7 +13354,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13543,7 +13465,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -13556,7 +13478,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13583,7 +13505,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13694,7 +13616,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -13707,7 +13629,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13734,7 +13656,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13845,7 +13767,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -13858,7 +13780,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13885,7 +13807,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13996,7 +13918,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -14009,7 +13931,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14036,7 +13958,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14147,7 +14069,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=titanium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0048-titanium-reference-state:tabulation
   identity:
     quantity:
@@ -14160,7 +14082,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14187,7 +14109,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0

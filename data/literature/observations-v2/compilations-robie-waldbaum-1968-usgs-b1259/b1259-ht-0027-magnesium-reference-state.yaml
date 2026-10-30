@@ -12,10 +12,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -132,10 +132,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -252,10 +252,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -372,10 +372,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -491,11 +491,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -557,21 +558,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 52
-        pdf_page_index: 58
-        table: b1259-ht-0027-magnesium-reference-state
-        note: as_published='9.841'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json
-        record: b1259-ht-0027-magnesium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -611,11 +599,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -677,21 +666,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 52
-        pdf_page_index: 58
-        table: b1259-ht-0027-magnesium-reference-state
-        note: as_published='40.290'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json
-        record: b1259-ht-0027-magnesium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -735,7 +711,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -855,7 +831,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -975,7 +951,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1095,7 +1071,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1215,7 +1191,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1335,7 +1311,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1455,7 +1431,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1562,7 +1538,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -1572,10 +1548,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1682,7 +1658,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=magnesium-(reference-state):v=df64785e2c
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=magnesium-(reference-state):v=df64785e2c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -1692,10 +1668,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1802,7 +1778,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=magnesium-(reference-state):v=b621d0ba13
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=magnesium-(reference-state):v=b621d0ba13:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -1812,10 +1788,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1922,7 +1898,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=magnesium-(reference-state):v=aa1f7f220c
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=magnesium-(reference-state):v=aa1f7f220c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -1932,10 +1908,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2042,7 +2018,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=magnesium-(reference-state):v=a025f2acc1
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=magnesium-(reference-state):v=a025f2acc1:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -2052,10 +2028,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2162,7 +2138,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=magnesium-(reference-state):v=18c5a7928e
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=magnesium-(reference-state):v=18c5a7928e:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -2172,10 +2148,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2282,7 +2258,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=magnesium-(reference-state):v=5402b74102
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=magnesium-(reference-state):v=5402b74102:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -2292,10 +2268,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2411,11 +2387,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2477,21 +2454,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 52
-        pdf_page_index: 58
-        table: b1259-ht-0027-magnesium-reference-state
-        note: as_published='4.261'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json
-        record: b1259-ht-0027-magnesium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2531,11 +2495,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2597,21 +2562,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 52
-        pdf_page_index: 58
-        table: b1259-ht-0027-magnesium-reference-state
-        note: as_published='6.401'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json
-        record: b1259-ht-0027-magnesium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2652,10 +2604,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2772,10 +2724,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2892,10 +2844,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3012,10 +2964,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3132,10 +3084,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3255,7 +3207,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3375,7 +3327,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3495,7 +3447,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3615,7 +3567,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3735,7 +3687,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3855,7 +3807,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3975,7 +3927,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4095,7 +4047,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4202,7 +4154,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=298.15:col=entropy:name=magnesium-(reference-state):v=2ff75962f6
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=298.15:col=entropy:name=magnesium-(reference-state):v=2ff75962f6:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -4212,10 +4164,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4322,7 +4274,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=500:col=entropy:name=magnesium-(reference-state):v=f07e6d1451
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=500:col=entropy:name=magnesium-(reference-state):v=f07e6d1451:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -4332,10 +4284,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4442,7 +4394,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=600:col=entropy:name=magnesium-(reference-state):v=83a8e3f975
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=600:col=entropy:name=magnesium-(reference-state):v=83a8e3f975:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -4452,10 +4404,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4562,7 +4514,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=700:col=entropy:name=magnesium-(reference-state):v=069b79edc4
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=700:col=entropy:name=magnesium-(reference-state):v=069b79edc4:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -4572,10 +4524,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4682,7 +4634,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=800:col=entropy:name=magnesium-(reference-state):v=5d7b0f9352
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=800:col=entropy:name=magnesium-(reference-state):v=5d7b0f9352:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -4692,10 +4644,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4802,7 +4754,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=900:col=entropy:name=magnesium-(reference-state):v=b7cf67a49e
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:S:shared:T=900:col=entropy:name=magnesium-(reference-state):v=b7cf67a49e:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -4812,10 +4764,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4931,11 +4883,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4997,21 +4950,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 52
-        pdf_page_index: 58
-        table: b1259-ht-0027-magnesium-reference-state
-        note: as_published='15.340'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json
-        record: b1259-ht-0027-magnesium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5051,11 +4991,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5117,21 +5058,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 52
-        pdf_page_index: 58
-        table: b1259-ht-0027-magnesium-reference-state
-        note: as_published='17.660'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json
-        record: b1259-ht-0027-magnesium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5172,10 +5100,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5199,10 +5127,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5332,10 +5260,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5359,10 +5287,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5492,10 +5420,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5519,10 +5447,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5652,10 +5580,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5679,10 +5607,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5811,11 +5739,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5925,7 +5854,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5952,7 +5881,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6085,7 +6014,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6112,7 +6041,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6245,7 +6174,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6272,7 +6201,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6405,7 +6334,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6432,7 +6361,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6565,7 +6494,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6592,7 +6521,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6725,7 +6654,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6752,7 +6681,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6885,7 +6814,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6912,7 +6841,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7032,7 +6961,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -7042,10 +6971,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7069,10 +6998,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7192,7 +7121,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -7202,10 +7131,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7229,10 +7158,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7352,7 +7281,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -7362,10 +7291,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7389,10 +7318,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7512,7 +7441,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -7522,10 +7451,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7549,10 +7478,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7672,7 +7601,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -7682,10 +7611,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7709,10 +7638,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7832,7 +7761,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -7842,10 +7771,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7869,10 +7798,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7992,7 +7921,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -8002,10 +7931,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -8029,10 +7958,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -8161,11 +8090,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8272,10 +8202,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8299,10 +8229,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8432,10 +8362,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8459,10 +8389,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8592,10 +8522,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8619,10 +8549,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8752,10 +8682,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8779,10 +8709,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8911,11 +8841,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9025,7 +8956,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9052,7 +8983,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9185,7 +9116,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9212,7 +9143,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9345,7 +9276,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9372,7 +9303,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9505,7 +9436,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9532,7 +9463,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9665,7 +9596,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9692,7 +9623,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9825,7 +9756,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9852,7 +9783,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9985,7 +9916,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10012,7 +9943,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10132,7 +10063,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -10142,10 +10073,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10169,10 +10100,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10292,7 +10223,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -10302,10 +10233,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10329,10 +10260,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10452,7 +10383,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -10462,10 +10393,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10489,10 +10420,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10612,7 +10543,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -10622,10 +10553,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10649,10 +10580,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10772,7 +10703,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -10782,10 +10713,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10809,10 +10740,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10932,7 +10863,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -10942,10 +10873,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10969,10 +10900,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -11092,7 +11023,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=magnesium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -11102,10 +11033,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -11129,10 +11060,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -11261,11 +11192,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11372,10 +11304,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11399,10 +11331,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11523,10 +11455,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11550,10 +11482,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11674,10 +11606,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11701,10 +11633,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11825,10 +11757,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11852,10 +11784,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11975,11 +11907,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1363 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12080,7 +12013,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12107,7 +12040,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12231,7 +12164,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12258,7 +12191,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12382,7 +12315,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12409,7 +12342,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12533,7 +12466,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12560,7 +12493,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12684,7 +12617,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12711,7 +12644,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12835,7 +12768,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12862,7 +12795,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12986,7 +12919,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13013,7 +12946,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13124,7 +13057,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=magnesium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=magnesium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -13134,10 +13067,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13161,10 +13094,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13275,7 +13208,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=magnesium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=magnesium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -13285,10 +13218,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13312,10 +13245,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13426,7 +13359,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=magnesium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=magnesium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -13436,10 +13369,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13463,10 +13396,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13577,7 +13510,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=magnesium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=magnesium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -13587,10 +13520,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13614,10 +13547,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13728,7 +13661,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=magnesium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=magnesium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -13738,10 +13671,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13765,10 +13698,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13879,7 +13812,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=magnesium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=magnesium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -13889,10 +13822,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13916,10 +13849,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -14030,7 +13963,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=magnesium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=magnesium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:tabulation
   identity:
     quantity:
@@ -14040,10 +13973,10 @@ observations:
       formula: Mg
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -14067,10 +14000,10 @@ observations:
             formula: Mg
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -14190,11 +14123,12 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 922 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

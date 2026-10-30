@@ -39,6 +39,7 @@ from simulator.battery.score import (
     compile_residual,
     flagged_strata,
     load_score_context,
+    _predict_with_engine,
     predict_with_engine,
     residual_to_plain,
     score_store,
@@ -126,7 +127,7 @@ def _feo_case(**kwargs):
 def test_comparison_path_shares_the_effusion_closure_condition() -> None:
     """Tier-3 effusion shares the closure, not a private number per engine."""
 
-    source = inspect.getsource(predict_with_engine)
+    source = inspect.getsource(_predict_with_engine)
     assert "PO2_OXYGEN_BALANCE_EFFUSION" in source
     assert "_borrow_internal_analytical_effusion" in source
 

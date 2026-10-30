@@ -9,13 +9,13 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: S
+      formula: S2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -122,7 +122,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=sulfur-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=sulfur-(reference-state):v=900e6181ee:poly=orthorhombic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
     quantity:
@@ -132,10 +132,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: orthorhombic
       charge:
         tag: value
         value: 0
@@ -251,11 +251,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -317,21 +318,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.490'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -371,11 +359,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -437,21 +426,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.394'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -491,11 +467,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -557,21 +534,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.609'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -611,11 +575,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -677,21 +642,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='1.019'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -731,11 +683,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -797,21 +750,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='3.842'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -851,11 +791,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -917,21 +858,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='17.171'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -969,13 +897,13 @@ observations:
       tag: value
       value: S
     species:
-      formula: S
+      formula: S2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1082,7 +1010,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=298.15:col=entropy:name=sulfur-(reference-state):v=3b3ee5e319
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:S:shared:T=298.15:col=entropy:name=sulfur-(reference-state):v=3b3ee5e319:poly=orthorhombic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
     quantity:
@@ -1092,10 +1020,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: orthorhombic
       charge:
         tag: value
         value: 0
@@ -1211,11 +1139,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1277,21 +1206,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='9.047'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1331,11 +1247,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1397,21 +1314,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='8.786'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1451,11 +1355,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1517,21 +1422,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='9.360'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1571,11 +1463,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1637,21 +1530,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='10.417'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1691,11 +1571,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1757,21 +1638,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='15.730'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1811,11 +1679,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1877,21 +1746,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='30.900'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1931,11 +1787,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1958,11 +1815,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -2033,22 +1891,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2091,11 +1935,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1100 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1100 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2118,11 +1963,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1100 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1100 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -2193,22 +2039,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2251,11 +2083,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1200 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1200 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2278,11 +2111,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1200 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1200 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -2353,22 +2187,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2411,11 +2231,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2438,11 +2259,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -2513,22 +2335,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2571,11 +2379,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2598,11 +2407,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -2673,22 +2483,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2731,11 +2527,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2758,11 +2555,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -2833,22 +2631,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2891,11 +2675,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2918,11 +2703,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -2993,22 +2779,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3051,11 +2823,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3078,11 +2851,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -3153,22 +2927,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3211,11 +2971,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3238,11 +2999,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -3313,22 +3075,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3369,13 +3117,13 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: S
+      formula: S2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3396,13 +3144,13 @@ observations:
       value:
         terms:
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3418,7 +3166,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -3531,11 +3279,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3558,11 +3307,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -3633,22 +3383,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3682,7 +3418,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=sulfur-(reference-state):v=900e6181ee:poly=orthorhombic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
     quantity:
@@ -3692,10 +3428,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: orthorhombic
       charge:
         tag: value
         value: 0
@@ -3719,10 +3455,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -3851,11 +3587,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3961,11 +3698,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4072,10 +3810,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4099,10 +3837,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4232,10 +3970,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4259,10 +3997,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4392,10 +4130,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4419,10 +4157,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4552,10 +4290,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4579,10 +4317,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4711,11 +4449,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4821,11 +4560,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4848,11 +4588,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 800 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 800 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -4923,22 +4664,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4981,11 +4708,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 900 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 900 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5008,11 +4736,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 900 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 900 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -5083,22 +4812,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5141,11 +4856,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5168,11 +4884,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -5243,22 +4960,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5301,11 +5004,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1100 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1100 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5328,11 +5032,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1100 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1100 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -5403,22 +5108,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5461,11 +5152,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1200 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1200 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5488,11 +5180,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1200 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1200 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -5563,22 +5256,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5621,11 +5300,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5648,11 +5328,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -5723,22 +5404,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5781,11 +5448,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5808,11 +5476,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -5883,22 +5552,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5941,11 +5596,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5968,11 +5624,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6043,22 +5700,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6101,11 +5744,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6128,11 +5772,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6203,22 +5848,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6261,11 +5892,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6288,11 +5920,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6363,22 +5996,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6421,11 +6040,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6448,11 +6068,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6523,22 +6144,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6579,13 +6186,13 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: S
+      formula: S2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6606,13 +6213,13 @@ observations:
       value:
         terms:
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6628,7 +6235,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -6741,11 +6348,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6768,11 +6376,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6843,22 +6452,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6892,7 +6487,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=sulfur-(reference-state):v=900e6181ee:poly=orthorhombic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
     quantity:
@@ -6902,10 +6497,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: orthorhombic
       charge:
         tag: value
         value: 0
@@ -6929,10 +6524,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -7061,11 +6656,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7171,11 +6767,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7282,10 +6879,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7309,10 +6906,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7442,10 +7039,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7469,10 +7066,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7602,10 +7199,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7629,10 +7226,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7762,10 +7359,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7789,10 +7386,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7921,11 +7518,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8031,11 +7629,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8058,11 +7657,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 800 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 800 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -8133,22 +7733,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -8191,11 +7777,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 900 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 900 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8218,11 +7805,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 900 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 900 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -8293,22 +7881,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -8351,11 +7925,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8378,11 +7953,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -8453,22 +8029,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -8502,11 +8064,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1100 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1100 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8529,11 +8092,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1100 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1100 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -8604,22 +8168,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -8653,11 +8203,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1200 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1200 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8680,11 +8231,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1200 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1200 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -8755,22 +8307,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -8804,11 +8342,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8831,11 +8370,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -8906,22 +8446,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -8955,11 +8481,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8982,11 +8509,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9057,22 +8585,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9106,11 +8620,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9133,11 +8648,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9208,22 +8724,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9257,11 +8759,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9284,11 +8787,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9359,22 +8863,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9408,11 +8898,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9435,11 +8926,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9510,22 +9002,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9557,13 +9035,13 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: S
+      formula: S2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9584,13 +9062,13 @@ observations:
       value:
         terms:
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9606,7 +9084,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -9701,7 +9179,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=sulfur-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=sulfur-(reference-state):v=725af3071b:poly=orthorhombic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0038-sulfur-reference-state:tabulation
   identity:
     quantity:
@@ -9711,10 +9189,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: orthorhombic
       charge:
         tag: value
         value: 0
@@ -9738,10 +9216,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -9861,11 +9339,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 368.54 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9962,11 +9441,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 388.36 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10064,10 +9544,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10091,10 +9571,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10215,10 +9695,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10242,10 +9722,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10366,10 +9846,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10393,10 +9873,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10517,10 +9997,10 @@ observations:
       formula: S
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10544,10 +10024,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10667,11 +10147,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 717.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10768,11 +10249,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10795,11 +10277,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 800 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 800 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -10870,22 +10353,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -10919,11 +10388,12 @@ observations:
     species:
       formula: S
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 900 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 900 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10946,11 +10416,12 @@ observations:
         - species:
             formula: S
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 900 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 900 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -11021,22 +10492,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 63
-        pdf_page_index: 69
-        table: b1259-ht-0038-sulfur-reference-state
-        note: as_published='000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json
-        record: b1259-ht-0038-sulfur-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:

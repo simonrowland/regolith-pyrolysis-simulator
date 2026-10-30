@@ -993,6 +993,29 @@ def test_p15_unqualified_silica_capture_is_flagged_not_product_glow() -> None:
     assert "flagged capture" not in ungated
 
 
+def test_p15_missing_stage_3_capture_is_unavailable_with_reason() -> None:
+    from simulator.three_product_report import classify_products
+
+    classification = classify_products(SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    ))
+    artifact = {
+        "timesteps": [{"hour": 1, "summary": {"campaign": "C2A"}, "ledger": {}}],
+        "terminal": {
+            "stage_purity": {},
+            "product_classification": classification,
+        },
+    }
+    stage = _stage_card(_run_panel(artifact)["html"], "stage_3_sio_zone")
+
+    assert "silica capture unavailable" in stage
+    assert "stage_3_missing" in stage
+    assert "collection not implied" not in stage
+    assert "classification pending" not in stage
+
+
 def test_p15_flagged_silica_product_keeps_product_route_and_flag() -> None:
     stages = _stage_purity()
     stages["stage_3_sio_zone"] = {
@@ -1028,6 +1051,57 @@ def test_p15_flagged_silica_product_keeps_product_route_and_flag() -> None:
     assert "authority: extrapolated" in stage
     assert "band: [1400,2200]" in stage
     assert "reason: outside certified SiO source band" in stage
+
+
+def test_p15_silica_stage_renders_partial_class_exclusion() -> None:
+    stages = _stage_purity()
+    stages["stage_3_sio_zone"] = {
+        "label": "SiO Zone",
+        "designated_species_kg": {"SiO": 4.5},
+        "coproduct_species_kg": {},
+        "impurity_species_kg": {},
+        "designated_kg": 4.5,
+        "impurity_kg": 0.0,
+        "total_kg": 4.5,
+        "purity_fraction": 1.0,
+        "verdict": "PURE",
+    }
+    classification = _flagged_silica_product_classification()
+    silica = classification["pure_silica_glass"]
+    silica.update({
+        "status": "partial",
+        "availability_flag": {"status": "partial", "total_basis": "lower_bound"},
+        "excluded": [{
+            "species": "Si",
+            "account": "process.cleaned_melt",
+            "reason": "missing LJ row",
+            "upper_bound_kg": 0.5,
+            "upper_bound_basis": "conservative_ledger_bound",
+        }],
+        "estimated_contributions": [{
+            "species": "SiO",
+            "account": "process.cleaned_melt",
+            "authority": "status_bearing",
+            "reason": "estimated carrier row",
+        }],
+    })
+    artifact = {
+        "timesteps": [{"hour": 1, "summary": {"campaign": "C2A"}, "ledger": {}}],
+        "terminal": {
+            "stage_purity": stages,
+            "product_classification": classification,
+        },
+    }
+
+    stage = _stage_card(_run_panel(artifact)["html"], "stage_3_sio_zone")
+
+    assert "sec-p15-stage--product" in stage
+    assert "PARTIAL silica product; computed total is a lower bound" in stage
+    assert (
+        "Si via process.cleaned_melt (up to 0.5 kg "
+        "(conservative upper bound); missing LJ row)"
+    ) in stage
+    assert "includes estimated transport for SiO" in stage
 
 
 def test_empty_stage_indeterminate_renders_as_no_material() -> None:

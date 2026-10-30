@@ -284,6 +284,7 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'Cr':  (2.880, 6000.0, 51.996),  # Estimated
     'Al':  (2.940, 3093.0, 26.982),  # Estimated
     'Ti':  (2.890, 6000.0, 47.867),  # Estimated
+    'Si':  (2.910, 3036.0, 28.085),  # Svehla 1962 NASA TR R-132 Table I, p. 24
     'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
 }
 
@@ -347,6 +348,10 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     'Ti': {
         'status': 'proxy',
         'source': 'estimated transition-metal vapor Lennard-Jones row',
+    },
+    'Si': {
+        'status': 'sourced',
+        'source': 'Svehla 1962 NASA TR R-132 Table I, p. 24',
     },
     'SiO': {
         'status': 'proxy',
@@ -5236,6 +5241,54 @@ def _alpha_record(
         record['alpha_s_domain_status'] = 'out_of_domain'
         record['output_status'] = 'status_bearing'
         record['alpha_s_authoritative_at_temperature'] = False
+        if (
+            species == 'Fe'
+            and record.get('value_ref')
+            == f'{STICKING_VALUE_REF_PREFIX}Fe.value'
+            and isinstance(spec, Mapping)
+            and spec.get('form') == 'scalar'
+            and T_K is not None
+        ):
+            # Fe uses the owner's adopted scalar form: alpha_s = 0.02, the
+            # high side of the five Costa & Jacobson Fe+ points over 1700–1800 K.
+            # The presentation supplies no alpha(T) equation, so extrapolating
+            # that adopted form means keeping its scalar value, not fitting the
+            # digitized scatter. At 1523.15 K the value remains 0.02, 176.85 K
+            # below the certified band; 0.02 is already in (0, 1], so the
+            # physical clamp is checked but not engaged.
+            raw_alpha = float(record['alpha_s'])
+            positive_floor = math.nextafter(0.0, 1.0)
+            bounded_alpha = min(1.0, max(positive_floor, raw_alpha))
+            bound_engaged = bounded_alpha != raw_alpha
+            record['alpha_s'] = bounded_alpha
+            record['alpha_s_domain_status'] = 'extrapolated'
+            record['authority_level'] = 'extrapolated'
+            record['alpha_s_physical_bound_engaged'] = bound_engaged
+            valid_band = _valid_temperature_range_K(
+                record.get('alpha_s_valid_range_K')
+            )
+            if valid_band is not None:
+                valid_low, valid_high = valid_band
+                source_fit = {
+                    'form': 'scalar',
+                    'value': raw_alpha,
+                    'source_id': 'kems-007-costa-2015',
+                    'source': record.get('source'),
+                    'source_url': record.get('source_url'),
+                }
+                record['alpha_s_extrapolation_notice'] = {
+                    'certified_band_K': valid_band,
+                    'temperature_used_K': float(T_K),
+                    'distance_below_band_K': max(0.0, valid_low - float(T_K)),
+                    'distance_above_band_K': max(0.0, float(T_K) - valid_high),
+                    'authority_level': 'extrapolated',
+                    'source_fit': source_fit,
+                    'physical_bound': {
+                        'lower_exclusive': 0.0,
+                        'upper_inclusive': 1.0,
+                    },
+                    'bound_engaged': bound_engaged,
+                }
     elif record.get('alpha_s_valid_range_K') is not None:
         record['alpha_s_domain_status'] = 'in_domain'
         record['alpha_s_authoritative_at_temperature'] = True
@@ -5731,10 +5784,11 @@ def _try_antoine_psat_pa(
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
-    ``(None, True)`` means typed refusal — including the case where the
-    species has Antoine data somewhere but no segment covers ``T_K``
-    (``_antoine_psat_pa`` returns None without raising). Never invent a
-    pressure for that gap (b-127 fabricated 100 Pa).
+    ``(None, True)`` means typed refusal. The lower-level
+    ``_antoine_psat_pa`` may raise ``WallSaturationPressureRefusal`` for an
+    unusable fit or return ``None`` when an evaluator supplies no pressure;
+    this adapter normalizes both outcomes. Never invent a pressure for that
+    gap (b-127 fabricated 100 Pa).
     """
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError

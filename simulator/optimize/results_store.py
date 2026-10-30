@@ -25,10 +25,12 @@ import warnings
 from typing import Any, Mapping, Sequence
 
 from simulator.corpus_version import current_corpus_version
+from simulator.chemistry.kernel.dto import DEGRADING_INTENT_RESULT_STATUSES
 from simulator.diagnostics import (
     coating_summary_with_grounded_authority,
     wall_deposit_sticking_authority_status,
 )
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import (
     EvalSpec,
@@ -68,9 +70,6 @@ OBJECTIVE_EVIDENCE_SCHEMA_VERSION = 1
 DEFAULT_BUSY_TIMEOUT_MS = 30000
 WRITE_RETRY_ATTEMPTS = 8
 WRITE_RETRY_BASE_DELAY_S = 0.05
-NON_AUTHORITATIVE_BACKEND_STATUSES = frozenset(
-    {LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN, "unavailable"}
-)
 APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
@@ -916,7 +915,7 @@ def _cache_write_rejections(scored_result: ScoredResult) -> tuple[str, ...]:
     )
     if backend_authoritative is not True:
         reasons.append("non_authoritative_backend")
-    contradiction = _backend_authority_contradiction(
+    contradiction = _backend_status_admission_rejection(
         backend_status,
         backend_authoritative,
     )
@@ -1039,14 +1038,23 @@ def _agreed_carrier_value(values: Sequence[Any]) -> Any | None:
     return distinct[0] if len(distinct) == 1 else None
 
 
-def _backend_authority_contradiction(
+def _backend_status_admission_rejection(
     backend_status: str | None,
     backend_authoritative: bool | None,
 ) -> str | None:
+    """Reject cache admissions whose feasibility contradicts their run status.
+
+    The primary predicate is feasible-vs-degrading: an authoritative backend
+    may refuse work, but a refusal cannot produce a feasible cached result.
+    The legacy diagnostic-stub token is outside that status partition and is
+    separately forbidden from claiming backend authority.
+    """
     status = str(backend_status or "").strip()
+    if status.lower() in DEGRADING_INTENT_RESULT_STATUSES:
+        return f"feasible_result_carries_degrading_backend_status:{status}"
     if (
         backend_authoritative is True
-        and status.lower() in NON_AUTHORITATIVE_BACKEND_STATUSES
+        and status.lower() == LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN
     ):
         return f"backend_authority_contradicts_status:{status}"
     return None
@@ -1468,6 +1476,10 @@ def _migrate_objective_values_v5(conn: sqlite3.Connection) -> None:
 
 
 def _objective_value_status(value: Any, evidence: Any) -> str:
+    if isinstance(evidence, Mapping):
+        evidence_status = evidence.get("value_status")
+        if evidence_status == "partial":
+            return "partial"
     if value is not None:
         return "available"
     if isinstance(evidence, Mapping):
@@ -1529,17 +1541,10 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
     for gate, item in payload.items():
         threshold = item["threshold"]
         gate_name = str(item["gate"])
-        authoritative_default = not (
-            gate_name == "coating" and "authoritative" not in item
-        )
-        authoritative_raw = (
-            item["authoritative"]
-            if "authoritative" in item
-            else authoritative_default
-        )
-        status_value = str(item.get("status", "available"))
+        authoritative_raw = item.get("authoritative", False)
+        status_value = str(item.get("status", "warning"))
         authoritative_value = _strict_bool(authoritative_raw)
-        output_status = str(item.get("output_status", "authoritative"))
+        output_status = str(item.get("output_status", "status_bearing"))
         status_reason = str(item.get("status_reason", ""))
         status_payload = (
             _jsonable(item.get("status_payload", {}))
@@ -1638,9 +1643,11 @@ def _coating_margin_grounded_authority(
             {},
             status_payload,
         )
-        if zero_deposit_authority.get(
-            "wall_saturation_pressure_refused_species"
-        ):
+        availability = wall_deposit_figure_availability(
+            has_positive_deposit=False,
+            authority=zero_deposit_authority,
+        )
+        if availability.status == "refused":
             return zero_deposit_authority
         return None
     wall_deposit = {species: 1.0 for species in deposited_species}

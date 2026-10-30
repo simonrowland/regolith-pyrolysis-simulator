@@ -384,7 +384,7 @@ def test_null_make_decision_while_parked_at_path_ab_is_rejected(client):
 # Nightly (2026-08-02 CI tiering): serial web full path (~391 s junit).
 # 2400s outer guard follows 1114s call at load ~79, Studio-2 (2026-10-23).
 @pytest.mark.nightly
-@pytest.mark.timeout(2400)
+@pytest.mark.cpu_budget(2400)
 def test_pause_resume_around_every_gate_is_ledger_identical(client):
     """(b) pause/resume churn at every gate -> one gate each, correct routing, identical ledger.
 

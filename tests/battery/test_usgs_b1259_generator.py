@@ -36,13 +36,13 @@ B1259_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1259_STORE_PATTERN = "compilations-robie-waldbaum-1968-usgs-b1259.yaml"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1259_RAW = 29809
-B1259_STORE_STORED = 14808
-B1259_STORED = 15118
-B1259_REFUSED = 2761
+B1259_STORE_STORED = 14820
+B1259_STORED = 15130
+B1259_REFUSED = 2749
 B1259_EXCLUDED = 11930
 B1259_RECORD_COUNT = 549
-B1259_RECORDS_STORING_NOTHING = 80
-B1259_EMPTY_FORMULA_UNRESOLVED_298K = 59
+B1259_RECORDS_STORING_NOTHING = 77
+B1259_EMPTY_FORMULA_UNRESOLVED_298K = 56
 B1259_EMPTY_FORMULA_UNRESOLVED_HT = 16
 B1259_EMPTY_METADATA_TABLES = 3
 B1259_EMPTY_ALL_CELLS_REFUSED_OR_EXCLUDED = 2
@@ -55,7 +55,7 @@ B1259_UNGUARDED_MERGED_STORED = 2
 B1259_IDENTITY_10X = 118
 B1259_IDENTITY_1X_10X = 27
 B1259_FORMULA_UNRESOLVED_HT = 16
-B1259_FORMULA_UNRESOLVED_298K_ROWS = 59
+B1259_FORMULA_UNRESOLVED_298K_ROWS = 56
 SILVER_298K = "b1259-298k-0001-silver"
 AG_ION_298K = "b1259-298k-0002-ag-aqueous-ion"
 AL_ION_298K = "b1259-298k-0004-al-aqueous-ion"
@@ -116,6 +116,34 @@ def test_tridymite_record_name_uses_the_closed_polymorph_alias() -> None:
         observation.identity.species.polymorph.is_unknown
         for observation in o_tridymite.observations
     )
+
+
+def test_hexagonal_anorthite_keeps_its_printed_unrecognised_polymorph() -> None:
+    record_id = "b1259-298k-0311-hexagonal-anorthite"
+    record = _load(record_id)
+    correction = next(
+        item for item in record["corrections"] if item["field"] == "polymorph"
+    )
+    assert correction["pdf_page"] == 30
+    assert correction["printed_token"] == "hexagonal"
+
+    generated = generator.generate_record(record)
+    assert generated.observations
+    assert all(
+        observation.identity.species.polymorph.is_unknown
+        and observation.identity.species.polymorph.rejection_kind.value == "unrecognised"
+        and "'hexagonal'" in observation.identity.species.polymorph.reason
+        for observation in generated.observations
+    )
+    from simulator.battery.compilation_tier import predict_thermo_attempt
+    from simulator.battery.enums import Engine
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        generated.observations[0],
+        invoke_pure_phase=False,
+    )
+    assert attempt.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
 
 
 def test_table1_states_calorie_r_and_joule_companion() -> None:
@@ -290,6 +318,145 @@ def test_formation_references_follow_b1259_temperature_schedules() -> None:
         "Co=B1259 reference-state table p.41/PDF p.47" in (obs.locator.note or "")
         for obs in cobalt_oxide.observations
     )
+
+
+def test_element_reference_state_observations_follow_temperature_schedule() -> None:
+    generated = _generation("b1259-ht-0025-potassium-reference-state")
+    potassium = _observations_for(
+        generated, Quantity.S, temperature="1000", formula="K"
+    )
+    assert len(potassium) == 1
+
+    reference = generator._element_reference_species("K", Decimal("1000"))
+    assert reference is not None
+    expected_species, _atoms = reference
+    assert potassium[0].identity.species == expected_species
+
+
+def test_element_reference_state_selector_keeps_compound_reference_rows() -> None:
+    record = _load("b1259-ht-0107-lead-monoxide-reference-state")
+    prior_phase, _prior_polymorph = generator._phase_state(record)
+    assert prior_phase.is_value
+    assert prior_phase.value is Phase.G
+
+    generated = generator.generate_record(record)
+    entropy = _observations_for(generated, Quantity.S, formula="PbO")
+    assert len(entropy) == 24
+    assert all(
+        observation.identity.species.phase == prior_phase
+        for observation in entropy
+    )
+
+
+def test_element_reference_state_boiling_rows_pair_entropy_with_phase() -> None:
+    for record_id, formula, temperature, condensed_s, gas_s in (
+        (
+            "b1259-ht-0025-potassium-reference-state",
+            "K",
+            "1043.7",
+            Decimal("26.300"),
+            Decimal("44.547"),
+        ),
+        (
+            "b1259-ht-0031-sodium-reference-state",
+            "Na",
+            "1176.9",
+            Decimal("23.688"),
+            Decimal("43.473"),
+        ),
+        (
+            "b1259-ht-0027-magnesium-reference-state",
+            "Mg",
+            "1363",
+            Decimal("20.710"),
+            Decimal("43.050"),
+        ),
+        (
+            "b1259-ht-0012-calcium-reference-state",
+            "Ca",
+            "1756",
+            Decimal("25.070"),
+            Decimal("45.800"),
+        ),
+    ):
+        generated = _generation(record_id)
+        entropy = _observations_for(
+            generated,
+            Quantity.S,
+            temperature=temperature,
+            formula=formula,
+        )
+        assert len(entropy) == 2
+        condensed = next(
+            observation
+            for observation in entropy
+            if "as_published=" + repr(str(condensed_s))
+            in (observation.locator.note or "")
+        )
+        gas = next(
+            observation
+            for observation in entropy
+            if "as_published=" + repr(str(gas_s))
+            in (observation.locator.note or "")
+        )
+        assert condensed.identity.species.phase.value is Phase.L
+        assert gas.identity.species.phase.value is Phase.G
+        assert gas.value.point > condensed.value.point
+
+
+def test_element_reference_transition_bad_enthalpy_stays_unknown() -> None:
+    record = _load("b1259-ht-0025-potassium-reference-state")
+    for row in record["rows"]:
+        if (
+            row.get("kind") == "data"
+            and row.get("temperature", {}).get("as_published") == "1043.7"
+            and row.get("entropy", {}).get("as_published") == "44.547"
+        ):
+            row["H_minus_H298"]["as_published"] = "30.014"
+            row["H_minus_H298"]["value"] = 30.014
+            # Keep the Planck identity: 44.547 - 1000*30.014/1043.7
+            # is 15.789694..., which prints as 15.790 at three decimals.
+            row["gibbs_function"]["as_published"] = "15.790"
+            row["gibbs_function"]["value"] = 15.790
+    generated = generator.generate_record(record)
+    entropy = _observations_for(
+        generated, Quantity.S, temperature="1043.7", formula="K"
+    )
+    assert len(entropy) == 2
+    assert all(observation.identity.species.phase.is_unknown for observation in entropy)
+
+
+def test_calcium_reference_state_rows_above_boiling_are_gas() -> None:
+    generated = _generation("b1259-ht-0012-calcium-reference-state")
+    for temperature in ("1800", "1900", "2000"):
+        entropy = _observations_for(
+            generated, Quantity.S, temperature=temperature, formula="Ca"
+        )
+        assert len(entropy) == 1
+        assert entropy[0].identity.species.phase.value is Phase.G
+
+
+def test_calcium_reference_state_gas_entropy_below_condensed_floor_stays_unknown() -> None:
+    record = _load("b1259-ht-0012-calcium-reference-state")
+    for row in record["rows"]:
+        if (
+            row.get("kind") == "data"
+            and row.get("temperature", {}).get("as_published") == "1800"
+        ):
+            row["entropy"]["as_published"] = "24.000"
+            row["entropy"]["value"] = 24.0
+            # Keep the Planck identity: 24.000 - 1000*49.829/1800
+            # is -3.682777..., which prints as -3.683 at the table's
+            # three-decimal precision.
+            row["gibbs_function"]["as_published"] = "-3.683"
+            row["gibbs_function"]["value"] = -3.683
+
+    generated = generator.generate_record(record)
+    entropy = _observations_for(
+        generated, Quantity.S, temperature="1800", formula="Ca"
+    )
+    assert len(entropy) == 1
+    assert entropy[0].identity.species.phase.is_unknown
 
 
 def test_reference_schedule_transition_rows_match_b1259_tables() -> None:

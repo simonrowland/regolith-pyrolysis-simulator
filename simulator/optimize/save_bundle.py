@@ -13,7 +13,7 @@ import zipfile
 
 from simulator.optimize.evalspec import current_code_version
 
-SAVE_SCHEMA_VERSION = 1
+SAVE_SCHEMA_VERSION = 2
 MEMBER_SCHEMA_VERSION = 1
 ARTIFACT_INDEX_NAME = "artifact.index.json"
 TERMINAL_STUDY_STATUSES = frozenset(

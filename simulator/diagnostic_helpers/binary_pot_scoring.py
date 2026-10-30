@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import sys
 import time
 from collections import defaultdict
 from dataclasses import dataclass
@@ -29,6 +30,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     BinaryPotBatteryError,
     EquilibrateCell,
     Po2Request,
+    close_battery_engine_handles,
     _refusal_matrix,
     cell_score_authority,
     cell_score_notice_kinds,
@@ -914,7 +916,9 @@ def run_scoring_arm(
         _hostname,
         _refusal_matrix,
         _utc_stamp,
+        battery_engine_handle_is_live,
         equilibrate_cell,
+        open_cached_battery_engine_handle,
         probe_battery_engines,
     )
 
@@ -925,121 +929,142 @@ def run_scoring_arm(
     wall0 = time.perf_counter()
     cpu0 = time.process_time()
     hostname = _hostname()
-    resolved = dict(handles) if handles is not None else probe_battery_engines(names)
+    provided_handles = dict(handles or {})
+    resolved: dict[str, EngineHandle] = {}
+    try:
+        resolved.update(
+            dict(handles) if handles is not None else probe_battery_engines(names)
+        )
 
-    n_expected = 0
-    for pot in scoring_pots:
-        n_expected += len(pot.temperatures_K) * len(names)
-    _emit_progress(
-        progress_log,
-        f"{_utc_stamp()} START scoring-arm hostname={hostname} n_expected={n_expected}",
-    )
+        n_expected = 0
+        for pot in scoring_pots:
+            n_expected += len(pot.temperatures_K) * len(names)
+        _emit_progress(
+            progress_log,
+            f"{_utc_stamp()} START scoring-arm hostname={hostname} n_expected={n_expected}",
+        )
 
-    cells: list[EquilibrateCell] = []
-    for pot in scoring_pots:
-        binary = pot.as_binary_pot()
+        cells: list[EquilibrateCell] = []
+        for pot in scoring_pots:
+            binary = pot.as_binary_pot()
+            for name in names:
+                handle = resolved.get(name) or probe_battery_engines((name,))[name]
+                resolved[name] = handle
+                for temperature_K in pot.temperatures_K:
+                    had_live_handle = battery_engine_handle_is_live(handle)
+                    if handle.backend is not None and not had_live_handle:
+                        handle, _owns_handle = open_cached_battery_engine_handle(
+                            name, resolved
+                        )
+                        resolved[name] = handle
+                        had_live_handle = battery_engine_handle_is_live(handle)
+                    cell = equilibrate_cell(
+                        handle,
+                        binary,
+                        temperature_K=float(temperature_K),
+                        po2=SCORING_PO2,
+                    )
+                    cells.append(cell)
+                    _emit_progress(
+                        progress_log,
+                        (
+                            f"{_utc_stamp()} {len(cells)}/{n_expected} "
+                            f"pot={cell.pot_id} engine={cell.engine} "
+                            f"T={cell.temperature_K:g} "
+                            f"status={cell.status} "
+                            f"reason={cell.refusal_reason or '-'} "
+                            f"n_act={len(cell.melt_activities)} "
+                            f"wall={cell.wall_s:.3f}"
+                        ),
+                    )
+                    if not battery_engine_handle_is_live(handle) and (
+                        not handle.available or had_live_handle
+                    ):
+                        handle, _owns_handle = open_cached_battery_engine_handle(
+                            name, resolved
+                        )
+                        resolved[name] = handle
+
+        envelopes = score_scoring_arm(
+            pots=scoring_pots,
+            cells=cells,
+            comparators=comparators,
+            envelope=envelope,
+            rail_for=rail_for,
+        )
+        binary_pots = [pot.as_binary_pot() for pot in scoring_pots]
+        identities = _engine_identities_from_toml()
+        engines_block: dict[str, Any] = {}
         for name in names:
-            handle = resolved.get(name) or probe_battery_engines((name,))[name]
-            resolved[name] = handle
-            for temperature_K in pot.temperatures_K:
-                cell = equilibrate_cell(
-                    handle,
-                    binary,
-                    temperature_K=float(temperature_K),
-                    po2=SCORING_PO2,
-                )
-                cells.append(cell)
-                _emit_progress(
-                    progress_log,
-                    (
-                        f"{_utc_stamp()} {len(cells)}/{n_expected} "
-                        f"pot={cell.pot_id} engine={cell.engine} "
-                        f"T={cell.temperature_K:g} "
-                        f"status={cell.status} "
-                        f"reason={cell.refusal_reason or '-'} "
-                        f"n_act={len(cell.melt_activities)} "
-                        f"wall={cell.wall_s:.3f}"
-                    ),
-                )
-                if not handle.available:
-                    revived = probe_battery_engines((name,))[name]
-                    resolved[name] = revived
-                    handle = revived
-
-    envelopes = score_scoring_arm(
-        pots=scoring_pots,
-        cells=cells,
-        comparators=comparators,
-        envelope=envelope,
-        rail_for=rail_for,
-    )
-    binary_pots = [pot.as_binary_pot() for pot in scoring_pots]
-    identities = _engine_identities_from_toml()
-    engines_block: dict[str, Any] = {}
-    for name in names:
-        handle = resolved.get(name)
-        engines_block[name] = {
-            "available": bool(handle.available) if handle is not None else False,
-            "unavailable_reason": (
-                handle.unavailable_reason if handle is not None else "not_probed"
+            handle = resolved.get(name)
+            engines_block[name] = {
+                "available": bool(handle.available) if handle is not None else False,
+                "unavailable_reason": (
+                    handle.unavailable_reason if handle is not None else "not_probed"
+                ),
+                "takes_fo2": bool(handle.takes_fo2) if handle is not None else False,
+                "identity": (
+                    dict(handle.identity)
+                    if handle is not None and handle.identity
+                    else identities.get(name, {})
+                ),
+            }
+        wall = time.perf_counter() - wall0
+        cpu = time.process_time() - cpu0
+        scored = [row for row in envelopes if row.get("score_eligible")]
+        residual_summary = _residual_summary(envelopes)
+        report = {
+            "schema_version": 1,
+            "kind": "binary_pot_scoring_arm",
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "authority": "diagnostic_only",
+            "certifies": False,
+            "calibrates": False,
+            "verdict": None,
+            "posture": (
+                "Measured KEMS activities vs each engine. Typed refusals are "
+                "scored rows. model_derived / quoted extract rows are not scored. "
+                "No coefficient is adjusted by this harness."
             ),
-            "takes_fo2": bool(handle.takes_fo2) if handle is not None else False,
-            "identity": (
-                dict(handle.identity)
-                if handle is not None and handle.identity
-                else identities.get(name, {})
-            ),
-        }
-    wall = time.perf_counter() - wall0
-    cpu = time.process_time() - cpu0
-    scored = [row for row in envelopes if row.get("score_eligible")]
-    residual_summary = _residual_summary(envelopes)
-    report = {
-        "schema_version": 1,
-        "kind": "binary_pot_scoring_arm",
-        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "authority": "diagnostic_only",
-        "certifies": False,
-        "calibrates": False,
-        "verdict": None,
-        "posture": (
-            "Measured KEMS activities vs each engine. Typed refusals are "
-            "scored rows. model_derived / quoted extract rows are not scored. "
-            "No coefficient is adjusted by this harness."
-        ),
-        "hostname": hostname,
-        "receipt": {
             "hostname": hostname,
-            "engine_identities": identities,
-            "wall_s": wall,
-            "cpu_s": cpu,
-            "wall_cpu_ratio": (wall / cpu) if cpu > 0.0 else None,
-        },
-        "pots": [pot.as_payload() | {"pot_id": pot.pot_id} for pot in scoring_pots],
-        "engines": engines_block,
-        "refusal_matrix": _refusal_matrix(binary_pots, names, cells),
-        "n_cells": len(cells),
-        "n_ok": sum(1 for cell in cells if cell.status == "ok"),
-        "n_refused": sum(1 for cell in cells if cell.status == "refusal"),
-        "n_envelope_rows": len(envelopes),
-        "n_score_eligible": len(scored),
-        "scored_rows_per_engine": _count_scored_per_engine(envelopes),
-        "residual_summary": residual_summary,
-        "cells": [cell.as_payload() for cell in cells],
-        "envelopes": envelopes,
-    }
-    _emit_progress(
-        progress_log,
-        (
-            f"{_utc_stamp()} DONE scoring-arm hostname={hostname} "
-            f"n_cells={report['n_cells']} n_ok={report['n_ok']} "
-            f"n_refused={report['n_refused']} "
-            f"n_envelope={report['n_envelope_rows']} "
-            f"n_score_eligible={report['n_score_eligible']} "
-            f"wall={wall:.3f} cpu={cpu:.3f}"
-        ),
-    )
-    return report
+            "receipt": {
+                "hostname": hostname,
+                "engine_identities": identities,
+                "wall_s": wall,
+                "cpu_s": cpu,
+                "wall_cpu_ratio": (wall / cpu) if cpu > 0.0 else None,
+            },
+            "pots": [pot.as_payload() | {"pot_id": pot.pot_id} for pot in scoring_pots],
+            "engines": engines_block,
+            "refusal_matrix": _refusal_matrix(binary_pots, names, cells),
+            "n_cells": len(cells),
+            "n_ok": sum(1 for cell in cells if cell.status == "ok"),
+            "n_refused": sum(1 for cell in cells if cell.status == "refusal"),
+            "n_envelope_rows": len(envelopes),
+            "n_score_eligible": len(scored),
+            "scored_rows_per_engine": _count_scored_per_engine(envelopes),
+            "residual_summary": residual_summary,
+            "cells": [cell.as_payload() for cell in cells],
+            "envelopes": envelopes,
+        }
+        _emit_progress(
+            progress_log,
+            (
+                f"{_utc_stamp()} DONE scoring-arm hostname={hostname} "
+                f"n_cells={report['n_cells']} n_ok={report['n_ok']} "
+                f"n_refused={report['n_refused']} "
+                f"n_envelope={report['n_envelope_rows']} "
+                f"n_score_eligible={report['n_score_eligible']} "
+                f"wall={wall:.3f} cpu={cpu:.3f}"
+            ),
+        )
+        return report
+    finally:
+        close_battery_engine_handles(
+            resolved,
+            exclude=provided_handles,
+            active_error=sys.exc_info()[1],
+        )
 
 
 def scoring_pot_from_payload(row: Mapping[str, Any]) -> ScoringPot:
