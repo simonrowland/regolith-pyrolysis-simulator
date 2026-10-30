@@ -17025,17 +17025,38 @@ def test_markova_residue_default_admission_survives_printed_composition_maps(
         if observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
     ]
-    def by_id(observations):
-        return {
-            observation.observation_id: (
+    def by_series_temperature(observations):
+        # The content hash in the observation id changes when a temperature
+        # step gains point conditions. Pair the printed loss on series and
+        # temperature; that is the value the store still holds.
+        keyed = {}
+        for observation in observations:
+            series = (
+                "VI"
+                if "residual_melt_VI_lherzolite" in observation.observation_id
+                else "V"
+            )
+            temperature = observation.identity.temperature_K
+            temperature_key = (
+                temperature.value
+                if temperature is not None and temperature.is_value
+                else None
+            )
+            keyed[(series, temperature_key)] = (
                 observation.value.point,
                 observation.admission.status,
                 observation.admission.reason,
             )
-            for observation in observations
-        }
+        return keyed
+
+    stored_by_step = by_series_temperature(stored_mass_loss)
+    migrated_by_step = by_series_temperature(migrated_mass_loss)
     assert len(stored_mass_loss) == 24
-    assert by_id(migrated_mass_loss) == by_id(stored_mass_loss)
+    assert len(migrated_mass_loss) == 24
+    # A repeated series and temperature would drop a row from the map.
+    assert len(stored_by_step) == 24
+    assert len(migrated_by_step) == 24
+    assert migrated_by_step == stored_by_step
 
 def test_residue_series_oxide_columns_are_migrated_or_documented() -> None:
     residue_fields = set(
