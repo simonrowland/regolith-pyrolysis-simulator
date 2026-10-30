@@ -242,18 +242,6 @@ def test_completed_run_wires_product_classification_and_markdown() -> None:
 
 
 def test_success_payload_builds_per_hour_projection_once(monkeypatch):
-    per_hour_projection_calls = []
-    project_per_hour = runner_module._execution_per_hour_summary
-
-    def count_per_hour_projection(execution):
-        per_hour_projection_calls.append(execution)
-        return project_per_hour(execution)
-
-    monkeypatch.setattr(
-        runner_module,
-        "_execution_per_hour_summary",
-        count_per_hour_projection,
-    )
     sim = SimpleNamespace(
         record=SimpleNamespace(
             liquid_fraction_provider="probe",
@@ -291,6 +279,26 @@ def test_success_payload_builds_per_hour_projection_once(monkeypatch):
         refusal_diagnostic={},
         envelope_detail_unavailable=None,
     )
+    per_hour_conversion_calls = []
+    json_safe = runner_module._json_safe
+
+    def count_per_hour_conversion(value):
+        if (
+            type(value) is list
+            and len(value) == len(execution.per_hour)
+            and all(
+                converted is original
+                for converted, original in zip(value, execution.per_hour)
+            )
+        ):
+            per_hour_conversion_calls.append(value)
+        return json_safe(value)
+
+    monkeypatch.setattr(
+        runner_module,
+        "_json_safe",
+        count_per_hour_conversion,
+    )
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
@@ -301,7 +309,8 @@ def test_success_payload_builds_per_hour_projection_once(monkeypatch):
 
     assert payload["per_hour_summary"] == [row]
     assert payload["pO2_enforcement_by_hour"] == [{"status": "ok"}]
-    assert per_hour_projection_calls == [execution]
+    # A reverted success builder converts the original rows again for summary.
+    assert len(per_hour_conversion_calls) == 1
 
 
 def test_failure_payload_builds_per_hour_projection_once(monkeypatch):

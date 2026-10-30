@@ -238,14 +238,18 @@ _TERMINAL_REFUSAL_SNAPSHOT_SEPARATE_ROOT_NAMES = (
 # frozen LabGeometry returned by parse_lab_geometry and only read to derive
 # pipe segments.
 #
-# The retained `_last_*` roots below are scalar leaves or replace-only
-# diagnostics. The writer/alias audit for every listed name found no nested
-# mutation of the entry object; `_last_extraction_completeness_diagnostic` is
-# the sole retained dict with an in-place writer, and _step_one_hour replaces
-# it before its .update() in _update_extraction_completeness. Producers for
-# the other listed diagnostics build local values and assign the root; scalar
-# telemetry roots cannot be mutated. Unknown roots and mutable model state
-# stay deep-copied.
+# The retained `_last_*` roots below are scalar leaves or replacement-based
+# diagnostics, with four dict writers that mutate only fresh per-hour roots.
+# In evaporation.py, _project_condensed_stage_collection mutates aliases of
+# `_last_condensed_by_stage_species_delta` and `_last_impurity_delta`, and
+# _record_wall_deposit_delta mutates an alias of
+# `_last_wall_deposit_by_segment_species_delta`; _step_one_hour replaces all
+# three with `{}` before those writers run. `_update_extraction_completeness`
+# updates `_last_extraction_completeness_diagnostic` after its per-hour reset
+# and after assigning a newly built dict. The old entry roots are never passed
+# to these writers. Other diagnostic producers build local values and assign
+# the root; scalar telemetry roots cannot be mutated. Unknown roots and mutable
+# model state stay deep-copied.
 #
 # These three mutable roots are intentionally absent from the retained set:
 # _record_phase_context_diagnostic writes through an alias into the entry map;
