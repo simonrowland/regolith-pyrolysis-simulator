@@ -177,7 +177,10 @@ def test_per_hour_and_p_o2_projections_keep_bytes_and_ownership():
         "extra": (1, 2),
     }])
     per_hour = _execution_per_hour_summary(execution)
-    p_o2_by_hour = _execution_pO2_enforcement_by_hour(execution)
+    p_o2_by_hour = _execution_pO2_enforcement_by_hour(
+        execution,
+        per_hour_summary=per_hour,
+    )
 
     assert json.dumps(per_hour, separators=(",", ":")) == (
         '[{"hour":1,"pO2_enforcement":{"status":"ok",'
