@@ -2724,12 +2724,25 @@ def gate_curve_provider_diagnostic_reasons(
     return tuple(reasons)
 
 
-def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
-    return any(
-        "timeout" in reason
-        or reason in {"aggregate_budget_exceeded", "mageminaggregatebudgetexceeded"}
-        for reason in gate_curve_provider_diagnostic_reasons(diagnostic)
+def gate_curve_provider_timeout_reason(
+    diagnostic: Mapping[str, Any] | None,
+) -> str | None:
+    return next(
+        (
+            reason
+            for reason in gate_curve_provider_diagnostic_reasons(diagnostic)
+            if "timeout" in reason
+            or reason in {
+                "aggregate_budget_exceeded",
+                "mageminaggregatebudgetexceeded",
+            }
+        ),
+        None,
     )
+
+
+def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
+    return gate_curve_provider_timeout_reason(diagnostic) is not None
 
 
 def gate_curve_provider_outcome_for_status(

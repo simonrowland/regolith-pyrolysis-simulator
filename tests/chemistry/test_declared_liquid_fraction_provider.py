@@ -661,7 +661,10 @@ def test_optimizer_resolves_gate_declared_in_loaded_setpoints(monkeypatch):
     assert spec.chemistry_kernel['liquid_fraction_provider'] == 'analytical'
 
 
-@pytest.mark.parametrize('failure', ['numerical', 'projected_numerical', 'aggregate_timeout', 'warm_timeout'])
+@pytest.mark.parametrize('failure', [
+    'numerical', 'missing_bracket', 'non_monotone', 'projected_numerical',
+    'aggregate_timeout', 'warm_timeout',
+])
 @pytest.mark.parametrize('prior_good', [False, True])
 def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     monkeypatch, failure, prior_good,
@@ -692,6 +695,16 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
             return SimpleNamespace(status='not_converged', diagnostic={
                 'backend_status_reason': 'no_convergence',
             }, warnings=('non-monotone frac_M(T)',))
+        if failure == 'missing_bracket':
+            return SimpleNamespace(status='not_converged', diagnostic={}, warnings=(
+                'solidus bracket absent: frac_M never crossed 0.001',
+                'liquidus bracket absent: frac_M never reached 0.995',
+            ))
+        if failure == 'non_monotone':
+            return SimpleNamespace(status='not_converged', diagnostic={}, warnings=(
+                'non-monotone frac_M(T): 450.000 C gives 0 below '
+                '400.000 C value 0.9',
+            ))
         return SimpleNamespace(status='out_of_domain', diagnostic={
             'backend_status_reason': 'composition_projected',
             'backend_diagnostics': {
@@ -719,16 +732,28 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
         assert notice['failure_hour'] == 7
         assert notice['failure_temperature_C'] == 1500.0
         assert notice['status'] == ('unavailable' if failure == 'warm_timeout' else (
-            'not_converged' if failure == 'numerical' else 'out_of_domain'
+            'not_converged' if failure in {
+                'numerical', 'missing_bracket', 'non_monotone',
+            } else 'out_of_domain'
         ))
-        assert notice['provider_diagnostic']
+        if failure in {'missing_bracket', 'non_monotone'}:
+            assert notice['provider_diagnostic'] == {}
+        else:
+            assert notice['provider_diagnostic']
         assert 'calibration-floor step' in notice['detail']
         assert 'not a fresh solve or a melting measurement' in notice['detail']
         if timed_out:
             assert notice['backend_failure_disposition'] == 'environment'
+            assert notice['reason'] == (
+                'aggregate_budget_exceeded'
+                if failure == 'aggregate_timeout'
+                else 'engine_worker_timeout'
+            )
         else:
             assert notice['outcome'] == 'numerical_failure'
             assert notice['warnings']
+            if failure in {'missing_bracket', 'non_monotone'}:
+                assert notice['reason'] == 'liquid_fraction_provider_failed'
         assert sim._freeze_gate_last_good_curve is None
         assert sim._freeze_gate_liquid_fraction_cache is None
         assert sim._freeze_gate_liquid_fraction_curve_memo == {}
@@ -773,12 +798,22 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     assert notice['failure_temperature_C'] == 1500.0
     assert notice['computed_hour'] == 7
     assert notice['composition_distance_wt_pct'] == 20.0
-    assert notice['provider_diagnostic']
+    if failure in {'missing_bracket', 'non_monotone'}:
+        assert notice['provider_diagnostic'] == {}
+    else:
+        assert notice['provider_diagnostic']
     if timed_out:
         assert notice['backend_failure_disposition'] == 'environment'
+        assert notice['reason'] == (
+            'aggregate_budget_exceeded'
+            if failure == 'aggregate_timeout'
+            else 'engine_worker_timeout'
+        )
     else:
         assert notice['warnings']
         assert notice['outcome'] == 'numerical_failure'
+        if failure in {'missing_bracket', 'non_monotone'}:
+            assert notice['reason'] == 'liquid_fraction_provider_failed'
     assert set(sim._freeze_gate_liquid_fraction_curve_memo) == memo_keys
     assert set(shared) == shared_keys
     assert store.capture_sequence == []
