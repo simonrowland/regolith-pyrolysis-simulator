@@ -546,7 +546,8 @@ class EnginePrediction:
         authority = self.authority or (
             Authority.REFUSED if self.value is None else Authority.BRIDGE
         )
-        if p2o5_screening_proxy and self.value is not None:
+        evaluation_produced = self.execution.state is ExecutionState.PRODUCED
+        if p2o5_screening_proxy and evaluation_produced and self.value is not None:
             authority = Authority.EXTRAPOLATED
         pack_source = _openimcc_sp_pack_source()
         object.__setattr__(self, "authority", authority)
@@ -560,8 +561,10 @@ class EnginePrediction:
             if isinstance(self.identity, Identity)
             else None
         )
-        identity_notices = [_openimcc_sp_identity_notice(quantity, authority)]
-        if p2o5_screening_proxy and self.value is not None:
+        identity_notices = []
+        if evaluation_produced:
+            identity_notices.append(_openimcc_sp_identity_notice(quantity, authority))
+        if p2o5_screening_proxy and evaluation_produced and self.value is not None:
             identity_notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
@@ -11186,17 +11189,7 @@ def compile_residual(
         source_relation: SourceRelation = SourceRelation.UNKNOWN,
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
-        sp_identity_notices: tuple[Notice, ...] = ()
-        if engine is Engine.OPENIMCC_SP and prediction is not None:
-            sp_identity_notice = _openimcc_sp_identity_notice(
-                quantity,
-                prediction.authority
-                if prediction is not None and prediction.authority is not None
-                else Authority.REFUSED,
-            )
-            if sp_identity_notice not in notices:
-                sp_identity_notices = (sp_identity_notice,)
-        all_notices = union_notices(notices, extra_notices, sp_identity_notices)
+        all_notices = union_notices(notices, extra_notices)
         result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
         excl = exclusions or ("status_match_or_mismatch",)
         if (
