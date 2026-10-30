@@ -84,8 +84,8 @@ _expect_red(
 )
 _expect_red(
     method_name="_migrate_extract_observation",
-    needle='source_unavailable_reason not in (None, "")',
-    replacement="False",
+    needle="if suppress_unvalued_nonyield_point:",
+    replacement="if False:",
     test_name="test_real_nonyield_points_do_not_emit_generic_unavailable_rows",
 )
 _expect_red(
