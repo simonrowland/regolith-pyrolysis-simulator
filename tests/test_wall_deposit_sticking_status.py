@@ -889,6 +889,7 @@ def test_fe_collector_inference_is_non_authoritative_inside_and_above_band(
         assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
     else:
         assert record["alpha_s_domain_status"] == "extrapolated"
+        assert record["authority_level"] == "extrapolated"
         assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
 
 

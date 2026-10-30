@@ -29,7 +29,7 @@ from simulator.backend_names import (
     LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
-from simulator.condensation import KnudsenRegimeRefusal
+from simulator.condensation import KnudsenRegimeRefusal, alpha_s as resolve_alpha_s
 from simulator.electrolysis import (
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
@@ -3721,14 +3721,13 @@ def test_parallel_composition_target_stub_study_completes(
 
         wall_authority = summary["wall_deposit_sticking_authority"]
         fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
+        expected_fe_alpha = resolve_alpha_s("Fe", 1523.15, {})
         assert any(
-            record.get("alpha_s", 0.0) == pytest.approx(0.02)
-            and record.get("alpha_s_extrapolation_notice", {}).get(
-                "authority_level"
-            ) == "extrapolated"
-            and record["alpha_s_extrapolation_notice"].get(
-                "temperature_used_K"
-            ) == pytest.approx(1523.15)
+            record.get("alpha_s") == pytest.approx(expected_fe_alpha)
+            and record.get("alpha_s_form") == "arrhenius"
+            and record.get("alpha_s_extrapolated") is False
+            and record.get("alpha_s_domain_status") == "in_domain"
+            and record.get("alpha_s_temperature_K") == pytest.approx(1523.15)
             for record in fe_records
         )
 
