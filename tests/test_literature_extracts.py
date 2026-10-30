@@ -5768,6 +5768,11 @@ def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
     tmp_path: Path,
 ) -> None:
     from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.score import _bench_for_score
+    from simulator.battery.source_oxygen import (
+        SourceOxygenCondition,
+        resolve_source_oxygen,
+    )
 
     cases = (
         (
@@ -5838,6 +5843,47 @@ def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
         ]
         assert observations
         assert all(item.experiment_id == experiment.experiment_id for item in observations)
+
+        if filename == "kems-022-demaria-1971.yaml":
+            atomic_oxygen = [
+                item
+                for item in result.observations.values()
+                if "demaria_1971_o_atomic_psat_table5" in item.observation_id.split("::")
+            ]
+            assert atomic_oxygen
+            assert all(item.experiment_id == experiment.experiment_id for item in atomic_oxygen)
+            conditions = [
+                (
+                    item,
+                    resolve_source_oxygen(
+                        item,
+                        result.observations.values(),
+                        _bench_for_score(experiment, result.benches),
+                    ),
+                )
+                for item in observations
+            ]
+            matched = [
+                (item, condition)
+                for item, condition in conditions
+                if isinstance(condition, SourceOxygenCondition)
+            ]
+            assert len(matched) == 10
+            assert len(conditions) - len(matched) == 4
+            assert all(
+                any(
+                    "demaria_1971_o_atomic_psat_table5" in used
+                    for used in condition.used_observations
+                )
+                for _item, condition in matched
+            )
+            pinned = next(
+                condition
+                for item, condition in matched
+                if item.identity.temperature_K.is_value
+                and item.identity.temperature_K.value == Decimal("2060")
+            )
+            assert pinned.observation.identity.species.formula == "O2"
 
 def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
     source_ids = (
