@@ -1878,7 +1878,10 @@ def test_controlled_flash_preserves_condenser_pressure_and_drains_residual(
     sim._apply_native_fe_saturation_split = lambda **_kwargs: None
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda _equilibrium: flux
+    sim._calculate_evaporation = lambda _equilibrium, **_kwargs: flux
+    sim._last_vapour_batch_flux_overlay = {
+        "selected_runtime_pa_by_species": {"Fe": 100.0}
+    }
     _bypass_analytic_depletion(sim)
     configured = {}
     real_configure = sim.condensation_model.configure_operating_conditions
