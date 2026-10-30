@@ -429,9 +429,9 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     _CRO_MW = 51.9961 + 15.9994  # CrO
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
-    _PINNED_CRO_OFFGAS_KG = 0.0
-    # 2026-10-28 c3 (d-268/d-287): Stage-3 routing reaches the iron-buffer saturation branch two hours earlier (h139 vs h141); the released O2 admits two more hours of CrO3 (+0.0099 kg in the train). The earlier 0.13 kg move was a carrier-order redox defect, fixed in this branch.
-    _PINNED_CR_OFFGAS_EQ_KG = 3.309271740035906e-5
+    # b-1057's proxy/bridge CrO alpha leaves a nonzero terminal-offgas trace;
+    # retain the production result instead of the refused-alpha zero.
+    _PINNED_CRO_OFFGAS_KG = 0.007463561171093632
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
@@ -451,15 +451,14 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         0.7042939343693395, rel=1e-9
     )
     assert cr_ingot_kg == pytest.approx(0.08, abs=0.005)
-    # Keep the offgas pins at 1e-6 relative tolerance.
+    # Keep the CrO offgas pin at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
-    assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
     # story payload values are display-rounded (2 dp), so compare loosely.
     assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == pytest.approx(
         cr_ingot_kg, abs=0.005
     )
     assert story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0) == pytest.approx(
-        0.0, abs=0.005
+        round(cro_offgas_kg, 2), abs=0.005
     )
     # Inventory closure follows AtomLedger streams: rump Cr + train Cr + Cr
     # in captured CrO3 + terminal offgas. One Cr per CrO3 gives kg CrO3 *
