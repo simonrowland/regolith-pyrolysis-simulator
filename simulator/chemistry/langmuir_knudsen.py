@@ -145,6 +145,43 @@ def knudsen_effusion_molar_flux(
     return delta_p / denominator
 
 
+def oxygen_efflux_implied_pO2_Pa(
+    J_Si_mol_cm2_s: float,
+    J_Mg_mol_cm2_s: float,
+    T_surface_K: float,
+) -> float:
+    """Return the melt-implied oxygen pressure for vacuum Langmuir runs.
+
+    Premise: SiO and Mg evaporation each remove one oxygen atom per product,
+    so the melt's oxygen efflux is ``J_O2 = (J_Si + J_Mg)/2``; the study uses
+    ``alpha_O2 = 1``. Algebra: convert the printed flux to mol/(m²·s) by
+    multiplying by 10⁴ cm²/m², then invert the ideal Knudsen law
+    ``J_O2 = pO2/sqrt(2*pi*M_O2*R*T)``. Unit check:
+    mol/(m²·s) × sqrt((kg/mol)·(J/(mol·K))·K) = Pa. Limiting case:
+    zero metal flux gives zero implied pO2; negative/non-finite inputs are
+    refused instead of becoming a pressure floor.
+    """
+    import math
+
+    silicon = float(J_Si_mol_cm2_s)
+    magnesium = float(J_Mg_mol_cm2_s)
+    temperature = float(T_surface_K)
+    if (
+        not all(math.isfinite(value) for value in (silicon, magnesium, temperature))
+        or silicon < 0.0
+        or magnesium < 0.0
+        or temperature <= 0.0
+    ):
+        raise ValueError("oxygen-efflux inputs must be finite, nonnegative fluxes and positive T")
+    from simulator.state import MOLAR_MASS
+
+    oxygen_molar_flux = 0.5 * (silicon + magnesium) * 10_000.0
+    molar_mass_kg_mol = float(MOLAR_MASS["O2"]) / 1000.0
+    return oxygen_molar_flux * math.sqrt(
+        2.0 * math.pi * molar_mass_kg_mol * GAS_CONSTANT_J_MOL_K * temperature
+    )
+
+
 def langmuir_molar_flux(
     T_surface_K: float,
     p_eq_pa: float,

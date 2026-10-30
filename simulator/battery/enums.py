@@ -97,6 +97,7 @@ class Quantity(StrEnum):
     CP = "cp"
     S = "S"
     EVAPORATION_RATE = "evaporation_rate"
+    EVAPORATION_FLUX_PER_AREA = "evaporation_flux_per_area"
     MASS_LOSS_RATE = "mass_loss_rate"
     WALL_DEPOSIT_MASS = "wall_deposit_mass"
     TRANSITION_TEMPERATURE = "transition_temperature"
@@ -611,6 +612,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.S: "J_per_declared_mol_basis_per_K",
     Quantity.ENTROPY_OF_FUSION: "J_per_declared_mol_basis_per_K",
     Quantity.EVAPORATION_RATE: "kg_per_s",
+    Quantity.EVAPORATION_FLUX_PER_AREA: "kg_per_m2_per_s",
     Quantity.MASS_LOSS_RATE: "kg_per_s",
     Quantity.WALL_DEPOSIT_MASS: "kg",
     Quantity.TRANSITION_TEMPERATURE: "K",
@@ -711,6 +713,7 @@ KINETIC_YIELD_QUANTITIES = frozenset(
     {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.EVAPORATION_RATE,
+        Quantity.EVAPORATION_FLUX_PER_AREA,
         Quantity.MASS_LOSS_RATE,
         Quantity.MASS_LOSS_FRACTION,
         Quantity.MASS_LOSS_FRACTION_VS_T,

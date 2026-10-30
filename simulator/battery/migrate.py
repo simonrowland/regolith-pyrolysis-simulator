@@ -464,6 +464,9 @@ UNIT_DECLARED_QUANTITY = {
 }
 
 QUANTITY_ALIASES = {
+    "printed_areal_molar_flux": Quantity.EVAPORATION_FLUX_PER_AREA,
+    "published_reduced_silicon_flux_time_series": Quantity.EVAPORATION_FLUX_PER_AREA,
+    "JSi": Quantity.EVAPORATION_FLUX_PER_AREA,
     "Fe3plus_over_Fe2plus": Quantity.FE3_FE2_RATIO,
     ValenceValueForm.AVERAGE_OXIDATION_STATE.value: Quantity.VALENCE_RATIO,
     "pure_Psat": Quantity.P_SAT,
@@ -608,6 +611,7 @@ REGIME_TO_METHOD = {
     "solar_vacuum_pyrolysis_free_evaporation": MethodToken.SOLAR_FURNACE_PYROLYSIS,
     "solar_fresnel_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
     "solar_fresnel_continuously_pumped_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+    "vacuum_pyrolysis_furnace": MethodToken.VACUUM_CHAMBER_PYROLYSIS,
     "vacuum_chamber_pyrolysis": MethodToken.VACUUM_CHAMBER_PYROLYSIS,
     "emf_cell": MethodToken.EMF_CELL,
     "quench_equilibration": MethodToken.QUENCH_EQUILIBRATION,
@@ -3413,6 +3417,62 @@ def _convert_rate_to_kg_per_s(
     return None, f"unmapped {quantity_label} unit {units!r}"
 
 
+def convert_evaporation_flux_per_area_to_kg_per_m2_s(
+    value: object,
+    units: str | None,
+    species_formula: str | None,
+) -> tuple[Decimal | None, str | None]:
+    """Normalize printed areal mass or molar flux to kg/(m²·s).
+
+    Premise: the source names a species and reports an areal flux. Algebra:
+    ``J_mass = J_molar × A_source/A_target × M``; for cm² input the area
+    factor is 10⁴ cm²/m², and for m² input it is 1. Unit check:
+    mol/(cm²·s) × cm²/m² × kg/mol = kg/(m²·s). A zero printed flux remains
+    zero; an unknown species or unit is refused rather than assigned a mass.
+    """
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "areal evaporation flux is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing areal evaporation flux unit"
+    unit = (
+        str(units).strip().lower().replace("²", "2").replace("−", "-")
+        .replace("⁻", "-").replace("^", "").replace("·", "")
+    )
+    unit = re.sub(r"\s+", "", unit)
+    if unit in {"kg/m2/s", "kgm-2s-1", "kg/m2s", "kgm-2/s", "kg_per_m2_per_s"}:
+        return amount, "identity:kg_per_m2_per_s"
+    if unit in {"g/m2/s", "gm-2s-1", "g/m2s", "gm-2/s"}:
+        return amount / Decimal("1000"), "g_per_m2_per_s_to_kg_per_m2_per_s"
+    if unit in {"mol/m2/s", "molm-2s-1", "mol/m2s", "molm-2/s"} or "molm-2s-1" in unit:
+        area_factor = Decimal("1")
+        original_unit = "mol/m2/s"
+    elif unit in {
+        "mol/cm2/s", "molcm-2s-1", "mol/cm2s", "molcm-2/s",
+    } or "molcm-2s-1" in unit:
+        area_factor = Decimal("10000")
+        original_unit = "mol/cm2/s"
+    else:
+        return None, f"unmapped areal evaporation flux unit {units!r}"
+    if not isinstance(species_formula, str) or not species_formula.strip():
+        return None, "areal molar flux has no resolved gas species formula"
+    try:
+        from simulator.accounting.formulas import resolve_species_formula
+
+        molar_mass = Decimal(
+            str(resolve_species_formula(species_formula.strip()).molar_mass_kg_per_mol())
+        )
+    except (KeyError, ValueError):
+        return None, f"areal molar flux species {species_formula!r} has no resolved molar mass"
+    if not molar_mass.is_finite() or molar_mass <= 0:
+        return None, f"areal molar flux species {species_formula!r} has no positive molar mass"
+    factor = area_factor * molar_mass
+    return amount * factor, (
+        f"areal_molar_flux_to_kg_per_m2_per_s:{species_formula.strip()}"
+        f":{molar_mass}:{factor}:{original_unit}"
+    )
+
+
 def convert_length_to_m(
     value: object, units: str | None
 ) -> tuple[Decimal | None, str | None]:
@@ -3542,6 +3602,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "m_kg_per_m2 = m_g_per_m2 / 1000",
         "kg_per_m2",
         "g_per_m2",
+    ),
+    "g_per_m2_per_s_to_kg_per_m2_per_s": (
+        Decimal("1000"),
+        "J_kg_per_m2_per_s = J_g_per_m2_per_s / 1000",
+        "kg_per_m2_per_s",
+        "g_per_m2_per_s",
     ),
     "mg_per_m2_to_kg_per_m2": (
         Decimal("1000000"),
@@ -4755,6 +4821,29 @@ def conversion_derivation(
             ),
             parameters=tuple(parameters),
             output_unit="mol_species_per_initial_kg",
+        )
+    if trail_text.startswith("areal_molar_flux_to_kg_per_m2_per_s:"):
+        _prefix, species, raw_molar_mass, raw_factor, original_unit = trail_text.split(":", 4)
+        molar_mass = _as_dec_or_none(raw_molar_mass)
+        factor = _as_dec_or_none(raw_factor)
+        original = _as_dec_or_none(original_value)
+        if molar_mass is None or molar_mass <= 0 or factor is None:
+            return None
+        parameters: list[tuple[str, Located[Decimal]]] = [
+            ("molar_mass_kg_per_mol", Located(State.of(molar_mass), locator=locator)),
+            ("factor", Located(State.of(factor), locator=locator)),
+        ]
+        if original is not None:
+            parameters.insert(0, ("original", Located(State.of(original), locator=locator)))
+        return Derivation(
+            relation=f"areal_molar_flux_{species}_to_kg_per_m2_per_s",
+            inputs=(
+                f"J[kg/(m^2 s)] = J[{original_unit}] * area_factor * M[{species}]",
+                "area_factor=10000 cm^2/m^2 for cm^2 input; 1 for m^2 input",
+                "zero input flux gives zero output flux",
+            ),
+            parameters=tuple(parameters),
+            output_unit="kg_per_m2_per_s",
         )
     meta = _CONVERSION_META.get(str(trail))
     if meta is None:
@@ -9507,6 +9596,13 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "value",
     ),
     Quantity.EVAPORATION_RATE: ("evaporation_rate",),
+    Quantity.EVAPORATION_FLUX_PER_AREA: (
+        "evaporation_flux_per_area",
+        "value_as_printed",
+        "J_mol_cm2_s",
+        "J_Si_mol_cm2_s",
+        "J_Mg_mol_cm2_s",
+    ),
     Quantity.ION_INTENSITY: ("ion_intensity",),
     Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
     Quantity.VALENCE_RATIO: ("value",),
@@ -10251,11 +10347,16 @@ def _selection_from_explicit_unit_conversion(
     units: str | None,
     payload: Mapping[str, Any],
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+    species_formula: str | None = None,
 ) -> SourceSelection | None:
     if quantity is Quantity.DENSITY:
         converted, trail = convert_density_to_kg_per_m3(amount, units)
     elif quantity in {Quantity.EVAPORATION_RATE, Quantity.MASS_LOSS_RATE}:
         converted, trail = _convert_rate_to_kg_per_s(amount, units, quantity)
+    elif quantity is Quantity.EVAPORATION_FLUX_PER_AREA:
+        converted, trail = convert_evaporation_flux_per_area_to_kg_per_m2_s(
+            amount, units, species_formula
+        )
     else:
         return None
     if converted is None:
@@ -10662,6 +10763,7 @@ def _selection_from_named_field(
     q_token: Quantity,
     units: str | None,
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+    species_formula: str | None = None,
 ) -> SourceSelection | None:
     if q_token in {
         Quantity.ACTIVITY,
@@ -11019,6 +11121,18 @@ def _selection_from_named_field(
             )
             if converted_selection is not None:
                 return converted_selection
+        if q_token is Quantity.EVAPORATION_FLUX_PER_AREA:
+            converted_selection = _selection_from_explicit_unit_conversion(
+                amount,
+                key,
+                q_token,
+                _printed_unit_for_field(payload, key) or units,
+                payload,
+                condition_ranges,
+                species_formula,
+            )
+            if converted_selection is not None:
+                return converted_selection
         if q_token is Quantity.DENSITY:
             density_units = _printed_unit_for_field(payload, key) or (
                 "kg/m3" if key == "density_kg_m3_also_printed" else units
@@ -11103,6 +11217,18 @@ def _selection_from_named_field(
             )
             if converted_selection is not None:
                 return converted_selection
+        if q_token is Quantity.EVAPORATION_FLUX_PER_AREA:
+            converted_selection = _selection_from_explicit_unit_conversion(
+                amount,
+                key,
+                q_token,
+                _printed_unit_for_field(payload, key) or units,
+                payload,
+                condition_ranges,
+                species_formula,
+            )
+            if converted_selection is not None:
+                return converted_selection
         if q_token is Quantity.DENSITY:
             amount, trail = convert_density_to_kg_per_m3(
                 amount, _printed_unit_for_field(payload, key) or units
@@ -11172,6 +11298,7 @@ def _selection_from_named_field(
             if q_token in {
                 Quantity.DENSITY,
                 Quantity.EVAPORATION_RATE,
+                Quantity.EVAPORATION_FLUX_PER_AREA,
                 Quantity.MASS_LOSS_RATE,
             }:
                 source_units = _printed_unit_for_field(payload, field_name) or units
@@ -11182,6 +11309,7 @@ def _selection_from_named_field(
                     source_units,
                     payload,
                     condition_ranges,
+                    species_formula,
                 )
                 hi_selection = _selection_from_explicit_unit_conversion(
                     hi,
@@ -11190,6 +11318,7 @@ def _selection_from_named_field(
                     source_units,
                     payload,
                     condition_ranges,
+                    species_formula,
                 )
                 assert lo_selection is not None and hi_selection is not None
                 if lo_selection.value.kind is not ValueKind.POINT:
@@ -11221,13 +11350,16 @@ def _series_selection_from_items(
     units: str | None,
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
     parent: Mapping[str, Any] | None = None,
+    species_formula: str | None = None,
 ) -> SourceSelection:
     points: list[tuple[Decimal, Decimal]] = []
     for item in series:
         if not isinstance(item, Mapping):
             continue
         t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, item)
-        v_sel = select_declared_source(q_token, units, item)
+        v_sel = select_declared_source(
+            q_token, units, item, species_formula=species_formula
+        )
         if t_sel.amount is not None and v_sel.amount is not None:
             points.append((t_sel.amount, v_sel.amount))
     if points:
@@ -11260,6 +11392,8 @@ def select_declared_source(
     declared: Quantity | State[Quantity] | str | None,
     units: str | None,
     payload: Mapping[str, Any] | None,
+    *,
+    species_formula: str | None = None,
 ) -> SourceSelection:
     """The only way source fields become an Observation value or identity axis.
 
@@ -11374,6 +11508,10 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if q_token is Quantity.EVAPORATION_FLUX_PER_AREA:
+        species_formula = (
+            _extract_formula_token(payload.get("gas_species")) or species_formula
+        )
     if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
         oxide_fields, invalid_fields = _residue_component_field_sets(payload)
         for field in ("residue_ppm", *oxide_fields):
@@ -11601,7 +11739,12 @@ def select_declared_source(
         series = points_list if _is_pressure_point_list(points_list) else None
     if isinstance(series, list) and series:
         return _series_selection_from_items(
-            series, q_token, units, condition_ranges, parent=payload
+            series,
+            q_token,
+            units,
+            condition_ranges,
+            parent=payload,
+            species_formula=species_formula,
         )
 
     tabulated = payload.get("tabulated_delta_fG_kJ_mol")
@@ -11703,7 +11846,13 @@ def select_declared_source(
             unused_ancillary=unused,
         )
 
-    named = _selection_from_named_field(payload, q_token, units, condition_ranges)
+    named = _selection_from_named_field(
+        payload,
+        q_token,
+        units,
+        condition_ranges,
+        species_formula,
+    )
     if named is not None:
         return _printed_scalar_selection(named, q_token, payload)
 
@@ -11780,6 +11929,7 @@ def empty_value_from_payload(
     obs_type: str | None,
     units: str | None,
     quantity: Quantity | State[Quantity] | None = None,
+    species_formula: str | None = None,
 ) -> tuple[Value, list[dict[str, Any]], SourceSelection]:
     """Return the archival Value plus printed-point dicts to explode.
 
@@ -11793,24 +11943,32 @@ def empty_value_from_payload(
             {"points": values} if _is_pressure_point_list(values) else {"series": values}
         )
     if not isinstance(values, Mapping):
-        sel = select_declared_source(quantity, units, None)
+        sel = select_declared_source(
+            quantity, units, None, species_formula=species_formula
+        )
         return sel.value, exploded, sel
 
     series = values.get("series")
     if isinstance(series, list) and series:
         for i, item in enumerate(series):
             exploded.append({"index": i, "item": item, "units": units})
-        sel = select_declared_source(quantity, units, values)
+        sel = select_declared_source(
+            quantity, units, values, species_formula=species_formula
+        )
         return sel.value, exploded, sel
 
     tabulated = values.get("tabulated_delta_fG_kJ_mol")
     if isinstance(tabulated, list) and tabulated:
         for i, item in enumerate(tabulated):
             exploded.append({"index": i, "item": item, "units": "kJ_per_mol"})
-        sel = select_declared_source(quantity, "kJ_per_mol", values)
+        sel = select_declared_source(
+            quantity, "kJ_per_mol", values, species_formula=species_formula
+        )
         return sel.value, exploded, sel
 
-    sel = select_declared_source(quantity, units, values)
+    sel = select_declared_source(
+        quantity, units, values, species_formula=species_formula
+    )
     return sel.value, exploded, sel
 
 
@@ -16536,6 +16694,382 @@ class Migrator:
             enriched.append(experiment)
         return {**doc, "experiments": enriched}
 
+    @staticmethod
+    def _oxygen_efflux_condition(
+        J_Si_mol_cm2_s: object,
+        J_Mg_mol_cm2_s: object,
+        temperature_K: object,
+        locator: Mapping[str, Any],
+    ) -> dict[str, Any] | None:
+        """Build a located pO2 condition from paired vacuum Langmuir fluxes."""
+        silicon = _as_dec_or_none(J_Si_mol_cm2_s)
+        magnesium = _as_dec_or_none(J_Mg_mol_cm2_s)
+        temperature = _as_dec_or_none(temperature_K)
+        if (
+            silicon is None
+            or magnesium is None
+            or temperature is None
+            or silicon < 0
+            or magnesium < 0
+            or temperature <= 0
+        ):
+            return None
+        from simulator.chemistry.langmuir_knudsen import (
+            oxygen_efflux_implied_pO2_Pa,
+        )
+
+        try:
+            pressure = Decimal(
+                str(
+                    oxygen_efflux_implied_pO2_Pa(
+                        float(silicon), float(magnesium), float(temperature)
+                    )
+                )
+            )
+        except (ArithmeticError, OverflowError, ValueError):
+            return None
+        if not pressure.is_finite() or pressure <= 0:
+            return None
+
+        def parameter(value: Decimal) -> dict[str, Any]:
+            return {
+                "state": {"tag": "value", "value": str(value)},
+                "locator": dict(locator),
+            }
+
+        return {
+            "state": {
+                "tag": "value",
+                "value": {"kind": "point", "point": str(pressure)},
+            },
+            "locator": dict(locator),
+            "inference": {
+                "relation": "vacuum_langmuir_oxygen_efflux_to_pO2",
+                "inputs": (
+                    "J_O2 = alpha_O2 * (J_Si + J_Mg) / 2; alpha_O2 = 1",
+                    "pO2 = J_O2 * sqrt(2*pi*M_O2*R*T)",
+                    "printed J values are mol/(cm^2 s); convert to mol/(m^2 s) by 10^4",
+                ),
+                "parameters": [
+                    ["J_Si_mol_cm2_s", parameter(silicon)],
+                    ["J_Mg_mol_cm2_s", parameter(magnesium)],
+                    ["T_K", parameter(temperature)],
+                    ["alpha_O2", parameter(Decimal("1"))],
+                ],
+                "output_unit": "Pa",
+            },
+        }
+
+    @staticmethod
+    def _oxygen_efflux_pressure_from_condition(
+        condition: object,
+    ) -> Decimal | None:
+        if not isinstance(condition, Located) or condition.inference is None:
+            return None
+        if condition.inference.relation != "vacuum_langmuir_oxygen_efflux_to_pO2":
+            return None
+        if not condition.state.is_value or not isinstance(condition.state.value, Value):
+            return None
+        value = condition.state.value
+        pressure = value.point if value.kind is ValueKind.POINT else None
+        if pressure is None or not pressure.is_finite() or pressure <= 0:
+            return None
+        return pressure
+
+    @staticmethod
+    def _printed_arm_flux(arm: object) -> Decimal | None:
+        if not isinstance(arm, Mapping):
+            return None
+        printed = arm.get("value_as_printed")
+        if not isinstance(printed, str):
+            return _as_dec_or_none(printed)
+        match = re.fullmatch(
+            r"\s*\(?\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))"
+            r"\s*(?:±\s*[^)]*)?\)?\s*[×x]\s*10\s*([−-]?\s*\d+)\s*",
+            printed,
+        )
+        if match is None:
+            return _as_dec_or_none(printed)
+        exponent = match.group(2).replace("−", "-").replace(" ", "")
+        try:
+            return Decimal(match.group(1)) * (Decimal(10) ** int(exponent))
+        except (ArithmeticError, ValueError):
+            return None
+
+    @classmethod
+    def _prepare_sio_flux_extract_rows(
+        cls, doc: Mapping[str, Any]
+    ) -> Mapping[str, Any]:
+        """Promote extracted Si flux rows and attach their melt-implied pO2."""
+        source_id = str(doc.get("source_id") or "")
+        raw_species = doc.get("species")
+        if not isinstance(raw_species, Mapping):
+            return doc
+        species = dict(raw_species)
+        if source_id == "kems-037-richter-2002":
+            mg_block = species.get("Mg")
+            sio_block = species.get("SiO")
+            if not isinstance(mg_block, Mapping) or not isinstance(sio_block, Mapping):
+                return doc
+            mg_by_sample: dict[str, Mapping[str, Any]] = {}
+            for context in mg_block.get("context") or ():
+                if not isinstance(context, Mapping):
+                    continue
+                values = context.get("values")
+                if not isinstance(values, Mapping):
+                    continue
+                sample = values.get("sample")
+                if isinstance(sample, str):
+                    mg_by_sample[sample] = context
+            promoted: list[dict[str, Any]] = []
+            for context in sio_block.get("context") or ():
+                if not isinstance(context, Mapping):
+                    continue
+                values_raw = context.get("values")
+                conditions = context.get("point_conditions")
+                if not isinstance(values_raw, Mapping) or not isinstance(conditions, Mapping):
+                    continue
+                atmosphere = conditions.get("atmosphere")
+                atmosphere_value = (
+                    atmosphere.get("state", {}).get("value")
+                    if isinstance(atmosphere, Mapping)
+                    else None
+                )
+                if not isinstance(atmosphere_value, str) or "vacuum" not in atmosphere_value.casefold():
+                    continue
+                sample = values_raw.get("sample")
+                mg_context = mg_by_sample.get(str(sample))
+                mg_values = mg_context.get("values") if isinstance(mg_context, Mapping) else None
+                if not isinstance(mg_values, Mapping):
+                    continue
+                t_k, _trail = convert_temperature_to_k(context.get("T_C"), "C")
+                si_flux = _as_dec_or_none(values_raw.get("value_as_printed"))
+                mg_flux = _as_dec_or_none(mg_values.get("value_as_printed"))
+                if t_k is None or si_flux is None or mg_flux is None:
+                    continue
+                locator = context.get("locator")
+                row_locator = dict(locator) if isinstance(locator, Mapping) else {}
+                pO2 = cls._oxygen_efflux_condition(si_flux, mg_flux, t_k, row_locator)
+                if pO2 is None:
+                    continue
+                values = dict(values_raw)
+                values["quantity_as_printed"] = values.get("quantity")
+                values["quantity"] = Quantity.EVAPORATION_FLUX_PER_AREA.value
+                values["J_Si_mol_cm2_s"] = str(si_flux)
+                values["J_Mg_mol_cm2_s"] = str(mg_flux)
+                values["T_K"] = str(t_k)
+                experiment = (
+                    "b-133-evaporation"
+                    if str(sample).startswith("B-133-")
+                    else "b-113-evaporation"
+                    if str(sample).startswith("B-113-")
+                    else None
+                )
+                if experiment is None:
+                    continue
+                promoted.append(
+                    {
+                        **dict(context),
+                        "type": "printed_areal_flux_context",
+                        "experiment": experiment,
+                        "values": values,
+                        "point_conditions": {**conditions, "fO2_Pa": pO2},
+                    }
+                )
+            species["SiO"] = {
+                **dict(sio_block),
+                "observations": [
+                    *(sio_block.get("observations") or ()),
+                    *promoted,
+                ],
+            }
+            return {**doc, "species": species}
+
+        if source_id == "kems-010-richter-2007":
+            sio_block = species.get("SiO")
+            mg_block = species.get("Mg")
+            if not isinstance(sio_block, Mapping) or not isinstance(mg_block, Mapping):
+                return doc
+            mg_rows: dict[str, Mapping[str, Any]] = {}
+            for observation in mg_block.get("observations") or ():
+                values = observation.get("values") if isinstance(observation, Mapping) else None
+                if not isinstance(values, Mapping) or values.get("quantity") != "published_mass_loss_and_reduced_flux_time_series":
+                    continue
+                for item in values.get("series") or ():
+                    if isinstance(item, Mapping) and isinstance(item.get("sample"), str):
+                        mg_rows[str(item["sample"])] = item
+            prepared_rows = []
+            for observation in sio_block.get("observations") or ():
+                if not isinstance(observation, Mapping):
+                    prepared_rows.append(observation)
+                    continue
+                values_raw = observation.get("values")
+                if (
+                    not isinstance(values_raw, Mapping)
+                    or values_raw.get("quantity")
+                    != "published_reduced_silicon_flux_time_series"
+                ):
+                    prepared_rows.append(observation)
+                    continue
+                values = dict(values_raw)
+                series = []
+                for item_raw in values_raw.get("series") or ():
+                    if not isinstance(item_raw, Mapping):
+                        continue
+                    item = dict(item_raw)
+                    sample = item.get("sample")
+                    mg_item = mg_rows.get(str(sample))
+                    si_flux = _as_dec_or_none(item.get("J_mol_cm2_s"))
+                    mg_flux = (
+                        _as_dec_or_none(mg_item.get("J_mol_cm2_s"))
+                        if mg_item is not None
+                        else None
+                    )
+                    t_k, _trail = convert_temperature_to_k(item.get("T_C"), "C")
+                    if mg_item is not None and isinstance(mg_item.get("composition_wt_pct"), Mapping):
+                        item["composition_wt_pct"] = dict(mg_item["composition_wt_pct"])
+                    if si_flux is not None:
+                        item["J_Si_mol_cm2_s"] = str(si_flux)
+                    if mg_flux is not None:
+                        item["J_Mg_mol_cm2_s"] = str(mg_flux)
+                    item["composition_flux_time_basis_mismatch"] = True
+                    item["composition_basis_as_published"] = "end_of_run_residue"
+                    item["flux_time_basis_as_published"] = "interval_average"
+                    locator = item.get("locator") or observation.get("locator") or {}
+                    pO2 = (
+                        cls._oxygen_efflux_condition(si_flux, mg_flux, t_k, locator)
+                        if si_flux is not None and mg_flux is not None and t_k is not None and isinstance(locator, Mapping)
+                        else None
+                    )
+                    if pO2 is not None:
+                        point_conditions = dict(item.get("point_conditions") or {})
+                        point_conditions["fO2_Pa"] = pO2
+                        item["point_conditions"] = point_conditions
+                    series.append(item)
+                values["quantity_as_printed"] = values_raw.get("quantity")
+                values["quantity"] = Quantity.EVAPORATION_FLUX_PER_AREA.value
+                values["gas_species"] = "SiO(g)"
+                values["composition_flux_time_basis_mismatch"] = True
+                values["composition_basis_as_published"] = "end_of_run_residue"
+                values["flux_time_basis_as_published"] = "interval_average"
+                values["series"] = series
+                pO2 = (
+                    series[0].get("point_conditions", {}).get("fO2_Pa")
+                    if series and isinstance(series[0], Mapping)
+                    else None
+                )
+                point_conditions = dict(observation.get("point_conditions") or {})
+                if pO2 is not None:
+                    point_conditions["fO2_Pa"] = pO2
+                prepared_rows.append(
+                    {
+                        **dict(observation),
+                        "experiment": observation.get("experiment") or "type-b-cai-like-lab-melt",
+                        "values": values,
+                        "point_conditions": point_conditions,
+                    }
+                )
+            species["SiO"] = {**dict(sio_block), "observations": prepared_rows}
+            return {**doc, "species": species}
+
+        if source_id == "mendybaev-2021-cai-low-pressure-h2-evap":
+            si_block = species.get("Si")
+            mg_block = species.get("Mg")
+            if not isinstance(si_block, Mapping) or not isinstance(mg_block, Mapping):
+                return doc
+            mg_value = next(
+                (
+                    self_value
+                    for item in mg_block.get("observations") or ()
+                    if isinstance(item, Mapping)
+                    and isinstance((self_value := item.get("values")), Mapping)
+                    and self_value.get("quantity") == "JMg"
+                ),
+                None,
+            )
+            si_rows = []
+            for observation in si_block.get("observations") or ():
+                if not isinstance(observation, Mapping):
+                    si_rows.append(observation)
+                    continue
+                values_raw = observation.get("values")
+                if not isinstance(values_raw, Mapping) or values_raw.get("quantity") != "JSi":
+                    si_rows.append(observation)
+                    continue
+                si_arm = next(
+                    (arm for arm in values_raw.get("arms") or () if isinstance(arm, Mapping) and arm.get("arm") == "vacuum"),
+                    None,
+                )
+                mg_arm = next(
+                    (
+                        arm
+                        for arm in (mg_value or {}).get("arms", ())
+                        if isinstance(arm, Mapping) and arm.get("arm") == "vacuum"
+                    ),
+                    None,
+                )
+                si_flux = cls._printed_arm_flux(si_arm)
+                mg_flux = cls._printed_arm_flux(mg_arm)
+                t_k, _trail = convert_temperature_to_k(observation.get("T_C"), "C")
+                locator = observation.get("locator")
+                pO2 = (
+                    cls._oxygen_efflux_condition(si_flux, mg_flux, t_k, locator)
+                    if si_flux is not None
+                    and mg_flux is not None
+                    and t_k is not None
+                    and isinstance(locator, Mapping)
+                    else None
+                )
+                values = dict(values_raw)
+                values["quantity_as_printed"] = values_raw.get("quantity")
+                values["quantity"] = Quantity.EVAPORATION_FLUX_PER_AREA.value
+                values["value_as_printed"] = str(si_flux) if si_flux is not None else None
+                values["gas_species"] = "SiO(g)"
+                if t_k is not None:
+                    values["T_K"] = str(t_k)
+                if si_flux is not None:
+                    values["J_Si_mol_cm2_s"] = str(si_flux)
+                if mg_flux is not None:
+                    values["J_Mg_mol_cm2_s"] = str(mg_flux)
+                point_conditions = dict(observation.get("point_conditions") or {})
+                experiment_rows = doc.get("experiments") or ()
+                if isinstance(experiment_rows, Mapping):
+                    experiment_rows = [
+                        dict(value, experiment_id=key)
+                        for key, value in experiment_rows.items()
+                        if isinstance(value, Mapping)
+                    ]
+                vacuum_experiment = next(
+                    (
+                        row
+                        for row in experiment_rows
+                        if isinstance(row, Mapping)
+                        and row.get("experiment_id") == "cai4b2-vacuum-series"
+                    ),
+                    None,
+                )
+                initial_composition = (
+                    vacuum_experiment.get("sample", {}).get("initial_composition")
+                    if isinstance(vacuum_experiment, Mapping)
+                    and isinstance(vacuum_experiment.get("sample"), Mapping)
+                    else None
+                )
+                if isinstance(initial_composition, Mapping):
+                    point_conditions["composition"] = initial_composition
+                if pO2 is not None:
+                    point_conditions["fO2_Pa"] = pO2
+                si_rows.append(
+                    {
+                        **dict(observation),
+                        "experiment": "cai4b2-vacuum-series",
+                        "values": values,
+                        "point_conditions": point_conditions,
+                    }
+                )
+            species["Si"] = {**dict(si_block), "observations": si_rows}
+            return {**doc, "species": species}
+        return doc
+
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -16551,6 +17085,7 @@ class Migrator:
             )
             return
         doc = self._richter_table1_sample_inputs(doc)
+        doc = self._prepare_sio_flux_extract_rows(doc)
         source = doc.get("source") or {}
         if not isinstance(source, Mapping):
             source = {}
@@ -17186,9 +17721,9 @@ class Migrator:
         raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
         exact_alias_gas_formula = (
             _extract_formula_token(values.get("gas_species"))
-            if isinstance(raw_quantity, str)
-            and raw_quantity in QUANTITY_ALIASES
-            and q_token is Quantity.P_PARTIAL
+            if isinstance(values.get("gas_species"), str)
+            and q_token
+            in {Quantity.P_PARTIAL, Quantity.EVAPORATION_FLUX_PER_AREA}
             else None
         )
         species_formula = (
@@ -17232,6 +17767,18 @@ class Migrator:
         species = make_species(
             species_formula, phase, polymorph=species_polymorph
         )
+        if (
+            q_token is Quantity.EVAPORATION_FLUX_PER_AREA
+            and exact_alias_gas_formula is not None
+        ):
+            phase = State.of(Phase.G)
+            species = make_species(
+                exact_alias_gas_formula, phase, polymorph=species_polymorph
+            )
+            phase_provenance = (
+                "species.phase=gas declared by source values.gas_species "
+                f"{values.get('gas_species')}"
+            )
         suffix_formula, suffix_derivation, suffix_reference = (None, None, None)
         if isinstance(raw_quantity, str):
             _qualified, suffix = split_qualified_quantity(raw_quantity)
@@ -17776,7 +18323,11 @@ class Migrator:
                     f"source structured reaction is invalid: {exc}"
                 )
         value, exploded, value_sel = empty_value_from_payload(
-            values, obs_type, obs.get("units"), quantity=quantity
+            values,
+            obs_type,
+            obs.get("units"),
+            quantity=quantity,
+            species_formula=species.formula,
         )
         observation_provenance = _printed_scalar_provenance(
             observation_provenance, values, value_sel
@@ -17813,6 +18364,7 @@ class Migrator:
                 Quantity.FUGACITY,
                 Quantity.H_MINUS_H298,
                 Quantity.EVOLVED_GAS_YIELD,
+                Quantity.EVAPORATION_FLUX_PER_AREA,
             }
             and value_sel.available
             and value_sel.field_name
@@ -18121,6 +18673,21 @@ class Migrator:
             else (experiment.method if experiment is not None else method)
         )
         validity_notices: list[Notice] = []
+        if (
+            q_token is Quantity.EVAPORATION_FLUX_PER_AREA
+            and values.get("composition_flux_time_basis_mismatch") is True
+        ):
+            validity_notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(Quantity.EVAPORATION_FLUX_PER_AREA,),
+                    reason=(
+                        "composition basis is end-of-run residue, while the paired "
+                        "evaporation flux is an interval average"
+                    ),
+                    origin=obs_id,
+                )
+            )
         if (
             q_token is Quantity.P_SAT
             and effective_method.is_value
@@ -18530,6 +19097,17 @@ class Migrator:
             )
         ):
             ident_kwargs["fO2_Pa"] = oxygen_state
+        if q_token is Quantity.EVAPORATION_FLUX_PER_AREA:
+            pressure = self._oxygen_efflux_pressure_from_condition(
+                (point_conditions or {}).get("fO2_Pa")
+            )
+            ident_kwargs["fO2_Pa"] = (
+                State.of(pressure)
+                if pressure is not None
+                else State.unknown(
+                    "vacuum Langmuir oxygen-efflux pO2 is not derivable from paired Si/Mg fluxes"
+                )
+            )
         if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
             experiment = self.result.experiments.get(experiment_id)
             printed = (
@@ -19984,7 +20562,12 @@ class Migrator:
                     **raw_item,
                     "gas_species": parent_values["gas_species"],
                 }
-            value_sel = select_declared_source(q_token, units, selection_payload)
+            value_sel = select_declared_source(
+                q_token,
+                units,
+                selection_payload,
+                species_formula=species.formula,
+            )
             provenance = _printed_scalar_provenance(
                 provenance, raw_item, value_sel
             )
@@ -20124,6 +20707,15 @@ class Migrator:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(point_oxide_map)
             )
+        elif (
+            q_token_point is Quantity.EVAPORATION_FLUX_PER_AREA
+            and point_oxide_map
+        ):
+            point_printed_composition, point_composition_located = (
+                _located_printed_and_initial(point_oxide_map, point_locator)
+            )
+            if point_composition_located is not None:
+                ident_kwargs["composition"] = point_composition_located.state
         elif (
             point_oxide_map
             and (
@@ -20791,6 +21383,20 @@ class Migrator:
             )
         ):
             identity = replace(identity, fO2_Pa=oxygen_state)
+        if q_token_point is Quantity.EVAPORATION_FLUX_PER_AREA:
+            pressure = self._oxygen_efflux_pressure_from_condition(
+                (point_conditions or {}).get("fO2_Pa")
+            )
+            identity = replace(
+                identity,
+                fO2_Pa=(
+                    State.of(pressure)
+                    if pressure is not None
+                    else State.unknown(
+                        "vacuum Langmuir oxygen-efflux pO2 is not derivable from paired Si/Mg fluxes"
+                    )
+                ),
+            )
         experiment = self.result.experiments.get(experiment_id)
         if (
             q_token_point is Quantity.VALENCE_RATIO
@@ -20867,6 +21473,19 @@ class Migrator:
                 "composition": Located(
                     identity.composition,
                     locator=point_locator,
+                ),
+            }
+        elif (
+            q_token_point is Quantity.EVAPORATION_FLUX_PER_AREA
+            and point_composition_located is not None
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": point_composition_located,
+                **(
+                    {"printed_composition": point_printed_composition}
+                    if point_printed_composition is not None
+                    else {}
                 ),
             }
         if identity.composition is None or not identity.composition.is_value:

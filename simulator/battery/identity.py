@@ -1097,6 +1097,22 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "sample_mass_kg",
             "wall",
         )
+    elif q is Quantity.EVAPORATION_FLUX_PER_AREA:
+        req("temperature_K", "composition", "fO2_Pa")
+        na(
+            "per",
+            "reservoir",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "subtype",
+        )
     elif q in KINETIC_YIELD_QUANTITIES:
         req(
             "temperature_K",
@@ -1321,7 +1337,10 @@ def profile_for(identity: Identity) -> QuantityProfile:
     return QuantityProfile(
         required=frozenset(required),
         permitted_not_applicable=frozenset(permitted_na),
-        exposure_area_required=q in KINETIC_YIELD_QUANTITIES,
+        exposure_area_required=(
+            q in KINETIC_YIELD_QUANTITIES
+            and q is not Quantity.EVAPORATION_FLUX_PER_AREA
+        ),
     )
 
 

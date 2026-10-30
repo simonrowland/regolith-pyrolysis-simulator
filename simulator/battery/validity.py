@@ -334,6 +334,7 @@ _METHOD_SCOPED_APPARATUS_QUANTITIES = frozenset(
         Quantity.LOG10_KF,
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.EVAPORATION_RATE,
+        Quantity.EVAPORATION_FLUX_PER_AREA,
         Quantity.MASS_LOSS_RATE,
         Quantity.MASS_LOSS_FRACTION,
         Quantity.MASS_LOSS_FRACTION_VS_T,
@@ -356,7 +357,12 @@ def underdetermined_apparatus(
     *,
     observation: Observation | None = None,
 ) -> GateOutcome:
-    """Pressure/flux conversion requires the method's geometry determinants."""
+    """Require geometry only when the observable still needs it.
+
+    EVAPORATION_FLUX_PER_AREA remains method-scoped, but its measured quantity
+    already includes area in the denominator, so its value does not need the
+    exposed area that an absolute evaporation rate requires.
+    """
 
     method_state = experiment.method
     checks: list[GateCheck] = []

@@ -213,7 +213,11 @@ SINGLE_LIQUID_ENGINES: frozenset[Engine] = frozenset(
 # quantities come from the engine-specific compilation tier.
 _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
     _VAPOUR_EQUILIBRIUM
-    | {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+    | {
+        Quantity.ACTIVITY,
+        Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.EVAPORATION_FLUX_PER_AREA,
+    }
 )
 # Equilibrium partial pressures from these two predictors are independent of
 # total pressure. The evaluation proof is in test_score's pressure-axis test.
@@ -357,6 +361,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.YIELD_FRACTION: MetricOperation.RELATIVE,
     Quantity.O2_YIELD: MetricOperation.RELATIVE,
     Quantity.EVAPORATION_RATE: MetricOperation.RELATIVE,
+    Quantity.EVAPORATION_FLUX_PER_AREA: MetricOperation.DEX,
     Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
     Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
     Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
@@ -5891,6 +5896,122 @@ def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | Non
     return pressure
 
 
+def _efflux_derived_oxygen_pressure_for_score(
+    observation: Observation,
+) -> Decimal | None:
+    condition = (observation.point_conditions or {}).get("fO2_Pa")
+    if (
+        condition is None
+        or condition.inference is None
+        or condition.inference.relation != "vacuum_langmuir_oxygen_efflux_to_pO2"
+        or not condition.state.is_value
+        or not isinstance(condition.state.value, Value)
+        or condition.state.value.kind is not ValueKind.POINT
+    ):
+        return None
+    pressure = condition.state.value.point
+    if pressure is None or not pressure.is_finite() or pressure <= 0:
+        return None
+    return pressure
+
+
+def _areal_evaporation_flux_from_pressure(
+    *,
+    species_formula: str,
+    equilibrium_pressure_Pa: float,
+    temperature_K: float,
+    composition: object,
+) -> tuple[float | None, dict[str, object] | None]:
+    """Pass an engine cell pressure through the production evaporation provider."""
+    from simulator.battery.enums import AmountBasis
+    from simulator.battery.records import Composition
+    from simulator.battery.residue import (
+        ResidueChannel,
+        ResidueInventoryRefusal,
+        _channel_terms,
+        _finite_step_fluxes,
+    )
+    from simulator.condensation import alpha_s
+    from simulator.evaporation import _load_evaporation_alpha_by_species
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    if (
+        not math.isfinite(equilibrium_pressure_Pa)
+        or equilibrium_pressure_Pa < 0.0
+    ):
+        return None, {
+            "reason": "engine_flux_species_pressure_invalid",
+            "pressure_Pa": str(equilibrium_pressure_Pa),
+        }
+    if (
+        not isinstance(composition, Composition)
+        or composition.amount_basis
+        not in {AmountBasis.MOLE_FRACTION, AmountBasis.MOL_INVENTORY}
+    ):
+        return None, {
+            "reason": "flux_composition_is_not_a_mole_inventory",
+            "amount_basis": (
+                composition.amount_basis.value
+                if isinstance(composition, Composition)
+                else None
+            ),
+        }
+    inventory_mol = {
+        str(name): float(amount) for name, amount in composition.components
+    }
+    vapor_pressure_data = vapor_pressure_legacy_view(
+        load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
+    )
+    alpha_by_species = _load_evaporation_alpha_by_species(vapor_pressure_data)
+    alpha_spec = alpha_by_species.get(species_formula)
+    if alpha_spec is None:
+        return None, {
+            "reason": "evaporation_alpha_unavailable",
+            "species": species_formula,
+        }
+    try:
+        alpha = alpha_s(species_formula, temperature_K, {"coefficient_spec": alpha_spec})
+        terms = _channel_terms(
+            (
+                ResidueChannel(
+                    species=species_formula,
+                    formula=species_formula,
+                    parent_oxide="SiO2",
+                    alpha=alpha,
+                    alpha_source="vapor_pressures.yaml evaporation_alpha",
+                ),
+            ),
+            require_oxygen_channels=False,
+        )
+        flux_by_species_kg_s = _finite_step_fluxes(
+            terms,
+            inventory_mol,
+            temperature_K=temperature_K,
+            area_m2=1.0,
+            pressures_Pa={species_formula: equilibrium_pressure_Pa},
+            background_pressure_Pa=0.0,
+        )
+    except (ResidueInventoryRefusal, ArithmeticError, TypeError, ValueError) as exc:
+        return None, {
+            "reason": (
+                exc.reason
+                if isinstance(exc, ResidueInventoryRefusal)
+                else "evaporation_flux_provider_input_refused"
+            ),
+            "detail": str(exc),
+        }
+    # The production provider returns kg/s = flux[kg/(m²·s)] × area[m²];
+    # area is 1 m² here, so its numeric rate is the canonical flux. The
+    # provider converts kg/h to kg/s at its boundary.
+    flux = flux_by_species_kg_s.get(species_formula)
+    if flux is None or not math.isfinite(flux) or flux < 0.0:
+        return None, {
+            "reason": "evaporation_flux_provider_did_not_report_species",
+            "species": species_formula,
+        }
+    return flux, None
+
+
 _FE_REDOX_RATIO_UNDEFINED = object()
 _KRESS91_SOURCES = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
 _MELTS_FE_REDOX_ENGINES = (Engine.ALPHAMELTS, Engine.THERMOENGINE)
@@ -8386,6 +8507,21 @@ def predict_with_engine(
             refusal_detail=_quantity_not_predicted_detail(quantity),
             identity=identity,
         )
+    if (
+        quantity is Quantity.EVAPORATION_FLUX_PER_AREA
+        and _efflux_derived_oxygen_pressure_for_score(observation) is None
+    ):
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            authority=Authority.REFUSED,
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={"reason": "missing_efflux_derived_pO2"},
+            identity=identity,
+        )
     sample_phase_detail = (
         melt_activity_sample_phase_refusal(identity)
         if isinstance(identity, Identity)
@@ -9121,11 +9257,20 @@ def predict_with_engine(
             )
         if pressure_notice is not None:
             input_notices.append(pressure_notice)
+        if quantity is Quantity.EVAPORATION_FLUX_PER_AREA:
+            pressure_bar = 0.0
 
-    knudsen_vapour = _knudsen_vapour_equilibrium(quantity, experiment)
+    knudsen_vapour = (
+        quantity is Quantity.EVAPORATION_FLUX_PER_AREA
+        or _knudsen_vapour_equilibrium(quantity, experiment)
+    )
     # d-216: a linked or printed source pressure is the row's fO2 before
     # the ladder runs, so every engine is commanded the measured condition.
-    source_pressure = _source_oxygen_pressure_for_score(observation)
+    source_pressure = (
+        _efflux_derived_oxygen_pressure_for_score(observation)
+        if quantity is Quantity.EVAPORATION_FLUX_PER_AREA
+        else _source_oxygen_pressure_for_score(observation)
+    )
     if knudsen_vapour and source_pressure is not None:
         identity = replace(identity, fO2_Pa=State.of(source_pressure))
     # A found source pressure is commanded below. The shared ladder is only
@@ -9808,6 +9953,9 @@ def predict_with_engine(
     elif quantity in _VAPOUR_EQUILIBRIUM:
         reported = pressures
         unit = "Pa"
+    elif quantity is Quantity.EVAPORATION_FLUX_PER_AREA:
+        reported = pressures
+        unit = "kg_per_m2_per_s"
     else:
         return EnginePrediction(
             engine=engine,
@@ -9938,6 +10086,71 @@ def predict_with_engine(
             reported, compared,
         )
         magnitude = value
+    elif quantity is Quantity.EVAPORATION_FLUX_PER_AREA:
+        matched, _warnings = _match_reported_species_with_notices(
+            compared,
+            reported,
+            species=identity.species,
+        )
+        if matched is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                certified_band=certified_band,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "engine_did_not_report_flux_species_pressure",
+                    "formula": compared,
+                    "reported": sorted(str(name) for name in reported),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        composition = (
+            identity.composition.value
+            if identity.composition is not None
+            and identity.composition.is_value
+            else composition_value
+        )
+        magnitude, provider_refusal = _areal_evaporation_flux_from_pressure(
+            species_formula=compared,
+            equilibrium_pressure_Pa=float(matched[1]),
+            temperature_K=float(T),
+            composition=composition,
+        )
+        if provider_refusal is not None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=f"{call_evidence};builtin_evaporation_flux",
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                certified_band=certified_band,
+                refusal_reason=(
+                    RefusalReason.IDENTITY_INCOMPLETE
+                    if provider_refusal.get("reason")
+                    == "flux_composition_is_not_a_mole_inventory"
+                    else RefusalReason.UNSUPPORTED
+                ),
+                refusal_detail=provider_refusal,
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
     else:
         matched, activity_repair_warnings = _match_reported_species_with_notices(
             compared,
