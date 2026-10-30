@@ -101,8 +101,10 @@ class ResidueEngineNonconvergence(RuntimeError):
 class ResidueEngineTransportError(ResidueEngineNonconvergence):
     """Infrastructure failure moving an engine result across its worker pipe."""
 
-    def __init__(self, detail: str) -> None:
-        super().__init__("openimcc", detail, reason="engine_transport_error:openimcc")
+    def __init__(self, detail: str, *, engine: str = "openimcc") -> None:
+        super().__init__(
+            engine, detail, reason=f"engine_transport_error:{engine}"
+        )
 
 
 _OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S = 120.0
@@ -226,7 +228,11 @@ Finalize(None, _close_openimcc_evaluation_worker, exitpriority=10)
 
 
 def _evaluate_openimcc_isolated(
-    evaluate: Callable[..., Any], *, timeout_s: float, **kwargs: Any
+    evaluate: Callable[..., Any],
+    *,
+    timeout_s: float,
+    engine_name: str = "openimcc",
+    **kwargs: Any,
 ) -> Any:
     """Run one residue-engine call in a killable process with a hard deadline."""
     global _OPENIMCC_EVALUATION_WORKER
@@ -261,7 +267,7 @@ def _evaluate_openimcc_isolated(
                 child.close()
                 _OPENIMCC_EVALUATION_WORKER = None
             raise ResidueEngineTransportError(
-                f"OpenIMCC worker failed to start: {exc}"
+                f"OpenIMCC worker failed to start: {exc}", engine=engine_name
             ) from exc
         child.close()
         worker = (process, parent, evaluate)
@@ -270,14 +276,16 @@ def _evaluate_openimcc_isolated(
             _close_openimcc_evaluation_worker()
             raise ResidueEngineTransportError(
                 "OpenIMCC worker readiness timed out after "
-                f"{_OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S:g}s"
+                f"{_OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S:g}s",
+                engine=engine_name,
             )
         try:
             startup = parent.recv()
         except (EOFError, OSError) as exc:
             _close_openimcc_evaluation_worker()
             raise ResidueEngineTransportError(
-                f"OpenIMCC worker exited before readiness: {exc}"
+                f"OpenIMCC worker exited before readiness: {exc}",
+                engine=engine_name,
             ) from exc
         if startup != ("ready",):
             _close_openimcc_evaluation_worker()
@@ -287,24 +295,26 @@ def _evaluate_openimcc_isolated(
                 and startup[0] == "startup_error"
             ):
                 raise ResidueEngineTransportError(
-                    f"OpenIMCC worker startup failed: {startup[1]}: {startup[2]}"
+                    f"OpenIMCC worker startup failed: {startup[1]}: {startup[2]}",
+                    engine=engine_name,
                 )
             raise ResidueEngineTransportError(
-                f"unexpected OpenIMCC worker startup response: {startup!r}"
+                f"unexpected OpenIMCC worker startup response: {startup!r}",
+                engine=engine_name,
             )
     process, parent, _evaluate = worker
     try:
         try:
             parent.send(kwargs)
         except (OSError, TypeError, ValueError) as exc:
-            raise ResidueEngineTransportError(str(exc)) from exc
+            raise ResidueEngineTransportError(str(exc), engine=engine_name) from exc
         if not parent.poll(timeout_s):
             _close_openimcc_evaluation_worker()
             raise TimeoutError(f"OpenIMCC call timed out after {timeout_s:g}s")
         try:
             response = parent.recv()
         except (EOFError, OSError) as exc:
-            raise ResidueEngineTransportError(str(exc)) from exc
+            raise ResidueEngineTransportError(str(exc), engine=engine_name) from exc
         if response[0]:
             result_kind, payload = response[1:]
             if result_kind == "openimcc_bridge_result":
@@ -313,15 +323,17 @@ def _evaluate_openimcc_isolated(
                 try:
                     return OpenImccBridgeResult.from_transport(payload)
                 except (KeyError, TypeError, ValueError) as exc:
-                    raise ResidueEngineTransportError(str(exc)) from exc
+                    raise ResidueEngineTransportError(
+                        str(exc), engine=engine_name
+                    ) from exc
             return payload
         error_name, detail = response[1:]
         if error_name in {"PicklingError", "TypeError", "AttributeError"} and (
             "pickl" in str(detail).lower() or "serializ" in str(detail).lower()
         ):
-            raise ResidueEngineTransportError(str(detail))
+            raise ResidueEngineTransportError(str(detail), engine=engine_name)
         if error_name == "ImccNonconvergenceError":
-            raise ResidueEngineNonconvergence("openimcc", str(detail))
+            raise ResidueEngineNonconvergence(engine_name, str(detail))
         raise RuntimeError(f"isolated OpenIMCC {error_name}: {detail}")
     finally:
         if not process.is_alive():
@@ -1293,6 +1305,55 @@ def _append_omission_notices(notices: list[Any], callbacks: Mapping[Any, Any]) -
                 notices.append(notice)
 
 
+def _record_openimcc_residue_state(
+    engine: str,
+    state: Any,
+    *,
+    pack_name: str,
+    engine_metadata: dict[str, str],
+    engine_flags: set[str],
+) -> None:
+    """Collect bridge identity and evaluator domain labels for residue callers."""
+    state_flags = tuple(str(flag) for flag in state.flags)
+    engine_flags.update(state_flags)
+    extrapolated = bool(state.extrapolated)
+    if extrapolated:
+        engine_flags.add("openimcc_extrapolated")
+
+    engine_metadata.update(
+        {
+            "model_id": str(state.pack_model_id),
+            "datapack_version": str(state.pack_version),
+            "pack_digest": str(state.pack_digest),
+            "openimcc_version": str(state.openimcc_version),
+        }
+    )
+    if engine == Engine.OPENIMCC_SP.value:
+        envelope_status = str(state.envelope_status)
+        engine_metadata.update(
+            {
+                "pack": pack_name,
+                "envelope_status": envelope_status,
+                "extrapolated": str(extrapolated).lower(),
+            }
+        )
+        if envelope_status != "inside":
+            engine_flags.add(f"openimcc_envelope_status:{envelope_status}")
+
+
+def _openimcc_residue_state_provenance(
+    engine: str,
+    engine_flags: set[str],
+    engine_metadata: Mapping[str, str],
+) -> dict[str, object]:
+    if engine != Engine.OPENIMCC_SP.value:
+        return {}
+    return {
+        "engine_flags": tuple(sorted(engine_flags)),
+        "engine_metadata": dict(engine_metadata),
+    }
+
+
 def _make_residue_pressure_model(
     engine: str,
     gas_channels: Sequence[tuple[str, Sequence[Any]]],
@@ -1345,6 +1406,7 @@ def _make_residue_pressure_model(
                     state = _evaluate_openimcc_isolated(
                         openimcc_bridge.evaluate,
                         timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
+                        engine_name=engine,
                         composition_mol=current_composition,
                         temperature_K=temperature_K,
                         pack=pack_name,
@@ -1359,18 +1421,13 @@ def _make_residue_pressure_model(
                         f"{caller} OpenIMCC timeout: {exc}",
                         reason=f"engine_timeout:{engine}:{caller.lower().replace(' ', '_')}",
                     ) from exc
-                engine_flags.update(str(flag) for flag in state.flags)
-                if state.extrapolated:
-                    engine_flags.add("openimcc_extrapolated")
-                metadata = {
-                    "model_id": state.pack_model_id,
-                    "datapack_version": state.pack_version,
-                    "pack_digest": state.pack_digest,
-                    "openimcc_version": state.openimcc_version,
-                }
-                if engine == Engine.OPENIMCC_SP.value:
-                    metadata["pack"] = pack_name
-                engine_metadata.update(metadata)
+                _record_openimcc_residue_state(
+                    engine,
+                    state,
+                    pack_name=pack_name,
+                    engine_metadata=engine_metadata,
+                    engine_flags=engine_flags,
+                )
                 base_pressure_bar = evaluate_gas(
                     state.parent_oxide_activities,
                     temperature_K,
@@ -2959,6 +3016,7 @@ def _predict_hashimoto_residue_cohort(
             raise ResidueInventoryRefusal("hashimoto_runtime_alpha_channels_missing")
 
         engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
+        engine_flags: set[str] = set()
         pressure_model = _make_residue_pressure_model(
             engine,
             gas_channels,
@@ -2966,7 +3024,7 @@ def _predict_hashimoto_residue_cohort(
             temperature_K=temperature_K,
             total_pressure_Pa=total_pressure_Pa,
             engine_metadata=melt_pack_identity,
-            engine_flags=set(),
+            engine_flags=engine_flags,
             missing_channels_reason="hashimoto_internal_analytical_channels_missing",
             caller="Hashimoto residue cohort",
             floor_inversion_diagnostics=(
@@ -3198,6 +3256,9 @@ def _predict_hashimoto_residue_cohort(
                 "pack_digest": {
                     "melt_datapack": melt_pack_identity.get("pack_digest", ""),
                 },
+                **_openimcc_residue_state_provenance(
+                    engine, engine_flags, melt_pack_identity
+                ),
                 **(
                     {"engine_binding_identity": engine_binding_identity}
                     if engine_binding_identity is not None
@@ -3503,6 +3564,7 @@ def _predict_sossi_residue_cohort(
         )
         pressure_cache: dict[tuple[tuple[str, float], ...], Mapping[str, float]] = {}
         melt_pack_identity: dict[str, str] = {}
+        engine_flags: set[str] = set()
         melt_activity_input_policy: dict[str, Any] = {}
         melt_activity_extensions: dict[str, dict[str, Any]] = {}
         if is_openimcc:
@@ -3533,6 +3595,7 @@ def _predict_sossi_residue_cohort(
                         state = _evaluate_openimcc_isolated(
                             openimcc_bridge.evaluate,
                             timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
+                            engine_name=engine,
                             composition_mol=activity_composition,
                             temperature_K=temperature_K,
                             pack=pack_name,
@@ -3598,16 +3661,13 @@ def _predict_sossi_residue_cohort(
                         parent_oxides=gas_parent_oxides,
                         allow_extrapolation=True,
                     )
-                    melt_pack_identity.update(
-                        {
-                            "model_id": str(state.pack_model_id),
-                            "datapack_version": str(state.pack_version),
-                            "pack_digest": str(state.pack_digest),
-                            "openimcc_version": str(state.openimcc_version),
-                        }
+                    _record_openimcc_residue_state(
+                        engine,
+                        state,
+                        pack_name=pack_name,
+                        engine_metadata=melt_pack_identity,
+                        engine_flags=engine_flags,
                     )
-                    if engine == Engine.OPENIMCC_SP.value:
-                        melt_pack_identity["pack"] = pack_name
                     base = dict(gas_result)
                     pressure_cache[key] = base
                 pO2_bar = 10.0**log10_pO2_bar
@@ -3660,6 +3720,9 @@ def _predict_sossi_residue_cohort(
                         "source_id": _SOSSI_SOURCE_ID,
                         "experiment_id": experiment_id,
                         "engine": engine,
+                        **_openimcc_residue_state_provenance(
+                            engine, engine_flags, melt_pack_identity
+                        ),
                         "run_refusal": {
                             **exc.as_record(),
                             "cohort": "sossi_residue_cohort",
@@ -3872,6 +3935,9 @@ def _predict_sossi_residue_cohort(
                     "integration": geometry_refinement,
                     "gas_channel_omissions": omissions,
                     "channel_missing_elements": tuple(missing_elements),
+                    **_openimcc_residue_state_provenance(
+                        engine, engine_flags, melt_pack_identity
+                    ),
                     **(
                         {"engine_binding_identity": engine_binding_identity}
                         if engine_binding_identity is not None

@@ -8247,6 +8247,97 @@ def _predict_phase_row(
     )
 
 
+# b-1089 owns the default arm's dropped residue-domain notices and needs its
+# own physics ruling; this ticket propagates them only for the SP identity.
+_RESIDUE_DOMAIN_FLAG_ENGINES = frozenset({Engine.OPENIMCC_SP})
+
+
+def _engine_flag_notices(
+    engine: Engine,
+    quantity: Quantity,
+    flags: Sequence[str],
+    *,
+    envelope_status: str | None = None,
+    extrapolated: bool = False,
+) -> tuple[Notice, ...]:
+    if quantity is Quantity.MASS_LOSS_FRACTION:
+        notices: list[Notice] = []
+        for flag in flags:
+            if (
+                "paper-demonstrated-window" in flag
+                or flag == "openimcc_extrapolated"
+                or flag.startswith("alpha_extrapolated:")
+            ):
+                kind = NoticeKind.OUT_OF_CERTIFIED_BAND
+            elif flag.startswith("mass_loss_"):
+                kind = NoticeKind.FALLBACK
+            else:
+                continue
+            notices.append(
+                Notice(
+                    kind=kind,
+                    affected_quantities=(quantity,),
+                    reason=flag,
+                    origin=f"engine:{engine.value}",
+                )
+            )
+        return tuple(notices)
+
+    if (
+        quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+        or engine not in _RESIDUE_DOMAIN_FLAG_ENGINES
+    ):
+        return ()
+
+    domain_flags = [
+        flag
+        for flag in flags
+        if flag == "openimcc_extrapolated"
+        or any(
+            token in flag.lower()
+            for token in ("outside", "out_of_domain", "extrapolat")
+        )
+    ]
+    if extrapolated and "openimcc_extrapolated" not in domain_flags:
+        domain_flags.append("openimcc_extrapolated")
+    if envelope_status and envelope_status not in {"inside", "in_domain"}:
+        domain_flags.append(f"openimcc_envelope_status:{envelope_status}")
+    return tuple(
+        Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(quantity,),
+            reason=flag,
+            origin=f"engine:{engine.value}",
+            authority=Authority.EXTRAPOLATED,
+        )
+        for flag in dict.fromkeys(domain_flags)
+    )
+
+
+def _residue_domain_notices(
+    engine: Engine, provenance: Mapping[str, object]
+) -> tuple[Notice, ...]:
+    raw_flags = provenance.get("engine_flags", ())
+    flags = tuple(str(flag) for flag in raw_flags) if isinstance(
+        raw_flags, (tuple, list, set, frozenset)
+    ) else ()
+    metadata = provenance.get("engine_metadata", {})
+    if not isinstance(metadata, Mapping):
+        metadata = {}
+    return _engine_flag_notices(
+        engine,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        flags,
+        envelope_status=(
+            str(metadata["envelope_status"])
+            if metadata.get("envelope_status") is not None
+            else None
+        ),
+        extrapolated=str(metadata.get("extrapolated", "false")).lower()
+        in {"true", "1"},
+    )
+
+
 def _predict_mass_loss_with_residue(
     engine: Engine,
     identity: Identity,
@@ -8372,19 +8463,8 @@ def _predict_mass_loss_with_residue(
             identity=identity,
         )
 
-    notices = tuple(
-        Notice(
-            kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
-                "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
-                or flag.startswith("alpha_extrapolated:")
-            ) else NoticeKind.FALLBACK),
-            affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
-            reason=flag,
-            origin=f"engine:{engine.value}",
-        )
-        for flag in result.engine_flags
-        if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
-        or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
+    notices = _engine_flag_notices(
+        engine, Quantity.MASS_LOSS_FRACTION, result.engine_flags
     ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
@@ -10016,7 +10096,11 @@ def predict_with_engine(
         if engine in IMCC_ENGINES and quantity in _VAPOUR_EQUILIBRIUM:
             refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
             detail["reason"] = RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
-            detail["engine"] = "openimcc gas tables"
+            detail["engine"] = (
+                engine.value
+                if engine is Engine.OPENIMCC_SP
+                else "openimcc gas tables"
+            )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -10460,6 +10544,8 @@ def _hashimoto_residue_prediction(
                 origin="hashimoto-residue-addendum-a",
             )
         )
+        domain_notices = _residue_domain_notices(engine, primary_provenance)
+        notices.extend(domain_notices)
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -10469,6 +10555,9 @@ def _hashimoto_residue_prediction(
             ),
             value=Decimal(str(value)),
             unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            authority=(
+                Authority.EXTRAPOLATED if domain_notices else None
+            ),
             coefficient_sources=sources,
             lineage_complete=False,
             notices=tuple(notices),
@@ -10554,12 +10643,16 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
         value = result["composition_wt_pct"].get(reference.identity.species.formula)
         if value is None:
             raise ResidueInventoryRefusal("channel_missing", reference.identity.species.formula)
+        domain_notices = _residue_domain_notices(engine, provenance)
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
             execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
             value=Decimal(str(value)), unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            authority=(
+                Authority.EXTRAPOLATED if domain_notices else None
+            ),
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            notices=result["notices"], identity=reference.identity,
+            notices=(*result["notices"], *domain_notices), identity=reference.identity,
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
@@ -10774,6 +10867,8 @@ def _sossi_residue_prediction(
                     band=f"N_cap=256; experiment={short_id}",
                 )
             )
+        domain_notices = _residue_domain_notices(engine, provenance)
+        notices.extend(domain_notices)
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -10783,6 +10878,9 @@ def _sossi_residue_prediction(
             ),
             value=Decimal(str(value)),
             unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            authority=(
+                Authority.EXTRAPOLATED if domain_notices else None
+            ),
             coefficient_sources=sources,
             lineage_complete=False,
             notices=tuple(notices),
