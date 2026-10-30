@@ -555,19 +555,14 @@ def test_wrapped_diagnostic_distinguishes_numerical_and_environment_failure(
 
 
 @pytest.mark.parametrize('mode', ['reason', 'exception', 'backend_exception', 'aggregate_budget'])
-@pytest.mark.parametrize('recover', [False, True])
-def test_timeout_retries_same_declared_gate_once(
-    monkeypatch, mode, recover, vapor_pressure_data, feedstocks_data, setpoints_data,
+def test_timeout_does_not_retry_same_declared_gate(
+    monkeypatch, mode, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     calls = []
 
     def dispatch(intent, **kwargs):
         calls.append((intent, kwargs))
-        if recover and len(calls) == 2:
-            return SimpleNamespace(status='ok', diagnostic={
-                'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0,
-            })
         if mode == 'exception':
             raise EngineWorkerTimeout('magemin', 15.0, phase='liquidus')
         return SimpleNamespace(status='out_of_domain', diagnostic={
@@ -586,19 +581,15 @@ def test_timeout_retries_same_declared_gate_once(
         })
 
     monkeypatch.setattr(sim, '_dispatch_only', dispatch)
-    if recover:
-        assert sim._freeze_gate_curve()['source'] == 'gate_liquid_fraction'
-    else:
-        curve = sim._freeze_gate_curve()
-        notice = curve['gate_provider_refusal']
-        assert curve['source'] == 'kress91_liquid_calibration_floor'
-        assert notice['provider'] == 'magemin'
-        assert notice['backend_failure_disposition'] == 'environment'
-        assert notice['authority'] == 'extrapolated (lower-rung)'
-        assert sim._freeze_gate_liquid_fraction_cache is None
-        assert sim._freeze_gate_liquid_fraction_curve_memo == {}
-    assert len(calls) == 2
-    assert calls[0] == calls[1]
+    curve = sim._freeze_gate_curve()
+    notice = curve['gate_provider_refusal']
+    assert curve['source'] == 'kress91_liquid_calibration_floor'
+    assert notice['provider'] == 'magemin'
+    assert notice['backend_failure_disposition'] == 'environment'
+    assert notice['authority'] == 'extrapolated (lower-rung)'
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert sim._freeze_gate_liquid_fraction_curve_memo == {}
+    assert len(calls) == 1
 
 
 @pytest.mark.parametrize('failure', [
@@ -741,7 +732,7 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
         sim.melt.hour = 8
         again = sim._melt_redox_liquidus_gate_curve()
         assert again['gate_provider_refusal']['failure_hour'] == 8
-        assert len(calls) == call_count + (2 if timed_out else 1)
+        assert len(calls) == call_count + 1
         assert sim._freeze_gate_liquid_fraction_curve_memo == {}
         assert shared == {}
         assert store.capture_sequence == []
@@ -793,7 +784,7 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     sim.melt.hour = 9
     sim.melt.p_total_mbar -= 100.0
     again = sim._melt_redox_liquidus_gate_curve()
-    assert len(calls) == call_count + (2 if timed_out else 1)
+    assert len(calls) == call_count + 1
     assert again['gate_provider_refusal']['failure_hour'] == 9
     assert again['gate_provider_refusal']['computed_hour'] == 7
     assert set(sim._freeze_gate_liquid_fraction_curve_memo) <= memo_keys

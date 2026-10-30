@@ -2790,35 +2790,32 @@ class EvaporationMixin:
                     f'gate provider registration failed: {type(exc).__name__}',
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
-        for attempt in range(2):
-            try:
-                result = self._dispatch_only(
-                    ChemistryIntent.GATE_LIQUID_FRACTION,
-                    control_inputs={},
-                    fO2_log=fO2_log,
-                    redox_state=redox_state,
-                    fe_redox_policy='intrinsic',
-                )
-            except (
-                ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
-            ) as exc:
-                diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
-                if isinstance(exc, EngineWorkerTimeout):
-                    diagnostic['reason'] = 'engine_worker_timeout'
-                diagnostic['exception_class'] = type(exc).__name__
-                diagnostic['exception_message'] = str(exc)
-                status = str(getattr(exc, 'status', 'unavailable'))
-                warnings = list(getattr(exc, 'warnings', ()) or ())
-            else:
-                diagnostic = dict(getattr(result, 'diagnostic', None) or {})
-                status = str(
-                    getattr(result, 'status', None)
-                    or diagnostic.get('backend_status')
-                    or 'unavailable'
-                )
-                warnings = list(getattr(result, 'warnings', ()) or ())
-            if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
-                break
+        try:
+            result = self._dispatch_only(
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                control_inputs={},
+                fO2_log=fO2_log,
+                redox_state=redox_state,
+                fe_redox_policy='intrinsic',
+            )
+        except (
+            ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
+        ) as exc:
+            diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
+            if isinstance(exc, EngineWorkerTimeout):
+                diagnostic['reason'] = 'engine_worker_timeout'
+            diagnostic['exception_class'] = type(exc).__name__
+            diagnostic['exception_message'] = str(exc)
+            status = str(getattr(exc, 'status', 'unavailable'))
+            warnings = list(getattr(exc, 'warnings', ()) or ())
+        else:
+            diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+            status = str(
+                getattr(result, 'status', None)
+                or diagnostic.get('backend_status')
+                or 'unavailable'
+            )
+            warnings = list(getattr(result, 'warnings', ()) or ())
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
