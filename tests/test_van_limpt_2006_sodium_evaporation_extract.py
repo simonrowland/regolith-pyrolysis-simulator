@@ -201,13 +201,16 @@ def test_van_limpt_isolated_migration_keeps_unknown_quantities_and_conditions() 
         assert set(row.point_conditions) == expected_conditions
         assert all(row.point_conditions[key].state.is_value for key in expected_rate_conditions)
         assert all(row.point_conditions[key].locator.page == 6 for key in expected_rate_conditions)
+        printed_composition = row.point_conditions["composition"].state.value
+        assert row.identity.composition is not None
+        assert row.identity.composition.is_value
+        assert row.identity.composition.value == printed_composition
     assert rate_1400.point_conditions["temperature_K"].locator.page == 6
     assert rate_1400.identity.temperature_K.value == Decimal("1673.15")
     assert rate_1400.point_conditions["gas_mix"].state.value == "N2/H2O or air/H2O"
     assert rate_1400.point_conditions["gas_mix"].locator.page == 6
     assert rate_1400.point_conditions["composition"].state.is_value
-    assert rate_1400.identity.composition is None
-    rate_composition = rate_1400.point_conditions["composition"].state.value
+    rate_composition = rate_1400.identity.composition.value
     assert rate_composition.amount_basis is AmountBasis.MOL_INVENTORY
     assert rate_composition.basis == "printed_formula_stoichiometry"
     assert dict(rate_composition.components) == {
@@ -219,8 +222,7 @@ def test_van_limpt_isolated_migration_keeps_unknown_quantities_and_conditions() 
     assert not rate_range.identity.temperature_K.is_value
     assert "[1723.15, 1733.15]" in rate_range.identity.temperature_K.reason
     assert "temperature_K" not in rate_range.point_conditions
-    assert rate_range.identity.composition is None
-    rate_range_composition = rate_range.point_conditions["composition"].state.value
+    rate_range_composition = rate_range.identity.composition.value
     assert rate_range_composition.amount_basis is AmountBasis.MOL_INVENTORY
     assert dict(rate_range_composition.components) == {
         "Na2O": Decimal("1"),
