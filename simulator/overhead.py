@@ -1216,13 +1216,28 @@ class OverheadGasModel:
         # makes an eigenvalue of dG larger than 1, so a diagonal secant
         # or midpoint step stalls or oscillates. A scaled Newton solve of
         # F(u) = (G(s*u) - s*u) / s, with s_i a per-species pressure
-        # scale, converges where that iteration does not. The pipe
-        # residual m_in(P) - m_pipe(P) is then one scalar root. For a
-        # nonincreasing evaporation law, m_in falls or holds as P rises
-        # and m_pipe grows as P^2 - P2^2, so the residual is monotone
-        # and a bracketed Brent solve is the root. The fixed inlet stays
-        # constant during trials. A non-overloaded hour never calls this
-        # solver.
+        # scale, converges where that iteration does not.
+        # The pipe residual is r(P) = m_in(P) - m_pipe(P). Proven at
+        # fixed molar mass: compressible Poiseuille gives
+        # m_pipe ∝ M (P^2 - P2^2), so m_pipe grows with P. M is not
+        # fixed. The conductance call recomputes it from the trial
+        # inflow, and a lighter mixture can cut M P^2 while P rises.
+        # Uniqueness of r(P) = 0 is not proven when that molar mass
+        # changes. For a nonincreasing evaporation law, m_in falls or
+        # holds as P rises, but that does not make r monotone once M
+        # can fall.
+        # If more than one root exists, the search still returns one
+        # pressure that meets the mass floor and does not flag the
+        # other. Brent runs on [setpoint, the first trial in the
+        # doubling sequence from the equilibrium sum whose residual is
+        # non-positive]. A Brent pressure that misses the floor falls
+        # through to one bisection midpoint that meets it. Neither step
+        # certifies the lowest pressure at or above the setpoint, which
+        # is the balance a headspace rising from the setpoint would
+        # reach first. An unflagged return means the mass floor was
+        # met, not that the root is unique. The fixed inlet stays
+        # constant during trials. A non-overloaded hour never calls
+        # this solver.
         species_order = list(partials_by_species)
         warm_partials: list[float] | None = None
 
