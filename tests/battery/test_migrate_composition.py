@@ -430,8 +430,8 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
         for name, value in source_map.items()
         if name not in {"Cl", "total"}
     }
-    # Oxides total 95.67 wt%; Cl adds 0.81 wt% to the printed 96.48 wt% total.
-    assert sum(oxide_map.values()) == Decimal("95.67")
+    # The source's oxide cells sum to 95.68 wt%; Cl is printed separately.
+    assert sum(oxide_map.values()) == Decimal("95.68")
     assert as_decimal(source_map["Cl"]) == Decimal("0.81")
     assert expected.state.value.components == wt_pct_to_mole_fraction(
         oxide_map
@@ -572,7 +572,7 @@ def test_plante_section_4_1_detection_limits_have_no_vacuum_conditions() -> None
     ),
 )
 def test_plante_glass_initials_use_analyzed_printed_map_by_name(
-    monkeypatch, experiment_id: str, bench: str
+    experiment_id: str, bench: str
 ) -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -587,15 +587,6 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
         name: float(value) for name, value in analytical_wt.items()
     }
 
-    convert = migrate_module.wt_pct_to_mole_fraction
-    seen: list[dict[str, Decimal]] = []
-
-    def record_map(wt):
-        if "Li2O" in wt:
-            seen.append({name: as_decimal(value) for name, value in wt.items()})
-        return convert(wt)
-
-    monkeypatch.setattr(migrate_module, "wt_pct_to_mole_fraction", record_map)
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrated_id = next(
         key
@@ -605,7 +596,7 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
     experiment = migrator.result.experiments[migrated_id]
 
     assert experiment.bench_id.endswith(f"::bench::{bench}")
-    assert analytical_wt in seen
+    # Table 1 already carries a typed initial; final map checks prove it survived selection.
     _assert_plante_samples_use_analyzed_composition(migrator.result, expected)
     _assert_plante_observations_use_analyzed_composition(migrator.result, expected)
 
@@ -1665,12 +1656,14 @@ def test_mass_closure_is_identical_through_plain_and_full_migration(
         for observation_id, observation in result.observations.items()
         if observation_id.startswith("fixture-source::na_psat::")
     )
-    assert migrated.identity.composition is not None
-    assert migrated.identity.composition.is_value
-    assert migrated.identity.composition.value == plain.state.value
+    # A p_sat identity does not compare composition; the migrated row stores it in point_conditions.
+    composition = (migrated.point_conditions or {}).get("composition")
+    assert isinstance(composition, Located)
+    assert composition.state.is_value
+    assert composition.state.value == plain.state.value
     if "XxO" in components:
-        assert plain.inference is not None
-        assert any("XxO" in item for item in plain.inference.inputs)
+        assert composition.inference is not None
+        assert any("XxO" in item for item in composition.inference.inputs)
         projected = [
             notice
             for notice in migrated.notices
@@ -1816,6 +1809,30 @@ def test_b704_nonclosing_mass_percent_stays_printed_and_refuses_engine_compositi
     )
 
 
+def test_plain_identity_reader_turns_nonoxide_mass_assay_into_unknown() -> None:
+    # Taniguchi Table 1 row 101 prints metallic Fe alone, with no oxide map.
+    identity = migrate_module._identity_from_plain(
+        {
+            "quantity": {"tag": "value", "value": "activity"},
+            "composition": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["Fe", "0.437"]],
+                },
+            },
+        }
+    )
+
+    assert identity.composition is not None
+    assert identity.composition.is_unknown
+    assert identity.composition.reason == (
+        "mass-percent composition is a partial analysis: "
+        "kept sum=0 wt% is below 95 wt%"
+    )
+
+
 @pytest.mark.parametrize(
     "water_context",
     (
@@ -1885,12 +1902,14 @@ def test_b704_hydrous_datum_state_completes_full_migration(tmp_path: Path) -> No
         for observation_id, observation in result.observations.items()
         if observation_id.startswith("fixture-source::na_psat::")
     )
-    composition = observation.identity.composition
-    assert composition is not None and composition.is_value
-    assert composition.value.amount_basis is AmountBasis.MOLE_FRACTION
-    assert set(composition.value.as_map()) == {"SiO2", "MgO"}
-    assert sum(composition.value.as_map().values()) == Decimal("1")
-    printed = result.experiments[observation.experiment_id].sample.printed_composition
+    # A p_sat identity does not compare composition; this datum's mixture is row-local.
+    composition = (observation.point_conditions or {}).get("composition")
+    assert isinstance(composition, Located) and composition.state.is_value
+    assert composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert set(composition.state.value.as_map()) == {"SiO2", "MgO"}
+    assert sum(composition.state.value.as_map().values()) == Decimal("1")
+    printed = (observation.point_conditions or {}).get("printed_composition")
+    assert isinstance(printed, Located)
     assert printed is not None and printed.state.is_value
     assert as_decimal(str(printed.state.value["H2O"])) == Decimal("5.00")
 
@@ -2239,11 +2258,12 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                     )
                     if label == "LPI" and "S" in raw_composition:
                         assert expected.as_map()["S"] > 0
-                        sample_printed = migrator.result.experiments[
-                            observation.experiment_id
-                        ].sample.printed_composition
-                        assert sample_printed is not None and sample_printed.state.is_value
-                        assert sample_printed.state.value["S"] == as_decimal(
+                        # Four distinct specimen maps share these experiments, so sulfur stays row-local.
+                        row_printed = (observation.point_conditions or {}).get(
+                            "printed_composition"
+                        )
+                        assert row_printed is not None and row_printed.state.is_value
+                        assert row_printed.state.value["S"] == as_decimal(
                             raw_composition["S"]
                         )
                     if "FeOT" in raw_composition:
@@ -2309,6 +2329,7 @@ def test_untyped_printed_composition_note_does_not_create_initial_composition() 
 
     sample = _sample_from_plain(raw)
 
+    # Cl closes the printed mass map but stays outside the oxide engine vector.
     assert sample.printed_composition is not None
     assert sample.printed_composition.state.value == {"SiO2": "60", "MgO": "40"}
     assert sample.initial_composition is None
@@ -2768,7 +2789,7 @@ def test_bischof_measured_and_nominal_initials_remain_conflicted() -> None:
     )
 
 
-def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
+def test_volatile_mass_percent_initial_preserves_print_and_converts_oxide_basis() -> None:
     raw = {
         "initial_composition": {
             "locator": {"table": "2", "page": 14},
@@ -2786,9 +2807,12 @@ def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical(
     sample = _sample_from_plain(raw)
 
     assert sample.printed_composition is not None
-    assert sample.printed_composition.state.value == raw["initial_composition"]["state"]["value"]
+    assert sample.printed_composition.state.value == {"SiO2": "60", "Cl": "40"}
     assert sample.initial_composition is not None
-    assert sample.initial_composition.state.is_unknown
+    assert sample.initial_composition.state.is_value
+    assert sample.initial_composition.state.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("60"), "Cl": Decimal("40")}
+    )
 
 
 def _iter_store_observations() -> list[dict]:
