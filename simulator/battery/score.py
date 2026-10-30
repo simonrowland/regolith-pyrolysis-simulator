@@ -5986,29 +5986,14 @@ class _FeRedoxRefusal:
 def _open_cached_battery_handle(
     engine: Engine,
     handles: Mapping[str, object] | None,
-) -> object:
-    """Open one battery engine, reusing a live handle and dropping a dead one."""
+) -> tuple[object, bool]:
+    """Open or reuse a battery engine, reporting whether this caller owns it."""
 
-    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        open_cached_battery_engine_handle,
+    )
 
-    handle_map: Mapping[str, object] = {} if handles is None else handles
-    handle = handle_map.get(engine.value)
-    if handle is not None and (
-        not getattr(handle, "available", False)
-        or getattr(handle, "backend", None) is None
-    ):
-        if isinstance(handle_map, dict):
-            handle_map.pop(engine.value, None)
-        handle = None
-    if handle is None:
-        handle = open_battery_engine(engine.value)
-        if (
-            isinstance(handle_map, dict)
-            and getattr(handle, "available", False)
-            and getattr(handle, "backend", None) is not None
-        ):
-            handle_map[engine.value] = handle
-    return handle
+    return open_cached_battery_engine_handle(engine.value, handles)
 
 
 def _printed_condition_decimal(observation: Observation, key: str) -> Decimal | None:
@@ -6557,7 +6542,7 @@ def _predict_fe_redox(
     if fo2_log is None and melts:
         # Missing printed fO2 is a refusal unless this engine computes its own.
         # The flag is on the opened handle, not a hardcoded engine name.
-        handle = _open_cached_battery_handle(engine, handles)
+        handle, _owns_handle = _open_cached_battery_handle(engine, handles)
         if not getattr(handle, "available", False) or getattr(
             handle, "backend", None
         ) is None:
@@ -6772,7 +6757,7 @@ def _predict_fe_redox(
         )
 
     if handle is None:
-        handle = _open_cached_battery_handle(engine, handles)
+        handle, _owns_handle = _open_cached_battery_handle(engine, handles)
         if (
             not getattr(handle, "available", False)
             or getattr(handle, "backend", None) is None
@@ -7984,6 +7969,7 @@ def _equilibrate_phase_assemblage(
     pressure_bar: float,
     solute_fugacity_bar: float | None = None,
     solute_fugacity_parameter: str | None = None,
+    handles: Mapping[str, object] | None = None,
 ) -> EquilibriumResult:
     """One melt-backend equilibrate. Tests replace this; it does not default pO2 or P.
 
@@ -7993,38 +7979,75 @@ def _equilibrate_phase_assemblage(
 
     import inspect
 
-    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
-
-    handle = open_battery_engine(engine.value)
+    handle, owns_handle = _open_cached_battery_handle(engine, handles)
     backend = getattr(handle, "backend", None)
     if backend is None:
         reason = getattr(handle, "unavailable_reason", None) or "backend unavailable"
         raise RuntimeError(str(reason))
-    kwargs: dict[str, object] = {
-        "temperature_C": temperature_C,
-        "composition_kg": dict(composition_kg),
-        "fO2_log": fO2_log,
-        "pressure_bar": pressure_bar,
-    }
     try:
-        parameters = inspect.signature(backend.equilibrate).parameters
-    except (TypeError, ValueError):
-        parameters = {}
-    from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
+        kwargs: dict[str, object] = {
+            "temperature_C": temperature_C,
+            "composition_kg": dict(composition_kg),
+            "fO2_log": fO2_log,
+            "pressure_bar": pressure_bar,
+        }
+        try:
+            parameters = inspect.signature(backend.equilibrate).parameters
+        except (TypeError, ValueError):
+            parameters = {}
+        from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
-    kwargs.update(isothermal_run_kwargs(handle.name, parameters))
-    if solute_fugacity_bar is not None:
-        if not solute_fugacity_parameter:
-            raise RuntimeError("printed solute fugacity has no parameter name")
-        accepts = solute_fugacity_parameter in parameters or any(
-            item.kind is inspect.Parameter.VAR_KEYWORD for item in parameters.values()
-        )
-        if not accepts:
-            raise RuntimeError(
-                f"{type(backend).__name__} does not accept {solute_fugacity_parameter}"
+        kwargs.update(isothermal_run_kwargs(handle.name, parameters))
+        if solute_fugacity_bar is not None:
+            if not solute_fugacity_parameter:
+                raise RuntimeError("printed solute fugacity has no parameter name")
+            accepts = solute_fugacity_parameter in parameters or any(
+                item.kind is inspect.Parameter.VAR_KEYWORD
+                for item in parameters.values()
             )
-        kwargs[solute_fugacity_parameter] = solute_fugacity_bar
-    return backend.equilibrate(**kwargs)
+            if not accepts:
+                raise RuntimeError(
+                    f"{type(backend).__name__} does not accept "
+                    f"{solute_fugacity_parameter}"
+                )
+            kwargs[solute_fugacity_parameter] = solute_fugacity_bar
+        return backend.equilibrate(**kwargs)
+    finally:
+        if owns_handle:
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                close_battery_engine_handle,
+            )
+
+            close_battery_engine_handle(handle)
+
+
+_ENGINE_WORKER_LIFECYCLE_FAILURES = (
+    "EngineWorkerDied",
+    "EngineWorkerUnavailable",
+    "EngineWorkerPoolLifecycleError",
+)
+
+
+def _engine_worker_lifecycle_failure(result: object) -> str | None:
+    """Return a typed worker lifecycle failure preserved by the backend."""
+
+    diagnostics = getattr(result, "diagnostics", None)
+    failure = (
+        diagnostics.get("backend_failure_exception")
+        if isinstance(diagnostics, Mapping)
+        else None
+    )
+    if failure not in _ENGINE_WORKER_LIFECYCLE_FAILURES:
+        engine_reason = str(getattr(result, "engine_reason", None) or "")
+        failure = next(
+            (
+                name
+                for name in _ENGINE_WORKER_LIFECYCLE_FAILURES
+                if f"{name}:" in engine_reason
+            ),
+            None,
+        )
+    return failure if failure in _ENGINE_WORKER_LIFECYCLE_FAILURES else None
 
 
 def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
@@ -8127,6 +8150,8 @@ def _predict_phase_row(
     identity: Identity,
     channel: str,
     sources: tuple[str, ...],
+    *,
+    handles: Mapping[str, object] | None = None,
 ) -> EnginePrediction:
     """One printed component, or one printed L_X, from an assemblage."""
 
@@ -8305,6 +8330,8 @@ def _predict_phase_row(
         if solute is not None and anion_pa is not None:
             call_kwargs["solute_fugacity_bar"] = float(anion_pa / Decimal("1e5"))
             call_kwargs["solute_fugacity_parameter"] = solute.fugacity_parameter
+        if handles is not None:
+            call_kwargs["handles"] = handles
         result = _equilibrate_phase_assemblage(
             engine,
             temperature_C=float(temperature - Decimal("273.15")),
@@ -8322,6 +8349,18 @@ def _predict_phase_row(
                 "detail": f"{type(exc).__name__}: {exc}",
             },
             execution=ExecutionState.NOT_PROBED,
+        )
+
+    worker_failure = _engine_worker_lifecycle_failure(result)
+    if worker_failure is not None:
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": f"engine_transport_error:{engine.value}",
+                "engine": engine.value,
+                "backend_failure_exception": worker_failure,
+            },
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
         )
 
     formula = identity.species.formula
@@ -8615,6 +8654,53 @@ def predict_with_engine(
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
 ) -> EnginePrediction:
+    """Dispatch one engine and close any handle opened for this call."""
+
+    if isinstance(handles, dict):
+        return _predict_with_engine(
+            engine,
+            observation,
+            handles=handles,
+            isolated=isolated,
+            experiment=experiment,
+            bench=bench,
+            fo2_mode=fo2_mode,
+        )
+
+    provided_handles = handles or {}
+    resolved_handles = dict(provided_handles)
+    try:
+        return _predict_with_engine(
+            engine,
+            observation,
+            handles=resolved_handles,
+            isolated=isolated,
+            experiment=experiment,
+            bench=bench,
+            fo2_mode=fo2_mode,
+        )
+    finally:
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            close_battery_engine_handles,
+        )
+
+        close_battery_engine_handles(
+            resolved_handles,
+            exclude=provided_handles,
+            active_error=sys.exc_info()[1],
+        )
+
+
+def _predict_with_engine(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
     _require_score_engine(engine)
@@ -8718,7 +8804,9 @@ def predict_with_engine(
             and phase_basis in PHASE_BASIS_TOKENS
         )
     ):
-        return _predict_phase_row(engine, observation, identity, channel, sources)
+        return _predict_phase_row(
+            engine, observation, identity, channel, sources, handles=handles
+        )
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
@@ -9593,7 +9681,7 @@ def predict_with_engine(
         )
 
     handle_map = handles if handles is not None else {}
-    handle = _open_cached_battery_handle(engine, handle_map)
+    handle, _owns_handle = _open_cached_battery_handle(engine, handle_map)
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
     if engine is Engine.OPENIMCC:
@@ -9888,9 +9976,13 @@ def predict_with_engine(
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
             cell_status = str(getattr(cell, "engine_status", "") or "")
+            worker_failure = _engine_worker_lifecycle_failure(cell)
             if typed in {"out_of_domain", "out_of_basis"} or cell_status == "out_of_domain":
                 refusal_reason = RefusalReason.METRIC_DOMAIN
                 typed_reason = "out_of_domain"
+            elif worker_failure is not None:
+                refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+                typed_reason = f"engine_transport_error:{engine.value}"
             else:
                 refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
                 if typed == REFUSAL_TIMEOUT:
@@ -9919,6 +10011,11 @@ def predict_with_engine(
                     "cell_refusal_reason": typed,
                     "engine_status": cell_status,
                     "engine_reason": engine_side_reason,
+                    **(
+                        {"backend_failure_exception": worker_failure}
+                        if worker_failure is not None
+                        else {}
+                    ),
                 },
                 identity=identity,
                 requested_composition=requested,
@@ -12922,33 +13019,15 @@ def _score_store_with_decisions(
                             )
                             last_progress = now
     finally:
-        active_error = sys.exc_info()[1]
-        close_errors: list[BaseException] = []
-        for name, handle in resolved_handles.items():
-            if provided_handles.get(name) is handle:
-                continue
-            backend = getattr(handle, "backend", None)
-            close = getattr(backend, "close", None)
-            if callable(close):
-                try:
-                    close()
-                except BaseException as exc:  # noqa: BLE001 - close every owned handle
-                    close_errors.append(exc)
-        if close_errors:
-            if active_error is not None:
-                for error in close_errors:
-                    add_note = getattr(active_error, "add_note", None)
-                    if callable(add_note):
-                        add_note(f"engine handle cleanup failed: {error!r}")
-                if not callable(getattr(active_error, "add_note", None)):
-                    raise active_error from close_errors[0]
-            else:
-                first_error = close_errors[0]
-                for error in close_errors[1:]:
-                    add_note = getattr(first_error, "add_note", None)
-                    if callable(add_note):
-                        add_note(f"additional engine handle cleanup failure: {error!r}")
-                raise first_error
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            close_battery_engine_handles,
+        )
+
+        close_battery_engine_handles(
+            resolved_handles,
+            exclude=provided_handles,
+            active_error=sys.exc_info()[1],
+        )
 
     if _stream is not None:
         _stream.finalize(

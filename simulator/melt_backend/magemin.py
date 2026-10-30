@@ -1423,9 +1423,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         return True
 
     def close(self) -> None:
-        if self._subprocess_pool is not None:
-            self._subprocess_pool.close(cancel_pending=True)
-            self._subprocess_pool = None
+        pool = self._subprocess_pool
+        self._subprocess_pool = None
+        self._available = False
+        if pool is not None:
+            pool.close(cancel_pending=True)
 
     def is_available(self) -> bool:
         return self._available
@@ -2872,6 +2874,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     EngineWorkerPoolLifecycleError,
                     EngineWorkerUnavailable,
                 ) as exc:
+                    try:
+                        self.close()
+                    except Exception as cleanup_error:  # noqa: BLE001 - preserve worker death
+                        add_note = getattr(exc, 'add_note', None)
+                        if callable(add_note):
+                            add_note(
+                                f'MAGEMin worker cleanup also failed: {cleanup_error}'
+                            )
                     raise _MAGEMinEngineLifecycleError(
                         type(exc).__name__, str(exc)
                     ) from exc

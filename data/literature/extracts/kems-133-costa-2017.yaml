@@ -401,11 +401,12 @@ species:
         page: 43
         figure: "6"
       T_range_K: [1750.0, 2250.0]
-      phase: vapor_over_Fo95Fa5_olivine
+      phase: gas
       standard_state: P(Mg) over Fo95Fa5
       regime: kems_effusion
       units: as plotted (not tabulated)
       values:
+        system_class: solid_solution_silicate
         quantity: partial_pressure_Mg
         gas_species: Mg
         method_class: measured_direct
@@ -487,11 +488,12 @@ species:
         page: 43
         figure: "6"
       T_range_K: [1750.0, 2250.0]
-      phase: vapor_over_Fo95Fa5_olivine
+      phase: gas
       standard_state: P(SiO) over Fo95Fa5
       regime: kems_effusion
       units: as plotted (not tabulated)
       values:
+        system_class: solid_solution_silicate
         quantity: partial_pressure_SiO
         gas_species: SiO
         method_class: measured_direct
@@ -529,11 +531,12 @@ species:
         page: 43
         figure: "6"
       T_range_K: [1750.0, 2250.0]
-      phase: vapor_over_Fo95Fa5_olivine
+      phase: gas
       standard_state: P(O2) over Fo95Fa5
       regime: kems_effusion
       units: as plotted (not tabulated)
       values:
+        system_class: solid_solution_silicate
         quantity: partial_pressure_O2
         gas_species: O2
         method_class: measured_direct
@@ -571,11 +574,12 @@ species:
         page: 43
         figure: "6"
       T_range_K: [1750.0, 2250.0]
-      phase: vapor_over_Fo95Fa5_olivine
+      phase: gas
       standard_state: P(O) over Fo95Fa5
       regime: kems_effusion
       units: as plotted (not tabulated)
       values:
+        system_class: solid_solution_silicate
         quantity: partial_pressure_O
         gas_species: O
         method_class: measured_direct

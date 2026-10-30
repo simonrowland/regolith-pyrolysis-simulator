@@ -259,6 +259,107 @@ class EngineHandle:
     identity: Mapping[str, Any] = field(default_factory=dict)
 
 
+def close_battery_engine_handle(handle: object) -> None:
+    backend = getattr(handle, "backend", None)
+    close = getattr(backend, "close", None)
+    if callable(close):
+        close()
+
+
+def close_battery_engine_handles(
+    handles: Mapping[str, object],
+    *,
+    exclude: Mapping[str, object] | None = None,
+    active_error: BaseException | None = None,
+) -> None:
+    """Close owned handles, attempting every backend before reporting errors."""
+
+    excluded_ids = {id(handle) for handle in (exclude or {}).values()}
+    closed_ids: set[int] = set()
+    close_errors: list[BaseException] = []
+    for handle in handles.values():
+        handle_id = id(handle)
+        if handle_id in excluded_ids or handle_id in closed_ids:
+            continue
+        closed_ids.add(handle_id)
+        try:
+            close_battery_engine_handle(handle)
+        except BaseException as exc:  # noqa: BLE001 - close every owned handle
+            close_errors.append(exc)
+    if not close_errors:
+        return
+    if active_error is not None:
+        for error in close_errors:
+            add_note = getattr(active_error, "add_note", None)
+            if callable(add_note):
+                add_note(f"engine handle cleanup failed: {error!r}")
+        if not callable(getattr(active_error, "add_note", None)):
+            raise active_error from close_errors[0]
+        return
+    first_error = close_errors[0]
+    for error in close_errors[1:]:
+        add_note = getattr(first_error, "add_note", None)
+        if callable(add_note):
+            add_note(f"additional engine handle cleanup failure: {error!r}")
+    raise first_error
+
+
+def battery_engine_handle_is_live(handle: object) -> bool:
+    if not getattr(handle, "available", False):
+        return False
+    backend = getattr(handle, "backend", None)
+    if backend is None:
+        return False
+    backend_available = getattr(backend, "is_available", None)
+    if backend_available is None:
+        return True
+    try:
+        state = backend_available() if callable(backend_available) else backend_available
+        return bool(state)
+    except Exception:  # noqa: BLE001 - failed liveness probes mean dead transport
+        return False
+
+
+def retire_battery_engine_handle(handle: object) -> None:
+    try:
+        close_battery_engine_handle(handle)
+    except Exception:  # noqa: BLE001 - continue retiring a failed transport
+        pass
+    for field_name, value in (("backend", None), ("available", False)):
+        try:
+            setattr(handle, field_name, value)
+        except (AttributeError, TypeError):
+            pass
+
+
+def open_cached_battery_engine_handle(
+    engine_name: str,
+    handles: Mapping[str, object] | None,
+) -> tuple[object, bool]:
+    """Return a live cached engine or open one, with ownership for replacements."""
+
+    handle_map: Mapping[str, object] = {} if handles is None else handles
+    handle = handle_map.get(engine_name)
+    if handle is not None and not battery_engine_handle_is_live(handle):
+        retire_battery_engine_handle(handle)
+        if isinstance(handle_map, dict):
+            handle_map.pop(engine_name, None)
+        handle = None
+
+    owned_handle = True
+    if handle is None:
+        handle = open_battery_engine(engine_name)
+        if (
+            isinstance(handle_map, dict)
+            and battery_engine_handle_is_live(handle)
+        ):
+            handle_map[engine_name] = handle
+            owned_handle = False
+    else:
+        owned_handle = False
+    return handle, owned_handle
+
+
 def _handle_model_id(handle: EngineHandle) -> str | None:
     """Return the loaded OpenIMCC backend's model id, if one is available."""
 
@@ -3453,32 +3554,37 @@ def run_isolated_cell_worker(
         cell_material=po2_raw.get("cell_material"),
     )
     engine_name = str(payload["engine"])
+    owns_handle = handle is None or handle.name != engine_name
     if handle is None or handle.name != engine_name:
         handle = open_battery_engine(engine_name)
-    if handle.name == "alphamelts" and handle.backend is not None:
-        # A fresh per-cell backend used to start with an empty warning set.
-        # Keep that output behavior while the native transport is reused.
-        warning_seen = getattr(
-            handle.backend, "_pseudo_vapor_pressure_warning_seen", None
+    try:
+        if handle.name == "alphamelts" and handle.backend is not None:
+            # A fresh per-cell backend used to start with an empty warning set.
+            # Keep that output behavior while the native transport is reused.
+            warning_seen = getattr(
+                handle.backend, "_pseudo_vapor_pressure_warning_seen", None
+            )
+            if isinstance(warning_seen, set):
+                warning_seen.clear()
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=float(payload["temperature_K"]),
+            po2=po2,
+            timeout_s=finite_float(payload.get("timeout_s")),
+            physical_pressure_bar=(
+                None
+                if payload.get("physical_pressure_bar") is None
+                else float(payload["physical_pressure_bar"])
+            ),
+            qualification=bool(payload.get("qualification")),
+            isolated=False,
+            arm=str(payload.get("arm") or ARM_HEADLINE),
         )
-        if isinstance(warning_seen, set):
-            warning_seen.clear()
-    cell = equilibrate_cell(
-        handle,
-        pot,
-        temperature_K=float(payload["temperature_K"]),
-        po2=po2,
-        timeout_s=finite_float(payload.get("timeout_s")),
-        physical_pressure_bar=(
-            None
-            if payload.get("physical_pressure_bar") is None
-            else float(payload["physical_pressure_bar"])
-        ),
-        qualification=bool(payload.get("qualification")),
-        isolated=False,
-        arm=str(payload.get("arm") or ARM_HEADLINE),
-    )
-    return cell.as_payload()
+        return cell.as_payload()
+    finally:
+        if owns_handle:
+            close_battery_engine_handle(handle)
 
 
 def _crash_cell_from_returncode(
@@ -3577,9 +3683,7 @@ class _IsolatedCellEngine:
         self.handle = handle
 
     def close(self) -> None:
-        close = getattr(self.handle.backend, "close", None)
-        if callable(close):
-            close()
+        close_battery_engine_handle(self.handle)
 
 
 def _bootstrap_isolated_cell_engine(engine: str) -> tuple[_IsolatedCellEngine, str]:
@@ -3592,6 +3696,10 @@ def _handle_isolated_cell_request(
     payload: Mapping[str, Any],
     _diagnostic_log: Any,
 ) -> dict[str, Any]:
+    handles = {resource.handle.name: resource.handle}
+    resource.handle, _owns_handle = open_cached_battery_engine_handle(
+        resource.handle.name, handles
+    )
     return run_isolated_cell_worker(payload, handle=resource.handle)
 
 
@@ -4203,15 +4311,8 @@ def equilibrate_cell(
             or isinstance(exc, TimeoutError)
             or "timeout" in type(exc).__name__.lower()
         )
-        if is_timeout:
-            closer = getattr(handle.backend, "close", None)
-            if callable(closer):
-                try:
-                    closer()
-                except Exception:  # noqa: BLE001 - close is best-effort after timeout
-                    pass
-            handle.backend = None
-            handle.available = False
+        if is_timeout or not battery_engine_handle_is_live(handle):
+            retire_battery_engine_handle(handle)
             handle.unavailable_reason = engine_reason
         return _done(
             status=status,
@@ -4327,132 +4428,159 @@ def run_engine_arm(
     wall0 = time.perf_counter()
     cpu0 = time.process_time()
     hostname = _hostname()
-    resolved = dict(handles) if handles is not None else probe_battery_engines(engine_names)
-    reused = {
-        _cell_identity_key(cell): cell
-        for cell in (reuse_cells or ())
-    }
+    provided_handles = dict(handles or {})
+    resolved: dict[str, EngineHandle] = {}
+    try:
+        resolved.update(
+            dict(handles) if handles is not None else probe_battery_engines(engine_names)
+        )
+        reused = {
+            _cell_identity_key(cell): cell
+            for cell in (reuse_cells or ())
+        }
 
-    n_expected = 0
-    for job in jobs:
-        for name in engine_names:
-            handle = resolved.get(name) or open_battery_engine(name)
-            resolved[name] = handle
-            takes_fo2 = handle.takes_fo2 or bool(
-                (reuse_engine_blocks or {}).get(name, {}).get("takes_fo2")
-            )
-            n_po2 = (
-                len(po2_requests_for_engine(grid, takes_fo2=takes_fo2))
-                if job.use_grid_po2
-                else 1
-            )
-            n_expected += len(job.temperatures_K) * n_po2
-    _emit_progress(
-        progress_log,
-        (
-            f"{_utc_stamp()} START hostname={hostname} n_expected={n_expected} "
-            f"qualification={str(qualification).lower()} "
-            f"scoring={str(include_scoring_pots).lower()} "
-            f"reuse={len(reused)}"
-        ),
-    )
+        n_expected = 0
+        for job in jobs:
+            for name in engine_names:
+                handle = resolved.get(name) or open_battery_engine(name)
+                resolved[name] = handle
+                takes_fo2 = handle.takes_fo2 or bool(
+                    (reuse_engine_blocks or {}).get(name, {}).get("takes_fo2")
+                )
+                n_po2 = (
+                    len(po2_requests_for_engine(grid, takes_fo2=takes_fo2))
+                    if job.use_grid_po2
+                    else 1
+                )
+                n_expected += len(job.temperatures_K) * n_po2
+        _emit_progress(
+            progress_log,
+            (
+                f"{_utc_stamp()} START hostname={hostname} n_expected={n_expected} "
+                f"qualification={str(qualification).lower()} "
+                f"scoring={str(include_scoring_pots).lower()} "
+                f"reuse={len(reused)}"
+            ),
+        )
 
-    cells: list[EquilibrateCell] = []
-    for job in jobs:
-        for name in engine_names:
-            handle = resolved.get(name) or open_battery_engine(name)
-            resolved[name] = handle
-            takes_fo2 = handle.takes_fo2 or bool(
-                (reuse_engine_blocks or {}).get(name, {}).get("takes_fo2")
-            )
-            requests = (
-                po2_requests_for_engine(grid, takes_fo2=takes_fo2)
-                if job.use_grid_po2
-                else (Po2Request(mode=PO2_ENGINE_DEFAULT, po2_bar=None),)
-            )
-            for temperature_K in job.temperatures_K:
-                for po2 in requests:
-                    probe = EquilibrateCell(
-                        pot_id=job.pot.pot_id,
-                        engine=name,
-                        temperature_K=float(temperature_K),
-                        po2=po2,
-                        status="",
-                        refusal_reason=None,
-                        engine_status=None,
-                        engine_reason=None,
-                        melt_activities={},
-                        gas_partial_pressures_Pa={},
-                        liquid_fraction=None,
-                        wall_s=0.0,
-                        cpu_s=0.0,
-                        hostname="",
-                        arm=job.arm,
-                    )
-                    existing = reused.get(_cell_identity_key(probe))
-                    if existing is not None:
-                        cell = existing
-                    else:
-                        cell = equilibrate_cell(
-                            handle,
-                            job.pot,
+        cells: list[EquilibrateCell] = []
+        for job in jobs:
+            for name in engine_names:
+                handle = resolved.get(name) or open_battery_engine(name)
+                resolved[name] = handle
+                takes_fo2 = handle.takes_fo2 or bool(
+                    (reuse_engine_blocks or {}).get(name, {}).get("takes_fo2")
+                )
+                requests = (
+                    po2_requests_for_engine(grid, takes_fo2=takes_fo2)
+                    if job.use_grid_po2
+                    else (Po2Request(mode=PO2_ENGINE_DEFAULT, po2_bar=None),)
+                )
+                for temperature_K in job.temperatures_K:
+                    for po2 in requests:
+                        probe = EquilibrateCell(
+                            pot_id=job.pot.pot_id,
+                            engine=name,
                             temperature_K=float(temperature_K),
                             po2=po2,
-                            qualification=job.qualification,
+                            status="",
+                            refusal_reason=None,
+                            engine_status=None,
+                            engine_reason=None,
+                            melt_activities={},
+                            gas_partial_pressures_Pa={},
+                            liquid_fraction=None,
+                            wall_s=0.0,
+                            cpu_s=0.0,
+                            hostname="",
                             arm=job.arm,
                         )
-                    cells.append(cell)
-                    po2_label = (
-                        "default"
-                        if po2.mode == PO2_ENGINE_DEFAULT
-                        else f"{po2.po2_bar:g}"
-                    )
-                    _emit_progress(
-                        progress_log,
-                        (
-                            f"{_utc_stamp()} {len(cells)}/{n_expected} "
-                            f"arm={cell.arm} pot={cell.pot_id} engine={cell.engine} "
-                            f"T={cell.temperature_K:g} po2={po2_label} "
-                            f"status={cell.status} "
-                            f"reason={cell.refusal_reason or '-'} "
-                            f"n_act={len(cell.melt_activities)} "
-                            f"n_gas={len(cell.gas_partial_pressures_Pa)} "
-                            f"wall={cell.wall_s:.3f}"
-                        ),
-                    )
-                    if not handle.available:
-                        # Re-open once after a kill; if still dead, stamp the rest.
-                        if handle.unavailable_reason and "timeout" in (
-                            handle.unavailable_reason or ""
-                        ).lower():
-                            revived = open_battery_engine(name)
-                            resolved[name] = revived
-                            handle = revived
-
-    report = build_report(
-        pots=catalog,
-        grid=grid,
-        handles=resolved,
-        cells=cells,
-        hostname=hostname,
-        wall_s=time.perf_counter() - wall0,
-        cpu_s=time.process_time() - cpu0,
-        engine_names=engine_names,
-        reuse_engine_blocks=reuse_engine_blocks,
-    )
-    _emit_progress(
-        progress_log,
-        (
-            f"{_utc_stamp()} DONE hostname={report['hostname']} "
-            f"n_cells={report['n_cells']} n_ok={report['n_ok']} "
-            f"n_refused={report['n_refused']} "
-            f"n_matched_residuals={report['n_matched_residuals']} "
-            f"n_qualification_cells={report.get('n_qualification_cells', 0)} "
-            f"wall={report['receipt']['wall_s']:.3f} "
-            f"cpu={report['receipt']['cpu_s']:.3f}"
-        ),
-    )
-    return report
+                        existing = reused.get(_cell_identity_key(probe))
+                        if existing is not None:
+                            cell = existing
+                        else:
+                            had_live_handle = battery_engine_handle_is_live(handle)
+                            if handle.backend is not None and not had_live_handle:
+                                handle, _owns_handle = (
+                                    open_cached_battery_engine_handle(
+                                        name, resolved
+                                    )
+                                )
+                                resolved[name] = handle
+                                had_live_handle = battery_engine_handle_is_live(
+                                    handle
+                                )
+                            cell = equilibrate_cell(
+                                handle,
+                                job.pot,
+                                temperature_K=float(temperature_K),
+                                po2=po2,
+                                qualification=job.qualification,
+                                arm=job.arm,
+                            )
+                            if not battery_engine_handle_is_live(handle) and (
+                                had_live_handle
+                                or (
+                                    not handle.available
+                                    and "timeout"
+                                    in (handle.unavailable_reason or "").lower()
+                                )
+                            ):
+                                handle, _owns_handle = (
+                                    open_cached_battery_engine_handle(
+                                        name, resolved
+                                    )
+                                )
+                                resolved[name] = handle
+                        cells.append(cell)
+                        po2_label = (
+                            "default"
+                            if po2.mode == PO2_ENGINE_DEFAULT
+                            else f"{po2.po2_bar:g}"
+                        )
+                        _emit_progress(
+                            progress_log,
+                            (
+                                f"{_utc_stamp()} {len(cells)}/{n_expected} "
+                                f"arm={cell.arm} pot={cell.pot_id} engine={cell.engine} "
+                                f"T={cell.temperature_K:g} po2={po2_label} "
+                                f"status={cell.status} "
+                                f"reason={cell.refusal_reason or '-'} "
+                                f"n_act={len(cell.melt_activities)} "
+                                f"n_gas={len(cell.gas_partial_pressures_Pa)} "
+                                f"wall={cell.wall_s:.3f}"
+                            ),
+                        )
+        report = build_report(
+            pots=catalog,
+            grid=grid,
+            handles=resolved,
+            cells=cells,
+            hostname=hostname,
+            wall_s=time.perf_counter() - wall0,
+            cpu_s=time.process_time() - cpu0,
+            engine_names=engine_names,
+            reuse_engine_blocks=reuse_engine_blocks,
+        )
+        _emit_progress(
+            progress_log,
+            (
+                f"{_utc_stamp()} DONE hostname={report['hostname']} "
+                f"n_cells={report['n_cells']} n_ok={report['n_ok']} "
+                f"n_refused={report['n_refused']} "
+                f"n_matched_residuals={report['n_matched_residuals']} "
+                f"n_qualification_cells={report.get('n_qualification_cells', 0)} "
+                f"wall={report['receipt']['wall_s']:.3f} "
+                f"cpu={report['receipt']['cpu_s']:.3f}"
+            ),
+        )
+        return report
+    finally:
+        close_battery_engine_handles(
+            resolved,
+            exclude=provided_handles,
+            active_error=sys.exc_info()[1],
+        )
 
 
 # ---------------------------------------------------------------------------
