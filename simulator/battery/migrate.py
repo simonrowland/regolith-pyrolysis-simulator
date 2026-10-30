@@ -13958,7 +13958,8 @@ def sample_from_equipment(
     printed = None if catalogue_marked else _printed_composition_from_roots(
         roots, vocab, fallback_locator=locator
     )
-    printed = _preserve_printed_composition_context(printed, None, values)
+    if not catalogue_marked:
+        printed = _preserve_printed_composition_context(printed, None, values)
     initial = catalogue
     if printed is None and catalogue is None and not catalogue_marked:
         refusal_reason: list[str] = []
