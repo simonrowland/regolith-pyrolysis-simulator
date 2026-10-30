@@ -27,6 +27,28 @@ fidelity_samples:
     table: '3'
     row: '1'
     note: 600 dpi render checked against Table 3, row 1, Mg pressure cell.
+source_caveats:
+- locator:
+    page: 97
+    pdf_page_index: 96
+    published_page: 11
+    section: 2.2.2
+  quote: 'The initial slag composition, in wt%, was: Al2O3 (12.06), CaO (3.8), Cr2O3 (1.3), Fe2O3 (14.25), K2O (19.54), MgO (1.03), Na2O (0.47), SO3 (0.21), SiO2 (46.82), TiO2 (0.52).'
+  note: Printed initial composition for the K1 sample; it is not a run-state analysis.
+- locator:
+    page: 93
+    pdf_page_index: 92
+    published_page: 7
+    section: 2.2.1
+  quote: 'KMS Data for MgO + H2 System'
+  note: The printed condensed sample is MgO(s); H2 is the reacting gas.
+- locator:
+    page: 94
+    pdf_page_index: 93
+    published_page: 8
+    section: 2.2.1
+  quote: 'MgO(s) = Mg + 1/2 O2'
+  note: The source identifies the solid MgO reservoir in the monitored vaporization reaction.
 species:
   K:
     observations:
@@ -85,10 +107,26 @@ species:
                   measured value.
             composition:
               state:
-                tag: unknown
-                reason: K1 run-state composition at 1466 K is not reported; the initial composition is
-                  not the run-state composition.
-              locator: *id001
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                    Al2O3: '12.06'
+                    CaO: '3.8'
+                    Cr2O3: '1.3'
+                    Fe2O3: '14.25'
+                    K2O: '19.54'
+                    MgO: '1.03'
+                    Na2O: '0.47'
+                    SO3: '0.21'
+                    SiO2: '46.82'
+                    TiO2: '0.52'
+              locator:
+                page: 97
+                pdf_page_index: 96
+                published_page: 11
+                section: 2.2.2
+                note: Printed initial composition for the K1 sample.
           locator: *id001
     context:
     - observation_id: hastie_1980_main_table1_K2_slag_model_pressures
@@ -782,6 +820,11 @@ species:
         method_as_printed: The Mg+ ion intensity was calibrated against the known Mg pressure over MgO(s);
           Table 1 gives the Mg KMS cross section and sensitivity factor.
         system_as_published: MgO(s) + H2 system; reaction (3)
+        reservoir_formula: MgO
+        reservoir:
+          formula: MgO
+          phase: {tag: value, value: cr}
+        reservoir_as_printed: MgO(s) in the MgO + H2 system
         points:
         - T_K_as_printed: '2077'
           T_K: 2077
