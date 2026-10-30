@@ -317,6 +317,16 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 # Found by /qa on 2026-07-19
 # Report: docs-private/research/2026-07-19-webqa/report.md
 # Nightly (2026-08-02 CI tiering): serial web full path (~187 s junit).
+# CPU budget (b-1072 follow-up): measured pytest-worker CPU (process_time over the call
+# phase, the quantity the cpu_budget verdict uses), serial, niced, on studio-2:
+#   green 237db575c (b179), load 30-55: 295.1, 286.5, 289.6, 310.1, 298.5 s
+#   green dbe796462 (b180), load 29-54: 319.0, 323.3, 342.5, 340.5, 329.0 s
+#   interleaved A/B at matched load, b179 vs b180: 329.3/307.4, 322.5/321.7, 297.9/287.1 s
+#   rpp-ctrl-3 nightly at -n 6: 292.8 (b178), 291.7 (b179), 302.0 (b180), 312.0 s (b181)
+# The A/B shows b180 is not heavier (median 307 vs 322 s): the drift is host contention,
+# not code. Over all 15 studio-2 runs CPU spans 286.5-342.5 s, so the 300 s default sits
+# inside the spread. Sized from the loaded maximum: 450 s = 1.31 x 342.5 s.
+@pytest.mark.cpu_budget(450)
 @pytest.mark.nightly
 def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     sid, state, events, decisions, completion = _drive(

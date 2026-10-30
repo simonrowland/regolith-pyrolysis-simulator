@@ -130,6 +130,15 @@ HEAVY_ROSTER = frozenset({
      "test_pause_resume_around_every_gate_is_ledger_identical"),
     ("tests/test_web_functional_qa.py",
      "test_alternate_path_b_completes_with_gate_pause_resume"),
+    # b-1072 follow-up (2026-10-30), owner ratification requested via main:
+    # the headless full-run web journey is nightly-only and already in this
+    # file's serial chain. MEASURED 286.5-342.5 s worker CPU over 15 serial
+    # studio-2 runs (interleaved A/B shows no code-driven growth) and
+    # 292-312 s in the rpp nightly, so the 300 s default fails it under
+    # ordinary contention. Budget 450 s at the mark. Long-term fate per
+    # t-414: a call-volume cut.
+    ("tests/test_web_functional_qa.py",
+     "test_headless_full_run_ledgers_and_product_story_match_runner"),
     ("tests/test_yield_root_cause.py",
      "test_c5_targeted_feo_full_track_reduces_target_after_low_temperature"
      "_hours"),
