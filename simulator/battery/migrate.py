@@ -4020,10 +4020,7 @@ def _wt_percent_conversion_or_refusal(
         oxide_wt = _oxide_mass_percent_components(wt)
         volatile_wt = _printed_volatile_mass_percent(wt, closure_context)
         closure_wt = {**oxide_wt, **volatile_wt}
-        closure_error = _percent_composition_closure_error(closure_wt, "mass")
-        if closure_error is not None:
-            raise ValueError(closure_error)
-
+        conversion_wt = oxide_wt
         if volatile_wt:
             oxide_total = sum(
                 (
@@ -4044,9 +4041,11 @@ def _wt_percent_conversion_or_refusal(
                     )
                     for name, amount in oxide_wt.items()
                 }
-            return wt_pct_to_mole_fraction(conversion_wt), None
-
-        return wt_pct_to_mole_fraction(oxide_wt), None
+        converted = wt_pct_to_mole_fraction(conversion_wt)
+        closure_error = _percent_composition_closure_error(closure_wt, "mass")
+        if closure_error is not None:
+            raise ValueError(closure_error)
+        return converted, None
     except (ArithmeticError, ValueError) as exc:
         return None, f"mass-percent composition is not usable: {exc}"
 
@@ -4151,6 +4150,7 @@ def _oxide_map_from_mapping(
     refusal_reason: list[str] | None = None,
     declared_map: bool = False,
     closure_context: object = None,
+    preserve_printed_map_on_refusal: bool = False,
 ) -> dict[str, Decimal] | None:
     if not isinstance(obj, Mapping):
         return None
@@ -4191,7 +4191,7 @@ def _oxide_map_from_mapping(
                     oxide, _factor = equivalent
                     comps[oxide] = comps.get(oxide, Decimal("0")) + amount
                 if len(comps) >= 2:
-                    if not checked(comps):
+                    if not checked(comps) and not preserve_printed_map_on_refusal:
                         return None
                     return comps
                 continue
@@ -4207,6 +4207,7 @@ def _oxide_map_from_mapping(
                 refusal_reason=refusal_reason,
                 declared_map=True,
                 closure_context=row_context,
+                preserve_printed_map_on_refusal=preserve_printed_map_on_refusal,
             )
             if got:
                 for name, value in nested.items():
@@ -4229,7 +4230,7 @@ def _oxide_map_from_mapping(
                             got[oxide] = got.get(oxide, Decimal("0")) + amount
                         else:
                             got[token] = amount
-                if not checked(got):
+                if not checked(got) and not preserve_printed_map_on_refusal:
                     return None
                 return got
     if not declared_map:
@@ -4250,7 +4251,7 @@ def _oxide_map_from_mapping(
         comps[_canonical_printed_oxide_name(name)] = amount
     if len(comps) < 2:
         return None
-    if not checked(comps):
+    if not checked(comps) and not preserve_printed_map_on_refusal:
         return None
     missing = _missing_major_oxide_names(obj)
     if missing:
@@ -19879,6 +19880,7 @@ class Migrator:
                     ),
                     declared_map=point_map_declared,
                     closure_context=raw_item,
+                    preserve_printed_map_on_refusal=True,
                 )
             if q_for_species is Quantity.MASS_LOSS_FRACTION:
                 point_oxide_map = (
@@ -20569,7 +20571,7 @@ class Migrator:
                             composition = _mass_percent_composition_state(
                                 components,
                                 basis="printed_oxides",
-                                closure_context=values,
+                                closure_context=parent_values,
                             )
                     mass = run_experiment.sample.mass_kg
                     mass_value = (

@@ -11685,14 +11685,11 @@ def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-023-demaria-1973.yaml")
     assert result.validation is not None
-    # 829ce3701 withholds two owner-selected initials (samples 10017 and
-    # 12073) instead of picking one. 243fb508c admits both Na series.
+    # Both cross-source whole-sample proxies fail printed-precision closure
+    # (99.79 wt% for 10017 and 99.48 wt% for 12073), so neither is selected
+    # as an initial composition and they cannot conflict with each other.
     issues = result.validation.hard_issues
-    assert len(issues) == 1
-    assert issues[0].reason is RefusalReason.INVALID_SOURCE
-    assert "initial_composition_conflict" in issues[0].detail
-    assert "10017" in issues[0].detail
-    assert "12073" in issues[0].detail
+    assert issues == ()
     rows = [
         obs
         for obs in result.observations.values()

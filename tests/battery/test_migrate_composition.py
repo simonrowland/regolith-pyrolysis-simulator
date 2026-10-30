@@ -74,11 +74,13 @@ _MARKOVA_VI_PREFIX = (
     "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite"
 )
 _SWEPT_COMPOSITION_MAPS = (
-    ("Zhang", "kems-006-zhang-2021", "starting_glass_wt_pct", "Rb2O", 12),
-    ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 4),
-    ("Britt", "britt-2019-asteroid-simulants", "composition_wt_pct", "FeOT", 3),
-    ("Hendrix", "hendrix-2024-reactivity-reduced-simulants", "composition_wt_pct", "SO3", 2),
-    ("Flemetakis", "ta-flemetakis-2024", "composition_wt_pct", "B2O3", 1),
+    # Zhang repeats a 99.32 wt% starting-glass map in twelve rows, with no
+    # printed volatile component to close the difference.
+    ("Zhang", "kems-006-zhang-2021", "starting_glass_wt_pct", "Rb2O", 0, 12),
+    ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 4, 0),
+    ("Britt", "britt-2019-asteroid-simulants", "composition_wt_pct", "FeOT", 3, 0),
+    ("Hendrix", "hendrix-2024-reactivity-reduced-simulants", "composition_wt_pct", "SO3", 2, 0),
+    ("Flemetakis", "ta-flemetakis-2024", "composition_wt_pct", "B2O3", 1, 0),
 )
 _MLS_BULK_ID_PREFIXES = {
     "cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:",
@@ -280,7 +282,7 @@ def test_noncomposition_values_are_not_scanned_or_refused_as_oxides() -> None:
     assert not hasattr(migrate_module, "_is_formula_component_key")
 
 
-def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> None:
+def test_flemetakis_nonclosing_starting_glass_is_refused(tmp_path) -> None:
     source = "ta-flemetakis-2024.yaml"
     source_path = REPO_ROOT / "data/literature/extracts" / source
     document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
@@ -306,19 +308,17 @@ def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> Non
     )
     point_composition = (observation.point_conditions or {}).get("composition")
     assert isinstance(point_composition, Located)
-    assert point_composition.state.is_value
-    assert isinstance(point_composition.state.value, Composition)
-    assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert point_composition.state.is_unknown
+    assert point_composition.state.reason == (
+        "mass-percent composition is not usable: "
+        "mass-percent composition does not close to 100 (sum=99.37)"
+    )
 
     initial = result.experiments[observation.experiment_id].sample.initial_composition
-    assert initial is not None and initial.state.is_value
+    assert initial is not None and initial.state.is_unknown
     assert initial.locator is not None
     assert initial.locator.section == "2.1 Starting material"
-    assert isinstance(initial.state.value, Composition)
-    assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-    assert not migrate_module._initial_compositions_conflict(
-        initial, point_composition
-    )
+    assert initial.state.reason == point_composition.state.reason
 
 
 def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
@@ -345,7 +345,7 @@ def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
     assert source_experiment.sample.initial_composition is None
 
 
-def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
+def test_hastie_nonclosing_typed_initial_charge_is_refused() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-020-hastie-1981-nbsir.yaml"
     document = yaml.safe_load(path.read_text(encoding="utf-8"))
     observation = next(
@@ -360,6 +360,11 @@ def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
         locator=migrate_module.locator_from_mapping(observation["locator"]),
     )
     assert selected.initial_composition is not None
+    assert selected.initial_composition.state.is_unknown
+    assert selected.initial_composition.state.reason == (
+        "mass-percent composition is not usable: "
+        "mass-percent composition does not close to 100 (sum=98.0)"
+    )
 
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
@@ -368,10 +373,7 @@ def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
     ]
 
     actual = experiment.sample.initial_composition
-    assert actual is not None and actual.state.is_value
-    assert dict(actual.state.value.components) == dict(
-        selected.initial_composition.state.value.components
-    )
+    assert actual is not None and actual.state == selected.initial_composition.state
 
 
 def test_volovetskii_starting_glass_material_state_is_initial() -> None:
@@ -391,7 +393,10 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
     )
     expected = selected.initial_composition
     assert expected is not None and not expected.state.is_value
-    assert "unsupported numeric component(s): Cl" in expected.state.reason
+    assert expected.state.reason == (
+        "mass-percent composition is not usable: "
+        "mass-percent composition does not close to 100 (sum=96.49)"
+    )
 
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
@@ -1144,8 +1149,20 @@ def test_markova_initial_charge_stays_context_under_refusal_mutation(
     point["composition_wt_pct"] = dict(point["composition_wt_pct"], XxO=10)
     original_parse = migrate_module._oxide_map_from_mapping
 
-    def discard_refusal(obj, *, refusal_reason=None, declared_map=False):
-        return original_parse(obj, declared_map=declared_map)
+    def discard_refusal(
+        obj,
+        *,
+        refusal_reason=None,
+        declared_map=False,
+        closure_context=None,
+        preserve_printed_map_on_refusal=False,
+    ):
+        return original_parse(
+            obj,
+            declared_map=declared_map,
+            closure_context=closure_context,
+            preserve_printed_map_on_refusal=preserve_printed_map_on_refusal,
+        )
 
     monkeypatch.setattr(migrate_module, "_oxide_map_from_mapping", discard_refusal)
     original_load_yaml = migrate_module.load_yaml
@@ -1882,10 +1899,24 @@ def test_real_pretyped_experiment_initials_match_printed_composition_owner(
 
 def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
     migrator = Migrator()
-    for _label, source, _field, _species, _count in _SWEPT_COMPOSITION_MAPS:
+    for (
+        _label,
+        source,
+        _field,
+        _species,
+        _count,
+        _refusal_count,
+    ) in _SWEPT_COMPOSITION_MAPS:
         migrator._migrate_extract(REPO_ROOT / "data/literature/extracts" / f"{source}.yaml")
 
-    for label, source, field, species, expected_count in _SWEPT_COMPOSITION_MAPS:
+    for (
+        label,
+        source,
+        field,
+        species,
+        expected_count,
+        expected_refusal_count,
+    ) in _SWEPT_COMPOSITION_MAPS:
         doc = yaml.safe_load(
             (REPO_ROOT / "data/literature/extracts" / f"{source}.yaml").read_text()
         )
@@ -1941,7 +1972,10 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                         )
                         feot_derivations += 1
                 converted += 1
-        assert (refused, converted) == (0, expected_count), label
+        assert (refused, converted) == (
+            expected_refusal_count,
+            expected_count,
+        ), label
         if label == "Britt":
             assert feot_derivations == expected_count
 
@@ -2601,7 +2635,14 @@ def test_migrate_lifts_markova_shaped_oxide_map(tmp_path: Path) -> None:
     assert experiment.sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
     later_printed = later.point_conditions["printed_composition"].state.value
     assert as_decimal(later_printed["SiO2"]) == as_decimal("0.0")
+    assert as_decimal(later_printed["Al2O3"]) == as_decimal("79.28")
     assert later_printed != printed
+    later_composition = later.point_conditions["composition"]
+    assert later_composition.state.is_unknown
+    assert later_composition.state.reason == (
+        "mass-percent composition is not usable: "
+        "mass-percent composition does not close to 100 (sum=101.00)"
+    )
 
 
 def test_migrate_keeps_ilmenite_and_drops_sample_code(tmp_path: Path) -> None:
@@ -3085,8 +3126,12 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
                 }
                 assert actual_moles == dict(converted.components)
     assert refused_residue_rows == {
+        ("VI", Decimal("1726")): Decimal("99.91"),
         ("VI", Decimal("1883")): Decimal("91.43"),
         ("VI", Decimal("1960")): Decimal("95.01"),
+        ("VI", Decimal("2207")): Decimal("101.00"),
+        ("V", Decimal("1476")): Decimal("99.37"),
+        ("V", Decimal("2119")): Decimal("99.50"),
     }
 
     for panel, charge in charges.items():
