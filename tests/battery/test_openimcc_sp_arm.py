@@ -55,6 +55,10 @@ _LI_2005_FEO_ROW = (
     "li-2005-na-al-phosphate-fe-activities::"
     "li_2005_table_1_feo_activity_coefficient::T=1823:row=1-1:h=946adbc5ed6a"
 )
+_HASHIMOTO_GREEN_RESIDUE_OBSERVATION_ID = (
+    "kems-015-hashimoto-1983::hashimoto_1983_table3_residue_composition_series::"
+    "T=1973.15:row=c3-(2):h=26a09cbd7ac5"
+)
 _SP_PACK_SOURCE = "openimcc-pack-id:d066-ext"
 _OPENIMCC_GREEN_PIN_EXCLUDED_VOLATILE_PATHS = (
     "version",
@@ -143,6 +147,19 @@ def _sp_engine() -> Engine:
     return next(engine for engine in SCORE_ENGINE_SET if engine.value == "openimcc-sp")
 
 
+@pytest.fixture(scope="module")
+def _li_2005_score_context():
+    return load_score_context(sources=("li-2005-na-al-phosphate-fe-activities",))
+
+
+def _assert_openimcc_prediction_matches_green_baseline(name: str, prediction) -> None:
+    pin = _openimcc_prediction_pin(prediction)
+    actual_sha256 = hashlib.sha256(
+        json.dumps(pin, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    assert actual_sha256 == _OPENIMCC_GREEN_PREDICTION_SHA256[name]
+
+
 def test_openimcc_sp_is_registered_as_a_distinct_battery_engine() -> None:
     engine = _sp_engine()
 
@@ -166,12 +183,8 @@ def test_openimcc_sp_is_registered_as_a_distinct_battery_engine() -> None:
     ) == "obs-1::activity::melt_activity::openimcc-sp"
 
 
-def test_openimcc_value_authority_notices_and_refusal_match_green_baseline() -> None:
+def test_openimcc_activity_prediction_matches_green_baseline() -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
-    from simulator.battery.score import (
-        _hashimoto_residue_prediction,
-        quantity_token,
-    )
 
     composition = Composition(
         basis="ordered_complete_mole_inventory",
@@ -199,20 +212,57 @@ def test_openimcc_value_authority_notices_and_refusal_match_green_baseline() -> 
         experiment=activity_experiment,
         isolated=False,
     )
+    _assert_openimcc_prediction_matches_green_baseline(
+        "activity", activity_prediction
+    )
+
+
+def test_openimcc_residue_prediction_matches_green_baseline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
+    import simulator.battery.residue as residue
+    from simulator.battery.score import _hashimoto_residue_prediction
 
     residue_context = load_score_context(sources=("kems-015-hashimoto-1983",))
-    residue_reference = next(
-        row
-        for row in residue_context.observations.values()
-        if row.source_id == "kems-015-hashimoto-1983"
-        and row.identity.species.formula == "FeO"
-        and quantity_token(row.identity)
-        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    residue_reference = residue_context.observations[
+        _HASHIMOTO_GREEN_RESIDUE_OBSERVATION_ID
+    ]
+    original_predict_cohort = residue._predict_hashimoto_residue_cohort
+
+    def predict_reference_run_only(experiments, runtime_catalog, **kwargs):
+        reference_experiment = next(
+            experiment
+            for experiment in experiments
+            if experiment["experiment_id"] == residue_reference.experiment_id
+        )
+        first_sample = experiments[0]["sample"]
+        reference_sample = reference_experiment["sample"]
+        assert first_sample["mass_kg"] == reference_sample["mass_kg"]
+        assert (
+            first_sample["printed_composition"]["state"]["value"]
+            == reference_sample["printed_composition"]["state"]["value"]
+        )
+        return original_predict_cohort(
+            [reference_experiment],
+            runtime_catalog,
+            _allow_partial_cohort_for_test=True,
+            **kwargs,
+        )
+
+    monkeypatch.setattr(
+        residue, "_predict_hashimoto_residue_cohort", predict_reference_run_only
     )
     residue_prediction = _hashimoto_residue_prediction(
         residue_context, residue_reference, Engine.OPENIMCC, {}
     )
+    _assert_openimcc_prediction_matches_green_baseline(
+        "residue", residue_prediction
+    )
 
+
+def test_openimcc_mass_loss_prediction_matches_green_baseline() -> None:
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
     mass_loss_context = load_score_context(
         sources=("mendybaev-2017-fun-cai-lab-evaporation",)
     )
@@ -229,19 +279,9 @@ def test_openimcc_value_authority_notices_and_refusal_match_green_baseline() -> 
         experiment=mass_loss_context.experiments[mass_loss_reference.experiment_id],
         isolated=False,
     )
-
-    actual = {
-        "activity": _openimcc_prediction_pin(activity_prediction),
-        "residue": _openimcc_prediction_pin(residue_prediction),
-        "mass_loss": _openimcc_prediction_pin(mass_loss_prediction),
-    }
-    actual_sha256 = {
-        name: hashlib.sha256(
-            json.dumps(pin, sort_keys=True, separators=(",", ":")).encode()
-        ).hexdigest()
-        for name, pin in actual.items()
-    }
-    assert actual_sha256 == _OPENIMCC_GREEN_PREDICTION_SHA256
+    _assert_openimcc_prediction_matches_green_baseline(
+        "mass_loss", mass_loss_prediction
+    )
 
 
 def test_sp_pack_id_is_provenance_not_a_coefficient_ancestor() -> None:
@@ -270,11 +310,12 @@ def test_openimcc_sp_selects_the_extension_paired_with_default_d066() -> None:
 
 def test_li_2005_p2o5_feo_row_uses_the_extension_pack(
     monkeypatch: pytest.MonkeyPatch,
+    _li_2005_score_context,
 ) -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
     from simulator.melt_backend import openimcc_bridge
 
-    context = load_score_context(sources=("li-2005-na-al-phosphate-fe-activities",))
+    context = _li_2005_score_context
     reference = context.observations[_LI_2005_FEO_ROW]
     composition = reference.identity.composition.value
     assert any(name == "P2O5" and amount > 0 for name, amount in composition.components)
@@ -437,10 +478,9 @@ def test_openimcc_composition_domain_authority_is_sp_only() -> None:
 
 def test_openimcc_sp_pack_notice_tracks_evaluation_state(
     monkeypatch: pytest.MonkeyPatch,
+    _li_2005_score_context,
 ) -> None:
-    context = load_score_context(
-        sources=("li-2005-na-al-phosphate-fe-activities",)
-    )
+    context = _li_2005_score_context
     reference = context.observations[_LI_2005_FEO_ROW]
     identity = reference.identity
     assert identity.composition is not None
