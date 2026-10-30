@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
@@ -11,6 +12,7 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
+    NoticeKind,
     Quantity,
     Rail,
     RefusalReason,
@@ -149,13 +151,13 @@ def test_li_2005_p2o5_feo_row_uses_the_sp_arm_or_refuses_with_identity() -> None
     )
 
 
-def test_openimcc_sp_out_of_domain_composition_is_flagged_or_refused() -> None:
+def test_openimcc_sp_outside_validated_envelope_is_flagged() -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
     composition = Composition(
         basis="ordered_complete_mole_inventory",
         components=(
-            ("Rb2O", Decimal("0.2")),
-            ("SiO2", Decimal("0.8")),
+            ("K2O", Decimal("0.50001")),
+            ("SiO2", Decimal("0.49999")),
         ),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
@@ -163,10 +165,10 @@ def test_openimcc_sp_out_of_domain_composition_is_flagged_or_refused() -> None:
         formula="SiO2",
         component_basis="SiO2",
         composition=composition,
-        T_K=Decimal("2200"),
+        T_K=Decimal("1800"),
     )
     reference = F.observation(
-        "openimcc-sp-out-of-domain-composition",
+        "openimcc-sp-outside-validated-envelope",
         F.tabulation_experiment().experiment_id,
         identity,
         Decimal("1"),
@@ -176,17 +178,123 @@ def test_openimcc_sp_out_of_domain_composition_is_flagged_or_refused() -> None:
     candidate = candidate_observation(reference, prediction)
     assert candidate.engine is not None
     assert _SP_PACK_SOURCE in candidate.engine.coefficient_sources
-    assert candidate.authority is not None
-    if prediction.value is None:
-        assert isinstance(prediction.refusal_reason, RefusalReason)
-        assert candidate.authority is Authority.REFUSED
-    else:
-        assert candidate.authority is Authority.EXTRAPOLATED
-        assert any(
-            notice.authority is Authority.EXTRAPOLATED
-            and any(
-                token in notice.reason.lower()
-                for token in ("outside", "domain", "envelope")
-            )
-            for notice in prediction.notices
+    assert prediction.value is not None
+    assert candidate.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.authority is Authority.EXTRAPOLATED
+        and "outside_validated" in notice.reason
+        for notice in prediction.notices
+    )
+
+
+def test_openimcc_sp_residue_domain_status_becomes_a_scored_notice() -> None:
+    from simulator.battery.score import _residue_domain_notices
+
+    notices = _residue_domain_notices(
+        Engine.OPENIMCC_SP,
+        {
+            "engine_flags": (
+                "openimcc_extrapolated",
+                "composition_outside_validated_envelope",
+            ),
+            "engine_metadata": {
+                "envelope_status": "outside_validated",
+                "extrapolated": "true",
+            },
+        },
+    )
+
+    assert notices
+    assert all(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.authority is Authority.EXTRAPOLATED
+        for notice in notices
+    )
+    assert any("outside_validated" in notice.reason for notice in notices)
+    assert any("openimcc_extrapolated" in notice.reason for notice in notices)
+    assert _residue_domain_notices(
+        Engine.OPENIMCC,
+        {
+            "engine_flags": ("openimcc_extrapolated",),
+            "engine_metadata": {"envelope_status": "outside_validated"},
+        },
+    ) == ()
+
+
+def test_openimcc_sp_residue_provenance_keeps_the_bridge_domain_result() -> None:
+    from simulator.battery.residue import (
+        _openimcc_residue_state_provenance,
+        _record_openimcc_residue_state,
+    )
+
+    state = SimpleNamespace(
+        flags=("composition_outside_validated_envelope",),
+        extrapolated=True,
+        envelope_status="outside_validated",
+        pack_model_id="openimcc-test-model",
+        pack_version="test-version",
+        pack_digest="test-digest",
+        openimcc_version="test-openimcc-version",
+    )
+    flags: set[str] = set()
+    metadata: dict[str, str] = {}
+
+    _record_openimcc_residue_state(
+        Engine.OPENIMCC_SP.value,
+        state,
+        pack_name="d066-ext",
+        engine_metadata=metadata,
+        engine_flags=flags,
+    )
+    provenance = _openimcc_residue_state_provenance(
+        Engine.OPENIMCC_SP.value, flags, metadata
+    )
+
+    assert metadata["pack"] == "d066-ext"
+    assert metadata["envelope_status"] == "outside_validated"
+    assert metadata["extrapolated"] == "true"
+    assert "composition_outside_validated_envelope" in flags
+    assert "openimcc_extrapolated" in flags
+    assert "openimcc_envelope_status:outside_validated" in flags
+    assert provenance["engine_flags"] == tuple(sorted(flags))
+    assert provenance["engine_metadata"] == metadata
+
+
+def test_openimcc_sp_residue_worker_refusal_names_the_sp_arm(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import residue
+
+    class Worker:
+        def is_alive(self) -> bool:
+            return True
+
+    class Connection:
+        def send(self, _payload) -> None:
+            pass
+
+        def poll(self, _timeout) -> bool:
+            return True
+
+        def recv(self):
+            return False, "ImccNonconvergenceError", "forced SP nonconvergence"
+
+    def evaluate(**_kwargs):
+        raise AssertionError("the cached worker response should be used")
+
+    monkeypatch.setattr(
+        residue,
+        "_OPENIMCC_EVALUATION_WORKER",
+        (Worker(), Connection(), evaluate),
+    )
+    with pytest.raises(residue.ResidueEngineNonconvergence) as raised:
+        residue._evaluate_openimcc_isolated(
+            evaluate,
+            timeout_s=1.0,
+            engine_name=Engine.OPENIMCC_SP.value,
+            temperature_K=1800.0,
         )
+
+    assert raised.value.engine == Engine.OPENIMCC_SP.value
+    assert raised.value.reason == "engine_nonconvergence"
