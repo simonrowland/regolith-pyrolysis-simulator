@@ -561,7 +561,7 @@ class EnginePrediction:
             else None
         )
         identity_notices = [_openimcc_sp_identity_notice(quantity, authority)]
-        if p2o5_screening_proxy:
+        if p2o5_screening_proxy and self.value is not None:
             identity_notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
@@ -5139,7 +5139,14 @@ def cell_notices(
                     band=band,
                     authority=(
                         Authority.EXTRAPOLATED
-                        if kind == "openimcc_temperature_extrapolated"
+                        if (
+                            kind == "openimcc_temperature_extrapolated"
+                            or (
+                                engine in _DOMAIN_FLAG_ENGINES
+                                and kind
+                                == "openimcc_composition_outside_validated_envelope"
+                            )
+                        )
                         and row.get("authority") == AUTHORITY_EXTRAPOLATED
                         else None
                     ),
@@ -8272,9 +8279,10 @@ def _predict_phase_row(
     )
 
 
-# b-1089 owns the default arm's dropped residue-domain notices and needs its
-# own physics ruling; this ticket propagates them only for the SP identity.
-_RESIDUE_DOMAIN_FLAG_ENGINES = frozenset({Engine.OPENIMCC_SP})
+# b-1089 owns the default arm's dropped domain notices and needs its own
+# physics ruling; this ticket propagates cell-composition and residue-domain
+# notices only for the SP identity.
+_DOMAIN_FLAG_ENGINES = frozenset({Engine.OPENIMCC_SP})
 
 
 def _engine_flag_notices(
@@ -8310,7 +8318,7 @@ def _engine_flag_notices(
 
     if (
         quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION
-        or engine not in _RESIDUE_DOMAIN_FLAG_ENGINES
+        or engine not in _DOMAIN_FLAG_ENGINES
     ):
         return ()
 
@@ -11179,7 +11187,7 @@ def compile_residual(
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
         sp_identity_notices: tuple[Notice, ...] = ()
-        if engine is Engine.OPENIMCC_SP:
+        if engine is Engine.OPENIMCC_SP and prediction is not None:
             sp_identity_notice = _openimcc_sp_identity_notice(
                 quantity,
                 prediction.authority
