@@ -1535,10 +1535,22 @@ class OverheadGasModel:
             low_Pa: float,
             high_Pa: float,
         ) -> tuple[EvaporationFlux, float] | None:
-            # Halving a sign-changing bracket. 80 steps take any finite
-            # double range below one ulp of the upper end, so leaving
-            # the loop is the bracket collapsing, not acceptance of a
-            # stalled iterate.
+            # Halving a sign-changing bracket until a midpoint meets the
+            # mass floor. Eighty steps do not bring every finite bracket
+            # under one ulp.
+            # Premise: the in-loop return is width <= ulp(high). Falling
+            # out of the loop is the step cap. Both are unresolved; the
+            # caller flags the balance. Only a midpoint inside the mass
+            # floor is returned. Brent is the primary solver.
+            # Algebra: while low is negligible beside high, float64
+            # (low+high)/2 equals high/2, so eighty steps that keep
+            # pulling a 1e150 Pa high end down leave high/2**80.
+            # Unit check: 1e150 Pa / 2**80 = 8.272e125 Pa. ulp of that
+            # end is 1.503e110 Pa, so the width is 5.50e15 ulps, not one.
+            # (low+high)/2 also drops the low end while high is huge.
+            # Limiting case: ends that already share a binade collapse
+            # in about 52 halvings, the float64 mantissa width. A high
+            # end near the 1e150 Pa search cap does not.
             for _ in range(80):
                 if (
                     not math.isfinite(low_Pa)
