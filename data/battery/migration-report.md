@@ -4,7 +4,7 @@ rows in: 84429
 records out (observations): 172655
 works: 698
 experiments: 6588
-queue size: 113502
+queue size: 113478
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 697
@@ -225,7 +225,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | absent_admissions | 3511 | 13934 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
 | range_only_T | 3125 | 2789 (mismatch) |
-| system_like_phases | 1065 | 4061 (mismatch) |
+| system_like_phases | 1065 | 4037 (mismatch) |
 | missing_phases | 237 | 1354 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18280,7 +18280,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml` | 3 | 3 | 9 |
 | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` | 10 | 30 | 60 |
 | `data/literature/extracts/di-donato-granati-2000.yaml` | 95 | 95 | 95 |
-| `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` | 24 | 24 | 48 |
+| `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` | 24 | 24 | 24 |
 | `data/literature/extracts/dohmen-2003-coupled-kinetics.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/dong-2009-cr-v-slag-activities.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/drowart-1960-al2o3-kems.yaml` | 10 | 141 | 0 |
