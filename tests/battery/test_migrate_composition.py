@@ -1342,12 +1342,14 @@ def test_markova_initial_charge_stays_context_under_refusal_mutation(
         *,
         refusal_reason=None,
         declared_map=False,
+        declared_component_map=None,
         closure_context=None,
         preserve_printed_map_on_refusal=False,
     ):
         return original_parse(
             obj,
             declared_map=declared_map,
+            declared_component_map=declared_component_map,
             closure_context=closure_context,
             preserve_printed_map_on_refusal=preserve_printed_map_on_refusal,
         )
@@ -1389,9 +1391,20 @@ def test_plante_declared_map_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> 
     )
     original_reader = migrate_module._initial_oxide_map_from_values
 
-    def drop_declaration(values, *, refusal_reason=None, declared_map=False):
+    def drop_declaration(
+        values,
+        *,
+        refusal_reason=None,
+        declared_map=False,
+        declared_component_map=None,
+        closure_context=None,
+    ):
         return original_reader(
-            values, refusal_reason=refusal_reason, declared_map=False
+            values,
+            refusal_reason=refusal_reason,
+            declared_map=False,
+            declared_component_map=declared_component_map,
+            closure_context=closure_context,
         )
 
     monkeypatch.setattr(
