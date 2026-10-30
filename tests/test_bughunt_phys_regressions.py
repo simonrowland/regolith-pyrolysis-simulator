@@ -481,6 +481,7 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     sim.setpoints = {"nested": {"value": "entry"}}
     sim.feedstocks = {"entry": {"density": 1.0}}
     sim.vapor_pressure_catalog_data = {"families": {"entry": [1.0]}}
+    sim.vapor_pressures = {"metals": {"entry": {"A": 1.0}}}
     sim.materials = {"stages": {"entry": {"alpha": 0.5}}}
     sim.lab_geometry = ("entry", 1.0)
     sim._last_vapor_pressure_diagnostic = {"entry": {"pressure_Pa": 1.0}}
@@ -507,6 +508,7 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
         sim.setpoints = {"nested": {"value": "refused"}}
         sim.feedstocks = {"refused": {"density": 2.0}}
         sim.vapor_pressure_catalog_data = {"families": {"refused": [2.0]}}
+        sim.vapor_pressures = {"metals": {"refused": {"A": 2.0}}}
         sim.materials = {"stages": {"refused": {"alpha": 0.25}}}
         sim.lab_geometry = ("refused", 2.0)
         sim._last_vapor_pressure_diagnostic = {
