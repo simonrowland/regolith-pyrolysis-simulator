@@ -184,7 +184,17 @@ def test_store_yields_adopted_target_type_observations(
     # Car source edits vs green: 1952 -> 1973. Kambayashi 1983 adds 50 rows;
     # Yakovlev 1984 and Yakovlev-Shornikov 2011 add 8 and 12, Schneider adds 1;
     # edits to other KEMS sources net -50 after the reviewed context moves.
-    assert len(kems) == 1973
+    # Batch6 vs gate green c4a5fb34e is +16. It is not a KEMS-028 expansion:
+    # that source's observation ids are unchanged. kems-111 Ichise 1982 Table 4
+    # (704e1d4c9; ror-b981-valueloss checked the printed p. 557 a_Fe, a_Mo, and
+    # gamma grids) replaces ichise_1982_table4_partial_molar_1823K with 18 rows:
+    # activity_Fe at x_Mo 0, 0.1, 0.2, 0.3, 0.35, 0.484, 0.5, 0.554, 0.81, 0.9,
+    # and 1.0; aMo_1823K; gammaFe_1823K; gammaMo_1823K; GmixFe; GmixMo; GexFe;
+    # GexMo. Net +17. kems-026 markova_1984_table2_residual_melt_VI_lherzolite
+    # leaves this ledger (0373c506ad; ror-mark84cond P2, not a required revert):
+    # type rate_series becomes composition_series. The row stays in the extract.
+    # Net -1.
+    assert len(kems) == 1989
     # Active KEMS source IDs grew from 45 to 81 (+36); source IDs and added
     # extract files are distinct counts (37 files were added).
     # famBAND04: the Schneider 1980 Figure 2 series adds a new KEMS source
@@ -1909,14 +1919,19 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # Car source updates bring the adopted total to 2069, including Kambayashi
     # 1983 (+50), Yakovlev 1984 (+8), Yakovlev-Shornikov 2011 (+12), and
     # Schneider 1980 (+1), offset by reviewed source reclassifications.
+    # The batch6 +16 named on the KEMS count move the total to 2085 and the
+    # skipped count to 2064. Comparable stays 21: the new Ichise rows and the
+    # Markova type move are typed refusals, not scored points.
     assert coverage["observations"] == sum(
         obs.adoption_basis != "superseded" for obs in adopted_observations
-    ) == 2069
+    ) == 2085
     assert coverage["comparable"] == 21
-    assert coverage["skipped"] == 2048
+    assert coverage["skipped"] == 2064
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
     assert coverage["comparable_points"] == 26
-    assert coverage["gap_points"] == 2027
+    # Gap records follow the same +16: Ichise Table 4 adds 17 gap points and
+    # the Markova VI row leaves one. Comparable points stay 26.
+    assert coverage["gap_points"] == 2043
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1938,11 +1953,13 @@ def test_coverage_ledger_is_observation_first_and_exact(
         )
         for key, row in by_type.items()
     } == {
-        "activity_coefficient": (504, 1, 503, 1),
+        # activity +13, gibbs +4, rate -1: the Ichise Table 4 split and the
+        # Markova VI type move named on the KEMS count.
+        "activity_coefficient": (517, 1, 516, 1),
         "alpha": (71, 2, 69, 6),
-        "gibbs_table": (301, 0, 301, 0),
+        "gibbs_table": (305, 0, 305, 0),
         "psat_series": (260, 1, 259, 2),
-        "rate_series": (821, 2, 819, 2),
+        "rate_series": (820, 2, 818, 2),
         "transition_point": (112, 15, 97, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
@@ -1950,14 +1967,14 @@ def test_coverage_ledger_is_observation_first_and_exact(
         key: (row["observations"], row["comparable"], row["comparable_points"])
         for key, row in by_family.items()
     } == {
-        "activity_coefficient": (374, 1, 1),
+        "activity_coefficient": (387, 1, 1),
         "activity_self_agreement": (10, 0, 0),
         "alpha": (71, 2, 6),
-        "gibbs_table": (301, 0, 0),
+        "gibbs_table": (305, 0, 0),
         "ordering_activity": (120, 0, 0),
         "ordering_bound": (161, 2, 2),
         "psat_series": (260, 1, 2),
-        "rate_hkl": (659, 0, 0),
+        "rate_hkl": (658, 0, 0),
         "relative_volatility": (1, 0, 0),
         "transition_point": (112, 15, 15),
     }
