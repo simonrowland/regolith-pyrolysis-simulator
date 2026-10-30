@@ -8,10 +8,10 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2367
+  sources: 2370
   by_stage:
     located: 208
-    inbox: 1357
+    inbox: 1360
     in_progress: 192
     ingested_partial: 147
     ingested_complete: 136
@@ -22,8 +22,9 @@ anti_loss:
     count: 0
     ids: []
   corpus_unpushed:
-    count: 20
+    count: 21
     ids:
+    - b1b576a198cc5011ef99d9f9168ff21010d9f813
     - 195d28c0e683be9355c88777ef9da26ec52a05bb
     - 97aec1a0cb7e1bc06d1590aac6b2d87c0061b298
     - 397b7f796003345dd917cd3bfbf9a39f553be7d7
@@ -11432,6 +11433,17 @@ sources:
     - raw/hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3/mineru-Hayashi2019_ISIJInt59_1744/p001-p008/out/src--hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3--Hayashi2019_ISIJInt59_1744-p001-p008/vlm/src--hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3--Hayashi2019_ISIJInt59_1744-p001-p008_content_list_v2.json
     - raw/hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3/mineru-Hayashi2019_ISIJInt59_1744/p001-p008/out/src--hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3--Hayashi2019_ISIJInt59_1744-p001-p008/vlm/src--hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3--Hayashi2019_ISIJInt59_1744-p001-p008_middle.json
     - raw/hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3/mineru-Hayashi2019_ISIJInt59_1744/p001-p008/out/src--hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3--Hayashi2019_ISIJInt59_1744-p001-p008/vlm/src--hayashi-2019-isij-iron-oxide-activity-na2o-sio2-feo-fe2o3--Hayashi2019_ISIJInt59_1744-p001-p008_model.json
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: hayashi-2025-ca-fe-silicate-redox-activities
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/hayashi-2025-ca-fe-silicate-redox-activities/SOURCE.md
+    - raw/hayashi-2025-ca-fe-silicate-redox-activities/hayashi-2025-ca-fe-silicate-redox-activities.pdf
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
@@ -23344,6 +23356,17 @@ sources:
     artefacts:
     - raw/maxwell-wiik-1971-astromat-data
     reason: source folder exists in the corpus, but no document
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: mccabe-1958-fe-langmuir-knudsen
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/mccabe-1958-fe-langmuir-knudsen/SOURCE.md
+    - raw/mccabe-1958-fe-langmuir-knudsen/mccabe-1958-fe-langmuir-knudsen.pdf
+    reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -37907,6 +37930,17 @@ sources:
     - raw/washburn-1963-vaporization-iron-oxides/mineru-qt41v0q16v/p029-p029/out/src--washburn-1963-vaporization-iron-oxides--qt41v0q16v-p029-p029/vlm/src--washburn-1963-vaporization-iron-oxides--qt41v0q16v-p029-p029_middle.json
     - raw/washburn-1963-vaporization-iron-oxides/mineru-qt41v0q16v/p029-p029/out/src--washburn-1963-vaporization-iron-oxides--qt41v0q16v-p029-p029/vlm/src--washburn-1963-vaporization-iron-oxides--qt41v0q16v-p029-p029_model.json
     - raw/washburn-1963-vaporization-iron-oxides/washburn-1963-vaporization-iron-oxides.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: watne-1977-potassium-vapor-pressure-furnace
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/watne-1977-potassium-vapor-pressure-furnace/SOURCE.md
+    - raw/watne-1977-potassium-vapor-pressure-furnace/watne-1977-potassium-vapor-pressure-furnace.pdf
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
