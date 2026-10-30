@@ -540,9 +540,14 @@ class EnginePrediction:
     def __post_init__(self) -> None:
         if self.engine is not Engine.OPENIMCC_SP:
             return
+        p2o5_screening_proxy = _openimcc_sp_uses_p2o5_screening_proxy(
+            self.identity
+        )
         authority = self.authority or (
             Authority.REFUSED if self.value is None else Authority.BRIDGE
         )
+        if p2o5_screening_proxy and self.value is not None:
+            authority = Authority.EXTRAPOLATED
         pack_source = _openimcc_sp_pack_source()
         object.__setattr__(self, "authority", authority)
         object.__setattr__(
@@ -555,14 +560,34 @@ class EnginePrediction:
             if isinstance(self.identity, Identity)
             else None
         )
+        identity_notices = [_openimcc_sp_identity_notice(quantity, authority)]
+        if p2o5_screening_proxy:
+            identity_notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=() if quantity is None else (quantity,),
+                    reason=(
+                        "P2O5 parent reference state: "
+                        "crystal-reference screening proxy; no P2O5(l) claim"
+                    ),
+                    origin=f"engine:{Engine.OPENIMCC_SP.value}",
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
         object.__setattr__(
             self,
             "notices",
-            union_notices(
-                self.notices,
-                (_openimcc_sp_identity_notice(quantity, authority),),
-            )
+            union_notices(self.notices, tuple(identity_notices))
         )
+
+
+def _openimcc_sp_uses_p2o5_screening_proxy(identity: Identity | None) -> bool:
+    if identity is None or not identity.composition.is_value:
+        return False
+    return any(
+        name == "P2O5" and amount > 0
+        for name, amount in identity.composition.value.components
+    )
 
 
 def _openimcc_sp_pack_source() -> str:
@@ -11153,16 +11178,15 @@ def compile_residual(
         source_relation: SourceRelation = SourceRelation.UNKNOWN,
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
+        sp_identity_notice = _openimcc_sp_identity_notice(
+            quantity,
+            prediction.authority
+            if prediction is not None and prediction.authority is not None
+            else Authority.REFUSED,
+        )
         sp_identity_notices = (
-            (
-                _openimcc_sp_identity_notice(
-                    quantity,
-                    prediction.authority
-                    if prediction is not None and prediction.authority is not None
-                    else Authority.REFUSED,
-                ),
-            )
-            if engine is Engine.OPENIMCC_SP
+            (sp_identity_notice,)
+            if engine is Engine.OPENIMCC_SP and sp_identity_notice not in notices
             else ()
         )
         all_notices = union_notices(notices, extra_notices, sp_identity_notices)
@@ -11587,20 +11611,6 @@ def compile_residual(
         )
 
     notices = union_notices(notices, prediction.notices)
-    if engine is Engine.OPENIMCC_SP:
-        notices = union_notices(
-            notices,
-            (
-                _openimcc_sp_identity_notice(
-                    quantity,
-                    prediction.authority
-                    if prediction.authority is not None
-                    else Authority.REFUSED
-                    if prediction.value is None
-                    else Authority.BRIDGE,
-                ),
-            ),
-        )
     result_mode = fo2_mode or _fo2_mode_from_notices(notices)
     if quantity is not None and _pressure_independent_comparison(
         reference, prediction
