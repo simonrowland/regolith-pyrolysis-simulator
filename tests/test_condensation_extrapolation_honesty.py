@@ -616,32 +616,42 @@ def test_fe_alpha_s_range_travels_through_stage_provenance():
     ]
 
 
-def test_fe_scalar_alpha_extrapolation_at_1523_15_k_has_source_notice():
-    record = condensation._sidecar_alpha_record("Fe", T_K=1523.15)
+def test_fe_tachibana_alpha_domain_and_bounded_extrapolation_provenance():
+    value_ref = {"value_ref": condensation.STICKING_FE_CONDENSATION_VALUE_REF}
+    in_band_temperature_K = 1523.15
+    expected_in_band_alpha = condensation.alpha_s(
+        "Fe", in_band_temperature_K, {"entry": value_ref},
+    )
+    in_band_record = condensation._sidecar_alpha_record(
+        "Fe", T_K=in_band_temperature_K,
+    )
 
-    assert record["alpha_s"].hex() == float(0.02).hex()
-    assert record["alpha_s_domain_status"] == "extrapolated"
-    assert record["authority_level"] == "extrapolated"
-    assert record["alpha_s_physical_bound_engaged"] is False
-    assert record["output_status"] == "status_bearing"
-    notice = record["alpha_s_extrapolation_notice"]
-    assert notice["certified_band_K"] == [1700.0, 1800.0]
-    assert notice["temperature_used_K"] == 1523.15
-    assert notice["distance_below_band_K"] == pytest.approx(176.85)
-    assert notice["distance_above_band_K"] == 0.0
-    assert notice["authority_level"] == "extrapolated"
-    assert notice["source_fit"] == {
-        "form": "scalar",
-        "value": 0.02,
-        "source_id": "kems-007-costa-2015",
-        "source": record["source"],
-        "source_url": record["source_url"],
-    }
-    assert notice["physical_bound"] == {
-        "lower_exclusive": 0.0,
-        "upper_inclusive": 1.0,
-    }
-    assert notice["bound_engaged"] is False
+    assert in_band_record["alpha_s"] == pytest.approx(expected_in_band_alpha)
+    assert in_band_record["alpha_s_extrapolated"] is False
+    assert in_band_record["alpha_s_domain_status"] == "in_domain"
+    assert "alpha_s_extrapolation_warning" not in in_band_record
+    assert "alpha_s_extrapolation_notice" not in in_band_record
+
+    out_of_band_temperature_K = 1423.15
+    expected_out_of_band_alpha = condensation.alpha_s(
+        "Fe", out_of_band_temperature_K, {"entry": value_ref},
+    )
+    out_of_band_record = condensation._sidecar_alpha_record(
+        "Fe", T_K=out_of_band_temperature_K,
+    )
+
+    assert out_of_band_record["alpha_s"] == pytest.approx(expected_out_of_band_alpha)
+    assert out_of_band_record["alpha_s_extrapolated"] is True
+    assert out_of_band_record["alpha_s_domain_status"] == "out_of_domain"
+    assert out_of_band_record["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert out_of_band_record["alpha_s_authority_level"] == "extrapolated"
+    assert "Fe alpha_s arrhenius coefficient extrapolated" in out_of_band_record[
+        "alpha_s_extrapolation_warning"
+    ]
+    assert "[1443, 1633]" in out_of_band_record["alpha_s_extrapolation_warning"]
+    assert "Tachibana, Nagahara & Ozawa 2001" in out_of_band_record["alpha_s_cite"]
+    assert out_of_band_record["citation_status"] == "CITED"
+    assert "Tachibana, Nagahara & Ozawa 2001" in out_of_band_record["source"]
 
 
 def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
