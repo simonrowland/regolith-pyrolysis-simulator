@@ -1243,6 +1243,7 @@ class Experiment:
     # the store's context rows. Values are never copied onto the experiment.
     equipment_context_id: str | None = None
     thermal_schedule: ThermalSchedule | None = None
+    fe_metal_saturated: Located[bool] | None = None
 
     def __post_init__(self) -> None:
         if not self.experiment_id:

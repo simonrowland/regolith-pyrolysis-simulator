@@ -6993,6 +6993,11 @@ def test_g01_map_phase_refuses_heuristics() -> None:
     assert mapped.is_unknown
 
 
+def test_t1569_distin_liquid_slag_phase_is_reviewed_identity() -> None:
+    mapped, why = map_phase("liquid FeO-SiO2 slag")
+    assert mapped.is_value and mapped.value is Phase.L and why is None
+
+
 def test_t998_alkali_source_tokens_are_closed() -> None:
     from simulator.battery.migrate import PHASE_MAP, REGIME_TO_METHOD
 
