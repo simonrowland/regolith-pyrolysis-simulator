@@ -384,7 +384,12 @@ def test_shornikov_2000_migrates_printed_transition_temperatures() -> None:
 
 def test_shilov_1998_migrates_printed_po_pressures() -> None:
     result = _migrate("shilov-1998-sno-zno-p2o5-vaporization.yaml")
-    assert len(result.observations) == 92
+    # 92 counted one migrated row per wide point. Table 4 atomic oxygen is now
+    # one point per printed equation (4 compositions x eqs 4, 8, 9, 10, 11 =
+    # 20, was 4) and Table 5 is one point per printed activity cell (9, was 5
+    # wide rows that already held both eq 13/14 and eq 19). 92 + 16 + 4 = 112.
+    # Each head value equals the parent column it was split from.
+    assert len(result.observations) == 112
     migrated_po_rows = [
         observation
         for observation in result.observations.values()
