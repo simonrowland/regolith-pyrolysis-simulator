@@ -516,16 +516,28 @@ def test_openimcc_sp_pack_notice_tracks_evaluation_state(
     )
 
     from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend import openimcc_bridge
 
-    def fail_evaluation(*_args, **_kwargs):
-        raise RuntimeError("forced failure after SP evaluation was attempted")
+    handle = binary_pot_battery.open_battery_engine(engine.value)
+    assert handle.available
+    assert handle.backend._pack_name == "d066-ext"
+    bridge_calls: list[dict[str, object]] = []
+    original_bridge_evaluate = openimcc_bridge.evaluate
 
-    monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", fail_evaluation)
-    handle = SimpleNamespace(
-        name=engine.value,
-        available=True,
-        backend=object(),
-        identity={},
+    def record_bridge_evaluate(**kwargs):
+        bridge_calls.append(dict(kwargs))
+        return original_bridge_evaluate(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", record_bridge_evaluate)
+    original_equilibrate_cell = binary_pot_battery.equilibrate_cell
+
+    def fail_after_evaluation(*args, **kwargs):
+        cell = original_equilibrate_cell(*args, **kwargs)
+        assert cell.status == "ok"
+        raise RuntimeError("forced failure after successful SP evaluation")
+
+    monkeypatch.setattr(
+        binary_pot_battery, "equilibrate_cell", fail_after_evaluation
     )
     attempted_unavailable = predict_with_engine(
         engine,
@@ -541,6 +553,8 @@ def test_openimcc_sp_pack_notice_tracks_evaluation_state(
         attempted_unavailable.execution.call_evidence
         == "equilibrate_cell:openimcc-sp:exception"
     )
+    assert bridge_calls
+    assert bridge_calls[-1]["pack"] == "d066-ext"
 
     pack_notices = tuple(
         notice
