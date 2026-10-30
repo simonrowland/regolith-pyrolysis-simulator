@@ -17,8 +17,23 @@ extraction:
   date: '2026-10-22'
   worker: codex-fam42-1022
 review_status: draft
+benches:
+- id: stolyarova-2021-double-knudsen-cell
+  identity:
+    basis: described_in_this_work
+  cell_materials:
+  - state:
+      tag: value
+      value: W
+    locator:
+      page: 8
+      pdf_page_index: 7
+      published_page: 1565
+      section: Experimental part
+      note: 'The paper states: "Образцы испаряли из сдвоенной эффузионной камеры Кнудсена, изготовленной из вольфрама."'
 experiments:
 - experiment_id: stolyarova-2021-knudsen-kems
+  bench_id: stolyarova-2021-double-knudsen-cell
   method: knudsen_effusion
   locator:
     page: 6
