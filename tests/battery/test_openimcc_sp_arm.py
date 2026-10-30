@@ -436,7 +436,9 @@ def test_li_2005_p2o5_feo_row_uses_the_extension_pack(
         context=context,
         prediction=prediction,
     )
-    assert residual.key.endswith("::openimcc-sp")
+    assert residual.key.endswith(
+        f"::melt_activity::{_sp_engine().value}::fo2_mode=shared_ladder"
+    )
     assert any(
         _SP_PACK_SOURCE in notice.reason
         and f"authority={candidate.authority.value}" in notice.reason

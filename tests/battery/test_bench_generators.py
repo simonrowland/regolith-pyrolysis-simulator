@@ -9,7 +9,13 @@ import pytest
 
 from simulator.battery.consumer_inputs import collect_consumer_inputs, REQUIREMENTS
 from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
-from simulator.battery.enums import AmountBasis, BenchIdentityBasis, MethodToken, ValueKind
+from simulator.battery.enums import (
+    IMCC_ENGINE_NAMES,
+    AmountBasis,
+    BenchIdentityBasis,
+    MethodToken,
+    ValueKind,
+)
 from simulator.battery.records import (
     Bench, BenchIdentity, BenchReference, Composition, Sample, State, Value,
     Derivation, FO2Control, ThermalSchedule, ThermalPoint, ApparatusGeometry,
@@ -363,7 +369,14 @@ def test_engine_inputs_active_set_and_provenance():
     inputs = collect_consumer_inputs(experiment, bench, observation)
     results = engine_point_requests(inputs)
     assert {item.payload["engine"] for item in results} == {
-        "internal-analytical", "alphamelts", "thermoengine", "vaporock", "magemin", "cached-real", "openimcc"}
+        "internal-analytical",
+        "alphamelts",
+        "thermoengine",
+        "vaporock",
+        "magemin",
+        "cached-real",
+        *IMCC_ENGINE_NAMES,
+    }
     for result in results:
         assert result.payload["temperature_C"] == 1126.85
         assert result.payload["pressure_bar"] == 1e-5
