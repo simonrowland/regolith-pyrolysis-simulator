@@ -72,8 +72,8 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
         json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
     ).encode("utf-8")
 
-    # Pin the complete serialized runner result and the authoritative ledger
-    # projections before changing the per-hour refusal snapshot ownership.
+    # Derived at 60e46f287 (d-137 base); the b183 base and restacked tip
+    # produce identical payload and ledger bytes.
     ledger = snapshot_atom_ledger(execution.simulator.atom_ledger)
     ledger_state = {
         "gross_account_flows": ledger.gross_account_flows(),
@@ -103,7 +103,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     assert execution.status == "ok"
     assert len(execution.snapshots) == 2
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "48f5ef924f554599242f2cbabd8c12b594cf69b0033a7d2cb4412624e76471b9"
+        "1722c50e3d639ae645b39da6af20d3f78a2831943fbc5c6124c6b78a2acd6a7a"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

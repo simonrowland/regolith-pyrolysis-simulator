@@ -250,6 +250,9 @@ _TERMINAL_REFUSAL_SNAPSHOT_SEPARATE_ROOT_NAMES = (
 # to these writers. Other diagnostic producers build local values and assign
 # the root; scalar telemetry roots cannot be mutated. Unknown roots and mutable
 # model state stay deep-copied.
+# d-137's hydraulic-diameter map is read from retained `setpoints`, then copied
+# into `_overhead_model` and `_condensation_model`; both mutable model roots
+# remain deep-copied on refusal.
 #
 # These three mutable roots are intentionally absent from the retained set:
 # _record_phase_context_diagnostic writes through an alias into the entry map;
