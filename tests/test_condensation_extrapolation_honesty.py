@@ -17,15 +17,15 @@ from simulator.state import (
 
 
 @pytest.mark.parametrize(
-    ("notice_level", "expected_level"),
+    ("notice_level", "notice_status", "expected_level"),
     [
-        ("status_bearing", "status_bearing"),
-        ("extrapolated", "extrapolated"),
-        ("unavailable", "unavailable"),
+        ("status_bearing", "analytical_upper_bound", "status_bearing"),
+        ("extrapolated", "extrapolated", "extrapolated"),
+        ("unavailable", "unavailable", "unavailable"),
     ],
 )
 def test_wall_transport_parent_authority_tracks_notice_levels(
-    notice_level, expected_level
+    notice_level, notice_status, expected_level
 ):
     payload = _wall_deposit_authority_payload(
         authoritative=False,
@@ -36,7 +36,7 @@ def test_wall_transport_parent_authority_tracks_notice_levels(
         evaporation_transport_notices_by_species={
             "Fe": {
                 "evaporation_alpha": {
-                    "status": "analytical_upper_bound",
+                    "status": notice_status,
                     "authority_level": notice_level,
                 }
             }
