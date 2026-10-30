@@ -63,8 +63,8 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
         assert exclusion["upper_bound_basis"] == "conservative_ledger_bound"
 
     silica = products["pure_silica_glass"]
-    assert silica["stage_3_capture_kg"] > 0.0
-    assert silica["stage_3_kg_by_species"]
+    assert silica["stage_3_capture_kg"] == 0.0
+    assert silica["stage_3_kg_by_species"] == {}
     sio_estimate = next(
         item
         for item in silica["estimated_contributions"]
