@@ -26,9 +26,11 @@ from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
 )
-from simulator.battery.records import Composition
+from simulator.battery.records import Composition, Execution
 from simulator.battery.score import (
+    ENGINE_COEFFICIENT_SOURCES,
     ENGINE_CHANNELS,
+    EnginePrediction,
     SCORE_ENGINE_SET,
     candidate_observation,
     cell_notices,
@@ -36,6 +38,7 @@ from simulator.battery.score import (
     load_score_context,
     predict_with_engine,
     residual_key,
+    _input_refusal,
 )
 from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.battery.waypoints import ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES
@@ -432,18 +435,18 @@ def test_openimcc_composition_domain_authority_is_sp_only() -> None:
     assert openimcc_notice.authority is None
 
 
-def test_openimcc_sp_p2o5_screening_notice_requires_a_scored_value() -> None:
+def test_openimcc_sp_pack_notice_tracks_evaluation_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     context = load_score_context(
         sources=("li-2005-na-al-phosphate-fe-activities",)
     )
     reference = context.observations[_LI_2005_FEO_ROW]
-    engine = _sp_engine()
     identity = reference.identity
     assert identity.composition is not None
+    engine = _sp_engine()
 
-    from simulator.battery.score import ENGINE_COEFFICIENT_SOURCES, _input_refusal
-
-    unscored = _input_refusal(
+    not_probed = _input_refusal(
         engine=engine,
         channel=ENGINE_CHANNELS[engine],
         sources=ENGINE_COEFFICIENT_SOURCES[engine],
@@ -452,13 +455,76 @@ def test_openimcc_sp_p2o5_screening_notice_requires_a_scored_value() -> None:
         reason=RefusalReason.IDENTITY_UNKNOWN,
         detail={"reason": "temperature_unknown"},
     )
-
-    assert unscored.execution.state is ExecutionState.NOT_PROBED
+    assert not_probed.execution.state is ExecutionState.NOT_PROBED
     assert not any(
         notice.reason.startswith(
             (_SP_PACK_SOURCE, "P2O5 parent reference state:")
         )
-        for notice in unscored.notices
+        for notice in not_probed.notices
+    )
+
+    unsupported = EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        identity=identity,
+    )
+    assert not any(
+        notice.reason.startswith(_SP_PACK_SOURCE)
+        for notice in unsupported.notices
+    )
+
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    def fail_evaluation(*_args, **_kwargs):
+        raise RuntimeError("forced failure after SP evaluation was attempted")
+
+    monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", fail_evaluation)
+    handle = SimpleNamespace(
+        name=engine.value,
+        available=True,
+        backend=object(),
+        identity={},
+    )
+    attempted_unavailable = predict_with_engine(
+        engine,
+        reference,
+        handles={engine.value: handle},
+        isolated=False,
+    )
+    assert (
+        attempted_unavailable.execution.state
+        is ExecutionState.ATTEMPTED_UNAVAILABLE
+    )
+    assert (
+        attempted_unavailable.execution.call_evidence
+        == "equilibrate_cell:openimcc-sp:exception"
+    )
+
+    pack_notices = tuple(
+        notice
+        for notice in attempted_unavailable.notices
+        if notice.reason == f"{_SP_PACK_SOURCE}; authority=refused"
+    )
+    assert len(pack_notices) == 1
+    assert pack_notices[0].authority is Authority.REFUSED
+    assert not any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in attempted_unavailable.notices
+    )
+    residual, candidate = compile_residual(
+        reference,
+        engine,
+        context=context,
+        prediction=attempted_unavailable,
+    )
+    assert candidate is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert any(
+        notice.reason == f"{_SP_PACK_SOURCE}; authority=refused"
+        for notice in residual.notices
     )
 
 
