@@ -278,8 +278,6 @@ def test_default_classification_values_preserve_pre_change_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # b-956: against green the hashed payload only gains keys: the 26
-    # zero-valued oxygen partition keys restored under oxygen.partition_kg
-    # and metals_plus_O2.O2_partition_kg, and an empty
-    # estimated_contributions list on 7 classes. No value changes.
-    assert digest == "a290d5b37eadd34e8c7e3963e045e895305ea459a35a774f19aff370a1dfc28b"
+    # Car 1 review fixes: computed-zero silica availability and b-1057's
+    # flagged proxy/bridge CrO inventory are now reflected in the product story.
+    assert digest == "ab5685dd465a2a8f9b8852c0b5a387761135856bf96ef18b07608571739479b9"
