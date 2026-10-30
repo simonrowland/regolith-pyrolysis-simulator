@@ -3926,6 +3926,34 @@ def _printed_composition_source_map(payload: object) -> Mapping[str, Any] | None
     return source_map or None
 
 
+def _declared_printed_composition_map(payload: object) -> Mapping[str, Any] | None:
+    if not isinstance(payload, Mapping):
+        return None
+    state = payload.get("state")
+    if isinstance(state, Mapping) and str(state.get("tag") or "value") == "value":
+        payload = state.get("value")
+    if not isinstance(payload, Mapping):
+        return None
+    for key in _PRINTED_COMPOSITION_MAP_KEYS:
+        nested = payload.get(key)
+        if isinstance(nested, Mapping):
+            return _printed_composition_map(nested)
+    point_conditions = payload.get("point_conditions")
+    if isinstance(point_conditions, Mapping):
+        printed = _printed_composition_map(
+            point_conditions.get("printed_composition")
+        )
+        if printed is not None:
+            return printed
+    if (
+        "components" in payload
+        and _enum(AmountBasis, payload.get("amount_basis"))
+        is AmountBasis.MASS_PERCENT
+    ):
+        return _printed_composition_map(payload)
+    return None
+
+
 def _is_printed_chemical_component_name(name: str) -> bool:
     token = _canonical_printed_oxide_name(name.strip())
     if _is_composition_condition_key(token) or is_sample_code_formula(token):
@@ -3942,22 +3970,43 @@ def _is_printed_chemical_component_name(name: str) -> bool:
 
 
 def _unrecognized_printed_chemical_components(
-    wt: Mapping[str, Decimal], closure_context: object
+    wt: Mapping[str, Decimal],
+    closure_context: object,
+    *,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> dict[str, Decimal]:
+    if declared_component_map is None:
+        declared_component_map = _declared_printed_composition_map(closure_context)
+    if declared_component_map is None and closure_context is wt:
+        declared_component_map = wt
+    declared_names = (
+        {
+            _canonical_printed_oxide_name(str(name).strip())
+            for name in declared_component_map
+        }
+        if declared_component_map is not None
+        else set()
+    )
     source_map = {
         **wt,
         **(_printed_composition_source_map(closure_context) or {}),
+        **(declared_component_map or {}),
     }
     dropped: dict[str, Decimal] = {}
     for raw_name, raw_amount in source_map.items():
         name = _canonical_printed_oxide_name(str(raw_name).strip())
         if (
-            _is_composition_condition_key(name)
-            or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+            name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or _volatile_closure_component(name) is not None
-            or not _is_printed_chemical_component_name(name)
             or name in _COMPOSITION_COMPONENTS
             or _kume_formula_unit_oxide(name) is not None
+            or (
+                name not in declared_names
+                and (
+                    _is_composition_condition_key(name)
+                    or not _is_printed_chemical_component_name(name)
+                )
+            )
         ):
             continue
         amount = _printed_mass_percent_number(raw_amount)
@@ -3993,13 +4042,20 @@ def _source_printed_composition_values(
     wt: Mapping[str, Any] | None, closure_context: object
 ) -> dict[str, Any]:
     source_map = _printed_composition_source_map(closure_context)
+    declared_map = _declared_printed_composition_map(closure_context)
+    declared_names = (
+        {str(name) for name in declared_map}
+        if declared_map is not None
+        else set()
+    )
     if source_map is None:
         source_map = wt or {}
     printed: dict[str, Any] = {}
     for key, value in source_map.items():
         name = str(key)
         if not (
-            (
+            name in declared_names
+            or (
                 not _is_composition_condition_key(name)
                 and not is_sample_code_formula(name)
                 and _is_printed_chemical_component_name(name)
@@ -4045,12 +4101,20 @@ def _preserve_printed_composition_context(
     wt: Mapping[str, Any] | None,
     closure_context: object,
 ) -> Located[Mapping[str, Any]] | None:
-    if printed is None or not printed.state.is_value:
-        return printed
-    values = dict(printed.state.value)
-    for name, amount in _printed_map_payload(
+    source_values = _printed_map_payload(
         _source_printed_composition_values(wt, closure_context)
-    ).items():
+    )
+    if printed is None or not printed.state.is_value:
+        if printed is not None or not source_values:
+            return printed
+        locator = (
+            _locator_from_plain(closure_context.get("locator"))
+            if isinstance(closure_context, Mapping)
+            else None
+        )
+        return located_value(source_values, locator)
+    values = dict(printed.state.value)
+    for name, amount in source_values.items():
         values.setdefault(name, amount)
     if values == printed.state.value:
         return printed
@@ -4187,6 +4251,9 @@ _COMPOSITION_CONDITION_KEYS = frozenset(
         "T_C_is_initial_composition",
         "mass_loss_pct",
         "mass_loss_wt_pct",
+        "sample",
+        "sample_id",
+        "sample_label",
         "t_min",
         "Nr",
         "is_initial",
@@ -4335,9 +4402,14 @@ def _wt_percent_conversion_or_refusal(
     wt: Mapping[str, Decimal],
     *,
     closure_context: object = None,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> tuple[Composition | None, str | None]:
     try:
-        dropped = _unrecognized_printed_chemical_components(wt, closure_context)
+        dropped = _unrecognized_printed_chemical_components(
+            wt,
+            closure_context,
+            declared_component_map=declared_component_map,
+        )
         dropped_mass = sum(dropped.values(), Decimal("0"))
         if any(not amount.is_finite() or amount < 0 for amount in dropped.values()):
             raise ValueError("unsupported printed component has a negative or non-finite amount")
@@ -4505,9 +4577,14 @@ def _oxide_map_from_mapping(
     )
     found_nested_map = False
 
-    def checked(comps: dict[str, Decimal]) -> bool:
+    def checked(
+        comps: dict[str, Decimal],
+        declared_component_map: Mapping[str, Any] | None = None,
+    ) -> bool:
         _composition, refusal = _wt_percent_conversion_or_refusal(
-            comps, closure_context=row_context
+            comps,
+            closure_context=row_context,
+            declared_component_map=declared_component_map,
         )
         if refusal is None:
             return True
@@ -4542,7 +4619,7 @@ def _oxide_map_from_mapping(
                         continue
                     oxide, _factor = equivalent
                     comps[oxide] = comps.get(oxide, Decimal("0")) + amount
-                accepted = checked(comps)
+                accepted = checked(comps, nested)
                 if not accepted and not preserve_refused_map:
                     return None
                 if len(comps) >= 2:
@@ -4583,7 +4660,11 @@ def _oxide_map_from_mapping(
                             oxide, _factor = equivalent
                             if oxide not in got:
                                 got[oxide] = amount
-                if got != original and not checked(got) and not preserve_refused_map:
+                if (
+                    got != original
+                    and not checked(got, nested)
+                    and not preserve_refused_map
+                ):
                     return None
                 return got
     # Once a named composition field was present, a failed parse belongs to
@@ -4610,7 +4691,16 @@ def _oxide_map_from_mapping(
             continue
         oxide, _factor = equivalent
         comps[oxide] = comps.get(oxide, Decimal("0")) + amount
-    accepted = checked(comps)
+    direct_component_map = (
+        {
+            name: value
+            for name, value in obj.items()
+            if not _is_composition_condition_key(str(name))
+        }
+        if declared_map
+        else None
+    )
+    accepted = checked(comps, direct_component_map)
     if not accepted and not preserve_refused_map:
         return None
     return comps if len(comps) >= 2 else None

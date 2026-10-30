@@ -1053,6 +1053,78 @@ def test_refused_nested_composition_does_not_absorb_sibling_conditions() -> None
     assert "run" not in refusal[0]
 
 
+def test_declared_unknown_label_counts_as_dropped_mass_and_stays_printed() -> None:
+    printed = {
+        "SiO2": "60",
+        "MgO": "40",
+        "unknown-component": "40",
+    }
+    refusal: list[str] = []
+    assert migrate_module._oxide_map_from_mapping(
+        printed, declared_map=True, refusal_reason=refusal
+    ) is None
+    assert refusal == [
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "unknown-component=40 wt%"
+    ]
+
+    sample = sample_from_equipment(
+        {},
+        values={
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            "composition_wt_pct": printed,
+        },
+    )
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == printed
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert (
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "unknown-component=40 wt%"
+    ) in sample.initial_composition.state.reason
+
+
+def test_declared_unknown_trace_projects_and_flat_row_conditions_do_not() -> None:
+    source = {
+        "composition_wt_pct": {
+            "SiO2": "59.7",
+            "MgO": "40",
+            "unknown-component": "0.3",
+        }
+    }
+    wt = migrate_module._oxide_map_from_mapping(
+        source,
+        declared_map=True,
+        closure_context=source,
+    )
+    assert wt == {"SiO2": Decimal("59.7"), "MgO": Decimal("40")}
+    notice = migrate_module._composition_projection_notice(
+        wt,
+        closure_context=source,
+        quantity=migrate_module.Quantity.ACTIVITY,
+        origin="fixture",
+    )
+    assert notice is not None
+    assert notice.dropped == ("unknown-component",)
+    assert "unknown-component=0.3 wt%" in notice.reason
+
+    flat_row = {
+        "SiO2": "60",
+        "MgO": "40",
+        "p_atm": "0.2",
+        "run": "7",
+        "sample": "MLS-1",
+    }
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")},
+        closure_context=flat_row,
+    )
+    assert converted is not None
+    assert refusal is None
+
+
 def test_merge_preserves_selected_initial_without_incoming_initial() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-010-richter-2007.yaml"
     source = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -1649,6 +1721,9 @@ def test_mass_closure_is_identical_through_plain_and_full_migration(
         {name: Decimal(value) for name, value in components.items()}
     )
     assert plain.state.value == public
+    if "XxO" in components:
+        assert plain.inference is not None
+        assert any("XxO" in item for item in plain.inference.inputs)
 
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     migrated = next(
