@@ -684,7 +684,10 @@ def test_fe_melt_alpha_notice_preserves_bridge_and_extrapolation_authority(
     assert "Hashimoto 1983" in notice["reason"]
     assert "alpha=1" in notice["reason"]
     assert "McCabe" in notice["reason"]
-    assert any("Fe evaporation alpha" in warning for warning in result.warnings)
+    warning_authority = "Fe evaporation alpha authority is bridge"
+    if notice_status == "extrapolated":
+        warning_authority += " (extrapolated)"
+    assert any(warning_authority in warning for warning in result.warnings)
 
 
 def test_fe_bridge_alpha_is_not_scored_as_a_measurement() -> None:

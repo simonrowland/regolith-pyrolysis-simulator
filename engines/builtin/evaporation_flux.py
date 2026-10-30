@@ -1921,13 +1921,17 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 + ", ".join(sorted(unmeasured_alpha_fallback_species))
             )
         for species, notice in sorted(alpha_authority_notices_by_species.items()):
-            authority = (
-                "extrapolated analytical upper bound"
+            authority_status = str(
+                notice.get(ALPHA_AUTHORITY_STATUS_FIELD) or "unspecified"
+            ).replace("_", " ")
+            extrapolation = (
+                " (extrapolated)"
                 if notice.get("status") == "extrapolated"
-                else "analytical upper bound"
+                else ""
             )
             warning_messages.append(
-                f"WARNING: {species} evaporation alpha is an {authority} "
+                f"WARNING: {species} evaporation alpha authority is "
+                f"{authority_status}{extrapolation} "
                 f"(not a measured coefficient): {notice['reason']}"
             )
         if missing_transport_parameters:
