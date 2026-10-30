@@ -5214,7 +5214,14 @@ def test_only_binary_complement_point_compositions_score_and_flag(
             )
         },
     )
-    prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
+    prediction = (
+        replace(
+            _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+            requested_composition=State.of(composition),
+        )
+        if scores
+        else _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
+    )
     residual, _candidate = compile_residual(
         reference,
         Engine.INTERNAL_ANALYTICAL,
@@ -5249,6 +5256,88 @@ def test_only_binary_complement_point_compositions_score_and_flag(
         assert residual.refusal is not None
         assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
         assert complement_notices == ()
+
+
+@pytest.mark.parametrize(
+    ("quantity", "effusion_refusal"),
+    ((Quantity.ION_INTENSITY, False), (Quantity.P_PARTIAL, True)),
+)
+def test_binary_complement_notice_requires_composition_consumption(
+    quantity: Quantity, effusion_refusal: bool
+) -> None:
+    composition = Composition(
+        basis="binary_complement",
+        components=(("SrO", Decimal("0.33")), ("Al2O3", Decimal("0.67"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    inference = Derivation(
+        relation="binary_complement",
+        inputs=("caption: 33 mol% SrO",),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+
+    def point_observation(experiment, observation_id, identity, value):
+        reference = F.observation(
+            observation_id,
+            experiment.experiment_id,
+            identity,
+            value,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="binary-complement-source",
+        )
+        return replace(
+            reference,
+            point_conditions={
+                "composition": Located(
+                    State.of(composition),
+                    locator=F.loc(table="S7", note="sample 1 caption: 33 mol% SrO"),
+                    inference=inference,
+                )
+            },
+        )
+
+    experiment = (
+        F.kems_experiment(orifice_area=None, clausing=None, kn=None, calibrated=False)
+        if effusion_refusal
+        else F.tabulation_experiment()
+    )
+    identity = replace(
+        _partial_identity(),
+        quantity=quantity,
+        composition=State.unknown("composition is recorded on the source point"),
+        total_pressure_Pa=(
+            State.of(Decimal("1e-6")) if effusion_refusal else None
+        ),
+    )
+    reference = point_observation(
+        experiment,
+        "binary-complement-effusion-refusal"
+        if effusion_refusal
+        else "binary-complement-ion-intensity",
+        identity,
+        Decimal("11") if effusion_refusal else Decimal("1"),
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(
+            F.work(), experiment, reference, review="reviewed"
+        ),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is (
+        RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        if effusion_refusal
+        else RefusalReason.UNSUPPORTED
+    )
+    if not effusion_refusal:
+        assert residual.refusal.detail["reason"] == "not_a_vapour_quantity"
+    assert all(
+        notice.kind is not NoticeKind.COMPOSITION_BINARY_COMPLEMENT
+        for notice in residual.notices
+    )
 
 
 def test_hastie_initial_charge_notice_reaches_residual() -> None:

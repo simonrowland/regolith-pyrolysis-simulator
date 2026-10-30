@@ -11261,9 +11261,6 @@ def compile_residual(
     _point_composition, point_composition_notice = _printed_point_composition(
         source_reference
     )
-    point_composition_notices = (
-        () if point_composition_notice is None else (point_composition_notice,)
-    )
     # Value owns approximation; this notice carries it through the stratum/report flow.
     approximate_value_notices = (
         (
@@ -11281,7 +11278,6 @@ def compile_residual(
         reference.notices,
         flagged_notices,
         evidence_class_notices,
-        point_composition_notices,
         approximate_value_notices,
         _quench_notices(reference),
     )
@@ -11755,6 +11751,12 @@ def compile_residual(
         )
 
     notices = union_notices(notices, prediction.notices)
+    if (
+        point_composition_notice is not None
+        and _point_composition is not None
+        and prediction.requested_composition == _point_composition
+    ):
+        notices = union_notices(notices, (point_composition_notice,))
     result_mode = fo2_mode or _fo2_mode_from_notices(notices)
     if quantity is not None and _pressure_independent_comparison(
         reference, prediction
@@ -11998,6 +12000,15 @@ def compile_residual(
         compared_candidate = _comparison_identity(
             compared_candidate, reference, prediction
         )
+        if (
+            point_composition_notice is not None
+            and _point_composition is not None
+            and (
+                compared_reference.composition == _point_composition
+                or compared_candidate.composition == _point_composition
+            )
+        ):
+            notices = union_notices(notices, (point_composition_notice,))
     source_phase_missing = (
         quantity is Quantity.ACTIVITY
         and isinstance(source_identity, Identity)
