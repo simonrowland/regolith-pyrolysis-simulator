@@ -1402,6 +1402,7 @@ def test_hour_rollback_snapshot_owns_gross_and_cumulative_state() -> None:
         material_origin="feedstock",
     )
     snapshot = _snapshot_atom_ledger(ledger)
+    assert snapshot.__dict__ == ledger.__dict__
     snapshot_flows = snapshot.gross_account_flows()
     snapshot_events = snapshot.gross_account_flow_events()
     snapshot_unattributed = (

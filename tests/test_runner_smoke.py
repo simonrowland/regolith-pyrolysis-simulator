@@ -29,7 +29,7 @@ import math
 import subprocess
 import sys
 from pathlib import Path
-from types import SimpleNamespace
+from types import MappingProxyType, SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -44,6 +44,7 @@ from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
 from simulator.condensation import CondensationModel
 from simulator.core import CondensationTrain, EvaporationFlux, MeltState
+from simulator.diagnostics import _plain_value
 from simulator.optimize.recipe import (
     C3_ALKALI_DOSING_K_KG_PATH,
     C3_ALKALI_DOSING_NA_KG_PATH,
@@ -122,6 +123,43 @@ def test_json_safe_nonfinite_numbers_export_null():
     assert _json_safe(
         {"nan": float("nan"), "inf": [float("inf"), -float("inf")]}
     ) == {"nan": None, "inf": [None, None]}
+
+
+def test_json_safe_mapping_proxy_keeps_serialized_order_and_shape():
+    safe = _json_safe(
+        MappingProxyType({"first": "ok", "second": (1, float("inf"))})
+    )
+
+    assert safe == {"first": "ok", "second": [1, None]}
+    assert json.dumps(safe, separators=(",", ":")) == (
+        '{"first":"ok","second":[1,null]}'
+    )
+
+
+def test_plain_diagnostic_values_keep_serialized_payload_bytes():
+    payload = {
+        "message": "ok",
+        "enabled": True,
+        "missing": None,
+        "count": 12,
+        "nested": ({"items": {"b", "a"}},),
+        "nonfinite": float("inf"),
+    }
+
+    plain = _plain_value(payload)
+
+    assert plain == {
+        "message": "ok",
+        "enabled": True,
+        "missing": None,
+        "count": 12,
+        "nested": [{"items": ["a", "b"]}],
+        "nonfinite": "inf",
+    }
+    assert json.dumps(plain, separators=(",", ":")) == (
+        '{"message":"ok","enabled":true,"missing":null,"count":12,'
+        '"nested":[{"items":["a","b"]}],"nonfinite":"inf"}'
+    )
 
 
 def test_completed_run_wires_product_classification_and_markdown() -> None:
