@@ -1550,6 +1550,54 @@ def test_b704_nonclosing_mass_percent_stays_printed_and_refuses_engine_compositi
     )
 
 
+@pytest.mark.parametrize(
+    "water_context",
+    (
+        {"H2O_wt_pct": "5.00"},
+        {
+            "point_conditions": {
+                "H2O_EMPA": {"state": {"tag": "value", "value": "5.00"}}
+            }
+        },
+    ),
+)
+def test_b704_hydrous_mass_percent_closes_only_with_row_printed_water(
+    water_context: dict[str, object],
+) -> None:
+    oxides = {"SiO2": Decimal("55.00"), "MgO": Decimal("40.00")}
+    hydrous_row = {
+        "composition_wt_pct": {name: str(amount) for name, amount in oxides.items()},
+        **water_context,
+    }
+    refusal: list[str] = []
+
+    parsed = migrate_module._oxide_map_from_mapping(
+        hydrous_row, refusal_reason=refusal, declared_map=True
+    )
+    assert parsed == oxides
+    assert refusal == []
+
+    _printed, initial = migrate_module._located_printed_and_initial(
+        parsed, None, closure_context=hydrous_row
+    )
+    assert initial is not None and initial.state.is_value
+    assert set(dict(initial.state.value.components)) == set(oxides)
+
+    dry_row = {
+        "composition_wt_pct": {
+            name: str(amount) for name, amount in oxides.items()
+        }
+    }
+    refusal = []
+    assert (
+        migrate_module._oxide_map_from_mapping(
+            dry_row, refusal_reason=refusal, declared_map=True
+        )
+        is None
+    )
+    assert refusal == ["mass-percent composition does not close to 100 (sum=95.00)"]
+
+
 def test_b704_jsc_partial_oxide_map_refuses_engine_composition_with_missing_major() -> None:
     path = REPO_ROOT / "data/literature/extracts/jsc-lunar-catalog-12023.yaml"
     document = yaml.safe_load(path.read_text(encoding="utf-8"))
