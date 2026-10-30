@@ -170,7 +170,48 @@ def test_default_lunar_c0_fe_evaporation_baseline_pin():
         for entry in payload["per_hour_summary"]
     )
 
-    assert evaporated_fe_kg == pytest.approx(0.257950173988228, abs=1.0e-12)
+    from simulator.state import MOLAR_MASS
+
+    condensed_fe_kg = float(
+        payload["per_hour_summary"][-1]["condensation_train_kg_cumulative"].get(
+            "Fe", 0.0
+        )
+    )
+    vented_fe_kg = (
+        float(payload["final_state"]["terminal.offgas"].get("Fe", 0.0))
+        * MOLAR_MASS["Fe"]
+        / 1000.0
+    )
+    assert evaporated_fe_kg == pytest.approx(0.3170480069287773, abs=1.0e-12)
+    assert condensed_fe_kg == pytest.approx(0.025077380196186987, abs=1.0e-12)
+    assert vented_fe_kg == pytest.approx(0.29197062673259033, abs=1.0e-12)
+
+    fe_hour_notices = []
+    for row in payload["per_hour_summary"]:
+        metadata = row["vapour_batch_summary"]["metadata"]
+        wall_authority = metadata.get("wall_deposit_sticking_authority", {})
+        record = (
+            wall_authority.get("evaporation_transport_notices_by_species", {})
+            .get("Fe", {})
+            .get("evaporation_alpha")
+        )
+        if record:
+            fe_hour_notices.append(record)
+    assert fe_hour_notices
+    notice = fe_hour_notices[-1]
+    assert notice["alpha_authority_status"] == "analytical_upper_bound"
+    assert notice["status"] == "analytical_upper_bound"
+    assert notice["authority_level"] == "status_bearing"
+    assert "Fedkin/Alexander" in notice["reason"]
+
+    pareto_fe = payload["run_metadata"]["pressure_coating_pareto_diagnostic"][
+        "by_species"
+    ]["Fe"]
+    assert pareto_fe["alpha_authority_status"] == "analytical_upper_bound"
+    assert (
+        pareto_fe["evaporation_transport_notices"]["evaporation_alpha"]
+        == notice
+    )
 
 
 def test_product_classifier_fixed_composition_anchor() -> None:

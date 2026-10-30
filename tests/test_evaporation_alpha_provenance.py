@@ -39,14 +39,18 @@ SETPOINTS_PATH = REPO_ROOT / "data" / "setpoints.yaml"
 
 EXPECTED_ALPHA = {
     ("metals", "Fe"): {
-        "value": 0.02,
-        "envelope": (0.011, 0.020),
+        "value": 1.0,
+        "T_band_K": (1200, 2500),
+        "envelope": (0.0, 1.0),
         "source": (
-            "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ "
-            "alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated "
-            "Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
+            "Hertz-Knudsen alpha=1 analytical upper bound for Fe(g) leaving ferrous silicate melt; "
+            "no admissible direct melt measurement. Pound 1972 Table 1 / McCabe et al. 1956 "
+            "gives alpha=0.9 for solid electrolytic Fe (pure-element condensed, fenced). "
+            "Fedkin/Alexander melt fits of 0.23-0.28 at 1973-2273 K are unscored and remain "
+            "a certification target."
         ),
         "tier": 2,
+        "status": "analytical_upper_bound",
     },
     ("metals", "Mg"): {
         "value": 0.20,
@@ -183,7 +187,14 @@ def test_calibrated_evaporation_alpha_values_sources_and_envelopes():
         alpha = data[section][species]["evaporation_alpha"]
         envelope = tuple(alpha["envelope"])
 
-        if isinstance(expected["value"], dict):
+        if (
+            isinstance(alpha["value"], dict)
+            and alpha["value"].get("form") == "scalar"
+        ):
+            value = alpha["value"]
+            assert value["value"] == pytest.approx(expected["value"])
+            assert tuple(value["temperature_range_K"]) == expected["T_band_K"]
+        elif isinstance(expected["value"], dict):
             value = alpha["value"]
             assert value["form"] == expected["value"]["form"]
             assert value["A"] == pytest.approx(expected["value"]["A"])
@@ -205,6 +216,18 @@ def test_calibrated_evaporation_alpha_values_sources_and_envelopes():
             assert tuple(alpha["T_band_K"]) == expected["T_band_K"]
         assert alpha["source"] == expected["source"]
         assert alpha["tier"] == expected["tier"]
+        if "status" in expected:
+            assert alpha["status"] == expected["status"]
+
+    fe_alpha = data["metals"]["Fe"]["evaporation_alpha"]
+    assert fe_alpha["tier"] != 1
+    assert fe_alpha["status"] == "analytical_upper_bound"
+    assert any(
+        source.get("use") == "native_metal_pond_only"
+        and source.get("value") == pytest.approx(0.9)
+        and source.get("system_class") == "pure_element_condensed"
+        for source in fe_alpha.get("competing_sources", ())
+    )
 
     false_sf2004_labels = {
         "Fe": "SF2004 Table 10 Fe(liq)",
@@ -596,6 +619,66 @@ def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
     assert serialized["alpha_context"]["alpha_authority_status"] == (
         "analytical_upper_bound"
     )
+
+
+@pytest.mark.parametrize(
+    ("temperature_C", "notice_status", "authority_level"),
+    [
+        (1700.0, "analytical_upper_bound", "status_bearing"),
+        (2300.0, "extrapolated", "extrapolated"),
+    ],
+)
+def test_fe_melt_alpha_notice_preserves_upper_bound_and_extrapolation_authority(
+    temperature_C, notice_status, authority_level
+):
+    raw = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    alpha_by_species = _load_evaporation_alpha_by_species(raw)
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"FeO": 10.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_C,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            "overhead_pressure_pa": 0.0,
+            CONTROL_FLUX_PRESSURES_KEY: {"Fe": 100.0},
+            "overhead_partials_Pa": {},
+            "molar_mass_kg_mol": {"Fe": 0.055845},
+            "stoich_by_species": {
+                "Fe": {
+                    "parent_oxide": "FeO",
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                },
+            },
+            "available_oxide_kg": {"Fe": 10.0},
+            "melt_surface_area_m2": 1.0,
+            "stir_factor": 1.0,
+            "alpha": alpha_by_species,
+        },
+    )
+
+    result = BuiltinEvaporationFluxProvider().dispatch(request)
+
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Fe"] > 0.0
+    assert result.diagnostic["alpha_used_by_species"]["Fe"] == pytest.approx(1.0)
+    assert result.diagnostic["alpha_authority_status_by_species"]["Fe"] == (
+        "analytical_upper_bound"
+    )
+    notice = result.diagnostic["alpha_authority_notices_by_species"]["Fe"]
+    assert notice["status"] == notice_status
+    assert notice["authority_level"] == authority_level
+    assert notice["alpha_authority_status"] == "analytical_upper_bound"
+    assert "No measured intrinsic alpha for Fe(g) leaving silicate melt" in (
+        notice["reason"]
+    )
+    assert "McCabe" in notice["reason"]
+    assert "Fedkin/Alexander" in notice["reason"]
+    assert any("Fe evaporation alpha" in warning for warning in result.warnings)
 
 
 def test_default_setpoints_refuse_unmeasured_alpha_fallback():

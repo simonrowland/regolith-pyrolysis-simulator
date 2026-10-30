@@ -6,6 +6,7 @@ import pytest
 
 from simulator import condensation
 from simulator.accounting.queries import wall_deposit_candidate_for_surface_kg
+from simulator.diagnostics import _wall_deposit_authority_payload
 from simulator.state import (
     CondensationStage,
     CondensationTrain,
@@ -13,6 +14,57 @@ from simulator.state import (
     MeltState,
     PipeSegment,
 )
+
+
+@pytest.mark.parametrize(
+    ("notice_level", "expected_level"),
+    [
+        ("status_bearing", "status_bearing"),
+        ("extrapolated", "extrapolated"),
+        ("unavailable", "unavailable"),
+    ],
+)
+def test_wall_transport_parent_authority_tracks_notice_levels(
+    notice_level, expected_level
+):
+    payload = _wall_deposit_authority_payload(
+        authoritative=False,
+        code="test",
+        deposited_species=(),
+        uncertified_species=(),
+        provenance={},
+        evaporation_transport_notices_by_species={
+            "Fe": {
+                "evaporation_alpha": {
+                    "status": "analytical_upper_bound",
+                    "authority_level": notice_level,
+                }
+            }
+        },
+    )
+
+    assert payload["authority_level"] == expected_level
+
+
+def test_wall_transport_parent_keeps_real_saturation_extrapolation():
+    payload = _wall_deposit_authority_payload(
+        authoritative=False,
+        code="test",
+        deposited_species=(),
+        uncertified_species=(),
+        provenance={},
+        wall_saturation_pressure_extrapolations_by_species={"Mg": {"fit": {}}},
+        evaporation_transport_notices_by_species={
+            "Fe": {
+                "evaporation_alpha": {
+                    "status": "analytical_upper_bound",
+                    "authority_level": "status_bearing",
+                }
+            }
+        },
+    )
+
+    assert payload["authority_level"] == "extrapolated"
 
 
 def _stage3_unavailable_psat_model():

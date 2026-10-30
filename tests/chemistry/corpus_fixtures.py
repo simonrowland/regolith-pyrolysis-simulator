@@ -399,6 +399,12 @@ def alpha_envelope_anchors(
             if (
                 value is None
                 and isinstance(value_raw, Mapping)
+                and value_raw.get("form") == "scalar"
+            ):
+                value = _coerce_float(value_raw.get("value"))
+            if (
+                value is None
+                and isinstance(value_raw, Mapping)
                 and value_raw.get("form") == "arrhenius"
             ):
                 A = _coerce_float(value_raw.get("A"))
