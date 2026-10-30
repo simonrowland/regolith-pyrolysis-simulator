@@ -1342,17 +1342,10 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     names = [name.strip() for name, _amount in pairs]
     if _duplicate_mass_percent_component_names(pairs):
         return None
-    if any(
-        not name
-        or (
-            name.casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
-            and not _is_printed_chemical_component_name(name)
-        )
-        for name in names
-    ):
+    if any(not name for name in names):
         return None
-    # Keep unsupported chemical names until the shared b-704 policy can
-    # distinguish trace projections from material partial analyses.
+    # Preserve every named mass-percent component here. The shared b-704
+    # conversion policy decides which numeric components can be projected.
     return dict(pairs)
 
 
@@ -1465,23 +1458,13 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
                 locator=locator,
             )
         accepted_wt = _oxide_mass_percent_components(wt)
-        dropped = _unrecognized_printed_chemical_components(wt, payload)
-        source_notes = []
-        if dropped:
-            source_notes.append(
-                "omitted trace components: " + ", ".join(sorted(dropped))
-            )
-        if any(
-            _canonical_printed_oxide_name(name.strip()) == "FeOT" for name in wt
-        ):
-            source_notes.append(_FEOT_COMPOSITION_DERIVATION_NOTE)
         return Located(
             State.of(composition),
             locator=locator,
             inference=wt_pct_to_mole_fraction_derivation(
                 accepted_wt,
                 locator,
-                source_note="; ".join(source_notes) or None,
+                source_note=_wt_percent_derivation_source_note(wt, payload),
             ),
         )
     if (
@@ -3972,6 +3955,20 @@ def _unrecognized_printed_chemical_components(
     return dropped
 
 
+def _wt_percent_derivation_source_note(
+    wt: Mapping[str, Decimal], closure_context: object
+) -> str | None:
+    notes = []
+    dropped = _unrecognized_printed_chemical_components(wt, closure_context)
+    if dropped:
+        notes.append("omitted trace components: " + ", ".join(sorted(dropped)))
+    if any(
+        _canonical_printed_oxide_name(name.strip()) == "FeOT" for name in wt
+    ):
+        notes.append(_FEOT_COMPOSITION_DERIVATION_NOTE)
+    return "; ".join(notes) or None
+
+
 def _source_printed_composition_values(
     wt: Mapping[str, Any] | None, closure_context: object
 ) -> dict[str, Any]:
@@ -4298,9 +4295,30 @@ def _mole_fraction_from_wt_percent_components(
         total += n
     if total <= 0:
         raise ValueError("printed oxide wt% map has no positive mass")
+    components = [(oxide, n / total) for oxide, n in moles.items()]
+    if components:
+        # Keep exact zeros and place Decimal division residue on the largest
+        # mole fraction, where it has the smallest relative effect.
+        correction_index = max(
+            range(len(components)),
+            key=lambda index: components[index][1],
+        )
+        oxide, _fraction = components[correction_index]
+        components[correction_index] = (
+            oxide,
+            Decimal("1")
+            - sum(
+                (
+                    fraction
+                    for index, (_name, fraction) in enumerate(components)
+                    if index != correction_index
+                ),
+                Decimal("0"),
+            ),
+        )
     return Composition(
         basis="printed_oxides",
-        components=tuple((oxide, n / total) for oxide, n in moles.items()),
+        components=tuple(components),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
 
@@ -4608,6 +4626,24 @@ def _point_rows(values: object) -> list[Mapping[str, Any]]:
     return []
 
 
+def _initial_charge_row_kinds(item: object) -> frozenset[str]:
+    if not isinstance(item, Mapping):
+        return frozenset()
+    kinds: set[str] = set()
+    if item.get("T_C_is_initial_composition") is True:
+        kinds.add("flagged")
+    t_c = _as_dec_or_none(item.get("T_C"))
+    loss_raw = (
+        item["mass_loss_pct"]
+        if "mass_loss_pct" in item
+        else item.get("mass_loss_wt_pct")
+    )
+    loss = _as_dec_or_none(loss_raw)
+    if t_c == 0 and loss == 0:
+        kinds.add("zero_loss")
+    return frozenset(kinds)
+
+
 def _printed_initial_charge_row_map(
     values: object,
     *,
@@ -4640,7 +4676,7 @@ def _printed_initial_charge_row_map(
 
     ranked = _point_rows(values)
     for item in ranked:
-        if item.get("T_C_is_initial_composition") is True:
+        if "flagged" in _initial_charge_row_kinds(item):
             got = _mass_loss_oxide_map_from_mapping(item) or _oxide_map_from_mapping(
                 item,
                 refusal_reason=refusal_reason,
@@ -4659,14 +4695,7 @@ def _printed_initial_charge_row_map(
             if got:
                 return checked(got, row_context)
     for item in ranked:
-        t_c = _as_dec_or_none(item.get("T_C"))
-        loss_raw = (
-            item["mass_loss_pct"]
-            if "mass_loss_pct" in item
-            else item.get("mass_loss_wt_pct")
-        )
-        loss = _as_dec_or_none(loss_raw)
-        if t_c == 0 and loss == 0:
+        if "zero_loss" in _initial_charge_row_kinds(item):
             got = _mass_loss_oxide_map_from_mapping(item) or _oxide_map_from_mapping(
                 item,
                 refusal_reason=refusal_reason,
@@ -5154,7 +5183,17 @@ def _located_printed_and_initial(
     conversion_map = _oxide_mass_percent_components(wt)
     if not conversion_map:
         return None, None
-    printed = located_value(_printed_map_payload(printed_map), locator)
+    printed = located_value(
+        {
+            str(name): (
+                value
+                if value is None or value == "" or isinstance(value, (str, Mapping))
+                else as_decimal(value)
+            )
+            for name, value in printed_map.items()
+        },
+        locator,
+    )
     state = _wt_percent_conversion_state(
         wt, closure_context=closure_context or wt
     )
@@ -5162,7 +5201,11 @@ def _located_printed_and_initial(
         initial = Located(
             state,
             locator=locator,
-            inference=wt_pct_to_mole_fraction_derivation(conversion_map, locator),
+            inference=wt_pct_to_mole_fraction_derivation(
+                conversion_map,
+                locator,
+                source_note=_wt_percent_derivation_source_note(wt, closure_context),
+            ),
         )
     else:
         initial = Located(state, locator=locator)
@@ -5301,6 +5344,19 @@ def _owner_initial_from_printed(
             raw, refusal_reason=refusal_reason, declared_map=True
         )
     if wt:
+        source_map = _source_printed_composition_values(wt, closure_context)
+        if source_map:
+            ordered_wt = {
+                name: wt[name]
+                for name in source_map
+                if name in wt
+            }
+            ordered_wt.update(
+                (name, amount)
+                for name, amount in wt.items()
+                if name not in ordered_wt
+            )
+            wt = ordered_wt
         _printed, initial = _located_printed_and_initial(
             wt,
             locator,
@@ -20566,6 +20622,15 @@ class Migrator:
             # A row-local printed map supplies identity composition when the
             # identity has no value; keep an already declared composition (for
             # example Guo Table 5's printed mole fractions) authoritative.
+            ident_kwargs["composition"] = _wt_percent_conversion_state(
+                point_oxide_map, closure_context=raw_item
+            )
+        elif (
+            point_oxide_map
+            and q_token_point is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and _initial_charge_row_kinds(raw_item)
+            and not getattr(ident_kwargs.get("composition"), "is_value", False)
+        ):
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 point_oxide_map, closure_context=raw_item
             )
