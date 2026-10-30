@@ -4000,12 +4000,10 @@ def _unrecognized_printed_chemical_components(
             or _volatile_closure_component(name) is not None
             or name in _COMPOSITION_COMPONENTS
             or _kume_formula_unit_oxide(name) is not None
+            or _is_composition_condition_key(name)
             or (
                 name not in declared_names
-                and (
-                    _is_composition_condition_key(name)
-                    or not _is_printed_chemical_component_name(name)
-                )
+                and not _is_printed_chemical_component_name(name)
             )
         ):
             continue
