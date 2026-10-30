@@ -362,7 +362,16 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             else 'unknown'
         )
         tier = alpha_spec.get('tier', 'unknown')
-        routing = cro_data.get('fiat_routing', {}) or {}
+        catalog = getattr(sim, 'vapor_pressure_catalog_data', {}) or {}
+        species_rows = catalog.get('species', ())
+        cro_catalog_data = next(
+            (
+                row for row in species_rows
+                if isinstance(row, Mapping) and row.get('id') == 'CrO'
+            ),
+            {},
+        )
+        routing = cro_catalog_data.get('fiat_routing', {}) or {}
         routing_note = routing.get('routing_note') or (
             'Routing note unavailable; capture remains uncertified.'
         )
