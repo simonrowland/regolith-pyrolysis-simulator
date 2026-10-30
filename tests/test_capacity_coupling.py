@@ -1239,8 +1239,35 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         sim.atom_ledger.total_kg_by_account("process.cleaned_melt")
     )
     assert abs(snapshot.melt_mass_kg - source_after_kg) <= _NONTRIVIAL_FLUX_KG_HR
+    # First-liquid Fe0 comproportionation debits Fe2O3 from cleaned melt and
+    # credits FeO there. This one-hour snapshot makes the kg/h vapour rate a
+    # kg interval amount (asserted below). Algebra: expected source loss =
+    # vapour + bleed + (transition debit - credit), all in kg; with no matching
+    # transition, the transition term is zero.
+    fe0_comproportionation_debit_kg = math.fsum(
+        lot.total_mass_kg(sim.atom_ledger.registry)
+        for transition in sim.atom_ledger.transitions
+        if transition.reason == "fe0_comproportionation"
+        for lot in transition.debits
+        if lot.account == "process.cleaned_melt"
+    )
+    fe0_comproportionation_credit_kg = math.fsum(
+        lot.total_mass_kg(sim.atom_ledger.registry)
+        for transition in sim.atom_ledger.transitions
+        if transition.reason == "fe0_comproportionation"
+        for lot in transition.credits
+        if lot.account == "process.cleaned_melt"
+    )
     assert abs(
-        (source_before_kg - source_after_kg) - (released_kg_hr + bleed_o2_kg)
+        (source_before_kg - source_after_kg)
+        - math.fsum(
+            (
+                released_kg_hr,
+                bleed_o2_kg,
+                fe0_comproportionation_debit_kg
+                - fe0_comproportionation_credit_kg,
+            )
+        )
     ) <= _NONTRIVIAL_FLUX_KG_HR
     assert sim._subsolidus_pending_release is None
     assert snapshot.mass_balance_error_pct <= 5.0e-12
