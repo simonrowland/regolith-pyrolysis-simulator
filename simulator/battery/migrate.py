@@ -19549,10 +19549,17 @@ class Migrator:
                                 else None
                             )
                         )
-                        if (
+                        # Queue both a declared unavailable cell and a blank
+                        # cell. The blank has no reason and no value payload;
+                        # emitting it would store a generic null observation.
+                        suppress_unvalued_nonyield_point = (
                             not point_value.available
-                            and source_unavailable_reason not in (None, "")
-                        ):
+                            and (
+                                source_unavailable_reason not in (None, "")
+                                or value_payload in (None, "")
+                            )
+                        )
+                        if suppress_unvalued_nonyield_point:
                             point_locator = (
                                 locator_from_mapping(
                                     raw.get("locator"),
