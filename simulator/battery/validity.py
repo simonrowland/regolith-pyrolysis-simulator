@@ -187,17 +187,24 @@ def _calibration_not_grounded_detail(calibration: object) -> dict[str, str] | No
             "calibration_record_status": "not_recorded",
             "calibration_notice": "No calibration entry has been recorded yet.",
         }
-    if isinstance(calibration, dict) and any(
-        isinstance(located, Located)
-        and not located.state.is_value
-        and "not printed" in (located.state.reason or "").casefold()
-        for located in calibration.values()
-    ):
-        return {
-            "flag": "calibration_not_grounded",
-            "calibration_record_status": "not_printed",
-            "calibration_notice": "The source record says the calibration was not printed.",
-        }
+    if isinstance(calibration, dict):
+        for located in calibration.values():
+            if not isinstance(located, Located) or located.state.is_value:
+                continue
+            reason = (located.state.reason or "").casefold()
+            if "not printed" in reason:
+                record_status = "not_printed"
+                notice = "The source record says the calibration was not printed."
+            elif "not_published" in reason:
+                record_status = "not_published"
+                notice = "The source record says the calibration standard was not published."
+            else:
+                continue
+            return {
+                "flag": "calibration_not_grounded",
+                "calibration_record_status": record_status,
+                "calibration_notice": notice,
+            }
     return None
 
 

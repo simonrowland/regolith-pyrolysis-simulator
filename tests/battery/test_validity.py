@@ -18,13 +18,47 @@ from simulator.battery.migrate import (
     load_yaml,
     observation_from_plain,
 )
-from simulator.battery.records import Experiment, Observation
+from simulator.battery.records import Experiment, Located, Observation, State
 from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
     underdetermined_apparatus,
 )
 from tests.battery import factories as F
+
+
+@pytest.mark.parametrize(
+    ("calibration_reason", "expected_record_status"),
+    (("not printed", "not_printed"), ("not_published", "not_published")),
+)
+def test_uncalibrated_kems_partial_pressure_flags_unpublished_calibration(
+    calibration_reason: str, expected_record_status: str
+) -> None:
+    experiment = F.kems_experiment(calibrated=False)
+    assert experiment.apparatus is not None
+    experiment = replace(
+        experiment,
+        apparatus=replace(
+            experiment.apparatus,
+            calibration={
+                "standard": Located(
+                    State.unknown(calibration_reason), locator=F.loc(page=4)
+                )
+            },
+        ),
+    )
+
+    outcome = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+
+    assert outcome.passed
+    calibration_check = next(
+        check for check in outcome.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.detail["flag"] == "calibration_not_grounded"
+    assert (
+        calibration_check.detail["calibration_record_status"]
+        == expected_record_status
+    )
 
 
 @pytest.mark.parametrize(
