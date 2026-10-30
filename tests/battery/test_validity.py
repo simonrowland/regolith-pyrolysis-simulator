@@ -18,13 +18,81 @@ from simulator.battery.migrate import (
     load_yaml,
     observation_from_plain,
 )
-from simulator.battery.records import Experiment, Observation
+from simulator.battery.records import Experiment, Located, Observation, State
 from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
     underdetermined_apparatus,
 )
 from tests.battery import factories as F
+
+
+@pytest.mark.parametrize(
+    ("calibration_field", "calibration_reason", "expected_record_status"),
+    (
+        ("standard", "not printed", "not_printed"),
+        ("standard", "not_published", "not_published"),
+        ("reference_substance", "not_published", "not_published"),
+        ("calibration_substance", "not_published", "not_published"),
+    ),
+)
+def test_uncalibrated_kems_partial_pressure_flags_unpublished_calibration(
+    calibration_field: str,
+    calibration_reason: str,
+    expected_record_status: str,
+) -> None:
+    experiment = F.kems_experiment(calibrated=False)
+    assert experiment.apparatus is not None
+    experiment = replace(
+        experiment,
+        apparatus=replace(
+            experiment.apparatus,
+            calibration={
+                calibration_field: Located(
+                    State.unknown(calibration_reason), locator=F.loc(page=4)
+                )
+            },
+        ),
+    )
+
+    outcome = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+
+    assert outcome.passed
+    calibration_check = next(
+        check for check in outcome.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.detail["flag"] == "calibration_not_grounded"
+    assert (
+        calibration_check.detail["calibration_record_status"]
+        == expected_record_status
+    )
+
+
+def test_unpublished_auxiliary_without_printed_standard_is_flagged() -> None:
+    experiment = F.kems_experiment(calibrated=False)
+    assert experiment.apparatus is not None
+    experiment = replace(
+        experiment,
+        apparatus=replace(
+            experiment.apparatus,
+            calibration={
+                "multiplier_isotope_corrections": Located(
+                    State.unknown("not_published"), locator=F.loc(page=4)
+                )
+            },
+        ),
+    )
+
+    outcome = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+
+    assert outcome.passed
+    calibration_check = next(
+        check for check in outcome.checks if check.name == "kems_calibration"
+    )
+    assert calibration_check.detail["calibration_record_status"] == "not_published"
+    assert calibration_check.detail["calibration_notice"] == (
+        "The source record says the calibration standard was not published."
+    )
 
 
 @pytest.mark.parametrize(
