@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Phase, Quantity, ValueKind
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -160,13 +160,19 @@ def test_conditions_reach_every_numeric_vapor_row_without_filling_unknown_axes()
         assert row.identity.fO2_Pa.is_unknown
 
     for observation_id in numeric_alkali:
+        # Gate green c4a5fb34e keeps phase gas (6cef33a04, b-1080). The melt
+        # sample stays on sample_label; a sample token on a vapour row is not
+        # a phase the identity schema can carry.
         raw_phase = raw[observation_id][1]["phase"]
-        assert raw_phase == "Murchison_CM_chondrite_melt_knudsen"
+        assert raw_phase == "gas"
         row = next(
             row for row in rows.values() if row.observation_id.endswith(observation_id)
         )
-        assert row.identity.species.phase.is_unknown
-        assert raw_phase in (row.identity.species.phase.reason or "")
+        assert row.identity.species.phase.is_value
+        assert row.identity.species.phase.value is Phase.G
+        sample = row.point_conditions["sample_label"].state
+        assert sample.is_value
+        assert sample.value == "Murchison chondrite"
 
 
 def test_render_fidelity_pins_prose_table_and_inline_figure_marker_series() -> None:
