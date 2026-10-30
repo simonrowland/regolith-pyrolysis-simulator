@@ -1984,6 +1984,75 @@ def test_plain_identity_reader_turns_nonoxide_mass_assay_into_unknown() -> None:
     )
 
 
+def test_plain_identity_reader_refuses_large_unsupported_mass_component() -> None:
+    identity = migrate_module._identity_from_plain(
+        {
+            "quantity": {"tag": "value", "value": "activity"},
+            "composition": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [
+                        ["SiO2", "60"],
+                        ["MgO", "40"],
+                        ["unknown-component", "40"],
+                    ],
+                },
+            },
+        }
+    )
+
+    assert identity.composition is not None
+    assert identity.composition.is_unknown
+    assert "unknown-component=40 wt%" in identity.composition.reason
+
+
+def test_plain_mass_percent_trace_accepts_and_retains_dropped_name_provenance() -> None:
+    serialized_composition = {
+        "tag": "value",
+        "value": {
+            "basis": "printed_oxides",
+            "amount_basis": "mass_percent",
+            "components": [
+                ["SiO2", "60"],
+                ["MgO", "40"],
+                ["unknown-component", "0.3"],
+            ],
+        },
+    }
+    identity = migrate_module._identity_from_plain(
+        {
+            "quantity": {"tag": "value", "value": "activity"},
+            "composition": serialized_composition,
+        }
+    )
+    composition = migrate_module._composition_located_from_plain(
+        serialized_composition
+    )
+
+    assert identity.composition is not None and identity.composition.is_value
+    assert composition.state.is_value
+    assert composition.inference is not None
+    assert "omitted trace components: unknown-component" in composition.inference.inputs
+
+
+def test_plain_identity_with_recognized_oxide_composition_round_trips() -> None:
+    payload = {
+        "quantity": {"tag": "value", "value": "activity"},
+        "composition": {
+            "tag": "value",
+            "value": {
+                "basis": "printed_oxides",
+                "amount_basis": "mole_fraction",
+                "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+            },
+        },
+    }
+
+    assert to_plain(migrate_module._identity_from_plain(payload)) == payload
+
+
 @pytest.mark.parametrize(
     "water_context",
     (
@@ -4484,4 +4553,9 @@ def test_nonclosing_mass_percent_conversion_is_refused() -> None:
         ValueError,
         match="mass-percent composition is a partial analysis: kept sum=90 wt%",
     ):
-        migrate_module._composition_from_plain(payload)
+        migrate_module._composition_from_plain(
+            payload,
+            declared_component_map=migrate_module._declared_printed_composition_map(
+                payload
+            ),
+        )

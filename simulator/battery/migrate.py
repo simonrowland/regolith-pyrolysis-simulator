@@ -1442,7 +1442,10 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             state = body.get("state")
             body = state.get("value") if isinstance(state, Mapping) else None
         try:
-            composition = _composition_from_plain(body)
+            composition = _composition_from_plain(
+                body,
+                declared_component_map=_declared_printed_composition_map(body),
+            )
         except (ArithmeticError, ValueError) as exc:
             return Located(
                 State.unknown(str(exc)),
@@ -1506,9 +1509,19 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
         )
     if isinstance(payload, Mapping) and "state" not in payload:
         return located_value(
-            _composition_from_plain(payload), _locator_from_plain(payload.get("locator"))
+            _composition_from_plain(
+                payload,
+                declared_component_map=_declared_printed_composition_map(payload),
+            ),
+            _locator_from_plain(payload.get("locator")),
         )
-    return _located_from_plain(payload, _composition_from_plain)
+    return _located_from_plain(
+        payload,
+        lambda value: _composition_from_plain(
+            value,
+            declared_component_map=_declared_printed_composition_map(value),
+        ),
+    )
 
 
 def _point_condition_from_plain(
@@ -1710,7 +1723,7 @@ def _composition_from_plain(
     payload: object,
     *,
     closure_context: object = None,
-    declared_component_map: Mapping[str, Any] | None = None,
+    declared_component_map: Mapping[str, Any] | None,
 ) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
@@ -1782,9 +1795,18 @@ def _composition_from_plain(
     )
 
 
-def _composition_state_from_plain(payload: object) -> State[Composition]:
+def _composition_state_from_plain(
+    payload: object,
+    *,
+    declared_component_map: Mapping[str, Any] | None,
+) -> State[Composition]:
     try:
-        return _state_from_plain(payload, _composition_from_plain)
+        return _state_from_plain(
+            payload,
+            lambda value: _composition_from_plain(
+                value, declared_component_map=declared_component_map
+            ),
+        )
     except (ArithmeticError, ValueError) as exc:
         return State.unknown(str(exc))
 
@@ -1949,8 +1971,12 @@ def _identity_from_plain(payload: object) -> Identity:
     if payload.get("reservoir") is not None:
         kwargs["reservoir"] = _state_from_plain(payload["reservoir"], _species_from_plain)
     if payload.get("composition") is not None:
+        composition_payload = payload["composition"]
         kwargs["composition"] = _composition_state_from_plain(
-            payload["composition"]
+            composition_payload,
+            declared_component_map=_declared_printed_composition_map(
+                composition_payload
+            ),
         )
     if payload.get("fO2_Pa") is not None:
         kwargs["fO2_Pa"] = _state_from_plain(payload["fO2_Pa"], as_decimal)
