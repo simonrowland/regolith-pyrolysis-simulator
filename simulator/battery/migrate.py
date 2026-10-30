@@ -10026,6 +10026,67 @@ def _numeric_field(payload: Mapping[str, Any], key: str) -> Decimal | None:
     return _as_dec_or_none(raw)
 
 
+# Axes and printed echoes are not the cell's measurement. A mole-count key is
+# composition only when the row says its basis is a mole fraction.
+_NON_YIELD_CONDITION_FIELDS = frozenset(
+    {
+        "T",
+        "T_K",
+        "T_C",
+        "Tmax_C",
+        "temperature_K",
+        "temperature_C",
+        "locator",
+        "composition_basis",
+    }
+)
+_NON_YIELD_RANGE_QUANTITIES = frozenset(
+    {
+        Quantity.DENSITY,
+        Quantity.EVAPORATION_RATE,
+        Quantity.MASS_LOSS_RATE,
+    }
+)
+
+
+def _non_yield_point_is_blank(
+    raw: Mapping[str, Any],
+    *,
+    quantity: Quantity | None,
+    selected_available: bool,
+) -> bool:
+    """True when no recognised value field holds a number.
+
+    One owner for the non-yield blank cell. ``value`` being empty is not
+    blank when a source-specific field holds the number: that row migrates,
+    and a number the migrator cannot ground becomes a typed-unavailable
+    observation. A payload with no number is blank. The caller queues it,
+    including a declared unavailable value. Condition axes, ``*_as_printed``
+    echoes, and mole-count keys are not value fields. A numeric ``range`` is
+    the measurement only for density and the two rate quantities.
+    """
+
+    if selected_available:
+        return False
+    if quantity in _NON_YIELD_RANGE_QUANTITIES:
+        raw_range = raw.get("range")
+        if (
+            isinstance(raw_range, (list, tuple))
+            and len(raw_range) >= 2
+            and all(_as_dec_or_none(bound) is not None for bound in raw_range[:2])
+        ):
+            return False
+    for key in raw:
+        name = str(key)
+        if name in _NON_YIELD_CONDITION_FIELDS or name.endswith("_as_printed"):
+            continue
+        if name.startswith("N_") and raw.get("composition_basis") == "mole_fraction":
+            continue
+        if _numeric_field(raw, name) is not None:
+            return False
+    return True
+
+
 def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
     raw = payload.get(key)
     if isinstance(raw, Mapping):
@@ -19566,11 +19627,17 @@ class Migrator:
                                 else None
                             )
                         )
-                        # Queue both a declared unavailable cell and a blank
-                        # cell. The blank has no reason and no value payload;
-                        # emitting it would store a generic null observation.
+                        # Queue a declared unavailable cell and a genuinely blank
+                        # cell. A number in any recognised value field is a
+                        # measurement, so the row migrates when `value` is empty.
                         suppress_unvalued_nonyield_point = (
-                            not point_value.available
+                            _non_yield_point_is_blank(
+                                raw,
+                                quantity=(
+                                    q_token if isinstance(q_token, Quantity) else None
+                                ),
+                                selected_available=point_value.available,
+                            )
                             and (
                                 source_unavailable_reason not in (None, "")
                                 or value_payload in (None, "")
