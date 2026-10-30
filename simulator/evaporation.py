@@ -591,6 +591,14 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
                     payload["source"] = str(alpha_data.get("source"))
                 alpha_by_species[species] = payload
                 continue
+            if isinstance(value, Mapping) and alpha_data.get("tag") is not None:
+                payload = dict(value)
+                payload["alpha_source_tag"] = str(alpha_data["tag"])
+                if alpha_data.get("tier") is not None:
+                    payload["alpha_source_tier"] = alpha_data.get("tier")
+                if alpha_data.get("source"):
+                    payload["source"] = str(alpha_data["source"])
+                value = payload
             alpha_by_species[species] = value
     return alpha_by_species
 

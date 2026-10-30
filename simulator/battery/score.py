@@ -5921,7 +5921,11 @@ def _areal_evaporation_flux_from_pressure(
     equilibrium_pressure_Pa: float,
     temperature_K: float,
     composition: object,
-) -> tuple[float | None, dict[str, object] | None]:
+) -> tuple[
+    float | None,
+    dict[str, object] | None,
+    dict[str, object] | None,
+]:
     """Pass an engine cell pressure through the production evaporation provider."""
     from simulator.battery.enums import AmountBasis
     from simulator.battery.records import Composition
@@ -5942,7 +5946,7 @@ def _areal_evaporation_flux_from_pressure(
         return None, {
             "reason": "engine_flux_species_pressure_invalid",
             "pressure_Pa": str(equilibrium_pressure_Pa),
-        }
+        }, None
     if (
         not isinstance(composition, Composition)
         or composition.amount_basis
@@ -5955,7 +5959,7 @@ def _areal_evaporation_flux_from_pressure(
                 if isinstance(composition, Composition)
                 else None
             ),
-        }
+        }, None
     inventory_mol = {
         str(name): float(amount) for name, amount in composition.components
     }
@@ -5968,9 +5972,32 @@ def _areal_evaporation_flux_from_pressure(
         return None, {
             "reason": "evaporation_alpha_unavailable",
             "species": species_formula,
-        }
+        }, None
+    alpha_provenance: dict[str, object] | None = None
     try:
-        alpha = alpha_s(species_formula, temperature_K, {"coefficient_spec": alpha_spec})
+        alpha_context: dict[str, object] = {"coefficient_spec": alpha_spec}
+        alpha = alpha_s(species_formula, temperature_K, alpha_context)
+        evaluation = alpha_context.get("alpha_s_evaluation")
+        evaluation = evaluation if isinstance(evaluation, Mapping) else {}
+        citation = str(
+            evaluation.get("alpha_s_cite") or alpha_spec.get("cite") or ""
+        ).strip()
+        doi_match = re.search(r"10\.\d{4,9}/[^\s,;]+", citation)
+        alpha_provenance = {
+            "citation": citation,
+            "source_id": (
+                doi_match.group(0).rstrip(".)") if doi_match is not None else None
+            ),
+            "source": str(alpha_spec.get("source") or "").strip(),
+            "proxy_tag": (
+                alpha_spec.get("alpha_proxy_tag")
+                or alpha_spec.get("alpha_source_tag")
+            ),
+            "status": evaluation.get("alpha_s_status"),
+            "extrapolated": bool(evaluation.get("alpha_s_extrapolated", False)),
+            "valid_range_K": evaluation.get("alpha_s_valid_range_K"),
+            "warning": evaluation.get("alpha_s_extrapolation_warning"),
+        }
         terms = _channel_terms(
             (
                 ResidueChannel(
@@ -5999,7 +6026,7 @@ def _areal_evaporation_flux_from_pressure(
                 else "evaporation_flux_provider_input_refused"
             ),
             "detail": str(exc),
-        }
+        }, alpha_provenance
     # The production provider returns kg/s = flux[kg/(m²·s)] × area[m²];
     # area is 1 m² here, so its numeric rate is the canonical flux. The
     # provider converts kg/h to kg/s at its boundary.
@@ -6008,8 +6035,8 @@ def _areal_evaporation_flux_from_pressure(
         return None, {
             "reason": "evaporation_flux_provider_did_not_report_species",
             "species": species_formula,
-        }
-    return flux, None
+        }, alpha_provenance
+    return flux, None, alpha_provenance
 
 
 _FE_REDOX_RATIO_UNDEFINED = object()
@@ -10121,12 +10148,61 @@ def predict_with_engine(
             and identity.composition.is_value
             else composition_value
         )
-        magnitude, provider_refusal = _areal_evaporation_flux_from_pressure(
+        magnitude, provider_refusal, alpha_provenance = _areal_evaporation_flux_from_pressure(
             species_formula=compared,
             equilibrium_pressure_Pa=float(matched[1]),
             temperature_K=float(T),
             composition=composition,
         )
+        if alpha_provenance is not None:
+            alpha_source_id = alpha_provenance.get("source_id")
+            if isinstance(alpha_source_id, str) and alpha_source_id:
+                sources = (*sources, alpha_source_id)
+            citation = str(alpha_provenance.get("citation") or "").strip()
+            source_description = str(alpha_provenance.get("source") or "").strip()
+            proxy_tag = alpha_provenance.get("proxy_tag")
+            alpha_status = alpha_provenance.get("status")
+            if citation or proxy_tag is not None:
+                notices = union_notices(
+                    notices,
+                    (
+                        Notice(
+                            kind=NoticeKind.FALLBACK,
+                            affected_quantities=(quantity,),
+                            reason=(
+                                "evaporation alpha provenance: "
+                                f"proxy_tag={proxy_tag or 'none'}; "
+                                f"status={alpha_status or 'not reported'}; "
+                                f"{source_description}"
+                            ),
+                            origin=f"coefficient:evaporation_alpha:{compared}",
+                            source=citation or source_description,
+                        ),
+                    ),
+                )
+            alpha_warning = alpha_provenance.get("warning")
+            if alpha_provenance.get("extrapolated") and alpha_warning:
+                valid_range = alpha_provenance.get("valid_range_K")
+                band = (
+                    f"{valid_range[0]}–{valid_range[1]} K"
+                    if isinstance(valid_range, (list, tuple)) and len(valid_range) == 2
+                    else None
+                )
+                notices = union_notices(
+                    notices,
+                    (
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(quantity,),
+                            reason=str(alpha_warning),
+                            origin=f"coefficient:evaporation_alpha:{compared}",
+                            source=citation or source_description,
+                            band=band,
+                            authority=Authority.EXTRAPOLATED,
+                        ),
+                    ),
+                )
+                authority = Authority.EXTRAPOLATED
         if provider_refusal is not None:
             return EnginePrediction(
                 engine=engine,
@@ -10137,7 +10213,7 @@ def predict_with_engine(
                 ),
                 authority=Authority.REFUSED,
                 notices=notices,
-                coefficient_sources=sources,
+                coefficient_sources=expand_coefficient_sources(sources),
                 lineage_complete=False,
                 certified_band=certified_band,
                 refusal_reason=(

@@ -7,6 +7,7 @@ import pytest
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import (
+    Authority,
     Engine,
     MetricOperation,
     MethodToken,
@@ -36,6 +37,7 @@ SOURCE_FILES = (
     "kems-037-richter-2002.yaml",
     "kems-010-richter-2007.yaml",
     "mendybaev-2021-cai-low-pressure-h2-evap.yaml",
+    "wetzel-gail-2013-sio-arrhenius.yaml",
 )
 
 
@@ -175,6 +177,36 @@ def test_richter_2002_rows_score_against_the_study_residuals(migrated_flux_sourc
         actual = by_sample[sample].numeric
         assert actual.operation is MetricOperation.DEX
         assert abs(actual.value - expected) <= Decimal("0.041")
+
+
+def test_score_preserves_evaporation_alpha_provenance_and_domain(
+    migrated_flux_sources,
+) -> None:
+    reference = _flux_rows(migrated_flux_sources, "kems-037-richter-2002")[0]
+
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, reference)
+
+    assert prediction.value is not None
+    assert "10.1051/0004-6361/201220803" in prediction.coefficient_sources
+    assert prediction.authority is Authority.EXTRAPOLATED
+    proxy_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.FALLBACK
+        and notice.origin == "coefficient:evaporation_alpha:SiO"
+    )
+    assert proxy_notice.source == "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803"
+    assert "proxy_tag=solid_film_growth_proxy_not_evaporation_evidence" in proxy_notice.reason
+    assert "status=UNCERTIFIED" in proxy_notice.reason
+    domain_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "coefficient:evaporation_alpha:SiO"
+    )
+    assert "extrapolated beyond valid_range_K [1000, 1800]" in domain_notice.reason
+    assert domain_notice.band == "1000.0–1800.0 K"
+    assert domain_notice.authority is Authority.EXTRAPOLATED
 
 
 def test_missing_efflux_pressure_is_a_typed_refusal(migrated_flux_sources) -> None:
