@@ -27,7 +27,7 @@ from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
 )
-from simulator.battery.records import Composition, Execution
+from simulator.battery.records import Composition, Execution, State
 from simulator.battery.score import (
     ENGINE_COEFFICIENT_SOURCES,
     ENGINE_CHANNELS,
@@ -580,6 +580,34 @@ def test_openimcc_sp_pack_notice_tracks_evaluation_state(
     assert any(
         notice.reason == f"{_SP_PACK_SOURCE}; authority=refused"
         for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
+    "composition",
+    (
+        None,
+        State.unknown("composition not recorded"),
+        State.not_applicable("composition is not part of this identity"),
+    ),
+    ids=("absent", "unknown", "not-applicable"),
+)
+def test_openimcc_sp_prediction_handles_missing_identity_composition(
+    composition,
+) -> None:
+    identity = replace(F.activity_identity(), composition=composition)
+
+    prediction = EnginePrediction(
+        engine=_sp_engine(),
+        channel=ENGINE_CHANNELS[_sp_engine()],
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("1"),
+        identity=identity,
+    )
+
+    assert not any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
     )
 
 
