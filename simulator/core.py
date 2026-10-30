@@ -227,11 +227,31 @@ _TERMINAL_REFUSAL_SNAPSHOT_SEPARATE_ROOT_NAMES = (
     _TERMINAL_REFUSAL_LIVE_ROOT_NAMES | frozenset({'atom_ledger', '_chem_kernel'})
 )
 
-# Constructor-owned configuration is read by the core and registered providers;
-# these published diagnostics are replaced before any in-place update. The
-# extraction diagnostic's sole in-place update follows its per-hour reset.
-# Retaining these entry values preserves refusal rollback while avoiding
-# repeated copies; unknown roots and mutable model state stay deep-copied.
+# Retain only roots with an audited owner boundary. `setpoints` is a private
+# constructor copy; its readers and CondensationModel.apply_setpoints_overrides
+# read it, while CampaignManager receives the separate constructor argument.
+# `feedstocks` is a private copy read through .get and feedstock validators.
+# `vapor_pressure_catalog_data` is compiled read-only and copied by
+# CondensationModel; `vapor_pressures` is an independent legacy projection
+# consumed by readers/providers that make their own projection. `materials`
+# is a private copy that CondensationModel copies again. `lab_geometry` is a
+# frozen LabGeometry returned by parse_lab_geometry and only read to derive
+# pipe segments.
+#
+# The retained `_last_*` roots below are scalar leaves or replace-only
+# diagnostics. The writer/alias audit for every listed name found no nested
+# mutation of the entry object; `_last_extraction_completeness_diagnostic` is
+# the sole retained dict with an in-place writer, and _step_one_hour replaces
+# it before its .update() in _update_extraction_completeness. Producers for
+# the other listed diagnostics build local values and assign the root; scalar
+# telemetry roots cannot be mutated. Unknown roots and mutable model state
+# stay deep-copied.
+#
+# These three mutable roots are intentionally absent from the retained set:
+# _record_phase_context_diagnostic writes through an alias into the entry map;
+# _scale_c0_joint_release and _commit_pending_subsolidus_release mutate the
+# saved bakeout map through local aliases; the freeze-gate writer adds keys to
+# its map in place. Keep all three entry values independently copied on refusal.
 _TERMINAL_REFUSAL_RETAINED_ROOT_NAMES = frozenset({
     'setpoints',
     'feedstocks',
@@ -257,7 +277,6 @@ _TERMINAL_REFUSAL_RETAINED_ROOT_NAMES = frozenset({
     '_last_evaporation_flux_diagnostic',
     '_last_extraction_completeness_diagnostic',
     '_last_fe_redox_respeciation_diagnostic',
-    '_last_freeze_gate_diagnostic',
     '_last_high_t_melt_activity',
     '_last_high_t_melt_activity_temperature_K',
     '_last_imcc_activity_shadow',
@@ -275,10 +294,8 @@ _TERMINAL_REFUSAL_RETAINED_ROOT_NAMES = frozenset({
     '_last_overhead_gas_equilibrium',
     '_last_overlap_evaporation_diagnostic',
     '_last_partial_melt_offgassing_diagnostic',
-    '_last_phase_context_diagnostic',
     '_last_reduced_real_cache_state',
     '_last_shuttle_refusal_diagnostic',
-    '_last_subsolidus_bakeout',
     '_last_target_inventory_diagnostic',
     '_last_throttle_reason',
     '_last_vapor_pressure_diagnostic',
