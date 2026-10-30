@@ -663,7 +663,7 @@ def test_optimizer_resolves_gate_declared_in_loaded_setpoints(monkeypatch):
 
 @pytest.mark.parametrize('failure', ['numerical', 'projected_numerical', 'aggregate_timeout', 'warm_timeout'])
 @pytest.mark.parametrize('prior_good', [False, True])
-def test_declared_gate_holds_numerical_failures_but_refuses_timeouts(
+def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     monkeypatch, failure, prior_good,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
@@ -708,25 +708,6 @@ def test_declared_gate_holds_numerical_failures_but_refuses_timeouts(
     sim.melt.temperature_C = 1500.0
     timed_out = failure.endswith('timeout')
     if not prior_good:
-        if timed_out:
-            with pytest.raises(EvaporationFluxRefusal) as error:
-                sim._melt_redox_liquidus_gate_curve()
-            assert error.value.reason == 'engine_compute_timeout'
-            assert error.value.diagnostic['reason_code'] == (
-                'engine_compute_timeout'
-            )
-            assert error.value.diagnostic['timeout_kind'] == (
-                'liquidus_finder_hang_guard'
-                if failure == 'aggregate_timeout'
-                else 'engine_worker_timeout'
-            )
-            assert sim._melt_redox_liquidus_gate_fallback_count == 0
-            assert sim._freeze_gate_last_good_curve is None
-            assert sim._freeze_gate_liquid_fraction_cache is None
-            assert sim._freeze_gate_liquid_fraction_curve_memo == {}
-            assert shared == {}
-            assert len(calls) == 1
-            return
         store = PT0DeterminismStore('capture')
         sim.configure_pt0_determinism_store(store)
         curve = sim._melt_redox_liquidus_gate_curve()
@@ -745,6 +726,11 @@ def test_declared_gate_holds_numerical_failures_but_refuses_timeouts(
         assert 'not a fresh solve or a melting measurement' in notice['detail']
         if timed_out:
             assert notice['backend_failure_disposition'] == 'environment'
+            assert notice['reason'] == (
+                'aggregate_budget_exceeded'
+                if failure == 'aggregate_timeout'
+                else 'engine_worker_timeout'
+            )
         else:
             assert notice['outcome'] == 'numerical_failure'
             assert notice['warnings']
@@ -782,21 +768,6 @@ def test_declared_gate_holds_numerical_failures_but_refuses_timeouts(
     composition.update(SiO2=40.0, MgO=60.0)
     store = PT0DeterminismStore('capture')
     sim.configure_pt0_determinism_store(store)
-    if timed_out:
-        with pytest.raises(EvaporationFluxRefusal) as error:
-            sim._melt_redox_liquidus_gate_curve()
-        assert error.value.reason == 'engine_compute_timeout'
-        assert error.value.diagnostic['reason_code'] == 'engine_compute_timeout'
-        assert error.value.diagnostic['timeout_kind'] == (
-            'liquidus_finder_hang_guard'
-            if failure == 'aggregate_timeout'
-            else 'engine_worker_timeout'
-        )
-        assert sim._melt_redox_liquidus_gate_fallback_count == 0
-        assert len(calls) == 2
-        assert set(sim._freeze_gate_liquid_fraction_curve_memo) == memo_keys
-        assert set(shared) == shared_keys
-        return
     held = sim._melt_redox_liquidus_gate_curve()
     notice = held['gate_provider_refusal']
     assert held['source'] == good['source']
@@ -810,6 +781,11 @@ def test_declared_gate_holds_numerical_failures_but_refuses_timeouts(
     assert notice['provider_diagnostic']
     if timed_out:
         assert notice['backend_failure_disposition'] == 'environment'
+        assert notice['reason'] == (
+            'aggregate_budget_exceeded'
+            if failure == 'aggregate_timeout'
+            else 'engine_worker_timeout'
+        )
     else:
         assert notice['warnings']
         assert notice['outcome'] == 'numerical_failure'
