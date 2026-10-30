@@ -212,6 +212,84 @@ _REFUSAL_IMMUTABLE_LEAF_TYPES = frozenset({
 })
 
 
+# These owners retain their identity across rollback.
+_TERMINAL_REFUSAL_LIVE_ROOT_NAMES = frozenset({
+    'backend',
+    '_sulfsat_gate',
+    '_base_species_formula_registry',
+    'species_formula_registry',
+    '_chem_registry',
+    'vapour_rail_catalog',
+    'cost_ledger',
+})
+# The ledger has a dedicated snapshot, and the chemistry kernel is rebuilt.
+_TERMINAL_REFUSAL_SNAPSHOT_SEPARATE_ROOT_NAMES = (
+    _TERMINAL_REFUSAL_LIVE_ROOT_NAMES | frozenset({'atom_ledger', '_chem_kernel'})
+)
+
+# Constructor-owned configuration is read by the core and registered providers;
+# these published diagnostics are replaced before any in-place update. The
+# extraction diagnostic's sole in-place update follows its per-hour reset.
+# Retaining these entry values preserves refusal rollback while avoiding
+# repeated copies; unknown roots and mutable model state stay deep-copied.
+_TERMINAL_REFUSAL_RETAINED_ROOT_NAMES = frozenset({
+    'setpoints',
+    'feedstocks',
+    'vapor_pressure_catalog_data',
+    'vapor_pressures',
+    'materials',
+    'lab_geometry',
+    '_last_actual_ramp',
+    '_last_backend_diagnostics',
+    '_last_backend_error',
+    '_last_backend_status',
+    '_last_bleed_cold_train_capacity',
+    '_last_c3_na_hold_adjustment',
+    '_last_c4_refusal_diagnostic',
+    '_last_c6_refusal_diagnostic',
+    '_last_c7_diagnostic',
+    '_last_c7_refusal_diagnostic',
+    '_last_campaign_summary',
+    '_last_char_contamination_diagnostic',
+    '_last_char_feo_reduction_diagnostic',
+    '_last_char_lance_diagnostic',
+    '_last_condensed_by_stage_species_delta',
+    '_last_evaporation_flux_diagnostic',
+    '_last_extraction_completeness_diagnostic',
+    '_last_fe_redox_respeciation_diagnostic',
+    '_last_freeze_gate_diagnostic',
+    '_last_high_t_melt_activity',
+    '_last_high_t_melt_activity_temperature_K',
+    '_last_imcc_activity_shadow',
+    '_last_impurity_delta',
+    '_last_melt_redox_liquid_fraction_diagnostic',
+    '_last_melt_redox_liquidus_gate_diagnostic',
+    '_last_melt_regime_diagnostic',
+    '_last_metal_phase_stratification_diagnostic',
+    '_last_native_fe_partition_diagnostic',
+    '_last_native_fe_saturation_event',
+    '_last_nominal_ramp',
+    '_last_o2_bubbler_diagnostic',
+    '_last_organics_source',
+    '_last_out_of_domain_diagnostics',
+    '_last_overhead_gas_equilibrium',
+    '_last_overlap_evaporation_diagnostic',
+    '_last_partial_melt_offgassing_diagnostic',
+    '_last_phase_context_diagnostic',
+    '_last_reduced_real_cache_state',
+    '_last_shuttle_refusal_diagnostic',
+    '_last_subsolidus_bakeout',
+    '_last_target_inventory_diagnostic',
+    '_last_throttle_reason',
+    '_last_vapor_pressure_diagnostic',
+    '_last_vapor_pressures_source',
+    '_last_vapour_batch_flux_overlay',
+    '_last_vapour_batch_report',
+    '_last_vapour_batch_resolve_error',
+    '_last_wall_deposit_by_segment_species_delta',
+})
+
+
 def _mappingproxy_referent(proxy: MappingProxyType) -> Any:
     referents = [
         item
@@ -15210,27 +15288,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         defer_committed_history: bool = False,
     ) -> tuple[Dict[str, Any], Any, Optional[Dict[str, Any]]]:
-        preserved_names = {
-            'backend',
-            '_sulfsat_gate',
-            '_base_species_formula_registry',
-            'species_formula_registry',
-            '_chem_registry',
-            # Immutable runtime compilation cache. Copying the full catalog
-            # into every hourly rollback snapshot is unnecessary and grows
-            # with each analytical carrier family; preserve object identity
-            # like the registry and kernel that consume it.
-            'vapour_rail_catalog',
-            'atom_ledger',
-            '_chem_kernel',
-            'cost_ledger',
-            # Compiled catalog state is immutable by owner contract: species
-            # are exposed through a mapping proxy, rules are tuples, and raw
-            # projections are deepcopy-on-read. It cannot participate in an
-            # hourly mutation that refusal rollback needs to restore.
-            'vapour_rail_catalog',
-        }
         memo = {id(self): self}
+        # This explicit write set is limited to read-only constructor config
+        # and diagnostics replaced by step(); every other root is deep-copied.
+        for name in _TERMINAL_REFUSAL_RETAINED_ROOT_NAMES:
+            value = self.__dict__.get(name, _REFUSAL_MISSING)
+            if value is not _REFUSAL_MISSING:
+                # The entry value is also stored in state_source below, so a
+                # refused hour restores it even when the live attribute is
+                # rebound. Memoizing its identity skips only this root's copy.
+                memo[id(value)] = value
         record = getattr(self, 'record', None)
         record_snapshots = getattr(record, 'snapshots', None)
         if (
@@ -15273,7 +15340,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         state_source = {
             name: value
             for name, value in self.__dict__.items()
-            if name not in preserved_names
+            if name not in _TERMINAL_REFUSAL_SNAPSHOT_SEPARATE_ROOT_NAMES
         }
         state = _deepcopy_refusal_state(state_source, memo)
         registry = getattr(self, '_chem_registry', None)
@@ -15324,15 +15391,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ledger: Any,
         cost_state: Optional[Mapping[str, Any]],
     ) -> None:
-        preserved_names = {
-            'backend',
-            '_sulfsat_gate',
-            '_base_species_formula_registry',
-            'species_formula_registry',
-            '_chem_registry',
-            'cost_ledger',
-            'vapour_rail_catalog',
-        }
         registry_tables = state.get(
             '_terminal_refusal_chem_registry_tables'
         )
@@ -15343,7 +15401,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         preserved = {
             name: self.__dict__[name]
-            for name in preserved_names
+            for name in _TERMINAL_REFUSAL_LIVE_ROOT_NAMES
             if name in self.__dict__
         }
         self.__dict__.clear()
