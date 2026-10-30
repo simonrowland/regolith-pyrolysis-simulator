@@ -1344,8 +1344,18 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
         return None
     if any(not name for name in names):
         return None
-    # Preserve every named mass-percent component here. The shared b-704
-    # conversion policy decides which numeric components can be projected.
+    if not any(
+        (
+            _kume_formula_unit_oxide(_canonical_printed_oxide_name(name))
+            is not None
+        )
+        or _volatile_closure_component(name) is not None
+        or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+        for name in names
+    ):
+        return None
+    # Preserve unknowns alongside a recognized component so the shared b-704
+    # conversion policy can decide whether a trace component may be projected.
     return dict(pairs)
 
 
@@ -3955,13 +3965,22 @@ def _unrecognized_printed_chemical_components(
     return dropped
 
 
+def _omitted_trace_component_source_note(
+    wt: Mapping[str, Decimal], closure_context: object
+) -> str | None:
+    dropped = _unrecognized_printed_chemical_components(wt, closure_context)
+    if not dropped:
+        return None
+    return "omitted trace components: " + ", ".join(sorted(dropped))
+
+
 def _wt_percent_derivation_source_note(
     wt: Mapping[str, Decimal], closure_context: object
 ) -> str | None:
     notes = []
-    dropped = _unrecognized_printed_chemical_components(wt, closure_context)
-    if dropped:
-        notes.append("omitted trace components: " + ", ".join(sorted(dropped)))
+    trace_note = _omitted_trace_component_source_note(wt, closure_context)
+    if trace_note is not None:
+        notes.append(trace_note)
     if any(
         _canonical_printed_oxide_name(name.strip()) == "FeOT" for name in wt
     ):
@@ -4296,26 +4315,6 @@ def _mole_fraction_from_wt_percent_components(
     if total <= 0:
         raise ValueError("printed oxide wt% map has no positive mass")
     components = [(oxide, n / total) for oxide, n in moles.items()]
-    if components:
-        # Keep exact zeros and place Decimal division residue on the largest
-        # mole fraction, where it has the smallest relative effect.
-        correction_index = max(
-            range(len(components)),
-            key=lambda index: components[index][1],
-        )
-        oxide, _fraction = components[correction_index]
-        components[correction_index] = (
-            oxide,
-            Decimal("1")
-            - sum(
-                (
-                    fraction
-                    for index, (_name, fraction) in enumerate(components)
-                    if index != correction_index
-                ),
-                Decimal("0"),
-            ),
-        )
     return Composition(
         basis="printed_oxides",
         components=tuple(components),
@@ -5103,10 +5102,16 @@ def _composition_located_from_values(
     pass_note = role == INITIAL_CHARGE_ONLY_PROXY_FLAG or has_feot or (
         role == "datum_state" and complement_note
     )
+    derivation_notes = []
+    trace_note = _omitted_trace_component_source_note(wt, values)
+    if trace_note is not None:
+        derivation_notes.append(trace_note)
+    if pass_note and isinstance(source_note, str) and source_note.strip():
+        derivation_notes.append(source_note)
     derivation = wt_pct_to_mole_fraction_derivation(
         wt,
         locator,
-        source_note=source_note if pass_note else None,
+        source_note="; ".join(derivation_notes) or None,
     )
     if set(wt) == {"K2O", "SiO2"} and wt["SiO2"] == Decimal("100") - wt["K2O"]:
         # The relation follows from the printed Decimal values. pass_note
@@ -5183,17 +5188,7 @@ def _located_printed_and_initial(
     conversion_map = _oxide_mass_percent_components(wt)
     if not conversion_map:
         return None, None
-    printed = located_value(
-        {
-            str(name): (
-                value
-                if value is None or value == "" or isinstance(value, (str, Mapping))
-                else as_decimal(value)
-            )
-            for name, value in printed_map.items()
-        },
-        locator,
-    )
+    printed = located_value(_runtime_printed_composition_values(printed_map), locator)
     state = _wt_percent_conversion_state(
         wt, closure_context=closure_context or wt
     )
@@ -13235,16 +13230,31 @@ def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
     return tuple(sorted(pairs)) or None
 
 
+def _runtime_printed_composition_values(
+    wt: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep printed strings and Decimalize numeric source values for runtime maps."""
+
+    return {
+        str(name): (
+            value
+            if value is None or value == "" or isinstance(value, (str, Mapping))
+            else as_decimal(value)
+        )
+        for name, value in wt.items()
+    }
+
+
 def _printed_composition_candidates(
     roots: Iterable[object],
     vocabulary: tuple[VocabEntry, ...],
     *,
     fallback_locator: Locator | None = None,
-) -> list[tuple[PrintedFingerprint, Locator, str]]:
+) -> list[tuple[PrintedFingerprint, Locator, str, Mapping[str, Any]]]:
     """Every vocabulary-named printed map under ``roots`` that has a locator."""
 
     names = {e.printed for e in vocabulary if e.field == "sample.printed_composition"}
-    found: list[tuple[PrintedFingerprint, Locator, str]] = []
+    found: list[tuple[PrintedFingerprint, Locator, str, Mapping[str, Any]]] = []
 
     def walk(obj: object, parent_loc: Locator | None, depth: int) -> None:
         if depth > 14:
@@ -13258,8 +13268,18 @@ def _printed_composition_candidates(
                         value, loc
                     )
                     fingerprint = _printed_fingerprint(raw_value)
-                    if fingerprint is not None and value_loc is not None:
-                        found.append((fingerprint, value_loc, name))
+                    components = (
+                        raw_value.get("components")
+                        if isinstance(raw_value, Mapping)
+                        and isinstance(raw_value.get("components"), Mapping)
+                        else raw_value
+                    )
+                    if (
+                        fingerprint is not None
+                        and value_loc is not None
+                        and isinstance(components, Mapping)
+                    ):
+                        found.append((fingerprint, value_loc, name, components))
                 if name not in _WALK_SKIP_KEYS and name != "locator":
                     walk(value, loc, depth + 1)
         elif isinstance(obj, list):
@@ -13296,10 +13316,17 @@ def _printed_composition_from_roots(
         preferred_fps = {item[0] for item in preferred}
         if len(preferred_fps) != 1:
             return None
-        fingerprint, loc, _name = preferred[0]
-        return located_value({k: v for k, v in fingerprint}, loc)
-    fingerprint, loc, _name = found[0]
-    return located_value({k: v for k, v in fingerprint}, loc)
+        fingerprint, loc, _name, components = preferred[0]
+    else:
+        fingerprint, loc, _name, components = found[0]
+    numeric_components = {
+        name: components[name]
+        for name, _value in fingerprint
+        if name in components
+    }
+    return located_value(
+        _runtime_printed_composition_values(numeric_components), loc
+    )
 
 
 def _is_printed_initial_charge(
@@ -13351,7 +13378,8 @@ def _printed_map_is_typed_initial(
         return True
     return any(
         fingerprint == target and name == "starting_glass_wt_pct"
-        for fingerprint, _located, name in _printed_composition_candidates(
+        for fingerprint, _located, name, _components
+        in _printed_composition_candidates(
             _lab_roots(equipment, values), vocabulary, fallback_locator=locator
         )
     )
@@ -13404,7 +13432,8 @@ def _printed_map_is_observation_level(
     own_roots = _lab_roots(equipment, own_values)
     if any(
         fingerprint == target
-        for fingerprint, _loc, _name in _printed_composition_candidates(
+        for fingerprint, _loc, _name, _components
+        in _printed_composition_candidates(
             own_roots, vocabulary, fallback_locator=locator
         )
     ):
@@ -18692,7 +18721,11 @@ class Migrator:
                     projected_state,
                     locator=projected_oxide_locator or locator,
                     inference=wt_pct_to_mole_fraction_derivation(
-                        projected_oxide_map, projected_oxide_locator or locator
+                        projected_oxide_map,
+                        projected_oxide_locator or locator,
+                        source_note=_wt_percent_derivation_source_note(
+                            projected_oxide_map, projected_closure_context
+                        ),
                     ),
                 ),
             }

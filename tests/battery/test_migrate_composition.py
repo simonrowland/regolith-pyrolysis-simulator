@@ -1907,7 +1907,11 @@ def test_b704_hydrous_datum_state_completes_full_migration(tmp_path: Path) -> No
     assert isinstance(composition, Located) and composition.state.is_value
     assert composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
     assert set(composition.state.value.as_map()) == {"SiO2", "MgO"}
-    assert sum(composition.state.value.as_map().values()) == Decimal("1")
+    # At 28-digit Decimal precision, about ten divisions leave at most n*1e-28 residue.
+    assert (
+        abs(sum(composition.state.value.as_map().values()) - Decimal("1"))
+        <= Decimal("1e-25")
+    )
     printed = (observation.point_conditions or {}).get("printed_composition")
     assert isinstance(printed, Located)
     assert printed is not None and printed.state.is_value
