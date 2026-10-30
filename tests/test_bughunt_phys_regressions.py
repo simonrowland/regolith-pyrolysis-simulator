@@ -497,6 +497,7 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     }
 
     def refuse_after_mutating_every_copied_root() -> None:
+        sim.created_during_failed_hour = {"must": "be removed"}
         sim.atom_ledger._transitions.append(object())
         sim.melt.hour = 5
         sim.overhead.pressure_mbar = 99.0
@@ -523,6 +524,7 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
         sim.step()
 
     assert raised.value is refusal
+    assert not hasattr(sim, "created_during_failed_hour")
     restored_roots = {
         name: value
         for name, value in sim.__dict__.items()
@@ -740,6 +742,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
 
     def complete_after_registering_providers() -> HourSnapshot:
         sim._register_freeze_gate_liquid_fraction_providers()
+        sim.created_during_successful_hour = {"committed": True}
         return HourSnapshot(hour=4)
 
     sim._step_one_hour = complete_after_registering_providers
@@ -752,6 +755,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
             "shadows": (),
         },
     }
+    assert sim.created_during_successful_hour == {"committed": True}
 
 
 def test_shared_mappingproxy_diamond_is_copied_not_live_aliased() -> None:
