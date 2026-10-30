@@ -82,8 +82,24 @@ _SWEPT_COMPOSITION_MAPS = (
     # (99.47/0.105) remain refused outside their printed rounding bounds.
     ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 1, 3),
     ("Britt", "britt-2019-asteroid-simulants", "composition_wt_pct", "FeOT", 3, 0),
-    ("Hendrix", "hendrix-2024-reactivity-reduced-simulants", "composition_wt_pct", "SO3", 2, 0),
-    ("Flemetakis", "ta-flemetakis-2024", "composition_wt_pct", "B2O3", 1, 0),
+    # Hendrix LMS-1 sums to 100.66 wt% against a 0.060 rounding bound.
+    (
+        "Hendrix",
+        "hendrix-2024-reactivity-reduced-simulants",
+        "composition_wt_pct",
+        "SO3",
+        1,
+        1,
+    ),
+    # The Flemetakis starting glass sums to 99.37 wt% against a 0.025 bound.
+    (
+        "Flemetakis",
+        "ta-flemetakis-2024",
+        "composition_wt_pct",
+        "B2O3",
+        0,
+        1,
+    ),
 )
 _MLS_BULK_ID_PREFIXES = {
     "cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:",
@@ -1923,6 +1939,7 @@ def test_real_pretyped_experiment_initials_match_printed_composition_owner(
 
 def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
     migrator = Migrator()
+    count_mismatches: list[str] = []
     for (
         _label,
         source,
@@ -1996,12 +2013,22 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                         )
                         feot_derivations += 1
                 converted += 1
-        assert (refused, converted) == (
-            expected_refusal_count,
-            expected_count,
-        ), label
-        if label == "Britt":
-            assert feot_derivations == expected_count
+        expected_counts = (expected_refusal_count, expected_count)
+        actual_counts = (refused, converted)
+        if actual_counts != expected_counts:
+            count_mismatches.append(
+                f"{label}: expected refused/converted={expected_counts}, "
+                f"got {actual_counts}"
+            )
+        if label == "Britt" and feot_derivations != expected_count:
+            count_mismatches.append(
+                f"{label}: expected FeOT derivations={expected_count}, "
+                f"got {feot_derivations}"
+            )
+
+    assert not count_mismatches, "composition sweep counts differ:\n" + "\n".join(
+        count_mismatches
+    )
 
 
 def test_untyped_printed_composition_note_does_not_create_initial_composition() -> None:
