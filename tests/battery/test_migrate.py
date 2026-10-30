@@ -3183,7 +3183,9 @@ def test_numeric_value_kind_plain_admission_pin(
     value_payload: dict[str, object],
     expected_status: AdmissionStatus,
 ) -> None:
-    observation = next(iter(migrate(_write_min_tree(tmp_path), write=False).observations.values()))
+    observation = next(
+        iter(migrate(_write_min_tree(tmp_path), write=False).observations.values())
+    )
     payload = to_plain(observation)
     payload["value"] = value_payload
     payload["admission"] = {"status": "pending"}
@@ -3266,6 +3268,62 @@ def test_plain_pending_without_source_decision_defaults_and_adds_notice(
 
     assert decoded.admission.status is AdmissionStatus.ADMITTED
     assert any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in decoded.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("status", "reason"),
+    [
+        ("pending", "source admission_status=pending"),
+        ("pending_validation", "source admission_status=pending_validation"),
+        ("pending", "no observation admission_status mapped from source"),
+        (None, "source admission_status=pending"),
+    ],
+)
+def test_plain_d056_pending_status_defaults_and_adds_notice(
+    tmp_path: Path, status: str | None, reason: str
+) -> None:
+    observation = next(
+        iter(migrate(_write_min_tree(tmp_path), write=False).observations.values())
+    )
+    payload = to_plain(observation)
+    admission = {"reason": reason}
+    if status is not None:
+        admission["status"] = status
+    payload["admission"] = admission
+
+    decoded = observation_from_plain(payload)
+
+    assert decoded.admission.status is AdmissionStatus.ADMITTED
+    assert decoded.admission.reason.startswith("admission_defaulted:")
+    assert any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in decoded.notices
+    )
+
+
+@pytest.mark.parametrize(
+    "reason",
+    [
+        "source admission_status=figure_only is not a closed v2.1 token",
+        "source admission_status=model_output_not_measurement is not a closed v2.1 token",
+        "source admission_status=quoted_attributed is not a closed v2.1 token",
+        "Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed",
+        "initial composition is not a run-temperature mass-loss measurement",
+    ],
+)
+def test_plain_pending_with_non_defaultable_reason_stays_pending(
+    tmp_path: Path, reason: str
+) -> None:
+    observation = next(iter(migrate(_write_min_tree(tmp_path), write=False).observations.values()))
+    payload = to_plain(observation)
+    payload["admission"] = {"status": "pending", "reason": reason}
+
+    decoded = observation_from_plain(payload)
+
+    assert decoded.admission.status is AdmissionStatus.PENDING
+    assert decoded.admission.reason == reason
+    assert not any(
         notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in decoded.notices
     )
 

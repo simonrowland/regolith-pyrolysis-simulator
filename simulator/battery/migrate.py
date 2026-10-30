@@ -2151,23 +2151,31 @@ def _admission_from_plain(payload: object, *, value: Value) -> Admission:
             or Locator(note="admission-decision"),
         )
     raw_status = payload.get("status")
-    reason = str(payload.get("reason") or _NO_ADMISSION_STATUS_REASON)
+    raw_reason = payload.get("reason")
+    stored_reason = None if raw_reason in (None, "") else str(raw_reason)
+    reason = stored_reason or _NO_ADMISSION_STATUS_REASON
     status_text = str(raw_status or "pending")
     has_numeric_value = _value_has_numeric_value(value)
     if (
         not payload.get("superseded_by")
         and decided is None
         and has_numeric_value
-        and status_text in {AdmissionStatus.PENDING.value, "pending_validation"}
+        and status_text
+        in {AdmissionStatus.PENDING.value, "pending_validation"}
     ):
         return admission_for(
-            status_text,
+            raw_status,
             superseded_by=None,
             extraction=None,
             locator=None,
+            stored_reason=stored_reason,
         )
+    if status_text == "pending_validation":
+        status = AdmissionStatus.PENDING
+    else:
+        status = AdmissionStatus(status_text)
     return Admission(
-        status=AdmissionStatus(status_text),
+        status=status,
         reason=reason,
         superseded_by=payload.get("superseded_by"),
         decided_by=decided,
@@ -7699,6 +7707,7 @@ def admission_for(
     extraction: Mapping[str, Any] | None,
     locator: Locator | None,
     refusal_reason: str | None = None,
+    stored_reason: str | None = None,
 ) -> Admission:
     if superseded_by:
         decided = None
@@ -7712,11 +7721,33 @@ def admission_for(
             superseded_by=superseded_by,
             decided_by=decided,
         )
+    defaultable_reasons = {
+        f"source admission_status={status}"
+        for status in (AdmissionStatus.PENDING.value, "pending_validation")
+    }
     if raw_status is None or raw_status == "":
+        if stored_reason in defaultable_reasons:
+            return _defaulted_admission(stored_reason)
+        if stored_reason not in (None, _NO_ADMISSION_STATUS_REASON):
+            return Admission(
+                status=AdmissionStatus.PENDING,
+                reason=stored_reason,
+            )
         return _defaulted_admission(_NO_ADMISSION_STATUS_REASON)
     text = str(raw_status)
     if text in {AdmissionStatus.PENDING.value, "pending_validation"}:
-        return _defaulted_admission(f"source admission_status={text}")
+        if (
+            stored_reason is not None
+            and stored_reason != _NO_ADMISSION_STATUS_REASON
+            and stored_reason not in defaultable_reasons
+        ):
+            return Admission(
+                status=AdmissionStatus.PENDING,
+                reason=stored_reason,
+            )
+        return _defaulted_admission(
+            stored_reason or f"source admission_status={text}"
+        )
     closed = {s.value: s for s in AdmissionStatus}
     if text in closed:
         status = closed[text]

@@ -69,13 +69,13 @@ def validate_migrated_store(root: Path | None = None) -> dict[str, object]:
     works, experiments, observations = load_migrated_store(root)
     assert works
     assert observations
-    figure_only = observations[
+    jones = observations[
         "1997jonesthermo::jones_1997_imcc_mgo_activity_comparison"
     ]
-    assert figure_only.admission.status is AdmissionStatus.ADMITTED
-    assert any(
+    assert jones.admission.status is AdmissionStatus.PENDING
+    assert not any(
         notice.kind is NoticeKind.ADMISSION_DEFAULTED
-        for notice in figure_only.notices
+        for notice in jones.notices
     )
 
     referenced_context_ids = set()

@@ -5136,9 +5136,7 @@ def test_d056_pending_kems_row_defaults_before_d274_and_reaches_engine() -> None
         ),
         admission=Admission(
             status=AdmissionStatus.PENDING,
-            reason=(
-                "source admission_status=figure_only is not a closed v2.1 token"
-            ),
+            reason="source admission_status=pending",
         ),
     )
     reference = observation_from_plain(to_plain(reference))
