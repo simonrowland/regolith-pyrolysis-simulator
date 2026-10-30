@@ -1440,10 +1440,25 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
                 State.unknown(f"mass-percent composition is not usable: {exc}"),
                 locator=locator,
             )
+        accepted_wt = _oxide_mass_percent_components(wt)
+        dropped = _unrecognized_printed_chemical_components(wt, payload)
+        source_notes = []
+        if dropped:
+            source_notes.append(
+                "omitted trace components: " + ", ".join(sorted(dropped))
+            )
+        if any(
+            _canonical_printed_oxide_name(name.strip()) == "FeOT" for name in wt
+        ):
+            source_notes.append(_FEOT_COMPOSITION_DERIVATION_NOTE)
         return Located(
             State.of(composition),
             locator=locator,
-            inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+            inference=wt_pct_to_mole_fraction_derivation(
+                accepted_wt,
+                locator,
+                source_note="; ".join(source_notes) or None,
+            ),
         )
     if (
         isinstance(body, Mapping)
@@ -3761,6 +3776,9 @@ _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
         "sum_as_published",
     }
 )
+_PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
+    {"-", "–", "—", "n.d.", "nd", "bdl", "--"}
+)
 # b-704's 2026-10-04 sweep found a natural gap between 92.35 and 96.86 wt%;
 # near-complete assays from 98 through 102 were ordinary, so accept kept mass
 # from 95 through 102 wt% and tolerate no more than 0.5 wt% of dropped traces.
@@ -3856,33 +3874,29 @@ def _printed_composition_source_map(payload: object) -> Mapping[str, Any] | None
 
     if not isinstance(payload, Mapping):
         return None
+    source_map: dict[str, Any] = {}
     for key in _PRINTED_COMPOSITION_MAP_KEYS:
         nested = payload.get(key)
         if isinstance(nested, Mapping):
             composition = _printed_composition_map(nested)
             if composition is not None:
-                return composition
+                source_map.update(composition)
+                break
     point_conditions = payload.get("point_conditions")
-    if isinstance(point_conditions, Mapping):
+    if not source_map and isinstance(point_conditions, Mapping):
         printed = _printed_composition_map(point_conditions.get("printed_composition"))
         if printed is not None:
-            return printed
-    flat_components = {
-        name.removesuffix("_wt_pct"): value
-        for name, value in payload.items()
-        if str(name).endswith("_wt_pct")
-        and _is_printed_chemical_component_name(
-            str(name).removesuffix("_wt_pct")
-        )
-    }
-    if flat_components:
-        return flat_components
+            source_map.update(printed)
     direct = _printed_composition_map(payload)
-    if direct is not None and any(
-        _is_printed_chemical_component_name(str(key)) for key in direct
-    ):
-        return direct
-    return None
+    if direct is not None:
+        for name, value in direct.items():
+            token = str(name).strip()
+            if (
+                _is_printed_chemical_component_name(token)
+                or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+            ):
+                source_map.setdefault(str(name), value)
+    return source_map or None
 
 
 def _is_printed_chemical_component_name(name: str) -> bool:
@@ -3940,7 +3954,10 @@ def _source_printed_composition_values(
         amount = _printed_mass_percent_number(value)
         if amount is not None:
             printed[name] = value
-        elif value is None or value == "":
+        elif value is None or value == "" or (
+            isinstance(value, str)
+            and value.strip().casefold() in _PRINTED_COMPOSITION_MISSING_MARKERS
+        ):
             printed[name] = value
 
     scopes: list[Mapping[str, Any]] = []
@@ -4237,6 +4254,8 @@ def _mole_fraction_from_wt_percent_components(
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     """Convert a standalone printed oxide map after applying its kept-mass check."""
 
+    # This Composition-only API has no notice or derivation channel; migration
+    # emits projection notices, and Located readers retain dropped names in their inference.
     return _wt_percent_conversion_or_raise(wt, closure_context=wt)
 
 

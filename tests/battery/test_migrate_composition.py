@@ -1669,6 +1669,8 @@ def test_mass_closure_is_identical_through_plain_and_full_migration(
     assert migrated.identity.composition.is_value
     assert migrated.identity.composition.value == plain.state.value
     if "XxO" in components:
+        assert plain.inference is not None
+        assert any("XxO" in item for item in plain.inference.inputs)
         projected = [
             notice
             for notice in migrated.notices
@@ -1676,6 +1678,61 @@ def test_mass_closure_is_identical_through_plain_and_full_migration(
         ]
         assert len(projected) == 1
         assert projected[0].dropped == ("XxO",)
+
+
+def test_mass_percent_refusal_matches_for_flat_hydrous_unknown_component(
+    tmp_path: Path,
+) -> None:
+    components = {
+        "SiO2": "54.90",
+        "MgO": "40.00",
+        "XxO": "10",
+        "H2O_wt_pct": "5.10",
+    }
+    plain = migrate_module._composition_located_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": list(components.items()),
+                },
+            }
+        }
+    )
+    assert plain.state.is_unknown
+    assert "XxO=10 wt%" in plain.state.reason
+    with pytest.raises(ValueError, match="XxO=10 wt%"):
+        wt_pct_to_mole_fraction(
+            {name: Decimal(value) for name, value in components.items()}
+        )
+
+    extract = _markova_vi_extract()
+    values = extract["species"]["SiO2"]["observations"][0]["values"]
+    values["points"] = [
+        {
+            "T_C": 0,
+            "mass_loss_pct": 0,
+            **components,
+            "T_C_is_initial_composition": True,
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+    )
+
+    assert point.identity.composition is not None
+    assert point.identity.composition.is_unknown
+    assert "XxO=10 wt%" in point.identity.composition.reason
+    printed = point.point_conditions["printed_composition"]
+    assert printed.state.is_value
+    assert printed.state.value == components
 
 
 @pytest.mark.parametrize(
@@ -2895,7 +2952,14 @@ def test_flat_refused_point_ignores_numeric_condition_columns(tmp_path: Path) ->
     assert set(printed.state.value) == {"SiO2", "MgO"}
 
 
-def test_flat_refused_point_preserves_blank_major_oxide(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "missing_marker",
+    (None, "", "-", "–", "—", "n.d.", "nd", "bdl", "--"),
+)
+def test_flat_refused_point_preserves_blank_and_missing_major_oxide(
+    tmp_path: Path,
+    missing_marker: str | None,
+) -> None:
     extract = _markova_vi_extract()
     values = extract["species"]["SiO2"]["observations"][0]["values"]
     values["points"] = [
@@ -2904,7 +2968,7 @@ def test_flat_refused_point_preserves_blank_major_oxide(tmp_path: Path) -> None:
             "mass_loss_pct": 0,
             "SiO2": "54.90",
             "MgO": "40.00",
-            "FeO": None,
+            "FeO": missing_marker,
             "T_C_is_initial_composition": True,
         }
     ]
@@ -2922,7 +2986,7 @@ def test_flat_refused_point_preserves_blank_major_oxide(tmp_path: Path) -> None:
     assert point.identity.composition.is_unknown
     printed = point.point_conditions["printed_composition"]
     assert printed.state.is_value
-    assert printed.state.value["FeO"] is None
+    assert printed.state.value["FeO"] == missing_marker
     assert printed.state.value["SiO2"] == "54.90"
     assert printed.state.value["MgO"] == "40.00"
 
