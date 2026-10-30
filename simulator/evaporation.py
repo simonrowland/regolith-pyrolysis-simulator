@@ -2166,6 +2166,7 @@ class EvaporationMixin:
                 timeout_reason
                 or diagnostic.get('backend_status_reason')
                 or diagnostic.get('reason')
+                or failure['reason']
             ),
             'qualification': 'held_last_good_curve',
             'authority': 'extrapolated (held)',
@@ -2821,6 +2822,7 @@ class EvaporationMixin:
                             timeout_reason
                             or diagnostic.get('backend_status_reason')
                             or diagnostic.get('reason')
+                            or failure['reason']
                         ),
                         'qualification': 'first_call_kress91_floor_prediction',
                         'authority': 'extrapolated (lower-rung)',
