@@ -5664,13 +5664,13 @@ def _alpha_record(
         record['alpha_s_domain_status'] = 'out_of_domain'
         record['output_status'] = 'status_bearing'
         record['alpha_s_authoritative_at_temperature'] = False
-        if (
-            species == 'Fe'
-            and record.get('alpha_s_extrapolation_method')
-            == 'bounded_arrhenius'
-        ):
-            # Fe's bounded Arrhenius continuation is a flagged prediction
-            # outside its certified band, not an unclassified domain failure.
+        if record.get('alpha_s_extrapolation_method') == 'bounded_arrhenius':
+            # A bounded Arrhenius continuation is a flagged prediction
+            # outside its certified band, not an unclassified domain
+            # failure. The method token carries that fact. The evaluator
+            # still mints the token only for Fe, because that published
+            # fit is the continuation; this record layer does not repeat
+            # the species check.
             record['alpha_s_domain_status'] = 'extrapolated'
             record['authority_level'] = 'extrapolated'
     elif record.get('alpha_s_valid_range_K') is not None:
