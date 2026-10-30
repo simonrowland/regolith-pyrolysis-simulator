@@ -417,14 +417,19 @@ def test_li_2005_p2o5_feo_row_uses_the_extension_pack(
     candidate = candidate_observation(reference, prediction)
     assert candidate.engine is not None
     assert _SP_PACK_SOURCE in candidate.engine.coefficient_sources
-    assert candidate.authority is not None
-    # Pin the pack's actual result below once the controller's green probe
-    # confirms whether this release's d066-ext datapack includes P2O5.
-    if prediction.value is None:
-        assert isinstance(prediction.refusal_reason, RefusalReason)
-        assert candidate.authority is Authority.REFUSED
-    else:
-        assert candidate.authority in {Authority.BRIDGE, Authority.EXTRAPOLATED}
+    assert prediction.value is not None
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert candidate.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.authority is Authority.EXTRAPOLATED
+        and notice.reason
+        == (
+            "P2O5 parent reference state: crystal-reference screening proxy; "
+            "no P2O5(l) claim"
+        )
+        for notice in prediction.notices
+    )
     assert any(
         _SP_PACK_SOURCE in notice.reason
         and f"authority={candidate.authority.value}" in notice.reason
