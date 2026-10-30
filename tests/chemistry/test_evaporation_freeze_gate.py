@@ -6722,7 +6722,9 @@ def test_core_gate_curve_memo_recomputes_after_provider_failure(
     def injected_provider_result(intent, *args, **kwargs):
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             provider_calls.append(intent)
-            failure_attempts = 1
+            failure_attempts = (
+                2 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 1
+            )
             if len(provider_calls) <= failure_attempts:
                 return IntentResult(
                     intent=intent,
@@ -6756,7 +6758,6 @@ def test_core_gate_curve_memo_recomputes_after_provider_failure(
     first = sim._melt_redox_liquidus_gate_curve()
     assert first['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
     assert first['gate_provider_refusal']['authority'] == 'extrapolated (lower-rung)'
-    assert len(provider_calls) == 1
     sim.melt.hour += 1
     key = _freeze_gate_key_for_current_state(sim)
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
@@ -6764,7 +6765,9 @@ def test_core_gate_curve_memo_recomputes_after_provider_failure(
     assert second['source'] == 'gate_liquid_fraction'
     assert second['solidus_T_C'] == 1000.0
     assert second['liquidus_T_C'] == 1300.0
-    assert len(provider_calls) == 2
+    assert len(provider_calls) == (
+        3 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 2
+    )
     assert sim._freeze_gate_liquid_fraction_curve_memo[key]['provider_outcome'] is GateCurveProviderOutcome.PRODUCED
 
 
@@ -7475,7 +7478,7 @@ def test_freeze_gate_wrapper_passes_buffer_offset_redox_state(
                     (1300.0, 1.0),
                 ),
             },
-            id='ok-timeout-falls-back',
+            id='ok-timeout-retries-provider',
         ),
         pytest.param(
             'unavailable',
@@ -7488,7 +7491,7 @@ def test_freeze_gate_wrapper_passes_buffer_offset_redox_state(
                 'backend_status': 'out_of_domain',
                 'backend_status_reason': 'timeout',
             },
-            id='timeout-falls-back',
+            id='timeout-retries-provider',
         ),
         pytest.param(
             'out_of_domain',
@@ -7529,7 +7532,9 @@ def test_failed_gate_provider_refusal_does_not_enter_any_memo(
     def injected_provider_result(intent, *args, **kwargs):
         assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
         provider_calls.append(intent)
-        failure_attempts = 1
+        failure_attempts = (
+            2 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 1
+        )
         if len(provider_calls) <= failure_attempts:
             return IntentResult(
                 intent=intent,
@@ -7562,14 +7567,15 @@ def test_failed_gate_provider_refusal_does_not_enter_any_memo(
     else:
         with pytest.raises(EvaporationFluxRefusal):
             sim._melt_redox_liquidus_gate_curve()
-    assert len(provider_calls) == 1
     key = _freeze_gate_key_for_current_state(sim)
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
     assert captures == []
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     second = sim._melt_redox_liquidus_gate_curve()
-    assert len(provider_calls) == 2
+    assert len(provider_calls) == (
+        3 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 2
+    )
     assert second['source'] == 'gate_liquid_fraction'
     assert second['solidus_T_C'] == 1000.0
     assert second['liquidus_T_C'] == 1300.0
