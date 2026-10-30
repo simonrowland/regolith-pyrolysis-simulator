@@ -116,8 +116,13 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # b-1043: the resolved-setpoints leaf chemistry_kernel.liquid_fraction_provider
     # is now "magemin". Removing only that leaf recovers 911f820f...;
     # EvalSpec's matching gate-input leaf is pinned separately below.
+    # Recomputed 2026-10-30 for d-310 (b-784 C2A product labels): the
+    # campaigns.C2A_continuous.products entries Fe, SiO2_glass and O2 each gain
+    # target_status=unverified_design_target, decision=d-310 and a reason
+    # string; no value changed. Removing exactly those nine leaves recovers
+    # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0"
+        "887faabbe81fa1006d7950fb78c45c8d428f775ddbc297a695d8addaf7987df4"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
