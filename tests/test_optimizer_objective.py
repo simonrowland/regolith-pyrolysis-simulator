@@ -2305,6 +2305,47 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     }
 
 
+def test_sso2_owner_gate_timeout_uses_flagged_floor_and_completes(monkeypatch):
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+    from simulator.core import PyrolysisSimulator
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    original_dispatch = PyrolysisSimulator._dispatch_only
+    original_gate_curve = PyrolysisSimulator._melt_redox_liquidus_gate_curve
+    gate_calls = []
+    timeout_curves = []
+
+    def timeout_gate(self, intent, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            gate_calls.append(intent)
+            raise EngineWorkerTimeout('magemin', 0.01, phase='call')
+        return original_dispatch(self, intent, **kwargs)
+
+    def capture_gate_curve(self, *args, **kwargs):
+        curve = original_gate_curve(self, *args, **kwargs)
+        if isinstance(curve, dict) and 'gate_provider_refusal' in curve:
+            timeout_curves.append(curve)
+        return curve
+
+    monkeypatch.setattr(PyrolysisSimulator, '_dispatch_only', timeout_gate)
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        '_melt_redox_liquidus_gate_curve',
+        capture_gate_curve,
+    )
+    execution = build_sso2_owner_recipe_execution(hours=9)
+
+    assert gate_calls
+    assert execution.status in {'ok', 'partial'}
+    assert timeout_curves
+    floor = next(
+        curve for curve in timeout_curves
+        if curve['gate_provider_refusal']['authority'] == 'extrapolated (lower-rung)'
+    )
+    assert floor['source'] == 'kress91_liquid_calibration_floor'
+    assert floor['gate_provider_refusal']['reason'] == 'engine_worker_timeout'
+
+
 def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
     from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
 

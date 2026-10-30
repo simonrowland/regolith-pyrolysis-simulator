@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import inspect
 import math
 import time
 from dataclasses import dataclass, field
@@ -16,26 +15,12 @@ from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_regime import liquid_fraction_invalidity
 
 
-# MAGEMin-facing default only - the generic finder stays unbounded so
-# AlphaMELTS (and pure-function unit tests) are not silently wall-capped.
-#
-# Derivation for DEFAULT_LIQUIDUS_FINDER_BUDGET_S (300 s):
-#   Premise: a legitimate real MAGEMin freeze-gate search on lunar mare
-#   is documented at ~163 s wall (37-point 400-2200 C / 50 C grid +
-#   bisection; AGENTS.md test-timeout invariant / M5 MacBook Pro).
-#   Worst-case call count under defaults: ceil((2200-400)/50)+1 = 37
-#   grid + 2 * max_bisection_iterations (32) = 37 + 64 = 101 engine
-#   calls. Per-call timeout default is 60 s, so a between-calls-only
-#   budget would admit up to ~budget + 60 s of overrun per call; under
-#   per-call limits alone the pathological case is 101 * 60 s ~ 101 min.
-#   The shared warm pool now owns normal runtime liquidus searches under its
-#   separate 15 s budget. This default remains only for explicit cold-worker
-#   diagnostics. Preserve margin over the measured 163 s cold search without
-#   retaining the former pre-pool 900 s ceiling: 163 s * 1.8 = 293.4 s,
-#   rounded to 300 s. Sanity: 300 s is still 1.84x the cold measurement and
-#   far below 101 * 60 s, so it bounds the spinel-hang class.
-# Unit check: all terms in seconds; product is seconds.
-DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 300.0
+# MAGEMin-facing wall guard only. The solver's work bound is the deterministic
+# sample count below; this guard refuses a hung run and never selects a
+# different curve based on ordinary load. The documented cold gate search is
+# about 163 s. Ten times that is 1630 s, rounded up to 1800 s (30 minutes) to
+# leave normal runs ample headroom. Unit check: 163 s * 10 is seconds.
+DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 1800.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
 # frac_M >= 1 - LIQUIDUS_LIQUID_EPSILON is liquid. This is the finder's
 # declaration tolerance. The freeze-gate consumer may snap a supplied
@@ -362,12 +347,10 @@ def find_liquidus_solidus_by_fraction(
 ) -> LiquidusSolidusResult:
     """Bracket and bisect solidus/liquidus on monotone melt fraction.
 
-    ``budget_s`` defaults to ``None`` (unbounded). Callers that must bound
-    aggregate wall time — MAGEMin in particular — pass a finite budget
-    explicitly (see ``DEFAULT_LIQUIDUS_FINDER_BUDGET_S``). Remaining budget
-    is threaded into each sample as ``remaining_budget_s`` when the
-    callable accepts it, so engine call timeouts can be clamped to the
-    residual rather than only checking the budget between calls.
+    ``budget_s`` defaults to ``None``. A finite value is a generous hang
+    guard, checked between samples; its residual is never passed to the
+    engine. The search work is bounded by the scan grid and the two
+    tolerance-bounded bisections.
     """
     from engines.alphamelts.thermoengine import (
         DECLARED_THERMOENGINE_FAILURE_TYPES,
@@ -420,6 +403,23 @@ def find_liquidus_solidus_by_fraction(
     except RuntimeError as exc:
         return _refused_input(str(exc))
 
+    # Each bisection starts with a bracket no wider than scan_step_C and halves
+    # its Celsius width until it reaches tolerance_C. At the defaults,
+    # ceil(log2(50 C / 2 C)) = 5 steps; one extra step covers endpoint rounding.
+    # The 32-step cap is therefore sufficient, and the deterministic sample
+    # bound is 37 grid samples + 2 * 6 bisection samples = 49 evaluations.
+    # The ratio is dimensionless and the bound counts evaluations, not seconds.
+    iteration_cap = max(0, math.ceil(max_bisection_iterations))
+    tolerance_steps = (
+        0
+        if step <= tolerance
+        else max(1, math.ceil(math.log2(step) - math.log2(tolerance)) + 1)
+    )
+    max_sample_evaluations = len(grid) + 2 * min(
+        iteration_cap,
+        tolerance_steps,
+    )
+
     liquid_threshold = 1.0 - liquid_epsilon_value
     samples: list[MeltFractionSample] = []
     raw_fraction_by_temperature: dict[float, float] = {}
@@ -449,69 +449,43 @@ def find_liquidus_solidus_by_fraction(
             f'after {len(samples)} calls'
         )
 
-    def remaining_budget_s() -> Optional[float]:
-        if deadline is None:
-            return None
-        return max(0.0, deadline - time.monotonic())
-
     def check_budget() -> None:
         if deadline is not None and time.monotonic() >= deadline:
             raise _LiquidusFinderBudgetExceeded(budget_warning())
 
-    def _raise_budget_if_engine_exhausted(exc: BaseException) -> None:
-        """Promote residual-timeout / cancel failures to typed budget exhaustion.
-
-        Between-call budget checks alone lose structure when the *engine*
-        path burns the residual (subprocess timeout clamped to remaining,
-        or a cancel for a non-positive residual). Without this promotion
-        those paths surface as generic ``liquidus finder failed: …`` with
-        empty diagnostics, while the in-process post-sample check still
-        emits ``reason=aggregate_budget_exceeded``. Exhaustion must be
-        equally legible on every execution path.
-        """
-        if deadline is None:
-            return
-        message = str(exc).lower()
-        residual_exhausted = remaining_budget_s() is not None and (
-            remaining_budget_s() <= 0.0
-        )
-        explicit_cancel = (
-            'aggregate liquidus budget exhausted' in message
-            or 'aggregate budget' in message
-        )
-        if residual_exhausted or explicit_cancel or time.monotonic() >= deadline:
-            raise _LiquidusFinderBudgetExceeded(budget_warning()) from exc
-
     def sample(T_C: float) -> MeltFractionSample:
         nonlocal last_T_C
         check_budget()
-        remaining = remaining_budget_s()
-        if remaining is not None and remaining <= 0.0:
-            raise _LiquidusFinderBudgetExceeded(budget_warning())
         last_T_C = float(T_C)
         temperature_C = float(T_C)
         if temperature_C in raw_fraction_by_temperature:
             raw = raw_fraction_by_temperature[temperature_C]
         else:
+            if len(raw_fraction_by_temperature) >= max_sample_evaluations:
+                raise LiquidusSampleError(
+                    'unavailable',
+                    ('liquidus finder deterministic sample bound exceeded',),
+                    {
+                        'reason': 'sample_bound_exceeded',
+                        'sample_limit': max_sample_evaluations,
+                        'call_count': len(raw_fraction_by_temperature),
+                    },
+                )
             try:
                 raw = _invoke_sample_fraction(
                     sample_fraction,
                     temperature_C,
-                    remaining_budget_s=remaining,
                 )
             except _LiquidusFinderBudgetExceeded:
                 raise
             except LiquidusSampleError as exc:
-                _raise_budget_if_engine_exhausted(exc)
                 raise _sample_error_with_exception_context(exc) from exc
             except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
-                _raise_budget_if_engine_exhausted(exc)
                 projected = _sample_error_for_declared_engine_failure(exc)
                 if projected is None:
                     raise
                 raise projected from exc
             except MeltBackendError as exc:
-                _raise_budget_if_engine_exhausted(exc)
                 projected = liquidus_sample_error_from_exception(exc)
                 if projected is None:
                     raise
@@ -1142,36 +1116,9 @@ def _refused_input(message: str) -> LiquidusSolidusResult:
 def _invoke_sample_fraction(
     sample_fraction: Callable[..., float],
     temperature_C: float,
-    *,
-    remaining_budget_s: Optional[float],
 ) -> float:
-    """Call sample_fraction, threading remaining budget when accepted.
-
-    Budget-aware engines (MAGEMin) declare
-    ``remaining_budget_s: Optional[float] = None`` (or a second positional)
-    and clamp their per-call timeout/cancellation to that residual. Simple
-    ``lambda T: ...`` unit-test callables keep working unchanged.
-    """
-    args = (float(temperature_C),)
-    kwargs = {}
-    if remaining_budget_s is not None:
-        try:
-            parameters = inspect.signature(sample_fraction).parameters
-        except (TypeError, ValueError):
-            parameters = {}
-        if 'remaining_budget_s' in parameters:
-            kwargs['remaining_budget_s'] = float(remaining_budget_s)
-        else:
-            positional = [
-                param for param in parameters.values()
-                if param.kind in (
-                    inspect.Parameter.POSITIONAL_ONLY,
-                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                )
-            ]
-            if len(positional) >= 2:
-                args = (*args, float(remaining_budget_s))
-    raw = sample_fraction(*args, **kwargs)
+    """Call one sample without coupling its timeout to wall elapsed."""
+    raw = sample_fraction(float(temperature_C))
     return _declared_float(raw, 'frac_M')
 
 
