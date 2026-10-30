@@ -12,10 +12,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -132,10 +132,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -252,10 +252,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -372,10 +372,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -492,10 +492,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -612,10 +612,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -732,10 +732,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -852,10 +852,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -972,10 +972,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1091,11 +1091,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1157,21 +1158,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='50.665'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1215,7 +1203,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1335,7 +1323,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1442,7 +1430,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -1452,10 +1440,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -1562,7 +1550,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=barium-(reference-state):v=5108dee7f6
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=barium-(reference-state):v=5108dee7f6:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -1572,10 +1560,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -1682,7 +1670,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=barium-(reference-state):v=28644dddf8
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=barium-(reference-state):v=28644dddf8:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -1692,10 +1680,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -1802,7 +1790,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=barium-(reference-state):v=5cba7ff2d4
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=barium-(reference-state):v=5cba7ff2d4:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -1812,10 +1800,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -1931,11 +1919,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1997,21 +1986,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='2.360'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2051,11 +2027,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2117,21 +2094,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='2.510'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2162,7 +2126,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=barium-(reference-state):v=86649a87b0
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=barium-(reference-state):v=86649a87b0:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -2172,10 +2136,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -2282,7 +2246,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=barium-(reference-state):v=17be17bea3
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=barium-(reference-state):v=17be17bea3:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -2292,10 +2256,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -2410,7 +2374,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=barium-(reference-state):v=a7a0d0faeb
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=barium-(reference-state):v=a7a0d0faeb:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -2420,10 +2384,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -2539,11 +2503,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2605,21 +2570,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='7.120'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2659,11 +2611,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2725,21 +2678,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='5.290'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -2788,10 +2728,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2908,10 +2848,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3028,10 +2968,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3148,10 +3088,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3268,10 +3208,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3388,10 +3328,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3508,10 +3448,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3628,10 +3568,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3748,10 +3688,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3867,11 +3807,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3933,21 +3874,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='51.030'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3991,7 +3919,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4111,7 +4039,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4218,7 +4146,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=298.15:col=entropy:name=barium-(reference-state):v=609763caee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=298.15:col=entropy:name=barium-(reference-state):v=609763caee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -4228,10 +4156,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -4338,7 +4266,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=400:col=entropy:name=barium-(reference-state):v=5d9a3ffd84
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=400:col=entropy:name=barium-(reference-state):v=5d9a3ffd84:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -4348,10 +4276,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -4458,7 +4386,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=500:col=entropy:name=barium-(reference-state):v=91eb4576e3
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=500:col=entropy:name=barium-(reference-state):v=91eb4576e3:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -4468,10 +4396,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -4578,7 +4506,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=600:col=entropy:name=barium-(reference-state):v=5e9cabb729
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=600:col=entropy:name=barium-(reference-state):v=5e9cabb729:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -4588,10 +4516,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -4707,11 +4635,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4773,21 +4702,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='21.210'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4827,11 +4743,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4893,21 +4810,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='21.440'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4938,7 +4842,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=700:col=entropy:name=barium-(reference-state):v=a9f7484001
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=700:col=entropy:name=barium-(reference-state):v=a9f7484001:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -4948,10 +4852,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -5058,7 +4962,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=800:col=entropy:name=barium-(reference-state):v=e384222059
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=800:col=entropy:name=barium-(reference-state):v=e384222059:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -5068,10 +4972,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -5186,7 +5090,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=900:col=entropy:name=barium-(reference-state):v=356fa9b031
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:S:shared:T=900:col=entropy:name=barium-(reference-state):v=356fa9b031:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -5196,10 +5100,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -5315,11 +5219,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5381,21 +5286,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='24.870'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -5443,11 +5335,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5509,21 +5402,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 31
-        pdf_page_index: 37
-        table: b1259-ht-0006-barium-reference-state
-        note: as_published='26.740'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json
-        record: b1259-ht-0006-barium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5564,10 +5444,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5591,10 +5471,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5726,10 +5606,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5753,10 +5633,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5888,10 +5768,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5915,10 +5795,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6050,10 +5930,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6077,10 +5957,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6212,10 +6092,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6239,10 +6119,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6374,10 +6254,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6401,10 +6281,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6536,10 +6416,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6563,10 +6443,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6698,10 +6578,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6725,10 +6605,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6860,10 +6740,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6887,10 +6767,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7021,11 +6901,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7136,7 +7017,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7163,7 +7044,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7298,7 +7179,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7325,7 +7206,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7447,7 +7328,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -7457,10 +7338,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -7484,10 +7365,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -7609,7 +7490,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -7619,10 +7500,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -7646,10 +7527,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -7771,7 +7652,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -7781,10 +7662,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -7808,10 +7689,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -7933,7 +7814,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -7943,10 +7824,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -7970,10 +7851,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -8104,11 +7985,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8206,7 +8088,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=barium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -8216,10 +8098,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -8243,10 +8125,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8368,7 +8250,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=barium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -8378,10 +8260,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -8405,10 +8287,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8530,7 +8412,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=barium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -8540,10 +8422,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -8567,10 +8449,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8701,11 +8583,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8813,10 +8696,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8840,10 +8723,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8975,10 +8858,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9002,10 +8885,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9137,10 +9020,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9164,10 +9047,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9299,10 +9182,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9326,10 +9209,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9461,10 +9344,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9488,10 +9371,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9623,10 +9506,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9650,10 +9533,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9785,10 +9668,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9812,10 +9695,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9947,10 +9830,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9974,10 +9857,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10109,10 +9992,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10136,10 +10019,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10270,11 +10153,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10385,7 +10269,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10412,7 +10296,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10547,7 +10431,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10574,7 +10458,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10696,7 +10580,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -10706,10 +10590,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -10733,10 +10617,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -10858,7 +10742,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -10868,10 +10752,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -10895,10 +10779,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11020,7 +10904,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -11030,10 +10914,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -11057,10 +10941,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11182,7 +11066,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=barium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -11192,10 +11076,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -11219,10 +11103,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11353,11 +11237,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11455,7 +11340,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=barium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -11465,10 +11350,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -11492,10 +11377,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11617,7 +11502,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=barium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -11627,10 +11512,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -11654,10 +11539,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11779,7 +11664,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=barium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=barium-(reference-state):v=900e6181ee:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -11789,10 +11674,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -11816,10 +11701,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11950,11 +11835,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12062,10 +11948,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12089,10 +11975,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12215,10 +12101,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12242,10 +12128,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12368,10 +12254,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12395,10 +12281,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12521,10 +12407,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12548,10 +12434,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12674,10 +12560,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12701,10 +12587,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12827,10 +12713,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12854,10 +12740,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12980,10 +12866,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13007,10 +12893,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13133,10 +13019,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13160,10 +13046,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13286,10 +13172,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13313,10 +13199,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13438,11 +13324,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1895 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13544,7 +13431,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13571,7 +13458,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13697,7 +13584,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13724,7 +13611,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13837,7 +13724,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=barium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=barium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -13847,10 +13734,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -13874,10 +13761,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -13990,7 +13877,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=barium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=barium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -14000,10 +13887,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -14027,10 +13914,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -14143,7 +14030,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=barium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=barium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -14153,10 +14040,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -14180,10 +14067,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -14296,7 +14183,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=barium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=barium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -14306,10 +14193,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -14333,10 +14220,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -14458,11 +14345,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 643 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -14551,7 +14439,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=barium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=barium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -14561,10 +14449,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -14588,10 +14476,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -14704,7 +14592,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=barium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=barium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -14714,10 +14602,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -14741,10 +14629,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -14857,7 +14745,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=barium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=barium-(reference-state):v=725af3071b:poly=beta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0006-barium-reference-state:tabulation
   identity:
     quantity:
@@ -14867,10 +14755,10 @@ observations:
       formula: Ba
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: beta
       charge:
         tag: value
         value: 0
@@ -14894,10 +14782,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: beta
             charge:
               tag: value
               value: 0
@@ -15019,11 +14907,12 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 983 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
