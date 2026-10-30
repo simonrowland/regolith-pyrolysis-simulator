@@ -5165,6 +5165,92 @@ def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
     )] == [("catalogue-composition", 1)]
 
 
+@pytest.mark.parametrize(
+    ("relation", "scores"),
+    (
+        ("binary_complement", True),
+        ("printed_mole_fraction", False),
+        ("extract_inference", False),
+    ),
+)
+def test_only_binary_complement_point_compositions_score_and_flag(
+    relation: str, scores: bool
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        flagged_strata,
+    )
+
+    experiment = F.tabulation_experiment()
+    composition = Composition(
+        basis="binary_complement",
+        components=(("SrO", Decimal("0.33")), ("Al2O3", Decimal("0.67"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    inference = Derivation(
+        relation=relation,
+        inputs=("caption: 33 mol% SrO",),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+    identity = replace(
+        _partial_identity(),
+        composition=State.unknown("composition is recorded on the source point"),
+    )
+    reference = replace(
+        F.observation(
+            f"binary-complement-{relation}",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="binary-complement-source",
+        ),
+        point_conditions={
+            "composition": Located(
+                State.of(composition),
+                locator=F.loc(table="S7", note="sample 1 caption: 33 mol% SrO"),
+                inference=inference,
+            )
+        },
+    )
+    prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=prediction,
+    )
+
+    complement_notices = tuple(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.COMPOSITION_BINARY_COMPLEMENT
+    )
+    if scores:
+        assert residual.status is not ResidualStatus.REFUSED
+        assert residual.numeric is not None
+        assert len(complement_notices) == 1
+        assert (
+            "complement of the caption mole percent"
+            in complement_notices[0].reason
+        )
+        assert flagged_strata(residual.notices) == (
+            FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        )
+        payload_notice = next(
+            notice
+            for notice in residual_to_plain(residual)["notices"]
+            if notice["kind"] == "composition_binary_complement"
+        )
+        assert payload_notice["kind"] == "composition_binary_complement"
+    else:
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+        assert complement_notices == ()
+
+
 def test_hastie_initial_charge_notice_reaches_residual() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -6118,6 +6204,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
 
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
@@ -6141,6 +6228,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
             NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
             "catalogue_composition:probe",
+        ),
+        (
+            FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+            NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
+            "composition_binary_complement:probe",
         ),
         (
             FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -6190,6 +6282,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
 def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_FIGURE_ONLY,
@@ -6210,6 +6303,10 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         (NoticeKind.UNVERIFIED_APPARATUS, "apparatus_unverified:probe"),
         (NoticeKind.CELL_MATERIAL_INFERRED, "cell_material_inferred:probe"),
         (NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG, "catalogue_composition:probe"),
+        (
+            NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
+            "composition_binary_complement:probe",
+        ),
         (NoticeKind.SOURCE_DISAGREEMENT, "source_internally_inconsistent:probe"),
         (NoticeKind.IMCC_COMPLEX_SATURATION, "imcc_complex_saturation:probe"),
         (
@@ -6242,6 +6339,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
+        FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
