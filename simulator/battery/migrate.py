@@ -1425,6 +1425,11 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             and str(state.get("tag") or "value") == "value"
             else None
         )
+    elif (
+        isinstance(payload, Mapping)
+        and str(payload.get("tag") or "") == StateTag.VALUE.value
+    ):
+        body = payload.get("value")
     if (
         isinstance(body, Mapping)
         and _enum(AmountBasis, body.get("amount_basis"))
@@ -1457,7 +1462,7 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             locator=source.locator,
             inference=source.inference,
         )
-    wt = _mass_percent_components(payload)
+    wt = _mass_percent_components(body)
     if wt is not None:
         if isinstance(payload, Mapping) and "state" not in payload:
             locator = _locator_from_plain(payload.get("locator"))
@@ -1499,7 +1504,7 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             ),
             locator=source.locator,
         )
-    if _mass_percent_pairs(payload) is not None:
+    if _mass_percent_pairs(body) is not None:
         source = _located_from_plain(payload, lambda value: value)
         return Located(
             State.unknown(
@@ -3985,6 +3990,8 @@ def _declared_printed_composition_map(payload: object) -> Mapping[str, Any] | No
     if not isinstance(payload, Mapping):
         return None
     state = payload.get("state")
+    if state is None and "tag" in payload:
+        state = payload
     if isinstance(state, Mapping) and str(state.get("tag") or "value") == "value":
         payload = state.get("value")
     if not isinstance(payload, Mapping):

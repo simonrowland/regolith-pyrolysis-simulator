@@ -2005,7 +2005,10 @@ def test_plain_identity_reader_refuses_large_unsupported_mass_component() -> Non
 
     assert identity.composition is not None
     assert identity.composition.is_unknown
-    assert "unknown-component=40 wt%" in identity.composition.reason
+    assert identity.composition.reason == (
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "unknown-component=40 wt%"
+    )
 
 
 def test_plain_mass_percent_trace_accepts_and_retains_dropped_name_provenance() -> None:
@@ -2033,6 +2036,9 @@ def test_plain_mass_percent_trace_accepts_and_retains_dropped_name_provenance() 
 
     assert identity.composition is not None and identity.composition.is_value
     assert composition.state.is_value
+    assert composition.state.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    )
     assert composition.inference is not None
     assert "omitted trace components: unknown-component" in composition.inference.inputs
 
