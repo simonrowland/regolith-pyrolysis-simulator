@@ -356,8 +356,10 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     )
     assert artifact["terminal"]["final_state"] == runner["final_state"]
     sim = state["session"].simulator
-    # Unmeasured-alpha prediction is unconditional; there is no default gate.
-    assert "allow_unmeasured_alpha_fallback" not in sim.setpoints["chemistry_kernel"]
+    assert (
+        sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
+        is False
+    )
     assert completion["products"] == {
         species: round(value, 2)
         for species, value in sim.product_ledger().items()

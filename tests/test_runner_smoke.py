@@ -508,6 +508,7 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
         shuttle_cycle=0,
         mre_voltage_V=0.0,
         mre_current_A=0.0,
+        mre_decomposition_voltage_status_by_oxide={},
         condensation_totals={},
         evap_flux=SimpleNamespace(species_kg_hr={}),
         wall_deposit_by_segment_species_delta={},
