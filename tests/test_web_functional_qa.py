@@ -316,7 +316,8 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 # Regression: WEBQA-001 — terminal UI hid the feedstock-to-product story.
 # Found by /qa on 2026-07-19
 # Report: docs-private/research/2026-07-19-webqa/report.md
-# Nightly (2026-08-02 CI tiering): serial web full path (~187 s junit).
+# Nightly campaign-length path: car 1 used 352 s CPU vs green at about 298 s;
+# C2A rose from 103 to 158 s after c3's Stage-3 admission and rerouting.
 @pytest.mark.nightly
 def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     sid, state, events, decisions, completion = _drive(
