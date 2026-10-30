@@ -38,6 +38,7 @@ from engines.antoine import (
 )
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUSES,
     ALPHA_AUTHORITY_STATUS_FIELD,
     _evaluate_extracted_arrhenius_alpha,
 )
@@ -3436,7 +3437,7 @@ def _evaluate_alpha(
     # (T, α) measurements split — aggregate/midpoint-synthesized points keep
     # the whole-row verdict).
     any_pin_bearing = False
-    analytical_ceiling_seen = False
+    nonmeasurement_alpha_skip_reason: str | None = None
     for pt in points:
         T_K = float(pt["T_K"])
         expected = float(pt["alpha"])
@@ -3501,17 +3502,14 @@ def _evaluate_alpha(
         )
         if extrapolated:
             runtime["alpha_s_extrapolated"] = True
-        analytical_ceiling = (
-            (runtime.get("alpha_context") or {}).get(
-                ALPHA_AUTHORITY_STATUS_FIELD
-            )
-            == "analytical_upper_bound"
+        alpha_authority_status = (runtime.get("alpha_context") or {}).get(
+            ALPHA_AUTHORITY_STATUS_FIELD
         )
-        if analytical_ceiling:
-            analytical_ceiling_seen = True
-            runtime["skip_reason"] = (
-                f"{_TYPED_SKIP_PREFIX}analytical_upper_bound_not_measurement"
+        if alpha_authority_status in ALPHA_AUTHORITY_STATUSES:
+            nonmeasurement_alpha_skip_reason = (
+                f"{_TYPED_SKIP_PREFIX}{alpha_authority_status}_not_measurement"
             )
+            runtime["skip_reason"] = nonmeasurement_alpha_skip_reason
         # Pin-bearing only when class AND form match. Form-corrected and all
         # other non-matches keep values for audit but out-of-domain status
         # excludes them from residual pins.
@@ -3535,10 +3533,10 @@ def _evaluate_alpha(
             runtime=runtime,
             unsupported_speciation=actual is None and pin_ok,
             out_of_domain=out_of_domain,
-            assumed_input=analytical_ceiling,
+            assumed_input=alpha_authority_status in ALPHA_AUTHORITY_STATUSES,
         )
         evaluation.records.append(record)
-        if pin_ok and not analytical_ceiling:
+        if pin_ok and alpha_authority_status not in ALPHA_AUTHORITY_STATUSES:
             any_pin_bearing = True
         if pin_ok and record.status == "mismatch":
             extr_tag = " extrapolated: true" if extrapolated else ""
@@ -3550,10 +3548,8 @@ def _evaluate_alpha(
     if not any_pin_bearing and axes_typed_skip is not None:
         evaluation.skip_reason = axes_typed_skip
         evaluation.skip_reasons.append(axes_typed_skip)
-    elif analytical_ceiling_seen and not any_pin_bearing:
-        evaluation.skip_reason = (
-            f"{_TYPED_SKIP_PREFIX}analytical_upper_bound_not_measurement"
-        )
+    elif nonmeasurement_alpha_skip_reason and not any_pin_bearing:
+        evaluation.skip_reason = nonmeasurement_alpha_skip_reason
         evaluation.skip_reasons.append(evaluation.skip_reason)
     elif not any_numeric:
         evaluation.skip_reason = (

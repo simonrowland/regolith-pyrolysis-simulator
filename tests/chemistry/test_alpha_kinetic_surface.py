@@ -35,7 +35,7 @@ from tests.chemistry.corpus_fixtures import alpha_envelope_anchors
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 EXPECTED_ALPHA_BY_SPECIES = {
-    "Fe": 1.0,
+    "Fe": 0.24,
     "Mg": 0.20,
     "Na": 1.0,
     "K": 0.13,

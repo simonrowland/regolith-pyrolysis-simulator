@@ -1566,21 +1566,19 @@ families:
       condensation_reference_at_1mbar_C: 1250
     vaporisation_coefficients:
       evaporation_alpha:
-        # This coefficient prices Fe(g) leaving ferrous silicate melt. No
-        # admissible direct melt measurement is present in the local corpus,
-        # so alpha=1 is the Hertz-Knudsen analytical ceiling over the 1200-2500
-        # K process window, not a tier-1 measured melt coefficient. Pound 1972
-        # Table 1 reports McCabe et al.'s 0.9 for solid electrolytic Fe at
-        # 1358-1520 K; that pure-element-condensed result is fenced from this
-        # melt system. Fedkin/Alexander melt fits of 0.23-0.28 at 1973-2273 K
-        # remain unscored model fits and are the target for future certification.
+        # Fedkin, Grossman & Ghiorso and Alexander are two model fits of the
+        # same Hashimoto 1983 vacuum-evaporation dataset, not independent
+        # measurements. Their 0.23-0.25 and 0.25-0.28 fits support a flagged
+        # bridge value; direct Fe(g)-from-melt measurement remains the
+        # certification target. The alpha=1 analytical ceiling and the solid
+        # Fe 0.9 pure-element-condensed result remain separately identified.
         value:
           form: scalar
-          value: 1.0
-          temperature_range_K: [1200, 2500]
-          notice: 'No measured intrinsic alpha for Fe(g) leaving silicate melt is available. The Pound 1972 / McCabe et al. solid-electrolytic-Fe alpha=0.9 row is fenced as pure-element condensed; unscored Fedkin/Alexander melt fits of 0.23-0.28 at 1973-2273 K are a certification target, not a measurement.'
-        status: analytical_upper_bound
-        source: 'Hertz-Knudsen alpha=1 analytical upper bound for Fe(g) leaving ferrous silicate melt; no admissible direct melt measurement. Pound 1972 Table 1 / McCabe et al. 1956 gives alpha=0.9 for solid electrolytic Fe (pure-element condensed, fenced). Fedkin/Alexander melt fits of 0.23-0.28 at 1973-2273 K are unscored and remain a certification target.'
+          value: 0.24
+          temperature_range_K: [1973, 2273]
+          notice: 'Fe melt alpha=0.24 ±0.03 is a flagged bridge from two model fits of the same Hashimoto 1983 vacuum-evaporation dataset: Fedkin, Grossman & Ghiorso 2006 give 0.23-0.25 and Alexander’s comparison gives 0.25-0.28. These are two modellers of one dataset, not independent measurements. Hertz-Knudsen alpha=1 remains the analytical upper bound. Pound 1972 / McCabe et al. solid-electrolytic-Fe alpha=0.9 is fenced as pure-element condensed. Direct Fe(g)-from-melt measurement is the certification target.'
+        status: bridge
+        source: 'Bridge value for Fe(g) leaving ferrous silicate melt: alpha=0.24 ±0.03 from the overlapping model fits to Hashimoto 1983 vacuum-evaporation experiments, Fedkin, Grossman & Ghiorso 2006 (0.23-0.25) and Alexander’s comparison (0.25-0.28). One dataset, two modellers; not measured and not certifying. Hertz-Knudsen alpha=1 remains the analytical upper bound. Pound 1972 Table 1 / McCabe et al. 1956 alpha=0.9 for solid electrolytic Fe is fenced as pure-element condensed. Certification target: direct Fe(g)-from-melt measurement.'
         competing_sources:
         - source: REF-040 Pound 1972 JPCRD 1:135-146 Table 1, reporting McCabe et al. [1956]
           value: 0.9
@@ -1591,20 +1589,19 @@ families:
           liquid_transition_K: 1811
           notice: 'Solid electrolytic Fe Langmuir-Knudsen measurement; the liquid-metal pond above 1811 K is outside its phase band and must be flagged.'
         T_band_K:
-        - 1200
-        - 2500
+        - 1973
+        - 2273
         envelope:
-        - 0.0
-        - 1.0
+        - 0.21
+        - 0.27
         tier: 2
-        tag: hkl_ideal_upper_bound_status_bearing
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 1200
-        - 2500
+        - 1973
+        - 2273
         envelope:
-        - 0.0
-        - 1.0
+        - 0.21
+        - 0.27
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
       acquisition_flag: vapour_pressure_out_of_range:Fe

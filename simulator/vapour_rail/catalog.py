@@ -28,7 +28,11 @@ import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.scalar_boundary import is_declared_real_scalar
 
-from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUSES,
+    AlphaSpecError,
+    parse_alpha_contract,
+)
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityVerdictKind,
@@ -4055,10 +4059,9 @@ def _validate_kinetics(family_id: str, kinetics: Mapping[str, Any]) -> None:
             # keep their established behavior. Once a row declares a status,
             # fail closed on misspellings or invented authority classes.
             authority_status = str(alpha_contract.get("status") or "").strip()
-            if authority_status and authority_status not in {
-                "analytical_upper_bound",
-                "diagnostic_upper_bound",
-            }:
+            if authority_status and authority_status not in (
+                ALPHA_AUTHORITY_STATUSES | {"diagnostic_upper_bound"}
+            ):
                 raise CatalogCompileError(
                     f"{family_id}.vaporisation_coefficients.evaporation_alpha.status "
                     f"has unsupported authority class {authority_status!r}"

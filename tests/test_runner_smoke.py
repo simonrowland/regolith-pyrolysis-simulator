@@ -100,8 +100,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
         # (trace Si flux; largest product move 6.3e-7 relative). Same values on
         # studio-2 and studio-3 (gate config).
-        # d-316 / b-1081: melt Fe evaporation alpha 0.02 -> 1 (flagged analytical upper
-        # bound); regenerated on studio-3, two passes identical.
+        # d-316 / b-1081 pinned alpha=1.0; t-1582 now changes this scenario to
+        # the bridge value. The controller owns regenerating these hash pins.
         "flux_maps_sha256": "07216beaa43016b071a5b8fc18af255899dea7db8fe981248c95ed4c107f4cb5",
         "ledger_sha256": "a9f494b3d6155edd63b94be8abf36598f125d0f3d9c624e36bad696e18e0deac",
     },
@@ -164,7 +164,7 @@ def test_default_lunar_c0_product_story_is_numeric_with_si_channel():
     assert class_total > 0.0
 
 
-def test_default_lunar_c0_fe_evaporation_baseline_pin():
+def test_default_lunar_c0_fe_evaporation_bridge_delta():
     payload = _run_scenario(SCENARIOS[0])
 
     evaporated_fe_kg = sum(
@@ -184,9 +184,26 @@ def test_default_lunar_c0_fe_evaporation_baseline_pin():
         * MOLAR_MASS["Fe"]
         / 1000.0
     )
-    assert evaporated_fe_kg == pytest.approx(0.3170480069287773, abs=1.0e-12)
-    assert condensed_fe_kg == pytest.approx(0.025077380196186987, abs=1.0e-12)
-    assert vented_fe_kg == pytest.approx(0.29197062673259033, abs=1.0e-12)
+    # The preceding tests-only alpha=1 pin is the baseline. Subtracting these
+    # current ledger totals [kg] measures the change; each delta tends to zero
+    # as the bridge alpha approaches the alpha=1 baseline.
+    alpha_1_baseline_kg = {
+        "evaporated": 0.3170480069287773,
+        "condensed": 0.025077380196186987,
+        "vented": 0.29197062673259033,
+    }
+    assert evaporated_fe_kg == pytest.approx(0.312366828673651, abs=1.0e-12)
+    assert condensed_fe_kg == pytest.approx(0.02470711549082863, abs=1.0e-12)
+    assert vented_fe_kg == pytest.approx(0.28765971318282224, abs=1.0e-12)
+    assert alpha_1_baseline_kg["evaporated"] - evaporated_fe_kg == pytest.approx(
+        0.0046811782551263, abs=1.0e-12
+    )
+    assert alpha_1_baseline_kg["condensed"] - condensed_fe_kg == pytest.approx(
+        0.000370264705358357, abs=1.0e-12
+    )
+    assert alpha_1_baseline_kg["vented"] - vented_fe_kg == pytest.approx(
+        0.00431091354976809, abs=1.0e-12
+    )
 
     fe_hour_notices = []
     for row in payload["per_hour_summary"]:
@@ -201,15 +218,21 @@ def test_default_lunar_c0_fe_evaporation_baseline_pin():
             fe_hour_notices.append(record)
     assert fe_hour_notices
     notice = fe_hour_notices[-1]
-    assert notice["alpha_authority_status"] == "analytical_upper_bound"
-    assert notice["status"] == "analytical_upper_bound"
-    assert notice["authority_level"] == "status_bearing"
-    assert "Fedkin/Alexander" in notice["reason"]
+    assert notice["alpha_authority_status"] == "bridge"
+    assert notice["status"] == "extrapolated"
+    assert notice["authority_level"] == "extrapolated"
+    for source in (
+        "Fedkin, Grossman & Ghiorso 2006",
+        "Alexander",
+        "Hashimoto 1983",
+        "alpha=1",
+    ):
+        assert source in notice["reason"]
 
     pareto_fe = payload["run_metadata"]["pressure_coating_pareto_diagnostic"][
         "by_species"
     ]["Fe"]
-    assert pareto_fe["alpha_authority_status"] == "analytical_upper_bound"
+    assert pareto_fe["alpha_authority_status"] == "bridge"
     assert (
         pareto_fe["evaporation_transport_notices"]["evaporation_alpha"]
         == notice

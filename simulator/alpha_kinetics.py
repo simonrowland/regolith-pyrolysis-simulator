@@ -14,6 +14,14 @@ class AlphaSpecError(ValueError):
 
 
 ANALYTICAL_UPPER_BOUND_ALPHA_STATUS = "analytical_upper_bound"
+BRIDGE_ALPHA_STATUS = "bridge"
+# `bridge` means a model-derived runtime estimate used across a measurement
+# gap; it is flagged and non-certifying. `analytical_upper_bound` remains the
+# separate Hertz-Knudsen ceiling status.
+ALPHA_AUTHORITY_STATUSES = frozenset({
+    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+    BRIDGE_ALPHA_STATUS,
+})
 ALPHA_AUTHORITY_STATUS_FIELD = "alpha_authority_status"
 
 
@@ -152,13 +160,12 @@ def parse_alpha_contract(contract: Any) -> float | dict[str, Any] | None:
             "evaporation_alpha requires value or exact status='no_data'"
         )
     value = parse_alpha_value(contract["value"])
-    if contract.get("status") != ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
+    status = contract.get("status")
+    if status not in ALPHA_AUTHORITY_STATUSES:
         return value
     if isinstance(value, Mapping):
         executable = dict(value)
     else:
         executable = {"form": "scalar", "value": value}
-    executable[ALPHA_AUTHORITY_STATUS_FIELD] = (
-        ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-    )
+    executable[ALPHA_AUTHORITY_STATUS_FIELD] = status
     return executable

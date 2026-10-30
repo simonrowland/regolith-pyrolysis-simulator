@@ -62,8 +62,8 @@ from engines.builtin._common import (
     unpack_controls,
 )
 from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUSES,
     ALPHA_AUTHORITY_STATUS_FIELD,
-    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
 )
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
@@ -243,11 +243,11 @@ def _evaluate_alpha_control(
     if (
         isinstance(alpha_spec, Mapping)
         and alpha_spec.get(ALPHA_AUTHORITY_STATUS_FIELD)
-        == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+        in ALPHA_AUTHORITY_STATUSES
     ):
-        evaluation[ALPHA_AUTHORITY_STATUS_FIELD] = (
-            ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-        )
+        evaluation[ALPHA_AUTHORITY_STATUS_FIELD] = alpha_spec[
+            ALPHA_AUTHORITY_STATUS_FIELD
+        ]
     return value, evaluation
 
 
@@ -1790,7 +1790,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             series_diagnostic = series_flux.as_diagnostic()
             if continuum_extrapolation is not None and uses_gas_resistance:
                 series_diagnostic["continuum_extrapolation_notice"] = dict(continuum_extrapolation)
-            if alpha_authority_status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
+            if alpha_authority_status in ALPHA_AUTHORITY_STATUSES:
                 series_diagnostic[ALPHA_AUTHORITY_STATUS_FIELD] = (
                     alpha_authority_status
                 )
@@ -1821,10 +1821,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             rate_kg_hr = J_kg_s_m2 * melt_surface_area_m2 * 3600.0
 
             if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
-                if (
-                    alpha_authority_status
-                    == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-                ):
+                if alpha_authority_status in ALPHA_AUTHORITY_STATUSES:
                     alpha_authority_status_by_species[species] = (
                         alpha_authority_status
                     )
@@ -1841,7 +1838,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                             "status": (
                                 "extrapolated"
                                 if alpha_extrapolated
-                                else ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+                                else alpha_authority_status
                             ),
                             "authority_level": (
                                 "extrapolated"

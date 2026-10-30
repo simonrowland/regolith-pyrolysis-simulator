@@ -185,6 +185,28 @@ def test_optimizer_tier_label_preserves_positive_alpha_ceiling_through_study_rec
     assert label["alpha_ceiling_species"] == ["Ca", "Ti"]
 
 
+def test_optimizer_cache_trace_preserves_bridge_alpha_authority() -> None:
+    run_execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _alpha_authority_status_by_species_engaged={"Fe": "bridge"}
+        ),
+        session=SimpleNamespace(
+            _config=SimpleNamespace(backend_name="alphamelts")
+        ),
+        trace={},
+        per_hour=(),
+        refusal_diagnostic={},
+        reason="",
+        backend_status="ok",
+        backend_authoritative=True,
+        reduced_real_cache={},
+    )
+
+    payload = evaluate_module._cache_trace_payload(run_execution, None)
+
+    assert payload["alpha_authority_status_by_species"] == {"Fe": "bridge"}
+
+
 def test_optimizer_tier_label_does_not_veto_unevaporated_ceiling_spec() -> None:
     run_reference = {
         "cache_state": "live_fill",

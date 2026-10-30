@@ -15,7 +15,13 @@ from simulator import condensation
 from simulator.chemistry.langmuir_knudsen import grounded_alpha
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.diagnostic_helpers.extract_reproduction import _engine_alpha
+from simulator.diagnostic_helpers.extract_reproduction import (
+    AdoptedObservation,
+    _engine_alpha,
+    evaluate_observation,
+    geometry_assumption_text,
+    load_vapor_pressure_data,
+)
 from simulator.diagnostics import pressure_coating_pareto_diagnostic
 from simulator.evaporation import (
     _load_evaporation_alpha_by_species,
@@ -39,18 +45,20 @@ SETPOINTS_PATH = REPO_ROOT / "data" / "setpoints.yaml"
 
 EXPECTED_ALPHA = {
     ("metals", "Fe"): {
-        "value": 1.0,
-        "T_band_K": (1200, 2500),
-        "envelope": (0.0, 1.0),
+        "value": 0.24,
+        "T_band_K": (1973, 2273),
+        "envelope": (0.21, 0.27),
         "source": (
-            "Hertz-Knudsen alpha=1 analytical upper bound for Fe(g) leaving ferrous silicate melt; "
-            "no admissible direct melt measurement. Pound 1972 Table 1 / McCabe et al. 1956 "
-            "gives alpha=0.9 for solid electrolytic Fe (pure-element condensed, fenced). "
-            "Fedkin/Alexander melt fits of 0.23-0.28 at 1973-2273 K are unscored and remain "
-            "a certification target."
+            "Bridge value for Fe(g) leaving ferrous silicate melt: alpha=0.24 ±0.03 from the "
+            "overlapping model fits to Hashimoto 1983 vacuum-evaporation experiments, "
+            "Fedkin, Grossman & Ghiorso 2006 (0.23-0.25) and Alexander’s comparison "
+            "(0.25-0.28). One dataset, two modellers; not measured and not certifying. "
+            "Hertz-Knudsen alpha=1 remains the analytical upper bound. Pound 1972 Table 1 / "
+            "McCabe et al. 1956 alpha=0.9 for solid electrolytic Fe is fenced as pure-element "
+            "condensed. Certification target: direct Fe(g)-from-melt measurement."
         ),
         "tier": 2,
-        "status": "analytical_upper_bound",
+        "status": "bridge",
     },
     ("metals", "Mg"): {
         "value": 0.20,
@@ -221,7 +229,7 @@ def test_calibrated_evaporation_alpha_values_sources_and_envelopes():
 
     fe_alpha = data["metals"]["Fe"]["evaporation_alpha"]
     assert fe_alpha["tier"] != 1
-    assert fe_alpha["status"] == "analytical_upper_bound"
+    assert fe_alpha["status"] == "bridge"
     assert any(
         source.get("use") == "native_metal_pond_only"
         and source.get("value") == pytest.approx(0.9)
@@ -624,11 +632,11 @@ def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
 @pytest.mark.parametrize(
     ("temperature_C", "notice_status", "authority_level"),
     [
-        (1700.0, "analytical_upper_bound", "status_bearing"),
+        (1700.0, "bridge", "status_bearing"),
         (2300.0, "extrapolated", "extrapolated"),
     ],
 )
-def test_fe_melt_alpha_notice_preserves_upper_bound_and_extrapolation_authority(
+def test_fe_melt_alpha_notice_preserves_bridge_and_extrapolation_authority(
     temperature_C, notice_status, authority_level
 ):
     raw = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
@@ -665,20 +673,59 @@ def test_fe_melt_alpha_notice_preserves_upper_bound_and_extrapolation_authority(
 
     assert result.status == "ok"
     assert result.diagnostic["evaporation_flux_kg_hr"]["Fe"] > 0.0
-    assert result.diagnostic["alpha_used_by_species"]["Fe"] == pytest.approx(1.0)
-    assert result.diagnostic["alpha_authority_status_by_species"]["Fe"] == (
-        "analytical_upper_bound"
-    )
+    assert result.diagnostic["alpha_used_by_species"]["Fe"] == pytest.approx(0.24)
+    assert result.diagnostic["alpha_authority_status_by_species"]["Fe"] == "bridge"
     notice = result.diagnostic["alpha_authority_notices_by_species"]["Fe"]
     assert notice["status"] == notice_status
     assert notice["authority_level"] == authority_level
-    assert notice["alpha_authority_status"] == "analytical_upper_bound"
-    assert "No measured intrinsic alpha for Fe(g) leaving silicate melt" in (
-        notice["reason"]
-    )
+    assert notice["alpha_authority_status"] == "bridge"
+    assert "Fedkin, Grossman & Ghiorso 2006" in notice["reason"]
+    assert "Alexander" in notice["reason"]
+    assert "Hashimoto 1983" in notice["reason"]
+    assert "alpha=1" in notice["reason"]
     assert "McCabe" in notice["reason"]
-    assert "Fedkin/Alexander" in notice["reason"]
     assert any("Fe evaporation alpha" in warning for warning in result.warnings)
+
+
+def test_fe_bridge_alpha_is_not_scored_as_a_measurement() -> None:
+    observation = AdoptedObservation(
+        species_id="Fe",
+        source_id="fixture-source",
+        observation_id="fixture_fe_bridge_alpha",
+        obs_type="alpha",
+        review_status="reviewed",
+        phase="silicate_melt",
+        regime=None,
+        standard_state=None,
+        T_range_K=(1700.0, 1700.0),
+        units="dimensionless",
+        uncertainty=None,
+        locator={"note": "synthetic status-path fixture"},
+        values={
+            "alpha": 0.24,
+            "system_class": "silicate_melt",
+            "transformation_class": "redox_reduction_required",
+            "material": "fixture_silicate_melt",
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+
+    evaluation = evaluate_observation(
+        observation,
+        vapor_pressure_data=load_vapor_pressure_data(),
+    )
+
+    assert evaluation.records
+    assert {record.status for record in evaluation.records} == {"assumed-input"}
+    assert evaluation.skip_reason == "typed-refusal:bridge_not_measurement"
+    assert not any(
+        record.status in {"match", "mismatch"}
+        for record in evaluation.records
+    )
 
 
 def test_default_setpoints_refuse_unmeasured_alpha_fallback():

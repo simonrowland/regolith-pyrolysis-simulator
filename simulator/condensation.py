@@ -96,8 +96,8 @@ from engines.antoine import (
     _read_antoine_coefficients,
 )
 from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUSES,
     ALPHA_AUTHORITY_STATUS_FIELD,
-    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
     AlphaSpecError,
     parse_alpha_value,
 )
@@ -1110,13 +1110,9 @@ def _alpha_s_scalar_evaluation(
         'alpha_s_temperature_K': T_K,
         'alpha_s_extrapolated': False,
     }
-    if (
-        spec.get(ALPHA_AUTHORITY_STATUS_FIELD)
-        == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-    ):
-        result[ALPHA_AUTHORITY_STATUS_FIELD] = (
-            ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-        )
+    alpha_authority_status = spec.get(ALPHA_AUTHORITY_STATUS_FIELD)
+    if alpha_authority_status in ALPHA_AUTHORITY_STATUSES:
+        result[ALPHA_AUTHORITY_STATUS_FIELD] = alpha_authority_status
     if valid_range is not None:
         valid_low, valid_high = valid_range
         extrapolated = not (valid_low <= T_K <= valid_high)
