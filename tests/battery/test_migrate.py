@@ -444,6 +444,35 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
     return root
 
 
+def test_values_method_is_used_when_extract_regime_is_absent(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = extract["species"]["Na"]["observations"][0]
+    observation.pop("regime")
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+
+    result = migrate(_write_min_tree(tmp_path / "fallback", extract), write=False)
+    migrated = next(iter(result.observations.values()))
+    experiment = result.experiments[migrated.experiment_id]
+    assert experiment.method == State.of(MethodToken.KNUDSEN_EFFUSION)
+
+    explicit_regime = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = explicit_regime["species"]["Na"]["observations"][0]
+    observation["regime"] = "unmapped source regime"
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+    result = migrate(
+        _write_min_tree(tmp_path / "explicit-regime", explicit_regime), write=False
+    )
+    migrated = next(iter(result.observations.values()))
+    experiment = result.experiments[migrated.experiment_id]
+    assert experiment.method.is_unknown
+
+
 def _migrate_real_extract(
     tmp_path: Path,
     name: str,

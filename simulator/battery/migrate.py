@@ -597,6 +597,9 @@ REGIME_TO_METHOD = {
     "kems_effusion_ion_comparison": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
+    # Rys (2007) stores these source method descriptions under values.method.
+    "Knudsen-cell mass-spectrometric ion currents converted to partial pressures using the thesis calibration.": MethodToken.KNUDSEN_EFFUSION,
+    "KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).": MethodToken.KNUDSEN_EFFUSION,
     "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
     "free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
     "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
@@ -18118,6 +18121,8 @@ class Migrator:
         if rail_raw:
             canonicalize_rail(str(rail_raw))
         method = map_method(obs.get("regime"))
+        if "regime" not in obs:
+            method = map_method(values.get("method"))
         if method.is_unknown:
             self.result.add_queue(
                 work.work_id,

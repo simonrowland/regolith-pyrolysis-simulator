@@ -4,7 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 from collections import Counter
 
-from simulator.battery.enums import Phase, Quantity
+from simulator.battery.enums import CellMaterial, MethodToken, Phase, Quantity
 from simulator.battery.migrate import Migrator
 from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 import yaml
@@ -198,6 +198,24 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     assert Counter(row.identity.species.formula for row in partial_pressures) == Counter(
         {"Na": 329, "K": 86, "NaO": 33, "O2": 31, "Na2O": 37}
     )
+
+    rys_experiment = next(
+        experiment
+        for experiment in result.experiments.values()
+        if experiment.experiment_id.endswith("rys-2007-kems-series")
+    )
+    assert rys_experiment.method.is_value
+    assert rys_experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    assert rys_experiment.bench_id is not None
+    rys_bench = result.benches[rys_experiment.bench_id]
+    assert rys_bench.cell_materials is not None
+    assert [material.state.value for material in rys_bench.cell_materials] == [
+        CellMaterial.IR
+    ]
+    assert rys_bench.geometry is not None
+    assert rys_bench.geometry.orifice_diameter_m is not None
+    assert rys_bench.geometry.orifice_diameter_m.state.value.point == Decimal("0.0003")
+    assert all(row.experiment_id == rys_experiment.experiment_id for row in partial_pressures)
 
     na_pressure = next(
         row
