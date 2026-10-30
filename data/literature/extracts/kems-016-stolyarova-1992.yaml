@@ -153,7 +153,7 @@ species:
           minus_delta_G_exp_kcal_mol: 10.3
           minus_delta_G_kohler: 6.2
           minus_delta_G_wilson: null
-          note: The source prints 0.50:0.25:25. The missing decimal is not repaired or guessed.
+          note: 'Table 1, printed p. 186, SiO2:CaO:MgO row prints 0.50:0.25:25. The third field is 25, not 0.25. Not repaired.'
         - system: SiO2:CaO:Al2O3:FeO:MgO
           x:
             SiO2: 0.36
@@ -305,9 +305,7 @@ species:
         condensed_phase: silicate_melt
         linked_gibbs_observation: stolyarova_1992_gibbs_cas_and_fcm_table1
         numeric_activity_published: false
-        numeric_activity_note: No tabulated MgO γ or a in this conference paper. Table 1 CMS
-          row is integral −ΔG = 10.3 kcal/mol at 1833 K (SiO2:CaO:MgO = 0.50:0.25:0.25),
-          not a component activity. Locator OCR Table 1 line_range 27-45.
+        numeric_activity_note: 'No tabulated MgO γ or a in this conference paper. Table 1 SiO2:CaO:MgO row is integral −ΔG = 10.3 kcal/mol at 1833 K. Printed composition is 0.50:0.25:25 (Table 1, p. 186), not a mole-fraction triple and not a component activity. Locator OCR Table 1 line_range 27-45.'
       equipment:
         cell_material:
           value: Pt, Mo, W
