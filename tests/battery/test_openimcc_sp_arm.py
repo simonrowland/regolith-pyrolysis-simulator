@@ -26,10 +26,9 @@ from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
 )
-from simulator.battery.records import Composition, Execution
+from simulator.battery.records import Composition
 from simulator.battery.score import (
     ENGINE_CHANNELS,
-    EnginePrediction,
     SCORE_ENGINE_SET,
     candidate_observation,
     cell_notices,
@@ -354,8 +353,8 @@ def test_li_2005_p2o5_feo_row_uses_the_extension_pack(
         context=replace(context, experiments={}),
     )
     assert gated_candidate is None
-    assert any(
-        _SP_PACK_SOURCE in notice.reason and "authority=refused" in notice.reason
+    assert not any(
+        notice.reason.startswith(_SP_PACK_SOURCE)
         for notice in gated_residual.notices
     )
 
@@ -439,17 +438,26 @@ def test_openimcc_sp_p2o5_screening_notice_requires_a_scored_value() -> None:
     )
     reference = context.observations[_LI_2005_FEO_ROW]
     engine = _sp_engine()
+    identity = reference.identity
+    assert identity.composition is not None
 
-    unscored = EnginePrediction(
+    from simulator.battery.score import ENGINE_COEFFICIENT_SOURCES, _input_refusal
+
+    unscored = _input_refusal(
         engine=engine,
         channel=ENGINE_CHANNELS[engine],
-        execution=Execution(state=ExecutionState.NOT_PROBED),
-        identity=reference.identity,
+        sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        identity=identity,
+        requested=identity.composition,
+        reason=RefusalReason.IDENTITY_UNKNOWN,
+        detail={"reason": "temperature_unknown"},
     )
 
-    assert unscored.value is None
+    assert unscored.execution.state is ExecutionState.NOT_PROBED
     assert not any(
-        notice.reason.startswith("P2O5 parent reference state:")
+        notice.reason.startswith(
+            (_SP_PACK_SOURCE, "P2O5 parent reference state:")
+        )
         for notice in unscored.notices
     )
 
