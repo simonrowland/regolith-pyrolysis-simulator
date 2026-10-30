@@ -478,6 +478,12 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
         "slotted": SlottedState({"value": 2}),
         "deque": deque([1, 2]),
     }
+    sim.setpoints = {"nested": {"value": "entry"}}
+    sim.feedstocks = {"entry": {"density": 1.0}}
+    sim.vapor_pressure_catalog_data = {"families": {"entry": [1.0]}}
+    sim.materials = {"stages": {"entry": {"alpha": 0.5}}}
+    sim.lab_geometry = ("entry", 1.0)
+    sim._last_vapor_pressure_diagnostic = {"entry": {"pressure_Pa": 1.0}}
     sim.vapour_rail_catalog = owner
     sim.atom_ledger = FakeLedger()
     sim._chem_registry = object()
@@ -498,6 +504,14 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
 
     def refuse_after_mutating_every_copied_root() -> None:
         sim.created_during_failed_hour = {"must": "be removed"}
+        sim.setpoints = {"nested": {"value": "refused"}}
+        sim.feedstocks = {"refused": {"density": 2.0}}
+        sim.vapor_pressure_catalog_data = {"families": {"refused": [2.0]}}
+        sim.materials = {"stages": {"refused": {"alpha": 0.25}}}
+        sim.lab_geometry = ("refused", 2.0)
+        sim._last_vapor_pressure_diagnostic = {
+            "refused": {"pressure_Pa": 2.0}
+        }
         sim.atom_ledger._transitions.append(object())
         sim.melt.hour = 5
         sim.overhead.pressure_mbar = 99.0
