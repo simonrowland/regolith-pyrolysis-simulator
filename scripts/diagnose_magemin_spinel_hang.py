@@ -63,7 +63,11 @@ PROJECTED_BULK_WT_PCT = {
 _CURRENT_SLOT: contextvars.ContextVar[dict[str, Any] | None] = (
     contextvars.ContextVar('magemin_probe_current_slot', default=None)
 )
+_CURRENT_TEMPERATURE: contextvars.ContextVar[float | None] = (
+    contextvars.ContextVar('magemin_probe_current_temperature', default=None)
+)
 _ORIGINAL_SLOT = magemin_module._magemin_subprocess_slot
+_ORIGINAL_MAGEMIN_CALL = MAGEMinBackend._call_magemin_subprocess
 _ORIGINAL_RUN = subprocess.run
 
 
@@ -100,10 +104,23 @@ def _native_call_temperature(args: Any) -> float | None:
     return None
 
 
+def _timed_magemin_call(self: Any, *args: Any, **kwargs: Any) -> Any:
+    temperature = kwargs.get('temperature_C')
+    token = _CURRENT_TEMPERATURE.set(
+        None if temperature is None else float(temperature)
+    )
+    try:
+        return _ORIGINAL_MAGEMIN_CALL(self, *args, **kwargs)
+    finally:
+        _CURRENT_TEMPERATURE.reset(token)
+
+
 @contextmanager
 def _timed_subprocess_slot(timeout_s: float) -> Iterator[None]:
     started = time.perf_counter()
-    state: dict[str, Any] = {'temperature_C': None}
+    state: dict[str, Any] = {
+        'temperature_C': _CURRENT_TEMPERATURE.get(),
+    }
     token = _CURRENT_SLOT.set(state)
     try:
         try:
@@ -169,6 +186,7 @@ def _timed_subprocess_run(args: Any, *positional: Any, **keywords: Any) -> Any:
 # its child re-imports this script as __mp_main__, before the MAGEMin handler
 # executes. They are never installed in the simulator source.
 magemin_module._magemin_subprocess_slot = _timed_subprocess_slot
+MAGEMinBackend._call_magemin_subprocess = _timed_magemin_call
 subprocess.run = _timed_subprocess_run
 
 
@@ -454,7 +472,7 @@ def _collect_scan_results(output_dir: Path, scan_ids: list[str]) -> None:
         for event in native_events:
             temperature = event.get('temperature_C')
             if temperature is not None:
-                native_by_temperature[float(temperature)].append(event)
+                native_by_temperature[round(float(temperature), 6)].append(event)
 
         _emit({
             'event': 'scan-summary',
@@ -471,10 +489,13 @@ def _collect_scan_results(output_dir: Path, scan_ids: list[str]) -> None:
         ]
         for sample in sample_results:
             temperature = sample.get('temperature_C')
+            temperature_key = (
+                round(float(temperature), 6) if temperature is not None else None
+            )
             native = (
-                native_by_temperature[float(temperature)].popleft()
-                if temperature is not None
-                and native_by_temperature.get(float(temperature))
+                native_by_temperature[temperature_key].popleft()
+                if temperature_key is not None
+                and native_by_temperature.get(temperature_key)
                 else {}
             )
             cpu_s = float(native.get('solver_cpu_user_s', 0.0)) + float(
@@ -484,9 +505,12 @@ def _collect_scan_results(output_dir: Path, scan_ids: list[str]) -> None:
             slot_wait_s = native.get('slot_wait_s')
             wall_s = float(sample.get('wall_s', 0.0))
             transport_pool_s = (
-                max(0.0, wall_s - float(slot_wait_s or 0.0) - float(solve_wall_s or 0.0))
-                if slot_wait_s is not None and solve_wall_s is not None
-                else None
+                max(
+                    0.0,
+                    wall_s - float(slot_wait_s or 0.0)
+                    - float(solve_wall_s or 0.0),
+                )
+                if slot_wait_s is not None else None
             )
             _emit({
                 'event': 'sample-summary',
