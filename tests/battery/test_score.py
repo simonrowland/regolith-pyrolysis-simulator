@@ -5110,6 +5110,70 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
     assert refused.numeric is None
 
 
+def test_d056_pending_kems_row_defaults_before_d274_and_reaches_engine() -> None:
+    from simulator.battery.migrate import observation_from_plain, to_plain
+    from simulator.battery.records import Admission
+
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=True
+    )
+    reference = F.observation(
+        "d056-pending-effusion-row",
+        experiment.experiment_id,
+        replace(
+            _partial_identity(),
+            total_pressure_Pa=State.of(Decimal("1e-6")),
+        ),
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="pending-kems-source",
+    )
+    reference = replace(
+        reference,
+        evidence=replace(
+            reference.evidence,
+            original_method_class="measured_direct",
+        ),
+        admission=Admission(
+            status=AdmissionStatus.PENDING,
+            reason=(
+                "source admission_status=figure_only is not a closed v2.1 token"
+            ),
+        ),
+    )
+    reference = observation_from_plain(to_plain(reference))
+    assert reference.admission.status is AdmissionStatus.ADMITTED
+    admission_notice = next(
+        notice
+        for notice in reference.notices
+        if notice.kind is NoticeKind.ADMISSION_DEFAULTED
+    )
+
+    engine_calls = []
+
+    def predict(engine, observation, **kwargs):
+        engine_calls.append(engine)
+        return _partial_prediction(engine, observation, **kwargs)
+
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        predict=predict,
+    )
+
+    assert engine_calls == [Engine.INTERNAL_ANALYTICAL]
+    assert residual.numeric is not None
+    assert residual.refusal is None
+    assert admission_notice in residual.notices
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "in_cell_partial_pressure_sum" in notice.reason
+        for notice in residual.notices
+    )
+
+
 def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
     experiment = F.kems_experiment()
     composition = Composition(

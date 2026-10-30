@@ -2103,11 +2103,6 @@ def _evidence_from_plain(payload: object) -> Evidence:
 
 _NO_ADMISSION_STATUS_REASON = "no observation admission_status mapped from source"
 _ADMISSION_DEFAULTED_PREFIX = "admission_defaulted:"
-_DEFAULTABLE_PENDING_REASONS = {
-    _NO_ADMISSION_STATUS_REASON,
-    "source admission_status=pending",
-    "source admission_status=pending_validation is not a closed v2.1 token",
-}
 
 
 def _defaulted_admission(source_reason: str) -> Admission:
@@ -2163,17 +2158,14 @@ def _admission_from_plain(payload: object, *, value: Value) -> Admission:
         not payload.get("superseded_by")
         and decided is None
         and has_numeric_value
-        and (
-            (status_text == "pending" and reason in _DEFAULTABLE_PENDING_REASONS)
-            or status_text == "pending_validation"
-        )
+        and status_text in {AdmissionStatus.PENDING.value, "pending_validation"}
     ):
-        default_reason = (
-            reason
-            if reason in _DEFAULTABLE_PENDING_REASONS
-            else f"source admission_status={status_text}"
+        return admission_for(
+            status_text,
+            superseded_by=None,
+            extraction=None,
+            locator=None,
         )
-        return _defaulted_admission(default_reason)
     return Admission(
         status=AdmissionStatus(status_text),
         reason=reason,

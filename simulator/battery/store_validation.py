@@ -72,8 +72,8 @@ def validate_migrated_store(root: Path | None = None) -> dict[str, object]:
     figure_only = observations[
         "1997jonesthermo::jones_1997_imcc_mgo_activity_comparison"
     ]
-    assert figure_only.admission.status is AdmissionStatus.PENDING
-    assert not any(
+    assert figure_only.admission.status is AdmissionStatus.ADMITTED
+    assert any(
         notice.kind is NoticeKind.ADMISSION_DEFAULTED
         for notice in figure_only.notices
     )
