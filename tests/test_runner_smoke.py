@@ -162,6 +162,34 @@ def test_plain_diagnostic_values_keep_serialized_payload_bytes():
     )
 
 
+def test_per_hour_and_p_o2_projections_keep_bytes_and_ownership():
+    from simulator.runner import (
+        _execution_pO2_enforcement_by_hour,
+        _execution_per_hour_summary,
+    )
+
+    execution = SimpleNamespace(per_hour=[{
+        "hour": 1,
+        "pO2_enforcement": MappingProxyType({
+            "status": "ok",
+            "details": ({"limit": None},),
+        }),
+        "extra": (1, 2),
+    }])
+    per_hour = _execution_per_hour_summary(execution)
+    p_o2_by_hour = _execution_pO2_enforcement_by_hour(execution)
+
+    assert json.dumps(per_hour, separators=(",", ":")) == (
+        '[{"hour":1,"pO2_enforcement":{"status":"ok",'
+        '"details":[{"limit":null}]},"extra":[1,2]}]'
+    )
+    assert json.dumps(p_o2_by_hour, separators=(",", ":")) == (
+        '[{"status":"ok","details":[{"limit":null}]}]'
+    )
+    per_hour[0]["pO2_enforcement"]["details"][0]["limit"] = 3
+    assert p_o2_by_hour[0]["details"][0]["limit"] is None
+
+
 def test_completed_run_wires_product_classification_and_markdown() -> None:
     """Wiring-only: runner attaches the shared classifier and formatter output."""
 
