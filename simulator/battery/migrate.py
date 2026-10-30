@@ -4155,6 +4155,10 @@ def _oxide_map_from_mapping(
     if not isinstance(obj, Mapping):
         return None
     row_context = obj if closure_context is None else closure_context
+    preserve_refused_map = (
+        preserve_printed_map_on_refusal and refusal_reason is not None
+    )
+    found_nested_map = False
 
     def checked(comps: dict[str, Decimal]) -> bool:
         _composition, refusal = _wt_percent_conversion_or_refusal(
@@ -4171,6 +4175,7 @@ def _oxide_map_from_mapping(
     for key in _PRINTED_COMPOSITION_MAP_KEYS:
         nested = obj.get(key)
         if isinstance(nested, Mapping):
+            found_nested_map = True
             if key == "composition_mass_percent":
                 comps: dict[str, Decimal] = {}
                 for name, value in nested.items():
@@ -4191,7 +4196,7 @@ def _oxide_map_from_mapping(
                     oxide, _factor = equivalent
                     comps[oxide] = comps.get(oxide, Decimal("0")) + amount
                 if len(comps) >= 2:
-                    if not checked(comps) and not preserve_printed_map_on_refusal:
+                    if not checked(comps) and not preserve_refused_map:
                         return None
                     return comps
                 continue
@@ -4207,7 +4212,7 @@ def _oxide_map_from_mapping(
                 refusal_reason=refusal_reason,
                 declared_map=True,
                 closure_context=row_context,
-                preserve_printed_map_on_refusal=preserve_printed_map_on_refusal,
+                preserve_printed_map_on_refusal=preserve_refused_map,
             )
             if got:
                 for name, value in nested.items():
@@ -4230,10 +4235,13 @@ def _oxide_map_from_mapping(
                             got[oxide] = got.get(oxide, Decimal("0")) + amount
                         else:
                             got[token] = amount
-                if not checked(got) and not preserve_printed_map_on_refusal:
+                if not checked(got) and not preserve_refused_map:
                     return None
                 return got
-    if not declared_map:
+    # Once a named composition field was present, a failed parse belongs to
+    # that map. Do not reinterpret sibling pressure, redox, or run columns as
+    # additional printed oxides.
+    if not declared_map or found_nested_map:
         return None
     comps: dict[str, Decimal] = {}
     for key, value in obj.items():
@@ -4251,7 +4259,7 @@ def _oxide_map_from_mapping(
         comps[_canonical_printed_oxide_name(name)] = amount
     if len(comps) < 2:
         return None
-    if not checked(comps) and not preserve_printed_map_on_refusal:
+    if not checked(comps) and not preserve_refused_map:
         return None
     missing = _missing_major_oxide_names(obj)
     if missing:
@@ -18363,11 +18371,7 @@ class Migrator:
                         printed.locator or locator,
                         closure_context=values,
                     )
-            if (
-                declared_order
-                and derived is not None
-                and derived.state.is_value
-            ):
+            if declared_order and derived is not None:
                 point_conditions = {
                     **(point_conditions or {}),
                     "composition": derived,
@@ -18379,7 +18383,6 @@ class Migrator:
             if (
                 not declared_order
                 and derived is not None
-                and derived.state.is_value
                 and "composition" not in point_conditions
             ):
                 point_conditions["composition"] = derived

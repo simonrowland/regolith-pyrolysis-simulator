@@ -17614,9 +17614,17 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
             oxide: Decimal(str(amount))
             for oxide, amount in source_experiment["sample"]["printed_composition"]["state"]["value"].items()
         }
-        assert identity.composition.value.amount_basis.value == "mass_percent"
-        assert identity.composition.value.basis == "printed_oxides"
-        assert dict(identity.composition.value.components) == expected_start_composition
+        # The source reports five major oxides totaling 99.75 wt% and no
+        # same-row volatile value that could close the missing mass.
+        assert (
+            sum(expected_start_composition.values(), Decimal("0"))
+            == Decimal("99.75")
+        )
+        assert identity.composition.is_unknown
+        assert identity.composition.reason == (
+            "mass-percent composition is not usable: "
+            "mass-percent composition does not close to 100 (sum=99.75)"
+        )
         assert identity.temperature_K.value == run_key[1]
         assert identity.sample_mass_kg.value == Decimal(
             source_experiment["sample"]["mass_kg"]["state"]["value"]["point"]

@@ -77,7 +77,9 @@ _SWEPT_COMPOSITION_MAPS = (
     # Zhang repeats a 99.32 wt% starting-glass map in twelve rows, with no
     # printed volatile component to close the difference.
     ("Zhang", "kems-006-zhang-2021", "starting_glass_wt_pct", "Rb2O", 0, 12),
-    ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 4, 0),
+    # LPI's four S-bearing maps total 99.85, 100.26, 99.21, and 99.47 wt%;
+    # printed S counts, but none closes within the component rounding bound.
+    ("LPI", "lpi-lunar-soils", "major_oxide_wt_pct", "S", 0, 4),
     ("Britt", "britt-2019-asteroid-simulants", "composition_wt_pct", "FeOT", 3, 0),
     ("Hendrix", "hendrix-2024-reactivity-reduced-simulants", "composition_wt_pct", "SO3", 2, 0),
     ("Flemetakis", "ta-flemetakis-2024", "composition_wt_pct", "B2O3", 1, 0),
@@ -996,6 +998,27 @@ def test_declared_composition_map_refuses_combined_alkali_label_by_name() -> Non
     ) is None
     assert refusal == [
         "printed oxide wt% map has unsupported numeric component(s): Na2O_plus_K2O"
+    ]
+
+
+def test_refused_nested_composition_does_not_absorb_sibling_conditions() -> None:
+    refusal: list[str] = []
+    values = {
+        "quantity": "composition",
+        "composition_wt_pct": {"SiO2": "55", "MgO": "40"},
+        "p_atm": "0.2",
+        "delta_IW": "-1.0",
+        "run": 7,
+    }
+
+    assert (
+        migrate_module._initial_oxide_map_from_values(
+            values, refusal_reason=refusal, declared_map=True
+        )
+        is None
+    )
+    assert refusal == [
+        "mass-percent composition does not close to 100 (sum=95)"
     ]
 
 
@@ -2640,7 +2663,6 @@ def test_migrate_lifts_markova_shaped_oxide_map(tmp_path: Path) -> None:
     later_composition = later.point_conditions["composition"]
     assert later_composition.state.is_unknown
     assert later_composition.state.reason == (
-        "mass-percent composition is not usable: "
         "mass-percent composition does not close to 100 (sum=101.00)"
     )
 
