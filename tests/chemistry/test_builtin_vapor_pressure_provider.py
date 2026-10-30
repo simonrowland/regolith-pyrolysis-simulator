@@ -596,7 +596,7 @@ def test_builtin_provider_deduplicates_repeated_antoine_skip_in_one_result(
         ("CoO_gas", _co_vapor_request_at_T_K, 2100.0, 1800.0),
     ),
 )
-def test_t622_builtin_provider_applies_typed_ood_before_evaluation(
+def test_t622_builtin_provider_retains_flagged_ood_evaluation(
     vapor_pressure_data,
     species_id,
     request_factory,
@@ -609,9 +609,10 @@ def test_t622_builtin_provider_applies_typed_ood_before_evaluation(
     transition = refused.diagnostic["extrapolated_beyond_valid_range_K"][
         species_id
     ]
-    assert transition["status"] == "typed_refusal"
-    assert transition["refusal_code"] == "outside_declared_evaluator_domain"
-    assert species_id not in refused.diagnostic["vapor_pressures_Pa"]
+    assert transition["reason"] == "outside_declared_evaluator_domain"
+    assert transition["authority_level"] == "extrapolated"
+    assert transition["certified_band"]["temperature_K"]
+    assert refused.diagnostic["vapor_pressures_Pa"][species_id] > 0
 
     accepted = provider.dispatch(request_factory(in_domain_K))
     assert species_id in accepted.diagnostic["vapor_pressures_Pa"]
@@ -3136,7 +3137,7 @@ def test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo(
     )
 
 
-def test_request_level_fo2_below_transport_floor_is_rejected(
+def test_request_level_fo2_below_transport_floor_is_flagged(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
@@ -3152,8 +3153,12 @@ def test_request_level_fo2_below_transport_floor_is_rejected(
         control_inputs={},
     )
 
-    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
-        provider.dispatch(request)
+    result = provider.dispatch(request)
+    assert result.status == 'ok'
+    assert result.diagnostic['pO2_bar'] == 1e-20
+    assert result.diagnostic['vapor_pressures_Pa']['SiO'] > 0
+    assert any('authority_level=extrapolated' in note and 'below transport model floor' in note
+               for note in result.control_audit.notes)
 
 
 def test_interval_required_foulant_vapor_row_is_not_certifying(
@@ -3296,8 +3301,8 @@ def test_al2o_provider_applies_single_cation_activity_square_once(
     )
 
 
-@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
-def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
+@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0])
+def test_explicit_transport_po2_rejects_invalid_values(
     vapor_pressure_data,
     pO2_bar,
 ):
@@ -4194,3 +4199,54 @@ _REVIEWED_ADDITIVE_CARRIERS = {
     "Si3",
     "SiO2_gas",
 }
+
+
+@pytest.mark.parametrize('temperature_K', [650., 700.])
+def test_cold_mg_source_continues_with_original_source_band_notice(vapor_pressure_data, temperature_K):
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(_mg_vapor_request_at_T_K(temperature_K))
+    assert result.status == 'ok'
+    notice = result.diagnostic['extrapolated_beyond_valid_range_K']['Mg']
+    assert notice['computed_pressure_Pa'] > 0
+    assert notice['computed_pressure_Pa'] == result.diagnostic['below_reporting_threshold_omissions']['Mg']['computed_pressure_Pa']
+    assert 'metal_vapor_pressure_out_of_source_certified_range' in notice['reason']
+    assert notice['authority_level'] == 'extrapolated'
+    assert notice['certified_band']['temperature_K'] == (701., 1361.)
+
+
+def test_cold_mg_invalid_fit_still_refuses(vapor_pressure_data):
+    import copy
+    payload = copy.deepcopy(vapor_pressure_data)
+    payload['metals']['Mg']['pure_component_antoine']['B'] = 'invalid'
+    with pytest.raises(VaporPressureComputationError):
+        BuiltinVaporPressureProvider(payload).dispatch(_mg_vapor_request_at_T_K(650.))
+
+
+def test_legacy_cold_mg_preserves_flagged_subthreshold_value(vapor_pressure_data):
+    result = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_MgOnlyMelt(650.))._internal_analytical_equilibrium()
+    notice = result.diagnostics['extrapolated_beyond_valid_range_K']['Mg']
+    assert notice['computed_pressure_Pa'] > 0
+    assert 'metal_vapor_pressure_out_of_source_certified_range' in notice['reason']
+    assert notice['authority_level'] == 'extrapolated'
+
+
+@pytest.mark.parametrize("temperature_K", [1000., 2500.])
+def test_uncompiled_oxide_fit_continues_on_both_sides_with_notice(temperature_K):
+    row = {"antoine": {"A": 10., "B": 10000., "C": 0.},
+           "valid_range_K": [1400., 2273.15]}
+    provider = BuiltinVaporPressureProvider({"metals": {}, "oxide_vapors": {"SiO": row}})
+    provider._vapour_rail_catalog = None
+    result = provider.dispatch(_request_for_oxide_at_T_K("SiO2", temperature_K))
+    assert result.diagnostic["vapor_pressures_Pa"]["SiO"] > 0
+    notice = result.diagnostic["extrapolated_beyond_valid_range_K"]["SiO"]
+    assert notice["reason"] == "oxide_vapor_pressure_out_of_validated_range"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {"temperature_K": (1400., 2273.15)}
+
+
+def test_uncompiled_oxide_continuation_keeps_invalid_coefficient_refusal():
+    row = {"antoine": {"A": 10., "B": "invalid", "C": 0.},
+           "valid_range_K": [1400., 2273.15]}
+    provider = BuiltinVaporPressureProvider({"metals": {}, "oxide_vapors": {"SiO": row}})
+    provider._vapour_rail_catalog = None
+    with pytest.raises(VaporPressureComputationError):
+        provider.dispatch(_request_for_oxide_at_T_K("SiO2", 1000.))

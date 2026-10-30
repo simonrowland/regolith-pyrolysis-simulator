@@ -34,6 +34,7 @@ from simulator.vapour_rail.catalog import (
     validate_species_catalog,
 )
 from simulator.vapour_rail.channels import CHANNEL_O2
+from simulator.vapour_rail.activity import ActivityVerdictKind, SourceReactionActivity
 from tests.git_history import require_git_history
 
 
@@ -1994,3 +1995,124 @@ def test_validated_row_rejects_junk_anchor_refs(anchor_refs) -> None:
         match=r"validation\.anchor_refs",
     ):
         compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+@pytest.mark.parametrize(('species_id', 'temperature_K'), [
+    ('CrO', 199.), ('SiO2_gas', 199.), ('MnO_gas', 900.),
+])
+def test_composite_constituent_domain_uses_flagged_continuation(species_id, temperature_K):
+    catalog = compile_vapour_rail_catalog(yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text()))
+    evaluator = catalog.species[species_id].evaluator
+    result = evaluator.evaluate(temperature_K, source_activity=1., pO2_bar=1.)
+    assert result.pressure_pa > 0.
+    assert result.out_of_range
+    notice = result.extrapolation_notice
+    assert 'outside domain' in notice['reason']
+    assert notice['authority_level'] == 'extrapolated'
+    assert notice['certified_band']['temperature_K'] == evaluator.valid_temperature_K
+
+
+@pytest.mark.parametrize("species_id,expected_hex", [
+    ("CrO", "0x1.779fd6a9b87c6p-15"),
+    ("SiO2_gas", "0x1.df74e85d7b664p-10"),
+    ("MnO_gas", "0x1.1b126f54b6035p-10"),
+])
+def test_composite_direct_pressure_refactor_pin(species_id, expected_hex):
+    # Executable 3d11c8fc6 output; refactor identity, not a physical anchor.
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    result = catalog.species[species_id].evaluator.evaluate(
+        1800.0, source_activity=1.0, pO2_bar=1.0,
+    )
+    assert result.pressure_pa.hex() == expected_hex
+
+
+@pytest.mark.parametrize("species_id,boundary_K", [
+    ("CrO", 300.0), ("CrO", 20000.0),
+    ("SiO2_gas", 300.0), ("SiO2_gas", 6000.0),
+    ("MnO_gas", 1000.0), ("MnO_gas", 3000.0),
+])
+def test_composite_constituent_boundary_is_continuous(species_id, boundary_K):
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    evaluator = catalog.species[species_id].evaluator
+    below, above = (
+        evaluator.evaluate(t, source_activity=1.0, pO2_bar=1.0).pressure_pa
+        for t in (boundary_K - 1e-5, boundary_K + 1e-5)
+    )
+    # A coverage boundary is not a phase change: compare the two public
+    # values independently of the continuation helper or its chosen slope.
+    assert below > 0.0 and above > 0.0
+    assert math.log10(below) == pytest.approx(math.log10(above), abs=1e-4, rel=0)
+
+
+@pytest.mark.parametrize("species_id,temperature_K", [
+    ("CrO", 500.0), ("CrO", 5000.0),
+    ("SiO2_gas", 500.0), ("SiO2_gas", 5000.0),
+    ("MnO_gas", 1100.0), ("MnO_gas", 2900.0),
+])
+def test_composite_keeps_direct_values_within_constituent_support(
+    species_id, temperature_K,
+):
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    evaluator = catalog.species[species_id].evaluator
+    result = evaluator.evaluate(temperature_K, source_activity=1.0, pO2_bar=1.0)
+    assert math.log10(result.pressure_pa) == pytest.approx(
+        evaluator.reference_model.log10_pressure(temperature_K)
+    )
+
+
+@pytest.mark.parametrize("species_id,temperature_K", [
+    ("CrO", 199.0), ("CrO", 20001.0),
+    ("SiO2_gas", 199.0), ("SiO2_gas", 6001.0),
+    ("MnO_gas", 900.0), ("MnO_gas", 3001.0),
+])
+def test_composite_constituent_continuation_reaches_typed_shadow(
+    species_id, temperature_K,
+):
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    species = catalog.species[species_id]
+    declaration = species.source_reaction_activity
+    activity = SourceReactionActivity(
+        component_id=declaration.component_id,
+        value=1.0,
+        ln_value=0.0,
+        ln_band=(-0.2, 0.2),
+        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+        bound_direction=None,
+        reason="explicit_test_activity",
+        standard_state=declaration.standard_state,
+        phase_assemblage_ref="test:liquid_melt",
+        chemical_potential_ref="test:mu",
+        state_fingerprint="state:test",
+        solve_group_id=None,
+        provider="test",
+    )
+    evaluator = species.evaluator
+    scalar = evaluator.evaluate(temperature_K, source_activity=1.0, pO2_bar=1.0)
+    shadow = evaluator.evaluate_typed_shadow(
+        temperature_K,
+        activity=activity,
+        pO2_bar=1.0,
+        expected_component_id=declaration.component_id,
+        expected_standard_state=declaration.standard_state,
+        expected_state_fingerprint="state:test",
+    )
+    assert shadow["status"] == "shadow_only_no_behavior_authority"
+    assert shadow["out_of_range"]
+    assert shadow["extrapolation_notice"] == scalar.extrapolation_notice
+    minimum_positive_pa = math.nextafter(0.0, math.inf)
+    if scalar.pressure_pa == minimum_positive_pa:
+        # The scalar projection floors at IEEE-754's minimum; ln space
+        # retains the finite estimate below that numerical endpoint.
+        assert math.isfinite(shadow["ln_pressure_Pa"])
+        assert shadow["ln_pressure_Pa"] < math.log(minimum_positive_pa)
+    else:
+        assert shadow["ln_pressure_Pa"] == pytest.approx(math.log(scalar.pressure_pa))
+    assert shadow["ln_pressure_band_offsets"] == pytest.approx(
+        (-0.2 * evaluator.activity_exponent, 0.2 * evaluator.activity_exponent)
+    )
+
+
+def test_composite_continuation_still_refuses_missing_activity():
+    catalog = compile_vapour_rail_catalog(yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text()))
+    with pytest.raises(CatalogCompileError, match='explicit source_activity'):
+        catalog.species['CrO'].evaluator.evaluate(199., pO2_bar=1.)
