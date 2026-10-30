@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from functools import lru_cache
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 
+from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
+from simulator.accounting.formulas import resolve_species_formula
 from simulator import condensation as condensation_module
 from simulator.condensation import (
     CondensationModel,
@@ -26,14 +29,73 @@ from simulator.state import EvaporationFlux, MeltState, PipeSegment
 
 
 @lru_cache(maxsize=None)
-def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[str, float]]:
-    return sio_wall_report_at_temperature(liner_temperature_c)
+def _report_at_wall_T(
+    liner_temperature_c: float,
+) -> tuple[dict[str, Any], dict[str, Any], float, int]:
+    rollback_sio_credit_kg: list[float] = []
+    rollback_transition_count = 0
+    original_dispatch = BuiltinCondensationRouteProvider.dispatch
+
+    def capture_rollback_credits(provider, request):
+        nonlocal rollback_transition_count
+        result = original_dispatch(provider, request)
+        rollback_accounts = [
+            account
+            for account, diagnostic in result.diagnostic.get(
+                "wall_reaction_diagnostics_by_account", {}
+            ).items()
+            if diagnostic.get("materialization_adjustment")
+            == "rollback_coupled_reaction_to_unchanged_arrival"
+        ]
+        if rollback_accounts:
+            assert result.transition is not None
+            rollback_transition_count += len(rollback_accounts)
+            sio_molar_mass_kg_per_mol = resolve_species_formula(
+                "SiO", request.account_view.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for account in rollback_accounts:
+                credited_sio_mol = float(
+                    result.transition.credits.get(account, {}).get("SiO", 0.0)
+                )
+                # Route transition credits are mol; project them to the kg
+                # reported from the wall-deposit ledger account.
+                rollback_sio_credit_kg.append(
+                    credited_sio_mol * sio_molar_mass_kg_per_mol
+                )
+        return result
+
+    with patch.object(
+        BuiltinCondensationRouteProvider,
+        "dispatch",
+        new=capture_rollback_credits,
+    ):
+        report, diagnostics = sio_wall_report_at_temperature(
+            liner_temperature_c
+        )
+    return (
+        report,
+        diagnostics,
+        sum(rollback_sio_credit_kg),
+        rollback_transition_count,
+    )
 
 
 def _sio_wall_product_deposit_kg(liner_temperature_c: float) -> float:
-    report, _ = _report_at_wall_T(liner_temperature_c)
+    report, _, rollback_sio_credit_kg, rollback_transition_count = (
+        _report_at_wall_T(liner_temperature_c)
+    )
     values = sio_pin_values(report)
-    assert values["wall_SiO_kg"] == pytest.approx(0.0)
+    # Car 1 round 3 diagnosis (docs-private/research/2026-10-28-car1/car1-r3.md):
+    # a sub-floor coupled wall reaction rolls back to unchanged arrival and
+    # credits raw SiO to the cool wall, which is physically plausible below
+    # about 850 C. Account for the SiO on the named rollback transitions.
+    assert values["wall_SiO_kg"] == pytest.approx(
+        rollback_sio_credit_kg,
+        rel=1e-9,
+        abs=1e-24,
+    )
+    if rollback_transition_count == 0:
+        assert values["wall_SiO_kg"] == pytest.approx(0.0, abs=1e-24)
     return values["sio_wall_deposit_kg"]
 
 
