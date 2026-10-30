@@ -2771,23 +2771,11 @@ def test_two_phase_bulk_rows_are_refused_before_single_liquid_prediction(engine)
     assert residual.execution.state is ExecutionState.NOT_PROBED
     assert ref.admission.status is AdmissionStatus.PENDING
     if engine is Engine.OPENIMCC_SP:
-        # The refused SP row still records the configured pack and REFUSED
-        # authority, even though preflight stopped before pack evaluation.
-        pack_caveats = tuple(
-            notice
+        assert not any(
+            notice.reason.startswith("openimcc-pack-id:")
             for notice in residual.notices
-            if notice.origin == f"engine:{Engine.OPENIMCC_SP.value}"
         )
-        assert len(pack_caveats) == 1
-        assert pack_caveats[0].kind is NoticeKind.ENGINE_MODEL_CAVEAT
-        assert pack_caveats[0].affected_quantities == (Quantity.P_PARTIAL,)
-        assert pack_caveats[0].reason == (
-            "openimcc-pack-id:d066-ext; authority=refused"
-        )
-        assert pack_caveats[0].authority is Authority.REFUSED
-        assert residual.notices == (*ref.notices, *pack_caveats)
-    else:
-        assert residual.notices == ref.notices
+    assert residual.notices == ref.notices
 
 
 def test_two_phase_bulk_marker_refusal_preserves_homogeneous_row_count():

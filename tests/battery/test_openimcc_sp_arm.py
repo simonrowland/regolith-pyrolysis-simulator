@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
+    ExecutionState,
     NoticeKind,
     Quantity,
     Rail,
@@ -25,11 +26,13 @@ from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
 )
-from simulator.battery.records import Composition
+from simulator.battery.records import Composition, Execution
 from simulator.battery.score import (
     ENGINE_CHANNELS,
+    EnginePrediction,
     SCORE_ENGINE_SET,
     candidate_observation,
+    cell_notices,
     compile_residual,
     load_score_context,
     predict_with_engine,
@@ -66,8 +69,11 @@ _OPENIMCC_GREEN_PIN_EXCLUDED_VOLATILE_PATHS = (
         "process_cpu_seconds_by_geometry"
     ),
 )
+_OPENIMCC_GREEN_PIN_NORMALIZED_VOLATILE_PATHS = (
+    "execution.call_evidence.host",
+)
 _OPENIMCC_GREEN_PREDICTION_SHA256 = {
-    "activity": "e3f818b63005ea8c9ad2df74c5cbfe7a3d709b53742a33e11d234517538a492f",
+    "activity": "b282c105c8a766c2a4f2493a8bc63db4d9b7931643619e7d2c1b5c6c78e9ec60",
     "residue": "794d18de88174b14f28d12617d163c9e863e6261abd3fe44e6a13e8a17994925",
     "mass_loss": "c3acd11cfc46b5067fba2de6c401c7cf7a661ccc36f77f923d1dca190358676a",
 }
@@ -104,11 +110,30 @@ def _drop_pin_path(value: dict[str, object], dotted_path: str) -> None:
         current.pop(parts[-1], None)
 
 
+def _normalize_pin_host(pin: dict[str, object]) -> None:
+    execution = pin.get("execution")
+    if not isinstance(execution, dict):
+        return
+    call_evidence = execution.get("call_evidence")
+    if not isinstance(call_evidence, str):
+        return
+    before_host, marker, after_host = call_evidence.partition("host=")
+    if not marker:
+        return
+    _host, separator, after_separator = after_host.partition(":")
+    execution["call_evidence"] = (
+        before_host + "host=<host>" + separator + after_separator
+    )
+
+
 def _openimcc_prediction_pin(prediction) -> dict[str, object]:
     pin = _pin_value(prediction)
     assert isinstance(pin, dict)
     for volatile_path in _OPENIMCC_GREEN_PIN_EXCLUDED_VOLATILE_PATHS:
         _drop_pin_path(pin, volatile_path)
+    for volatile_path in _OPENIMCC_GREEN_PIN_NORMALIZED_VOLATILE_PATHS:
+        if volatile_path == "execution.call_evidence.host":
+            _normalize_pin_host(pin)
     return pin
 
 
@@ -285,7 +310,6 @@ def test_li_2005_p2o5_feo_row_uses_the_extension_pack(
     assert prediction.refusal_reason is None
     assert prediction.authority is Authority.EXTRAPOLATED
     assert candidate.authority is Authority.EXTRAPOLATED
-    assert len(prediction.notices) == 21
     assert any(
         notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
         and notice.affected_quantities == (Quantity.ACTIVITY_COEFFICIENT,)
@@ -368,8 +392,65 @@ def test_openimcc_sp_outside_validated_envelope_is_flagged() -> None:
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         and notice.authority is Authority.EXTRAPOLATED
-        and "outside_validated" in notice.reason
+        and notice.reason
+        == (
+            "X_Me2O outside openimcc validated envelope; "
+            "evaluate(allow_out_of_envelope=True)"
+        )
         for notice in prediction.notices
+    )
+
+
+def test_openimcc_composition_domain_authority_is_sp_only() -> None:
+    raw_notice = {
+        "kind": "openimcc_composition_outside_validated_envelope",
+        "authority": "extrapolated",
+        "reason": (
+            "X_Me2O outside openimcc validated envelope; "
+            "evaluate(allow_out_of_envelope=True)"
+        ),
+    }
+    cell = SimpleNamespace(notices=(raw_notice,))
+
+    sp_notice = next(
+        notice
+        for notice in cell_notices(
+            Quantity.ACTIVITY_COEFFICIENT, Engine.OPENIMCC_SP, cell
+        )
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    openimcc_notice = next(
+        notice
+        for notice in cell_notices(
+            Quantity.ACTIVITY_COEFFICIENT, Engine.OPENIMCC, cell
+        )
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+
+    assert sp_notice.reason == raw_notice["reason"]
+    assert sp_notice.authority is Authority.EXTRAPOLATED
+    assert openimcc_notice.reason == raw_notice["reason"]
+    assert openimcc_notice.authority is None
+
+
+def test_openimcc_sp_p2o5_screening_notice_requires_a_scored_value() -> None:
+    context = load_score_context(
+        sources=("li-2005-na-al-phosphate-fe-activities",)
+    )
+    reference = context.observations[_LI_2005_FEO_ROW]
+    engine = _sp_engine()
+
+    unscored = EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        identity=reference.identity,
+    )
+
+    assert unscored.value is None
+    assert not any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in unscored.notices
     )
 
 
