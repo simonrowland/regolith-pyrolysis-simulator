@@ -1611,7 +1611,7 @@ def _unverified_apparatus_notices(
     unknown_method_activity = (
         experiment.method.is_unknown
         and gates.reason is RefusalReason.METHOD_UNKNOWN
-        and quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and quantity is Quantity.ACTIVITY
         and author_reported_activity
         and typed_condensed_reference
     )
@@ -1621,7 +1621,7 @@ def _unverified_apparatus_notices(
     ):
         return ()
     comparison_activity = (
-        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        quantity is Quantity.ACTIVITY
         and author_reported_activity
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
@@ -1646,7 +1646,7 @@ def _unverified_apparatus_notices(
         and _has_calibration_not_grounded(gates.checks)
     )
     calibration_flagged_activity = (
-        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        quantity is Quantity.ACTIVITY
         and author_reported_activity
         and _has_calibration_not_grounded(gates.checks)
     )
@@ -10886,6 +10886,7 @@ def compile_residual(
     fo2_mode: Fo2Mode | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
+    precomputed_prediction = prediction is not None
     source_reference = reference
     sample_phase_detail = (
         melt_activity_sample_phase_refusal(reference.identity)
@@ -11233,11 +11234,12 @@ def compile_residual(
         ),
         None,
     )
-    if (
-        unprinted_reference_phase is not None
-        and engine is Engine.INTERNAL_ANALYTICAL
-    ):
-        if experiment is not None and experiment.method.is_unknown:
+    if unprinted_reference_phase is not None:
+        if (
+            engine is Engine.INTERNAL_ANALYTICAL
+            and experiment is not None
+            and experiment.method.is_unknown
+        ):
             return _refused(
                 RefusalReason.METHOD_UNKNOWN,
                 {
@@ -11248,15 +11250,18 @@ def compile_residual(
                 execution=Execution(state=ExecutionState.NOT_PROBED),
                 exclusions=("experiment_method_known", "source_polymorph_printed"),
             )
-        return _refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {
-                "reason": unprinted_reference_phase.reason,
-                "formula": formula,
-            },
-            execution=Execution(state=ExecutionState.NOT_PROBED),
-            exclusions=("source_reference_polymorph_printed",),
-        )
+        if not precomputed_prediction and (
+            predict is None or predict is predict_with_engine
+        ):
+            return _refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": unprinted_reference_phase.reason,
+                    "formula": formula,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("source_reference_polymorph_printed",),
+            )
 
     if sample_phase_detail is not None:
         # Validity gates do not read the row composition. The activity
@@ -11552,6 +11557,44 @@ def compile_residual(
                 ),
             ),
         )
+
+    if unprinted_reference_phase is not None:
+        if (
+            prediction.execution.state is not ExecutionState.PRODUCED
+            or prediction.value is None
+        ) and prediction.refusal_reason in {
+            RefusalReason.IDENTITY_INCOMPLETE,
+            RefusalReason.IDENTITY_MISMATCH,
+            RefusalReason.IDENTITY_UNKNOWN,
+            RefusalReason.INVALID_IDENTITY,
+        }:
+            detail = dict(prediction.refusal_detail)
+            secondary_reasons = detail.get("secondary_reasons", ())
+            if isinstance(secondary_reasons, str):
+                secondary_reasons = (secondary_reasons,)
+            detail["secondary_reasons"] = list(
+                dict.fromkeys(
+                    (*secondary_reasons, unprinted_reference_phase.reason)
+                )
+            )
+            return _refused(
+                prediction.refusal_reason,
+                detail,
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+                source_relation=source_relation,
+            )
+        if not precomputed_prediction:
+            return _refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": unprinted_reference_phase.reason,
+                    "formula": formula,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                source_relation=source_relation,
+                exclusions=("source_reference_polymorph_printed",),
+            )
 
     if prediction.execution.state is not ExecutionState.PRODUCED or prediction.value is None:
         reason = prediction.refusal_reason or RefusalReason.UNSUPPORTED

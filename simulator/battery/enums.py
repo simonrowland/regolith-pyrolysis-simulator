@@ -167,6 +167,9 @@ class RefusalReason(StrEnum):
     BACKGROUND_PRESSURE_INTERVAL_STRADDLES = "background_pressure_interval_straddles"
     IDENTITY_MISMATCH = "identity_mismatch"
     IDENTITY_UNKNOWN = "identity_unknown"
+    ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH = (
+        "element_reference_state_phase_identity_mismatch"
+    )
     INVALID_IDENTITY = "invalid_identity"
     DECISION_RULE_MISSING = "decision_rule_missing"
     METRIC_DOMAIN = "metric_domain"

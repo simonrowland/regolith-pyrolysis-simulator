@@ -12,10 +12,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -132,10 +132,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -252,10 +252,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -372,10 +372,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -492,10 +492,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -612,10 +612,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -732,10 +732,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -852,10 +852,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -972,10 +972,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1092,10 +1092,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1211,11 +1211,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1277,21 +1278,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='34.834'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1331,11 +1319,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1397,21 +1386,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='16.250'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1451,11 +1427,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1517,21 +1494,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='35.775'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1562,7 +1526,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -1572,10 +1536,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1682,7 +1646,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=antimony-(reference-state):v=ac7d974d0d
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=antimony-(reference-state):v=ac7d974d0d:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -1692,10 +1656,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1802,7 +1766,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=antimony-(reference-state):v=6d56a97746
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=antimony-(reference-state):v=6d56a97746:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -1812,10 +1776,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1922,7 +1886,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=antimony-(reference-state):v=8a54ada88f
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=antimony-(reference-state):v=8a54ada88f:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -1932,10 +1896,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2042,7 +2006,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=antimony-(reference-state):v=7076b25e81
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=antimony-(reference-state):v=7076b25e81:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -2052,10 +2016,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2162,7 +2126,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=antimony-(reference-state):v=7811d2a1eb
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=antimony-(reference-state):v=7811d2a1eb:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -2172,10 +2136,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2282,7 +2246,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=antimony-(reference-state):v=b877f4f383
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=antimony-(reference-state):v=b877f4f383:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -2292,10 +2256,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2411,11 +2375,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2477,21 +2442,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='4.020'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2531,11 +2483,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2597,21 +2550,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='8.710'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2652,10 +2592,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2772,10 +2712,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2892,10 +2832,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3012,10 +2952,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3132,10 +3072,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3252,10 +3192,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3372,10 +3312,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3492,10 +3432,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3612,10 +3552,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3732,10 +3672,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3851,11 +3791,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3917,21 +3858,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='28.940'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3971,11 +3899,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4037,21 +3966,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='38.680'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4091,11 +4007,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4157,21 +4074,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='38.890'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4202,7 +4106,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=298.15:col=entropy:name=antimony-(reference-state):v=208fdb2f5f
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=298.15:col=entropy:name=antimony-(reference-state):v=208fdb2f5f:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -4212,10 +4116,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4322,7 +4226,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=400:col=entropy:name=antimony-(reference-state):v=1ba397f9f6
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=400:col=entropy:name=antimony-(reference-state):v=1ba397f9f6:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -4332,10 +4236,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4442,7 +4346,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=500:col=entropy:name=antimony-(reference-state):v=c3b7cbc8af
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=500:col=entropy:name=antimony-(reference-state):v=c3b7cbc8af:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -4452,10 +4356,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4562,7 +4466,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=600:col=entropy:name=antimony-(reference-state):v=075b503498
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=600:col=entropy:name=antimony-(reference-state):v=075b503498:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -4572,10 +4476,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4682,7 +4586,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=700:col=entropy:name=antimony-(reference-state):v=4a3b7964b3
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=700:col=entropy:name=antimony-(reference-state):v=4a3b7964b3:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -4692,10 +4596,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4802,7 +4706,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=800:col=entropy:name=antimony-(reference-state):v=5cf8a163ca
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=800:col=entropy:name=antimony-(reference-state):v=5cf8a163ca:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -4812,10 +4716,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4922,7 +4826,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=900:col=entropy:name=antimony-(reference-state):v=3bc5a34089
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:S:shared:T=900:col=entropy:name=antimony-(reference-state):v=3bc5a34089:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -4932,10 +4836,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -5051,11 +4955,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5117,21 +5022,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='18.130'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5171,11 +5063,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5237,21 +5130,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='23.320'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5292,10 +5172,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5319,10 +5199,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5452,10 +5332,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5479,10 +5359,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5612,10 +5492,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5639,10 +5519,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5772,10 +5652,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5799,10 +5679,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5932,10 +5812,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5959,10 +5839,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6092,10 +5972,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6119,10 +5999,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6252,10 +6132,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6279,10 +6159,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6412,10 +6292,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6439,10 +6319,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6572,10 +6452,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6599,10 +6479,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6732,10 +6612,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6759,10 +6639,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6891,11 +6771,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7001,11 +6882,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7028,11 +6910,12 @@ observations:
         - species:
             formula: Sb
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -7103,22 +6986,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Sb=B1259 reference-state table p.66/PDF p.72
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -7152,7 +7021,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -7162,10 +7031,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7189,10 +7058,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7312,7 +7181,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -7322,10 +7191,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7349,10 +7218,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7472,7 +7341,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -7482,10 +7351,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7509,10 +7378,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7632,7 +7501,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -7642,10 +7511,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7669,10 +7538,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7792,7 +7661,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -7802,10 +7671,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7829,10 +7698,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7952,7 +7821,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -7962,10 +7831,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7989,10 +7858,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -8112,7 +7981,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -8122,10 +7991,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -8149,10 +8018,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -8281,11 +8150,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8392,10 +8262,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8419,10 +8289,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8552,10 +8422,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8579,10 +8449,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8712,10 +8582,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8739,10 +8609,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8872,10 +8742,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8899,10 +8769,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9032,10 +8902,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9059,10 +8929,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9192,10 +9062,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9219,10 +9089,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9352,10 +9222,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9379,10 +9249,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9512,10 +9382,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9539,10 +9409,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9672,10 +9542,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9699,10 +9569,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9832,10 +9702,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9859,10 +9729,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9991,11 +9861,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10101,11 +9972,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10128,11 +10000,12 @@ observations:
         - species:
             formula: Sb
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -10203,22 +10076,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Sb=B1259 reference-state table p.66/PDF p.72
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -10252,7 +10111,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -10262,10 +10121,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10289,10 +10148,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10412,7 +10271,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -10422,10 +10281,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10449,10 +10308,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10572,7 +10431,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -10582,10 +10441,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10609,10 +10468,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10732,7 +10591,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -10742,10 +10601,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10769,10 +10628,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10892,7 +10751,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -10902,10 +10761,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10929,10 +10788,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -11052,7 +10911,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -11062,10 +10921,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -11089,10 +10948,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -11212,7 +11071,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=antimony-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -11222,10 +11081,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -11249,10 +11108,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -11381,11 +11240,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11492,10 +11352,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11519,10 +11379,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11643,10 +11503,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11670,10 +11530,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11794,10 +11654,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11821,10 +11681,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11945,10 +11805,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11972,10 +11832,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12096,10 +11956,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12123,10 +11983,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12247,10 +12107,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12274,10 +12134,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12398,10 +12258,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12425,10 +12285,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12549,10 +12409,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12576,10 +12436,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12700,10 +12560,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12727,10 +12587,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12851,10 +12711,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12878,10 +12738,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13001,11 +12861,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1908 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13102,11 +12963,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13129,11 +12991,12 @@ observations:
         - species:
             formula: Sb
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -13204,22 +13067,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 66
-        pdf_page_index: 72
-        table: b1259-ht-0041-antimony-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Sb=B1259 reference-state table p.66/PDF p.72
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json
-        record: b1259-ht-0041-antimony-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -13244,7 +13093,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=antimony-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=antimony-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -13254,10 +13103,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13281,10 +13130,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13395,7 +13244,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=antimony-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=antimony-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -13405,10 +13254,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13432,10 +13281,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13546,7 +13395,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=antimony-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=antimony-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -13556,10 +13405,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13583,10 +13432,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13697,7 +13546,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=antimony-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=antimony-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -13707,10 +13556,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13734,10 +13583,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13848,7 +13697,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=antimony-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=antimony-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -13858,10 +13707,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13885,10 +13734,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13999,7 +13848,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=antimony-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=antimony-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -14009,10 +13858,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -14036,10 +13885,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -14150,7 +13999,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=antimony-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=antimony-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0041-antimony-reference-state:tabulation
   identity:
     quantity:
@@ -14160,10 +14009,10 @@ observations:
       formula: Sb
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -14187,10 +14036,10 @@ observations:
             formula: Sb
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -14310,11 +14159,12 @@ observations:
     species:
       formula: Sb
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 903 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

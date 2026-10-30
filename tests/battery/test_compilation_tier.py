@@ -44,6 +44,7 @@ from simulator.battery.identity import (
     assumed_crystal_standard_pressure_Pa,
     bar_to_pa,
     identity_equal,
+    ideal_gas_entropy_pressure_shift_J_per_mol_K,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
@@ -3470,14 +3471,13 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
 
     Mg-001 at 1366.104 K is the reference-state gas: published H−H298 is
     169.298, which includes vaporization. Mg-005 at that node is 22.198.
-    That enthalpy still refuses. B1259 magnesium S at 298.15 K declares
-    101325 Pa, so S refuses on pressure and the detail carries both
-    pressures. B1452 magnesium S at 1361 K declares 100000 Pa, so S
-    answers the gas table even though the elemental zero is the crystal.
+    That enthalpy still refuses. B1452 magnesium S at 1361 K declares
+    100000 Pa, so S answers the gas table even though the elemental zero is
+    the crystal.
     B1452 SiO has no elemental ideal-gas enthalpy reference; Cp and S
-    still answer O-012, and H−H298 refuses. B1259 and B1452 oxygen are
-    the ideal gas at 298.15 K, so those rows return the printed O-029
-    node.
+    still answer O-012, and H−H298 refuses. B1259 oxygen H−H298 and B1452
+    oxygen S use the printed O-029 nodes. B1259 oxygen reference-state S
+    at 298.15 K also scores against O-029.
     """
 
     import pytest
@@ -3511,38 +3511,6 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     assert attempt.refusal_detail["observation_table"] == "Mg-001"
     assert attempt.refusal_detail["gas_table"] == "Mg-005"
     assert attempt.refusal_detail["gas_phase"] == Phase.G.value
-
-    robie = replace(
-        F.observation(
-            "robie-magnesium-reference-entropy",
-            "exp-1",
-            replace(
-                _gas_thermo("Mg", Quantity.S, Decimal("298.15")),
-                standard_pressure_Pa=State.of(b1259_pressure),
-            ),
-            Decimal("32.67704"),
-            source_id="robie-waldbaum-1968-usgs-b1259",
-        ),
-        locator=Locator(
-            table="b1259-ht-0027-magnesium-reference-state",
-            record="b1259-ht-0027-magnesium-reference-state",
-        ),
-    )
-    robie_attempt = predict_thermo_attempt(Engine.VAPOROCK, robie)
-    assert robie_attempt.value is None
-    assert robie_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert (
-        robie_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
-    )
-    assert robie_attempt.refusal_detail["gas_table"] == "Mg-005"
-    assert robie_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert robie_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert robie_attempt.refusal_detail["coefficient_interval"] == "outside"
-    assert robie_attempt.refusal_detail["branch"] == "table"
-    assert (
-        robie_attempt.refusal_detail["observation_table"]
-        == "b1259-ht-0027-magnesium-reference-state"
-    )
 
     assert b1452_ideal_gas("Mg") is False
     near_boiling = replace(
@@ -3681,14 +3649,8 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     assert b1259_pressure != b1452_pressure
 
 
-def test_vaporock_gas_entropy_refuses_one_atmosphere_against_janaf() -> None:
-    """The stored B1259 oxygen entropy is 1 atm. JANAF's gas table is 0.1 MPa.
-
-    b1259-298k-0060-oxygen S at 298.15 K is 204.999264 J/(mol·K) with
-    standard_pressure_Pa 101325. O-029's entropy is the 1 bar value.
-    S refuses and the detail carries both pressures. Cp at that same
-    declared pressure still returns the printed O-029 node.
-    """
+def test_vaporock_b1259_oxygen_298_entropy_scores_against_o029() -> None:
+    """B1259 elemental O2 S scores against the same O2 gas reference."""
 
     import pytest
 
@@ -3696,7 +3658,6 @@ def test_vaporock_gas_entropy_refuses_one_atmosphere_against_janaf() -> None:
 
     from pathlib import Path
 
-    from simulator.battery.generators.janaf import STANDARD_PRESSURE_PA
     from simulator.battery.migrate import load_yaml, observation_from_plain
     from simulator.battery.records import as_decimal
 
@@ -3718,13 +3679,13 @@ def test_vaporock_gas_entropy_refuses_one_atmosphere_against_janaf() -> None:
     assert observation.value.point == Decimal("204.999264")
 
     attempt = predict_thermo_attempt(Engine.VAPOROCK, observation)
-    assert attempt.value is None
-    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
-    assert attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert attempt.refusal_detail["gas_pressure_Pa"] == format(STANDARD_PRESSURE_PA, "f")
-    assert attempt.refusal_detail["gas_table"] == "O-029"
+    assert attempt.refusal_reason is None
+    assert attempt.value is not None
+    assert "O-029" in attempt.call_evidence
+    assert (
+        attempt.value - observation.value.point
+        == Decimal("0.038292840583983002276896")
+    )
 
     printed_cp = _printed_janaf_node("O-029", Decimal("500"), "heat_capacity")
     heat_capacity = replace(
@@ -3756,20 +3717,267 @@ def _b1259_point(filename: str, observation_id: str):
         / filename
     )
     raw = next(
-        row for row in document["observations"] if row["observation_id"] == observation_id
+        row
+        for row in document["observations"]
+        if row["observation_id"] == observation_id
     )
     return observation_from_plain(raw)
+
+
+def _generated_b1259_entropy(record_id: str):
+    import json
+
+    from simulator.battery.generators import usgs_b1259
+
+    record = json.loads(
+        (usgs_b1259.RECORDS_DIR / f"{record_id}.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    generated = usgs_b1259.generate_record(record)
+    return [
+        observation
+        for observation in generated.observations
+        if quantity_token(observation.identity) is Quantity.S
+    ]
+
+
+def test_vaporock_b1259_condensed_reference_state_entropy_refuses_phase_identity() -> None:
+    from simulator.battery.generators.usgs_b1259 import (
+        SOURCE_ID as b1259_source,
+        STANDARD_PRESSURE_PA,
+        _element_reference_species,
+    )
+    from simulator.battery.records import Locator
+
+    reference = _element_reference_species("K", Decimal("1000"))
+    assert reference is not None
+    potassium_species, _atoms = reference
+    assert potassium_species.phase.value is Phase.L
+    potassium = replace(
+        F.observation(
+            "robie-potassium-reference-entropy-1000",
+            "exp-1",
+            replace(
+                _gas_thermo("K", Quantity.S, Decimal("1000")),
+                species=potassium_species,
+                standard_pressure_Pa=State.of(STANDARD_PRESSURE_PA),
+            ),
+            Decimal("108.742160"),
+            source_id=b1259_source,
+        ),
+        locator=Locator(
+            table="b1259-ht-0025-potassium-reference-state",
+            record="b1259-ht-0025-potassium-reference-state",
+        ),
+    )
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, potassium)
+    assert attempt.value is None
+    assert (
+        attempt.refusal_reason
+        is RefusalReason.ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH
+    )
+    assert (
+        attempt.refusal_detail["reason"]
+        == "element-reference-state-phase-identity-mismatch"
+    )
+
+
+def test_vaporock_b1259_gas_reference_state_entropy_scores_above_transition() -> None:
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from simulator.battery.generators.usgs_b1259 import (
+        SOURCE_ID as b1259_source,
+        STANDARD_PRESSURE_PA,
+        _element_reference_species,
+    )
+    from simulator.battery.records import Locator
+
+    reference = _element_reference_species("K", Decimal("1100"))
+    assert reference is not None
+    potassium_species, _atoms = reference
+    assert potassium_species.phase.value is Phase.G
+    potassium = replace(
+        F.observation(
+            "robie-potassium-reference-entropy-1100",
+            "exp-1",
+            replace(
+                _gas_thermo("K", Quantity.S, Decimal("1100")),
+                species=potassium_species,
+                standard_pressure_Pa=State.of(STANDARD_PRESSURE_PA),
+            ),
+            Decimal("140"),
+            source_id=b1259_source,
+        ),
+        locator=Locator(
+            table="b1259-ht-0025-potassium-reference-state",
+            record="b1259-ht-0025-potassium-reference-state",
+        ),
+    )
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, potassium)
+    assert attempt.refusal_reason is None
+    assert attempt.value is not None
+    assert "K-005" in attempt.call_evidence
+
+
+def test_vaporock_b1259_boiling_pairs_score_gas_and_refuse_condensed() -> None:
+    pytest.importorskip("vaporock.equil")
+
+    for record_id, formula, temperature in (
+        ("b1259-ht-0025-potassium-reference-state", "K", Decimal("1043.7")),
+        ("b1259-ht-0027-magnesium-reference-state", "Mg", Decimal("1363")),
+        ("b1259-ht-0031-sodium-reference-state", "Na", Decimal("1176.9")),
+    ):
+        entropy = [
+            observation
+            for observation in _generated_b1259_entropy(record_id)
+            if observation.identity.species.formula == formula
+            and observation.identity.temperature_K.value == temperature
+        ]
+        assert len(entropy) == 2
+        gas = next(
+            observation
+            for observation in entropy
+            if observation.identity.species.phase.value is Phase.G
+        )
+        condensed = next(
+            observation
+            for observation in entropy
+            if observation.identity.species.phase.value is Phase.L
+        )
+
+        gas_attempt = predict_thermo_attempt(Engine.VAPOROCK, gas)
+        assert gas_attempt.refusal_reason is None
+        assert gas_attempt.value is not None
+        if formula == "Mg":
+            assert "janaf_table_id=Mg-005" in gas_attempt.call_evidence
+
+        condensed_attempt = predict_thermo_attempt(Engine.VAPOROCK, condensed)
+        assert condensed_attempt.value is None
+        assert (
+            condensed_attempt.refusal_reason
+            is RefusalReason.ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH
+        )
+
+
+def test_vaporock_b1259_bad_transition_enthalpy_refuses_both_rows() -> None:
+    pytest.importorskip("vaporock.equil")
+
+    import json
+
+    from simulator.battery.generators import usgs_b1259
+
+    record_id = "b1259-ht-0025-potassium-reference-state"
+    record = json.loads(
+        (usgs_b1259.RECORDS_DIR / f"{record_id}.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    for row in record["rows"]:
+        if (
+            row.get("kind") == "data"
+            and row.get("temperature", {}).get("as_published") == "1043.7"
+            and row.get("entropy", {}).get("as_published") == "44.547"
+        ):
+            row["H_minus_H298"]["as_published"] = "30.014"
+            row["H_minus_H298"]["value"] = 30.014
+            # Keep the Planck identity: 44.547 - 1000*30.014/1043.7
+            # is 15.789694..., which prints as 15.790 at three decimals.
+            row["gibbs_function"]["as_published"] = "15.790"
+            row["gibbs_function"]["value"] = 15.790
+    generated = usgs_b1259.generate_record(record)
+    entropy = [
+        observation
+        for observation in generated.observations
+        if quantity_token(observation.identity) is Quantity.S
+        and observation.identity.species.formula == "K"
+        and observation.identity.temperature_K.value == Decimal("1043.7")
+    ]
+    assert len(entropy) == 2
+
+    attempts = [predict_thermo_attempt(Engine.VAPOROCK, obs) for obs in entropy]
+    assert all(attempt.value is None for attempt in attempts)
+    assert all(
+        attempt.refusal_reason
+        is RefusalReason.ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH
+        for attempt in attempts
+    )
+
+
+def test_vaporock_b1259_unknown_phase_census_uses_phase_identity_reason() -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+    from simulator.battery.generators.usgs_b1259 import SOURCE_ID as b1259_source
+    from simulator.battery.records import Locator
+
+    identity = _gas_thermo("K", Quantity.S, Decimal("1043.7"))
+    identity = replace(
+        identity,
+        species=replace(
+            identity.species,
+            phase=State.unknown("transition pair did not resolve"),
+            polymorph=State.unknown("transition pair did not resolve"),
+        ),
+    )
+    observation = replace(
+        F.observation(
+            "b1259-k-transition-unknown",
+            "exp-1",
+            identity,
+            Decimal("185.4"),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id=b1259_source,
+        ),
+        locator=Locator(
+            table="b1259-ht-0025-potassium-reference-state",
+            record="b1259-ht-0025-potassium-reference-state",
+        ),
+    )
+
+    result = compilation_tier_census(
+        _context(observation),
+        engines=(Engine.VAPOROCK,),
+        audit_compile_residual=False,
+    )
+    row = next(
+        row for row in result["rows"] if row["quantity"] == Quantity.S.value
+    )
+    assert row["numeric"] == 0
+    assert row["refused"][
+        "element_reference_state_phase_identity_mismatch:"
+        "element-reference-state-phase-identity-mismatch"
+    ] == 1
+
+
+def test_vaporock_b1259_calcium_above_boiling_entropy_scores() -> None:
+    pytest.importorskip("vaporock.equil")
+
+    calcium = next(
+        observation
+        for observation in _generated_b1259_entropy(
+            "b1259-ht-0012-calcium-reference-state"
+        )
+        if observation.identity.species.formula == "Ca"
+        and observation.identity.temperature_K.value == Decimal("1800")
+    )
+    assert calcium.identity.species.phase.value is Phase.G
+
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, calcium)
+    assert attempt.refusal_reason is None
+    assert attempt.value is not None
 
 
 def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
     """Inside a coefficient row, each quantity keeps its own basis axis.
 
-    B1259 O2 entropy at 800 K is 1 atm, so S refuses with both pressures.
-    B1259 magnesium entropy at 1500 K is the same pressure refusal, not
-    an enthalpy-zero refusal. Mg-001 at 1500 K and 1 bar answers S and
+    B1259 O2 entropy at 800 K and magnesium entropy at 1500 K are printed at
+    1 atm, so VapoRock shifts its 1-bar fit to their printed pressure. This
+    remains an entropy pressure conversion, not an enthalpy-zero conversion.
+    Mg-001 at 1500 K and 1 bar answers S and
     Cp; its H−H298 still refuses. O2 H−H298 at 800 K follows the printed
     O-029 node. K entropy at 1200 K answers on K-005 and on locator I.
-    The negative entropy case is 101325 Pa, not a different table id.
+    A 101325 Pa K identity receives the same printed-pressure shift.
     Co, Mn, and Ni on (1000, 3000] store H = 0 and do not reproduce
     printed H−H298, so that enthalpy refuses. Co heat capacity on the
     same row still answers.
@@ -3778,6 +3986,7 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
     import pytest
 
     pytest.importorskip("vaporock.equil")
+    from simulator.battery.generators.janaf import STANDARD_PRESSURE_PA
 
     oxygen_entropy = _b1259_point(
         "b1259-ht-0034-oxygen-reference-state.yaml",
@@ -3785,14 +3994,23 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
         "S:shared:T=800:col=entropy:name=oxygen-(reference-state):v=b128b3593f",
     )
     entropy_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen_entropy)
-    assert entropy_attempt.value is None
-    assert entropy_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert entropy_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
-    assert entropy_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert entropy_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert entropy_attempt.refusal_detail["gas_table"] == "O-029"
-    assert entropy_attempt.refusal_detail["coefficient_interval"] == "inside"
-    assert entropy_attempt.refusal_detail["branch"] == "shomate"
+    pressure_shift = ideal_gas_entropy_pressure_shift_J_per_mol_K(
+        STANDARD_PRESSURE_PA, Decimal("101325")
+    )
+    # For 1 bar -> 1 atm, ΔS = -R ln(p_to/p_from) = -R ln(101325/100000).
+    assert pressure_shift.quantize(Decimal("0.00001")) == Decimal("-0.10944")
+    printed_oxygen_entropy = _printed_janaf_node(
+        "O-029", Decimal("800"), "entropy"
+    )
+    assert entropy_attempt.refusal_reason is None
+    assert entropy_attempt.value is not None
+    assert abs(
+        entropy_attempt.value - (printed_oxygen_entropy + pressure_shift)
+    ) <= Decimal("0.001")
+    assert entropy_attempt.authority is Authority.BRIDGE
+    assert entropy_attempt.notices == ()
+    assert "coefficient_interval=inside" in entropy_attempt.call_evidence
+    assert "branch=shomate" in entropy_attempt.call_evidence
 
     magnesium_entropy = _b1259_point(
         "b1259-ht-0027-magnesium-reference-state.yaml",
@@ -3800,20 +4018,19 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
         "S:shared:T=1500:col=entropy:name=magnesium-(reference-state):v=48985b088a",
     )
     magnesium_attempt = predict_thermo_attempt(Engine.VAPOROCK, magnesium_entropy)
-    assert magnesium_attempt.value is None
-    assert magnesium_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert (
-        magnesium_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
-    )
-    assert magnesium_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert magnesium_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert magnesium_attempt.refusal_detail["gas_table"] == "Mg-005"
-    assert magnesium_attempt.refusal_detail["coefficient_interval"] == "inside"
-    assert magnesium_attempt.refusal_detail["branch"] == "shomate"
+    printed_entropy = _printed_janaf_node("Mg-005", Decimal("1500"), "entropy")
+    assert magnesium_attempt.refusal_reason is None
+    assert magnesium_attempt.value is not None
+    assert abs(
+        magnesium_attempt.value - (printed_entropy + pressure_shift)
+    ) <= Decimal("0.001")
+    assert magnesium_attempt.authority is Authority.BRIDGE
+    assert magnesium_attempt.notices == ()
+    assert "coefficient_interval=inside" in magnesium_attempt.call_evidence
+    assert "branch=shomate" in magnesium_attempt.call_evidence
 
     from simulator.battery.records import Locator
 
-    printed_entropy = _printed_janaf_node("Mg-005", Decimal("1500"), "entropy")
     printed_heat = _printed_janaf_node("Mg-005", Decimal("1500"), "heat_capacity")
     assert printed_entropy == Decimal("182.230")
     assert printed_heat == Decimal("20.786")
@@ -3944,15 +4161,15 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
         ),
     )
     atmosphere_attempt = predict_thermo_attempt(Engine.VAPOROCK, one_atmosphere)
-    assert atmosphere_attempt.value is None
-    assert atmosphere_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert (
-        atmosphere_attempt.refusal_detail["reason"]
-        == "tabulated_table_basis_mismatch"
-    )
-    assert atmosphere_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
-    assert atmosphere_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
-    assert atmosphere_attempt.refusal_detail["gas_table"] == "K-005"
+    assert atmosphere_attempt.refusal_reason is None
+    assert atmosphere_attempt.value is not None
+    # In-band K S is a Shomate fit; its printed-table fidelity is checked
+    # separately with the existing 0.3 J/(mol·K) bound.
+    assert atmosphere_attempt.value == potassium_attempt.value + pressure_shift
+    assert atmosphere_attempt.authority is Authority.BRIDGE
+    assert atmosphere_attempt.notices == ()
+    assert "coefficient_interval=inside" in atmosphere_attempt.call_evidence
+    assert "branch=shomate" in atmosphere_attempt.call_evidence
 
     cobalt_enthalpy = _same_table_gas(
         "co-unverified-enthalpy",
