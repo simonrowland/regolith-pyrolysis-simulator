@@ -1050,11 +1050,8 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
 ):
     """Exercise the finite-capacity shadow at a hot, in-domain C4 point.
 
-    The parent finite-capacity run poisons at the live/solved rate-set
-    assertion, so these expected rates come from the same parent commit with
-    runtime enforcement disabled (the non-binding fallback required by the
-    b-582 proof). The external ``b582_probe_wrap.py`` records the fixed
-    shadow's non-empty rate map for this exact setup.
+    The expected rates are pinned to the production resolver output for this
+    setup, including c3's sequential redox clamp-order change.
     """
     from simulator.thermal_train import FiniteCapacity
 
@@ -1090,18 +1087,16 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
-    # Recorded on parent 5672e61d9 by the non-binding fallback probe:
-    # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
-    # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
-    # b-858: atomic Si now uses the sourced Svehla 1962 Table I transport row.
+    # Re-pinned from the production resolver after c3's clamp-order change;
+    # the four changed rates move by at most 1.4%.
     expected_rates = {
         "Al": 1.776974630811854e-10,
-        "AlO": 2.622990526227972e-10,
+        "AlO": 2.5868512647895485e-10,
         "Ca": 6.00143229355403e-09,
         "CaO_gas": 2.067737447801073e-11,
-        "Cr": 4.355218555260953e-05,
-        "CrO": 9.136286575214734e-06,
-        "CrO2": 3.1730720722299763e-06,
+        "Cr": 4.3552191736308734e-05,
+        "CrO": 9.129280757927083e-06,
+        "CrO2": 3.170453002929102e-06,
         "CrO3": 9.294384109563237e-10,
         "K": 1.8395070246088384e-04,
         "K2": 1.6813544178336032e-11,
