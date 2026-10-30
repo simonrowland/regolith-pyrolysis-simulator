@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -143,17 +144,19 @@ def test_b702_standard_state_clusters_migrate(tmp_path: Path) -> None:
         migrated_rows = [
             item
             for item in furukawa.observations.values()
-            if f"::{observation_id}::" in item.observation_id
+            if item.observation_id.endswith(f"::{observation_id}")
         ]
-        assert len(migrated_rows) == 11
-        assert all(item.point_conditions is not None for item in migrated_rows)
-        assert all(
-            item.point_conditions["temperature_K"].state.is_value
-            and str(item.point_conditions["temperature_K"].state.value) == "1873.15"
-            and item.point_conditions["temperature_K"].locator is not None
-            and item.point_conditions["temperature_K"].locator.published_page == 385
-            for item in migrated_rows
-        )
+        assert len(migrated_rows) == 1
+        migrated_row = migrated_rows[0]
+        assert migrated_row.value.kind.value == "unavailable"
+        assert migrated_row.identity.temperature_K.is_value
+        assert migrated_row.identity.temperature_K.value == Decimal("1873.15")
+        assert migrated_row.point_conditions is not None
+        temperature = migrated_row.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == Decimal("1873.15")
+        assert temperature.locator is not None
+        assert temperature.locator.published_page == 385
 
     ueda = _migrate_real_extract(
         tmp_path / "ueda", "kems-095-ueda-1986.yaml"

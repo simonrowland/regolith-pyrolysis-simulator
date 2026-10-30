@@ -347,7 +347,7 @@ def test_shornikov_2013_migrates_printed_gibbs_energies() -> None:
 
 def test_adamkovicova_1980_ingested_count_and_pdf_cells() -> None:
     result = _migrate("adamkovicova-1980-casio3-heat-of-fusion.yaml")
-    assert len(result.observations) == 47
+    assert len(result.observations) == 25
     assert result.validation.hard_issues == ()
     assert _point(result, "adamkovicova_1980_heat_of_fusion_at_1817K") == Decimal(
         "57.3"
@@ -384,12 +384,10 @@ def test_shornikov_2000_migrates_printed_transition_temperatures() -> None:
 
 def test_shilov_1998_migrates_printed_po_pressures() -> None:
     result = _migrate("shilov-1998-sno-zno-p2o5-vaporization.yaml")
-    # 92 counted one migrated row per wide point. Table 4 atomic oxygen is now
-    # one point per printed equation (4 compositions x eqs 4, 8, 9, 10, 11 =
-    # 20, was 4) and Table 5 is one point per printed activity cell (9, was 5
-    # wide rows that already held both eq 13/14 and eq 19). 92 + 16 + 4 = 112.
+    # The 92 already include Table 4's 20 atomic oxygen points and Table 5's
+    # 9 activity cells; 112 was the count with blank-cell suppression off.
     # Each head value equals the parent column it was split from.
-    assert len(result.observations) == 112
+    assert len(result.observations) == 92
     migrated_po_rows = [
         observation
         for observation in result.observations.values()
