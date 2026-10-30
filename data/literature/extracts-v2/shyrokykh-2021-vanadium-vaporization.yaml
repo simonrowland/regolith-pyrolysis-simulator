@@ -1,4 +1,362 @@
 schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/shyrokykh-2021-vanadium-vaporization.yaml
-observations: []
+observations:
+- observation_id: shyrokykh-2021-vanadium-vaporization::shyrokykh_2021_csv1_text_extraction_bound
+  experiment_id: 10.1007/s11663-021-02114-9::shyrokykh-2021-vanadium-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: V2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: This is the initial slag composition; the post-treatment liquid composition changed during alumina dissolution
+        and V2O5 extraction and is not reported per text-bound yield point.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: bound
+    bound_operator: '>'
+    bound_value: '0.77'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: The extract has no quantity token for species removal; the printed V2O5 extraction fraction is not total sample
+      mass loss.
+    decided_by:
+      worker: fam17-1019
+      date: '2026-10-19'
+      evidence:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports more than 77 mass pct V2O5 extracted at 60 minutes for CSV1.
+  notices: []
+  source_id: shyrokykh-2021-vanadium-vaporization
+  locator:
+    page: 3
+    published_page: 1474
+    pdf_page_index: 2
+    section: IV.A CaO-SiO2-VOx Slag System
+    note: Text reports more than 77 mass pct V2O5 extracted at 60 minutes for CSV1.
+  read_from: pdf:shyrokykh-2021-vanadium-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports more than 77 mass pct V2O5 extracted at 60 minutes for CSV1.
+    composition:
+      state:
+        tag: unknown
+        reason: This is the initial slag composition; the post-treatment liquid composition changed during alumina dissolution
+          and V2O5 extraction and is not reported per text-bound yield point.
+      locator:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        table: I
+        note: Reported initial slag composition used for this sample; post-treatment values are not row-specific here.
+    initial_composition:
+      state:
+        tag: value
+        value:
+          CaO_wt_pct: '44.61'
+          SiO2_wt_pct: '47.29'
+          V2O5_wt_pct: '8.1'
+      locator:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        table: I
+        note: Reported initial slag composition used for this sample; post-treatment values are not row-specific here.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '85000'
+      locator:
+        page: 5
+        published_page: 1476
+        pdf_page_index: 4
+        table: II
+    atmosphere:
+      state:
+        tag: value
+        value: argon during heating and melting; oxygen top-blowing during treatment
+      locator:
+        page: 5
+        published_page: 1476
+        pdf_page_index: 4
+        table: II
+    oxygen_top_blowing_flow_cm3_min:
+      state:
+        tag: value
+        value: '250'
+      locator:
+        page: 5
+        published_page: 1476
+        pdf_page_index: 4
+        table: II
+    oxygen_partial_pressure:
+      state:
+        tag: unknown
+        reason: The paper prints oxygen flow rate and total chamber pressure, but no oxygen partial pressure; p(O2) is not
+          calculated.
+      locator:
+        page: 5
+        published_page: 1476
+        pdf_page_index: 4
+        table: II
+    holding_time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports more than 77 mass pct V2O5 extracted at 60 minutes for CSV1.
+- observation_id: shyrokykh-2021-vanadium-vaporization::shyrokykh_2021_csv2_text_extraction_bound
+  experiment_id: 10.1007/s11663-021-02114-9::shyrokykh-2021-vanadium-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: V2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: This is the initial slag composition; the post-treatment liquid composition changed during alumina dissolution
+        and V2O5 extraction and is not reported per text-bound yield point.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: bound
+    bound_operator: '>'
+    bound_value: '0.45'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: The extract has no quantity token for species removal; the printed V2O5 extraction fraction is not total sample
+      mass loss.
+    decided_by:
+      worker: fam17-1019
+      date: '2026-10-19'
+      evidence:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports more than 45 mass pct V2O5 extracted at 60 minutes for CSV2.
+  notices: []
+  source_id: shyrokykh-2021-vanadium-vaporization
+  locator:
+    page: 3
+    published_page: 1474
+    pdf_page_index: 2
+    section: IV.A CaO-SiO2-VOx Slag System
+    note: Text reports more than 45 mass pct V2O5 extracted at 60 minutes for CSV2.
+  read_from: pdf:shyrokykh-2021-vanadium-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports more than 45 mass pct V2O5 extracted at 60 minutes for CSV2.
+    composition:
+      state:
+        tag: unknown
+        reason: This is the initial slag composition; the post-treatment liquid composition changed during alumina dissolution
+          and V2O5 extraction and is not reported per text-bound yield point.
+      locator:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        table: I
+        note: Reported initial slag composition used for this sample; post-treatment values are not row-specific here.
+    initial_composition:
+      state:
+        tag: value
+        value:
+          CaO_wt_pct: '44.37'
+          SiO2_wt_pct: '49.53'
+          V2O5_wt_pct: '6.09'
+      locator:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        table: I
+        note: Reported initial slag composition used for this sample; post-treatment values are not row-specific here.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '85000'
+      locator:
+        page: 5
+        published_page: 1476
+        pdf_page_index: 4
+        table: II
+    atmosphere:
+      state:
+        tag: value
+        value: argon during heating and melting; oxygen top-blowing during treatment
+      locator:
+        page: 5
+        published_page: 1476
+        pdf_page_index: 4
+        table: II
+    oxygen_top_blowing_flow_cm3_min:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        page: 5
+        published_page: 1476
+        pdf_page_index: 4
+        table: II
+    oxygen_partial_pressure:
+      state:
+        tag: unknown
+        reason: The paper prints oxygen flow rate and total chamber pressure, but no oxygen partial pressure; p(O2) is not
+          calculated.
+      locator:
+        page: 5
+        published_page: 1476
+        pdf_page_index: 4
+        table: II
+    holding_time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 3
+        published_page: 1474
+        pdf_page_index: 2
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports more than 45 mass pct V2O5 extracted at 60 minutes for CSV2.
