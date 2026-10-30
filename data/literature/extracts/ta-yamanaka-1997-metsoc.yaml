@@ -139,13 +139,14 @@ species:
         page: 1
         section: Results and discussion
         equation: '4'
-      phase: Na2O-SiO2_glass_melt
+      phase: gas
       standard_state: Na(g) evaporation mass and partial pressure as defined by the authors
       regime: thermogravimetry_surface_controlled_evaporation
       units: as published
       uncertainty:
         note: No numerical uncertainty is printed; fitted zeta and eta are stated to come from least squares.
       values:
+        system_class: silicate_melt
         quantity: evaporation_mass_time_fit
         method_class: measured_direct
         gas_species: Na(g)

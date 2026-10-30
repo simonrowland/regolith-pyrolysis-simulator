@@ -9069,7 +9069,7 @@ def test_candidate_census_splits_admitted_from_pending() -> None:
 def test_predict_success_path_does_not_hardcode_lineage_complete_false() -> None:
     from simulator.battery import score as score_mod
 
-    tree = ast.parse(inspect.getsource(score_mod.predict_with_engine))
+    tree = ast.parse(inspect.getsource(score_mod._predict_with_engine))
     produced_with_value = 0
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
@@ -14794,6 +14794,13 @@ def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
         ("no_liquid", "refusal", "no_liquid", RefusalReason.ATTEMPTED_UNAVAILABLE),
         ("engine_timeout", "TimeoutError", "engine_timeout", RefusalReason.ATTEMPTED_UNAVAILABLE),
         ("unavailable", "RuntimeError", "runtime_error", RefusalReason.ATTEMPTED_UNAVAILABLE),
+        pytest.param(
+            "not_converged",
+            "not_converged",
+            "engine_not_converged",
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            id="physics-nonconvergence",
+        ),
     ],
 )
 def test_magemin_native_activity_failure_keeps_typed_cause(
@@ -14870,6 +14877,118 @@ def test_magemin_native_activity_failure_keeps_typed_cause(
     assert prediction.refusal_reason is refusal_reason
     assert prediction.refusal_detail["reason"] == reason
     assert prediction.refusal_detail["cell_refusal_reason"] == cell_refusal
+
+
+def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from concurrent.futures import Future
+    from functools import wraps
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.engine_pool import EngineWorkerDied
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    class FailedPool:
+        def close(self, *, cancel_pending: bool = False) -> None:
+            pass
+
+        def submit(self, *_args, **_kwargs):
+            future = Future()
+            future.set_exception(
+                EngineWorkerDied("call", "fake MAGEMin worker exited")
+            )
+            return future
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._subprocess_pool = FailedPool()
+    results = []
+    equilibrate = backend.equilibrate
+
+    @wraps(equilibrate)
+    def capture_result(*args, **kwargs):
+        result = equilibrate(*args, **kwargs)
+        results.append(result)
+        return result
+
+    backend.equilibrate = capture_result
+    handle = EngineHandle("magemin", backend, True, None, False, False)
+    experiment = F.kems_experiment()
+    work = F.work(experiment.work_id)
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "magemin-worker-lifecycle-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id=work.work_id,
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=context,
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+
+    assert len(results) == 1
+    assert results[0].status == "not_converged"
+    assert (
+        results[0].diagnostics["backend_failure_exception"] == "EngineWorkerDied"
+    )
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert (
+        prediction.refusal_detail["reason"] == "engine_transport_error:magemin"
+    )
+    assert prediction.value is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert (
+        residual.refusal.detail["reason"] == "engine_transport_error:magemin"
+    )
+    assert not residual.score_eligible
 
 
 def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(

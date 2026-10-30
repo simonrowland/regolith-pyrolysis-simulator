@@ -47,7 +47,7 @@ species:
       T_range_K:
       - 1773.15
       - 1773.15
-      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      phase: gas
       standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
       regime: calculated_blast_furnace_vapor_equilibrium
       units: bar as published
@@ -55,6 +55,7 @@ species:
         note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
           at 1500 C.
       values:
+        system_class: silicate_melt
         quantity: equilibrium_partial_pressure
         gas_species: SiO(g)
         method_class: quoted_attributed
@@ -93,7 +94,7 @@ species:
       T_range_K:
       - 1773.15
       - 1773.15
-      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      phase: gas
       standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
       regime: calculated_blast_furnace_vapor_equilibrium
       units: bar as published
@@ -101,6 +102,7 @@ species:
         note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
           at 1500 C.
       values:
+        system_class: silicate_melt
         quantity: equilibrium_partial_pressure
         gas_species: SiS(g)
         method_class: quoted_attributed
@@ -139,7 +141,7 @@ species:
       T_range_K:
       - 1773.15
       - 1773.15
-      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      phase: gas
       standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
       regime: calculated_blast_furnace_vapor_equilibrium
       units: bar as published
@@ -147,6 +149,7 @@ species:
         note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
           at 1500 C.
       values:
+        system_class: silicate_melt
         quantity: equilibrium_partial_pressure
         gas_species: S2(g)
         method_class: quoted_attributed
@@ -185,7 +188,7 @@ species:
       T_range_K:
       - 1773.15
       - 1773.15
-      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      phase: gas
       standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
       regime: calculated_blast_furnace_vapor_equilibrium
       units: bar as published
@@ -193,6 +196,7 @@ species:
         note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
           at 1500 C.
       values:
+        system_class: silicate_melt
         quantity: equilibrium_partial_pressure
         gas_species: CS(g)
         method_class: quoted_attributed
@@ -231,7 +235,7 @@ species:
       T_range_K:
       - 1773.15
       - 1773.15
-      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      phase: gas
       standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
       regime: calculated_blast_furnace_vapor_equilibrium
       units: bar as published
@@ -239,6 +243,7 @@ species:
         note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
           at 1500 C.
       values:
+        system_class: silicate_melt
         quantity: equilibrium_partial_pressure
         gas_species: COS(g)
         method_class: quoted_attributed
@@ -277,13 +282,14 @@ species:
       T_range_K:
       - 1473.15
       - 1773.15
-      phase: blast_furnace_slag_0.5pct_K2O_Bprime_1.5
+      phase: gas
       standard_state: p(K) bar as printed; a(K2O) relative to hypothetical solid K2O
       regime: calculated_blast_furnace_vapor_equilibrium
       units: p_K in bar; K in bar^3; a(K2O) dimensionless as printed
       uncertainty:
         note: No numerical uncertainty printed on Table 2.
       values:
+        system_class: silicate_melt
         quantity: equilibrium_partial_pressure
         gas_species: K(g)
         method_class: quoted_attributed

@@ -3238,7 +3238,7 @@ species:
       T_range_K:
       - 1643.0
       - 1643.0
-      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      phase: gas
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -3249,6 +3249,7 @@ species:
       regime: kems_effusion
       units: atm as published
       values:
+        system_class: molten_metal
         quantity: partial_pressure
         gas_species: PO(g)
         method_class: model_derived
@@ -3612,7 +3613,7 @@ species:
       T_range_K:
       - 1643.0
       - 1643.0
-      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      phase: gas
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -3623,6 +3624,7 @@ species:
       regime: kems_effusion
       units: atm as published
       values:
+        system_class: molten_metal
         quantity: partial_pressure
         gas_species: PO2(g)
         method_class: model_derived
@@ -3765,7 +3767,7 @@ species:
       T_range_K:
       - 1643.0
       - 1643.0
-      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      phase: gas
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -3776,6 +3778,7 @@ species:
       regime: kems_effusion
       units: atm as published
       values:
+        system_class: molten_metal
         quantity: partial_pressure
         gas_species: P2(g)
         method_class: model_derived

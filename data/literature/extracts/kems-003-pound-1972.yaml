@@ -64,7 +64,7 @@ species:
       T_range_K:
       - 1540.0
       - 1740.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -102,7 +102,7 @@ species:
       T_range_K:
       - 1358.0
       - 1520.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -171,7 +171,7 @@ species:
       T_range_K:
       - 1600.0
       - 1800.0
-      phase: solid_Fe_metal
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -330,7 +330,7 @@ species:
       T_range_K:
       - 1318.0
       - 1563.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -347,6 +347,7 @@ species:
         - 1.0
         gas_species: Cr(g)
         material: 99.9_percent_polycrystalline_solid_chromium_A_D_Mackay
+        system_class: pure_element_condensed
         technique: Langmuir-Knudsen
         authors: McCabe et al. [1956]
         note: 'Table 1: Chromium, solid; 1318–1563 K; α_v=0.9±0.1. Complementary to Fe McCabe row (different
@@ -366,7 +367,7 @@ species:
       T_range_K:
       - 1318.0
       - 1563.0
-      phase: solid_Cr_metal
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -431,7 +432,7 @@ species:
       T_range_K:
       - 1171.0
       - 1552.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -441,6 +442,7 @@ species:
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha: 1.0
         alpha_range:
         - 0.98
@@ -472,7 +474,7 @@ species:
       T_range_K:
       - 2403.0
       - 2403.0
-      phase: solid_and_liquid_at_melting_point
+      phase: gas
       condensed_form:
         state: mixed_solid_and_liquid_as_tabulated
         metastable: false
@@ -481,6 +483,7 @@ species:
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
+        system_class: silicate_melt
         alpha: 0.98
         alpha_range:
         - 0.96
@@ -513,7 +516,7 @@ species:
       T_range_K:
       - 2357.0
       - 2870.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -523,6 +526,7 @@ species:
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha: 1.0
         alpha_range:
         - 0.9
@@ -554,7 +558,7 @@ species:
       T_range_K:
       - 1234.0
       - 1234.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -564,6 +568,7 @@ species:
       regime: langmuir_knudsen_comparison_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha_lower_bound: 0.92
         printed: '>0.92'
         semantics: bound_not_point_ordering
@@ -590,7 +595,7 @@ species:
       T_range_K:
       - 339.85
       - 392.45
-      phase: liquid
+      phase: gas
       condensed_form:
         state: liquid
         metastable: false
@@ -633,7 +638,7 @@ species:
       T_range_K:
       - 1500.0
       - 1500.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -643,6 +648,7 @@ species:
       regime: condensation_high_supersaturation_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha_lower_bound: 0.998
         printed: '>0.998'
         semantics: bound_not_point_ordering
@@ -671,7 +677,7 @@ species:
       T_range_K:
       - 1500.0
       - 1500.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -681,6 +687,7 @@ species:
       regime: condensation_high_supersaturation_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha_lower_bound: 0.99
         printed: '>0.99'
         semantics: bound_not_point_ordering
@@ -708,7 +715,7 @@ species:
       T_range_K:
       - 2200.0
       - 2200.0
-      phase: solid_polycrystalline
+      phase: gas
       condensed_form:
         state: crystalline
         metastable: false
@@ -718,6 +725,7 @@ species:
       regime: condensation_high_supersaturation_review
       units: dimensionless
       values:
+        system_class: pure_element_condensed
         alpha: 0.998
         alpha_range:
         - 0.9975

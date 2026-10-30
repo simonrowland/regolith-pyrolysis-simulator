@@ -272,6 +272,7 @@ def _make_absent_magemin(monkeypatch):
 class _ImmediateFailurePool:
     def __init__(self, exception):
         self.exception = exception
+        self.close_calls = 0
 
     def submit(self, *_args, **_kwargs):
         future = Future()
@@ -280,6 +281,9 @@ class _ImmediateFailurePool:
 
     def _abort_request(self, _future, *, diagnostic_detail=None):
         return False
+
+    def close(self, *, cancel_pending=False):
+        self.close_calls += 1
 
 
 def _make_pooled_subprocess_backend(exception):
@@ -1080,6 +1084,7 @@ def test_magemin_worker_exit_returns_typed_not_converged():
             'MAGEMin subprocess pool slot 0 worker exited without a result',
         )
     )
+    pool = backend._subprocess_pool
 
     result = backend.equilibrate(
         1500.0,
@@ -1095,7 +1100,8 @@ def test_magemin_worker_exit_returns_typed_not_converged():
     assert 'worker exited without a result' in (
         result.diagnostics['backend_failure_message']
     )
-    assert backend.is_available() is True
+    assert backend.is_available() is False
+    assert pool.close_calls == 1
 
 
 def test_magemin_pool_unavailable_returns_typed_not_converged():
@@ -1117,6 +1123,7 @@ def test_magemin_pool_unavailable_returns_typed_not_converged():
     assert 'worker is unavailable' in (
         result.diagnostics['backend_failure_message']
     )
+    assert backend.is_available() is False
 
 
 def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
@@ -1138,6 +1145,7 @@ def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
         'EngineWorkerPoolLifecycleError'
     )
     assert 'no live consumer' in result.diagnostics['backend_failure_message']
+    assert backend.is_available() is False
 
 
 def test_magemin_in_process_budget_exhaustion_returns_typed_status():

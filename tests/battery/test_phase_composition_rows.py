@@ -10,8 +10,10 @@ dissolved S or Cl, and that refusal is counted.
 from __future__ import annotations
 
 import math
+import os
 from dataclasses import replace
 from decimal import Decimal
+from types import MappingProxyType
 
 import pytest
 import yaml
@@ -55,6 +57,7 @@ from simulator.battery.score import (
     _residual_engine_observable,
     compile_residual,
     compute_metric,
+    compile_residual,
     metric_operation_for_identity,
     no_headline_rail_reason,
     populate_numeric,
@@ -771,7 +774,15 @@ def test_phase_rows_score_component_dex_from_the_assemblage(
 
     calls: list[dict] = []
 
-    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar):
+    def hook(
+        engine,
+        *,
+        temperature_C,
+        composition_kg,
+        fO2_log,
+        pressure_bar,
+        handles=None,
+    ):
         calls.append(
             {
                 "engine": engine,
@@ -838,12 +849,431 @@ def test_phase_rows_score_component_dex_from_the_assemblage(
         assert set(call["composition_kg"]) == {"SiO2", "MgO"}
 
 
+def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    opened: list[EngineHandle] = []
+
+    class FakeBackend:
+        def __init__(self) -> None:
+            self.read_fd, self.write_fd = os.pipe()
+            self.closed = False
+            self.close_calls = 0
+
+        def equilibrate(self, **_kwargs) -> EquilibriumResult:
+            return EquilibriumResult(
+                liquid_fraction=1.0,
+                phase_compositions={"liquid": {"SiO2": 10.0, "MgO": 40.0}},
+            )
+
+        def close(self) -> None:
+            self.close_calls += 1
+            if self.closed:
+                return
+            os.close(self.read_fd)
+            os.close(self.write_fd)
+            self.closed = True
+
+    def open_fake_engine(name: str) -> EngineHandle:
+        handle = EngineHandle(
+            name=name,
+            backend=FakeBackend(),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", open_fake_engine)
+    experiment = F.tabulation_experiment()
+    work = F.work()
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observations = {
+        f"phase-worker-reuse-{index}": F.observation(
+            f"phase-worker-reuse-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal("5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for index in range(32)
+    }
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations=observations,
+    )
+    import simulator.battery.score as score_module
+
+    residuals, _candidates, _events = score_module._score_store_with_decisions(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 32
+    assert all(residual.numeric is not None for residual in residuals)
+    assert len(opened) == 1, f"opened {len(opened)} engine handles for 32 rows"
+    assert opened[0].backend.close_calls == 1
+    observation = observations["phase-worker-reuse-0"]
+
+    def fail_to_start(_name: str) -> EngineHandle:
+        raise OSError(24, "Too many open files")
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", fail_to_start)
+    failed_prediction = predict_with_engine(
+        Engine.THERMOENGINE, observation, handles={}
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+    )
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.THERMOENGINE,
+        context=context,
+        prediction=failed_prediction,
+        comparison_ids={observation.observation_id},
+    )
+    assert failed_prediction.value is None
+    assert failed_prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert not residual.score_eligible
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+
+
+@pytest.mark.parametrize(
+    "engine",
+    (
+        pytest.param(Engine.THERMOENGINE, id="thermoengine"),
+        pytest.param(Engine.MAGEMIN, id="magemin"),
+    ),
+)
+def test_phase_rows_reopen_cached_handle_after_transport_death(
+    monkeypatch: pytest.MonkeyPatch, engine: Engine
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.engine_pool import EngineWorkerDied
+
+    opened: list[EngineHandle] = []
+    backends: list[object] = []
+
+    class FakeBackend:
+        def __init__(self, *, dies: bool) -> None:
+            self.live = True
+            self.close_calls = 0
+            self.dies = dies
+
+        def is_available(self) -> bool:
+            return self.live
+
+        def equilibrate(self, **_kwargs) -> EquilibriumResult:
+            if self.dies:
+                self.dies = False
+                self.live = False
+                raise EngineWorkerDied("call", "fake worker exited")
+            if not self.live:
+                raise AssertionError("a closed transport was reused")
+            return EquilibriumResult(
+                liquid_fraction=1.0,
+                phase_compositions={"liquid": {"SiO2": 10.0, "MgO": 40.0}},
+            )
+
+        def close(self) -> None:
+            self.close_calls += 1
+            self.live = False
+
+    def open_fake_engine(name: str) -> EngineHandle:
+        backend = FakeBackend(dies=not opened)
+        backends.append(backend)
+        handle = EngineHandle(
+            name=name,
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", open_fake_engine)
+    work = F.work()
+    experiment = F.tabulation_experiment()
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observations = {
+        f"phase-worker-death-{index}": F.observation(
+            f"phase-worker-death-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal("5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for index in range(2)
+    }
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations=observations,
+    )
+
+    predictions: list[EnginePrediction] = []
+
+    def capture_prediction(engine, observation, *, handles, **kwargs):
+        prediction = predict_with_engine(
+            engine, observation, handles=handles, **kwargs
+        )
+        predictions.append(prediction)
+        return prediction
+
+    import simulator.battery.score as score_module
+
+    residuals, _candidates, _events = score_module._score_store_with_decisions(
+        context,
+        engines=(engine,),
+        include_diagnostics=False,
+        predict=capture_prediction,
+    )
+    by_id = {residual.reference: residual for residual in residuals}
+    assert by_id["phase-worker-death-0"].numeric is None
+    assert len(predictions) == 2
+    assert predictions[0].value is None
+    assert predictions[1].value == Decimal("10")
+    assert by_id["phase-worker-death-1"].numeric is not None
+    assert len(opened) == 2
+    assert backends[0].close_calls >= 1
+    assert backends[1].close_calls == 1
+
+
+def test_magemin_worker_lifecycle_result_is_transport_refusal_in_score_loop(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from concurrent.futures import Future
+    from functools import wraps
+    from pathlib import Path
+
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.engine_pool import EngineWorkerDied
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    class FailedPool:
+        def __init__(self) -> None:
+            self.close_calls = 0
+
+        def submit(self, *_args, **_kwargs):
+            future = Future()
+            future.set_exception(
+                EngineWorkerDied("call", "fake MAGEMin worker exited")
+            )
+            return future
+
+        def close(self, *, cancel_pending: bool = False) -> None:
+            self.close_calls += 1
+
+    pool = FailedPool()
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._subprocess_pool = pool
+    results: list[EquilibriumResult] = []
+    equilibrate = backend.equilibrate
+
+    @wraps(equilibrate)
+    def capture_result(*args, **kwargs):
+        result = equilibrate(*args, **kwargs)
+        results.append(result)
+        return result
+
+    backend.equilibrate = capture_result
+    handle = EngineHandle(
+        name="magemin",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(
+        binary_pot_battery, "open_battery_engine", lambda _name: handle
+    )
+
+    work = F.work()
+    experiment = F.tabulation_experiment()
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observation = F.observation(
+        "magemin-worker-lifecycle",
+        experiment.experiment_id,
+        identity,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+    )
+    predictions: list[EnginePrediction] = []
+
+    def capture_prediction(engine, observation, *, handles, **kwargs):
+        prediction = predict_with_engine(
+            engine, observation, handles=handles, **kwargs
+        )
+        predictions.append(prediction)
+        return prediction
+
+    import simulator.battery.score as score_module
+
+    residuals, _candidates, _events = score_module._score_store_with_decisions(
+        context,
+        engines=(Engine.MAGEMIN,),
+        include_diagnostics=False,
+        predict=capture_prediction,
+    )
+
+    assert len(results) == 1
+    assert results[0].status == "not_converged"
+    assert (
+        results[0].diagnostics["backend_failure_exception"] == "EngineWorkerDied"
+    )
+    assert len(predictions) == 1
+    prediction = predictions[0]
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert (
+        prediction.refusal_detail["reason"] == "engine_transport_error:magemin"
+    )
+    assert prediction.value is None
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert (
+        residual.refusal.detail["reason"] == "engine_transport_error:magemin"
+    )
+    assert not residual.score_eligible
+    assert pool.close_calls == 1
+
+    monkeypatch.setattr(
+        score_module,
+        "_equilibrate_phase_assemblage",
+        lambda *_args, **_kwargs: EquilibriumResult(status="not_converged"),
+    )
+    physical_nonconvergence = predict_with_engine(
+        Engine.MAGEMIN, observation, handles={}
+    )
+    assert physical_nonconvergence.refusal_reason is RefusalReason.UNSUPPORTED
+    assert physical_nonconvergence.refusal_detail["reason"] == (
+        "phase_not_in_assemblage"
+    )
+
+
+def test_phase_prediction_closes_replacement_for_read_only_handle_map(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    class FakeBackend:
+        def __init__(self, *, live: bool) -> None:
+            self.live = live
+            self.close_calls = 0
+
+        def is_available(self) -> bool:
+            return self.live
+
+        def equilibrate(self, **_kwargs) -> EquilibriumResult:
+            assert self.live
+            return EquilibriumResult(
+                liquid_fraction=1.0,
+                phase_compositions={"liquid": {"SiO2": 10.0, "MgO": 40.0}},
+            )
+
+        def close(self) -> None:
+            self.close_calls += 1
+            self.live = False
+
+    stale_backend = FakeBackend(live=False)
+    stale = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=stale_backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    opened: list[EngineHandle] = []
+
+    def open_fake_engine(name: str) -> EngineHandle:
+        handle = EngineHandle(
+            name=name,
+            backend=FakeBackend(live=True),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", open_fake_engine)
+    work = F.work()
+    experiment = F.tabulation_experiment()
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observation = F.observation(
+        "phase-read-only-handles",
+        experiment.experiment_id,
+        identity,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        observation,
+        handles=MappingProxyType({Engine.THERMOENGINE.value: stale}),
+    )
+
+    assert prediction.value == Decimal("10")
+    assert len(opened) == 1
+    assert opened[0].backend.close_calls == 1
+
+
 def test_alphamelts_phase_score_surfaces_invalid_oxide_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Kill mutation: discard_phase_oxide_projection_notices."""
 
-    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar):
+    def hook(
+        engine,
+        *,
+        temperature_C,
+        composition_kg,
+        fO2_log,
+        pressure_bar,
+        handles=None,
+    ):
         return EquilibriumResult(
             liquid_fraction=1.0,
             phase_compositions={
@@ -975,7 +1405,10 @@ def test_closed_phase_residual_keeps_derived_dex_decision_band(
 def test_distribution_ratio_dex_uses_both_phase_amounts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar):
+    def hook(
+        engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
+        handles=None,
+    ):
         return EquilibriumResult(
             liquid_fraction=1.0,
             phase_compositions={
@@ -1213,7 +1646,10 @@ def test_printed_experiment_pressure_reaches_the_scorer(
 ) -> None:
     calls: list[dict] = []
 
-    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar):
+    def hook(
+        engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
+        handles=None,
+    ):
         calls.append(
             {
                 "engine": engine,
@@ -1359,6 +1795,7 @@ def test_capacity_scores_only_when_the_adapter_declares_the_solute(
         pressure_bar,
         solute_fugacity_bar=None,
         solute_fugacity_parameter=None,
+        handles=None,
     ):
         calls.append(
             {
