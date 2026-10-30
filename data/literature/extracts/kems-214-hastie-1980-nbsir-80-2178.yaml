@@ -43,12 +43,19 @@ source_caveats:
   quote: 'KMS Data for MgO + H2 System'
   note: The printed condensed sample is MgO(s); H2 is the reacting gas.
 - locator:
-    page: 94
-    pdf_page_index: 93
-    published_page: 8
+    page: 93
+    pdf_page_index: 92
+    published_page: 7
     section: 2.2.1
-  quote: 'MgO(s) = Mg + 1/2 O2'
+  quote: '(1) MgO(s) = Mg + 1/2 O2'
   note: The source identifies the solid MgO reservoir in the monitored vaporization reaction.
+- locator:
+    page: 99
+    pdf_page_index: 98
+    published_page: 13
+    section: 2.2.2
+  quote: 'at higher temperatures, and vaporization rates, the data are greatly modified by the effects of changing slag composition.'
+  note: The 1466 K K1 pressure point is in the changing-composition regime; this quote does not report a run-state composition.
 species:
   K:
     observations:
@@ -105,7 +112,7 @@ species:
                 published_page: 13
                 note: The text says TMS N2 typically contained about 5 × 10^-5 atm O2; not a point-specific
                   measured value.
-            composition:
+            starting_composition:
               state:
                 tag: value
                 value:
@@ -127,6 +134,17 @@ species:
                 published_page: 11
                 section: 2.2.2
                 note: Printed initial composition for the K1 sample.
+            composition:
+              state:
+                tag: unknown
+                reason: run-state composition at 1466 K is not reported; the source says higher-temperature
+                  vaporization data are modified by changing slag composition.
+              locator:
+                page: 99
+                pdf_page_index: 98
+                published_page: 13
+                section: 2.2.2
+                note: At higher temperatures and vaporization rates, source says data are modified by changing slag composition.
           locator: *id001
     context:
     - observation_id: hastie_1980_main_table1_K2_slag_model_pressures
