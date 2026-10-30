@@ -25,6 +25,7 @@ import hashlib
 from collections import defaultdict
 from dataclasses import replace
 import json
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -96,9 +97,11 @@ MASS_BALANCE_MAX_PCT = 5e-12
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
         # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
-        # c3: redox applied once per batch in canonical order (lunar C0 moves).
-        "flux_maps_sha256": "b17dd0a57b6cce6860af54eed8f1ba93a0a7187597f7c30940313825173ad6a4",
-        "ledger_sha256": "b8d78633ec0c91bbc92f34b1e92378ad36987e7209fefc5aedff5cd54ab9b18f",
+        # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
+        # (trace Si flux; largest product move 6.3e-7 relative). Same values on
+        # studio-2 and studio-3 (gate config).
+        "flux_maps_sha256": "b3e8f5d65e0868bb09f59134fef15e923c654145512225862d615fef2fcb457a",
+        "ledger_sha256": "f50e2c2aaf8cef9711951d08c5df8213a7dbd0f1af467b385502eeec6aa69324",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
@@ -143,6 +146,20 @@ def test_completed_run_wires_product_classification_and_markdown() -> None:
     assert "Silica glass" in report["markdown"]
     assert "Industrial mixed glass" in report["markdown"]
     assert "Refractory ceramic rump" in report["markdown"]
+
+
+def test_default_lunar_c0_product_story_is_numeric_with_si_channel():
+    payload = _run_scenario(SCENARIOS[0])
+
+    assert payload["status"] == "ok"
+    classification = payload["product_classification"]["classification"]
+    metals_and_oxygen = classification["metals_plus_O2"]
+    assert "Na" in metals_and_oxygen["metals_kg"]
+    assert "Si" in metals_and_oxygen["metals_kg"]
+    class_total = metals_and_oxygen["class_total_kg"]
+    assert isinstance(class_total, (int, float))
+    assert math.isfinite(class_total)
+    assert class_total > 0.0
 
 
 def test_product_classifier_fixed_composition_anchor() -> None:

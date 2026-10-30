@@ -218,12 +218,17 @@ def test_transition_and_free_molecular_regimes_do_not_apply_continuum_gas_film()
 def test_missing_chapman_enskog_parameters_do_not_fall_back_to_constant():
     with pytest.raises(
         EvaporationFluxConfigurationError,
-        match="missing Chapman-Enskog transport parameters.*species='Si'",
+        match="missing Chapman-Enskog transport parameters.*species='H2O'",
     ):
-        _evap(species="Si", knudsen_number=1.0e-7)
+        _evap(
+            species="H2O",
+            molar_mass_kg_mol=0.01801528,
+            knudsen_number=1.0e-7,
+        )
 
     free_molecular = _evap(
-        species="Si",
+        species="H2O",
+        molar_mass_kg_mol=0.01801528,
         knudsen_number=math.inf,
         melt_resistance_enabled=False,
     )
@@ -277,6 +282,29 @@ def test_cro2_evaporation_proxy_absolute_diffusivity_pin():
     # at 1973 K and 1000 Pa. The previous 0.0448662 m2/s pin used the
     # bar-form 0.00266 constant with P in atm (1.216% high).
     assert result.d_ab_m2_s == pytest.approx(0.044327038311009044, rel=1e-12)
+
+
+def test_cro2_evaporation_proxy_uses_shared_sio_collision_parameters():
+    from simulator.condensation import _LENNARD_JONES_PARAMS
+
+    sio_sigma, sio_epsilon, _sio_molar_mass = _LENNARD_JONES_PARAMS["SiO"]
+    expected = _chapman_enskog_d_ab_m2_s(
+        "CrO2",
+        1973.0,
+        1000.0,
+        carrier="N2",
+        species_params=(sio_sigma, sio_epsilon, 83.9941),
+    )
+    result = _evap(
+        species="CrO2",
+        molar_mass_kg_mol=0.0839941,
+        knudsen_number=1.0e-7,
+        T_surface_K=1973.0,
+        T_gas_K=1973.0,
+        melt_resistance_enabled=False,
+    )
+
+    assert result.d_ab_m2_s == pytest.approx(expected, rel=1e-12)
 
 
 def test_chapman_enskog_prefactor_matches_bsl_atmosphere_form():

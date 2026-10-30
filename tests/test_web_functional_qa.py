@@ -241,6 +241,78 @@ def _story_total(story, *keys):
     return sum(story[key]["class_total_kg"] for key in keys)
 
 
+def test_advisory_product_story_renders_partial_metadata() -> None:
+    payload = {
+        "product_story_status": "ok",
+        "product_story": {
+            "metal_ingots": {
+                "species_kg": {"Fe": 1.0},
+                "class_total_kg": 1.0,
+                "status": "partial",
+                "excluded": [{
+                    "species": "Si",
+                    "account": "process.cleaned_melt",
+                    "reason": "missing LJ row",
+                    "upper_bound_kg": 0.5617,
+                    "upper_bound_basis": "conservative_ledger_bound",
+                }],
+                "estimated_contributions": [{
+                    "species": "SiO",
+                    "account": "process.cleaned_melt",
+                    "authority": "status_bearing",
+                    "reason": "estimated carrier row",
+                }],
+            },
+        },
+        "products": {},
+    }
+    rendered = _render_product_story(
+        html=(
+            '<div id="product-ledger-state"></div>'
+            '<div id="product-ledger-content"></div>'
+        ),
+        payload=payload,
+    )
+
+    text = rendered["text"]["product-ledger-content"]
+    assert "status: partial" in text
+    assert "species Si" in text
+    assert "account process.cleaned_melt" in text
+    assert "reason missing LJ row" in text
+    assert "up to 0.562 kg (conservative upper bound)" in text
+    assert "includes estimated transport for SiO (status_bearing)" in text
+
+
+def test_advisory_product_story_renders_available_estimated_transport() -> None:
+    payload = {
+        "product_story_status": "ok",
+        "product_story": {
+            "metal_ingots": {
+                "species_kg": {"Fe": 1.0},
+                "class_total_kg": 1.0,
+                "estimated_contributions": [{
+                    "species": "SiO",
+                    "account": "process.cleaned_melt",
+                    "authority": "extrapolated",
+                    "reason": "estimated carrier row",
+                }],
+            },
+        },
+        "products": {},
+    }
+    rendered = _render_product_story(
+        html=(
+            '<div id="product-ledger-state"></div>'
+            '<div id="product-ledger-content"></div>'
+        ),
+        payload=payload,
+    )
+
+    text = rendered["text"]["product-ledger-content"]
+    assert "includes estimated transport for SiO (extrapolated)" in text
+    assert "estimated contributions unavailable" not in text
+
+
 # Regression: WEBQA-001 — terminal UI hid the feedstock-to-product story.
 # Found by /qa on 2026-07-19
 # Report: docs-private/research/2026-07-19-webqa/report.md

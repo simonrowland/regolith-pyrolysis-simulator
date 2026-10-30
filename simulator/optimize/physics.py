@@ -17,6 +17,7 @@ from simulator.accounting.completeness import (
     TARGET_YIELD_DENOMINATOR_SOURCE,
     TARGET_YIELD_NUMERATOR_SOURCE,
     TARGET_YIELD_PROVENANCE_RULE,
+    evaporation_quantity_unavailability,
     extraction_completeness_by_target,
     target_species_yield_by_initial_cleaned_melt,
 )
@@ -26,6 +27,7 @@ from simulator.diagnostics import (
     _carrier_is_inapplicable,
     wall_deposit_sticking_authority_status,
 )
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.trace import WALL_DEPOSIT_ZONE_NAMES
 
@@ -813,6 +815,56 @@ class PhysicsConstraintSet:
                 output_status=output_status,
                 status_reason=status_reason,
             )
+        raw_wall_rate = report.get("wall_deposit_kg_per_campaign")
+        if (
+            "wall_deposit_kg_per_campaign" in report
+            and raw_wall_rate is None
+            and report.get("unqualified_deposition_rate_kg_per_campaign") is None
+        ):
+            availability = wall_deposit_figure_availability(
+                has_positive_deposit=False,
+                authority=authority_payload,
+                refusal=(
+                    report.get("refusal")
+                    if isinstance(report.get("refusal"), Mapping)
+                    else None
+                ),
+                measured=False,
+            )
+            if availability.status == "refused":
+                unavailable_reason = (
+                    status_reason
+                    or str(
+                        (availability.refusal or {}).get("reason")
+                        or "wall-deposit quantity unavailable"
+                    )
+                )
+                status_payload = {
+                    **report,
+                    "constraint_mode": "continuous",
+                    "coating_verdict": "unavailable",
+                    "coating_unavailable_reason": unavailable_reason,
+                }
+                if threshold_is_unqualified:
+                    status_payload.update(
+                        coating_constraint_mode="no_unqualified_deposition",
+                        coating_constraint_authoritative=False,
+                    )
+                if availability.refusal is not None:
+                    status_payload["wall_deposit_refusal"] = availability.refusal
+                return GateMargin(
+                    gate="coating",
+                    feasible=False,
+                    margin=-math.inf,
+                    threshold=self.coating_min_campaigns_to_resinter,
+                    observed=None,
+                    detail=f"coating unavailable: {unavailable_reason}",
+                    status="unavailable",
+                    authoritative=False,
+                    output_status=output_status,
+                    status_reason=unavailable_reason,
+                    status_payload=status_payload,
+                )
         warning_flags = _coating_dew_point_warnings(
             diagnostics,
             authority_payload,
@@ -1065,6 +1117,12 @@ class PhysicsConstraintSet:
                 threshold = self._extraction_threshold_for_target(str(target))
                 result = by_target[str(target)]
                 if result.completeness_fraction is None:
+                    if result.reason.startswith("unavailable: "):
+                        return _unavailable_gate(
+                            "extraction_completeness",
+                            threshold,
+                            result.reason.removeprefix("unavailable: "),
+                        )
                     detail = _extraction_completeness_fail_closed_detail(result)
                     if detail.startswith("not-applicable:"):
                         return _not_applicable(
@@ -1217,6 +1275,11 @@ class PhysicsConstraintSet:
 def _extraction_completeness_fail_closed_detail(
     result: TargetExtractionCompleteness,
 ) -> str:
+    if result.reason.startswith("unavailable: "):
+        return (
+            f"{result.target_species}: "
+            f"{result.reason.removeprefix('unavailable: ')}"
+        )
     if result.reason.startswith("not-applicable:"):
         return result.reason
     if result.reason == "no target-equivalent mol evidence":
@@ -1340,6 +1403,19 @@ def _extraction_completeness_by_target_for_trace(
     *,
     require_residual_species: bool = False,
 ) -> Mapping[str, TargetExtractionCompleteness]:
+    unavailable_results = {}
+    for target in constraints.target_species:
+        target = str(target)
+        unavailable = evaporation_quantity_unavailability(trace, target)
+        if unavailable:
+            unavailable_results[target] = TargetExtractionCompleteness(
+                target,
+                None,
+                None,
+                None,
+                None,
+                f"unavailable: {unavailable['reason']}",
+            )
     provenance_results = _provenance_extraction_results_from_trace(
         trace,
         constraints,
@@ -1364,16 +1440,17 @@ def _extraction_completeness_by_target_for_trace(
             ledger_results,
             tuple(str(target) for target in constraints.target_species),
         )
-        return provenance_results
+        return MappingProxyType({**provenance_results, **unavailable_results})
     products = _required_mapping(trace, "product_ledger_kg")
     rump = _required_mapping(trace, "terminal_rump_by_species_kg")
-    return extraction_completeness_by_target(
+    results = extraction_completeness_by_target(
         tuple(str(target) for target in constraints.target_species),
         constraints.residual_species_by_target,
         products,
         rump,
         require_residual_species=require_residual_species,
     )
+    return MappingProxyType({**results, **unavailable_results})
 
 
 def _provenance_extraction_results_from_trace(
@@ -2885,6 +2962,18 @@ def _fail_closed(gate: str, threshold: ThresholdSpec, detail: str) -> GateMargin
         threshold=threshold,
         observed=math.nan,
         detail=f"fail-closed: {detail}",
+    )
+
+
+def _unavailable_gate(gate: str, threshold: ThresholdSpec, reason: str) -> GateMargin:
+    return replace(
+        _fail_closed(gate, threshold, reason),
+        observed=None,
+        status="unavailable",
+        authoritative=False,
+        output_status="unavailable",
+        status_reason=reason,
+        status_payload={"reason": reason},
     )
 
 
