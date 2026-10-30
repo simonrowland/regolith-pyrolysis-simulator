@@ -2142,7 +2142,7 @@ class EvaporationMixin:
         return curve
 
     def _hold_freeze_gate_provider_curve(
-        self, failure: Mapping[str, Any],
+        self, failure: Mapping[str, Any], *, timeout_reason: str | None = None,
     ) -> dict[str, Any] | None:
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
@@ -2162,6 +2162,11 @@ class EvaporationMixin:
         diagnostic = failure['provider_diagnostic']
         curve['gate_provider_refusal'] = {
             **failure,
+            'reason': (
+                timeout_reason
+                or diagnostic.get('backend_status_reason')
+                or diagnostic.get('reason')
+            ),
             'qualification': 'held_last_good_curve',
             'authority': 'extrapolated (held)',
             'failure_hour': int(self.melt.hour),
@@ -2788,12 +2793,7 @@ class EvaporationMixin:
         ):
             failure = {
                 'provider': self._liquid_fraction_provider,
-                'reason': (
-                    timeout_reason
-                    or diagnostic.get('backend_status_reason')
-                    or diagnostic.get('reason')
-                    or 'liquid_fraction_provider_failed'
-                ),
+                'reason': timeout_reason or 'liquid_fraction_provider_failed',
                 'outcome': status_outcome,
                 'provider_diagnostic': diagnostic,
                 'status': status,
@@ -2807,13 +2807,21 @@ class EvaporationMixin:
                 status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
                 or timeout_reason is not None
             ):
-                held = self._hold_freeze_gate_provider_curve(failure)
+                held = self._hold_freeze_gate_provider_curve(
+                    failure,
+                    timeout_reason=timeout_reason,
+                )
                 if held is not None:
                     return held
                 curve = self._freeze_gate_kress_floor_curve(None, reasons)
                 if curve is not None:
                     curve['gate_provider_refusal'] = {
                         **failure,
+                        'reason': (
+                            timeout_reason
+                            or diagnostic.get('backend_status_reason')
+                            or diagnostic.get('reason')
+                        ),
                         'qualification': 'first_call_kress91_floor_prediction',
                         'authority': 'extrapolated (lower-rung)',
                         'failure_hour': int(self.melt.hour),
