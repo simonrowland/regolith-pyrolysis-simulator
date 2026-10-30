@@ -22,6 +22,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    AmountBasis,
     PerBasis,
     AdmissionStatus,
     BenchIdentityBasis,
@@ -3005,7 +3006,7 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     assert all(p.derivation.output_unit == "Pa" for p in points)
 
 
-def test_nonclosing_phase_sample_composition_round_trips_as_unknown(
+def test_near_complete_phase_sample_composition_round_trips_as_value(
     tmp_path: Path,
 ) -> None:
     extract = deepcopy(FIXTURE_EXTRACT)
@@ -3057,10 +3058,8 @@ def test_nonclosing_phase_sample_composition_round_trips_as_unknown(
         "fixture-source::partial-phase-silica"
     ].identity.composition
     assert composition is not None
-    assert composition.is_unknown
-    assert "mass-percent composition does not close to 100 (sum=97.55)" in (
-        composition.reason or ""
-    )
+    # The source assay is 70.00 + 27.55 = 97.55 wt%, above b-704's 95 wt% floor.
+    assert composition.is_value
 
     for case, initial_row in (
         (
@@ -3112,15 +3111,12 @@ def test_nonclosing_phase_sample_composition_round_trips_as_unknown(
         assert migrated_rows
         assert any(
             observation.identity.composition is not None
-            and observation.identity.composition.is_unknown
+            and observation.identity.composition.is_value
             for observation in migrated_rows
         )
         experiment = initial_experiments[migrated_rows[0].experiment_id]
         assert experiment.sample.initial_composition is not None
-        assert experiment.sample.initial_composition.state.is_unknown
-        assert "mass-percent composition does not close to 100 (sum=97.55)" in (
-            experiment.sample.initial_composition.state.reason or ""
-        )
+        assert experiment.sample.initial_composition.state.is_value
 
 
 def test_series_explosion_keeps_parent_confidence_level(tmp_path: Path) -> None:
@@ -11685,15 +11681,14 @@ def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-023-demaria-1973.yaml")
     assert result.validation is not None
-    # The 10017 and 12073 proxy totals (99.79 and 99.48 wt%) both lie within ±2,
-    # so selecting both for the shared experiment exposes their source conflict.
+    # The 10017 and 12073 proxy totals (99.79 and 99.48 wt%) are in b-704's
+    # 95–102 interval, so the selected initials expose their source conflict.
     issues = result.validation.hard_issues
-    conflicts = [
-        issue for issue in issues if "initial_composition_conflict" in issue.detail
-    ]
-    assert len(conflicts) == 1
-    assert "lpi-compendium-10017" in conflicts[0].detail
-    assert "lpi-compendium-12073" in conflicts[0].detail
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert "initial_composition_conflict" in issues[0].detail
+    assert "lpi-compendium-10017" in issues[0].detail
+    assert "lpi-compendium-12073" in issues[0].detail
     rows = [
         obs
         for obs in result.observations.values()
@@ -17618,14 +17613,15 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
             oxide: Decimal(str(amount))
             for oxide, amount in source_experiment["sample"]["printed_composition"]["state"]["value"].items()
         }
-        # The source reports five major oxides totaling 99.75 wt%, within the shared ±2 wt% rule.
+        # The source reports five major oxides totaling 99.75 wt%, within b-704's 95–102 interval.
         assert (
             sum(expected_start_composition.values(), Decimal("0"))
             == Decimal("99.75")
         )
         assert identity.composition.is_value
-        expected_composition = wt_pct_to_mole_fraction(expected_start_composition)
-        assert identity.composition.value.components == expected_composition.components
+        assert identity.composition.value.amount_basis is AmountBasis.MASS_PERCENT
+        assert identity.composition.value.basis == "printed_oxides"
+        assert dict(identity.composition.value.components) == expected_start_composition
         assert identity.temperature_K.value == run_key[1]
         assert identity.sample_mass_kg.value == Decimal(
             source_experiment["sample"]["mass_kg"]["state"]["value"]["point"]
