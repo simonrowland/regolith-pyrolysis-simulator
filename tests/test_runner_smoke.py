@@ -209,21 +209,8 @@ def test_per_hour_and_p_o2_projections_keep_bytes_and_ownership():
     assert p_o2_by_hour[0]["details"][0]["limit"] is None
 
 
-def test_completed_run_wires_product_classification_and_markdown(monkeypatch) -> None:
+def test_completed_run_wires_product_classification_and_markdown() -> None:
     """Wiring-only: runner attaches the shared classifier and formatter output."""
-
-    per_hour_projection_calls = []
-    project_per_hour = runner_module._execution_per_hour_summary
-
-    def count_per_hour_projection(execution):
-        per_hour_projection_calls.append(execution)
-        return project_per_hour(execution)
-
-    monkeypatch.setattr(
-        runner_module,
-        "_execution_per_hour_summary",
-        count_per_hour_projection,
-    )
 
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
@@ -248,7 +235,69 @@ def test_completed_run_wires_product_classification_and_markdown(monkeypatch) ->
     assert "Silica glass" in report["markdown"]
     assert "Industrial mixed glass" in report["markdown"]
     assert "Refractory ceramic rump" in report["markdown"]
-    assert len(per_hour_projection_calls) == 1
+
+
+def test_success_payload_builds_per_hour_projection_once(monkeypatch):
+    per_hour_projection_calls = []
+    project_per_hour = runner_module._execution_per_hour_summary
+
+    def count_per_hour_projection(execution):
+        per_hour_projection_calls.append(execution)
+        return project_per_hour(execution)
+
+    monkeypatch.setattr(
+        runner_module,
+        "_execution_per_hour_summary",
+        count_per_hour_projection,
+    )
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            liquid_fraction_provider="probe",
+            snapshots=[],
+            cost_rollup={},
+        ),
+        melt=SimpleNamespace(hour=1),
+        _c3_alkali_credit_drawn_kg_by_species={},
+        _c3_alkali_credit_outstanding_kg_by_species=lambda: {},
+        species_formula_registry={},
+        train=SimpleNamespace(),
+    )
+    row = {
+        "hour": 1,
+        "mass_balance_pct": 0.0,
+        "pO2_enforcement": {"status": "ok"},
+    }
+    execution = SimpleNamespace(
+        simulator=sim,
+        session=SimpleNamespace(
+            _config=SimpleNamespace(additives_kg={}, setpoints={}),
+        ),
+        snapshots=(),
+        trace=SimpleNamespace(),
+        per_hour=(row,),
+        shadow_trace=(),
+        reduced_real_cache={},
+        campaigns_elapsed=1.0,
+        campaigns_elapsed_start=0.0,
+        backend_status="ok",
+        backend_authoritative=False,
+        status="ok",
+        reason="",
+        error_message="",
+        refusal_diagnostic={},
+        envelope_detail_unavailable=None,
+    )
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+
+    payload = run._build_output(execution)
+
+    assert payload["per_hour_summary"] == [row]
+    assert payload["pO2_enforcement_by_hour"] == [{"status": "ok"}]
+    assert per_hour_projection_calls == [execution]
 
 
 def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
