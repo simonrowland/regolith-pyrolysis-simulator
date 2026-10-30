@@ -9,7 +9,7 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -109,6 +109,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:S:shared:T=298.15:col=entropy:name=magnesite:v=b64814c078
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -116,7 +117,7 @@ observations:
       tag: value
       value: S
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -216,6 +217,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=magnesite:v=fe3652cdc2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -223,7 +225,7 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -251,7 +253,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -298,7 +300,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -410,6 +412,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=magnesite:v=8b6ccaa160
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -417,7 +420,7 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -445,7 +448,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -492,7 +495,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -604,6 +607,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=magnesite:v=49345b11c9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -611,7 +615,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -639,7 +643,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -686,7 +690,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -789,6 +793,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=magnesite:v=6a3cf6998e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -796,7 +801,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -824,7 +829,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -871,7 +876,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -974,6 +979,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=magnesite:v=bda94ea52a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -981,7 +987,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -1009,7 +1015,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -1056,7 +1062,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -1159,6 +1165,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=400:col=log_Kf:name=magnesite:v=c3afbfd8f2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -1166,7 +1173,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -1194,7 +1201,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -1241,7 +1248,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -1344,6 +1351,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=500:col=log_Kf:name=magnesite:v=be5066f734
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -1351,7 +1359,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -1379,7 +1387,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -1426,7 +1434,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -1529,6 +1537,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=600:col=log_Kf:name=magnesite:v=1dc0212dfa
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -1536,7 +1545,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -1564,7 +1573,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -1611,7 +1620,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -1714,6 +1723,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=700:col=log_Kf:name=magnesite:v=59089121e0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -1721,7 +1731,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -1749,7 +1759,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -1796,7 +1806,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -1899,6 +1909,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=800:col=log_Kf:name=magnesite:v=031408681f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -1906,7 +1917,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -1934,7 +1945,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -1981,7 +1992,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -2084,6 +2095,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=900:col=log_Kf:name=magnesite:v=67f38603e7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
@@ -2091,7 +2103,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgCO
+      formula: MgCO3
       phase:
         tag: value
         value: cr
@@ -2119,7 +2131,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgCO
+            formula: MgCO3
             phase:
               tag: value
               value: cr
@@ -2166,7 +2178,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: -1/2
+          coefficient: -3/2
     formation_elements:
       tag: value
       value:
@@ -2269,3 +2281,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
     parameters: []
     output_unit: dimensionless
+    references: []

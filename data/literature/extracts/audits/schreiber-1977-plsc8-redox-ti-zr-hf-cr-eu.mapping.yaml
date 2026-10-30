@@ -1,0 +1,27 @@
+source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+source:
+  citation: Schreiber (1977), Redox states of Ti, Zr, Hf, Cr, and Eu in basaltic magmas, Proceedings of the Eighth Lunar Science Conference, 1785-1807.
+tables:
+  - page: 4
+    table: '1'
+    disposition: context-no-token
+    candidate_tokens: [equilibrium_phase_composition]
+    reason: >-
+      Whole-rock Earth and lunar basalt comparisons and incomplete bulk synthetic
+      starting compositions are not single-phase analyses; dashed oxides are
+      unreported, not zero.
+  - page: 9
+    table: '2'
+    disposition: context-no-token
+    candidate_tokens: [delta_fH]
+    reason: >-
+      Values are standard enthalpy changes for reduction reactions, not formation
+      enthalpies from elements; the schema has no reaction-enthalpy token.
+  - page: 16
+    table: '3'
+    disposition: mixed
+    candidate_tokens: [valence_ratio]
+    reason: >-
+      Prior-work measured reduced-state fractions are typed as quoted values.
+      This-study estimates and Zr(III)=0 are model estimates, not measurements,
+      and remain context. Zr and Hf have no measured values in the table.

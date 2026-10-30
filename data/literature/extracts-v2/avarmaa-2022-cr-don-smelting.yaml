@@ -1,0 +1,172 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/avarmaa-2022-cr-don-smelting.yaml
+observations:
+- observation_id: avarmaa-2022-cr-don-smelting::avarmaa_2022_average_slag_chromium_at_1400C
+  experiment_id: 10.1080/08827508.2020.1854251::avarmaa-2022-cr-don-smelting
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: average of all experimental points in Figure 1
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: The printed 0.66 wt% is the mean across experimental points with varying matte Fe and slag MgO.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.66'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: avarmaa-2022-cr-don-smelting::avarmaa_2022_average_slag_chromium_at_1400C
+  source_id: avarmaa-2022-cr-don-smelting
+  locator:
+    page: 8
+    published_page: 206
+    pdf_page_index: 7
+    section: Discussion and conclusions
+  read_from: pdf:avarmaa-2022-cr-don-smelting
+  point_conditions:
+    phase_assemblage:
+      state:
+        tag: value
+        value: silica + chromite spinel saturation
+      locator:
+        page: 8
+        published_page: 206
+        pdf_page_index: 7
+    composition:
+      state:
+        tag: unknown
+        reason: The printed 0.66 wt% is the mean across experimental points with varying matte Fe and slag MgO.
+      locator:
+        page: 8
+        published_page: 206
+        pdf_page_index: 7
+    log_fO2:
+      state:
+        tag: unknown
+        reason: Figure 1 averages experimental points with different oxygen partial pressures; no single pressure applies
+          to the mean.
+      locator:
+        page: 8
+        published_page: 206
+        pdf_page_index: 7
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 8
+        published_page: 206
+        pdf_page_index: 7
+        section: Discussion and conclusions
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 8
+              published_page: 206
+              pdf_page_index: 7
+              section: Discussion and conclusions
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 206
+              pdf_page_index: 7
+              section: Discussion and conclusions
+        output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      locator:
+        page: 8
+        published_page: 206
+        pdf_page_index: 7
+        section: Discussion and conclusions
+  derived_from:
+  - unknown:avarmaa-2022-cr-don-smelting
+  derivation:
+    relation: Reported mean chromium concentration across the experimental points plotted in Figure 1.
+    inputs:
+    - unknown:avarmaa-2022-cr-don-smelting
+    parameters: []
+    output_unit: wt% Cr
+    references: []

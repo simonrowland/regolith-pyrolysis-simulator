@@ -250,21 +250,32 @@ def test_plant_mre_isolated_from_reproduction_loader_and_driver(
 ) -> None:
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    campaign_key = {
+        CampaignPhase.C5: "C5",
+        CampaignPhase.MRE_BASELINE: "mre_baseline",
+    }[campaign]
+    source_row = load_config_bundle().setpoints["campaigns"][campaign_key]
+    setpoints = {
+        "campaigns": {
+            campaign_key: {
+                key: source_row[key]
+                for key in ("pO2_mbar_default", "p_total_mbar_default")
+            }
+        },
+        "mre_voltage_sequence": {
+            "sequence": [
+                {
+                    "species": "FeO",
+                    "decomposition_V": 0.8,
+                    "min_hold_hours": 1,
+                }
+            ]
+        },
+        "chemistry_kernel": {"liquid_fraction_provider": "analytical"},
+    }
     sim = PyrolysisSimulator(
         backend,
-        {
-            "campaigns": {},
-            "chemistry_kernel": {"liquid_fraction_provider": "analytical"},
-            "mre_voltage_sequence": {
-                "sequence": [
-                    {
-                        "species": "FeO",
-                        "decomposition_V": 0.8,
-                        "min_hold_hours": 1,
-                    }
-                ]
-            },
-        },
+        setpoints,
         # This one-rung exhaustion case requires an explicitly all-ferrous
         # charge, rather than an FeOt assay with a predicted ferric fraction.
         {"x": {

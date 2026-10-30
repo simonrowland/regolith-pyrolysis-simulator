@@ -2652,9 +2652,10 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         profile=PROFILE,
         executor=FakeExecutor(refused_execution),
     )
-    assert refused.objectives.as_mapping()["pure_silica_glass_kg"] is None
+    assert refused.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
     refused_evidence = refused.objectives.evidence["pure_silica_glass_kg"]
-    assert refused_evidence["value_status"] == "unavailable"
+    assert refused_evidence["value_status"] == "partial"
+    assert refused_evidence["total_basis"] == "lower_bound"
     assert "flag" not in refused_evidence
     assert refused_evidence["certification_flag"] == {
         "status": "unavailable",
@@ -2662,6 +2663,8 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         "band": None,
         "reason": "missing SiO carrier input",
     }
+    assert refused_evidence["availability_flag"]["status"] == "partial"
+    assert {item["species"] for item in refused_evidence["excluded"]} == {"SiO"}
 
 
 def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:

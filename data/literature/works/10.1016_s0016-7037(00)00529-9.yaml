@@ -1,0 +1,1022 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/s0016-7037(00)00529-9
+  citation: Wang, J., Davis, A. M., Clayton, R. N., Mayeda, T. K., & Hashimoto, A. (2001). Chemical and isotopic fractionation
+    during the evaporation of the FeO-MgO-SiO2-CaO-Al2O3-TiO2 rare earth element melt system. Geochimica et Cosmochimica Acta,
+    65(3), 479–494.
+  source_ids:
+  - wang-2001-solar-melt-evaporation-residues
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:wang-2001-solar-melt-evaporation-residues
+      role: pdf
+      path: raw/wang-2001-solar-melt-evaporation-residues/wang-2001-solar-melt-evaporation-residues.pdf
+      sha256:
+        tag: value
+        value: 2d3ff08c92283b4449c0f199a695807b2bb6a605cd456edbc42dfc62d79fe8df
+    - asset_id: pdftotext:wang-2001-solar-melt-evaporation-residues
+      role: pdftotext
+      path: text/wang-2001-solar-melt-evaporation-residues
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:wang-2001-solar-melt-evaporation-residues
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/s0016-7037(00)00529-9
+experiments:
+- experiment_id: 10.1016/s0016-7037(00)00529-9::wang-2001-solar-melt-evaporation-residues
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0016-7037(00)00529-9
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+context:
+- observation_id: wang_2001_figure_10_deferred
+  type: figure_only
+  locator:
+    page: 12
+    published_page: 490
+    pdf_page_index: 11
+    figure: '10'
+  units: as printed; no numeric points
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - Mg
+    - Si
+    - Fe
+    - Ti
+    phase: silicate melt
+    temperature_as_printed: 1800 and 2000 °C
+    caption_as_printed: Fig. 10. The volatilities (J/C) of magnesium, silicon, iron, and titanium do not show a strong dependence
+      on degree of evaporation.
+    panel: single panel
+    axes_as_printed:
+      x: '% Mass loss'
+      y: J/C (cm/s)
+    series:
+    - Fe
+    - Si
+    - Mg
+    - Ti
+    marker_counts:
+      Fe:
+        1800_C: 4
+        2000_C: 1
+      Si:
+        1800_C: 6
+        2000_C: 4
+      Mg:
+        1800_C: 6
+        2000_C: 4
+      Ti:
+        1800_C: 2
+        2000_C: 3
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+    schema_gap: no quantity token for molar area flux J or volatility J/C
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_10_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_11_deferred
+  type: figure_only
+  locator:
+    page: 12
+    published_page: 490
+    pdf_page_index: 11
+    figure: '11'
+  units: as printed; no numeric points
+  values:
+    quantity: residue_component_composition
+    method_class: figure_only
+    species:
+    - La
+    - Ce
+    - Pr
+    - Nd
+    - Sm
+    - Eu
+    - Gd
+    - Tb
+    - Dy
+    - Ho
+    - Er
+    - Tm
+    - Yb
+    - Lu
+    phase: quenched residue bulk
+    temperature_as_printed: multiple runs; see sample identifiers
+    caption_as_printed: Fig. 11. REE patterns of evaporation residues show negative cerium anomalies above ~30% total mass
+      loss and negative praseodymium anomalies above 70% mass loss. The slight decrease in enrichment factor from neodymium
+      to lutetium in the more heavily evaporated residues is likely to be an analytical artifact due to small relative changes
+      in REE ion yield with bulk chemical composition.
+    panel: single panel
+    axes_as_printed:
+      x: Decreasing ionic radius; element labels
+      y: Enrichment factor relative to starting material
+    series:
+    - REE abundance patterns
+    marker_counts:
+      La: 16
+      Ce: 16
+      Pr: 16
+      Nd: 16
+      Sm: 16
+      Eu: 16
+      Gd: 16
+      Tb: 16
+      Dy: 16
+      Ho: 16
+      Er: 16
+      Tm: 16
+      Yb: 16
+      Lu: 16
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_11_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_12_deferred
+  type: figure_only
+  locator:
+    page: 13
+    published_page: 491
+    pdf_page_index: 12
+    figure: '12'
+  units: as printed; no numeric points
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - La
+    - Ce
+    - Fe
+    - Mg
+    - Si
+    - Pr
+    phase: quenched residue bulk
+    temperature_as_printed: 1800 and 2000 °C
+    caption_as_printed: Fig. 12. The fraction remaining of lanthanum shows that there was no evaporation of lanthanum. Calcium,
+      aluminum, and neodymium to lutetium (not plotted) also show no detectable loss. Iron is the most volatile element considered
+      here, followed by cerium. There is no significant evaporation of cerium, magnesium, or silicon until 99% of the iron
+      has been evaporated.
+    panel: single panel
+    axes_as_printed:
+      x: '% Mass loss'
+      y: Fraction remaining
+    series:
+    - La
+    - Ce
+    - Fe
+    - Mg
+    - Si
+    - Pr
+    marker_counts:
+      La: 16
+      Ce: 16
+      Fe: 16
+      Mg: 16
+      Si: 16
+      Pr: 16
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+    schema_gap: no store token for fraction remaining of each component
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_12_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_13_deferred
+  type: figure_only
+  locator:
+    page: 13
+    published_page: 491
+    pdf_page_index: 12
+    figure: '13'
+  units: as printed; no numeric points
+  values:
+    quantity: isotope_delta
+    method_class: figure_only
+    species:
+    - O
+    - Mg
+    - Si
+    phase: quenched residue
+    temperature_as_printed: multiple runs; see sample identifiers
+    caption_as_printed: Fig. 13. The magnesium, silicon, and oxygen isotopic compositions of evaporation residues plot along
+      straight lines in this diagram, as expected for a system that follows a Rayleigh relationship. R is the isotope ratio
+      in the residue, R0 is the isotope ratio in the starting material, and f is the fraction of the element remaining in
+      the residue.
+    panel: single panel
+    axes_as_printed:
+      x: -ln(f)
+      y: 1000 ln(R/R0)
+    series:
+    - 25Mg/24Mg
+    - 26Mg/24Mg
+    - 17O/16O
+    - 18O/16O
+    - 29Si/28Si
+    - 30Si/28Si
+    marker_counts:
+      25Mg/24Mg: 15
+      26Mg/24Mg: 15
+      17O/16O: 15
+      18O/16O: 15
+      29Si/28Si: 15
+      30Si/28Si: 15
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_13_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_1_deferred
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 484
+    pdf_page_index: 5
+    figure: '1'
+  units: as printed; no numeric points
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - FeO
+    - MgO
+    - SiO2
+    - CaO
+    - Al2O3
+    - TiO2
+    phase: sintered starting-material mixture
+    temperature_as_printed: not applicable
+    caption_as_printed: Fig. 1. A backscattered electron image of the material used as the starting composition for evaporation
+      experiments, which consists of a sintered mixture of the oxides of the major rock-forming elements in solar relative
+      proportions, shows some porosity and limited reaction between different oxides. The scale bar is 10 µm. The darker grains
+      are almost pure silica and the lighter grains are iron-magnesium oxide.
+    panel: single panel
+    axes_as_printed: none; backscattered-electron micrograph
+    series:
+    - starting-material phases
+    marker_counts:
+      micrograph: not applicable
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+    schema_gap: no microstructure quantity token
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_1_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_2_deferred
+  type: figure_only
+  locator:
+    page: 7
+    published_page: 485
+    pdf_page_index: 6
+    figure: '2'
+  units: as printed; no numeric points
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - FeO
+    - MgO
+    - SiO2
+    phase: quenched residue SC11; glass with olivine and magnetite
+    temperature_as_printed: 1500 °C
+    caption_as_printed: Fig. 2. A secondary electron image of evaporation residue SC11, which was heated to 1500°C and immediately
+      quenched, shows a porphyritic texture. The scale bar is 10 µm. Sitting in the glass matrix are olivine (dark grains)
+      and magnetite (light grains). Olivine becomes more fayalitic towards the edge (brighter), but the bright edges are an
+      artifact of the secondary electron image.
+    panel: single panel
+    axes_as_printed: none; secondary-electron micrograph
+    series:
+    - glass
+    - olivine
+    - magnetite
+    marker_counts:
+      micrograph: not applicable
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+    schema_gap: no microstructure quantity token
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_2_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_3_deferred
+  type: figure_only
+  locator:
+    page: 8
+    published_page: 486
+    pdf_page_index: 7
+    figure: '3'
+  units: as printed; no numeric points
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - FeO
+    - MgO
+    - SiO2
+    phase: quenched residue SC12; glass with olivine and iron oxide
+    temperature_as_printed: 1400 °C
+    caption_as_printed: Fig. 3. A secondary electron image of evaporation residue SC12, which was heated to 1400°C and immediately
+      quenched, also shows a porphyritic texture, but the grain size is smaller than that of residue SC11 (Fig. 2). The scale
+      bar is 10 µm.
+    panel: single panel
+    axes_as_printed: none; secondary-electron micrograph
+    series:
+    - glass
+    - olivine
+    - iron oxide
+    marker_counts:
+      micrograph: not applicable
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+    schema_gap: no microstructure quantity token
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_3_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_4_deferred
+  type: figure_only
+  locator:
+    page: 9
+    published_page: 487
+    pdf_page_index: 8
+    figure: '4'
+  units: as printed; no numeric points
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - FeO
+    - MgO
+    - SiO2
+    phase: quenched residue SC5; olivine bars, magnetite, and glass
+    temperature_as_printed: 1800 °C
+    caption_as_printed: Fig. 4. A secondary electron image of evaporation residue SC5, which was heated to 1800°C and immediately
+      quenched, shows a barred structure. The scale bar is 100 µm. The bars with light edges are olivine crystals that run
+      across the entire residue. Dendritic magnetite lies in the silicate glass between olivine bars.
+    panel: single panel
+    axes_as_printed: none; secondary-electron micrograph
+    series:
+    - olivine
+    - magnetite
+    - glass
+    marker_counts:
+      micrograph: not applicable
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+    schema_gap: no microstructure quantity token
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_4_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_5_deferred
+  type: figure_only
+  locator:
+    page: 10
+    published_page: 488
+    pdf_page_index: 9
+    figure: '5'
+  units: as printed; no numeric points
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - FeO
+    - MgO
+    - SiO2
+    phase: quenched residue SC1; forsterite and glass
+    temperature_as_printed: 1800 °C for 1 h
+    caption_as_printed: Fig. 5. A backscattered electron image of evaporation residue SC1, which was heated at 1800°C for
+      1 h before quenching, shows a barred structure that is much finer than that of residue SC5. The scale bar is 100 µm.
+      Forsterite appears dark and glass appears bright.
+    panel: single panel
+    axes_as_printed: none; backscattered-electron micrograph
+    series:
+    - forsterite
+    - glass
+    marker_counts:
+      micrograph: not applicable
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+    schema_gap: no microstructure quantity token
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_5_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_6_deferred
+  type: figure_only
+  locator:
+    page: 10
+    published_page: 488
+    pdf_page_index: 9
+    figure: '6'
+  units: as printed; no numeric points
+  values:
+    quantity: residue_component_composition
+    method_class: figure_only
+    species:
+    - MgO
+    - Al2O3
+    - SiO2
+    - CaO
+    - TiO2
+    - FeO
+    phase: quenched residue SC1
+    temperature_as_printed: 1800 °C for 1 h
+    caption_as_printed: Fig. 6. An electron microprobe line profile across residue SC1 shows no systematic variation in chemical
+      composition from the edge (0 µm) to the center (2150 µm). The electron beam was defocused to 100 µm.
+    panel: single panel
+    axes_as_printed:
+      x: Distance (µm)
+      y: wt%
+    series:
+    - MgO
+    - Al2O3
+    - SiO2
+    - CaO
+    - TiO2
+    - FeO
+    marker_counts:
+      MgO: 0
+      Al2O3: 0
+      SiO2: 0
+      CaO: 0
+      TiO2: 0
+      FeO: 0
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_6_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_7_deferred
+  type: figure_only
+  locator:
+    page: 10
+    published_page: 488
+    pdf_page_index: 9
+    figure: '7'
+  units: as printed; no numeric points
+  values:
+    quantity: residue_component_composition
+    method_class: figure_only
+    species:
+    - MgO
+    - Al2O3
+    - SiO2
+    - CaO
+    - TiO2
+    - FeO
+    phase: quenched residue bulk compositions
+    temperature_as_printed: 1800 and 2000 °C
+    caption_as_printed: Fig. 7. A plot of the chemical composition of residues vs. percent of initial mass evaporated shows
+      that most of the iron is evaporated in the first 50% of mass loss. The other oxides steadily increase in this interval.
+      After 50% mass loss, the refractory oxides CaO, Al2O3, and TiO2 continue to increase and MgO and SiO2 evaporate. The
+      temperature for each data point is shown along the top and different temperatures are indicated with different symbols.
+      Residues produced at 1800°C and 2000°C fall along the same paths. The average bulk composition of CAI is close to the
+      composition produced by 93% evaporation of solar composition material.
+    panel: single panel
+    axes_as_printed:
+      x: '% Mass loss'
+      y: Composition of residue, in wt%
+    series:
+    - MgO
+    - Al2O3
+    - SiO2
+    - CaO
+    - TiO2
+    - FeO
+    marker_counts:
+      MgO: 16
+      Al2O3: 16
+      SiO2: 16
+      CaO: 16
+      TiO2: 16
+      FeO: 16
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_7_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_8_deferred
+  type: figure_only
+  locator:
+    page: 11
+    published_page: 489
+    pdf_page_index: 10
+    figure: '8'
+  units: as printed; no numeric points
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - MgO
+    - Al2O3
+    - SiO2
+    - CaO
+    - TiO2
+    - FeO
+    phase: quenched residue bulk compositions
+    temperature_as_printed: 1800 and 2000 °C
+    caption_as_printed: Fig. 8. The masses of oxides remaining in the residue vs. percent of initial mass evaporated for all
+      residues, with the initial mass of each residue scaled to 100 mg. The temperature for each data point is shown along
+      the top and different temperatures are indicated with different symbols. There is no significant evaporation of CaO
+      and Al2O3. In the first 50% of evaporation, most of the FeO is lost, a substantial fraction of SiO2 is lost and some
+      MgO evaporates. MgO and SiO2 evaporate in nearly fixed proportions above 50% evaporation and some TiO2 loss becomes
+      apparent above 70% evaporation.
+    panel: single panel
+    axes_as_printed:
+      x: '% Mass loss'
+      y: Residual mass from a 100 mg charge (mg)
+    series:
+    - MgO
+    - Al2O3
+    - SiO2
+    - CaO
+    - TiO2
+    - FeO
+    marker_counts:
+      MgO: 16
+      Al2O3: 16
+      SiO2: 16
+      CaO: 16
+      TiO2: 16
+      FeO: 16
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); authors' figure
+    schema_gap: no stored token for remaining mass of an individual residue component
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_8_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_figure_9_deferred
+  type: figure_only
+  locator:
+    page: 11
+    published_page: 489
+    pdf_page_index: 10
+    figure: '9'
+  units: as printed; no numeric points
+  values:
+    quantity: mass_loss_fraction
+    method_class: figure_only
+    species:
+    - MgO
+    - SiO2
+    - FeO
+    - TiO2
+    phase: silicate melt residue components
+    temperature_as_printed: 1800 and 2000 °C
+    caption_as_printed: Fig. 9. A comparison of the amounts of weight loss of magnesium, silicon, iron, and titanium at 1800°C
+      and 2000°C shows more rapid evaporation at 2000°C. The data of Hashimoto (1983) fall along curves of our data at 1800°C,
+      but deviate from the 2000°C for short evaporation times (because of different experimental designs). Samples SC2 and
+      SC3 show anomalously low degrees of mass loss and were not included in calculation of evaporation kinetics.
+    panel: single panel
+    axes_as_printed:
+      x: Time (min)
+      y: Weight loss (%)
+    series:
+    - MgO
+    - SiO2
+    - FeO
+    - TiO2
+    marker_counts:
+      MgO:
+        this_work_1800_C: 9
+        this_work_2000_C: 5
+        Hashimoto_1983: plotted comparison markers; not separately counted
+      SiO2:
+        this_work_1800_C: 9
+        this_work_2000_C: 5
+        Hashimoto_1983: plotted comparison markers; not separately counted
+      FeO:
+        this_work_1800_C: 9
+        this_work_2000_C: 5
+        Hashimoto_1983: plotted comparison markers; not separately counted
+      TiO2:
+        this_work_1800_C: 9
+        this_work_2000_C: 5
+        Hashimoto_1983: plotted comparison markers; not separately counted
+    digitisation: deferred to a figure pass
+    attribution: Wang et al. (2001); Hashimoto (1983) comparison data
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_figure_9_deferred
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_table1_ln2o3_aggregate_no_formula
+  type: context
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+  units: wt%
+  values:
+    quantity_candidate: residue_component_composition
+    method_class: measured_direct
+    caption_as_printed: ΣLn2O3, total of all rare earth elements as oxides.
+    reason_not_typed: The aggregate Ln2O3 has no single chemical species formula in the existing species containers. Individual
+      elemental ppm rows La–Lu are typed separately.
+    candidate_tokens:
+    - residue_component_composition
+    rows_as_printed:
+    - sample: SC12
+      SigmaLn2O3_wt_pct: '0.138'
+      standard_error_wt_pct: '0.006'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: SC12
+    - sample: SC11
+      SigmaLn2O3_wt_pct: '0.169'
+      standard_error_wt_pct: '0.031'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: SC11
+    - sample: SC5
+      SigmaLn2O3_wt_pct: '0.167'
+      standard_error_wt_pct: '0.021'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: SC5
+    - sample: SC13
+      SigmaLn2O3_wt_pct: '0.210'
+      standard_error_wt_pct: '0.011'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: SC13
+    - sample: SC8
+      SigmaLn2O3_wt_pct: '0.196'
+      standard_error_wt_pct: '0.008'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: SC8
+    - sample: SC4
+      SigmaLn2O3_wt_pct: '0.239'
+      standard_error_wt_pct: '0.002'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: SC4
+    - sample: SC14
+      SigmaLn2O3_wt_pct: '0.447'
+      standard_error_wt_pct: '0.038'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: SC14
+    - sample: SC1
+      SigmaLn2O3_wt_pct: '0.349'
+      standard_error_wt_pct: '0.010'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: SC1
+    - sample: SC7
+      SigmaLn2O3_wt_pct: '0.354'
+      standard_error_wt_pct: '0.007'
+      locator:
+        page: 5
+        published_page: 483
+        pdf_page_index: 4
+        table: '1'
+        row: SC7
+    - sample: SC2
+      SigmaLn2O3_wt_pct: '0.409'
+      standard_error_wt_pct: '0.008'
+      locator:
+        page: 5
+        published_page: 483
+        pdf_page_index: 4
+        table: '1'
+        row: SC2
+    - sample: SC16
+      SigmaLn2O3_wt_pct: '0.585'
+      standard_error_wt_pct: '0.043'
+      locator:
+        page: 5
+        published_page: 483
+        pdf_page_index: 4
+        table: '1'
+        row: SC16
+    - sample: SC6
+      SigmaLn2O3_wt_pct: '0.718'
+      standard_error_wt_pct: '0.007'
+      locator:
+        page: 5
+        published_page: 483
+        pdf_page_index: 4
+        table: '1'
+        row: SC6
+    - sample: SC3
+      SigmaLn2O3_wt_pct: '0.890'
+      standard_error_wt_pct: '0.057'
+      locator:
+        page: 5
+        published_page: 483
+        pdf_page_index: 4
+        table: '1'
+        row: SC3
+    - sample: SC15
+      SigmaLn2O3_wt_pct: '1.38'
+      standard_error_wt_pct: '0.07'
+      locator:
+        page: 5
+        published_page: 483
+        pdf_page_index: 4
+        table: '1'
+        row: SC15
+    - sample: SC10
+      SigmaLn2O3_wt_pct: '1.20'
+      standard_error_wt_pct: '0.11'
+      locator:
+        page: 5
+        published_page: 483
+        pdf_page_index: 4
+        table: '1'
+        row: SC10
+    - sample: SC9
+      SigmaLn2O3_wt_pct: '2.86'
+      standard_error_wt_pct: '0.16'
+      locator:
+        page: 5
+        published_page: 483
+        pdf_page_index: 4
+        table: '1'
+        row: SC9
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_table1_ln2o3_aggregate_no_formula
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_table3_calculated_evaporation_parameters
+  type: context
+  locator:
+    page: 12
+    published_page: 490
+    pdf_page_index: 11
+    table: '3'
+  units: mol cm^-2 s^-1; cm s^-1
+  values:
+    quantity_candidates:
+    - evaporation_rate
+    - mass_loss_rate
+    method_class: model_derived
+    quantity_as_printed: J (mol cm^-2 s^-1) and J/C (cm s^-1)
+    reason_not_typed: Table 3 reports calculated molar area fluxes and calculated volatilities, not a stored total-mass evaporation
+      rate. The available evaporation_rate and mass_loss_rate units do not represent these printed quantities.
+    method_note: Authors infer the entries from consecutive residue compositions and a melt-density parameterization; no direct
+      flux measurement is tabulated.
+    rows_as_printed:
+    - temperature_C: '1800'
+      time_min: 0–7
+      J_mol_cm2_s:
+        Fe: 1.56×10^-6
+        Si: 3.75×10^-7
+        Mg: 1.91×10^-7
+      J_over_C_cm_s:
+        Fe: 1.26×10^-4
+        Si: 1.99×10^-5
+        Mg: 9.55×10^-6
+    - temperature_C: '1800'
+      time_min: 7–15
+      J_mol_cm2_s:
+        Fe: 9.02×10^-7
+        Si: 3.36×10^-7
+        Mg: 1.38×10^-7
+      J_over_C_cm_s:
+        Fe: 1.26×10^-4
+        Si: 1.67×10^-5
+        Mg: 6.07×10^-6
+    - temperature_C: '1800'
+      time_min: 15–40
+      J_mol_cm2_s:
+        Fe: 2.37×10^-7
+        Si: 2.34×10^-7
+        Mg: 1.13×10^-7
+      J_over_C_cm_s:
+        Fe: 9.20×10^-5
+        Si: 1.14×10^-5
+        Mg: 4.32×10^-6
+    - temperature_C: '1800'
+      time_min: 40–60
+      J_mol_cm2_s:
+        Fe: 1.50×10^-8
+        Si: 1.51×10^-7
+        Mg: 1.41×10^-7
+      J_over_C_cm_s:
+        Fe: 9.30×10^-5
+        Si: 7.45×10^-6
+        Mg: 4.99×10^-6
+    - temperature_C: '1800'
+      time_min: 60–120
+      J_mol_cm2_s:
+        Si: 1.47×10^-7
+        Mg: 1.87×10^-7
+        Ti: 2.45×10^-10
+      J_over_C_cm_s:
+        Si: 7.62×10^-6
+        Mg: 6.59×10^-6
+        Ti: 2.54×10^-6
+    - temperature_C: '1800'
+      time_min: 120–220
+      J_mol_cm2_s:
+        Si: 9.24×10^-8
+        Mg: 1.61×10^-7
+        Ti: 1.20×10^-10
+      J_over_C_cm_s:
+        Si: 5.37×10^-6
+        Mg: 6.98×10^-6
+        Ti: 7×10^-7
+    - temperature_C: '2000'
+      time_min: 0–5
+      J_mol_cm2_s:
+        Fe: 4.92×10^-6
+        Si: 3.01×10^-6
+        Mg: 1.63×10^-6
+      J_over_C_cm_s:
+        Fe: 6.53×10^-4
+        Si: 1.65×10^-4
+        Mg: 6.87×10^-5
+    - temperature_C: '2000'
+      time_min: 5–15
+      J_mol_cm2_s:
+        Si: 1.35×10^-6
+        Mg: 2.16×10^-6
+        Ti: 1.59×10^-9
+      J_over_C_cm_s:
+        Si: 7.68×10^-5
+        Mg: 8.04×10^-5
+        Ti: 1.25×10^-5
+    - temperature_C: '2000'
+      time_min: 15–20
+      J_mol_cm2_s:
+        Si: 9.04×10^-7
+        Mg: 1.63×10^-6
+        Ti: 1.25×10^-9
+      J_over_C_cm_s:
+        Si: 5.89×10^-5
+        Mg: 7.84×10^-5
+        Ti: 5.86×10^-6
+    - temperature_C: '2000'
+      time_min: 20–25
+      J_mol_cm2_s:
+        Si: 9.28×10^-7
+        Mg: 1.19×10^-6
+        Ti: 1.78×10^-9
+      J_over_C_cm_s:
+        Si: 1.14×10^-4
+        Mg: 1.39×10^-4
+        Ti: 7.-9×10^-7
+    note: Table 3 is model-derived. Its final 1800 °C Ti volatility cell appears as ‘7.-9 × 10^-7’ in the 600-dpi render and
+      is retained verbatim as an ambiguous printed value.
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_table3_calculated_evaporation_parameters
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2
+- observation_id: wang_2001_table4_oxygen_precision_note
+  type: context
+  locator:
+    page: 13
+    published_page: 491
+    pdf_page_index: 12
+    table: '4'
+  units: ‰
+  values:
+    statement_as_printed: Some oxygen data are the average of multiple analyses; precision for oxygen and silicon mass spectrometric
+      analyses is better than ±0.5‰.
+    method_class: measured_direct
+    note: The source gives a method-level precision, not a per-cell uncertainty; no cell uncertainty is inferred.
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_table4_oxygen_precision_note
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: O
+- observation_id: wang_2001_table4_silicon_interference_note
+  type: context
+  locator:
+    page: 13
+    published_page: 491
+    pdf_page_index: 12
+    table: '4'
+  units: ‰
+  values:
+    statement_as_printed: An interference from sulfur fluoride species sometimes affects the accuracy of δ29Si data.
+    method_class: measured_direct
+    note: The source states an interference but gives no per-cell correction; values remain as printed.
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_table4_silicon_interference_note
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: Si
+- observation_id: wang_2001_table5_isotope_fractionation_factors_no_quantity_token
+  type: context
+  locator:
+    page: 14
+    published_page: 492
+    pdf_page_index: 13
+    table: '5'
+  units: dimensionless alpha values as printed
+  values:
+    method_class: model_derived and quoted_attributed as labeled by source
+    quantity_as_printed: isotopic fractionation factor alpha = R_condensed/R_gas
+    reason_not_typed: There is no isotope fractionation factor quantity token. EVAPORATION_COEFFICIENT_ALPHA refers to a different
+      physical quantity and would be a wrong token.
+    note: Solar melt fit and comparison experiments/theoretical values are listed separately as printed; no conversion to
+      isotope delta is made. The source prints ±0.0000 for the solar-melt 18O/16O and 30Si/28Si factors; those zero uncertainties
+      are omitted. The source prints ±0.0000 for the solar-melt 18O/16O and 30Si/28Si factors; those zero uncertainties are
+      omitted. The source prints ±0.0000 for the solar-melt 18O/16O and 30Si/28Si factors; those zero uncertainties are omitted.
+      The source prints ±0.0000 for the solar-melt 18O/16O and 30Si/28Si factors; those zero uncertainties are omitted.
+    rows_as_printed:
+    - material: Solar melt
+      26Mg/24Mg: 1.0303 ± 0.0006
+      18O/16O: '1.0237'
+      30Si/28Si: '1.0169'
+      evidence: authors fit from Figure 13
+    - material: Mg2SiO4(l)
+      26Mg/24Mg: 1.0313 ± 0.0009
+      18O/16O: 1.0198 ± 0.0005
+      30Si/28Si: 1.0142 ± 0.0004
+      evidence: Davis et al. (1990)
+    - material: Mg2SiO4(s)
+      26Mg/24Mg: 1.0294 ± 0.0030
+      18O/16O: —
+      30Si/28Si: —
+      evidence: Wang et al. (1999)
+    - material: Fe0.94O(l)
+      26Mg/24Mg: —
+      18O/16O: '1.0217'
+      30Si/28Si: —
+      evidence: Wang et al. (1994c)
+    - material: Theoretical
+      26Mg/24Mg: 1.0408 (Mg); 1.0247 (MgO)
+      18O/16O: 1.0308 (O2); 1.0225 (SiO)
+      30Si/28Si: 1.0225 (SiO); 1.0165 (SiO2)
+      evidence: theoretical mass-ratio values, as printed
+    quantity_candidates:
+    - isotope_delta
+    - evaporation_coefficient_alpha
+  context_id: wang-2001-solar-melt-evaporation-residues::context::wang_2001_table5_isotope_fractionation_factors_no_quantity_token
+  work_id: 10.1016/s0016-7037(00)00529-9
+  source_id: wang-2001-solar-melt-evaporation-residues
+  species: SiO2

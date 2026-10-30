@@ -1,0 +1,762 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  citation: Tranell G., Ostrovski O. and Jahanshahi S. (2000). Silica Activity and Raman Spectra of the CaO-SiO2-TiOx System.
+    Molten Slags2000 proceedings.
+  source_ids:
+  - tranell-2000-silica-activity-titanium
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:tranell-2000-silica-activity-titanium
+      role: pdf
+      path: raw/tranell-2000-silica-activity-titanium/tranell-2000-silica-activity-titanium.pdf
+      sha256:
+        tag: value
+        value: bbad87fcfb92ab588bba402b333c054f69d6697ca172f7e9f94abb3e8f7f3576
+    - asset_id: pdftotext:tranell-2000-silica-activity-titanium
+      role: pdftotext
+      path: text/tranell-2000-silica-activity-titanium
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:tranell-2000-silica-activity-titanium
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da::tranell-2000-silica-activity-titanium
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: II
+    note: 12 numeric Cu assay cells by X-ray fluorescence; each point has its row and column locator.
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+context:
+- observation_id: tranell_2000_figure_1_whole_figure_deferred
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    figure: '1'
+    panel: whole_figure
+  panel: whole_figure
+  attribution: Present study measurements; comparison series attributed to Gokcen [26].
+  units: as printed on axes
+  values:
+    quantity: p_partial
+    species: H2O
+    phase: gas
+    temperature_as_printed: water-bath temperature varies along the x-axis; experiment temperature is not stated
+    oxygen_condition_as_printed: not stated
+    composition_as_printed: not stated
+    axes_as_printed:
+      x: Temperature (deg C)
+      y: Vapour Pressure (atm) of H2O over Saturated LiCl
+    caption: Water vapour pressure over saturated lithium chloride for a range of water bath temperatures, as measured by
+      mass spectrometer. Results compared with those of Gokcen [26].
+    series:
+    - name: Present Study
+      marker: green triangle
+      marker_count: 5
+      evidence_class: measured_direct
+    - name: Gokcen [26]
+      marker: red circle
+      marker_count: 5
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_1_whole_figure_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: H2O
+- observation_id: tranell_2000_figure_2_a_deferred
+  type: figure_record
+  locator:
+    page: 12
+    pdf_page_index: 11
+    figure: '2'
+    panel: a
+  panel: a
+  attribution: Present metal-slag-gas equilibrium experiments; the black binary line is after Eriksson et al. [29].
+  units: as printed on axes
+  values:
+    quantity: activity
+    species: SiO2
+    phase: l
+    temperature_as_printed: 1873 K
+    oxygen_condition_as_printed: pO2 = 10^-12 atm
+    composition_as_printed: CaO-SiO2-TiOx; x-axis is SiO2 mol%; series are TiOx mol%.
+    axes_as_printed:
+      x: mol% SiO2
+      y: aSiO2
+    caption: Activity of silica as a function of silica mole fraction in CaO-SiO2-TiOx slags at 1873 K and oxygen potential
+      10^-12 atm; solid SiO2 (crist.) standard state. Points estimated from iso-activity lines in Figure 3.
+    series:
+    - name: 5 mol% TiOx
+      marker: red circle
+      marker_count: 4
+      evidence_class: measured_reduced
+    - name: 11 mol% TiOx
+      marker: cyan square
+      marker_count: 4
+      evidence_class: measured_reduced
+    - name: 17 mol% TiOx
+      marker: blue triangle
+      marker_count: 3
+      evidence_class: measured_reduced
+    - name: CaO-SiO2 binary activity after Eriksson et al. [29]
+      marker: black line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: The figure caption says plotted points are estimated from Figure 3; no point values are digitized in this pass.
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_2_a_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_2_b_deferred
+  type: figure_record
+  locator:
+    page: 12
+    pdf_page_index: 11
+    figure: '2'
+    panel: b
+  panel: b
+  attribution: Stolyarova et al. [23] Knudsen effusion measurements; the black binary line is after Eriksson et al. [29].
+  units: as printed on axes
+  values:
+    quantity: activity
+    species: SiO2
+    phase: l
+    temperature_as_printed: 1850 K
+    oxygen_condition_as_printed: pO2 approximately 10^-9 atm
+    composition_as_printed: CaO-SiO2-TiOx; x-axis is SiO2 mol%; series are TiOx mol%.
+    axes_as_printed:
+      x: mol% SiO2
+      y: aSiO2
+    caption: Activity of silica as a function of silica mole fraction in CaO-SiO2-TiOx slags at 1850 K and oxygen potential
+      approximately 10^-9 atm; solid SiO2 (crist.) standard state.
+    series:
+    - name: 17 mol% TiOx
+      marker: blue triangle
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: 11 mol% TiOx
+      marker: cyan diamond
+      marker_count: 4
+      evidence_class: quoted_attributed
+    - name: 5 mol% TiOx
+      marker: red circle
+      marker_count: 4
+      evidence_class: quoted_attributed
+    - name: CaO-SiO2 binary activity after Eriksson et al. [29]
+      marker: black line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_2_b_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_3_isoactivity_model_context
+  type: model_derived_figure_context
+  locator:
+    page: 13
+    pdf_page_index: 12
+    figure: '3'
+  units: dimensionless activity
+  values:
+    quantity_as_printed: approximate SiO2 iso-activity contour levels
+    quantity_token: activity
+    candidate_tokens_considered:
+    - activity
+    method_class: model_derived
+    values_as_printed:
+    - '0.07'
+    - '0.12'
+    - '0.24'
+    - '0.32'
+    - '0.47'
+    - '0.62'
+    relation: Calculated averages from the three experimental series; figure pass deferred.
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_3_isoactivity_model_context
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_3_whole_figure_deferred
+  type: figure_record
+  locator:
+    page: 13
+    pdf_page_index: 12
+    figure: '3'
+    panel: whole_figure
+  panel: whole_figure
+  attribution: Present study; iso-activity levels are author-calculated averages.
+  units: as printed on axes
+  values:
+    quantity: activity
+    species: SiO2
+    phase: l
+    temperature_as_printed: 1873 K
+    oxygen_condition_as_printed: pO2 = 10^-12 atm
+    composition_as_printed: CaO-SiO2-TiOx ternary diagram; axes are oxide mole percent.
+    axes_as_printed:
+      ternary_axes:
+      - CaO mol%
+      - SiO2 mol%
+      - TiOx mol%
+      label: Mole %
+    caption: Approximate SiO2 iso-activity curves in the CaO-SiO2-TiOx system at 1873 K and pO2 = 10^-12 atm, as measured
+      by metal-slag-gas equilibrium experiments. Values shown are calculated averages from the 3 experimental series.
+    series:
+    - name: iso-activity 0.07
+      marker: blue contour
+      marker_count: 0
+      evidence_class: model_derived
+    - name: iso-activity 0.12
+      marker: blue contour
+      marker_count: 0
+      evidence_class: model_derived
+    - name: iso-activity 0.24
+      marker: blue contour
+      marker_count: 0
+      evidence_class: model_derived
+    - name: iso-activity 0.32
+      marker: blue contour
+      marker_count: 0
+      evidence_class: model_derived
+    - name: iso-activity 0.47
+      marker: blue contour
+      marker_count: 0
+      evidence_class: model_derived
+    - name: iso-activity 0.62
+      marker: blue contour
+      marker_count: 0
+      evidence_class: model_derived
+    - name: Unlabelled experimental symbols underlying the 3-series average
+      marker: black point symbols; no series legend
+      marker_count: 12
+      evidence_class: measured_reduced
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: The paper prints six contour labels and unlabelled black data symbols; the black symbols are counted as one combined
+      series because the figure gives no per-series legend.
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_3_whole_figure_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_4_whole_figure_deferred
+  type: figure_record
+  locator:
+    page: 14
+    pdf_page_index: 13
+    figure: '4'
+    panel: whole_figure
+  panel: whole_figure
+  attribution: Present study.
+  units: as printed on axes
+  values:
+    quantity: unavailable
+    species: SiO2
+    phase: quenched slag
+    temperature_as_printed: 1873 K; titanium-free CaO-SiO2 slag equilibrated under air
+    oxygen_condition_as_printed: air
+    composition_as_printed: Ti-free CaO-SiO2; CaO/SiO2 approximately 1.25 by mass; complete composition not printed.
+    axes_as_printed:
+      x: Raman Shift (cm^-1), low-frequency envelope on left and high-frequency envelope on right
+      y: Raman signal intensity (axis units not printed)
+    caption: 'Raman Shift for a titanium-free CaO-SiO2 slag (CaO/SiO2 approximately 1.25), equilibrated under air at 1873
+      K. Left: low-frequency envelope. Right: high-frequency envelope.'
+    series:
+    - name: low-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: high-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: 'No store quantity token represents a Raman spectrum/intensity trace; candidate tokens checked: activity, equilibrium_phase_composition,
+      concentration_series, valence_ratio. No token fits Raman shift versus signal intensity.'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_4_whole_figure_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_5_a_deferred
+  type: figure_record
+  locator:
+    page: 14
+    pdf_page_index: 13
+    figure: '5'
+    panel: a
+  panel: a
+  attribution: Present study.
+  units: as printed on axes
+  values:
+    quantity: unavailable
+    species: SiO2
+    phase: quenched slag
+    temperature_as_printed: 1873 K
+    oxygen_condition_as_printed: air
+    composition_as_printed: Slag 1; CaO/SiO2 approximately 1.25 by mass; TiOx = 7 wt%; complete composition not printed.
+    axes_as_printed:
+      x: Raman Shift (cm^-1), low-frequency envelope on left and high-frequency envelope on right
+      y: Raman signal intensity (axis units not printed)
+    caption: 'Raman Shift for slag 1 (CaO/SiO2 approximately 1.25, 7 wt% TiOx), equilibrated under a) air at 1873 K and b)
+      under pO2 approximately 10^-12 atm at 1873 K. Left: low-frequency envelope. Right: high-frequency envelope.'
+    series:
+    - name: low-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: high-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: 'No store quantity token represents a Raman spectrum/intensity trace; candidate tokens checked: activity, equilibrium_phase_composition,
+      concentration_series, valence_ratio. No token fits Raman shift versus signal intensity.'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_5_a_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_5_b_deferred
+  type: figure_record
+  locator:
+    page: 14
+    pdf_page_index: 13
+    figure: '5'
+    panel: b
+  panel: b
+  attribution: Present study.
+  units: as printed on axes
+  values:
+    quantity: unavailable
+    species: SiO2
+    phase: quenched slag
+    temperature_as_printed: 1873 K
+    oxygen_condition_as_printed: pO2 approximately 10^-12 atm
+    composition_as_printed: Slag 1; CaO/SiO2 approximately 1.25 by mass; TiOx = 7 wt%; complete composition not printed.
+    axes_as_printed:
+      x: Raman Shift (cm^-1), low-frequency envelope on left and high-frequency envelope on right
+      y: Raman signal intensity (axis units not printed)
+    caption: 'Raman Shift for slag 1 (CaO/SiO2 approximately 1.25, 7 wt% TiOx), equilibrated under a) air at 1873 K and b)
+      under pO2 approximately 10^-12 atm at 1873 K. Left: low-frequency envelope. Right: high-frequency envelope.'
+    series:
+    - name: low-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: high-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: 'No store quantity token represents a Raman spectrum/intensity trace; candidate tokens checked: activity, equilibrium_phase_composition,
+      concentration_series, valence_ratio. No token fits Raman shift versus signal intensity.'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_5_b_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_6_a_deferred
+  type: figure_record
+  locator:
+    page: 15
+    pdf_page_index: 14
+    figure: '6'
+    panel: a
+  panel: a
+  attribution: Present study.
+  units: as printed on axes
+  values:
+    quantity: unavailable
+    species: SiO2
+    phase: quenched slag
+    temperature_as_printed: 1873 K
+    oxygen_condition_as_printed: air
+    composition_as_printed: Slag 5; CaO/SiO2 approximately 1.25 by mass; TiOx = 14 wt%; complete composition not printed.
+    axes_as_printed:
+      x: Raman Shift (cm^-1), low-frequency envelope on left and high-frequency envelope on right
+      y: Raman signal intensity (axis units not printed)
+    caption: 'Raman Shift for slag 5 (CaO/SiO2 approximately 1.25, 14 wt% TiOx), equilibrated under a) air at 1873 K and b)
+      under pO2 approximately 10^-12 atm at 1873 K. Left: low-frequency envelope. Right: high-frequency envelope.'
+    series:
+    - name: low-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: high-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: 'No store quantity token represents a Raman spectrum/intensity trace; candidate tokens checked: activity, equilibrium_phase_composition,
+      concentration_series, valence_ratio. No token fits Raman shift versus signal intensity.'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_6_a_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_6_b_deferred
+  type: figure_record
+  locator:
+    page: 15
+    pdf_page_index: 14
+    figure: '6'
+    panel: b
+  panel: b
+  attribution: Present study.
+  units: as printed on axes
+  values:
+    quantity: unavailable
+    species: SiO2
+    phase: quenched slag
+    temperature_as_printed: 1873 K
+    oxygen_condition_as_printed: pO2 approximately 10^-12 atm
+    composition_as_printed: Slag 5; CaO/SiO2 approximately 1.25 by mass; TiOx = 14 wt%; complete composition not printed.
+    axes_as_printed:
+      x: Raman Shift (cm^-1), low-frequency envelope on left and high-frequency envelope on right
+      y: Raman signal intensity (axis units not printed)
+    caption: 'Raman Shift for slag 5 (CaO/SiO2 approximately 1.25, 14 wt% TiOx), equilibrated under a) air at 1873 K and b)
+      under pO2 approximately 10^-12 atm at 1873 K. Left: low-frequency envelope. Right: high-frequency envelope.'
+    series:
+    - name: low-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: high-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: 'No store quantity token represents a Raman spectrum/intensity trace; candidate tokens checked: activity, equilibrium_phase_composition,
+      concentration_series, valence_ratio. No token fits Raman shift versus signal intensity.'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_6_b_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_7_a_deferred
+  type: figure_record
+  locator:
+    page: 15
+    pdf_page_index: 14
+    figure: '7'
+    panel: a
+  panel: a
+  attribution: Present study.
+  units: as printed on axes
+  values:
+    quantity: unavailable
+    species: SiO2
+    phase: quenched slag
+    temperature_as_printed: 1873 K
+    oxygen_condition_as_printed: air
+    composition_as_printed: Slag 9; CaO/SiO2 approximately 1.25 by mass; TiOx = 21 wt%; complete composition not printed.
+    axes_as_printed:
+      x: Raman Shift (cm^-1), low-frequency envelope on left and high-frequency envelope on right
+      y: Raman signal intensity (axis units not printed)
+    caption: 'Raman Shift for slag 9 (CaO/SiO2 approximately 1.25, 21 wt% TiOx), equilibrated under a) air at 1873 K and b)
+      under pO2 approximately 10^-12 atm at 1873 K. Left: low-frequency envelope. Right: high-frequency envelope.'
+    series:
+    - name: low-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: high-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: 'No store quantity token represents a Raman spectrum/intensity trace; candidate tokens checked: activity, equilibrium_phase_composition,
+      concentration_series, valence_ratio. No token fits Raman shift versus signal intensity.'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_7_a_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_figure_7_b_deferred
+  type: figure_record
+  locator:
+    page: 15
+    pdf_page_index: 14
+    figure: '7'
+    panel: b
+  panel: b
+  attribution: Present study.
+  units: as printed on axes
+  values:
+    quantity: unavailable
+    species: SiO2
+    phase: quenched slag
+    temperature_as_printed: 1873 K
+    oxygen_condition_as_printed: pO2 approximately 10^-12 atm
+    composition_as_printed: Slag 9; CaO/SiO2 approximately 1.25 by mass; TiOx = 21 wt%; complete composition not printed.
+    axes_as_printed:
+      x: Raman Shift (cm^-1), low-frequency envelope on left and high-frequency envelope on right
+      y: Raman signal intensity (axis units not printed)
+    caption: 'Raman Shift for slag 9 (CaO/SiO2 approximately 1.25, 21 wt% TiOx), equilibrated under a) air at 1873 K and b)
+      under pO2 approximately 10^-12 atm at 1873 K. Left: low-frequency envelope. Right: high-frequency envelope.'
+    series:
+    - name: low-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: high-frequency Raman envelope
+      marker: continuous spectrum
+      marker_count: 0
+      evidence_class: measured_direct
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    note: 'No store quantity token represents a Raman spectrum/intensity trace; candidate tokens checked: activity, equilibrium_phase_composition,
+      concentration_series, valence_ratio. No token fits Raman shift versus signal intensity.'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_figure_7_b_deferred
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_gamma_si_copper_model_parameter
+  type: model_parameter_context
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: II
+    row: activity heading
+    column: gammaSi
+    note: Table II heading prints gammaSi = 0.018; discussion gives its estimate at 1873 K.
+  units: dimensionless activity coefficient
+  values:
+    quantity_as_printed: gammaSi, activity coefficient of Si in liquid copper at 1873 K
+    quantity_token: activity_coefficient
+    candidate_tokens_considered:
+    - activity_coefficient
+    method_class: model_derived
+    value_as_printed: '0.018'
+    temperature_K: '1873'
+    method_as_printed: estimated based on copper-gas-pure silica equilibrium experiment and literature data [28]
+    schema_gap: The printed number is an estimated reduction parameter rather than a separate measured slag activity row;
+      retained as model-derived context and used in the measured-reduced activity derivations.
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_gamma_si_copper_model_parameter
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: Si
+- observation_id: tranell_2000_table_i_master_slags_context
+  type: measured_table_context
+  locator:
+    page: 16
+    pdf_page_index: 15
+    table: I
+    note: Composition of master slags, as analysed by ICP-AES; 14 rows.
+  units: CaO/SiO2 mass ratio and TiO2 wt%
+  values:
+    quantity_as_printed: Composition of master slags, as analysed by ICP-AES
+    quantity_token: unavailable for this incomplete starting-slag composition
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    - liquidus_composition
+    - condensate_composition
+    schema_gap: No existing token represents a master-slag starting composition with only a CaO/SiO2 mass ratio and TiO2 wt%.
+      It is not an equilibrated phase result, and the missing oxide amounts cannot be reconstructed.
+    rows:
+    - slag: '1'
+      CaO_SiO2_mass_ratio_wt_as_printed: '1.25'
+      TiO2_wt_pct_as_printed: '7.30'
+    - slag: '2'
+      CaO_SiO2_mass_ratio_wt_as_printed: '0.99'
+      TiO2_wt_pct_as_printed: '7.55'
+    - slag: '3'
+      CaO_SiO2_mass_ratio_wt_as_printed: '0.77'
+      TiO2_wt_pct_as_printed: '7.78'
+    - slag: '4'
+      CaO_SiO2_mass_ratio_wt_as_printed: '0.53'
+      TiO2_wt_pct_as_printed: '7.34'
+    - slag: '5'
+      CaO_SiO2_mass_ratio_wt_as_printed: '1.21'
+      TiO2_wt_pct_as_printed: '14.40'
+    - slag: '6'
+      CaO_SiO2_mass_ratio_wt_as_printed: '1.00'
+      TiO2_wt_pct_as_printed: '14.20'
+    - slag: '7'
+      CaO_SiO2_mass_ratio_wt_as_printed: '0.70'
+      TiO2_wt_pct_as_printed: '14.60'
+    - slag: '8'
+      CaO_SiO2_mass_ratio_wt_as_printed: '0.56'
+      TiO2_wt_pct_as_printed: '14.80'
+    - slag: '9'
+      CaO_SiO2_mass_ratio_wt_as_printed: '1.21'
+      TiO2_wt_pct_as_printed: '20.85'
+    - slag: '10'
+      CaO_SiO2_mass_ratio_wt_as_printed: '1.00'
+      TiO2_wt_pct_as_printed: '22.00'
+    - slag: '11'
+      CaO_SiO2_mass_ratio_wt_as_printed: '0.75'
+      TiO2_wt_pct_as_printed: '22.20'
+    - slag: '12'
+      CaO_SiO2_mass_ratio_wt_as_printed: '0.56'
+      TiO2_wt_pct_as_printed: '21.70'
+    - slag: '13'
+      CaO_SiO2_mass_ratio_wt_as_printed: '1.35'
+      TiO2_wt_pct_as_printed: '52.35'
+    - slag: '14'
+      CaO_SiO2_mass_ratio_wt_as_printed: '1.00'
+      TiO2_wt_pct_as_printed: '51.10'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_table_i_master_slags_context
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: SiO2
+- observation_id: tranell_2000_table_ii_unreacted_copper_reference_context
+  type: measured_table_context
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: II
+    row: Reference*
+    note: 'Footnote: analysis of the pure unreacted copper metal.'
+  units: wt ppm
+  values:
+    quantity_as_printed: Si, Ti and Mo concentrations in pure unreacted copper reference metal
+    quantity_token: unavailable as an equilibrium-phase composition because this is the unreacted reference metal
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    - condensate_composition
+    schema_gap: The table reports an unreacted pure-copper control, not an equilibrated product composition; no matching quantity
+      token represents this control in context.
+    values_as_printed:
+      XSi GDMS (wt ppm): '0.08'
+      XSi ICP (wt ppm): '-'
+      XTi GDMS (wt ppm): '0.003'
+      XTi ICP (wt ppm): '-'
+      XMo GDMS (wt ppm): <0.008
+      XMo ICP (wt ppm): '-'
+      Cu in slag (wt ppm): '-'
+      Mo in slag (wt ppm): '-'
+      aSi in copper: '-'
+      aSiO2 in slag: '-'
+      Ti3+/Ti4+ in slag: '-'
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_table_ii_unreacted_copper_reference_context
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: Si
+- observation_id: tranell_2000_table_iv_ti_icp_upper_bounds_context
+  type: measured_table_context
+  locator:
+    page: 19
+    pdf_page_index: 18
+    table: IV
+    note: Five XTi ICP-AES values are printed as <0.5 wt ppm.
+  units: wt ppm
+  values:
+    quantity_as_printed: Ti concentration in quenched slag, ICP-AES, censored below the detection limit
+    quantity_token: unavailable for a bound in the exploded equilibrium_phase_composition row list
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    schema_gap: The existing migrator rejects a bound value in this row-list source field as non-numeric; retaining the printed
+      upper limits here avoids converting them to point values.
+    values_as_printed:
+    - row: '2'
+      sample: Slag 2
+      XTi_ICP_wt_ppm: <0.5
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: IV
+        row: '2'
+        column: XTi ICP (wt ppm)
+      temperature_K: '1873'
+      oxygen_partial_pressure_as_printed: 5E-12 atm
+      equilibration_time_h: 24
+    - row: '3'
+      sample: Slag 3
+      XTi_ICP_wt_ppm: <0.5
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: IV
+        row: '3'
+        column: XTi ICP (wt ppm)
+      temperature_K: '1873'
+      oxygen_partial_pressure_as_printed: 5E-12 atm
+      equilibration_time_h: 24
+    - row: '4'
+      sample: Slag 4
+      XTi_ICP_wt_ppm: <0.5
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: IV
+        row: '4'
+        column: XTi ICP (wt ppm)
+      temperature_K: '1873'
+      oxygen_partial_pressure_as_printed: 5E-12 atm
+      equilibration_time_h: 24
+    - row: '5'
+      sample: Slag 5
+      XTi_ICP_wt_ppm: <0.5
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: IV
+        row: '5'
+        column: XTi ICP (wt ppm)
+      temperature_K: '1873'
+      oxygen_partial_pressure_as_printed: 5E-12 atm
+      equilibration_time_h: 24
+    - row: '7'
+      sample: Slag 7
+      XTi_ICP_wt_ppm: <0.5
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: IV
+        row: '7'
+        column: XTi ICP (wt ppm)
+      temperature_K: '1873'
+      oxygen_partial_pressure_as_printed: 5E-12 atm
+      equilibration_time_h: 24
+  context_id: tranell-2000-silica-activity-titanium::context::tranell_2000_table_iv_ti_icp_upper_bounds_context
+  work_id: ba03e79f6e6b84729d9b92abb2a8e3440e9220de8d5d36c70d315b94283751da
+  source_id: tranell-2000-silica-activity-titanium
+  species: Ti

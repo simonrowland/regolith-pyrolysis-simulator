@@ -1,0 +1,57 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2018-thermodynamic-evaporation-model
+source:
+  citation: Shornikov, S. I. (2018). Thermodynamic Modelling of Evaporation Processes of
+    Lunar and Meteoritic Substance. 81st Annual Meeting of The Meteoritical Society,
+    abstract 6134. LPI Contribution No. 2067.
+  year: 2018
+  corpus_asset: raw/shornikov-2018-thermodynamic-evaporation-model/shornikov-2018-thermodynamic-evaporation-model.pdf
+  corpus_sha256: 459fa638472e09e72fde10c2b2fc1f697dbe60693b9f1b0d53f687261a995ff3
+  duplicate_of: shornikov-2019-lunar-meteorite-evaporation-model
+extraction:
+  method: The PDF is a one-page image. Tesseract on the 200 dpi render, run from the
+    render directory, recovered the title, the model sentences, and references [1]–[15].
+    The same sentences were then compared with the 2019 journal text. No figure is on
+    the page. No number was stored as an observation.
+  date: '2026-10-20'
+  worker: t1372-w2-w9-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables: []
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: sh18_duplicate_of_2019
+      type: conference_abstract_of_journal
+      locator:
+        page: 1
+        pdf_page_index: 0
+        note: Header of the 200 dpi render reads 81st Annual Meeting of The Meteoritical
+          Society 2018 (LPI Contrib. No. 2067) 6134.pdf. The page says the details of
+          the model and the results will be discussed during the presentation.
+      units: as printed
+      standard_state: The Lewis equation is printed as p_i = a_i p°_i, with p°_i the
+        partial pressure over the individual substance (pure component). The abstract
+        says both solid and liquid pure oxides usually evaporate without a change in
+        condensed-phase composition. It does not assign one phase to the activity.
+      values:
+        duplicate_of: shornikov-2019-lunar-meteorite-evaporation-model
+        evidence: The 2019 paper is Shornikov, Geochemistry International 57(8), 865–872,
+          "Thermodynamic modeling of evaporation processes of lunar and meteorite
+          substance." It prints the same Hertz–Knudsen description, the same statement
+          that the partial evaporation coefficient is equal to 1 (Shornikov, 2015), the
+          same Lewis equation, the same ideal-associated-solution model, and the same
+          1600–2500 K Knudsen range for the thermodynamic database.
+        alpha_sentence_as_printed: The partial evaporation coefficient, characterizing
+          the change in the structure of a molecule during its transition to the gas
+          phase, in this case is equal to 1 [2].
+        alpha_citation: '[2] Shornikov S. I. (2015) Geochem. Int. 53:1080–1089'
+        database_span_as_printed: 1600–2500 K, reference [10] Shornikov and Yakovlev,
+          LPS XLVI, abstract 1270
+        decision: context only
+        reason: The coefficient 1 is a cited model assumption. The sentence gives no
+          temperature and no composition, so it is not stored as an alpha observation.
+          The 2019 paper already prints the same sentence. Expected migration phase
+          for the Lewis activity is unknown.

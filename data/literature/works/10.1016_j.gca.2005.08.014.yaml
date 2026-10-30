@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:kems-005-fedkin-2006
       role: pdf
@@ -91,40 +91,11 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0013'
-          approximate: false
-      locator:
-        paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
-        section: '4.1'
-        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
-      inference:
-        relation: bar_to_Pa
-        inputs:
-        - P_Pa = P_bar × 1e5
-        - original_unit=bar
-        - as_published=1.3e-08 bar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000000013'
-            locator:
-              paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
-              section: '4.1'
-              source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
-        - - factor
-          - state:
-              tag: value
-              value: '100000'
-            locator:
-              paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
-              section: '4.1'
-              source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
-        output_unit: Pa
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
     sweep_gas:
       state:
         tag: unknown
@@ -135,15 +106,266 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2005.08.014
   locator:
+    page: 9
+    figure: '4'
+    line_range: 241-243
+    source_path: text/kems-005-fedkin-2006/mineru/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+context:
+- observation_id: fedkin_2006_table3_hashimoto_fit_outputs
+  type: evaporation_coefficient_table_context
+  table: '3'
+  locator:
+    page: 7
+    published_page: 212
     table: '3'
-    line_range: 186-197
-    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: graphite crucible (Hashimoto) / vacuum free-evap (Yu)
+  units: dimensionless alpha
+  equipment:
+    chamber_pressure_bar:
+      value: '0.000000013'
       locator:
-        paragraph: apparatus of primary experiment
-        line_range: '171'
-        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        page: 7
+        published_page: 212
+        table: '3'
+        note: Hashimoto vacuum chamber pressure for the Table 3 runs.
+  note: Evaporation coefficients obtained by Fedkin et al. modeling Hashimoto (1983) vacuum experiments; context, not scored
+    points.
+  schema_gap: fitted evaporation coefficient output is context under the evidence rule
+  values:
+  - element: Fe
+    source_observation_id: fedkin_2006_fe_hashimoto_langmuir_table3
+    gas_species: Fe(g)
+    printed_phase_descriptor: silicate_melt
+    temperature_values:
+    - T_K: '1973'
+      alpha: '0.23'
+      sigma: '0.02'
+    - T_K: '2073'
+      alpha: '0.25'
+      sigma: '0.02'
+    - T_K: '2173'
+      alpha: '0.24'
+      sigma: '0.02'
+    - T_K: '2273'
+      alpha: '0.23'
+      sigma: '0.02'
+    alexander_2004_temperature_values:
+    - T_K: '1973'
+      alpha: '0.25'
+      sigma: '0.03'
+    - T_K: '2073'
+      alpha: '0.26'
+      sigma: '0.04'
+    - T_K: '2173'
+      alpha: '0.27'
+      sigma: '0.02'
+    - T_K: '2273'
+      alpha: '0.28'
+      sigma: '0.01'
+    quoted_author: Alexander (2004)
+    note: null
+  - element: Mg
+    source_observation_id: fedkin_2006_mg_hashimoto_langmuir_table3
+    gas_species: Mg(g)
+    printed_phase_descriptor: silicate_melt
+    temperature_values:
+    - T_K: '1973'
+      alpha: '0.24'
+      sigma: '0.01'
+    - T_K: '2073'
+      alpha: '0.28'
+      sigma: '0.01'
+    - T_K: '2173'
+      alpha: '0.28'
+      sigma: '0.01'
+    - T_K: '2273'
+      alpha: '0.27'
+      sigma: '0.01'
+    alexander_2004_temperature_values:
+    - T_K: '1973'
+      alpha: '0.27'
+      sigma: '0.05'
+    - T_K: '2073'
+      alpha: '0.28'
+      sigma: '0.05'
+    - T_K: '2173'
+      alpha: '0.28'
+      sigma: '0.05'
+    - T_K: '2273'
+      alpha: '0.29'
+      sigma: '0.03'
+    quoted_author: Alexander (2004)
+    note: Table 3 Mg this-work values transcribed from the repaired MinerU HTML table; weak T dependence
+  - element: SiO
+    source_observation_id: fedkin_2006_sio_hashimoto_langmuir_table3
+    gas_species: SiO(g)
+    printed_phase_descriptor: silicate_melt_FCMAS_chondrule_analog
+    temperature_values:
+    - T_K: '1973'
+      alpha: '0.12'
+      sigma: '0.01'
+    - T_K: '2073'
+      alpha: '0.17'
+      sigma: '0.01'
+    - T_K: '2173'
+      alpha: '0.2'
+      sigma: '0.01'
+    - T_K: '2273'
+      alpha: '0.21'
+      sigma: '0.01'
+    alexander_2004_temperature_values:
+    - T_K: '1973'
+      alpha: '0.16'
+      sigma: '0.02'
+    - T_K: '2073'
+      alpha: '0.17'
+      sigma: '0.02'
+    - T_K: '2173'
+      alpha: '0.19'
+      sigma: '0.02'
+    - T_K: '2273'
+      alpha: '0.21'
+      sigma: '0.02'
+    quoted_author: Alexander (2004)
+    note: 'Table 3 this-work SiO row: 0.12/0.17/0.20/0.21 ±0.01 at 1973–2273 K. Authors note progressive increase with T.
+      Mid-range pin alpha=0.17 at 2073 K.'
+  context_id: kems-005-fedkin-2006::context::fedkin_2006_table3_hashimoto_fit_outputs
+  work_id: 10.1016/j.gca.2005.08.014
+  source_id: kems-005-fedkin-2006
+  species: Fe
+- observation_id: fedkin_2006_table4_inverse_fit_outputs
+  type: inverse_fit_outputs_context
+  table: '4'
+  locator:
+    page: 14
+    table: '4'
+  units: dimensionless alpha
+  note: Printed inverse-fit coefficients from the FeO-free Wang et al. (2001) experiment and quoted Alexander (2001) estimates;
+    context, not scored points.
+  schema_gap: inverse-fitted evaporation coefficient has no scored token
+  values:
+  - element: Mg
+    source_observation_id: fedkin_2006_t4_mg_this_work_inverse
+    quoted_author: Fedkin et al. (2006)
+    values:
+      quantity: inverse_fitted_evaporation_coefficient
+      method_class: model_derived_inverse_fit
+      evidence_kind: model
+      measurement_status: model_output_not_measurement
+      status: typed_refusal
+      admission_status: rejected_model_output_not_measurement
+      refusal_reason: model_output_not_measurement
+      gas_species: Mg(g)
+      material: Wang_et_al_2001_FeO_free_CMAS_residue
+      per_temperature:
+      - T_K: '2073'
+        alpha: '0.14'
+        sigma: '0.01'
+      - T_K: '2273'
+        alpha: '0.19'
+        sigma: '0.01'
+      series:
+      - T_K: '2073'
+        alpha: '0.14'
+        sigma: '0.01'
+      - T_K: '2273'
+        alpha: '0.19'
+        sigma: '0.01'
+    locator:
+      page: 219
+      table: '4'
+      row: Mg; This work
+  - element: Mg
+    source_observation_id: fedkin_2006_t4_mg_alexander_2001_inverse
+    quoted_author: Alexander (2001)
+    values:
+      quantity: inverse_fitted_evaporation_coefficient
+      method_class: quoted_attributed
+      evidence_class: quoted_attributed
+      attribution: Alexander (2001) EQR model estimates, reproduced by Fedkin et al. (2006), Table 4
+      evidence_kind: model
+      measurement_status: model_output_not_measurement
+      status: typed_refusal
+      admission_status: rejected_model_output_not_measurement
+      refusal_reason: model_output_not_measurement
+      gas_species: Mg(g)
+      material: Wang_et_al_2001_FeO_free_CMAS_residue
+      model: Alexander_2001_EQR
+      per_temperature:
+      - T_K: '2073'
+        alpha: '0.19'
+      - T_K: '2273'
+        alpha: '0.16'
+      series:
+      - T_K: '2073'
+        alpha: '0.19'
+      - T_K: '2273'
+        alpha: '0.16'
+    locator:
+      page: 219
+      table: '4'
+      row: Mg; Alexander (2001)
+  - element: SiO
+    source_observation_id: fedkin_2006_t4_sio_this_work_inverse
+    quoted_author: Fedkin et al. (2006)
+    values:
+      quantity: inverse_fitted_evaporation_coefficient
+      method_class: model_derived_inverse_fit
+      evidence_kind: model
+      measurement_status: model_output_not_measurement
+      status: typed_refusal
+      admission_status: rejected_model_output_not_measurement
+      refusal_reason: model_output_not_measurement
+      gas_species: SiO(g)
+      material: Wang_et_al_2001_FeO_free_CMAS_residue
+      per_temperature:
+      - T_K: '2073'
+        alpha: '0.07'
+        sigma: '0.01'
+      - T_K: '2273'
+        alpha: '0.08'
+        sigma: '0.01'
+      series:
+      - T_K: '2073'
+        alpha: '0.07'
+        sigma: '0.01'
+      - T_K: '2273'
+        alpha: '0.08'
+        sigma: '0.01'
+    locator:
+      page: 219
+      table: '4'
+      row: SiO; This work
+  - element: SiO
+    source_observation_id: fedkin_2006_t4_sio_alexander_2001_inverse
+    quoted_author: Alexander (2001)
+    values:
+      quantity: inverse_fitted_evaporation_coefficient
+      method_class: quoted_attributed
+      evidence_class: quoted_attributed
+      attribution: Alexander (2001) EQR model estimates, reproduced by Fedkin et al. (2006), Table 4
+      evidence_kind: model
+      measurement_status: model_output_not_measurement
+      status: typed_refusal
+      admission_status: rejected_model_output_not_measurement
+      refusal_reason: model_output_not_measurement
+      gas_species: SiO(g)
+      material: Wang_et_al_2001_FeO_free_CMAS_residue
+      model: Alexander_2001_EQR
+      per_temperature:
+      - T_K: '2073'
+        alpha: '0.11'
+      - T_K: '2273'
+        alpha: '0.08'
+      series:
+      - T_K: '2073'
+        alpha: '0.11'
+      - T_K: '2273'
+        alpha: '0.08'
+    locator:
+      page: 219
+      table: '4'
+      row: SiO; Alexander (2001)
+  context_id: kems-005-fedkin-2006::context::fedkin_2006_table4_inverse_fit_outputs
+  work_id: 10.1016/j.gca.2005.08.014
+  source_id: kems-005-fedkin-2006
+  species: Mg

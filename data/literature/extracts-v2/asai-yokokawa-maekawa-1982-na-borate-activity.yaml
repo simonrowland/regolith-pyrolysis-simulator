@@ -1,0 +1,4644 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml
+observations:
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.0625'
+        - - B2O3
+          - '0.9375'
+        - - Al2O3
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 15 B2O3 + 0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.0625'
+          - - B2O3
+            - '0.9375'
+          - - Al2O3
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p2
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.061728395'
+        - - B2O3
+          - '0.925925926'
+        - - Al2O3
+          - '0.012345679'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.2 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 15 B2O3 + 0.2 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.2 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.061728395'
+          - - B2O3
+            - '0.925925926'
+          - - Al2O3
+            - '0.012345679'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p3
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.061349693'
+        - - B2O3
+          - '0.920245399'
+        - - Al2O3
+          - '0.018404908'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.3 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 15 B2O3 + 0.3 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.3 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.061349693'
+          - - B2O3
+            - '0.920245399'
+          - - Al2O3
+            - '0.018404908'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p4
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.06097561'
+        - - B2O3
+          - '0.914634146'
+        - - Al2O3
+          - '0.024390244'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.4 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 15 B2O3 + 0.4 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.4 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.06097561'
+          - - B2O3
+            - '0.914634146'
+          - - Al2O3
+            - '0.024390244'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p6
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.060240964'
+        - - B2O3
+          - '0.903614458'
+        - - Al2O3
+          - '0.036144578'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.6 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 15 B2O3 + 0.6 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.6 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.060240964'
+          - - B2O3
+            - '0.903614458'
+          - - Al2O3
+            - '0.036144578'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p8
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.05952381'
+        - - B2O3
+          - '0.892857143'
+        - - Al2O3
+          - '0.047619048'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.8 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 15 B2O3 + 0.8 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 0.8 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.05952381'
+          - - B2O3
+            - '0.892857143'
+          - - Al2O3
+            - '0.047619048'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_1p0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.058823529'
+        - - B2O3
+          - '0.882352941'
+        - - Al2O3
+          - '0.058823529'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 1.0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 15 B2O3 + 1.0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 15 B2O3 + 1.0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.058823529'
+          - - B2O3
+            - '0.882352941'
+          - - Al2O3
+            - '0.058823529'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p4
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.294117647'
+        - - B2O3
+          - '0.588235294'
+        - - Al2O3
+          - '0.117647059'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 2 B2O3 + 0.4 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 2 B2O3 + 0.4 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 2 B2O3 + 0.4 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.294117647'
+          - - B2O3
+            - '0.588235294'
+          - - Al2O3
+            - '0.117647059'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p6
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.277777778'
+        - - B2O3
+          - '0.555555556'
+        - - Al2O3
+          - '0.166666667'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 2 B2O3 + 0.6 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 2 B2O3 + 0.6 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 2 B2O3 + 0.6 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.277777778'
+          - - B2O3
+            - '0.555555556'
+          - - Al2O3
+            - '0.166666667'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p8
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.263157895'
+        - - B2O3
+          - '0.526315789'
+        - - Al2O3
+          - '0.210526316'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 2 B2O3 + 0.8 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 2 B2O3 + 0.8 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 2 B2O3 + 0.8 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.263157895'
+          - - B2O3
+            - '0.526315789'
+          - - Al2O3
+            - '0.210526316'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_1p0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.25'
+        - - B2O3
+          - '0.5'
+        - - Al2O3
+          - '0.25'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 2 B2O3 + 1.0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 2 B2O3 + 1.0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 2 B2O3 + 1.0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.25'
+          - - B2O3
+            - '0.5'
+          - - Al2O3
+            - '0.25'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.25'
+        - - B2O3
+          - '0.75'
+        - - Al2O3
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 3 B2O3 + 0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.25'
+          - - B2O3
+            - '0.75'
+          - - Al2O3
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p2
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.238095238'
+        - - B2O3
+          - '0.714285714'
+        - - Al2O3
+          - '0.047619048'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.2 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 3 B2O3 + 0.2 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.2 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.238095238'
+          - - B2O3
+            - '0.714285714'
+          - - Al2O3
+            - '0.047619048'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p4
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.227272727'
+        - - B2O3
+          - '0.681818182'
+        - - Al2O3
+          - '0.090909091'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.4 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 3 B2O3 + 0.4 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.4 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.227272727'
+          - - B2O3
+            - '0.681818182'
+          - - Al2O3
+            - '0.090909091'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p5
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.222222222'
+        - - B2O3
+          - '0.666666667'
+        - - Al2O3
+          - '0.111111111'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.5 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 3 B2O3 + 0.5 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.5 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.222222222'
+          - - B2O3
+            - '0.666666667'
+          - - Al2O3
+            - '0.111111111'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p6
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.217391304'
+        - - B2O3
+          - '0.652173913'
+        - - Al2O3
+          - '0.130434783'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.6 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 3 B2O3 + 0.6 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.6 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.217391304'
+          - - B2O3
+            - '0.652173913'
+          - - Al2O3
+            - '0.130434783'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p8
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.208333333'
+        - - B2O3
+          - '0.625'
+        - - Al2O3
+          - '0.166666667'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.8 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 3 B2O3 + 0.8 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.8 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.208333333'
+          - - B2O3
+            - '0.625'
+          - - Al2O3
+            - '0.166666667'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p9
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.204081633'
+        - - B2O3
+          - '0.612244898'
+        - - Al2O3
+          - '0.183673469'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.9 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 3 B2O3 + 0.9 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 0.9 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.204081633'
+          - - B2O3
+            - '0.612244898'
+          - - Al2O3
+            - '0.183673469'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_1p0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.2'
+        - - B2O3
+          - '0.6'
+        - - Al2O3
+          - '0.2'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 1.0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 3 B2O3 + 1.0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 3 B2O3 + 1.0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.2'
+          - - B2O3
+            - '0.6'
+          - - Al2O3
+            - '0.2'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.2'
+        - - B2O3
+          - '0.8'
+        - - Al2O3
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 4 B2O3 + 0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.2'
+          - - B2O3
+            - '0.8'
+          - - Al2O3
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p25
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.19047619'
+        - - B2O3
+          - '0.761904762'
+        - - Al2O3
+          - '0.047619048'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.25 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 4 B2O3 + 0.25 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.25 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.19047619'
+          - - B2O3
+            - '0.761904762'
+          - - Al2O3
+            - '0.047619048'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p375
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.186046512'
+        - - B2O3
+          - '0.744186047'
+        - - Al2O3
+          - '0.069767442'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.375 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 4 B2O3 + 0.375 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.375 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.186046512'
+          - - B2O3
+            - '0.744186047'
+          - - Al2O3
+            - '0.069767442'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p5
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.181818182'
+        - - B2O3
+          - '0.727272727'
+        - - Al2O3
+          - '0.090909091'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.5 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 4 B2O3 + 0.5 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.5 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.181818182'
+          - - B2O3
+            - '0.727272727'
+          - - Al2O3
+            - '0.090909091'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p7
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.175438596'
+        - - B2O3
+          - '0.701754386'
+        - - Al2O3
+          - '0.122807018'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.7 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 4 B2O3 + 0.7 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.7 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.175438596'
+          - - B2O3
+            - '0.701754386'
+          - - Al2O3
+            - '0.122807018'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p9
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.169491525'
+        - - B2O3
+          - '0.677966102'
+        - - Al2O3
+          - '0.152542373'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.9 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 4 B2O3 + 0.9 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 0.9 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.169491525'
+          - - B2O3
+            - '0.677966102'
+          - - Al2O3
+            - '0.152542373'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_1p0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.166666667'
+        - - B2O3
+          - '0.666666667'
+        - - Al2O3
+          - '0.166666667'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 1.0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 4 B2O3 + 1.0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 4 B2O3 + 1.0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.166666667'
+          - - B2O3
+            - '0.666666667'
+          - - Al2O3
+            - '0.166666667'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.1'
+        - - B2O3
+          - '0.9'
+        - - Al2O3
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 9 B2O3 + 0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.1'
+          - - B2O3
+            - '0.9'
+          - - Al2O3
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p2
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.098039216'
+        - - B2O3
+          - '0.882352941'
+        - - Al2O3
+          - '0.019607843'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0.2 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 9 B2O3 + 0.2 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0.2 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.098039216'
+          - - B2O3
+            - '0.882352941'
+          - - Al2O3
+            - '0.019607843'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p4
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.096153846'
+        - - B2O3
+          - '0.865384615'
+        - - Al2O3
+          - '0.038461538'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0.4 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 9 B2O3 + 0.4 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0.4 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.096153846'
+          - - B2O3
+            - '0.865384615'
+          - - Al2O3
+            - '0.038461538'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p6
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.094339623'
+        - - B2O3
+          - '0.849056604'
+        - - Al2O3
+          - '0.056603774'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0.6 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 9 B2O3 + 0.6 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0.6 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.094339623'
+          - - B2O3
+            - '0.849056604'
+          - - Al2O3
+            - '0.056603774'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p8
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.092592593'
+        - - B2O3
+          - '0.833333333'
+        - - Al2O3
+          - '0.074074074'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0.8 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 9 B2O3 + 0.8 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 0.8 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.092592593'
+          - - B2O3
+            - '0.833333333'
+          - - Al2O3
+            - '0.074074074'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+- observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_1p0
+  experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
+        to this melt'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_formula_amounts_normalized_to_mole_fraction
+        components:
+        - - Na2O
+          - '0.090909091'
+        - - B2O3
+          - '0.818181818'
+        - - Al2O3
+          - '0.090909091'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
+      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
+      note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_concentration_cell'
+    original_method_class: emf_concentration_cell
+  admission:
+    status: rejected
+    reason: reference-melt absolute activity not printed
+    decided_by:
+      worker: codex-resume-21280-1793143602
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 1.0 Al2O3
+  notices: []
+  source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 9 B2O3 + 1.0 Al2O3
+  read_from: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        note: row_label=Na2O + 9 B2O3 + 1.0 Al2O3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_amounts_normalized_to_mole_fraction
+          components:
+          - - Na2O
+            - '0.090909091'
+          - - B2O3
+            - '0.818181818'
+          - - Al2O3
+            - '0.090909091'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'

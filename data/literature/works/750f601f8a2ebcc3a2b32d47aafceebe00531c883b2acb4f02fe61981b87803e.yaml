@@ -1,0 +1,199 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
+  citation: Shornikov, S. I. (2024). Thermodynamic properties of the K2O–P4O10 melts. Experiment in Geosciences, 30(1), 70–73.
+  source_ids:
+  - shornikov-2024-alkali-phosphate
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2024-alkali-phosphate
+      role: pdf
+      path: raw/shornikov-2024-alkali-phosphate/shornikov-2024-alkali-phosphate.pdf
+      sha256:
+        tag: value
+        value: b0c1f49a9fef04b4a73f96c589794ce1032072c35c89aad51e02cda74074b7bd
+    - asset_id: pdftotext:shornikov-2024-alkali-phosphate
+      role: pdftotext
+      path: text/shornikov-2024-alkali-phosphate
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2024-alkali-phosphate
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::experiment::shornikov-2024-k2o-cited-points
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Symbols 1–4 on Fig. 2 are Ratkovsky et al. (1975, 1976), Alikhanyan et al. (1975) and Steblevsky et al.
+      (1977). They are not measurements of this article.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
+  locator:
+    page: 4
+    published_page: 72
+    pdf_page_index: 3
+    figure: '2'
+- experiment_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::experiment::shornikov-2024-k2o-model
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Semi-empirical model, 600–1900 K, described in Shornikov (2019). Oxide activities, mixing energies and
+      partial pressures are calculated. Parents are the cited ΔG° compilations, not printed per point.' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
+  locator:
+    page: 2
+    published_page: 70
+    pdf_page_index: 1
+    section: Abstract
+context:
+- observation_id: shornikov_2024_k2o_fig1_phase_diagram
+  type: thermodynamic_example
+  units: not an activity
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 71
+    figure: '1'
+  values:
+    admission_status: refused
+    reason: Fig. 1 is the phase diagram according to Xie et al. (2020). Congruent melting at 1086, 1376 and 1892 K, and the
+      916 K dissociation of K5P3O10, are cited from Markina and Voskresenskaya (1969), not measured here.
+  context_id: shornikov-2024-alkali-phosphate::context::shornikov_2024_k2o_fig1_phase_diagram
+  work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
+  source_id: shornikov-2024-alkali-phosphate
+  species: K2O
+- observation_id: shornikov_2024_k2o_fig3_mixing_and_na
+  type: thermodynamic_example
+  units: kJ/mol for the mixing panel; dimensionless activity for the Na2O comparison
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 72
+    figure: '3'
+  values:
+    admission_status: refused
+    reason: Fig. 3A curves 1–4 and Fig. 3B curves 5 and 6 are calculated in the present study at 1673 K. Curves 2, 4 and 6
+      are the Na2O–P4O10 comparison. The Na2O article body is not in this PDF. No discrete markers are on these lines. The
+      mixing-energy minimum is described as the eutectic range between KPO3 and K4P2O7, more negative than the Na melt, and
+      no numeric minimum is printed. The curves were not digitized.
+  context_id: shornikov-2024-alkali-phosphate::context::shornikov_2024_k2o_fig3_mixing_and_na
+  work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
+  source_id: shornikov-2024-alkali-phosphate
+  species: K2O
+- observation_id: shornikov_2024_k2o_k_pressure_bound
+  type: thermodynamic_example
+  units: atm
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 72
+    section: Results
+    figure: '2'
+  values:
+    quantity: partial pressure upper bound
+    method_class: quoted_attributed
+    temperature_K: 1175
+    composition: potassium metaphosphate
+    species: K
+    partial_pressure_upper_bound_atm: 1e-14
+    sentence_as_published: The K partial pressure over the potassium metaphosphate at 1175 K is no more than 10−14 atm, which
+      significantly differs from the results obtained by Steblevsky et al. (1977). The value determined by them is too high
+      (Fig. 2, symbol 4).
+    reference_phase: A gas partial pressure. The Steblevsky number is not printed; symbol 4 was not read.
+  context_id: shornikov-2024-alkali-phosphate::context::shornikov_2024_k2o_k_pressure_bound
+  work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
+  source_id: shornikov-2024-alkali-phosphate
+  species: K2O
+- observation_id: shornikov_2024_k2o_po2_o2_bound
+  type: thermodynamic_example
+  units: atm
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 72
+    section: Results
+    figure: '2'
+  values:
+    quantity: partial pressure upper bound
+    method_class: quoted_attributed
+    temperature_K: 1300
+    composition: KPO3 melt (2K2O · P4O10), as printed
+    species: PO2 and O2
+    partial_pressure_upper_bound_atm: 1e-6
+    sentence_as_published: The PO2 and O2 partial pressures over the KPO3 melt at 1300 K calculated in the present study do
+      not exceed 10−6 atm (Fig. 2).
+    reference_phase: A gas partial pressure. Not an oxide activity standard.
+  context_id: shornikov-2024-alkali-phosphate::context::shornikov_2024_k2o_po2_o2_bound
+  work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
+  source_id: shornikov-2024-alkali-phosphate
+  species: K2O
+- observation_id: shornikov_2024_k2o_vapor_species
+  type: thermodynamic_example
+  units: not printed as a pressure
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 71
+    section: Results
+  values:
+    species_as_printed: K, K2, KO, K2O, K2O2, P, P2, P3, P4, PO, PO2, P2O3, P2O4, P2O5, P3O6, P4O6, P4O7, P4O8, P4O9, P4O10,
+      KPO3, K2P2O6, O, O2, O3, O4
+    reason: The list is the vapor set used in the equilibrium calculation. The only printed pressures are the two upper bounds
+      stored above.
+  context_id: shornikov-2024-alkali-phosphate::context::shornikov_2024_k2o_vapor_species
+  work_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e
+  source_id: shornikov-2024-alkali-phosphate
+  species: K2O

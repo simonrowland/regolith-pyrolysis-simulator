@@ -573,14 +573,6 @@
       "warnings": [],
       "owner_ratify_placeholders": [
         {
-          "name": "electrical_usd_per_kWh",
-          "value": 0.15,
-          "units": "USD/kWh",
-          "source_tag": "U.S. EIA, Electric Power Monthly, Table 5.6.A, Average Price of Electricity to Ultimate Customers by End-Use Sector, accessed 2026-07-12, https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_06_a; owner bootstrap margin",
-          "ticket": "COST-PARAM-ELECTRICAL-KWH",
-          "status": "owner-ratify-placeholder"
-        },
-        {
           "name": "thermal_usd_per_flux_h",
           "value": 1.0,
           "units": "USD/(K*h)",
@@ -613,7 +605,7 @@
           "status": "owner-ratify-placeholder"
         }
       ],
-      "owner_ratify_placeholder_count": 5,
+      "owner_ratify_placeholder_count": 4,
       "pumping_diagnostic": {
         "schema_version": "pumping-cost-rollup-v1",
         "status": "no_rows",
@@ -2404,28 +2396,61 @@
         "metals_kg": {},
         "metals_total_kg": 0.0,
         "O2_kg": 0.0,
-        "O2_partition_kg": {},
-        "class_total_kg": 0.0
+        "O2_partition_kg": {
+          "stored": 0.0,
+          "vented": 0.0,
+          "captured": 0.0,
+          "total": 0.0,
+          "stage0_stored": 0.0,
+          "melt_offgas_stored": 0.0,
+          "mre_anode_stored": 0.0,
+          "cistern_liquid_stored": 0.0,
+          "melt_offgas_vented": 0.0,
+          "melt_offgas_captured": 0.0,
+          "stage0_o2_vented_with_offgas": 0.0,
+          "stage0_o2_recovered_stored": 0.0,
+          "stage0_o2_bound_into_melt_redox": 0.0
+        },
+        "class_total_kg": 0.0,
+        "estimated_contributions": []
       },
       "ingots_metals": {
         "species_kg": {},
-        "class_total_kg": 0.0
+        "class_total_kg": 0.0,
+        "estimated_contributions": []
       },
       "oxygen": {
         "O2_kg": 0.0,
-        "partition_kg": {},
-        "class_total_kg": 0.0
+        "partition_kg": {
+          "stored": 0.0,
+          "vented": 0.0,
+          "captured": 0.0,
+          "total": 0.0,
+          "stage0_stored": 0.0,
+          "melt_offgas_stored": 0.0,
+          "mre_anode_stored": 0.0,
+          "cistern_liquid_stored": 0.0,
+          "melt_offgas_vented": 0.0,
+          "melt_offgas_captured": 0.0,
+          "stage0_o2_vented_with_offgas": 0.0,
+          "stage0_o2_recovered_stored": 0.0,
+          "stage0_o2_bound_into_melt_redox": 0.0
+        },
+        "class_total_kg": 0.0,
+        "estimated_contributions": []
       },
       "pure_silica_glass": {
         "stage_3_capture_kg": 0.0,
         "stage_3_kg_by_species": {},
-        "class_total_kg": 0.0
+        "class_total_kg": 0.0,
+        "estimated_contributions": []
       },
       "glass": {
         "species_kg": {},
         "class_total_kg": 0.0,
         "pure_silica_glass_kg": 0.0,
-        "industrial_mixed_glass_kg": 0.0
+        "industrial_mixed_glass_kg": 0.0,
+        "estimated_contributions": []
       },
       "industrial_mixed_glass": {
         "mixed_melt_residual_kg": 0.0,
@@ -2443,7 +2468,8 @@
           "N2": 1.9950124688279303,
           "organic_tar": 8.302949899423007
         },
-        "class_total_kg": 185.1770686969132
+        "class_total_kg": 185.1770686969132,
+        "estimated_contributions": []
       },
       "process_inventory_spent_reductant": {
         "kg_by_species": {},
@@ -2483,7 +2509,8 @@
           "ree_enrichment_factor": null,
           "derivation": "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
         },
-        "class_total_kg": 229.8441294934647
+        "class_total_kg": 229.8441294934647,
+        "estimated_contributions": []
       },
       "unclassified": {
         "kg_by_species": {
@@ -16711,27 +16738,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -16861,7 +16869,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 0,
+              "failure_temperature_C": 35.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -17224,27 +17245,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -17374,7 +17376,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 1,
+              "failure_temperature_C": 45.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -17737,27 +17752,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -17887,7 +17883,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 2,
+              "failure_temperature_C": 55.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -18250,27 +18259,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -18400,7 +18390,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 3,
+              "failure_temperature_C": 65.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -18763,27 +18766,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -18913,7 +18897,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 4,
+              "failure_temperature_C": 75.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -19276,27 +19273,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -19426,7 +19404,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 5,
+              "failure_temperature_C": 85.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -19789,27 +19780,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -19939,7 +19911,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 6,
+              "failure_temperature_C": 95.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -20302,27 +20287,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -20452,7 +20418,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 7,
+              "failure_temperature_C": 105.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -20815,27 +20794,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -20965,7 +20925,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 8,
+              "failure_temperature_C": 115.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -21328,27 +21301,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -21478,7 +21432,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 9,
+              "failure_temperature_C": 125.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -21841,27 +21808,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -21991,7 +21939,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 10,
+              "failure_temperature_C": 135.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},
@@ -25797,27 +25758,8 @@
             "liquidus_T_C": 1200.000001,
             "gate_provider_refusal": {
               "provider": "magemin",
-              "status": "out_of_domain",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
-              "authority": "extrapolated",
-              "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
-              },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
-                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -25947,7 +25889,20 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 11,
+              "failure_temperature_C": 145.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
             }
           },
           "evaporation": {},

@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:shornikov-2023-calcium-phosphate
       role: pdf
@@ -42,7 +42,7 @@ experiments:
         tag: unknown
         reason: range_only_not_a_single_temperature
       locator:
-        page: 55
+        page: 3
         published_page: 55
         pdf_page_index: 2
         section: Abstract
@@ -65,7 +65,7 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 33909ebb02e49e8305049cd22e1c95f184a37df70e1d0584e345356411291040
   locator:
-    page: 55
+    page: 3
     published_page: 55
     pdf_page_index: 2
     section: Abstract
@@ -74,7 +74,7 @@ context:
 - observation_id: shornikov_2023_figure1_phase_diagram
   type: thermodynamic_example
   locator:
-    page: 55
+    page: 3
     published_page: 55
     pdf_page_index: 2
     figure: '1'
@@ -92,7 +92,7 @@ context:
 - observation_id: shornikov_2023_minimum_mixing_energy
   type: thermodynamic_example
   locator:
-    page: 57
+    page: 5
     published_page: 57
     pdf_page_index: 4
     section: Results and Discussion
@@ -114,7 +114,7 @@ context:
 - observation_id: shornikov_2023_mixing_energy_figure4
   type: thermodynamic_example
   locator:
-    page: 57
+    page: 5
     published_page: 57
     pdf_page_index: 4
     figure: '4'
@@ -133,7 +133,7 @@ context:
 - observation_id: shornikov_2023_model_scope_and_qualifications
   type: thermodynamic_example
   locator:
-    page: 57
+    page: 5
     published_page: 57
     pdf_page_index: 4
     section: Results and Discussion
@@ -185,7 +185,7 @@ context:
     - Ca4P2O9
     printed_thermodynamic_context:
       locator:
-        page: 55
+        page: 3
         published_page: 55
         pdf_page_index: 2
         section: Introduction
@@ -215,7 +215,7 @@ context:
       - β-Ca3P2O8
     cited_measurement_context:
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
@@ -234,7 +234,7 @@ context:
     cited_literature_apparatus:
     - cell_material_as_printed: platinum
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
@@ -242,7 +242,7 @@ context:
       attribution: Ratkovsky et al. (1975).
     - cell_material_as_printed: molybdenum
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
@@ -250,7 +250,7 @@ context:
       attribution: Lopatin and Semenov (1986; 1989) and Nagai et al. (2009).
     - cell_material_as_printed: alund
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
@@ -259,7 +259,7 @@ context:
     prior_literature_experiment_sets:
     - method: knudsen_effusion
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
@@ -275,7 +275,7 @@ context:
         (1975); no individual source-to-species mapping beyond the article text is inferred.
       equipment_facts_not_reported_here:
         locator:
-          page: 56
+          page: 4
           published_page: 56
           pdf_page_index: 3
           section: Introduction
@@ -317,7 +317,7 @@ context:
             reason: not_reported_for_cited_studies
     - measurements: CaO activity in CaO–P4O10 melts, 11–22 mol % P4O10 at 1923 K.
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
@@ -327,7 +327,7 @@ context:
       cited_sources: Schwerdtfeger and Engell (1963), the single study identified by the authors.
     model_experiment_facts:
       locator:
-        page: 55
+        page: 3
         published_page: 55
         pdf_page_index: 2
         section: Abstract
@@ -381,28 +381,28 @@ context:
     - quote: A detailed review of the available physicochemical data and an assessment of thermodynamic properties in the
         CaO–P4O10 system was recently carried out in (Jantzen et al., 2019).
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
     - quote: The theoretical calculations of thermodynamic properties of the CaO–P4O10 melts in the temperature range 700–2100
         K were performed using a semi-empirical model (Shornikov, 2019) in order to clarify its parameters.
       locator:
-        page: 57
+        page: 5
         published_page: 57
         pdf_page_index: 4
         section: Results and Discussion
     - quote: Phosphorus is an important minor element of the lunar rocks. It has moderate volatility and is usually present
         as phosphates (merrilite, apatite).
       locator:
-        page: 55
+        page: 3
         published_page: 55
         pdf_page_index: 2
         section: Introduction
     - quote: Considerable interest in them is caused by the discovery of the OH–bearing apatites in a number of mare basalts,
         that contradicts the early statement about dryness of the lunar basaltic magmas.
       locator:
-        page: 55
+        page: 3
         published_page: 55
         pdf_page_index: 2
         section: Introduction
@@ -410,21 +410,21 @@ context:
         of the enthalpy of compound formation exceed 10 kJ/mol, and in the values of the entropy of formation – at least 5
         J/(mol×K).'
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
     - quote: The use of the latter can lead to chemical interaction with phosphate samples (Lopatin, 1997) and, thereby, distort
         the measurement results.
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
     - quote: Measurements of CaO activity in the CaO–P4O10 melt were performed in a narrow concentration range (11–22 mol
         % P4O10) at 1923 K in a single experimental study (Schwerdtfeger, Engell, 1963) (Fig. 2).
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
@@ -434,7 +434,7 @@ context:
         alloys (Nagai et al.., 2009) were determined by the Knudsen effusion mass spectrometry method in a wide temperature
         range of 800–1900 K (Fig. 3).
       locator:
-        page: 56
+        page: 4
         published_page: 56
         pdf_page_index: 3
         section: Introduction
@@ -444,21 +444,21 @@ context:
         as well as with experimental data obtained in (Schwerdtferger, Engell, 1963; Lopatin, Semenov, 1989), shows their
         satisfactory correspondence.
       locator:
-        page: 57
+        page: 5
         published_page: 57
         pdf_page_index: 4
         section: Results and Discussion
     - quote: The calculated oxide activities in the the CaO–P4O10 melt correspond to the position of the liquid phase in the
         phase diagram of the system (Fig. 1).
       locator:
-        page: 57
+        page: 5
         published_page: 57
         pdf_page_index: 4
         section: Results and Discussion
     - quote: The minimum value of the mixing energy in the CaO–P4O10 melts is in the composition region close to Ca2P2O7 and
         is equal to –210 kJ/mol.
       locator:
-        page: 57
+        page: 5
         published_page: 57
         pdf_page_index: 4
         section: Results and Discussion
@@ -466,14 +466,14 @@ context:
         phosphate correspond satisfactorily to the experimental data obtained by the Knudsen effusion mass spectrometric method
         in (Butylin et al., 1975; Ratkovsky et al., 1975; Lopatin, 1997).
       locator:
-        page: 57
+        page: 5
         published_page: 57
         pdf_page_index: 4
         section: Results and Discussion
     - quote: The higher partial pressure values of (PO2) gaseous oxide over Ca2P2O7 obtained by Lopatin (1997) are due to
         the presence of reducing conditions occurring in the case of a molybdenum effusion cell (Fig. 3B).
       locator:
-        page: 57
+        page: 5
         published_page: 57
         pdf_page_index: 4
         section: Results and Discussion
@@ -481,7 +481,7 @@ context:
         et al. (1975) illustrates the above-mentioned interaction of the phosphate melt with the alund effusion cell which
         they used in the experiments (Fig. 3B).
       locator:
-        page: 57
+        page: 5
         published_page: 57
         pdf_page_index: 4
         section: Results and Discussion
@@ -504,7 +504,7 @@ context:
           Russian Federation.
       references:
         locator:
-          page: 57
+          page: 5
           published_page: 57
           pdf_page_index: 4
           section: References
@@ -537,7 +537,7 @@ context:
 - observation_id: shornikov_2023_p4o10_activity_estimate_cap3o8
   type: thermodynamic_example
   locator:
-    page: 56
+    page: 4
     published_page: 56
     pdf_page_index: 3
     section: Introduction
@@ -562,7 +562,7 @@ context:
 - observation_id: shornikov_2023_po2_literature_qualification
   type: thermodynamic_example
   locator:
-    page: 57
+    page: 5
     published_page: 57
     pdf_page_index: 4
     section: Results and Discussion

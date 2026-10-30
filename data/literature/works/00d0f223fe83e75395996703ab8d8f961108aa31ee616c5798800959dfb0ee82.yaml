@@ -1,0 +1,115 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 00d0f223fe83e75395996703ab8d8f961108aa31ee616c5798800959dfb0ee82
+  citation: Colson, R. O., Nermoe, M. K. B., Hendrickson, T. R., & Floden, A. M. (1998). Stabilization of Cr3+ dimers in silicate
+    melt by the presence of Al. Lunar and Planetary Science XXIX, abstract 1622.
+  source_ids:
+  - colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
+      role: pdf
+      path: raw/colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc/colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc.pdf
+      sha256:
+        tag: value
+        value: e85960a72b1f2f1c081a575ed6705a16c2d1849f62809c7108fe65f3cf3acf1a
+    - asset_id: pdftotext:colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
+      role: pdftotext
+      path: text/colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: colson_nermoe_1998_abstract_numeric_statements
+  type: measured_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: null
+    section: Results
+  units: wt% Cr2O3; relative concentration
+  reason: 'Candidate redox token: valence_ratio. The printed concentrations describe when a Cr3+ dimer is important and do
+    not give a Cr valence ratio or dimer fraction. The abstract''s concentrations are retained as printed context, including
+    the attributed earlier-work range.'
+  values:
+    statements:
+    - claim: Earlier work suggested the dimer becomes insignificant below about 0.4 to 0.6 wt% Cr3+.
+      attribution: refs [3,4]
+    - claim: Al-bearing composition 3 results constrain dimer significance to at least 3–4 times lower concentration than
+        expected for compositions 1 and 2.
+      attribution: this work
+    - claim: The abstract concludes the dimer is important to at least 0.21 wt% Cr2O3 in composition 2.
+      attribution: this work
+    - claim: The abstract suggests effects may be most significant below 0.1 wt% Cr3%.
+      attribution: author interpretation
+    studied_compositions:
+    - CaO·MgO·2SiO2
+    - CaO·MgO·1.4SiO2
+    - 0.25Al2O3·1CaO·0.75MgO·2SiO2
+  context_id: colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc::context::colson_nermoe_1998_abstract_numeric_statements
+  work_id: 00d0f223fe83e75395996703ab8d8f961108aa31ee616c5798800959dfb0ee82
+  source_id: colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
+  species: Cr
+- observation_id: colson_nermoe_1998_figures_1_2
+  type: figure
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: null
+    figure: '1'
+  units: figure-only; no numeric points
+  reason: Electrochemical peak current and potential are not supported quantity tokens; figures deferred.
+  values:
+    quantity_as_printed: electrochemical_scan_rate_and_peak_potential_for_Cr_redox
+    method_class: figure_only
+    figures:
+    - figure: '1'
+      caption: Peak current varies linearly with square root of scan rate; peak potential remains constant.
+      panel: main
+      species: Cr
+      phase: melt
+      T: unknown
+      axes_as_printed:
+        x: square root of scan rate
+        y: peak current (mA) and peak potential (mV)
+      series:
+      - electrochemical scan-rate series
+      marker_counts: not_counted
+      locator:
+        page: 1
+        pdf_page_index: 0
+      attribution: this_work
+      digitisation: deferred to a figure pass
+    - figure: '2'
+      caption: Experiments in composition 2 show peak-potential shift with Cr2O3 concentration.
+      panel: main
+      species: Cr
+      phase: melt
+      T: unknown
+      axes_as_printed:
+        x: log(wt% Cr2O3)
+        y: peak potential (mV)
+      series:
+      - composition 2
+      marker_counts: not_counted
+      locator:
+        page: 1
+        pdf_page_index: 0
+      attribution: this_work
+      digitisation: deferred to a figure pass
+    digitisation: deferred to a figure pass
+  context_id: colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc::context::colson_nermoe_1998_figures_1_2
+  work_id: 00d0f223fe83e75395996703ab8d8f961108aa31ee616c5798800959dfb0ee82
+  source_id: colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
+  species: Cr

@@ -1,0 +1,532 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  citation: Romero-Serrano, A. & Pelton, A. D. (1999). Thermodynamic Analysis of Binary and Ternary Silicate Systems by a
+    Structural Model. ISIJ International, 39(5), 399–408.
+  source_ids:
+  - romero-serrano-1999-binary-ternary-silicates
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:romero-serrano-1999-binary-ternary-silicates
+      role: pdf
+      path: raw/romero-serrano-1999-binary-ternary-silicates/romero-serrano-1999-binary-ternary-silicates.pdf
+      sha256:
+        tag: value
+        value: 9dc21535f19b12dde91fbdb99e18fd52ffcc41ef3d5bd7c10ea668a8b808cec6
+    - asset_id: pdftotext:romero-serrano-1999-binary-ternary-silicates
+      role: pdftotext
+      path: text/romero-serrano-1999-binary-ternary-silicates
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:romero-serrano-1999-binary-ternary-silicates
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89::romero-serrano-1999-binary-ternary-silicates
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  locator:
+    page: 6
+    published_page: 404
+    pdf_page_index: 5
+    section: 6.1, SiO2–MnO–MgO system
+    note: Prose compares the calculated invariant point a with the experimental value from [19], which is also plotted in
+      Fig. 8 on PDF page 7; it remains one observation.
+context:
+- observation_id: romero_1999_figure_1
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 401
+    figure: '1'
+  panel: whole_figure
+  attribution: Experimental points are attributed to references [5], [6], [7] and [8] in the caption.
+  units: Temperature °C; mole fraction SiO2.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: MgO–SiO2 system
+    phase: liquidus and solidus boundaries
+    temperature_as_printed: Variable; y-axis is temperature in °C.
+    axes_as_printed:
+      x: Mole fraction SiO2
+      y: Temperature (°C)
+    caption: 'Optimized MgO–SiO2 phase diagram. Experimental points: ○ [5]; ◇ [6]; ▽ [7]; □ [8].'
+    series:
+    - name: '[5] open circles'
+      marker_count: 5
+      evidence_class: quoted_attributed
+    - name: '[6] open diamonds'
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: '[7] open inverted triangles'
+      marker_count: 8
+      evidence_class: quoted_attributed
+    - name: '[8] open squares'
+      marker_count: 11
+      evidence_class: quoted_attributed
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_1
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_10
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 405
+    figure: '10'
+  panel: whole_figure
+  attribution: Ban-ya et al. [21] for the experimental iso-activity points.
+  units: Dimensionless activity; liquid standard state.
+  values:
+    quantity: activity
+    method_class: model_derived
+    species: FeO
+    phase: liquid
+    temperature_as_printed: 1450 °C
+    standard_state_as_printed: liquid standard state
+    axes_as_printed:
+      x: Ternary SiO2–FeO–MnO composition triangle
+      y: FeO activity iso-activity contours
+    caption: Calculated and experimental [21] iso-activity curves at 1450°C in liquid SiO2–FeO–MnO solution (liquid standard
+      state).
+    series:
+    - name: aFeO = 0.1 filled circles
+      marker_count: 4
+      evidence_class: quoted_attributed
+      standard_state_as_printed: liquid standard state
+    - name: aFeO = 0.3 open circles
+      marker_count: 5
+      evidence_class: quoted_attributed
+      standard_state_as_printed: liquid standard state
+    - name: aFeO = 0.5 filled squares
+      marker_count: 6
+      evidence_class: quoted_attributed
+      standard_state_as_printed: liquid standard state
+    - name: aFeO = 0.7 open squares
+      marker_count: 5
+      evidence_class: quoted_attributed
+      standard_state_as_printed: liquid standard state
+    - name: aFeO = 0.9 filled triangles
+      marker_count: 4
+      evidence_class: quoted_attributed
+      standard_state_as_printed: liquid standard state
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_10
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_11
+  type: figure_record
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 406
+    figure: '11'
+  panel: whole_figure
+  attribution: Present-work calculated optimized liquidus diagram.
+  units: Temperature °C; weight percent.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: SiO2–FeO–MgO system
+    phase: liquidus surface
+    temperature_as_printed: Variable; isotherms are labelled in °C.
+    axes_as_printed:
+      x: Weight percent in ternary composition triangle (SiO2, FeO, MgO vertices)
+      y: Temperature contours (°C)
+    caption: Optimized SiO2–FeO–MgO phase diagram (liquidus). Temperature in °C.
+    series:
+    - name: Calculated liquidus isotherms and phase boundaries
+      marker_count: 0
+      evidence_class: model_derived
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_11
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_12
+  type: figure_record
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 406
+    figure: '12'
+  panel: whole_figure
+  attribution: Bowen and Schairer [23] as printed in the caption.
+  units: Temperature °C; mole fraction Fe2SiO4.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: Mg2SiO4–Fe2SiO4 pseudo-binary system
+    phase: liquidus and olivine boundaries
+    temperature_as_printed: Variable; y-axis is temperature in °C.
+    axes_as_printed:
+      x: Mole fraction Fe2SiO4
+      y: Temperature (°C)
+    caption: Optimized pseudo-binary Mg2SiO4–Fe2SiO4 phase diagram. Points from Bowen and Schairer [23].
+    series:
+    - name: Bowen and Schairer [23] open circles
+      marker_count: 14
+      evidence_class: quoted_attributed
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_12
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_13
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 407
+    figure: '13'
+  panel: whole_figure
+  attribution: Present-work structural-model calculations.
+  units: Gibbs free energy of mixing, kJ/mol; mole fraction SiO2.
+  values:
+    quantity: unavailable
+    schema_gap: The store has no quantity token for Gibbs free energy of mixing; delta_fG would represent a different quantity.
+    species: MO–SiO2 binary systems (M = Fe, Mn, Mg, Ca, Na)
+    phase: liquid silicate melt
+    temperature_as_printed: 1873 K
+    axes_as_printed:
+      x: Mole fraction SiO2
+      y: Gibbs Energy of Mixing (kJ/mol)
+    caption: Calculated Gibbs free energy of mixing of the MO–SiO2 binary systems (M = Fe, Mn, Mg, Ca, Na) at 1873 K.
+    series:
+    - name: FeO–SiO2
+      marker_count: 0
+      evidence_class: model_derived
+    - name: MnO–SiO2
+      marker_count: 0
+      evidence_class: model_derived
+    - name: MgO–SiO2
+      marker_count: 0
+      evidence_class: model_derived
+    - name: CaO–SiO2
+      marker_count: 0
+      evidence_class: model_derived
+    - name: Na2O–SiO2
+      marker_count: 0
+      evidence_class: model_derived
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_13
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_2
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 401
+    figure: '2'
+  panel: whole_figure
+  attribution: Experimental points are attributed to references [6], [10], [11] and [12] in the caption.
+  units: Temperature °C; mole fraction SiO2.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: FeO–SiO2 system
+    phase: liquidus and solidus boundaries
+    temperature_as_printed: Variable; y-axis is temperature in °C.
+    axes_as_printed:
+      x: Mole fraction SiO2
+      y: Temperature (°C)
+    caption: 'Optimized FeO–SiO2 phase diagram. Experimental points: △ [6]; ○ [10]; ◇ [11]; □ [12].'
+    series:
+    - name: '[6] open triangles'
+      marker_count: 10
+      evidence_class: quoted_attributed
+    - name: '[10] open circles'
+      marker_count: 9
+      evidence_class: quoted_attributed
+    - name: '[11] open diamonds'
+      marker_count: 6
+      evidence_class: quoted_attributed
+    - name: '[12] open squares'
+      marker_count: 10
+      evidence_class: quoted_attributed
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_2
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_3
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 402
+    figure: '3'
+  panel: whole_figure
+  attribution: Experimental points from [14] as printed in the caption.
+  units: Temperature °C; mole fraction MgO.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: MnO–MgO system
+    phase: liquidus and solidus boundaries
+    temperature_as_printed: Variable; y-axis is temperature in °C.
+    axes_as_printed:
+      x: Mole fraction MgO
+      y: Temperature (°C)
+    caption: 'Optimized MnO–MgO phase diagram. Experimental points: □ [14].'
+    series:
+    - name: '[14] open squares'
+      marker_count: 5
+      evidence_class: quoted_attributed
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_3
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_4
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 402
+    figure: '4'
+  panel: whole_figure
+  attribution: Experimental points from [15] as printed in the caption.
+  units: Temperature °C; mole fraction FeO.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: MgO–FeO system
+    phase: liquidus and solidus boundaries
+    temperature_as_printed: Variable; y-axis is temperature in °C.
+    axes_as_printed:
+      x: Mole fraction FeO
+      y: Temperature (°C)
+    caption: 'Optimized MgO–FeO phase diagram. Experimental points: □ [15].'
+    series:
+    - name: '[15] plotted open circles; caption symbol is open square'
+      marker_count: 15
+      evidence_class: quoted_attributed
+    numeric_points: none
+    digitisation: deferred to a figure pass
+    note: The 600 dpi plot symbols appear circular although the caption gives a square symbol.
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_4
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_5
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 403
+    figure: '5'
+  panel: whole_figure
+  attribution: Experimental points from [17] as printed in the caption.
+  units: Temperature °C; mole fraction MnO.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: FeO–MnO system
+    phase: liquidus and solidus boundaries
+    temperature_as_printed: Variable; y-axis is temperature in °C.
+    axes_as_printed:
+      x: Mole fraction MnO
+      y: Temperature (°C)
+    caption: 'Optimized FeO–MnO phase diagram. Experimental points: □ [17].'
+    series:
+    - name: '[17] open squares'
+      marker_count: 4
+      evidence_class: quoted_attributed
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_5
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_6
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 403
+    figure: '6'
+  panel: whole_figure
+  attribution: Present-work model schematic.
+  units: Interaction-energy terms (ω − ηT), J/mol.
+  values:
+    quantity: unavailable
+    schema_gap: The schematic interaction-energy representation has no matching existing quantity token.
+    species: Ternary SiO2–AO–BO system
+    phase: liquid model
+    temperature_as_printed: No fixed temperature is printed for the schematic.
+    axes_as_printed:
+      vertices: AO; BO; SiO2
+      interior: Gᴱ_AO–BO
+    caption: Illustration of the asymmetric approximation for estimating the excess free energy in a ternary from binary values.
+    series:
+    - name: Asymmetric approximation schematic
+      marker_count: 0
+      evidence_class: model_derived
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_6
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_7
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 404
+    figure: '7'
+  panel: whole_figure
+  attribution: Present-work calculated optimized liquidus diagram.
+  units: Temperature °C; weight percent.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: SiO2–MnO–MgO system
+    phase: liquidus surface
+    temperature_as_printed: Variable; isotherms are labelled in °C.
+    axes_as_printed:
+      x: Weight percent in ternary composition triangle (SiO2, MnO, MgO vertices)
+      y: Temperature contours (°C)
+    caption: Optimized SiO2–MnO–MgO phase diagram (liquidus). Temperature in °C.
+    series:
+    - name: Calculated liquidus isotherms and phase boundaries
+      marker_count: 0
+      evidence_class: model_derived
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_7
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_8
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 405
+    figure: '8'
+  panel: whole_figure
+  attribution: Glasser and Osborn [19] as printed in the caption.
+  units: Temperature °C; mole fraction Mn2SiO4.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: Mg2SiO4–Mn2SiO4 pseudo-binary system
+    phase: liquidus and olivine boundaries
+    temperature_as_printed: Variable; y-axis is temperature in °C.
+    axes_as_printed:
+      x: Mole fraction Mn2SiO4
+      y: Temperature (°C)
+    caption: Optimized pseudo-binary Mg2SiO4–Mn2SiO4 phase diagram. Points from Glasser and Osborn [19].
+    series:
+    - name: Glasser and Osborn [19] filled circles
+      marker_count: 14
+      evidence_class: quoted_attributed
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_8
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_figure_9
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 405
+    figure: '9'
+  panel: whole_figure
+  attribution: Present-work calculated optimized liquidus diagram.
+  units: Temperature °C; weight percent.
+  values:
+    quantity: transition_temperature
+    method_class: model_derived
+    species: SiO2–FeO–MnO system
+    phase: liquidus surface
+    temperature_as_printed: Variable; isotherms are labelled in °C.
+    axes_as_printed:
+      x: Weight percent in ternary composition triangle (SiO2, FeO, MnO vertices)
+      y: Temperature contours (°C)
+    caption: Optimized SiO2–FeO–MnO phase diagram (liquidus). Temperature in °C.
+    series:
+    - name: Calculated liquidus isotherms and phase boundaries
+      marker_count: 0
+      evidence_class: model_derived
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_figure_9
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2
+- observation_id: romero_1999_table_1_pure_phase_model_inputs
+  type: model_input_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 400
+    table: '1'
+    note: Table 1 is headed Thermodynamic Properties Relative to Elements at 298.15 K.
+  units: As printed in Table 1; no values re-emitted.
+  candidate_tokens_considered:
+  - delta_fH
+  - S
+  - cp
+  reason_unscored: The 20-row table gives pure-phase H/S baselines and Cp coefficients used as model inputs. It has no per-row
+    attribution, and the primary thermo compilations already have a canonical store location, so these values are not duplicated.
+  values:
+    method_class: model_derived
+    quantity_as_printed: Pure-phase enthalpy and entropy baselines and heat-capacity polynomial coefficients
+    numeric_rows_printed: 20
+    table_role: model inputs
+  context_id: romero-serrano-1999-binary-ternary-silicates::context::romero_1999_table_1_pure_phase_model_inputs
+  work_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  species: SiO2

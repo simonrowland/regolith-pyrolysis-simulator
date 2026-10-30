@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:kems-008-schaefer-fegley-2004
       role: pdf
@@ -91,6 +91,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j) over supported oxide components.
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -192,4 +193,4 @@ experiments:
   locator:
     table: '10'
     line_range: 649-661
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md

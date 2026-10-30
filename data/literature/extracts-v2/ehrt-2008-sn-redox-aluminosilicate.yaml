@@ -1,0 +1,2494 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ehrt-2008-sn-redox-aluminosilicate.yaml
+observations:
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_density_ABS
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '10'
+        - - B2O3
+          - '8'
+        - - SiO2
+          - '67'
+        - - BaO
+          - '2'
+        - - CaO
+          - '9'
+        - - MgO
+          - '4'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2560'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '10'
+      units: kg/m3
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_density_ABS
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 2
+    published_page: 69
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '10'
+          - - B2O3
+            - '8'
+          - - SiO2
+            - '67'
+          - - BaO
+            - '2'
+          - - CaO
+            - '9'
+          - - MgO
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:ehrt-2008-sn-redox-aluminosilicate
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.56'
+        locator:
+          page: 2
+          published_page: 69
+          pdf_page_index: 1
+          table: '1'
+        inference:
+          relation: g_per_cm3_to_kg_per_m3
+          inputs:
+          - rho_kg_per_m3 = rho_g_per_cm3 × 1000
+          - original_unit=g_per_cm3
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.56'
+              locator:
+                page: 2
+                published_page: 69
+                pdf_page_index: 1
+                table: '1'
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 2
+                published_page: 69
+                pdf_page_index: 1
+                table: '1'
+          output_unit: kg_per_m3
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 69
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_density_AS
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '15'
+        - - SiO2
+          - '65'
+        - - BaO
+          - '10'
+        - - CaO
+          - '10'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2850'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '10'
+      units: kg/m3
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_density_AS
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 2
+    published_page: 69
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '15'
+          - - SiO2
+            - '65'
+          - - BaO
+            - '10'
+          - - CaO
+            - '10'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:ehrt-2008-sn-redox-aluminosilicate
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.85'
+        locator:
+          page: 2
+          published_page: 69
+          pdf_page_index: 1
+          table: '1'
+        inference:
+          relation: g_per_cm3_to_kg_per_m3
+          inputs:
+          - rho_kg_per_m3 = rho_g_per_cm3 × 1000
+          - original_unit=g_per_cm3
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.85'
+              locator:
+                page: 2
+                published_page: 69
+                pdf_page_index: 1
+                table: '1'
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 2
+                published_page: 69
+                pdf_page_index: 1
+                table: '1'
+          output_unit: kg_per_m3
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 69
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_1900C_argon::T=2173.15:row=abs:h=17860278bfc3
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '10'
+        - - B2O3
+          - '8'
+        - - SiO2
+          - '67'
+        - - BaO
+          - '2'
+        - - CaO
+          - '9'
+        - - MgO
+          - '4'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 5
+    published_page: 72
+    pdf_page_index: 4
+    section: Conclusions
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Conclusions
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              section: Conclusions
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              section: Conclusions
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Conclusions
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Conclusions
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '10'
+          - - B2O3
+            - '8'
+          - - SiO2
+            - '67'
+          - - BaO
+            - '2'
+          - - CaO
+            - '9'
+          - - MgO
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 70
+        pdf_page_index: 2
+        section: Experimental
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1773.15:row=abs:h=34bb0eaab6c2
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '10'
+        - - B2O3
+          - '8'
+        - - SiO2
+          - '67'
+        - - BaO
+          - '2'
+        - - CaO
+          - '9'
+        - - MgO
+          - '4'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '10000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.4'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 5
+    published_page: 72
+    pdf_page_index: 4
+    figure: '8'
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              figure: '8'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              figure: '8'
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '10000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '10'
+          - - B2O3
+            - '8'
+          - - SiO2
+            - '67'
+          - - BaO
+            - '2'
+          - - CaO
+            - '9'
+          - - MgO
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from photoluminescence and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1923.15:row=abs:h=4f157ebe7479
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1923.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '10'
+        - - B2O3
+          - '8'
+        - - SiO2
+          - '67'
+        - - BaO
+          - '2'
+        - - CaO
+          - '9'
+        - - MgO
+          - '4'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.2'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 5
+    published_page: 72
+    pdf_page_index: 4
+    figure: '8'
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923.15'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1650'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              figure: '8'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              figure: '8'
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '10'
+          - - B2O3
+            - '8'
+          - - SiO2
+            - '67'
+          - - BaO
+            - '2'
+          - - CaO
+            - '9'
+          - - MgO
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from photoluminescence and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1873.15:row=as:h=e9395ccaa322
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '15'
+        - - SiO2
+          - '65'
+        - - BaO
+          - '10'
+        - - CaO
+          - '10'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.2'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 4
+    published_page: 71
+    pdf_page_index: 3
+    section: Results and discussion
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              section: Results and discussion
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Conclusions
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '15'
+          - - SiO2
+            - '65'
+          - - BaO
+            - '10'
+          - - CaO
+            - '10'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 70
+        pdf_page_index: 2
+        section: Experimental
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1973.15:row=as:h=c3177fb0b9ed
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1973.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '15'
+        - - SiO2
+          - '65'
+        - - BaO
+          - '10'
+        - - CaO
+          - '10'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.3'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 4
+    published_page: 71
+    pdf_page_index: 3
+    section: Results and discussion
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              section: Results and discussion
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Conclusions
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '15'
+          - - SiO2
+            - '65'
+          - - BaO
+            - '10'
+          - - CaO
+            - '10'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 70
+        pdf_page_index: 2
+        section: Experimental
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=1873.15:row=as:h=33c658f7d4a2
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '15'
+        - - SiO2
+          - '65'
+        - - BaO
+          - '10'
+        - - CaO
+          - '10'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.4'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 4
+    published_page: 71
+    pdf_page_index: 3
+    section: Results and discussion
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              section: Results and discussion
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        section: Results and discussion
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Conclusions
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '15'
+          - - SiO2
+            - '65'
+          - - BaO
+            - '10'
+          - - CaO
+            - '10'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 70
+        pdf_page_index: 2
+        section: Experimental
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=2073.15:row=abs:h=4e38776c1fee
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '10'
+        - - B2O3
+          - '8'
+        - - SiO2
+          - '67'
+        - - BaO
+          - '2'
+        - - CaO
+          - '9'
+        - - MgO
+          - '4'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.5'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 5
+    published_page: 72
+    pdf_page_index: 4
+    section: Results and discussion
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              section: Results and discussion
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Results and discussion
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Results and discussion
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '10'
+          - - B2O3
+            - '8'
+          - - SiO2
+            - '67'
+          - - BaO
+            - '2'
+          - - CaO
+            - '9'
+          - - MgO
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 70
+        pdf_page_index: 2
+        section: Experimental
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=2073.15:row=abs:h=8a64fe0c387e
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '10'
+        - - B2O3
+          - '8'
+        - - SiO2
+          - '67'
+        - - BaO
+          - '2'
+        - - CaO
+          - '9'
+        - - MgO
+          - '4'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.8'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 5
+    published_page: 72
+    pdf_page_index: 4
+    section: Results and discussion
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Results and discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 72
+              pdf_page_index: 4
+              section: Results and discussion
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Results and discussion
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Results and discussion
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '10'
+          - - B2O3
+            - '8'
+          - - SiO2
+            - '67'
+          - - BaO
+            - '2'
+          - - CaO
+            - '9'
+          - - MgO
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 70
+        pdf_page_index: 2
+        section: Experimental
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_1000_ppmw_fig6::T=2173.15:row=as:h=34a2a103c376
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '15'
+        - - SiO2
+          - '65'
+        - - BaO
+          - '10'
+        - - CaO
+          - '10'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 4
+    published_page: 71
+    pdf_page_index: 3
+    figure: '6'
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              figure: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              figure: '6'
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Conclusions
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '15'
+          - - SiO2
+            - '65'
+          - - BaO
+            - '10'
+          - - CaO
+            - '10'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_1000_ppmw_fig6::T=2273.15:row=as:h=d9138e8560bc
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '15'
+        - - SiO2
+          - '65'
+        - - BaO
+          - '10'
+        - - CaO
+          - '10'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 4
+    published_page: 71
+    pdf_page_index: 3
+    figure: '6'
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              figure: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              figure: '6'
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '15'
+          - - SiO2
+            - '65'
+          - - BaO
+            - '10'
+          - - CaO
+            - '10'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+    references: []
+- observation_id: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_5000_ppmw_1600C_air::T=1873.15:row=as:h=1babe8ec3659
+  experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed mol-percent glass composition, Table 1
+        components:
+        - - Al2O3
+          - '15'
+        - - SiO2
+          - '65'
+        - - BaO
+          - '10'
+        - - CaO
+          - '10'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.2'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  locator:
+    page: 4
+    published_page: 71
+    pdf_page_index: 3
+    figure: '4'
+  read_from: pdf:ehrt-2008-sn-redox-aluminosilicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              figure: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 71
+              pdf_page_index: 3
+              figure: '4'
+        output_unit: K
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '4'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        section: Conclusions
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed mol-percent glass composition, Table 1
+          components:
+          - - Al2O3
+            - '15'
+          - - SiO2
+            - '65'
+          - - BaO
+            - '10'
+          - - CaO
+            - '10'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 69
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements.
+    inputs: []
+    parameters: []
+    output_unit: fraction
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 70
+        pdf_page_index: 2
+        section: Experimental
+    references: []

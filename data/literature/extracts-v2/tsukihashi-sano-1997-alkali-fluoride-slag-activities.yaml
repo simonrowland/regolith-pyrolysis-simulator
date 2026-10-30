@@ -1,0 +1,136 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml
+observations:
+- observation_id: tsukihashi-sano-1997-alkali-fluoride-slag-activities::tsukihashi_sano_1997_eq12_na2o_gamma_fit
+  experiment_id: 76ba78691364bc4017fa1a2e3490972658ed2ad57f0f12921a4bfc5b6bf3971e::tsukihashi-sano-1997-alkali-fluoride-slag-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient_temperature_fit
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1423, 1623]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: liquid_endmember
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use reservoir
+    composition:
+      tag: unknown
+      reason: flux system and 4 mass% Na2O are stated, but complete per-temperature composition is not tabulated
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient_temperature_fit does not use wall
+  value:
+    kind: expression
+    expression_text: log10 γ = A + B/T
+    expression_parameters:
+    - - A
+      - '7.23'
+    - - B
+      - '-18600'
+    expression_domain: '{"input_unit":"K","validity_range_K":[1423,1623],"standard_state_as_printed":"not stated in Table
+      2 row","notes_as_printed":"1423–1623 K; CaO-4 mass% Na2O-CaF2-SiO2 flux doubly saturated with CaO and 3CaO·SiO2; standard
+      state pure Na2O(l); paper labels slope numerator A and intercept B in the form, while schema A_printed is the intercept
+      and B_printed is the signed slope; abstract prints intercept 7.53 while Eq. 12 and conclusion print 7.23; Eq. 12 used","A_as_printed":"7.23","B_as_printed":"−18,600"}'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: authors' fitted temperature dependence of measured Na2O activity coefficient
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tsukihashi-sano-1997-alkali-fluoride-slag-activities
+  locator:
+    page: 4
+    published_page: 732
+    equation: '12'
+    note: Abstract p. 729 prints intercept 7.53; Eq. 12 and conclusion print 7.23; Eq. 12 used per controller ruling.
+  read_from: pdf:tsukihashi-sano-1997-alkali-fluoride-slag-activities
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: flux system and 4 mass% Na2O are stated, but complete per-temperature composition is not tabulated
+      locator:
+        page: 4
+        published_page: 732
+        figure: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: CO2-CO gas; P_CO2/P_CO varied from 0.01 to 10
+      locator:
+        page: 3
+        published_page: 731
+        section: '3.2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: CO2/CO gas ratio is reported but absolute fO2 is not stated for this experiment
+      locator:
+        page: 4
+        published_page: 732
+        section: '3.2'

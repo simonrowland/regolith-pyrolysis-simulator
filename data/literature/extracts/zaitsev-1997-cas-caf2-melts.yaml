@@ -1,0 +1,901 @@
+schema_version: literature_extract.v1
+source_id: zaitsev-1997-cas-caf2-melts
+source:
+  citation: 'Zaitsev, A. I., Litvina, A. D., Lyakishev, N. P. and Mogutnov, B. M. (1997). Thermodynamics of CaO-Al2O3-SiO2 and CaF2-CaO-Al2O3-SiO2 melts. Journal of the Chemical Society, Faraday Transactions, 93, 3089-3098.'
+  doi: 10.1039/a700511c
+  year: 1997
+  corpus_asset: raw/zaitsev-1997-cas-caf2-melts/zaitsev-1997-cas-caf2-melts.pdf
+extraction:
+  method: >-
+    Manual transcription from the authoritative born-digital pdftotext-layout file. The available
+    table tool accepts MinerU content-list tables only, and this source has no MinerU output.
+    Tables 1-5 were checked cell-by-cell against 600 dpi PDF renders on pages 6, 7 and 9.
+    Figures 1-10 are context-only records with deferred digitisation. Table 4 prints only
+    x(SiO2) and x(Al2O3) for the ternary melts; CaO was left unknown and not reconstructed.
+    Table 5 contains calculated phase-transition coordinates and quoted comparison values;
+    they remain unscored context under t-1326.
+  date: '2026-10-18'
+  worker: fam3-1018
+review_status: draft
+fidelity_samples:
+  - path: species.SiO2.observations[zaitsev_1997_table4_present_1798k].values.points[0].activity_as_printed
+    value: '4.61 × 10−5'
+    locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 1}
+  - path: species.SiO2.observations[zaitsev_1997_table4_present_1873k].values.points[7].activity_as_printed
+    value: '1.14 × 10−4'
+    locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 14}
+  - path: species.SiO2.observations[zaitsev_1997_table4_ref5_1798k].values.points[0].activity_as_printed
+    value: '7 × 10−5'
+    locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 1}
+species:
+  SiO2:
+    observations:
+      - observation_id: zaitsev_1997_table4_present_1798k
+        type: activity_coefficient
+        locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4'}
+        phase: l
+        T_K: 1798
+        units: dimensionless
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember: {formula: SiO2, phase: {tag: value, value: l}}
+              component_basis: SiO2
+          inferred: false
+          note: The Table 4 caption states that the reference state is liquid SiO2.
+          locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4'}
+        derivation:
+          relation: SiO2 activity was reduced from measured vapour pressures and ion currents using equations (IV)-(V).
+          locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4'}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', note: Raw partial pressures and ion-current data for these tabulated points are not printed.}
+        standard_state_as_printed: liquid SiO2
+        values:
+          quantity: activity
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reference_state_as_printed: liquid SiO2
+          method_as_printed: Knudsen effusion mass spectrometry; activity reduced from measured vapour pressures
+          points:
+            - row_as_printed: '1'
+              activity: 0.0000461
+              activity_as_printed: '4.61 × 10−5'
+              x_SiO2_as_printed: '0.0658'
+              x_Al2O3_as_printed: '0.243'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 1}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 1}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 1}}
+            - row_as_printed: '2'
+              activity: 0.0000491
+              activity_as_printed: '4.91 × 10−5'
+              x_SiO2_as_printed: '0.0556'
+              x_Al2O3_as_printed: '0.264'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 2}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 2}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 2}}
+            - row_as_printed: '3'
+              activity: 0.0000551
+              activity_as_printed: '5.51 × 10−5'
+              x_SiO2_as_printed: '0.0500'
+              x_Al2O3_as_printed: '0.282'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 3}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 3}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 3}}
+            - row_as_printed: '4'
+              activity: 0.0000853
+              activity_as_printed: '8.53 × 10−5'
+              x_SiO2_as_printed: '0.0413'
+              x_Al2O3_as_printed: '0.331'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 4}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 4}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 4}}
+            - row_as_printed: '5'
+              activity: 0.000121
+              activity_as_printed: '1.21 × 10−4'
+              x_SiO2_as_printed: '0.0395'
+              x_Al2O3_as_printed: '0.363'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 5}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 5}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 5}}
+            - row_as_printed: '6'
+              activity: 0.000148
+              activity_as_printed: '1.48 × 10−4'
+              x_SiO2_as_printed: '0.0270'
+              x_Al2O3_as_printed: '0.420'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 6}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 6}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 6}}
+
+      - observation_id: zaitsev_1997_table4_present_1873k
+        type: activity_coefficient
+        locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4'}
+        phase: l
+        T_K: 1873
+        units: dimensionless
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember: {formula: SiO2, phase: {tag: value, value: l}}
+              component_basis: SiO2
+          inferred: false
+          note: The Table 4 caption states that the reference state is liquid SiO2.
+          locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4'}
+        derivation:
+          relation: SiO2 activity was reduced from measured vapour pressures and ion currents using equations (IV)-(V).
+          locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4'}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', note: Raw partial pressures and ion-current data for these tabulated points are not printed.}
+        standard_state_as_printed: liquid SiO2
+        values:
+          quantity: activity
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reference_state_as_printed: liquid SiO2
+          method_as_printed: Knudsen effusion mass spectrometry; activity reduced from measured vapour pressures
+          points:
+            - row_as_printed: '7'
+              activity: 0.000396
+              activity_as_printed: '3.96 × 10−4'
+              x_SiO2_as_printed: '0.103'
+              x_Al2O3_as_printed: '0.319'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 7}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 7}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 7}}
+            - row_as_printed: '8'
+              activity: 0.000496
+              activity_as_printed: '4.96 × 10−4'
+              x_SiO2_as_printed: '0.0986'
+              x_Al2O3_as_printed: '0.357'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 8}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 8}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 8}}
+            - row_as_printed: '9'
+              activity: 0.00105
+              activity_as_printed: '1.05 × 10−3'
+              x_SiO2_as_printed: '0.0801'
+              x_Al2O3_as_printed: '0.423'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 9}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 9}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 9}}
+            - row_as_printed: '10'
+              activity: 0.0000571
+              activity_as_printed: '5.71 × 10−5'
+              x_SiO2_as_printed: '0.0687'
+              x_Al2O3_as_printed: '0.228'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 10}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 10}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 10}}
+            - row_as_printed: '11'
+              activity: 0.0000729
+              activity_as_printed: '7.29 × 10−5'
+              x_SiO2_as_printed: '0.0673'
+              x_Al2O3_as_printed: '0.248'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 11}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 11}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 11}}
+            - row_as_printed: '12'
+              activity: 0.0000623
+              activity_as_printed: '6.23 × 10−5'
+              x_SiO2_as_printed: '0.0529'
+              x_Al2O3_as_printed: '0.263'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 12}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 12}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 12}}
+            - row_as_printed: '13'
+              activity: 0.0000694
+              activity_as_printed: '6.94 × 10−5'
+              x_SiO2_as_printed: '0.0451'
+              x_Al2O3_as_printed: '0.287'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 13}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 13}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 13}}
+            - row_as_printed: '14'
+              activity: 0.000114
+              activity_as_printed: '1.14 × 10−4'
+              x_SiO2_as_printed: '0.0951'
+              x_Al2O3_as_printed: '0.239'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 14}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 14}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 14}}
+            - row_as_printed: '15'
+              activity: 0.000137
+              activity_as_printed: '1.37 × 10−4'
+              x_SiO2_as_printed: '0.101'
+              x_Al2O3_as_printed: '0.244'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 15}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 15}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 15}}
+            - row_as_printed: '16'
+              activity: 0.000373
+              activity_as_printed: '3.73 × 10−4'
+              x_SiO2_as_printed: '0.132'
+              x_Al2O3_as_printed: '0.270'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 16}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 16}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 16}}
+            - row_as_printed: '17'
+              activity: 0.000196
+              activity_as_printed: '1.96 × 10−4'
+              x_SiO2_as_printed: '0.0945'
+              x_Al2O3_as_printed: '0.279'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 17}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 17}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 17}}
+            - row_as_printed: '18'
+              activity: 0.0000894
+              activity_as_printed: '8.94 × 10−5'
+              x_SiO2_as_printed: '0.0444'
+              x_Al2O3_as_printed: '0.308'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 18}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 18}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 18}}
+            - row_as_printed: '19'
+              activity: 0.000127
+              activity_as_printed: '1.27 × 10−4'
+              x_SiO2_as_printed: '0.0428'
+              x_Al2O3_as_printed: '0.341'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 19}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 19}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 19}}
+            - row_as_printed: '20'
+              activity: 0.000186
+              activity_as_printed: '1.86 × 10−4'
+              x_SiO2_as_printed: '0.0362'
+              x_Al2O3_as_printed: '0.394'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 20}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 20}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 20}}
+            - row_as_printed: '21'
+              activity: 0.000277
+              activity_as_printed: '2.77 × 10−4'
+              x_SiO2_as_printed: '0.0304'
+              x_Al2O3_as_printed: '0.448'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 21}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 21}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 21}}
+
+      - observation_id: zaitsev_1997_table4_ref5_1798k
+        type: activity_coefficient
+        locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4'}
+        phase: l
+        T_K: 1798
+        units: dimensionless
+        standard_state_as_printed: liquid SiO2
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: quoted_attributed
+          attribution: 'ref. 5'
+          reference_state_as_printed: liquid SiO2
+          points:
+            - row_as_printed: '1'
+              activity: 0.00007
+              activity_as_printed: '7 × 10−5'
+              x_SiO2_as_printed: '0.0658'
+              x_Al2O3_as_printed: '0.243'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 1}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 1}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 1}}
+            - row_as_printed: '2'
+              activity: 0.00005
+              activity_as_printed: '5 × 10−5'
+              x_SiO2_as_printed: '0.0556'
+              x_Al2O3_as_printed: '0.264'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 2}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 2}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 2}}
+            - row_as_printed: '3'
+              activity: 0.00005
+              activity_as_printed: '5 × 10−5'
+              x_SiO2_as_printed: '0.0500'
+              x_Al2O3_as_printed: '0.282'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 3}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 3}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 3}}
+            - row_as_printed: '4'
+              activity: 0.00007
+              activity_as_printed: '7 × 10−5'
+              x_SiO2_as_printed: '0.0413'
+              x_Al2O3_as_printed: '0.331'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 4}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 4}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 4}}
+            - row_as_printed: '5'
+              activity: 0.00008
+              activity_as_printed: '8 × 10−5'
+              x_SiO2_as_printed: '0.0395'
+              x_Al2O3_as_printed: '0.363'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 5}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 5}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 5}}
+            - row_as_printed: '6'
+              activity: 0.00005
+              activity_as_printed: '5 × 10−5'
+              x_SiO2_as_printed: '0.0270'
+              x_Al2O3_as_printed: '0.420'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 6}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1798}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 6}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 6}}
+
+      - observation_id: zaitsev_1997_table4_ref5_1873k
+        type: activity_coefficient
+        locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4'}
+        phase: l
+        T_K: 1873
+        units: dimensionless
+        standard_state_as_printed: liquid SiO2
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: quoted_attributed
+          attribution: 'ref. 5'
+          reference_state_as_printed: liquid SiO2
+          points:
+            - row_as_printed: '7'
+              activity: 0.00019
+              activity_as_printed: '1.9 × 10−4'
+              x_SiO2_as_printed: '0.103'
+              x_Al2O3_as_printed: '0.319'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 7}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 7}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 7}}
+            - row_as_printed: '8'
+              activity: 0.00021
+              activity_as_printed: '2.1 × 10−4'
+              x_SiO2_as_printed: '0.0986'
+              x_Al2O3_as_printed: '0.357'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 8}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 8}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 8}}
+            - row_as_printed: '9'
+              activity: 0.00025
+              activity_as_printed: '2.5 × 10−4'
+              x_SiO2_as_printed: '0.0801'
+              x_Al2O3_as_printed: '0.423'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 9}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 9}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 9}}
+            - row_as_printed: '10'
+              activity: 0.000057
+              activity_as_printed: '5.7 × 10−5'
+              x_SiO2_as_printed: '0.0687'
+              x_Al2O3_as_printed: '0.228'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 10}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 10}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 10}}
+            - row_as_printed: '11'
+              activity: 0.000044
+              activity_as_printed: '4.4 × 10−5'
+              x_SiO2_as_printed: '0.0673'
+              x_Al2O3_as_printed: '0.248'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 11}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 11}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 11}}
+            - row_as_printed: '12'
+              activity: 0.000033
+              activity_as_printed: '3.3 × 10−5'
+              x_SiO2_as_printed: '0.0529'
+              x_Al2O3_as_printed: '0.263'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 12}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 12}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 12}}
+            - row_as_printed: '13'
+              activity: 0.000035
+              activity_as_printed: '3.5 × 10−5'
+              x_SiO2_as_printed: '0.0451'
+              x_Al2O3_as_printed: '0.287'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 13}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 13}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 13}}
+            - row_as_printed: '14'
+              activity: 0.00015
+              activity_as_printed: '1.5 × 10−4'
+              x_SiO2_as_printed: '0.0951'
+              x_Al2O3_as_printed: '0.239'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 14}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 14}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 14}}
+            - row_as_printed: '15'
+              activity: 0.000092
+              activity_as_printed: '9.2 × 10−5'
+              x_SiO2_as_printed: '0.101'
+              x_Al2O3_as_printed: '0.244'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 15}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 15}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 15}}
+            - row_as_printed: '16'
+              activity: 0.00054
+              activity_as_printed: '5.4 × 10−4'
+              x_SiO2_as_printed: '0.132'
+              x_Al2O3_as_printed: '0.270'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 16}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 16}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 16}}
+            - row_as_printed: '17'
+              activity: 0.000086
+              activity_as_printed: '8.6 × 10−5'
+              x_SiO2_as_printed: '0.0945'
+              x_Al2O3_as_printed: '0.279'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 17}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 17}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 17}}
+            - row_as_printed: '18'
+              activity: 0.000028
+              activity_as_printed: '2.8 × 10−5'
+              x_SiO2_as_printed: '0.0444'
+              x_Al2O3_as_printed: '0.308'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 18}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 18}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 18}}
+            - row_as_printed: '19'
+              activity: 0.000044
+              activity_as_printed: '4.4 × 10−5'
+              x_SiO2_as_printed: '0.0428'
+              x_Al2O3_as_printed: '0.341'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 19}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 19}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 19}}
+            - row_as_printed: '20'
+              activity: 0.000028
+              activity_as_printed: '2.8 × 10−5'
+              x_SiO2_as_printed: '0.0362'
+              x_Al2O3_as_printed: '0.394'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 20}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 20}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 20}}
+            - row_as_printed: '21'
+              activity: 0.00002
+              activity_as_printed: '2 × 10−5'
+              x_SiO2_as_printed: '0.0304'
+              x_Al2O3_as_printed: '0.448'
+              attribution: 'ref. 5'
+              locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 21}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: 1873}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 21}}
+                composition: {state: {tag: unknown, reason: CaO_mole_fraction_not_printed}, locator: {page: 7, published_page: 3095, pdf_page_index: 6, table: '4', row: 21}}
+    context:
+      - observation_id: zaitsev_1997_text_effusion_random_sampling_and_composition_accuracy
+        type: textual_fact
+        locator: {page: 2, published_page: 3090, pdf_page_index: 1, section: 'Effusion experiments'}
+        units: mole fraction; wt%
+        attribution: Zaitsev et al. report random sampling of the samples after the experiments.
+        values:
+          experimental_context: Nb, Ta, or Mo powder was added to oxide compositions in some experiments; samples were randomly sampled after experiments.
+          quantity_as_printed: concentration of Nb, Ta, or Mo oxides in samples after experiments
+          value_as_printed: '<0.05%'
+          comparator: less_than
+          bound_semantics: oxide concentration was below 0.05%
+          composition_accuracy_as_printed: '±0.0001 to ±0.0002'
+          composition_accuracy_quantity: component mole fractions in the initial melt compositions
+          composition_accuracy_meaning: reported accuracy of the calculated initial melt mole fractions, not a measurement uncertainty for the oxide contamination bound
+
+      - observation_id: zaitsev_1997_table1_associate_characteristics
+        type: table_record
+        locator: {page: 6, published_page: 3094, pdf_page_index: 5, table: '1'}
+        units: 'J mol−1 for −ΔfHm°; J mol−1 K−1 for ΔfSm°'
+        attribution: Present optimized values; comparison values from the cited binary-system references shown in the table.
+        values:
+          quantity_as_printed: Thermodynamic characteristics of associates
+          units_as_printed: J mol−1 for −ΔfHm°; J mol−1 K−1 for ΔfSm°
+          method_class: model_derived
+          evidence_class: model_derived
+          system_as_printed: CaF2-CaO-Al2O3-SiO2 melt
+          rows:
+            - associate: CS
+              present_result: {minus_delta_fHm_J_mol: '139000', delta_fSm_J_mol_K: '0.6', evidence_class: model_derived}
+              binary_system_value: {minus_delta_fHm_J_mol: '138700', delta_fSm_J_mol_K: '0.8', attribution: 'ref. 30', evidence_class: quoted_attributed}
+            - associate: CA
+              present_result: {minus_delta_fHm_J_mol: '65200', delta_fSm_J_mol_K: '8.30', evidence_class: model_derived}
+              binary_system_value: {minus_delta_fHm_J_mol: '65300', delta_fSm_J_mol_K: '8.24', attribution: 'ref. 13', evidence_class: quoted_attributed}
+            - associate: Sw
+              present_result: {minus_delta_fHm_J_mol: '93000', delta_fSm_J_mol_K: '−27.3', evidence_class: model_derived}
+              binary_system_value: {minus_delta_fHm_J_mol: '92600', delta_fSm_J_mol_K: '−27.2', attribution: 'ref. 15', evidence_class: quoted_attributed}
+      - observation_id: zaitsev_1997_table2_association_and_polymerization
+        type: table_record
+        locator: {page: 6, published_page: 3094, pdf_page_index: 5, table: '2'}
+        units: 'J mol−1 for ΔfHm°; J mol−1 K−1 for ΔfSm°'
+        attribution: Present-work optimized thermodynamic characteristics; model-derived.
+        values:
+          quantity_as_printed: Association and polymerization reaction thermodynamic characteristics
+          units_as_printed: J mol−1 for ΔfHm°; J mol−1 K−1 for ΔfSm°
+          method_class: model_derived
+          evidence_class: model_derived
+          system_as_printed: CaF2-CaO-Al2O3-SiO2 melt
+          rows:
+            - {reaction_as_printed: polymerization, delta_fHm_J_mol: '−92600', delta_fSm_J_mol_K: '−27.2'}
+            - {reaction_as_printed: CS, delta_fHm_J_mol: '−138700', delta_fSm_J_mol_K: '0.8'}
+            - {reaction_as_printed: C2S, delta_fHm_J_mol: '−270400', delta_fSm_J_mol_K: '−41.3'}
+            - {reaction_as_printed: CA, delta_fHm_J_mol: '−65300', delta_fSm_J_mol_K: '8.24'}
+            - {reaction_as_printed: C2A, delta_fHm_J_mol: '−111800', delta_fSm_J_mol_K: '−2.41'}
+            - {reaction_as_printed: AS, delta_fHm_J_mol: '−21200', delta_fSm_J_mol_K: '0.0'}
+            - {reaction_as_printed: CAS, delta_fHm_J_mol: '−142500', delta_fSm_J_mol_K: '−23.9'}
+            - {reaction_as_printed: CAS2, delta_fHm_J_mol: '−122300', delta_fSm_J_mol_K: '−27.9'}
+            - {reaction_as_printed: C2AS, delta_fHm_J_mol: '−246500', delta_fSm_J_mol_K: '13.0'}
+      - observation_id: zaitsev_1997_table3_excess_gibbs_parameters
+        type: table_record
+        locator: {page: 6, published_page: 3094, pdf_page_index: 5, table: '3'}
+        units: J mol−1
+        attribution: Fitted present-work excess Gibbs energy parameters; model-derived.
+        values:
+          quantity_as_printed: Excess Gibbs energy parameters L_pqrv
+          quantity_token: unavailable
+          schema_gap: No existing quantity token represents this fitted multi-index excess Gibbs parameter table.
+          units_as_printed: J mol−1
+          temperature_variable_as_printed: T in K; R is the gas constant
+          method_class: model_derived
+          evidence_class: model_derived
+          system_as_printed: CaF2-CaO-Al2O3-SiO2 melt
+          rows:
+            - {p: 0, q: 1, r: 0, v: 1, L_pqrv_as_printed: '−1070 + 11.9T'}
+            - {p: 0, q: 2, r: 0, v: 2, L_pqrv_as_printed: '−121900'}
+            - {p: 1, q: 1, r: 0, v: 0, L_pqrv_as_printed: 'RT(3.84 − 0.00108T)'}
+            - {p: 2, q: 2, r: 0, v: 0, L_pqrv_as_printed: 'RT(−11.87 + 0.00472T)'}
+            - {p: 1, q: 0, r: 0, v: 1, L_pqrv_as_printed: '5390'}
+            - {p: 2, q: 0, r: 0, v: 2, L_pqrv_as_printed: '90590 − 49.77T'}
+            - {p: 1, q: 0, r: 1, v: 0, L_pqrv_as_printed: 'RT(−5.53 + 0.00185T)'}
+            - {p: 2, q: 0, r: 1, v: 0, L_pqrv_as_printed: 'RT(8.338 − 0.00251T)'}
+            - {p: 1, q: 1, r: 0, v: 1, L_pqrv_as_printed: '−149180'}
+      - observation_id: zaitsev_1997_table5_phase_transition_coordinates
+        type: table_record
+        locator: {page: 9, published_page: 3097, pdf_page_index: 8, table: '5'}
+        units: 'mole fraction coordinates and K'
+        attribution: Present entries are thermodynamic calculations; refs. 35, 41 and 42 are experimental comparison data; ref. 12 is a model prediction.
+        values:
+          quantity_as_printed: Liquid composition and temperature of invariant and congruent-melting reactions
+          quantity_token: unavailable
+          schema_gap: These are phase-equilibrium reaction temperatures, not single-oxide melting points; retained unscored under t-1326.
+          system_as_printed: CaO-Al2O3-SiO2
+          phase: l
+          method_class: model_derived
+          evidence_class: model_derived
+          t_1326: true
+          composition_note: Only x(SiO2) and x(Al2O3) are printed. CaO remains unknown; no complement was reconstructed.
+          rows:
+            - reaction_as_printed: 'l → SiO2(β-cryst.) + CAS2(s) + A3S2(s)'
+              x_SiO2_as_printed: '0.678'
+              x_Al2O3_as_printed: '0.109'
+              temperature_units: K
+              present_calculation: {T: '1443', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.648', x_Al2O3: '0.093', T: '1445', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.641', x_Al2O3: '0.083', T: '1463', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'l → C2AS(s) + CAS2(s) + CS(s)'
+              x_SiO2_as_printed: '0.432'
+              x_Al2O3_as_printed: '0.128'
+              temperature_units: K
+              present_calculation: {T: '1532', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.445', x_Al2O3: '0.125', T: '1540', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.436', x_Al2O3: '0.114', T: '1537', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'l → C2S(s) + CA(s) + C3A(s)'
+              x_SiO2_as_printed: '0.061'
+              x_Al2O3_as_printed: '0.304'
+              temperature_units: K
+              present_calculation: {T: '1572', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.074', x_Al2O3: '0.285', T: '1610', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.032', x_Al2O3: '0.316', T: '1608', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'l + Al2O3(s) → CAS2(s) + A3S2(s)'
+              x_SiO2_as_printed: '0.553'
+              x_Al2O3_as_printed: '0.243'
+              temperature_units: K
+              present_calculation: {T: '1785', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.556', x_Al2O3: '0.251', T: '1787', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.477', x_Al2O3: '0.297', T: '1820', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'l + C3S2(s) → C2AS(s) + CS(s)'
+              x_SiO2_as_printed: '0.421'
+              x_Al2O3_as_printed: '0.109'
+              temperature_units: K
+              present_calculation: {T: '1555', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.413', x_Al2O3: '0.072', T: '1585', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.419', x_Al2O3: '0.096', T: '1555', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'l + C2S(s) → C3S2(s) + C2AS(s)'
+              x_SiO2_as_printed: '0.389'
+              x_Al2O3_as_printed: '0.089'
+              temperature_units: K
+              present_calculation: {T: '1640', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.398', x_Al2O3: '0.070', T: '1590', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.397', x_Al2O3: '0.085', T: '1601', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'l + C2AS(s) → CA(s) + C2S(s)'
+              x_SiO2_as_printed: '0.113'
+              x_Al2O3_as_printed: '0.291'
+              temperature_units: K
+              present_calculation: {T: '1635', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.113', x_Al2O3: '0.290', T: '1655', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.155', x_Al2O3: '0.247', T: '1734', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'l + C3S(s) → C3A(s) + C2S(s)'
+              x_SiO2_as_printed: '0.072'
+              x_Al2O3_as_printed: '0.239'
+              temperature_units: K
+              present_calculation: {T: '1749', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.083', x_Al2O3: '0.214', T: '1730', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.103', x_Al2O3: '0.200', T: '1711', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'l + CaO(s) → C3S(s) + C3A(s)'
+              x_SiO2_as_printed: '0.066'
+              x_Al2O3_as_printed: '0.236'
+              temperature_units: K
+              present_calculation: {T: '1763', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.083', x_Al2O3: '0.214', T: '1745', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.108', x_Al2O3: '0.192', T: '1718', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'C2AS(s) → l, congruent melting'
+              x_SiO2_as_printed: '0.25'
+              x_Al2O3_as_printed: '0.25'
+              temperature_units: K
+              present_calculation: {T: '1866', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.25', x_Al2O3: '0.25', T: '1868', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.25', x_Al2O3: '0.25', T: '1868', attribution: 'ref. 12', evidence_class: model_derived}
+            - reaction_as_printed: 'CAS2(s) → l, congruent melting'
+              x_SiO2_as_printed: '0.5'
+              x_Al2O3_as_printed: '0.25'
+              temperature_units: K
+              present_calculation: {T: '1826', evidence_class: model_derived}
+              experimental_comparison: {x_SiO2: '0.5', x_Al2O3: '0.25', T: '1828', attribution: 'refs. 35, 41, 42', evidence_class: quoted_attributed}
+              ref12_prediction: {x_SiO2: '0.5', x_Al2O3: '0.25', T: '1828', attribution: 'ref. 12', evidence_class: model_derived}
+      - observation_id: zaitsev_1997_figure1_vapour_pressures
+        type: figure_record
+        locator: {page: 3, published_page: 3091, pdf_page_index: 2, figure: '1'}
+        panel: whole_figure
+        attribution: Present measured vapour-pressure markers from niobium effusion cells.
+        units: Pa
+        values:
+          quantity: partial_pressure
+          species: [CaF2(g), AlF3(g), SiF4(g)]
+          phase: vapour over CaF2-CaO-Al2O3-SiO2 liquid
+          temperature_as_printed: 1673 K
+          initial_composition_as_printed: {x0_CaF2: '0.303', x0_SiO2: '0.242', x0_Al2O3: '0.147', CaO: unknown}
+          composition_state: {tag: unknown, reason: initial_CaO_mole_fraction_not_printed}
+          axes_as_printed: {x: x(CaF2) along the distillation line, y: vapour pressure p in Pa}
+          caption: 'Vapour pressures of CaF2, AlF3 and SiF4 over the melt as a function of x(CaF2) during isothermal evaporation.'
+          series:
+            - {name: p(CaF2), marker: open triangle, orifice_diameter_as_printed: '2.08 × 10−4 m', marker_count: 18, evidence_class: measured_direct}
+            - {name: p(AlF3), marker: open circle, orifice_diameter_as_printed: '2.08 × 10−4 m', marker_count: 17, evidence_class: measured_direct}
+            - {name: p(SiF4), marker: open square, orifice_diameter_as_printed: '2.08 × 10−4 m', marker_count: 17, evidence_class: measured_direct}
+            - {name: p(CaF2), marker: filled triangle, orifice_diameter_as_printed: '3.32 × 10−4 m', marker_count: 17, evidence_class: measured_direct}
+            - {name: p(AlF3), marker: filled circle, orifice_diameter_as_printed: '3.32 × 10−4 m', marker_count: 16, evidence_class: measured_direct}
+            - {name: p(SiF4), marker: filled square, orifice_diameter_as_printed: '3.32 × 10−4 m', marker_count: 17, evidence_class: measured_direct}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure2_vapour_pressures
+        type: figure_record
+        locator: {page: 3, published_page: 3091, pdf_page_index: 2, figure: '2'}
+        panel: whole_figure
+        attribution: Present measured vapour-pressure markers from molybdenum effusion cells.
+        units: Pa
+        values:
+          quantity: partial_pressure
+          species: [CaF2(g), AlF3(g), SiF4(g)]
+          phase: vapour over CaF2-CaO-Al2O3-SiO2 liquid
+          temperature_as_printed: 1473 K
+          initial_compositions_as_printed:
+            - {x0_CaF2: '0.201', x0_SiO2: '0.400', x0_Al2O3: '0.095', CaO: unknown}
+            - {x0_CaF2: '0.171', x0_SiO2: '0.391', x0_Al2O3: '0.096', CaO: unknown}
+          composition_state: {tag: unknown, reason: initial_CaO_mole_fraction_not_printed}
+          axes_as_printed: {x: x(CaF2) along the distillation line, y: vapour pressure p in Pa}
+          caption: 'Vapour pressures of CaF2, AlF3 and SiF4 over the melts as a function of x(CaF2) during isothermal evaporation.'
+          series:
+            - {name: p(CaF2), marker: open triangle, orifice_diameter_as_printed: '2.54 × 10−4 m', marker_count: 16, evidence_class: measured_direct}
+            - {name: p(AlF3), marker: open circle, orifice_diameter_as_printed: '2.54 × 10−4 m', marker_count: 16, evidence_class: measured_direct}
+            - {name: p(SiF4), marker: open square, orifice_diameter_as_printed: '2.54 × 10−4 m', marker_count: 16, evidence_class: measured_direct}
+            - {name: p(CaF2), marker: filled triangle, orifice_diameter_as_printed: '4.09 × 10−4 m', marker_count: 16, evidence_class: measured_direct}
+            - {name: p(AlF3), marker: filled circle, orifice_diameter_as_printed: '4.09 × 10−4 m', marker_count: 16, evidence_class: measured_direct}
+            - {name: p(SiF4), marker: filled square, orifice_diameter_as_printed: '4.09 × 10−4 m', marker_count: 16, evidence_class: measured_direct}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure3_sio2_isoactivity
+        type: figure_record
+        locator: {page: 6, published_page: 3094, pdf_page_index: 5, figure: '3'}
+        panel: whole_figure
+        attribution: Present model contours and data attributed to ref. 2 in the caption.
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: SiO2
+          phase: l
+          temperature_as_printed: 1823 K
+          system_as_printed: CaO-Al2O3-SiO2
+          reference_state_as_printed: β-cristobalite
+          axes_as_printed: ternary mole-fraction phase-diagram coordinates CaO-Al2O3-SiO2
+          caption: 'Computed T = 1823 K isotherm; SiO2 isoactivity lines compare present results with data from ref. 2.'
+          series:
+            - {name: present results, style: solid SiO2 isoactivity contours, marker_count: 0, evidence_class: model_derived}
+            - {name: data from ref. 2, style: dashed SiO2 isoactivity contours, marker_count: 0, evidence_class: quoted_attributed, attribution: 'ref. 2'}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure4_sio2_isoactivity
+        type: figure_record
+        locator: {page: 7, published_page: 3095, pdf_page_index: 6, figure: '4'}
+        panel: whole_figure
+        attribution: Present model contours and data attributed to ref. 3 in the caption.
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: SiO2
+          phase: l
+          temperature_as_printed: 1873 K
+          system_as_printed: CaO-Al2O3-SiO2
+          reference_state_as_printed: β-cristobalite
+          axes_as_printed: ternary mole-fraction phase-diagram coordinates CaO-Al2O3-SiO2
+          caption: 'Computed T = 1873 K isotherm; SiO2 isoactivity lines compare present results with data from ref. 3.'
+          series:
+            - {name: present results, style: solid SiO2 isoactivity contours, marker_count: 0, evidence_class: model_derived}
+            - {name: data from ref. 3, style: dashed SiO2 isoactivity contours, marker_count: 0, evidence_class: quoted_attributed, attribution: 'ref. 3'}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure5_al2o3_isoactivity
+        type: figure_record
+        locator: {page: 7, published_page: 3095, pdf_page_index: 6, figure: '5'}
+        panel: whole_figure
+        attribution: Present model contours and data attributed to ref. 2 in the caption.
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: Al2O3
+          phase: l
+          temperature_as_printed: 1823 K
+          system_as_printed: CaO-Al2O3-SiO2
+          reference_state_as_printed: solid Al2O3
+          axes_as_printed: ternary mole-fraction phase-diagram coordinates CaO-Al2O3-SiO2
+          caption: 'Computed T = 1823 K isotherm; Al2O3 isoactivity lines compare present results with data from ref. 2.'
+          series:
+            - {name: present results, style: solid Al2O3 isoactivity contours, marker_count: 0, evidence_class: model_derived}
+            - {name: data from ref. 2, style: dashed Al2O3 isoactivity contours, marker_count: 0, evidence_class: quoted_attributed, attribution: 'ref. 2'}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure6_cao_isoactivity
+        type: figure_record
+        locator: {page: 7, published_page: 3095, pdf_page_index: 6, figure: '6'}
+        panel: whole_figure
+        attribution: Present model contours and data attributed to ref. 4 in the caption.
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: CaO
+          phase: l
+          temperature_as_printed: 1823 K
+          system_as_printed: CaO-Al2O3-SiO2
+          reference_state_as_printed: solid CaO
+          axes_as_printed: ternary mole-fraction phase-diagram coordinates CaO-Al2O3-SiO2
+          caption: 'Computed T = 1823 K isotherm; CaO isoactivity lines compare present results with data from ref. 4.'
+          series:
+            - {name: present results, style: solid CaO isoactivity contours, marker_count: 0, evidence_class: model_derived}
+            - {name: data from ref. 4, style: dashed CaO isoactivity contours, marker_count: 0, evidence_class: quoted_attributed, attribution: 'ref. 4'}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure7_caf2_isoactivity
+        type: figure_record
+        locator: {page: 8, published_page: 3096, pdf_page_index: 7, figure: '7'}
+        panel: whole_figure
+        attribution: Present-work calculated phase and activity diagram.
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: CaF2
+          phase: l
+          temperature_as_printed: 1773 K
+          fixed_coordinate_as_printed: x(CaF2) = 0.1
+          system_as_printed: CaF2-CaO-Al2O3-SiO2
+          reference_state_as_printed: pure solid CaF2
+          axes_as_printed: ternary mole-fraction coordinates of CaO-Al2O3-SiO2 at fixed x(CaF2)
+          caption: 'Computed T = 1773 K and x(CaF2) = 0.1 isotherm; CaF2 isoactivity lines relative to pure solid CaF2.'
+          series:
+            - {name: present model CaF2 isoactivity contours, style: calculated contours, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure8_sio2_isoactivity
+        type: figure_record
+        locator: {page: 8, published_page: 3096, pdf_page_index: 7, figure: '8'}
+        panel: whole_figure
+        attribution: Present-work calculated phase and activity diagram.
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: SiO2
+          phase: l
+          temperature_as_printed: 1773 K
+          fixed_coordinate_as_printed: x(CaF2) = 0.1
+          system_as_printed: CaF2-CaO-Al2O3-SiO2
+          reference_state_as_printed: β-cristobalite
+          axes_as_printed: ternary mole-fraction coordinates of CaO-Al2O3-SiO2 at fixed x(CaF2)
+          caption: 'Computed T = 1773 K and x(CaF2) = 0.1 isotherm; SiO2 isoactivity lines relative to β-cristobalite.'
+          series:
+            - {name: present model SiO2 isoactivity contours, style: calculated contours, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure9_al2o3_isoactivity
+        type: figure_record
+        locator: {page: 8, published_page: 3096, pdf_page_index: 7, figure: '9'}
+        panel: whole_figure
+        attribution: Present-work calculated phase and activity diagram.
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: Al2O3
+          phase: l
+          temperature_as_printed: 1773 K
+          fixed_coordinate_as_printed: x(CaF2) = 0.1
+          system_as_printed: CaF2-CaO-Al2O3-SiO2
+          reference_state_as_printed: pure solid Al2O3
+          axes_as_printed: ternary mole-fraction coordinates of CaO-Al2O3-SiO2 at fixed x(CaF2)
+          caption: 'Computed T = 1773 K and x(CaF2) = 0.1 isotherm; Al2O3 isoactivity lines relative to pure solid Al2O3.'
+          series:
+            - {name: present model Al2O3 isoactivity contours, style: calculated contours, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: zaitsev_1997_figure10_cao_isoactivity
+        type: figure_record
+        locator: {page: 8, published_page: 3096, pdf_page_index: 7, figure: '10'}
+        panel: whole_figure
+        attribution: Present-work calculated phase and activity diagram.
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: CaO
+          phase: l
+          temperature_as_printed: 1773 K
+          fixed_coordinate_as_printed: x(CaF2) = 0.1
+          system_as_printed: CaF2-CaO-Al2O3-SiO2
+          reference_state_as_printed: pure solid CaO
+          axes_as_printed: ternary mole-fraction coordinates of CaO-Al2O3-SiO2 at fixed x(CaF2)
+          caption: 'Computed T = 1773 K and x(CaF2) = 0.1 isotherm; CaO isoactivity lines relative to pure solid CaO.'
+          series:
+            - {name: present model CaO isoactivity contours, style: calculated contours, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass

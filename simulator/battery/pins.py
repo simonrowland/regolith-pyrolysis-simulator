@@ -286,7 +286,7 @@ def _pin_live_residual(row: Residual | Mapping[str, object]) -> _PinLiveResidual
         evidence = execution.get("call_evidence") if isinstance(execution, Mapping) else None
         call_evidence = None if evidence is None else str(evidence)
 
-    from simulator.battery.score import _residual_key_parts
+    from simulator.battery.score import _engine_from_residual_key, _residual_key_parts
 
     parsed = _residual_key_parts(key)
     quantity: Quantity | None = None
@@ -304,7 +304,7 @@ def _pin_live_residual(row: Residual | Mapping[str, object]) -> _PinLiveResidual
     else:
         # Not a four-field residual key. A short key still names its engine
         # or channel in the last field, including a key with no separator.
-        engine_token = key.rsplit("::", 1)[-1] if key else ""
+        engine_token = _engine_from_residual_key(key) if key else ""
         if engine_token:
             try:
                 engine = Engine(engine_token)

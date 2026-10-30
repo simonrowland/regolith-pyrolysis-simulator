@@ -1,0 +1,106 @@
+schema_version: literature_extract.v1
+source_id: schreiber-1986-internal-electron-exchange
+figure_policy: Figure 1 is recorded without numeric plot points; its interaction data remain deferred to a figure pass.
+source:
+  citation: >-
+    Schreiber, H. D. (1986). Internal Electron Exchange Reactions in Synthetic
+    Magmas. Lunar and Planetary Science XVII, 771-772 (abstract 1393).
+  year: 1986
+  doi: null
+extraction:
+  method: >-
+    Two-page scanned abstract transcribed from MinerU and pdftotext-layout.
+    The repeated Table 1 potentials were compared with Schreiber (1985) and
+    linked to that existing context record. Figure 1 remains deferred; numeric
+    values found in MinerU's details chart block were excluded.
+  date: '2026-10-20'
+  worker: fam27-1020
+review_status: draft
+experiments:
+  - experiment_id: schreiber_1986_internal_electron_exchange
+    series: >-
+      Mutual electron exchange among multivalent couples in four synthetic
+      reference melts. The abstract describes calibrated spectrophotometric
+      measurements and summarizes the plotted interaction results in Figure 1.
+    locator: {page: 1, pdf_page_index: 0, published_page: 771, section: Mutual interactions}
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: schreiber_1986_table1_repeated_reference_potentials
+        type: assessment
+        locator: {page: 2, pdf_page_index: 1, published_page: 772, table: '1'}
+        units: relative units as printed
+        values:
+          printed_quantity: experimentally determined reference reduction potential E_M'
+          method_class: quoted_attributed
+          admission_status: typed_unavailable
+          attribution: Schreiber (1985), Lunar and Planetary Science XVI, Table 1
+          repeated_from:
+            source_id: schreiber-1985-geochemical-emf-series
+            observation_id: schreiber_1985_table1_reference_reduction_potentials
+          candidate_tokens: [valence_ratio, interaction_parameter]
+          schema_gap: >-
+            No quantity token represents reference reduction potential in
+            relative units. Values are retained once in the 1985 extract's
+            context record because this table repeats the same 26 redox-couple
+            values; EMF_CELL is a method token, not a quantity token.
+          table_row_count: 26
+          table_disposition: >-
+            Context-duplicate, linked to the 1985 table record. Visual check of
+            all printed rows found the SRL-131 values unchanged; no second copy
+            of these values is emitted.
+      - observation_id: schreiber_1986_figure1_internal_exchange_interaction
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 772, figure: '1'}
+        phase: silicate melt as described; measurement state not stated
+        units: relative reduction-potential difference and relative degree of mutual interaction
+        values:
+          quantity: relative degree of internal electron exchange and calculated E'
+          schema_gap: >-
+            No quantity token represents relative redox interaction degree or
+            the plotted reduction-potential difference.
+          method_class: figure_only
+          species: [M, R]
+          temperature_as_published: >-
+            Reference-melt temperatures: FAS 1500 °C; FAD 1500 °C; ADA 1250 °C;
+            SRL-131 1150 °C. The figure does not assign separate temperatures
+            to the plotted markers.
+          composition_as_published: >-
+            FAS: 54.2 wt% SiO2, 9.9% Al2O3, 5.6% CaO, 30.3% MgO. FAD: 51.6 wt%
+            SiO2, 2.3% Al2O3, 19.2% CaO, 26.9% MgO. ADA: 65.4 wt% SiO2, 16.5%
+            Al2O3, 8.9% CaO, 4.6% MgO, 6.4% Na2O. SRL-131: 57.9 wt% SiO2, 14.7%
+            B2O3, 2.0% MgO, 17.7% Na2O, 5.7% Li2O; composition as printed here
+            is incomplete and no oxides were reconstructed.
+          axes_as_published: >-
+            x relative degree of mutual interaction by elements M and R (reverse
+            stoichiometric through no interaction to stoichiometric); y ΔE' =
+            aE'_M - nE'_R in relative units.
+          caption_as_published: >-
+            A plot of calculated E' as a function of the relative degree of
+            internal electron exchange of two redox couples in a melt. The
+            stoichiometric scale is meant to be only a quantitative estimate of
+            the mutual interaction.
+          panel: single plot
+          series:
+            - {label: SRL-131, marker: circle, marker_count: 12}
+            - {label: 'FAS, FAD, and ADA', marker: triangle, marker_count: 23}
+          marker_count_note: >-
+            Symbol counts were tallied from the 600 dpi render; multiple symbols
+            overlap near the stoichiometric end of the axis.
+          attribution: This work; figure plots calculated potentials and interaction degree.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1986_sequential_oxidation_and_redox_buffering
+        type: assessment
+        locator: {page: 2, pdf_page_index: 1, published_page: 772, section: Mutual interactions}
+        units: qualitative
+        values:
+          quantity: sequential oxidation of multiple redox couples and redox buffering
+          method_class: measured_direct
+          admission_status: typed_unavailable
+          claims_as_printed:
+            - With three redox couples present, an oxidizing agent oxidizes the easiest-to-oxidize component before another component.
+            - The oxidizing agent does not oxidize both components proportionately and simultaneously.
+            - An excess of the easiest-to-oxidize ion can protect another couple from exchange, described as redox buffering.
+          reason: The abstract reports these experimental findings qualitatively; numerical interaction data are only in deferred Figure 1.

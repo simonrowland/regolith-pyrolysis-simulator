@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:kems-016-stolyarova-1992
       role: pdf
@@ -29,43 +29,416 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
-experiments:
-- experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
-  kind: literature
-  method:
-    tag: value
-    value: knudsen_effusion
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
-  locator:
-    page: PDF p. 2 / printed p. 186
-    table: '1'
-    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
-    line_range: 27-45
-    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+experiments: []
 context:
+- observation_id: stolyarova_1992_al_cas_vapor_ions_and_gibbs
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    line_range: '19'
+    table: '1'
+  T_range_K:
+  - '1300'
+  - '1973'
+  phase: l
+  regime: knudsen_effusion
+  units: as published
+  values:
+    quantity: associated_vapor_ions_observed_Mo_cell
+    condensed_phase: silicate_melt
+    semantics: bound_not_point_ordering
+    ions:
+    - CaAlO+
+    - CaAl+
+    - AlSiO+
+    note: Ions identified during evaporation from Mo cell; no absolute partial-pressure table for Al carriers
+    cell_material_caveat: Mo cell — absolute p scrutiny; ion identity robust
+  equipment:
+    cell_material:
+      value: Mo (ion identification)
+      locator:
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        line_range: '19'
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_al_cas_vapor_ions_and_gibbs
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: Al
+- observation_id: stolyarova_1992_binary_wilson_model_parameters_table2
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    table: '2'
+    line_range: 47-59
+    note: Binary Wilson parameters used to calculate Gibbs energies of multicomponent systems
+  T_range_K:
+  - '1300'
+  - '1900'
+  phase: l
+  condensed_form:
+    state: liquid_melt
+    metastable: false
+    basis: explicit_author
+    note: Wilson parameters apply to the liquid binary oxide systems listed in Table 2.
+  standard_state: Wilson excess-Gibbs model parameterization for oxide melts
+  regime: thermodynamic_model
+  units: kcal/mol
+  values:
+    quantity: binary_wilson_gibbs_model_parameters
+    evidence_class: thermodynamic_model_parameter
+    model: Wilson
+    system_class: silicate_melt_thermodynamic_model
+    measurement_status: model_parameters_not_measured_activity_coefficients
+    activity_pin_eligible: false
+    consumer_policy: gibbs_model_evidence_only_never_activity_pin
+    parameter_definitions:
+    - l12
+    - l120
+    - l21
+    - l210
+    parameters:
+    - system: Na2O-SiO2
+      T_K: '1300'
+      l12: '62'
+      l120: '-47.4'
+      l21: '-115.1'
+      l210: '126.8'
+    - system: K2O-SiO2
+      T_K: '1300'
+      l12: '-64.2'
+      l120: '19.7'
+      l21: '-110.2'
+      l210: '107.7'
+    - system: Na2O-K2O
+      T_K: '1300'
+      l12: '-0.02'
+      l120: '0.04'
+      l21: '0.17'
+      l210: '0.08'
+    - system: B2O3-SiO2
+      T_K: '1300'
+      l12: '-3.07'
+      l120: '9.51'
+      l21: '-1.08'
+      l210: '-0.79'
+    - system: CaO-Al2O3
+      T_K: '1900'
+      l12: '-17.5'
+      l120: '21.1'
+      l21: '-23'
+      l210: '32.1'
+    - system: Al2O3-SiO2
+      T_K: '1900'
+      l12: '-7.44'
+      l120: '26.7'
+      l21: '10.4'
+      l210: '316.3'
+    - system: CaO-SiO2
+      T_K: '1900'
+      l12: '-30.8'
+      l120: '47.1'
+      l21: '-36'
+      l210: '55.9'
+    Al2O3_SiO2_l210_kcal_mol_as_printed: '316.3'
+  uncertainty:
+    note: Table values are published model coefficients; no measurement uncertainty is assigned.
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_binary_wilson_model_parameters_table2
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: SiO2
+- observation_id: stolyarova_1992_cao_cas_gibbs_table1
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    table: '1'
+    line_range: 27-45
+  T_range_K:
+  - '1933'
+  - '1933'
+  phase: l
+  regime: knudsen_effusion
+  units: kcal/mol
+  values:
+    quantity: CaO_component_CAS_multicomponent_gibbs
+    condensed_phase: silicate_melt
+    linked_observation: stolyarova_1992_gibbs_cas_and_fcm_table1
+    systems:
+    - CaO-Al2O3-SiO2
+    - CaO-MgO-SiO2
+    - CaO-Al2O3-SiO2-FeO-MgO
+    vapor_ions_observed:
+    - CaSiO3+
+    - CaSiO2+
+    - CaSiO+
+    - CaAlO+
+    - CaAl+
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_cao_cas_gibbs_table1
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: Ca
+- observation_id: stolyarova_1992_fe_bearing_melt_activity_context
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    paragraph: CaO-Al2O3-SiO2-FeO-MgO melts studied; oxide activities
+    line_range: 7-23
+  T_range_K:
+  - '1300'
+  - '1973'
+  phase: l
+  regime: knudsen_effusion
+  units: as published
+  values:
+    quantity: FeO_bearing_multicomponent_system_studied
+    systems_include: CaO-Al2O3-SiO2-FeO-MgO
+    condensed_phase: silicate_melt
+    note: Gibbs energies in Table 1 for FeO-bearing composition; Fe partials not tabulated as α
+    linked_gibbs_observation: stolyarova_1992_gibbs_cas_and_fcm_table1
+    numeric_activity_published: false
+    numeric_activity_note: No tabulated FeO γ or a in this conference paper. Table 1 FCMAS row is integral −ΔG = 8.0 kcal/mol
+      at 1933 K (SiO2:CaO:Al2O3:FeO:MgO = 0.36:0.09:0.01:0.05:0.49), not a component activity. Locator OCR Table 1 line_range
+      27-45.
+  equipment:
+    cell_material:
+      value: Pt, Mo, W effusion cells (Mo for ion-identification)
+      locator:
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        line_range: 17-19
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_fe_bearing_melt_activity_context
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: Fe
+- observation_id: stolyarova_1992_gibbs_cas_and_fcm_table1
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    repaired_table_path: text/kems-016-stolyarova-1992/ocr-repair/kems-016-stolyarova-1992.md
+    table: '1'
+    page: PDF p. 2 / printed p. 186
+    line_range: 27-45
+    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+  phase: l
+  regime: knudsen_effusion
+  units: kcal/mol (−ΔG as published)
+  values:
+    quantity: minus_delta_G_melt_experimental_HTMS
+    condensed_phase: silicate_melt
+    column_1_note: experimental HTMS (−ΔG kcal/mol)
+    column_2_note: Kohler calculated
+    column_3_note: Wilson calculated
+    points:
+    - system: SiO2:CaO:Al2O3
+      x:
+        SiO2: '0.5'
+        CaO: '0.43'
+        Al2O3: '0.07'
+      T_K: '1933'
+      minus_delta_G_exp_kcal_mol: '8.3'
+      minus_delta_G_kohler: '8.4'
+      minus_delta_G_wilson: '7.4'
+    - system: SiO2:CaO:Al2O3
+      x:
+        SiO2: '0.5'
+        CaO: '0.31'
+        Al2O3: '0.19'
+      T_K: '1933'
+      minus_delta_G_exp_kcal_mol: '8.5'
+      minus_delta_G_kohler: '8.8'
+      minus_delta_G_wilson: '8.4'
+    - system: SiO2:CaO:Al2O3
+      x:
+        SiO2: '0.5'
+        CaO: '0.25'
+        Al2O3: '0.25'
+      T_K: '1933'
+      minus_delta_G_exp_kcal_mol: '8.2'
+      minus_delta_G_kohler: '8.9'
+      minus_delta_G_wilson: '7.9'
+    - system: SiO2:CaO:Al2O3
+      x:
+        SiO2: '0.33'
+        CaO: '0.33'
+        Al2O3: '0.33'
+      T_K: '1933'
+      minus_delta_G_exp_kcal_mol: '7.5'
+      minus_delta_G_kohler: '9.1'
+      minus_delta_G_wilson: '10.6'
+    - system: SiO2:CaO:MgO
+      x: null
+      x_as_printed: 0.50:0.25:25
+      payload_status: SOURCE_INTERNAL_FORMAT_ERROR
+      T_K: '1833'
+      minus_delta_G_exp_kcal_mol: '10.3'
+      minus_delta_G_kohler: '6.2'
+      minus_delta_G_wilson: null
+      note: The source prints 0.50:0.25:25. The missing decimal is not repaired or guessed.
+    - system: SiO2:CaO:Al2O3:FeO:MgO
+      x:
+        SiO2: '0.36'
+        CaO: '0.09'
+        Al2O3: '0.01'
+        FeO: '0.05'
+        MgO: '0.49'
+      T_K: '1933'
+      minus_delta_G_exp_kcal_mol: '8'
+      minus_delta_G_kohler: '8.3'
+      minus_delta_G_wilson: null
+    co_measurement_note: Each −ΔG_exp is from simultaneous multicomponent KEMS activities on one melt composition; partial
+      pressures not published as species-resolved series in this paper.
+    first_CAS_minus_delta_G_exp_kcal_mol: '8.3'
+  equipment:
+    cell_material:
+      value: Pt, Mo, W (system-dependent)
+      locator:
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        paragraph: Vaporization has been carried out from platinum, molybdenum and tungsten effusion cells
+        line_range: '17'
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_gibbs_cas_and_fcm_table1
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: SiO2
+- observation_id: stolyarova_1992_k2o_in_nks_gibbs_table3
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    table: '3'
+    line_range: 61-70
+  T_range_K:
+  - '1300'
+  - '1300'
+  phase: l
+  regime: knudsen_effusion
+  units: kcal/mol
+  values:
+    quantity: K2O_component_of_NKS_gibbs_table3
+    condensed_phase: silicate_melt
+    linked_observation: stolyarova_1992_na2o_k2o_sio2_gibbs_table3
+    note: Same Table 3 compositions include K2O; no separate K partial-pressure series
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_k2o_in_nks_gibbs_table3
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: K
+- observation_id: stolyarova_1992_mg_bearing_melt_activity_context
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    paragraph: systems containing MgO among multi-oxide melts
+    line_range: 7-23
+  T_range_K:
+  - '1300'
+  - '1973'
+  phase: l
+  regime: knudsen_effusion
+  units: as published
+  values:
+    quantity: MgO_bearing_multicomponent_system_studied
+    systems_include: CaO-Al2O3-SiO2-FeO-MgO and SiO2-CaO-MgO
+    condensed_phase: silicate_melt
+    linked_gibbs_observation: stolyarova_1992_gibbs_cas_and_fcm_table1
+    numeric_activity_published: false
+    numeric_activity_note: No tabulated MgO γ or a in this conference paper. Table 1 CMS row is integral −ΔG = 10.3 kcal/mol
+      at 1833 K (SiO2:CaO:MgO = 0.50:0.25:0.25), not a component activity. Locator OCR Table 1 line_range 27-45.
+  equipment:
+    cell_material:
+      value: Pt, Mo, W
+      locator:
+        source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        paragraph: Vaporization has been carried out from platinum, molybdenum and tungsten effusion cells
+        line_range: '17'
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_mg_bearing_melt_activity_context
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: Mg
+- observation_id: stolyarova_1992_na2o_chemical_potential_nbs_table4
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    table: '4'
+    line_range: 65-75
+    paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+  T_range_K:
+  - '1273'
+  - '1273'
+  phase: l
+  regime: knudsen_effusion
+  units: kcal/mol (chemical potential of Na2O)
+  values:
+    quantity: chemical_potential_Na2O
+    condensed_phase: borosilicate_melt
+    column_a: Wilson method calculated
+    column_b: experimental [8]
+    points:
+    - x_Na2O: '0.44'
+      mu_Na2O_wilson_kcal_mol: '50.6'
+      mu_Na2O_exp_kcal_mol: '56'
+    - x_Na2O: '0.33'
+      mu_Na2O_wilson_kcal_mol: '56.5'
+      mu_Na2O_exp_kcal_mol: '60'
+    - x_Na2O: '0.24'
+      mu_Na2O_wilson_kcal_mol: '63'
+      mu_Na2O_exp_kcal_mol: '65.5'
+    - x_Na2O: '0.16'
+      mu_Na2O_wilson_kcal_mol: '71.2'
+      mu_Na2O_exp_kcal_mol: '73'
+    - x_Na2O: '0.09'
+      mu_Na2O_wilson_kcal_mol: '83'
+      mu_Na2O_exp_kcal_mol: '80'
+    first_mu_Na2O_exp_kcal_mol: '56'
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_na2o_chemical_potential_nbs_table4
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: Na
+- observation_id: stolyarova_1992_na2o_k2o_sio2_gibbs_table3
+  type: printed_table_context
+  locator:
+    source_path: text/kems-016-stolyarova-1992/mineru/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    table: '3'
+    line_range: 61-70
+    paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+  T_range_K:
+  - '1300'
+  - '1300'
+  phase: l
+  regime: knudsen_effusion
+  units: kcal/mol (−ΔG)
+  values:
+    quantity: minus_delta_G_NKS_melts
+    condensed_phase: silicate_melt
+    source_of_exp: HTMS values cited from [6] Chastel et al. 1987 as reported in Table 3 col 1
+    points:
+    - x:
+        SiO2: '0.85'
+        K2O: '0'
+        Na2O: '0.15'
+      minus_delta_G_exp_kcal_mol: '8.4'
+      minus_delta_G_wilson: '11.7'
+    - x:
+        SiO2: '0.85'
+        K2O: '0.1'
+        Na2O: '0.05'
+      minus_delta_G_exp_kcal_mol: '10.8'
+      minus_delta_G_wilson: '9.6'
+    - x:
+        SiO2: '0.85'
+        K2O: '0.075'
+        Na2O: '0.075'
+      minus_delta_G_exp_kcal_mol: '10.2'
+      minus_delta_G_wilson: '9.9'
+    - x:
+        SiO2: '0.85'
+        K2O: '0.05'
+        Na2O: '0.1'
+      minus_delta_G_exp_kcal_mol: '9.5'
+      minus_delta_G_wilson: '10'
+    - x:
+        SiO2: '0.85'
+        K2O: '0.15'
+        Na2O: '0'
+      minus_delta_G_exp_kcal_mol: '11.6'
+      minus_delta_G_wilson: '24.7'
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_na2o_k2o_sio2_gibbs_table3
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: Na
 - observation_id: stolyarova_1992_silicate_kems_geometry_activities
   type: method
   locator:
@@ -74,9 +447,9 @@ context:
   T_range_K:
   - '1300'
   - '1973'
-  phase: multicomponent_silicate_melt
+  phase: l
   standard_state: oxide activities via Belton-Fruehan / comparison method (Ag, Au standards)
-  regime: kems_effusion
+  regime: knudsen_effusion
   units: as published (activities; Gibbs energies kcal/mol in tables)
   values:
     quantity: multicomponent_silicate_KEMS_activities_geometry

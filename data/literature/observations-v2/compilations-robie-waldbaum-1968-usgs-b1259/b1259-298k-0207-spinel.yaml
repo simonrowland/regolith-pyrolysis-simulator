@@ -9,7 +9,7 @@ observations:
       tag: value
       value: S
     species:
-      formula: MgAl204
+      formula: MgAl2O4
       phase:
         tag: value
         value: cr
@@ -107,6 +107,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0207-spinel:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=spinel:v=e1a5c70953
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0207-spinel:tabulation
   identity:
@@ -114,7 +115,7 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: MgAl204
+      formula: MgAl2O4
       phase:
         tag: value
         value: cr
@@ -142,7 +143,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgAl204
+            formula: MgAl2O4
             phase:
               tag: value
               value: cr
@@ -165,7 +166,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-204'
+          coefficient: '-2'
         - species:
             formula: Mg
             phase:
@@ -178,6 +179,18 @@ observations:
               tag: value
               value: 0
           coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystalline
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -200,6 +213,17 @@ observations:
           polymorph:
             tag: value
             value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -255,7 +279,7 @@ observations:
       ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
       formation_basis=from_the_elements; elemental_reference_state_tables=Al=B1259 reference-state table p.27/PDF p.33, Mg=B1259
-      reference-state table p.52/PDF p.58
+      reference-state table p.52/PDF p.58, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0207-spinel.json
     record: b1259-298k-0207-spinel
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0207-spinel.json
@@ -276,6 +300,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0207-spinel:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=spinel:v=c57fdbdc64
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0207-spinel:tabulation
   identity:
@@ -283,7 +308,7 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: MgAl204
+      formula: MgAl2O4
       phase:
         tag: value
         value: cr
@@ -311,7 +336,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgAl204
+            formula: MgAl2O4
             phase:
               tag: value
               value: cr
@@ -334,7 +359,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-204'
+          coefficient: '-2'
         - species:
             formula: Mg
             phase:
@@ -347,6 +372,18 @@ observations:
               tag: value
               value: 0
           coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystalline
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -369,6 +406,17 @@ observations:
           polymorph:
             tag: value
             value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -424,7 +472,7 @@ observations:
       ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
       formation_basis=from_the_elements; elemental_reference_state_tables=Al=B1259 reference-state table p.27/PDF p.33, Mg=B1259
-      reference-state table p.52/PDF p.58
+      reference-state table p.52/PDF p.58, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0207-spinel.json
     record: b1259-298k-0207-spinel
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0207-spinel.json
@@ -445,6 +493,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0207-spinel:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=spinel:v=3534525d4c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0207-spinel:tabulation
   identity:
@@ -452,7 +501,7 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: MgAl204
+      formula: MgAl2O4
       phase:
         tag: value
         value: cr
@@ -480,7 +529,7 @@ observations:
       value:
         terms:
         - species:
-            formula: MgAl204
+            formula: MgAl2O4
             phase:
               tag: value
               value: cr
@@ -503,7 +552,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-204'
+          coefficient: '-2'
         - species:
             formula: Mg
             phase:
@@ -516,6 +565,18 @@ observations:
               tag: value
               value: 0
           coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystalline
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -538,6 +599,17 @@ observations:
           polymorph:
             tag: value
             value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -593,7 +665,7 @@ observations:
       ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
       formation_basis=from_the_elements; elemental_reference_state_tables=Al=B1259 reference-state table p.27/PDF p.33, Mg=B1259
-      reference-state table p.52/PDF p.58
+      reference-state table p.52/PDF p.58, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0207-spinel.json
     record: b1259-298k-0207-spinel
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0207-spinel.json
@@ -606,3 +678,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0207-spinel.json
     parameters: []
     output_unit: dimensionless
+    references: []

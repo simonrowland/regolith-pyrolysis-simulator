@@ -12,11 +12,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -78,8 +77,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='142.08'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -98,6 +108,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=1100:col=entropy:v=9066e90a3b
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -108,11 +119,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -174,8 +184,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='149.29'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -194,6 +215,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=1200:col=entropy:v=06325069c7
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -204,11 +226,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -270,8 +291,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='155.97'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -290,6 +322,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=1300:col=entropy:v=e6a5d2c54c
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -300,11 +333,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -366,8 +398,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='162.18'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -386,6 +429,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=1400:col=entropy:v=d748953da0
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -396,11 +440,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -462,8 +505,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='167.99'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -482,6 +536,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=1500:col=entropy:v=487c7b73bd
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -492,11 +547,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -558,8 +612,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='173.45'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -578,6 +643,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=1600:col=entropy:v=1232423bc5
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -588,11 +654,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -654,8 +719,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='178.61'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -674,6 +750,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=1700:col=entropy:v=e59914d716
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -684,11 +761,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -750,8 +826,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='183.50'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -770,6 +857,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=298.15:col=entropy:v=0f6ebe4ab1
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -780,11 +868,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -846,8 +933,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='64.50'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -866,6 +964,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=400:col=entropy:v=4648ac02a0
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -876,11 +975,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -942,8 +1040,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='79.67'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -962,6 +1071,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=500:col=entropy:v=d7e7c6fdb0
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -972,11 +1082,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1038,8 +1147,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='93.31'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1058,6 +1178,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=600:col=entropy:v=b5e0f78779
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1068,11 +1189,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1134,8 +1254,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='105.37'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1154,6 +1285,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=700:col=entropy:v=8789d7c6df
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1164,11 +1296,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1230,8 +1361,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='116.05'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1250,6 +1392,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=800:col=entropy:v=fa46adb36b
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1260,11 +1403,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1326,8 +1468,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='125.60'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1346,6 +1499,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:S:shared:T=900:col=entropy:v=7337f3791c
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1356,11 +1510,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1422,8 +1575,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='134.22'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1442,6 +1606,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=1000:col=heat_capacity:v=d66a88132f
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1452,11 +1617,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1518,8 +1682,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='75.17'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1538,6 +1713,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=1100:col=heat_capacity:v=58bb7f175c
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1548,11 +1724,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1614,8 +1789,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='76.23'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1634,6 +1820,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=1200:col=heat_capacity:v=56f4d57ecf
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1644,11 +1831,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1710,8 +1896,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='77.17'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1730,6 +1927,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=1300:col=heat_capacity:v=d7e8711a84
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1740,11 +1938,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1806,8 +2003,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='78.03'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1826,6 +2034,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=1400:col=heat_capacity:v=3cd1d7b5e3
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1836,11 +2045,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1902,8 +2110,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='78.82'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1922,6 +2141,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=1500:col=heat_capacity:v=4856954763
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -1932,11 +2152,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1998,8 +2217,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='79.56'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2018,6 +2248,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=1600:col=heat_capacity:v=29b512d59f
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2028,11 +2259,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2094,8 +2324,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='80.26'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2114,6 +2355,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=1700:col=heat_capacity:v=40be9376d4
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2124,11 +2366,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2190,8 +2431,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='80.94'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2210,6 +2462,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=298.15:col=heat_capacity:v=26fcc1f869
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2220,11 +2473,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2286,8 +2538,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='44.38'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2306,6 +2569,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=400:col=heat_capacity:v=7b6db35ea5
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2316,11 +2580,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2382,8 +2645,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='57.70'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2402,6 +2676,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=500:col=heat_capacity:v=a8717d1ca7
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2412,11 +2687,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2478,8 +2752,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='64.14'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2498,6 +2783,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=600:col=heat_capacity:v=efd6daffdf
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2508,11 +2794,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2574,8 +2859,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='67.98'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2594,6 +2890,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=700:col=heat_capacity:v=75d5def69f
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2604,11 +2901,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2670,8 +2966,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='70.55'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2690,6 +2997,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=800:col=heat_capacity:v=f23007a16a
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2700,11 +3008,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2766,8 +3073,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='72.45'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2786,6 +3104,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:cp:shared:T=900:col=heat_capacity:v=2e5072c8a0
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2796,11 +3115,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2862,8 +3180,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='73.94'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2882,6 +3211,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=1000:col=formation_gibbs_energy:v=4d0157bcdd
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -2892,11 +3222,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2920,11 +3249,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -3018,8 +3346,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-356.603'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3048,6 +3387,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=1100:col=formation_gibbs_energy:v=b4eeb1c209
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -3058,11 +3398,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3086,11 +3425,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -3184,8 +3522,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-340.362'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3214,6 +3563,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=1200:col=formation_gibbs_energy:v=9cff021efe
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -3224,11 +3574,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3252,11 +3601,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -3350,8 +3698,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-324.252'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3380,6 +3739,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=1300:col=formation_gibbs_energy:v=e81876fbf0
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -3390,11 +3750,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3418,11 +3777,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -3516,8 +3874,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-305.523'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3546,6 +3915,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=1400:col=formation_gibbs_energy:v=d84f05b8a7
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -3556,11 +3926,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3584,11 +3953,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -3682,8 +4050,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-286.572'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3712,6 +4091,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=1500:col=formation_gibbs_energy:v=7b44d23b28
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -3722,11 +4102,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3750,11 +4129,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -3848,8 +4226,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-267.722'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3878,6 +4267,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=1600:col=formation_gibbs_energy:v=db37065cdf
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -3888,11 +4278,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3916,11 +4305,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -4014,8 +4402,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-248.997'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4044,6 +4443,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=1700:col=formation_gibbs_energy:v=0db92f9cc0
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -4054,11 +4454,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4082,11 +4481,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -4180,8 +4578,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-230.378'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4210,6 +4619,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=400:col=formation_gibbs_energy:v=ee5f5611e4
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -4220,11 +4630,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4248,11 +4657,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -4346,8 +4754,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-457.186'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4376,6 +4795,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=500:col=formation_gibbs_energy:v=d030f92578
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -4386,11 +4806,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4414,11 +4833,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -4512,8 +4930,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-440.015'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4542,6 +4971,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=600:col=formation_gibbs_energy:v=45e47192b2
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -4552,11 +4982,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4580,11 +5009,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -4678,8 +5106,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-422.998'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4708,6 +5147,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=700:col=formation_gibbs_energy:v=4837b467ba
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -4718,11 +5158,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4746,11 +5185,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -4844,8 +5282,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-406.158'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4874,6 +5323,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=800:col=formation_gibbs_energy:v=bbfa75bb80
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -4884,11 +5334,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4912,11 +5361,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -5010,8 +5458,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-389.482'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5040,6 +5499,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fG:from_the_elements:T=900:col=formation_gibbs_energy:v=9bfc401a5c
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -5050,11 +5510,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5078,11 +5537,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -5176,8 +5634,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-372.965'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5206,6 +5675,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=1000:col=formation_enthalpy:v=ffaee58f0d
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -5216,11 +5686,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5244,11 +5713,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -5342,8 +5810,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-519.573'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5372,6 +5851,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=1100:col=formation_enthalpy:v=523b04d656
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -5382,11 +5862,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5410,11 +5889,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -5508,8 +5986,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-518.254'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5538,6 +6027,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=1200:col=formation_enthalpy:v=1a55f5291f
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -5548,11 +6038,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5576,11 +6065,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -5674,8 +6162,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-516.960'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5704,6 +6203,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=1300:col=formation_enthalpy:v=c56344bf81
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -5714,11 +6214,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5742,11 +6241,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -5840,8 +6338,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-552.510'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5870,6 +6379,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=1400:col=formation_enthalpy:v=65bd8435f3
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -5880,11 +6390,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5908,11 +6417,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -6006,8 +6514,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-551.046'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -6036,6 +6555,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=1500:col=formation_enthalpy:v=699a044c27
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -6046,11 +6566,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6074,11 +6593,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -6172,8 +6690,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-549.542'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -6202,6 +6731,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=1600:col=formation_enthalpy:v=a47252d01f
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -6212,11 +6742,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6240,11 +6769,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -6338,8 +6866,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-547.989'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -6368,6 +6907,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=1700:col=formation_enthalpy:v=09bea18d55
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -6378,11 +6918,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6406,11 +6945,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -6504,8 +7042,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-546.391'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -6534,6 +7083,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:v=bb5b43b398
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -6544,11 +7094,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6572,11 +7121,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -6670,8 +7218,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-526.350'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -6700,6 +7259,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=400:col=formation_enthalpy:v=43f6c43991
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -6710,11 +7270,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6738,11 +7297,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -6836,8 +7394,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-526.114'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -6866,6 +7435,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=500:col=formation_enthalpy:v=1154366ccc
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -6876,11 +7446,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6904,11 +7473,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -7002,8 +7570,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-525.520'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -7032,6 +7611,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=600:col=formation_enthalpy:v=529011db51
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -7042,11 +7622,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7070,11 +7649,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -7168,8 +7746,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-524.572'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -7198,6 +7787,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=700:col=formation_enthalpy:v=69a4134e63
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -7208,11 +7798,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7236,11 +7825,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -7334,8 +7922,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-523.436'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -7364,6 +7963,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=800:col=formation_enthalpy:v=0d24282136
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -7374,11 +7974,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7402,11 +8001,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -7500,8 +8098,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-522.194'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -7530,6 +8139,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:delta_fH:from_the_elements:T=900:col=formation_enthalpy:v=4901926790
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -7540,11 +8150,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7568,11 +8177,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -7666,8 +8274,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='-520.898'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -7696,6 +8315,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=1000:col=log_kf:v=8929057602
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -7706,11 +8326,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7734,11 +8353,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -7832,8 +8450,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='18.627'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -7854,6 +8483,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=1100:col=log_kf:v=7999c5d51e
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -7864,11 +8494,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7892,11 +8521,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -7990,8 +8618,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='16.163'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -8012,6 +8651,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=1200:col=log_kf:v=57bd269f73
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -8022,11 +8662,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8050,11 +8689,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -8148,8 +8786,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='14.114'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -8170,6 +8819,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=1300:col=log_kf:v=3ae5d0aae0
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -8180,11 +8830,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8208,11 +8857,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -8306,8 +8954,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='12.276'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -8328,6 +8987,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=1400:col=log_kf:v=19f696d078
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -8338,11 +8998,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8366,11 +9025,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -8464,8 +9122,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='10.692'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -8486,6 +9155,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=1500:col=log_kf:v=bb5f3cb383
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -8496,11 +9166,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8524,11 +9193,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -8622,8 +9290,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='9.323'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -8644,6 +9323,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=1600:col=log_kf:v=d961edb6fe
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -8654,11 +9334,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8682,11 +9361,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -8780,8 +9458,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='8.129'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -8802,6 +9491,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=1700:col=log_kf:v=0f6706457d
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -8812,11 +9502,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8840,11 +9529,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -8938,8 +9626,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='7.079'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -8960,6 +9659,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=400:col=log_kf:v=2879973ef0
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -8970,11 +9670,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8998,11 +9697,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -9096,8 +9794,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='59.703'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -9118,6 +9827,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=500:col=log_kf:v=5e66511c1c
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -9128,11 +9838,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9156,11 +9865,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -9254,8 +9962,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='45.968'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -9276,6 +9995,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=600:col=log_kf:v=107efc3878
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -9286,11 +10006,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9314,11 +10033,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -9412,8 +10130,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='36.825'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -9434,6 +10163,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=700:col=log_kf:v=a4a8c983ee
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -9444,11 +10174,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9472,11 +10201,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -9570,8 +10298,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='30.308'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -9592,6 +10331,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=800:col=log_kf:v=ee19437800
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -9602,11 +10342,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9630,11 +10369,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -9728,8 +10466,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='25.431'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -9750,6 +10499,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:log10_Kf:from_the_elements:T=900:col=log_kf:v=acfae9e7ad
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0145:tabulation
   identity:
@@ -9760,11 +10510,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9788,11 +10537,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Glass 298.15 to 1800 K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -9886,8 +10634,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 171
+        pdf_page_index: 177
+        table: robie-hemingway-fisher-1978-usgs-b1452-0145
+        note: as_published='21.646'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0145
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -9908,3 +10667,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0145.json
     parameters: []
     output_unit: dimensionless
+    references: []

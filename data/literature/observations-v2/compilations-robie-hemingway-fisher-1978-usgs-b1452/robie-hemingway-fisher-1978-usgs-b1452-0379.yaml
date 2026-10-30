@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
 observations:
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=298.15:col=entropy:v=f07a9c73ad
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=298.15:col=entropy:v=f07a9c73ad:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -14,9 +14,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -78,8 +77,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='133.26'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -98,7 +108,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=400:col=entropy:v=838f28df5c
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=400:col=entropy:v=838f28df5c:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -110,9 +121,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -174,8 +184,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='170.98'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -194,7 +215,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=500:col=entropy:v=fe8c6577fe
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=500:col=entropy:v=fe8c6577fe:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -206,9 +228,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -270,8 +291,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='203.04'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -290,7 +322,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=600:col=entropy:v=16cd7eb728
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=600:col=entropy:v=16cd7eb728:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -302,9 +335,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -366,8 +398,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='231.47'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -386,7 +429,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=800:col=entropy:v=a7a5d054fa
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=800:col=entropy:v=a7a5d054fa:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -398,9 +442,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -462,8 +505,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='280.67'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -482,7 +536,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=810:col=entropy:v=d17436445a
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:S:shared:T=810:col=entropy:v=d17436445a:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -494,9 +549,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -558,8 +612,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='286.45'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -578,7 +643,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=298.15:col=heat_capacity:v=f8894361a4
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=298.15:col=heat_capacity:v=f8894361a4:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -590,9 +656,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -654,8 +719,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='119.79'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -674,7 +750,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=400:col=heat_capacity:v=6cd38d5f75
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=400:col=heat_capacity:v=6cd38d5f75:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -686,9 +763,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -750,8 +826,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='137.02'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -770,7 +857,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=500:col=heat_capacity:v=0e1a9279fb
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=500:col=heat_capacity:v=0e1a9279fb:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -782,9 +870,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -846,8 +933,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='150.34'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -866,7 +964,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=700:col=heat_capacity:v=8b5feb7100
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=700:col=heat_capacity:v=8b5feb7100:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -878,9 +977,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -942,8 +1040,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='171.62'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -962,7 +1071,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=800:col=heat_capacity:v=b4009e3523
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=800:col=heat_capacity:v=b4009e3523:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -974,9 +1084,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1038,8 +1147,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='180.75'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1058,7 +1178,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=810:col=heat_capacity:v=fe4147b68e
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:cp:shared:T=810:col=heat_capacity:v=fe4147b68e:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -1070,9 +1191,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1134,8 +1254,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='181.63'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1154,7 +1285,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fG:from_the_elements:T=800:col=formation_gibbs_energy:v=3427309bab
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fG:from_the_elements:T=800:col=formation_gibbs_energy:v=3427309bab:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -1166,9 +1298,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1194,9 +1325,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -1336,8 +1466,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='-1807.682'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1366,7 +1507,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:v=96a21272cb
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:v=96a21272cb:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -1378,9 +1520,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1406,9 +1547,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -1548,8 +1688,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='-2121.920'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1578,7 +1729,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=400:col=formation_enthalpy:v=d76604c2a9
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=400:col=formation_enthalpy:v=d76604c2a9:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -1590,9 +1742,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1618,9 +1769,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -1760,8 +1910,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='-2125.083'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1790,7 +1951,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=500:col=formation_enthalpy:v=522d23be98
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=500:col=formation_enthalpy:v=522d23be98:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -1802,9 +1964,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1830,9 +1991,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -1972,8 +2132,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='-2124.839'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2002,7 +2173,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=600:col=formation_enthalpy:v=88239d8e44
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=600:col=formation_enthalpy:v=88239d8e44:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -2014,9 +2186,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2042,9 +2213,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2184,8 +2354,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='-2123.719'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2214,7 +2395,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=800:col=formation_enthalpy:v=d918e586dd
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=800:col=formation_enthalpy:v=d918e586dd:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -2226,9 +2408,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2254,9 +2435,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2396,8 +2576,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='-2119.442'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2426,7 +2617,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=810:col=formation_enthalpy:v=8990c588ea
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:delta_fH:from_the_elements:T=810:col=formation_enthalpy:v=8990c588ea:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -2438,9 +2630,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2466,9 +2657,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2608,8 +2798,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='-2109.308'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2638,7 +2839,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:log10_Kf:from_the_elements:T=810:col=log_kf:v=068a5f4ab9
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:log10_Kf:from_the_elements:T=810:col=log_kf:v=068a5f4ab9:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0379:tabulation
   identity:
     quantity:
@@ -2650,9 +2852,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2678,9 +2879,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Lov taliophillite 298.15 to 810 ~.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2820,8 +3020,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 405
+        pdf_page_index: 411
+        table: robie-hemingway-fisher-1978-usgs-b1452-0379
+        note: as_published='116.521'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0379
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2842,3 +3053,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0379.json
     parameters: []
     output_unit: dimensionless
+    references: []

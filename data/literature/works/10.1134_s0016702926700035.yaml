@@ -1,0 +1,3395 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0016702926700035
+  citation: Shornikov, S. I. (2026). Mass-Spectrometric Investigation of Evaporation Processes and Thermodynamic Properties
+    of Wollastonite. Geochemistry International, 64(8), 608–632.
+  source_ids:
+  - shornikov-2026-wollastonite-kems
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2026-wollastonite-kems
+      role: pdf
+      path: raw/shornikov-2026-wollastonite-kems/shornikov-2026-wollastonite-kems.pdf
+      sha256:
+        tag: value
+        value: c10b085a4cf7cd76c800914da74ab94ccc0749a5a443f84fbbfcb255001387f6
+    - asset_id: pdftotext:shornikov-2026-wollastonite-kems
+      role: pdftotext
+      path: text/shornikov-2026-wollastonite-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2026-wollastonite-kems
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0016702926700035
+experiments:
+- experiment_id: 10.1134/s0016702926700035::experiment::shornikov-2026-wollastonite-kems-runset
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_formula_stoichiometry
+          components:
+          - - CaO
+            - '1'
+          - - SiO2
+            - '1'
+          amount_basis: mol_inventory
+      locator:
+        page: 1
+        published_page: 608
+        pdf_page_index: 0
+        note: The abstract identifies the study material as wollastonite (CaSiO3); represented on the CaO–SiO2 oxide basis.
+    form:
+      state:
+        tag: value
+        value: Wollastonite synthesized by the precursor method and analyzed by X-ray diffraction and chemical methods.
+      locator:
+        page: 9
+        published_page: 616
+        pdf_page_index: 8
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0016702926700035
+  locator:
+    page: 9
+    published_page: 616
+    pdf_page_index: 8
+    section: Experimental
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+  bench_id: 10.1134/s0016702926700035::bench::shornikov-2026-mo-kems
+- experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0016702926700035
+  locator:
+    page: 16
+    published_page: 623
+    pdf_page_index: 15
+    table: '7'
+    note: row=1; column_header=Tm, K
+benches:
+- id: 10.1134/s0016702926700035::bench::shornikov-2026-mo-kems
+  work_id: 10.1134/s0016702926700035
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201 mass spectrometer with a modified ion source for high-temperature investigations
+    locator:
+      page: 9
+      published_page: 616
+      pdf_page_index: 8
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      page: 9
+      published_page: 616
+      pdf_page_index: 8
+      section: Experimental
+      note: Molybdenum Knudsen effusion cell.
+  temperature_measurement:
+    instrument:
+      state:
+        tag: value
+        value: EOP-66 optical pyrometer
+      locator:
+        page: 9
+        published_page: 616
+        pdf_page_index: 8
+        section: Experimental
+    accuracy:
+      state:
+        tag: value
+        value: better than 10 K at 2400 K
+      locator:
+        page: 9
+        published_page: 616
+        pdf_page_index: 8
+        section: Experimental
+  heating_method:
+    state:
+      tag: value
+      value: Alternating current passed through the molybdenum effusion cell.
+    locator:
+      page: 9
+      published_page: 616
+      pdf_page_index: 8
+      section: Experimental
+  other_facts: []
+context:
+- locator:
+    figure: '9'
+    note: No marker centre was read on the calculated curves. The oxygen-content sentence begins on published page 623 and
+      the approximately 36 mol % neutral-redox figure is printed on published page 624.
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+  observation_id: shornikov_2026_calculated_curves_not_digitized
+  type: model_scope
+  units: as reported
+  values:
+    evaporation_coefficients: Accepted from Shornikov (2015). No numerical alpha is printed in this paper.
+    fig10: 'Printed comparison: 0.010-0.016 mol % under the reducing molybdenum cell, and approximately 36 mol % under chemically
+      neutral evaporation. The reducing-cell range is also typed on shornikov_2026_fig10_oxygen_content_and_ratio. Series
+      1 marker reads are sibling context under O2. Series 2 is the calculated curve and is not read.'
+    fig9b: Partial pressures calculated for neutral redox conditions using Eqs. (24) and (25). No table.
+    figs_11_12: Total-pressure deviations and CAI residual-melt calculations. No wollastonite partial-pressure table.
+    orifice_geometry: Not printed. The cell construction is referred to earlier work.
+    quantity: model scope
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_calculated_curves_not_digitized
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig10_oxygen_content_and_ratio
+  type: figure_record
+  locator:
+    page: 18
+    pdf_page_index: 17
+    published_page: 625
+    figure: '10'
+  T_range_K:
+  - 1751
+  - 2087
+  phase: gas
+  units: mol % oxygen content; dimensionless O2/O ratio
+  values:
+    quantity: unavailable
+    quantity_as_printed: total oxygen content and O2/O ratio in gas over wollastonite melt
+    quantity_token: unavailable
+    schema_gap: No existing quantity token represents total gas-phase oxygen content or the O2/O molecular ratio.
+    method_class: figure_only
+    species:
+    - O
+    - O2
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: reciprocal temperature
+      y_a: O + O2, mol %
+      y_b: O2 + O, mol %
+    caption_as_printed: Dependencies of (a) the total oxygen content and (b) the O2/O ratio in the gas phase over wollastonite
+      melt on reciprocal temperature (1) obtained from evaporation experiments in a molybdenum cell under reducing conditions
+      and (2) calculated for neutral-redox evaporation.
+    panel: a and b
+    series:
+    - name: 1, reducing-condition KEMS experiment
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: 2, neutral-redox calculation
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: This study.
+    digitisation: deferred to a figure pass
+    note: Text states the total oxygen content over the melt is 0.010–0.016 mol %; this is not a store quantity and remains
+      in context. The rendered axes print O + O2, mol % on panel a and O2 + O, mol % on panel b. The caption calls panel b
+      the O2/O ratio. Series 1 marker reads are the sibling context records.
+    total_oxygen_content_as_printed: 0.010–0.016 mol %
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig10_oxygen_content_and_ratio
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: O2
+- locator:
+    figure: '10'
+    note: '600 dpi PDF page 18, published page 625, 5100 by 6600 px. Series 1 open circles, lower band of the broken axis.
+      Labelled y-tick lines: 0.016 at y=1321.5, 0.014 at y=1471.5, 0.012 at y=1622.5, 0.010 at y=1773.0. mol % = 0.03355294
+      - 1.32846025e-5*y. Residuals at most 0.000005. Labelled x-tick lines, 10^4/T: 5.6 at x=1067.5, 5.4 at x=1389.5, 5.2
+      at x=1712.5, 5.0 at x=2037.0, 4.8 at x=2361.0. 10^4/T = 6.25951210 - 6.18332128e-4*x. Residuals at most 0.00062. T below
+      is 10000 divided by that reading. Read uncertainty ±0.00010 mol % and ±2 K, widened to ±3 K left of the 5.6 tick. The
+      printed top-axis ticks do not match this conversion: 1800 at x=1098.5 reads 1792 K, 1900 at x=1539.5 reads 1884 K, 2000
+      at x=1981.5 reads 1986 K. The data axis is the bottom reciprocal-temperature axis. The in-plot 1 glyph is not a marker.
+      Not scored: the schema has no oxygen-content quantity. Series 2, the upper band, is the calculated neutral-redox curve
+      and is not read. Page axis label is O + O2, mol %, matching the rendered panel.'
+    page: 18
+    panel: a
+    pdf_page_index: 17
+    published_page: 625
+    series: '1'
+  observation_id: shornikov_2026_fig10a_oxygen_content
+  type: figure_read_unscored_quantity
+  uncertainty: ± 0.00010 mol % and ± 2 K from the labelled-tick fit; ± 3 K left of the 5.6 tick
+  units: mol %
+  values:
+    axis_as_printed: O + O2, mol %
+    points:
+    - decision: read_unscored
+      extrapolation: true
+      inv_T_1e4: '5.7172'
+      marker: 1
+      oxygen_mol_percent: '0.01092'
+      page_pixel_x: '876.98'
+      page_pixel_y: '1703.72'
+      temperature_K: '1749.09'
+    - decision: read_unscored
+      extrapolation: true
+      inv_T_1e4: '5.6214'
+      marker: 2
+      oxygen_mol_percent: '0.01132'
+      page_pixel_x: '1032.06'
+      page_pixel_y: '1673.72'
+      temperature_K: '1778.93'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.5858'
+      marker: 3
+      oxygen_mol_percent: '0.01082'
+      page_pixel_x: '1089.55'
+      page_pixel_y: '1710.93'
+      temperature_K: '1790.25'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.5418'
+      marker: 4
+      oxygen_mol_percent: '0.01113'
+      page_pixel_x: '1160.70'
+      page_pixel_y: '1688.25'
+      temperature_K: '1804.46'
+    - decision: deferred
+      extrapolation: false
+      inv_T_1e4: '5.4927'
+      marker: 5
+      oxygen_mol_percent: '0.01232'
+      page_pixel_x: '1240.19'
+      page_pixel_y: '1598.38'
+      reason: inside printed Tm 1818±7 K
+      temperature_K: '1820.61'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.4432'
+      marker: 6
+      oxygen_mol_percent: '0.01192'
+      page_pixel_x: '1320.17'
+      page_pixel_y: '1628.12'
+      temperature_K: '1837.15'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.3558'
+      marker: 7
+      oxygen_mol_percent: '0.01242'
+      page_pixel_x: '1461.49'
+      page_pixel_y: '1590.72'
+      temperature_K: '1867.13'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.2958'
+      marker: 8
+      oxygen_mol_percent: '0.01252'
+      page_pixel_x: '1558.55'
+      page_pixel_y: '1583.00'
+      temperature_K: '1888.29'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.2189'
+      marker: 9
+      oxygen_mol_percent: '0.01292'
+      page_pixel_x: '1682.99'
+      page_pixel_y: '1552.98'
+      temperature_K: '1916.13'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.104'
+      marker: 10
+      oxygen_mol_percent: '0.01511'
+      page_pixel_x: '1868.77'
+      page_pixel_y: '1387.96'
+      temperature_K: '1959.25'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.0575'
+      marker: 11
+      oxygen_mol_percent: '0.01522'
+      page_pixel_x: '1943.89'
+      page_pixel_y: '1380.24'
+      temperature_K: '1977.24'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '4.9452'
+      marker: 12
+      oxygen_mol_percent: '0.01572'
+      page_pixel_x: '2125.53'
+      page_pixel_y: '1342.61'
+      temperature_K: '2022.15'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '4.8658'
+      marker: 13
+      oxygen_mol_percent: '0.01501'
+      page_pixel_x: '2253.94'
+      page_pixel_y: '1395.61'
+      temperature_K: '2055.15'
+    - decision: read_unscored
+      extrapolation: true
+      inv_T_1e4: '4.7975'
+      marker: 14
+      oxygen_mol_percent: '0.01622'
+      page_pixel_x: '2364.48'
+      page_pixel_y: '1304.72'
+      temperature_K: '2084.43'
+    quantity: total oxygen content, not a scored quantity
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig10a_oxygen_content
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: O2
+- locator:
+    figure: '10'
+    note: '600 dpi PDF page 18. Series 1 open circles, lower band. Labelled y-tick lines: 0.045 at y=1300.5, 0.040 at y=1458.5,
+      0.035 at y=1616.5, 0.030 at y=1775.0. value = 0.08611284 - 3.16155359e-5*y. Residuals at most 0.000007. Labelled x-tick
+      lines: 5.6 at x=3048.0, 5.4 at x=3370.5, 5.2 at x=3693.0, 5.0 at x=4017.5, 4.8 at x=4339.5. 10^4/T = 7.48711789 - 6.19194275e-4*x.
+      Read uncertainty ±0.00015 and ±2 K, widened to ±3 K left of the 5.6 tick. The rendered axis prints O2 + O, mol %. The
+      caption describes the O2/O ratio. Not scored: the schema has no O2/O quantity. Series 2 is calculated and is not read.
+      The in-plot 1 glyph is not a marker.'
+    page: 18
+    panel: b
+    pdf_page_index: 17
+    published_page: 625
+    series: '1'
+  observation_id: shornikov_2026_fig10b_o2_over_o
+  type: figure_read_unscored_quantity
+  uncertainty: ± 0.00015 and ± 2 K from the labelled-tick fit; ± 3 K left of the 5.6 tick
+  units: mol %
+  values:
+    axis_as_printed: O2 + O, mol %
+    points:
+    - decision: read_unscored
+      extrapolation: true
+      inv_T_1e4: '5.7185'
+      marker: 1
+      o2_over_o: '0.03188'
+      page_pixel_x: '2856.26'
+      page_pixel_y: '1715.38'
+      temperature_K: '1748.7'
+    - decision: read_unscored
+      extrapolation: true
+      inv_T_1e4: '5.6227'
+      marker: 2
+      o2_over_o: '0.03353'
+      page_pixel_x: '3010.96'
+      page_pixel_y: '1663.25'
+      temperature_K: '1778.49'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.5867'
+      marker: 3
+      o2_over_o: '0.03418'
+      page_pixel_x: '3069.16'
+      page_pixel_y: '1642.58'
+      temperature_K: '1789.96'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.5432'
+      marker: 4
+      o2_over_o: '0.035'
+      page_pixel_x: '3139.47'
+      page_pixel_y: '1616.63'
+      temperature_K: '1804.02'
+    - decision: deferred
+      extrapolation: false
+      inv_T_1e4: '5.4937'
+      marker: 5
+      o2_over_o: '0.03483'
+      page_pixel_x: '3219.43'
+      page_pixel_y: '1622.14'
+      reason: inside printed Tm 1818±7 K
+      temperature_K: '1820.28'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.4444'
+      marker: 6
+      o2_over_o: '0.03486'
+      page_pixel_x: '3299.07'
+      page_pixel_y: '1621.02'
+      temperature_K: '1836.77'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.3568'
+      marker: 7
+      o2_over_o: '0.03591'
+      page_pixel_x: '3440.53'
+      page_pixel_y: '1587.96'
+      temperature_K: '1866.8'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.2967'
+      marker: 8
+      o2_over_o: '0.03711'
+      page_pixel_x: '3537.55'
+      page_pixel_y: '1549.98'
+      temperature_K: '1887.97'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.2199'
+      marker: 9
+      o2_over_o: '0.03856'
+      page_pixel_x: '3661.58'
+      page_pixel_y: '1504.03'
+      temperature_K: '1915.75'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.1048'
+      marker: 10
+      o2_over_o: '0.04047'
+      page_pixel_x: '3847.44'
+      page_pixel_y: '1443.83'
+      temperature_K: '1958.94'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '5.0583'
+      marker: 11
+      o2_over_o: '0.04212'
+      page_pixel_x: '3922.62'
+      page_pixel_y: '1391.59'
+      temperature_K: '1976.97'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '4.9459'
+      marker: 12
+      o2_over_o: '0.04356'
+      page_pixel_x: '4104.01'
+      page_pixel_y: '1345.94'
+      temperature_K: '2021.86'
+    - decision: read_unscored
+      extrapolation: false
+      inv_T_1e4: '4.8664'
+      marker: 13
+      o2_over_o: '0.04252'
+      page_pixel_x: '4232.47'
+      page_pixel_y: '1378.78'
+      temperature_K: '2054.91'
+    - decision: read_unscored
+      extrapolation: true
+      inv_T_1e4: '4.7982'
+      marker: 14
+      o2_over_o: '0.04438'
+      page_pixel_x: '4342.62'
+      page_pixel_y: '1320.00'
+      temperature_K: '2084.12'
+    quantity: O2/O, not a scored quantity
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+    caption_calls_this: O2/O ratio
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig10b_o2_over_o
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: O2
+- observation_id: shornikov_2026_fig11_CaSiO3_a_and_b
+  type: figure_record
+  locator:
+    page: 19
+    pdf_page_index: 18
+    published_page: 626
+    figure: '11'
+    panel: a and b
+  phase: gas above oxide or silicate compounds
+  units: dimensionless logarithmic pressure ratio
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - CaO
+    - Ca3SiO5
+    - Ca2SiO4
+    - CaSiO3
+    - SiO2
+    phase: gas above oxide or silicate compounds
+    temperature_as_printed: Panel a uses 10^4/T, K−1; panel b is at 2000 K.
+    axes_as_printed:
+      a_x: 10^4/T, K−1
+      a_y: log(p_tot/p_tot^st)
+      b_x: CaO, mol %
+      b_y: log(p_tot/p_tot^st)
+    caption_as_printed: 'Deviation of experimental data on total vapor pressure over (1) CaO, (2) Ca3SiO5, (3) Ca2SiO4, (4)
+      CaSiO3, and (5) SiO2 determined by mass spectrometry during evaporation of the compounds from a Knudsen effusion molybdenum
+      cell: (1) Shornikov, 2025; (2) Shornikov, 2026; (3) Shornikov, 2026a; (4) this study; and (5) Shornikov et al., 1998
+      from theoretical calculations depending on (a) reciprocal temperature and (b) CaO mole fraction at 2000 K.'
+    panel: a and b
+    series:
+    - name: 1, CaO (Shornikov, 2025)
+      panel: a
+      marker: open circles
+      marker_count: 15
+      evidence_class: quoted_attributed
+    - name: 2, Ca3SiO5 (Shornikov, 2026)
+      panel: a
+      marker: filled squares
+      marker_count: 11
+      evidence_class: quoted_attributed
+    - name: 3, Ca2SiO4 (Shornikov, 2026a)
+      panel: a
+      marker: filled circles
+      marker_count: 12
+      evidence_class: quoted_attributed
+    - name: 4, CaSiO3 (this study)
+      panel: a
+      marker: open diamonds
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: 5, SiO2 (Shornikov et al., 1998)
+      panel: a
+      marker: open triangles
+      marker_count: 15
+      evidence_class: quoted_attributed
+    - name: CaSiO3 composition dependence at 2000 K
+      panel: b
+      marker: open circles on calculated curve
+      marker_count: 4
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: The plotted ratio is total vapor pressure relative to the neutral-redox reference, not a partial pressure. No figure
+      values are digitized.
+    quantity_as_printed: log(p_tot/p_tot^st), deviation of total vapor pressure
+    quantity_token: unavailable
+    candidate_tokens:
+    - p_partial
+    - p_sat
+    schema_gap: No token represents a logarithmic ratio of total pressures.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig11_CaSiO3_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig12_CaSiO3_a
+  type: figure_record
+  locator:
+    page: 19
+    pdf_page_index: 18
+    published_page: 626
+    figure: '12'
+    panel: a
+  phase: residual melt of type-A CAI
+  units: mol % component
+  values:
+    quantity: residue_component_composition
+    method_class: figure_only
+    species:
+    - CaO
+    - MgO
+    - Al2O3
+    - SiO2
+    phase: residual melt of type-A CAI
+    temperature_as_printed: T, K axis approximately 1950–2650 K
+    axes_as_printed:
+      x: T, K
+      y: xi, mol %
+    caption_as_printed: Changes in the composition of residual melt of type-A CAIs during evaporation of (1) CaO, (2) MgO,
+      (3) Al2O3, and (4) SiO2 (Shornikov and Yakovlev, 2025).
+    panel: a
+    series:
+    - name: 1, CaO loss
+      marker: filled circles
+      marker_count: 19
+      evidence_class: quoted_attributed
+    - name: 2, MgO loss
+      marker: open circles
+      marker_count: 8
+      evidence_class: quoted_attributed
+    - name: 3, Al2O3 loss
+      marker: open circles
+      marker_count: 18
+      evidence_class: quoted_attributed
+    - name: 4, SiO2 loss
+      marker: open circles
+      marker_count: 16
+      evidence_class: quoted_attributed
+    attribution: Shornikov and Yakovlev, 2025
+    digitisation: deferred to a figure pass
+    note: Quoted residual-melt composition series; no numeric figure values are digitized.
+  T_range_K:
+  - 1950
+  - 2650
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig12_CaSiO3_a
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- observation_id: shornikov_2026_fig12_CaSiO3_b
+  type: figure_record
+  locator:
+    page: 19
+    pdf_page_index: 18
+    published_page: 626
+    figure: '12'
+    panel: b
+  phase: residual melt of type-A CAI
+  units: log activity
+  values:
+    quantity: activity
+    method_class: figure_only
+    species:
+    - Ca2Al2SiO7
+    - CaAl2Si2O8
+    - CaSiO3
+    phase: residual melt of type-A CAI
+    temperature_as_printed: T, K axis approximately 1950–2650 K
+    axes_as_printed:
+      x: T, K
+      y: log ai
+    caption_as_printed: Temperature dependencies of the activities of the (5) gehlenite, (6) anorthite, and (7) wollastonite
+      end-members in the residual melt of type-A CAIs (Shornikov and Yakovlev, 2025).
+    panel: b
+    series:
+    - name: 5, gehlenite end-member
+      formula: Ca2Al2SiO7
+      marker: filled circles
+      marker_count: 12
+      evidence_class: quoted_attributed
+    - name: 6, anorthite end-member
+      formula: CaAl2Si2O8
+      marker: open circles
+      marker_count: 9
+      evidence_class: quoted_attributed
+    - name: 7, wollastonite end-member
+      formula: CaSiO3
+      marker: open circles
+      marker_count: 13
+      evidence_class: quoted_attributed
+    attribution: Shornikov and Yakovlev, 2025
+    digitisation: deferred to a figure pass
+    note: Quoted calculated activities in a type-A CAI residual melt; reference states are not stated in this figure caption.
+      No numeric figure values are digitized.
+    quantity_as_printed: log ai for gehlenite, anorthite, and wollastonite end-members
+    standard_state:
+      state:
+        tag: unknown
+        reason: The figure caption does not state the activity reference state.
+  T_range_K:
+  - 1950
+  - 2650
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig12_CaSiO3_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- observation_id: shornikov_2026_fig13_O2_a_and_b
+  type: figure_record
+  locator:
+    page: 20
+    pdf_page_index: 19
+    published_page: 627
+    figure: '13'
+    panel: a and b
+  phase: gas over the printed oxide compounds and CAIs
+  units: mol % and logarithmic pressure ratio
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - O
+    - O2
+    phase: gas over the printed oxide compounds and CAIs
+    temperature_as_printed: 2000 K
+    axes_as_printed:
+      a_x: log p_tot, atm
+      a_y: O + O2, mol %
+      b_x: log p(pO2/pO), atm
+      b_y: log p(pO2/pO)
+    caption_as_printed: 'Oxygen content and dissociation of molecular oxygen in the gas phase over melts of oxide compounds
+      and CAIs at 2000 K: (1) CaAl12O19, (2) CaAl4O7, (3) CaAl2O4, (4) Ca2Al2SiO7, (5) MgAl2O4, (6) type-A CAIs, (7) Ca2MgSi2O7,
+      (8) CaMgSi2O6, (9) CaSiO3, (10) Mg2SiO4, (11) MgSiO3, and (12) CaAl2Si2O8.'
+    panel: a and b
+    series:
+    - name: 1, CaAl12O19
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 2, CaAl4O7
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 3, CaAl2O4
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 4, Ca2Al2SiO7
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 5, MgAl2O4
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 6, type-A CAI
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 7, Ca2MgSi2O7
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 8, CaMgSi2O6
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 9, CaSiO3
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 10, Mg2SiO4
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 11, MgSiO3
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 12, CaAl2Si2O8
+      marker: caption series symbol
+      marker_count: 1
+      evidence_class: quoted_attributed
+    attribution: Shornikov, 2025a calculations as cited in this paper
+    digitisation: deferred to a figure pass
+    note: The paper attributes the calculations discussed with this figure to Shornikov (2025a). Oxygen content and the molecular-to-atomic
+      oxygen dissociation ratio have no matching store token; no figure values are digitized.
+    quantity_as_printed: oxygen content and log p(O2/O) in gas
+    quantity_token: unavailable
+    candidate_tokens:
+    - p_partial
+    - ion_intensity
+    schema_gap: No token represents total gas oxygen content or a molecular-to-atomic oxygen pressure ratio.
+  T_range_K:
+  - 2000
+  - 2000
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig13_O2_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: O2
+- observation_id: shornikov_2026_fig1_CaSiO3_whole_figure
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 609
+    figure: '1'
+    panel: whole figure
+  phase: CaO–SiO2 phase fields
+  units: mol % CaO and K
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    species:
+    - CaO
+    - SiO2
+    - CaSiO3
+    - Ca3Si2O7
+    - Ca2SiO4
+    phase: CaO–SiO2 phase fields
+    temperature_as_printed: T, K axis approximately 1675–2020 K
+    axes_as_printed:
+      x: CaO, mol %
+      y: T, K
+    caption_as_printed: 'Phase diagram of the CaO–SiO2 system in the wollastonite region (DeNoirfontaine et al., 2012): (1)
+      SiO2 (tridymite) + α-CaSiO3, (2) SiO2 (tridymite) + liquid, (3) SiO2 (cristobalite) + liquid, (4) α-CaSiO3 + liquid,
+      (5) α-CaSiO3 + Ca3Si2O7, (6) Ca3Si2O7 + liquid, (7) Ca3Si2O7 + α''-Ca2SiO4, (8) Ca3Si2O7 + α-Ca2SiO4, (9) α-Ca2SiO4
+      + liquid, and (10) liquid.'
+    panel: whole figure
+    series:
+    - name: phase field 1
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 2
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 3
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 4
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 5
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 6
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 7
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 8
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 9
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: phase field 10
+      marker: boundary line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    attribution: DeNoirfontaine et al., 2012, as cited in the caption.
+    digitisation: deferred to a figure pass
+    note: Prior phase diagram attributed to DeNoirfontaine et al. (2012); boundary lines only, no numeric points digitized.
+  T_range_K:
+  - 1675
+  - 2020
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig1_CaSiO3_whole_figure
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig2_CaSiO3_a
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 610
+    figure: '2'
+    panel: a
+  phase: wollastonite
+  units: J/(mol K)
+  values:
+    quantity: cp
+    method_class: figure_only
+    species:
+    - CaSiO3
+    phase: wollastonite
+    temperature_as_printed: T, K axis 300–1800 K
+    axes_as_printed:
+      x: T, K
+      y: Cp(CaSiO3), J/(mol K)
+    caption_as_printed: '(a) Heat capacity and (b) mean heat capacity of wollastonite determined by calorimetry: (1) and (2)
+      (White, 1909, 1919), (3) (Parks and Kelly, 1925), (4) (Wagner, 1932), (5) (Krupka et al., 1985), (6) (Roth and Bertram,
+      1929), (7) (Gronow and Schwiete, 1933), (8) (Southard, 1941), (9) (Richet et al., 1991), (10) (Richet and Fiquet, 1991),
+      (11) (Courtial et al., 2000), (12) (Richet and Bottinga, 1984), and (13) (Stout and Piwinskii, 1982); and (14) calculated
+      (Bale et al., 2016).'
+    panel: a
+    series:
+    - name: 1 (White, 1909, 1919)
+      marker: open circles
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: 2 (White, 1909, 1919)
+      marker: crosses
+      marker_count: 4
+      evidence_class: quoted_attributed
+    - name: 3 (Parks and Kelly, 1925)
+      marker: diamonds
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: 4 (Wagner, 1932)
+      marker: inverted triangles
+      marker_count: 9
+      evidence_class: quoted_attributed
+    - name: 5 (Krupka et al., 1985)
+      marker: crosses
+      marker_count: 35
+      evidence_class: quoted_attributed
+    - name: 14 (Bale et al., 2016)
+      marker: calculated line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Literature sources are named by series in the caption; calculated series 14 is Bale et al., 2016.
+    digitisation: deferred to a figure pass
+    note: All plotted series are literature calorimetry or Bale et al. (2016) calculations; no present-study series or numeric
+      figure points are added.
+  T_range_K:
+  - 300
+  - 1800
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig2_CaSiO3_a
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig2_CaSiO3_b
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 610
+    figure: '2'
+    panel: b
+  phase: wollastonite
+  units: J/(mol K)
+  values:
+    quantity: cp
+    method_class: figure_only
+    species:
+    - CaSiO3
+    phase: wollastonite
+    temperature_as_printed: T, K axis 500–2600 K
+    axes_as_printed:
+      x: T, K
+      y: Cm(CaSiO3), J/(mol K)
+    caption_as_printed: '(a) Heat capacity and (b) mean heat capacity of wollastonite determined by calorimetry: (1) and (2)
+      (White, 1909, 1919), (3) (Parks and Kelly, 1925), (4) (Wagner, 1932), (5) (Krupka et al., 1985), (6) (Roth and Bertram,
+      1929), (7) (Gronow and Schwiete, 1933), (8) (Southard, 1941), (9) (Richet et al., 1991), (10) (Richet and Fiquet, 1991),
+      (11) (Courtial et al., 2000), (12) (Richet and Bottinga, 1984), and (13) (Stout and Piwinskii, 1982); and (14) calculated
+      (Bale et al., 2016).'
+    panel: b
+    series:
+    - name: 1 (Roth and Bertram, 1929)
+      marker: open circles
+      marker_count: 4
+      evidence_class: quoted_attributed
+    - name: 6 (Roth and Bertram, 1929)
+      marker: open triangles
+      marker_count: 5
+      evidence_class: quoted_attributed
+    - name: 7 (Gronow and Schwiete, 1933)
+      marker: filled squares
+      marker_count: 5
+      evidence_class: quoted_attributed
+    - name: 8 (Southard, 1941)
+      marker: crossed squares
+      marker_count: 6
+      evidence_class: quoted_attributed
+    - name: 9 (Richet et al., 1991)
+      marker: right triangles
+      marker_count: 7
+      evidence_class: quoted_attributed
+    - name: 10 (Richet and Fiquet, 1991)
+      marker: left triangles
+      marker_count: 7
+      evidence_class: quoted_attributed
+    - name: 11 (Courtial et al., 2000)
+      marker: right triangles
+      marker_count: 7
+      evidence_class: quoted_attributed
+    - name: 12 (Richet and Bottinga, 1984)
+      marker: circled plus
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: 13 (Stout and Piwinskii, 1982)
+      marker: stars
+      marker_count: 8
+      evidence_class: quoted_attributed
+    attribution: Literature sources are named by series in the caption; calculated series 14 is Bale et al., 2016.
+    digitisation: deferred to a figure pass
+    note: All plotted series are literature calorimetry or Bale et al. (2016) calculations; no present-study series or numeric
+      figure points are added.
+  T_range_K:
+  - 500
+  - 2600
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig2_CaSiO3_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig3_CaO_a
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 613
+    figure: '3'
+    panel: a
+  phase: wollastonite
+  units: dimensionless activity
+  values:
+    quantity: activity
+    method_class: figure_only
+    species:
+    - CaO
+    phase: wollastonite
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K
+      y: a_CaO
+    caption_as_printed: Activities of (a) calcium and (b) silicon oxides in wollastonite determined by the EMF method and
+      heterogeneous reactions in slags, and by Knudsen effusion mass spectrometry; series (23) is this study. The vertical
+      dotted line (24) indicates the melting point of wollastonite.
+    panel: a
+    series:
+    - name: 23 (this study)
+      marker: filled red circles
+      marker_count: 14
+      evidence_class: measured_reduced
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: This figure_record has no points. The prose approximate activity is not scored here; the 2024 extract already holds
+      it. The wave-2 600 dpi series-23 marker reads are sibling context and are not scored.
+    standard_state:
+      state:
+        tag: value
+        value:
+          convention: raoultian_pure_endmember
+          endmember:
+            formula: CaO
+            phase:
+              tag: unknown
+              reason: Published page 622 names a pure-component reference and does not state its temperature, so the stable-phase-at-T
+                rule leaves the phase unknown.
+            polymorph:
+              tag: unknown
+              reason: The paper does not name a CaO polymorph.
+          component_basis: CaO
+      inferred: false
+      basis: Page 622 identifies the reference as the pure component and does not give the temperature at which that pure
+        component was measured or tabulated. The stable-phase-at-T rule does not select crystalline CaO.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3_CaO_a
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig3_SiO2_b
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 613
+    figure: '3'
+    panel: b
+  phase: wollastonite
+  units: dimensionless activity
+  values:
+    quantity: activity
+    method_class: figure_only
+    species:
+    - SiO2
+    phase: wollastonite
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K
+      y: a_SiO2
+    caption_as_printed: Activities of (a) calcium and (b) silicon oxides in wollastonite determined by the EMF method and
+      heterogeneous reactions in slags, and by Knudsen effusion mass spectrometry; series (23) is this study. The vertical
+      dotted line (24) indicates the melting point of wollastonite.
+    panel: b
+    series:
+    - name: 23 (this study)
+      marker: filled red circles
+      marker_count: 14
+      evidence_class: measured_reduced
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: This figure_record has no points. The prose approximate activity is not scored here; the 2024 extract already holds
+      it. The wave-2 600 dpi series-23 marker reads are sibling context and are not scored.
+    standard_state:
+      state:
+        tag: value
+        value:
+          convention: raoultian_pure_endmember
+          endmember:
+            formula: SiO2
+            phase:
+              tag: unknown
+              reason: The reported interval includes solid cristobalite below its melting point and liquid above it.
+            polymorph:
+              tag: unknown
+              reason: The 1751–2087 K interval crosses cristobalite melting near 1999 K, so no single polymorph applies across
+                it.
+          component_basis: SiO2
+      inferred: true
+      basis: JANAF O-037's 1696 K high-quartz transition is not the stable pure-SiO2 reference at 1751 K. Cristobalite is
+        stable at 1751 K and melts near 1999 K; the reported 1751–2087 K interval crosses that melting point, so no single
+        reference phase can be selected.
+      transition_notice: The reported 1751–2087 K interval crosses cristobalite melting near 1999 K.
+      locator:
+        table_id: O-037
+        url: https://janaf.nist.gov/tables/O-037.html
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3_SiO2_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1751.53'
+  - '1751.53'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (852.71,
+      941.42). Read T = 1751.53 K, a(CaO) = 0.01414. Extrapolated: marker centre is left of the labelled 1800 tick. This temperature
+      is within 100 K of the printed melting point 1818±7 K. The reference phase is still not inferred.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_01
+  phase: crystalline wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1.5'
+  units: dimensionless activity
+  values:
+    activity: '0.01414'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: true
+    method_class: figure_only
+    page_pixel_x: '852.71'
+    page_pixel_y: '941.42'
+    quantity: activity
+    temperature_K: '1751.53'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_01
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1783.21'
+  - '1783.21'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (987.47,
+      896.09). Read T = 1783.21 K, a(CaO) = 0.01514. Extrapolated: marker centre is left of the labelled 1800 tick. This temperature
+      is within 100 K of the printed melting point 1818±7 K. The reference phase is still not inferred.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_02
+  phase: crystalline wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1.5'
+  units: dimensionless activity
+  values:
+    activity: '0.01514'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: true
+    method_class: figure_only
+    page_pixel_x: '987.47'
+    page_pixel_y: '896.09'
+    quantity: activity
+    temperature_K: '1783.21'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_02
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1800.18'
+  - '1800.18'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (1059.65,
+      870.10). Read T = 1800.18 K, a(CaO) = 0.01574. This temperature is within 100 K of the printed melting point 1818±7
+      K. The reference phase is still not inferred.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_03
+  phase: crystalline wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01574'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '1059.65'
+    page_pixel_y: '870.10'
+    quantity: activity
+    temperature_K: '1800.18'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_03
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1815.22'
+  - '1815.22'
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6. Fig. 3 panel (a), series 23, marker centre (1123.64, 849.54). Read T = 1815.22 K and a(CaO)
+      = 0.01623 ± 0.00015. Deferred: T is inside the printed melting point 1818±7 K, so the reference phase stays unknown.
+      Admission pending.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_04_deferred
+  type: figure_read_deferred
+  uncertainty: ± 0.00015 in activity and ± 1.0 K, read uncertainty. Inside the melting band.
+  units: dimensionless activity
+  values:
+    activity: '0.01623'
+    page_pixel_x: '1123.64'
+    page_pixel_y: '849.54'
+    quantity: activity read, not admitted
+    reason: inside printed Tm 1818±7 K
+    reference_phase: unknown
+    temperature_K: '1815.22'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_04_deferred
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1833.11'
+  - '1833.11'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (1199.77,
+      837.39). Read T = 1833.11 K, a(CaO) = 0.01653. This temperature is within 100 K of the printed melting point 1818±7
+      K. The reference phase is still not inferred.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_05
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01653'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '1199.77'
+    page_pixel_y: '837.39'
+    quantity: activity
+    temperature_K: '1833.11'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_05
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1859.1'
+  - '1859.1'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (1310.29,
+      828.92). Read T = 1859.10 K, a(CaO) = 0.01674. This temperature is within 100 K of the printed melting point 1818±7
+      K. The reference phase is still not inferred.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_06
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01674'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '1310.29'
+    page_pixel_y: '828.92'
+    quantity: activity
+    temperature_K: '1859.1'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_06
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1885.12'
+  - '1885.12'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (1420.98,
+      813.98). Read T = 1885.12 K, a(CaO) = 0.01712. This temperature is within 100 K of the printed melting point 1818±7
+      K. The reference phase is still not inferred.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_07
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01712'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '1420.98'
+    page_pixel_y: '813.98'
+    quantity: activity
+    temperature_K: '1885.12'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_07
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1910.1'
+  - '1910.1'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (1527.26,
+      809.20). Read T = 1910.10 K, a(CaO) = 0.01724. This temperature is within 100 K of the printed melting point 1818±7
+      K. The reference phase is still not inferred.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_08
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01724'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '1527.26'
+    page_pixel_y: '809.20'
+    quantity: activity
+    temperature_K: '1910.1'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_08
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1933.03'
+  - '1933.03'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (1624.79,
+      797.68). Read T = 1933.03 K, a(CaO) = 0.01754.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_09
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01754'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '1624.79'
+    page_pixel_y: '797.68'
+    quantity: activity
+    temperature_K: '1933.03'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_09
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1970.05'
+  - '1970.05'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (1782.31,
+      776.41). Read T = 1970.05 K, a(CaO) = 0.01811.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_10
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01811'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '1782.31'
+    page_pixel_y: '776.41'
+    quantity: activity
+    temperature_K: '1970.05'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_10
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1988.1'
+  - '1988.1'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (1859.06,
+      768.81). Read T = 1988.10 K, a(CaO) = 0.01832.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_11
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01832'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '1859.06'
+    page_pixel_y: '768.81'
+    quantity: activity
+    temperature_K: '1988.1'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_11
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '2024.99'
+  - '2024.99'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (2016.02,
+      757.48). Read T = 2024.99 K, a(CaO) = 0.01864.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_12
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01864'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '2016.02'
+    page_pixel_y: '757.48'
+    quantity: activity
+    temperature_K: '2024.99'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_12
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '2066.01'
+  - '2066.01'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (2190.50,
+      742.91). Read T = 2066.01 K, a(CaO) = 0.01905.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_13
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01905'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '2190.50'
+    page_pixel_y: '742.91'
+    quantity: activity
+    temperature_K: '2066.01'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_13
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '2086.59'
+  - '2086.59'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (a), series 23, filled red circle. Labelled
+      y-tick lines: 0.025 at y=561.5, 0.020 at y=710.5, 0.015 at y=901.5, 0.010 at y=1173.5, 0.005 at y=1633.5. log10(a) =
+      -1.23590839 - 0.00065183*y, 1534.15 px per decade. Residuals in log10 are -0.00015, +0.00006, -0.00038, +0.00083, -0.00036.
+      Labelled x-tick lines: 1800 at x=1059.5, 1900 at x=1483.5, 2000 at x=1909.5, 2100 at x=2335.5. T = 1551.081864 + 0.23507256*x,
+      425.40 px per 100 K. Residuals +0.14, -0.19, -0.05, +0.09 K. Read uncertainty is ±0.00015 in activity and ±1.0 K, widened
+      to ±1.5 K when the marker is left of the 1800 tick. The in-plot 23 glyph was not taken as a marker. Marker centre (2278.07,
+      735.90). Read T = 2086.59 K, a(CaO) = 0.01925.'
+    page: 6
+    panel: a
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3a_cao_14
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.00015'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.01925'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '2278.07'
+    page_pixel_y: '735.90'
+    quantity: activity
+    temperature_K: '2086.59'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3a_cao_14
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- T_range_K:
+  - '1750.52'
+  - '1750.52'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (2675.67, 1233.01). Read T = 1750.52 K, a(SiO2) = 0.19361. Extrapolated: marker centre is
+      left of the labelled 1800 tick. This temperature is within 100 K of the printed melting point 1818±7 K. The reference
+      phase is still not inferred.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_01
+  phase: crystalline wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1.5'
+  units: dimensionless activity
+  values:
+    activity: '0.19361'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: true
+    method_class: figure_only
+    page_pixel_x: '2675.67'
+    page_pixel_y: '1233.01'
+    quantity: activity
+    temperature_K: '1750.52'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_01
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1782.52'
+  - '1782.52'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (2782.14, 1217.64). Read T = 1782.52 K, a(SiO2) = 0.19872. Extrapolated: marker centre is
+      left of the labelled 1800 tick. This temperature is within 100 K of the printed melting point 1818±7 K. The reference
+      phase is still not inferred.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_02
+  phase: crystalline wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1.5'
+  units: dimensionless activity
+  values:
+    activity: '0.19872'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: true
+    method_class: figure_only
+    page_pixel_x: '2782.14'
+    page_pixel_y: '1217.64'
+    quantity: activity
+    temperature_K: '1782.52'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_02
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1799.53'
+  - '1799.53'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (2838.75, 1211.96). Read T = 1799.53 K, a(SiO2) = 0.20061. This temperature is within 100
+      K of the printed melting point 1818±7 K. The reference phase is still not inferred.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_03
+  phase: crystalline wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.20061'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '2838.75'
+    page_pixel_y: '1211.96'
+    quantity: activity
+    temperature_K: '1799.53'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_03
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1814.59'
+  - '1814.59'
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6. Fig. 3 panel (b), series 23, marker centre (2888.84, 1202.81). Read T = 1814.59 K and a(SiO2)
+      = 0.20366 ± 0.001. Deferred: T is inside the printed melting point 1818±7 K, so the reference phase stays unknown. Admission
+      pending.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_04_deferred
+  type: figure_read_deferred
+  uncertainty: ± 0.001 in activity and ± 1.0 K, read uncertainty. Inside the melting band.
+  units: dimensionless activity
+  values:
+    activity: '0.20366'
+    page_pixel_x: '2888.84'
+    page_pixel_y: '1202.81'
+    quantity: activity read, not admitted
+    reason: inside printed Tm 1818±7 K
+    reference_phase: unknown
+    temperature_K: '1814.59'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_04_deferred
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1832.6'
+  - '1832.6'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (2948.79, 1199.82). Read T = 1832.60 K, a(SiO2) = 0.20465. This temperature is within 100
+      K of the printed melting point 1818±7 K. The reference phase is still not inferred.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_05
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.20465'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '2948.79'
+    page_pixel_y: '1199.82'
+    quantity: activity
+    temperature_K: '1832.6'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_05
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1858.72'
+  - '1858.72'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3035.69, 1196.77). Read T = 1858.72 K, a(SiO2) = 0.20567. This temperature is within 100
+      K of the printed melting point 1818±7 K. The reference phase is still not inferred.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_06
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.20567'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3035.69'
+    page_pixel_y: '1196.77'
+    quantity: activity
+    temperature_K: '1858.72'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_06
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1884.8'
+  - '1884.8'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3122.46, 1196.70). Read T = 1884.80 K, a(SiO2) = 0.20569. This temperature is within 100
+      K of the printed melting point 1818±7 K. The reference phase is still not inferred.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_07
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.20569'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3122.46'
+    page_pixel_y: '1196.70'
+    quantity: activity
+    temperature_K: '1884.8'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_07
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1909.98'
+  - '1909.98'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3206.27, 1194.23). Read T = 1909.98 K, a(SiO2) = 0.20651. This temperature is within 100
+      K of the printed melting point 1818±7 K. The reference phase is still not inferred.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_08
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.20651'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3206.27'
+    page_pixel_y: '1194.23'
+    quantity: activity
+    temperature_K: '1909.98'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_08
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1932.99'
+  - '1932.99'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3282.82, 1194.10). Read T = 1932.99 K, a(SiO2) = 0.20655.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_09
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.20655'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3282.82'
+    page_pixel_y: '1194.10'
+    quantity: activity
+    temperature_K: '1932.99'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_09
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1970.28'
+  - '1970.28'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3406.92, 1194.05). Read T = 1970.28 K, a(SiO2) = 0.20657.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_10
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.20657'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3406.92'
+    page_pixel_y: '1194.05'
+    quantity: activity
+    temperature_K: '1970.28'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_10
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '1988.43'
+  - '1988.43'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3467.30, 1196.38). Read T = 1988.43 K, a(SiO2) = 0.20580.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_11
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.2058'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3467.30'
+    page_pixel_y: '1196.38'
+    quantity: activity
+    temperature_K: '1988.43'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_11
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '2025.64'
+  - '2025.64'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3591.12, 1187.95). Read T = 2025.64 K, a(SiO2) = 0.20860.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_12
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.2086'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3591.12'
+    page_pixel_y: '1187.95'
+    quantity: activity
+    temperature_K: '2025.64'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_12
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '2066.67'
+  - '2066.67'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3727.63, 1187.84). Read T = 2066.67 K, a(SiO2) = 0.20864.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_13
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.20864'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3727.63'
+    page_pixel_y: '1187.84'
+    quantity: activity
+    temperature_K: '2066.67'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_13
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- T_range_K:
+  - '2087.43'
+  - '2087.43'
+  experiment: shornikov-2026-wollastonite-kems-runset
+  locator:
+    figure: '3'
+    note: '600 dpi PDF page 6, published page 613, 5100 by 6600 px. Fig. 3 panel (b), series 23, filled red circle. Labelled
+      y-tick lines: 0.4 at y=612.5, 0.3 at y=913.5, 0.2 at y=1213.5, 0.1 at y=1514.5. a = 0.60379226 - 0.00033267*y, 300.60
+      px per 0.1. Residuals +0.00003, -0.00010, +0.00010, -0.00003. Labelled x-tick lines: 1800 at x=2840.5, 1900 at x=3173.0,
+      2000 at x=3505.5, 2100 at x=3838.5, 2200 at x=4171.5. T = 946.416395 + 0.30052587*x. Residuals +0.06, -0.02, -0.09,
+      -0.02, +0.06 K. Read uncertainty is ±0.0010 in activity and ±1.0 K, widened to ±1.5 K when the marker is left of the
+      1800 tick. The in-plot 23 glyph was not taken as a marker. The vertical dotted line near x=2896 is the melting mark,
+      not a tick. Marker centre (3796.72, 1181.89). Read T = 2087.43 K, a(SiO2) = 0.21062.'
+    page: 6
+    panel: b
+    pdf_page_index: 5
+    published_page: 613
+    series: '23'
+  observation_id: shornikov_2026_fig3b_sio2_14
+  phase: liquid wollastonite
+  standard_state: 'Published page 622, after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of
+    the gas phase over wollastonite and simple oxide (pure component), respectively. The paper does not state whether that
+    pure component is crystalline or liquid, and it does not state that p° was measured in this cell at the experiment temperature.
+    The reference phase is not inferred.'
+  type: figure_marker_read
+  uncertainty:
+    activity: '0.001'
+    confidence_level: not_stated
+    note: Read uncertainty from the labelled-tick fit. The paper prints no error bar on this marker.
+    temperature_K: '1'
+  units: dimensionless activity
+  values:
+    activity: '0.21062'
+    admission_status: preserved_unscored
+    composition_as_printed: stoichiometric CaSiO3 wollastonite
+    extrapolation: false
+    method_class: figure_only
+    page_pixel_x: '3796.72'
+    page_pixel_y: '1181.89'
+    quantity: activity
+    temperature_K: '2087.43'
+    reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free, and these
+      markers are not a second copy of the prose activities, which this extract does not score.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig3b_sio2_14
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- observation_id: shornikov_2026_fig4_CaSiO3_whole_figure
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 613
+    figure: '4'
+    panel: whole figure
+  phase: wollastonite
+  units: J/(mol K)
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - CaSiO3
+    phase: wollastonite
+    temperature_as_printed: T, K axis approximately 900–2100 K
+    axes_as_printed:
+      x: T, K
+      y: ΔGm(CaSiO3), J/(mol K)
+    caption_as_printed: 'Energy of mixing in wollastonite determined by the EMF method: (1) (Benz and Wagner, 1961), (2) (Sawamura,
+      1962), (3) (Rog and Kozlowska-Rog, 1983), (4) (Mukhopadhyay and Jacob, 1995), and (5) (Rog et al., 1998); in studies
+      of heterogeneous reactions in slags: (6) (Sharma and Richardson, 1962), (7) (Rein and Chipman, 1965), (8) (Kume et al.,
+      2000), and (9) (Jakobsson and Tangstad, 2015); by Knudsen effusion mass spectrometry: (10) (Zaitsev et al., 1992), (11)
+      (Zaitsev and Mogutnov, 1997), (12) (Shornikov and Archakov, 2000), and (13) (this study); and by calculations: (14)
+      (Barin, 1995) and (15) (Bale et al., 2016). The vertical dotted line (16) indicates the melting point of wollastonite.'
+    panel: whole figure
+    series:
+    - name: 13 (this study)
+      marker: filled red circles
+      marker_count: 14
+      evidence_class: model_derived
+    attribution: Literature and calculated sources are named by series in the caption; series 13 is this study.
+    digitisation: deferred to a figure pass
+    note: The present-study values are equation-derived from activity data; figure values are deferred and not digitized.
+    quantity_as_printed: energy of mixing ΔGm(CaSiO3)
+    quantity_token: unavailable
+    candidate_tokens:
+    - interaction_parameter
+    - partial_molar_enthalpy
+    schema_gap: No token represents the integral mixing Gibbs energy plotted here.
+  T_range_K:
+  - 900
+  - 2100
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig4_CaSiO3_whole_figure
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig5_Ca2SiO4_whole_figure
+  type: figure_record
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 615
+    figure: '5'
+    panel: whole figure
+  phase: condensate from larnite evaporation
+  units: dimensionless atomic ratios
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - Ca
+    - Si
+    - O
+    phase: condensate from larnite evaporation
+    temperature_as_printed: No temperature axis; source is Gerasimov et al. (2012).
+    axes_as_printed:
+      x: Depth of condensate layer, Å
+      y: Atomic ratio
+    caption_as_printed: 'Atomic ratios in a condensate obtained during larnite (Ca2SiO4) evaporation according to layer-by-layer
+      X-ray photoelectron spectroscopic analysis (Gerasimov et al., 2012): (1) (Ca/Si) and (2) (O/Si).'
+    panel: whole figure
+    series:
+    - name: 1 (Ca/Si)
+      marker: filled blue circles
+      marker_count: 10
+      evidence_class: quoted_attributed
+    - name: 2 (O/Si)
+      marker: open red circles
+      marker_count: 10
+      evidence_class: quoted_attributed
+    attribution: Gerasimov et al., 2012, as cited in the caption.
+    digitisation: deferred to a figure pass
+    note: Quoted figure from Gerasimov et al. (2012), not a present-study measurement; no numeric points digitized.
+    quantity_as_printed: atomic ratios Ca/Si and O/Si in larnite condensate
+    quantity_token: unavailable
+    candidate_tokens:
+    - condensate_composition
+    - residue_component_composition
+    schema_gap: No token represents paired element-to-element ratios in a condensate.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig5_Ca2SiO4_whole_figure
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig6_CaSiO3_d
+  type: figure_record
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: 620
+    figure: '6'
+    panel: d
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - CaSiO3
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_CaSiO3, atm
+    caption_as_printed: Logarithmic dependencies of the partial pressures of (a) Ca, (b) SiO, (c) O, and (d) CaSiO3 vapor
+      species over calcium oxide, tricalcium silicate, calcium orthosilicate, wollastonite, and silicon oxide on reciprocal
+      temperature determined by Knudsen effusion mass spectrometry; series (4) is this study.
+    panel: d
+    series:
+    - name: 4 (this study, wollastonite)
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: The numeric pressure cells are transcribed once from Table 3; this figure is deferred.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig6_CaSiO3_d
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaSiO3
+- observation_id: shornikov_2026_fig6_Ca_a
+  type: figure_record
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: 620
+    figure: '6'
+    panel: a
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - Ca
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_Ca, atm
+    caption_as_printed: Logarithmic dependencies of the partial pressures of (a) Ca, (b) SiO, (c) O, and (d) CaSiO3 vapor
+      species over calcium oxide, tricalcium silicate, calcium orthosilicate, wollastonite, and silicon oxide on reciprocal
+      temperature determined by Knudsen effusion mass spectrometry; series (4) is this study.
+    panel: a
+    series:
+    - name: 4 (this study, wollastonite)
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: The numeric pressure cells are transcribed once from Table 3; this figure is deferred.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig6_Ca_a
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: Ca
+- observation_id: shornikov_2026_fig6_O_c
+  type: figure_record
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: 620
+    figure: '6'
+    panel: c
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - O
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_O, atm
+    caption_as_printed: Logarithmic dependencies of the partial pressures of (a) Ca, (b) SiO, (c) O, and (d) CaSiO3 vapor
+      species over calcium oxide, tricalcium silicate, calcium orthosilicate, wollastonite, and silicon oxide on reciprocal
+      temperature determined by Knudsen effusion mass spectrometry; series (4) is this study.
+    panel: c
+    series:
+    - name: 4 (this study, wollastonite)
+      marker: source symbols
+      marker_count: 14
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: The numeric pressure cells are transcribed once from Table 3; this figure is deferred.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig6_O_c
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: O
+- observation_id: shornikov_2026_fig6_SiO_b
+  type: figure_record
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: 620
+    figure: '6'
+    panel: b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - SiO
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_SiO, atm
+    caption_as_printed: Logarithmic dependencies of the partial pressures of (a) Ca, (b) SiO, (c) O, and (d) CaSiO3 vapor
+      species over calcium oxide, tricalcium silicate, calcium orthosilicate, wollastonite, and silicon oxide on reciprocal
+      temperature determined by Knudsen effusion mass spectrometry; series (4) is this study.
+    panel: b
+    series:
+    - name: 4 (this study, wollastonite)
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: The numeric pressure cells are transcribed once from Table 3; this figure is deferred.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig6_SiO_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO
+- observation_id: shornikov_2026_fig7_CaSiO3_a
+  type: figure_record
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 621
+    figure: '7'
+    panel: a
+  phase: gas
+  units: log10(atm) as plotted
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - CaSiO3
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: 10^4/T, K−1
+      y: log p_CaSiO3, atm
+    caption_as_printed: 'Logarithmic dependencies of (a) the partial pressures and (b) constants of dissociation to simple
+      gaseous oxides of complex gaseous oxides: (1–5) CaSiO3, (6) and (7) CaTiO3, and (8) and (9) BaSiO3, determined by Knudsen
+      effusion mass spectrometry. Series (3) is this study.'
+    panel: a
+    series:
+    - name: 3 (this study)
+      marker: filled red circles
+      marker_count: 14
+      evidence_class: measured_reduced
+    attribution: This study; series (3), as printed in the caption.
+    digitisation: deferred to a figure pass
+    note: The pressure series is tabulated in Table 3; no figure values are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig7_CaSiO3_a
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaSiO3
+- observation_id: shornikov_2026_fig7_CaSiO3_b
+  type: figure_record
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 621
+    figure: '7'
+    panel: b
+  phase: gas-phase dissociation reaction
+  units: dimensionless logarithmic dissociation constant
+  values:
+    quantity: log10_K_star
+    method_class: figure_only
+    species:
+    - CaSiO3
+    phase: gas-phase dissociation reaction
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: 10^4/T, K−1
+      y: log Kd
+    caption_as_printed: 'Logarithmic dependencies of (a) the partial pressures and (b) constants of dissociation to simple
+      gaseous oxides of complex gaseous oxides: (1–5) CaSiO3, (6) and (7) CaTiO3, and (8) and (9) BaSiO3, determined by Knudsen
+      effusion mass spectrometry. Series (3) is this study.'
+    panel: b
+    series:
+    - name: 3 (this study)
+      marker: filled red circles
+      marker_count: 14
+      evidence_class: measured_reduced
+    attribution: This study; series (3), as printed in the caption.
+    digitisation: deferred to a figure pass
+    note: The dissociation-constant series has no numeric store points in this extract; figure is deferred.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig7_CaSiO3_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaSiO3
+- observation_id: shornikov_2026_fig8_Ca3Si2O7_whole_figure
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '8'
+    panel: whole figure
+  phase: rankinite
+  units: J/(mol K)
+  values:
+    quantity: unavailable
+    method_class: figure_only
+    species:
+    - Ca3Si2O7
+    phase: rankinite
+    temperature_as_printed: T, K axis approximately 900–2200 K
+    axes_as_printed:
+      x: T, K
+      y: ΔGm(Ca3Si2O7), J/(mol K)
+    caption_as_printed: Energy of mixing in rankinite Ca3Si2O7 determined by EMF and slag-equilibrium studies, KEMS, and thermochemical
+      calculations. Series (9) and (10) are this study, using Eqs. (31) and (32), respectively.
+    panel: whole figure
+    series:
+    - name: 9 (this study, wollastonite activity input)
+      marker: filled red circle
+      marker_count: 1
+      evidence_class: model_derived
+    - name: 10 (this study, orthosilicate activity input)
+      marker: filled blue diamond
+      marker_count: 1
+      evidence_class: model_derived
+    attribution: This study for series 9 and 10; other sources are named by series in the caption.
+    digitisation: deferred to a figure pass
+    note: Model-derived values from Eqs. (31) and (32); no figure coordinates digitized.
+    quantity_as_printed: energy of mixing ΔGm(Ca3Si2O7)
+    quantity_token: unavailable
+    candidate_tokens:
+    - interaction_parameter
+    - partial_molar_enthalpy
+    schema_gap: No token represents the integral mixing Gibbs energy plotted here.
+  T_range_K:
+  - 900
+  - 2200
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig8_Ca3Si2O7_whole_figure
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig9_CaO_a_and_b
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '9'
+    panel: a and b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - CaO
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_CaO, atm
+    caption_as_printed: 'Logarithmic dependencies of the partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3
+      over wollastonite on reciprocal temperature: (a) determined by Knudsen effusion mass spectrometry and (b) calculated
+      in the present study using Eqs. (24) and (25).'
+    panel: a and b
+    series:
+    - name: a, KEMS series
+      marker: source symbols
+      marker_count: 7
+      evidence_class: measured_reduced
+    - name: b, calculated neutral-redox series
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: Panel a reuses the Table 3 pressure data or Table 4 calculated oxygen values; panel b is calculated. No figure points
+      are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig9_CaO_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_fig9_CaSiO3_a_and_b
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '9'
+    panel: a and b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - CaSiO3
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_CaSiO3, atm
+    caption_as_printed: 'Logarithmic dependencies of the partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3
+      over wollastonite on reciprocal temperature: (a) determined by Knudsen effusion mass spectrometry and (b) calculated
+      in the present study using Eqs. (24) and (25).'
+    panel: a and b
+    series:
+    - name: a, KEMS series
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: b, calculated neutral-redox series
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: Panel a reuses the Table 3 pressure data or Table 4 calculated oxygen values; panel b is calculated. No figure points
+      are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig9_CaSiO3_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaSiO3
+- observation_id: shornikov_2026_fig9_Ca_a_and_b
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '9'
+    panel: a and b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - Ca
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_Ca, atm
+    caption_as_printed: 'Logarithmic dependencies of the partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3
+      over wollastonite on reciprocal temperature: (a) determined by Knudsen effusion mass spectrometry and (b) calculated
+      in the present study using Eqs. (24) and (25).'
+    panel: a and b
+    series:
+    - name: a, KEMS series
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: b, calculated neutral-redox series
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: Panel a reuses the Table 3 pressure data or Table 4 calculated oxygen values; panel b is calculated. No figure points
+      are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig9_Ca_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: Ca
+- observation_id: shornikov_2026_fig9_O2_a_and_b
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '9'
+    panel: a and b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - O2
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_O2, atm
+    caption_as_printed: 'Logarithmic dependencies of the partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3
+      over wollastonite on reciprocal temperature: (a) determined by Knudsen effusion mass spectrometry and (b) calculated
+      in the present study using Eqs. (24) and (25).'
+    panel: a and b
+    series:
+    - name: a, KEMS series
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: b, calculated neutral-redox series
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: Panel a reuses the Table 3 pressure data or Table 4 calculated oxygen values; panel b is calculated. No figure points
+      are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig9_O2_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: O2
+- observation_id: shornikov_2026_fig9_O_a_and_b
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '9'
+    panel: a and b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - O
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_O, atm
+    caption_as_printed: 'Logarithmic dependencies of the partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3
+      over wollastonite on reciprocal temperature: (a) determined by Knudsen effusion mass spectrometry and (b) calculated
+      in the present study using Eqs. (24) and (25).'
+    panel: a and b
+    series:
+    - name: a, KEMS series
+      marker: source symbols
+      marker_count: 14
+      evidence_class: model_derived
+    - name: b, calculated neutral-redox series
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: Panel a reuses the Table 3 pressure data or Table 4 calculated oxygen values; panel b is calculated. No figure points
+      are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig9_O_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: O
+- observation_id: shornikov_2026_fig9_Si2O2_a_and_b
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '9'
+    panel: a and b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - Si2O2
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_Si2O2, atm
+    caption_as_printed: 'Logarithmic dependencies of the partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3
+      over wollastonite on reciprocal temperature: (a) determined by Knudsen effusion mass spectrometry and (b) calculated
+      in the present study using Eqs. (24) and (25).'
+    panel: a and b
+    series:
+    - name: a, KEMS series
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: b, calculated neutral-redox series
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: Panel a reuses the Table 3 pressure data or Table 4 calculated oxygen values; panel b is calculated. No figure points
+      are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig9_Si2O2_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: Si2O2
+- observation_id: shornikov_2026_fig9_SiO2_a_and_b
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '9'
+    panel: a and b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - SiO2
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_SiO2, atm
+    caption_as_printed: 'Logarithmic dependencies of the partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3
+      over wollastonite on reciprocal temperature: (a) determined by Knudsen effusion mass spectrometry and (b) calculated
+      in the present study using Eqs. (24) and (25).'
+    panel: a and b
+    series:
+    - name: a, KEMS series
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: b, calculated neutral-redox series
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: Panel a reuses the Table 3 pressure data or Table 4 calculated oxygen values; panel b is calculated. No figure points
+      are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig9_SiO2_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO2
+- observation_id: shornikov_2026_fig9_SiO_a_and_b
+  type: figure_record
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 624
+    figure: '9'
+    panel: a and b
+  phase: gas
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - SiO
+    phase: gas
+    temperature_as_printed: 1751–2087 K experimental interval
+    axes_as_printed:
+      x: T, K (reciprocal-temperature dependency)
+      y: log p_SiO, atm
+    caption_as_printed: 'Logarithmic dependencies of the partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3
+      over wollastonite on reciprocal temperature: (a) determined by Knudsen effusion mass spectrometry and (b) calculated
+      in the present study using Eqs. (24) and (25).'
+    panel: a and b
+    series:
+    - name: a, KEMS series
+      marker: source symbols
+      marker_count: 14
+      evidence_class: measured_reduced
+    - name: b, calculated neutral-redox series
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Attributions are listed in the printed caption and series labels.
+    digitisation: deferred to a figure pass
+    note: Panel a reuses the Table 3 pressure data or Table 4 calculated oxygen values; panel b is calculated. No figure points
+      are digitized.
+  T_range_K:
+  - 1751
+  - 2087
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_fig9_SiO_a_and_b
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO
+- observation_id: shornikov_2026_molybdenum_cell_ion_current_ratios
+  type: ion_intensity_context
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 617
+    section: Thermodynamic properties of a gas phase over wollastonite
+  units: relative ion-current intensities as printed
+  values:
+    quantity_as_printed: 'SiO : Mo : MoO : MoO2 : MoO3 ion-current intensities'
+    candidate_tokens:
+    - ion_intensity_ratio
+    - p_partial
+    method_class: measured_direct
+    ratio_as_printed: '100 : 9.4 × 10−5 : 1.6 × 10−3 : 0.028 : 0.014'
+    reason: ion intensity; calibration not printed
+    schema_gap: Eq. (13) describes the cross-section and isotope correction for pressures, but the paper does not tabulate
+      those corrections for this current ratio.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_molybdenum_cell_ion_current_ratios
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO
+- observation_id: shornikov_2026_overlap_with_2024_chapter
+  type: prior_extract_overlap
+  locator:
+    page: 1
+    published_page: 608
+    pdf_page_index: 0
+    section: Abstract
+    note: Same campaign as shornikov-2024-wollastonite-evaporation. The shared summary constants are already typed in this
+      extract or in that one, and this record does not repeat their numbers.
+  units: as reported
+  values:
+    quantity: overlap record
+    already_extracted_in: shornikov-2024-wollastonite-evaporation
+    shared_record_ids_in_the_2024_extract:
+    - shornikov_2024_crystalline_formation_enthalpy
+    - shornikov_2024_crystalline_formation_entropy
+    - shornikov_2024_liquid_formation_enthalpy
+    - shornikov_2024_liquid_formation_entropy
+    - shornikov_2024_table1_current_melting_temperature
+    - shornikov_2024_cao_activity_prose
+    - shornikov_2024_sio2_activity_prose
+    kept_here: The page prints those values in this paper. The prose activities are not scored here; shornikov_2024_cao_activity_prose
+      and shornikov_2024_sio2_activity_prose already hold them. Table 1 mixing rows and the Table 7 this-study melting calculation
+      stay context. This record does not repeat their numbers.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_overlap_with_2024_chapter
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_page9_ion_intensity_ratios
+  type: ion_intensity_context
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 616
+    section: Thermodynamic properties of a gas phase over wollastonite
+  units: relative ion-current intensities as printed
+  values:
+    quantity_as_printed: ion-current intensity ratios for molecular and fragment ions
+    candidate_tokens:
+    - ion_intensity_ratio
+    - p_partial
+    method_class: measured_direct
+    ratios_as_printed:
+    - ions: 'Si : SiO'
+      ratio: '11 : 100'
+      attribution_note: Corresponds to SiO2 fragmentation; Shornikov et al. (1998) cited for comparison.
+    - ions: 'CaSi : CaSiO : CaSiO2 : CaSiO3'
+      ratio: '4 : 14 : 34 : 100'
+      notice: Approximately 50% of gaseous CaSiO3+ was fragmented.
+    - temperature_K: '2087'
+      ions: 'SiO : Si2O2 : CaSiO3 : SiO2 : Ca : O : O2 : CaO'
+      relative_intensities: '100 : 0.51 : 0.12 : 0.145 : 0.024 : 3.2 × 10−3 : 2.9 × 10−4 : 3.7 × 10−5'
+    reason: ion intensity; calibration not printed
+    schema_gap: These relative currents are not pressure values; the source gives no conversion for these ratios.
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_page9_ion_intensity_ratios
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: SiO
+- observation_id: shornikov_2026_rankinite_mixing_thermodynamics_model
+  type: model_derived_thermodynamics
+  locator:
+    page: 16
+    pdf_page_index: 15
+    published_page: 623
+    section: Thermodynamic properties of rankinite
+    note: The printed result follows Eqs. (31) and (32).
+  units: kJ/mol Ca3Si2O7 and J/(mol K)
+  values:
+    quantity_as_printed: rankinite mixing enthalpy and entropy
+    candidate_tokens:
+    - H_minus_H298
+    - partial_molar_enthalpy
+    - delta_fH
+    - S
+    - interaction_parameter
+    method_class: model_derived
+    formula: Ca3Si2O7
+    reaction_as_printed: Ca3Si2O7 (3CaO·2SiO2) formation from oxide components; energy of mixing estimated by Eqs. (31) and
+      (32).
+    T_K: 1600–1737
+    delta_Hm_kJ_mol: −42.63 ± 0.63
+    delta_Sm_J_mol_K: 2.39 ± 0.35
+    attribution: This study
+    schema_gap: 'Missing quantity: enthalpy and entropy of mixing. Published page 623 estimates the enthalpy and entropy of
+      mixing in rankinite at 1600-1737 K from Eqs. (31) and (32). Not delta_fH and not S. The printed entropy unit is J/(mol
+      K). This row is not a scored entropy, so that printed unit is kept. The orthosilicate activities used in Eq. (32) are
+      not printed here, so no parent is linked.'
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_rankinite_mixing_thermodynamics_model
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_table1_mixing_thermodynamics_schema_gap
+  type: table_disposition
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 611
+    table: '1'
+    note: Continued on physical page 5.
+  units: kJ/mol and J/(mol K), as printed
+  values:
+    quantity_as_printed: enthalpy and entropy of mixing in wollastonite
+    candidate_tokens:
+    - H_minus_H298
+    - partial_molar_enthalpy
+    - delta_fH
+    - S
+    - interaction_parameter
+    row_count: 48
+    this_study_rows_as_printed:
+    - row: '47'
+      T_K: 1751–1818
+      phase_as_printed: crystalline wollastonite
+      delta_Hm_kJ_mol: −38.92 ± 0.52
+      delta_Sm_J_mol_K: 2.33 ± 0.29
+      evidence_class: model_derived
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 612
+        table: '1'
+        row: '47'
+    - row: '48'
+      T_K: 1818–2087
+      phase_as_printed: liquid wollastonite
+      delta_Hm_kJ_mol: −11.29 ± 0.24
+      delta_Sm_J_mol_K: 17.53 ± 0.12
+      evidence_class: model_derived
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 612
+        table: '1'
+        row: '48'
+    schema_gap: No token represents integral mixing enthalpy ΔHm or mixing entropy ΔSm; delta_fH and S would misstate their
+      thermodynamic meanings.
+    table_disposition: context_no_token
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_table1_mixing_thermodynamics_schema_gap
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_table2_literature_experiment_survey
+  type: table_disposition
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 614
+    table: '2'
+  units: compositions and experimental conditions as printed
+  values:
+    quantity_as_printed: conditions and main results of earlier wollastonite evaporation studies
+    candidate_tokens:
+    - p_partial
+    - activity
+    - equilibrium_phase_composition
+    row_count: 10
+    schema_gap: This survey gives apparatus, temperature ranges, vapor-species lists, and result categories; it prints no
+      numerical pressure, activity, or composition results.
+    table_disposition: context_no_numeric_measurements
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_table2_literature_experiment_survey
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO
+- observation_id: shornikov_2026_table7_this_study_melting_calculation
+  type: calculated_melting_properties
+  locator:
+    page: 16
+    pdf_page_index: 15
+    published_page: 623
+    table: '7'
+    row: '12'
+  units: K and kJ/mol CaSiO3
+  values:
+    candidate_tokens:
+    - transition_temperature
+    - heat_of_fusion
+    method_class: model_derived
+    method: Calculated from differences between liquid and crystalline thermodynamic properties using Eqs. (28)–(30).
+    formula: CaSiO3
+    temperature_as_printed: 1818 ± 7 K
+    heat_of_fusion_as_printed: 27.64 ± 0.57 kJ/mol
+    attribution: This study
+    table_disposition: context_model
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_table7_this_study_melting_calculation
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: CaO

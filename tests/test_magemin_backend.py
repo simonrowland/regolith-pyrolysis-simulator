@@ -545,6 +545,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
         waiter.join(timeout=1.0)
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
     diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
@@ -656,6 +657,7 @@ def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
         pool.close(cancel_pending=True, timeout_s=3.0)
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
     pool = engine_pool.EngineWorkerPool(

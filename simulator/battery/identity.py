@@ -744,6 +744,25 @@ class IdentityEqualOutcome:
         return self.kind is IdentityEqualKind.EQUAL
 
 
+def _mixture_composition(identity: Identity) -> bool:
+    """A printed composition of two or more positive components.
+
+    A single-component phase, including a pure oxide, has no mixture axis.
+    A printed zero does not count: it records an absent oxide, not a second
+    component. Liquidus, solidus and glass do not use this test; those
+    subtypes require composition even when the source leaves it unknown.
+    """
+
+    state = identity.composition
+    if (
+        state is None
+        or not state.is_value
+        or not isinstance(state.value, Composition)
+    ):
+        return False
+    return sum(1 for _name, amount in state.value.components if amount > 0) >= 2
+
+
 def _format_enthalpy_increment_subtype(
     reference_temperature_K: Decimal,
     *,
@@ -796,9 +815,12 @@ def _parse_enthalpy_increment_subtype(
 def profile_for(identity: Identity) -> QuantityProfile:
     """Closed compared-axis profile for the declared quantity.
 
-    Applicability is determined by the quantity and its typed inputs, never
-    by whether an axis happens to be filled. Paired activity comparisons
-    combine both identities' profiles below.
+    Applicability is determined by the quantity and its typed inputs.
+    A mixture composition is one of those inputs for transition temperatures
+    outside liquidus, solidus and glass, and for heat of fusion. An empty
+    composition axis is not treated as required merely because some other
+    row filled one. Paired activity comparisons combine both identities'
+    profiles below.
     """
 
     q = quantity_token(identity)
@@ -902,6 +924,12 @@ def profile_for(identity: Identity) -> QuantityProfile:
         )
     elif q in FUSION_QUANTITIES:
         req("temperature_K", "subtype")
+        # Entropy of fusion stays composition-free. The mixture axis below
+        # is heat of fusion only; no entropy row asks for it.
+        if q is Quantity.ENTHALPY_OF_FUSION and _mixture_composition(identity):
+            req("composition")
+        else:
+            na("composition")
         na(
             "per",
             "standard_pressure_Pa",
@@ -909,7 +937,6 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "formation_elements",
             "reference_state",
             "reservoir",
-            "composition",
             "fO2_Pa",
             "total_pressure_Pa",
             "sweep_gas",
@@ -1090,7 +1117,14 @@ def profile_for(identity: Identity) -> QuantityProfile:
         subtype = ""
         if identity.subtype is not None and identity.subtype.is_value and identity.subtype.value is not None:
             subtype = str(identity.subtype.value)
-        if subtype in {"solidus", "liquidus", "glass"}:
+        # Liquidus, solidus and glass always compare on composition.
+        composition = identity.composition
+        # Every other subtype keeps a printed mixture. An explicit unknown
+        # composition remains a compared axis; absent composition and pure
+        # single-component transitions stay not_applicable.
+        if subtype in {"solidus", "liquidus", "glass"} or _mixture_composition(
+            identity
+        ) or (composition is not None and composition.is_unknown):
             req("composition")
         else:
             na("composition")
@@ -1933,9 +1967,10 @@ def _identity_equal(
     *,
     allow_unknown_species_phase: bool = False,
     allow_unknown_species_polymorph: bool = False,
+    ignore_fO2: bool = False,
     knudsen_residue_extent: bool = False,
 ) -> IdentityEqualOutcome:
-    """Compare identities, optionally allowing an unknown phase or polymorph."""
+    """Compare identities with the narrow caller-selected axis allowances."""
 
     left_q_state = _quantity_state(left)
     right_q_state = _quantity_state(right)
@@ -1995,6 +2030,10 @@ def _identity_equal(
     unknown: list[str] = []
     invalid: list[str] = []
     for name in _AXIS_NAMES:
+        # The caller uses this only for an explicit intrinsic-mode residual,
+        # whose engine received no fO2 input.
+        if ignore_fO2 and name == "fO2_Pa":
+            continue
         required = name in profile.required
         permitted_na = name in profile.permitted_not_applicable
         if not required and not permitted_na:

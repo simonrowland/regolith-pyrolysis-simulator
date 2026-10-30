@@ -1,0 +1,106 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e
+  citation: Shornikov, S. I., Yakovlev, O. I., and Ivanova, M. A. (2017). A thermodynamic study of inversion of MgO and SiO2
+    relative fugacity at CAI evaporation. Lunar and Planetary Science XLVIII, abstract 1134.
+  source_ids:
+  - shornikov-2017-cai-mgo-sio-fugacity
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2017-cai-mgo-sio-fugacity
+      role: pdf
+      path: raw/shornikov-2017-cai-mgo-sio-fugacity/shornikov-2017-cai-mgo-sio-fugacity.pdf
+      sha256:
+        tag: value
+        value: 458713037a89a71afad57c4037b5ad08be780c092709869a62f89bf28b69278b
+    - asset_id: pdftotext:shornikov-2017-cai-mgo-sio-fugacity
+      role: pdftotext
+      path: text/shornikov-2017-cai-mgo-sio-fugacity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2017-cai-mgo-sio-fugacity
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e::shornikov-2017-cai-mgo-sio-fugacity
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e
+  locator:
+    page: 1
+    pdf_page_index: 0
+    paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+    note: Printed a(SiO2) = 0.0032 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read
+      from the text on the 600 dpi page, not from the curve.; abstract=1134
+context:
+- observation_id: shornikov_2017_figures_123_not_digitized
+  type: figure_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    abstract: '1134'
+    figure: 1–3
+    note: Fig. 1 is on PDF page 1. Figs. 2 and 3 are on PDF page 2. Captions say the curves are calculated. Some panels use
+      a log composition or activity axis. The markers are series labels on model curves, not experimental points. No curve
+      point was read.
+  units: not applicable
+  values:
+    method_class: quoted_unattributed
+    reason: Model curves. The only composition-anchored activities the paper prints as numbers are the four text values at
+      50 mol% and 2300 K.
+    figure_1: calculated CaO/Al2O3 and MgO/SiO2 ratios in residual melts at 2300 K
+    figure_2: calculated CAI melt compositions and oxide activities at 2300 K
+    figure_3: calculated a(SiO2) and a(MgO) versus CaO or Al2O3 content at 2300 K and MgO/SiO2 = 2/3
+  context_id: shornikov-2017-cai-mgo-sio-fugacity::context::shornikov_2017_figures_123_not_digitized
+  work_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e
+  source_id: shornikov-2017-cai-mgo-sio-fugacity
+  species: SiO2
+- observation_id: shornikov_2017_no_numeric_fugacity
+  type: fugacity_discussion
+  locator:
+    page: 1
+    pdf_page_index: 0
+    abstract: '1134'
+    section: Title and text
+    note: The title says relative fugacity. The printed numbers are activities.
+  units: not applicable
+  values:
+    method_class: quoted_unattributed
+    numeric_fugacity: none printed
+    reason: The abstract equates activity with volatility in prose and does not print a fugacity value.
+  context_id: shornikov-2017-cai-mgo-sio-fugacity::context::shornikov_2017_no_numeric_fugacity
+  work_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e
+  source_id: shornikov-2017-cai-mgo-sio-fugacity
+  species: SiO2

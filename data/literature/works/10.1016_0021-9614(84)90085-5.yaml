@@ -1,0 +1,475 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/0021-9614(84)90085-5
+  citation: Kambayashi, S. and Kato, E. (1984), “A thermodynamic study of (magnesium oxide + silicon dioxide) by mass spectrometry
+    at 1973 K”, Journal of Chemical Thermodynamics 16, 241–248.
+  source_ids:
+  - kambayashi-kato-1984-mgo-sio2-1973k
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:kambayashi-kato-1984-mgo-sio2-1973k
+      role: pdf
+      path: raw/kambayashi-kato-1984-mgo-sio2-1973k/kambayashi-kato-1984-mgo-sio2-1973k.pdf
+      sha256:
+        tag: value
+        value: dfe8714968a4fc571918218759adc5e8ccfa5a76ff1befe87ccd658a81b3a62f
+    - asset_id: pdftotext:kambayashi-kato-1984-mgo-sio2-1973k
+      role: pdftotext
+      path: text/kambayashi-kato-1984-mgo-sio2-1973k
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kambayashi-kato-1984-mgo-sio2-1973k
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/0021-9614(84)90085-5
+experiments:
+- experiment_id: 10.1016/0021-9614(84)90085-5::experiment::kambayashi_1984_kems_mgo_sio2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: condition temperature_K is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 242
+        pdf_page_index: 1
+        section: Experimental Procedure
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 241
+        pdf_page_index: 0
+        note: High vacuum is stated; no numeric total pressure is printed.
+    sample_preparation:
+      state:
+        tag: unknown
+        reason: condition sample_preparation is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 242
+        pdf_page_index: 1
+        section: Experimental Procedure
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/0021-9614(84)90085-5
+  locator:
+    page: 1
+    published_page: 241
+    pdf_page_index: 0
+    section: Experimental Procedure
+context:
+- observation_id: kambayashi_1984_fig1_time_dependent_ion_currents
+  type: figure_record
+  locator:
+    figure: '1'
+    page: 2
+    published_page: 242
+    pdf_page_index: 1
+  units: figure axes as printed
+  values:
+    quantity: ion_intensity_ratio
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: gas
+    temperature_K_as_printed: '1873'
+    axes_as_printed:
+      x: t/min
+      y: ion current relative intensity
+    caption_as_printed: Time dependence of ion intensities at 1873 K.
+    series_as_printed: Pt+Ir cell with Pt+Ir alloy pieces; Pt+Rh cell with Pt+Rh alloy pieces
+    marker_count_per_series:
+      I(SiO+), Pt+Ir: 5
+      I(Mg+), Pt+Ir: 5
+      I(SiO+), Pt+Rh: 5
+      I(Mg+), Pt+Rh: 5
+    digitisation: deferred to a figure pass
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_fig1_time_dependent_ion_currents
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_fig2_ratio_1873k_cells
+  type: figure_record
+  locator:
+    figure: '2'
+    page: 3
+    published_page: 243
+    pdf_page_index: 2
+  units: figure axes as printed
+  values:
+    quantity: ion_intensity_ratio
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: gas
+    temperature_K_as_printed: '1873'
+    axes_as_printed:
+      x: x
+      y: I(SiO+)/I(Mg+)
+    caption_as_printed: Values of I(SiO+)/I(Mg+) as a function of x at 1873 K.
+    series_as_printed: Pt cell; Pt+Ir cell; Pt+Rh cell
+    marker_count_per_series:
+      Pt cell: 3
+      Pt+Ir cell: 3
+      Pt+Rh cell: 2
+    digitisation: deferred to a figure pass
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_fig2_ratio_1873k_cells
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_fig3_ratio_1973k_composition
+  type: figure_record
+  locator:
+    figure: '3'
+    page: 4
+    published_page: 244
+    pdf_page_index: 3
+  units: figure axes as printed
+  values:
+    quantity: ion_intensity_ratio
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: gas
+    temperature_K_as_printed: '1973'
+    axes_as_printed:
+      x: x
+      y: I(SiO+)/I(Mg+)
+    caption_as_printed: Values of I(SiO+)/I(Mg+) as a function of x at 1973 K.
+    series_as_printed: 0.2 mm orifice; Pt+Rh cell; other Pt+Ir-cell readings
+    marker_count_per_series:
+      0.2 mm orifice: 1
+      Pt+Rh cell: 1
+      other Pt+Ir-cell readings: 13
+    digitisation: deferred to a figure pass
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_fig3_ratio_1973k_composition
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_fig4_activity_integration
+  type: figure_record
+  locator:
+    figure: '4'
+    page: 5
+    published_page: 245
+    pdf_page_index: 4
+  units: figure axes as printed
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: liquid
+    temperature_K_as_printed: '1973'
+    axes_as_printed:
+      x: −log10{I(Mg+)/I(SiO+)}
+      y: x; activity integration
+    caption_as_printed: The activity integration plot for {(1−x)MgO+xSiO2} at 1973 K.
+    series_as_printed: 0.2 mm orifice; Pt+Rh cell; other Pt+Ir-cell readings
+    marker_count_per_series:
+      activity integration curve: 15
+    digitisation: deferred to a figure pass
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_fig4_activity_integration
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_fig5_calculated_activities
+  type: figure_record
+  locator:
+    figure: '5'
+    page: 5
+    published_page: 245
+    pdf_page_index: 4
+  units: figure axes as printed
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: liquid
+    temperature_K_as_printed: '1973'
+    axes_as_printed:
+      x: x
+      y: a(SiO2); a(MgO)
+    caption_as_printed: Calculated activities for {(1−x)MgO+xSiO2} at 1973 K.
+    series_as_printed: present authors
+    marker_count_per_series:
+      a(SiO2), present authors: 0
+      a(MgO), present authors: 0
+    digitisation: deferred to a figure pass
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_fig5_calculated_activities
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_fig6_proposed_liquidus
+  type: figure_record
+  locator:
+    figure: '6'
+    page: 7
+    published_page: 247
+    pdf_page_index: 6
+  units: figure axes as printed
+  values:
+    quantity: liquidus_composition
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: liquid and coexisting solids
+    temperature_K_as_printed: '1973'
+    axes_as_printed:
+      x: x
+      y: T/K
+    caption_as_printed: Proposed liquidus lines in {(1−x)MgO+xSiO2}.
+    series_as_printed: Authors’ work boundary markers; liquidus lines from this work and prior phase diagram
+    marker_count_per_series:
+      Authors’ work boundary markers: 4
+      liquidus lines: 0
+    digitisation: deferred to a figure pass
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_fig6_proposed_liquidus
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_liquid_phase_interval_1973k
+  type: phase_equilibrium
+  locator:
+    page: 4
+    published_page: 244
+    pdf_page_index: 3
+    section: Results
+  units: x(SiO2) mole fraction
+  values:
+    quantity_as_printed: observed liquid-phase region
+    method_class: measured_direct
+    schema_gap: The liquidus_composition token stores a component mole-fraction vector, but the prose reports only a two-bound
+      interval and does not identify endpoint assemblages.
+    candidate_token: liquidus_composition
+    x_interval_as_printed:
+    - '0.426'
+    - '0.606'
+    temperature_K: 1973
+    note: Table 1 ratios are reported constant over the adjoining two-phase regions.
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_liquid_phase_interval_1973k
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_quoted_janaf_reaction_gibbs_values
+  type: thermochemistry
+  locator:
+    page: 6
+    published_page: 246
+    pdf_page_index: 5
+    section: Discussion
+  units: kJ mol−1 at 1973 K
+  values:
+    quantity: quoted standard molar Gibbs free-energy changes
+    method_class: quoted_attributed
+    schema_gap: No reaction Gibbs-energy token; retain as printed context.
+    attribution: Calculated using JANAF Thermochemical Tables [5,6].
+    reactions:
+    - reaction: (1)
+      value_as_printed: −25
+    - reaction: (5)
+      value_as_printed: −60
+    - reaction: (6)
+      value_as_printed: −33
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_quoted_janaf_reaction_gibbs_values
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_reaction1_gibbs_cross_section_choices
+  type: thermochemistry
+  locator:
+    page: 6
+    published_page: 246
+    pdf_page_index: 5
+    section: Results
+  units: kJ mol−1 at 1973 K
+  values:
+    quantity: standard molar Gibbs free-energy change
+    method_class: model_derived
+    schema_gap: No token for these reaction Gibbs-energy changes. Reactions (5) and (6) are formation from oxides, not delta_fG
+      from elements.
+    reaction_as_printed: SiO2(s,l in mixture) + Mg(g) = MgO(s,l in mixture) + SiO(g)
+    temperature_K: 1973
+    values_as_printed:
+    - value_as_printed: −(9.1 ± 0.5)
+      basis: Otvos and Stevenson relative ionization cross sections
+    - value_as_printed: −(1.1 ± 0.5)
+      basis: Mann relative ionization cross sections
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_reaction1_gibbs_cross_section_choices
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_reaction5_oxide_formation_gibbs
+  type: thermochemistry
+  locator:
+    page: 6
+    published_page: 246
+    pdf_page_index: 5
+    section: Results
+  units: kJ mol−1 at 1973 K
+  values:
+    quantity: standard molar Gibbs free-energy change
+    method_class: model_derived
+    schema_gap: No token for these reaction Gibbs-energy changes. Reactions (5) and (6) are formation from oxides, not delta_fG
+      from elements.
+    reaction_as_printed: SiO2(s,l in mixture) + 2MgO(s,l in mixture) = Mg2SiO4(s)
+    temperature_K: 1973
+    values_as_printed:
+    - value_as_printed: −(55.7 ± 0.5)
+      basis: this work
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_reaction5_oxide_formation_gibbs
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_reaction6_oxide_formation_gibbs
+  type: thermochemistry
+  locator:
+    page: 6
+    published_page: 246
+    pdf_page_index: 5
+    section: Results
+  units: kJ mol−1 at 1973 K
+  values:
+    quantity: standard molar Gibbs free-energy change
+    method_class: model_derived
+    schema_gap: No token for these reaction Gibbs-energy changes. Reactions (5) and (6) are formation from oxides, not delta_fG
+      from elements.
+    reaction_as_printed: SiO2(s,l in mixture) + MgO(s,l in mixture) = MgSiO3(l)
+    temperature_K: 1973
+    values_as_printed:
+    - value_as_printed: −(35.5 ± 0.5)
+      basis: this work
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_reaction6_oxide_formation_gibbs
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2
+- observation_id: kambayashi_1984_table2_activity_current_ratio_schema_gap
+  type: tabulation
+  locator:
+    page: 6
+    published_page: 246
+    pdf_page_index: 5
+    table: '2'
+  units: dimensionless ratio as printed
+  values:
+    quantity_as_printed: a(MgO)I(SiO+)/a(SiO2)I(Mg+)
+    method_class: measured_reduced
+    schema_gap: No quantity token for this activity/current ratio. The printed numbers are retained without mapping them to
+      activity or ion_intensity_ratio.
+    temperature_K: 1973
+    rows:
+    - x_SiO2_as_printed: '0.795'
+      activity_current_ratio_as_printed: '2.93'
+      table_row: '2'
+      side_by_side_block: left
+      phase_assemblage_as_printed: liquid + SiO2(s)
+    - x_SiO2_as_printed: '0.795'
+      activity_current_ratio_as_printed: '2.89'
+      table_row: '3'
+      side_by_side_block: left
+      phase_assemblage_as_printed: liquid + SiO2(s)
+    - x_SiO2_as_printed: '0.631'
+      activity_current_ratio_as_printed: '2.92'
+      table_row: '4'
+      side_by_side_block: left
+      phase_assemblage_as_printed: liquid + SiO2(s)
+    - x_SiO2_as_printed: '0.581'
+      activity_current_ratio_as_printed: '2.82'
+      table_row: '5'
+      side_by_side_block: left
+      phase_assemblage_as_printed: liquid
+    - x_SiO2_as_printed: '0.547'
+      activity_current_ratio_as_printed: '2.98'
+      table_row: '6'
+      side_by_side_block: left
+      phase_assemblage_as_printed: liquid
+    - x_SiO2_as_printed: '0.547'
+      activity_current_ratio_as_printed: '3.00'
+      table_row: '7'
+      side_by_side_block: left
+      phase_assemblage_as_printed: liquid
+    - x_SiO2_as_printed: '0.516'
+      activity_current_ratio_as_printed: '2.82'
+      table_row: '8'
+      side_by_side_block: left
+      phase_assemblage_as_printed: liquid
+    - x_SiO2_as_printed: '0.500'
+      activity_current_ratio_as_printed: null
+      table_row: '9'
+      side_by_side_block: left
+      phase_assemblage_as_printed: liquid
+    - x_SiO2_as_printed: '0.476'
+      activity_current_ratio_as_printed: '3.04'
+      table_row: '2'
+      side_by_side_block: right
+      phase_assemblage_as_printed: liquid
+    - x_SiO2_as_printed: '0.442'
+      activity_current_ratio_as_printed: '2.73'
+      table_row: '3'
+      side_by_side_block: right
+      phase_assemblage_as_printed: liquid
+    - x_SiO2_as_printed: '0.438'
+      activity_current_ratio_as_printed: '3.06'
+      table_row: '4'
+      side_by_side_block: right
+      phase_assemblage_as_printed: liquid
+    - x_SiO2_as_printed: '0.415'
+      activity_current_ratio_as_printed: '2.92'
+      table_row: '5'
+      side_by_side_block: right
+      phase_assemblage_as_printed: liquid + Mg2SiO4(s)
+    - x_SiO2_as_printed: '0.348'
+      activity_current_ratio_as_printed: '2.92'
+      table_row: '6'
+      side_by_side_block: right
+      phase_assemblage_as_printed: liquid + Mg2SiO4(s)
+    - x_SiO2_as_printed: '0.348'
+      activity_current_ratio_as_printed: '2.90'
+      table_row: '7'
+      side_by_side_block: right
+      phase_assemblage_as_printed: liquid + Mg2SiO4(s)
+    - x_SiO2_as_printed: '0.220'
+      activity_current_ratio_as_printed: '2.83'
+      table_row: '8'
+      side_by_side_block: right
+      phase_assemblage_as_printed: MgO(s) + Mg2SiO4(s)
+    - x_SiO2_as_printed: '0.220'
+      activity_current_ratio_as_printed: '2.99'
+      table_row: '9'
+      side_by_side_block: right
+      phase_assemblage_as_printed: MgO(s) + Mg2SiO4(s)
+  context_id: kambayashi-kato-1984-mgo-sio2-1973k::context::kambayashi_1984_table2_activity_current_ratio_schema_gap
+  work_id: 10.1016/0021-9614(84)90085-5
+  source_id: kambayashi-kato-1984-mgo-sio2-1973k
+  species: SiO2

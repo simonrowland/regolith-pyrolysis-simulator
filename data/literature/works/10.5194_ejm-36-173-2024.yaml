@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:ta-flemetakis-2024
       role: pdf
@@ -43,7 +43,7 @@ experiments:
         value:
           kind: point
           point: '0.00004'
-          approximate: false
+          approximate: true
       locator:
         published_page: 174
         pdf_page_index: 2
@@ -76,6 +76,7 @@ experiments:
               section: 2.2 Experimental techniques
               source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -207,6 +208,7 @@ experiments:
               section: 2.1 Starting material
               source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -286,6 +288,7 @@ experiments:
               section: 4.3 Implications for evaporative B loss
               source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown

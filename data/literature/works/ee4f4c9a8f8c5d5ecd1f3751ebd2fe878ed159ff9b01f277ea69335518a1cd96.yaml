@@ -1,0 +1,263 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96
+  citation: 'Zhang, Z., Nie, N. X., Mendybaev, R. A., Liu, M.-C., Hu, J. J., Hopp, T., Alp, E. E., Lavina, B., Bullock, E.
+    S., McKeegan, K. D. & Dauphas, N. (2021), Supporting Information for “Loss and isotopic fractionation of alkali elements
+    during diffusion-limited evaporation from molten silicate: theory and experiments”, ACS Earth and Space Chemistry 5, 755–784.'
+  source_ids:
+  - zhang-2021-acsesc-si
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:zhang-2021-acsesc-si
+      role: pdf
+      path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
+      sha256:
+        tag: value
+        value: c0499ea7d6b5bae37e72b81f5474c9e00a8c159855086fff9847e582dbd95d7b
+    - asset_id: pdftotext:zhang-2021-acsesc-si
+      role: pdftotext
+      path: text/zhang-2021-acsesc-si
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:zhang-2021-acsesc-si
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1018135974216813105666661448'
+          - - CaO
+            - '0.1296990502225264349969819782'
+          - - FeO
+            - '0.09635846436686307280176800377'
+          - - K2O
+            - '0.01715081195378051990893623378'
+          - - MgO
+            - '0.1141337377032675754490912716'
+          - - Na2O
+            - '0.02376295692011644397393066021'
+          - - Rb2O
+            - '0.006455638547163228438046996244'
+          - - SiO2
+            - '0.4960841329630148976092099898'
+          - - TiO2
+            - '0.0145416099015865162553687213'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C0m1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_Rb2O_wt_pct
+          - state:
+              tag: value
+              value: '1.86'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_Rb2O_g_mol
+          - state:
+              tag: value
+              value: '186.9346'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '16'
+          CaO: '11.21'
+          FeO: '10.67'
+          K2O: '2.49'
+          MgO: '7.09'
+          Na2O: '2.27'
+          Rb2O: '1.86'
+          SiO2: '45.94'
+          TiO2: '1.79'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C0m1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96
+  locator:
+    page: 9
+    table: S1
+    note: Printed before/after weights for 12 experimental aliquots.

@@ -1,0 +1,316 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3
+  citation: 'Ehrt, D. (2008). Redox behaviour of Sn4+/Sn2+ in alkali free aluminosilicate glasses and melts. Physics and Chemistry
+    of Glasses: European Journal of Glass Science and Technology Part B, 49(2), 68–72.'
+  source_ids:
+  - ehrt-2008-sn-redox-aluminosilicate
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:ehrt-2008-sn-redox-aluminosilicate
+      role: pdf
+      path: raw/ehrt-2008-sn-redox-aluminosilicate/ehrt-2008-sn-redox-aluminosilicate.pdf
+      sha256:
+        tag: value
+        value: 54012c7eb56b6ecf95ec017969f91ea002a0d17850493f61005c1e4fe67fa2b3
+    - asset_id: pdftotext:ehrt-2008-sn-redox-aluminosilicate
+      role: pdftotext
+      path: text/ehrt-2008-sn-redox-aluminosilicate
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:ehrt-2008-sn-redox-aluminosilicate
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3::ehrt-2008-sn-redox-aluminosilicate
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3
+  locator:
+    page: 2
+    published_page: 69
+    pdf_page_index: 1
+    table: '1'
+context:
+- observation_id: ehrt2008_figures_1_8
+  type: figure
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 69
+    figure: '1'
+  units: figure-only; no numeric points
+  values:
+    quantity: viscosity_uv_absorption_mossbauer_valence_and_luminescence_figures
+    method_class: figure_only
+    figures:
+    - figure: '1'
+      page: 2
+      caption: Viscosity curves of two alkali-free aluminosilicate melts, compared with two sodium silicate melts.
+      panel: main
+      species: glass mixture
+      phase: melt
+      T:
+        state:
+          tag: value
+          value: 400–2000
+          units: °C
+      axes_as_printed:
+        x: temperature (°C)
+        y: viscosity log (dPa s)
+      series:
+      - AS
+      - ABS
+      - DS
+      - NS
+      marker_counts: not_counted
+      attribution: this_work_and_prior_work
+    - figure: '2'
+      page: 3
+      caption: Optical UV-absorption spectra of AS glass samples undoped and doped with Sn.
+      panel: main
+      species: Sn
+      phase: glass
+      T:
+        state:
+          tag: unknown
+          reason: measurement_temperature_not_printed
+      axes_as_printed:
+        x: wavelength (nm)
+        y: absorption
+      series:
+      - undoped
+      - 200 ppmw Sn
+      - 1000 ppmw Sn
+      marker_counts: not_counted
+      attribution: this_work
+    - figure: '3'
+      page: 3
+      caption: Fitted optical absorption spectrum of ABS glass doped with 1000 ppmw Sn.
+      panel: main
+      species: Sn
+      phase: glass
+      T:
+        state:
+          tag: unknown
+          reason: measurement_temperature_not_printed
+      axes_as_printed:
+        x: wavelength (nm)
+        y: absorption
+      series:
+      - measured total
+      - four fitted Sn2+ components
+      marker_counts: not_counted
+      attribution: this_work_model_fit
+    - figure: '4'
+      page: 4
+      caption: 119Sn Mössbauer spectra at 77 K of AS glass doped with 5000 ppmw Sn and equilibrated at 1600°C in air.
+      panel: main
+      species: Sn
+      phase: glass
+      T:
+        state:
+          tag: value
+          value: '1600'
+          units: °C
+      axes_as_printed:
+        x: isomer shift (mm/s)
+        y: transmission
+      series:
+      - Sn4+
+      - Sn2+
+      marker_counts: not_counted
+      attribution: this_work
+    - figure: '5'
+      page: 4
+      caption: 119Sn Mössbauer spectra at 77 K of ABS glass doped with 2000 ppmw Sn; after remelting at 1900°C in argon only
+        Sn2+ was detected.
+      panel: main
+      species: Sn
+      phase: glass
+      T:
+        state:
+          tag: value
+          value: '1900'
+          units: °C
+      axes_as_printed:
+        x: isomer shift (mm/s)
+        y: transmission
+      series:
+      - Sn2+
+      marker_counts: not_counted
+      attribution: this_work
+    - figure: '6'
+      page: 4
+      caption: Normalised optical UV-absorption spectra of AS glass samples doped with 1000 ppmw Sn under different melting
+        conditions.
+      panel: main
+      species: Sn
+      phase: glass
+      T:
+        state:
+          tag: value
+          value: 1600–2000
+          units: °C
+      axes_as_printed:
+        x: wavenumber (cm-1)
+        y: normalised absorption
+      series:
+      - 1600°C air 8h
+      - 1700°C air 6h
+      - 1600°C Ar 2h
+      - 1900°C Ar 1h
+      - 2000°C Ar 0.5h
+      marker_counts: not_counted
+      attribution: this_work
+    - figure: '7'
+      page: 4
+      caption: Relative Sn2+ content of ABS glass samples depending on melting temperature and time.
+      panel: main
+      species: Sn
+      phase: glass
+      T:
+        state:
+          tag: value
+          value: 1650–1800
+          units: °C
+      axes_as_printed:
+        x: time (h)
+        y: relative Sn2+ content (%)
+      series:
+      - 1650°C air
+      - 1800°C Ar
+      - 1700°C Ar
+      marker_counts: not_counted
+      attribution: this_work
+    - figure: '8'
+      page: 5
+      caption: Photoluminescence excitation and emission spectra of ABS glass doped with 2000 ppmw Sn, melted at 1650°C in
+        air and remelted at 1500°C under 100 mbar for 1 h.
+      panel: main
+      species: Sn
+      phase: glass
+      T:
+        state:
+          tag: value
+          value: 1500–1650
+          units: °C
+      axes_as_printed:
+        x: wavenumber (cm-1)
+        y: intensity
+      series:
+      - excitation
+      - emission
+      marker_counts: not_counted
+      attribution: this_work
+    digitisation: deferred to a figure pass
+  context_id: ehrt-2008-sn-redox-aluminosilicate::context::ehrt2008_figures_1_8
+  work_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  species: Sn
+- observation_id: ehrt2008_table1_glass_composition_and_untyped_properties
+  type: measured_table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 69
+    table: '1'
+  units: mol% composition; Tg in °C; α in ppm/K; refractive-index data as printed
+  reason: Whole-glass composition has no applicable composition-vector quantity token. Tg, thermal expansion, optical constants
+    and temperatures at fixed viscosity have no matching observation form here.
+  values:
+    quantity_as_printed: composition_and_properties_of_AS_and_ABS_base_glasses
+    method_class: measured_direct
+    points:
+    - glass: AS
+      composition_mol_percent:
+        Al2O3: '15'
+        SiO2: '65'
+        BaO: '10'
+        CaO: '10'
+      Tg_C_as_printed: 830 ± 10
+      alpha_100_300C_ppm_K_as_printed: 5.9 ± 0.5
+      refractive_index_ne: '1.5560'
+      Abbe_number_ve: '60.0'
+      T_eta_1e4_dPa_s_C: '1350'
+      T_eta_1e2_dPa_s_C: '1700'
+    - glass: ABS
+      composition_mol_percent:
+        Al2O3: '10'
+        B2O3: '8'
+        SiO2: '67'
+        BaO: '2'
+        CaO: '9'
+        MgO: '4'
+      Tg_C_as_printed: 710 ± 10
+      alpha_100_300C_ppm_K_as_printed: 3.8 ± 0.5
+      refractive_index_ne: '1.5237'
+      Abbe_number_ve: '62.0'
+      T_eta_1e4_dPa_s_C: '1250'
+      T_eta_1e2_dPa_s_C: '1600'
+  context_id: ehrt-2008-sn-redox-aluminosilicate::context::ehrt2008_table1_glass_composition_and_untyped_properties
+  work_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  species: Sn
+- observation_id: ehrt2008_table2_uv_absorption_coefficients
+  type: measured_table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 69
+    table: '2'
+  units: maximum wavelength nm; wavenumber cm-1; FWHM cm-1; specific absorption coefficient ppmw-1 cm-1
+  reason: 'Candidate quantity tokens considered: activity_coefficient and ion_intensity. Neither describes specific optical
+    absorption coefficients or Gaussian fit parameters.'
+  values:
+    quantity: specific_uv_absorption_coefficients_for_Sn2+
+    method_class: measured_reduced
+    points:
+    - maximum_wavelength_nm: 194 ± 2
+      wavenumber_cm_1: '51500'
+      FWHM_cm_1: 8200 ± 200
+      epsilon_ppmw_1_cm_1: 0.42 ± 0.05
+    - maximum_wavelength_nm: 214 ± 1
+      wavenumber_cm_1: '46630'
+      FWHM_cm_1: 3000 ± 100
+      epsilon_ppmw_1: 0.12 ± 0.02
+    - maximum_wavelength_nm: 232 ± 2
+      wavenumber_cm_1: '43120'
+      FWHM_cm_1: 5300 ± 200
+      epsilon_ppmw_1: 0.05 ± 0.01
+  context_id: ehrt-2008-sn-redox-aluminosilicate::context::ehrt2008_table2_uv_absorption_coefficients
+  work_id: 55e86618de554c42335209a118d1f6522f57a318b1fdeb1f3bccae9f128516b3
+  source_id: ehrt-2008-sn-redox-aluminosilicate
+  species: Sn

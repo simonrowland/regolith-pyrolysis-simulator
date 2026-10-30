@@ -1,0 +1,181 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780
+  citation: Shornikov, S. I. (2025). Thermodynamic properties of the Li2O–SiO2 melts. Experiment in Geosciences, 31(1), 58–61.
+  source_ids:
+  - shornikov-2025-lithium-silicate-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2025-lithium-silicate-melts
+      role: pdf
+      path: raw/shornikov-2025-lithium-silicate-melts/shornikov-2025-lithium-silicate-melts.pdf
+      sha256:
+        tag: value
+        value: 28996508b48df8e15b1d803f74f9b99945b55e4d1d58a107a94a061c31703185
+    - asset_id: pdftotext:shornikov-2025-lithium-silicate-melts
+      role: pdftotext
+      path: text/shornikov-2025-lithium-silicate-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2025-lithium-silicate-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780::experiment::shornikov_2025_li2o_sio2_model
+  kind: literature
+  method:
+    tag: value
+    value: engine_evaluation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: range_only_not_a_single_temperature
+      locator:
+        page: 3
+        published_page: 59
+        pdf_page_index: 2
+        section: Abstract
+        note: The model covers 1000–2000 K.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780
+  locator:
+    page: 3
+    published_page: 59
+    pdf_page_index: 2
+    section: Abstract
+    note: Semi-empirical model calculations for 1000–2000 K. No Knudsen cell is used in this paper.
+context:
+- observation_id: shornikov_2025_li2o_sio2_fig1_phase_diagram
+  type: phase_diagram
+  locator:
+    page: 3
+    published_page: 59
+    pdf_page_index: 2
+    figure: '1'
+  units: figure-only
+  values:
+    quantity: Li2O–SiO2 phase relations
+    method_class: figure_only
+    attribution: Claus et al. (1996) and Lee et al. (2025), as printed in the body.
+    reason: Region diagram. Boundaries were not digitized. The caption names SiO2 fields as beta-quartz, tridymite and cristobalite.
+      Those names are phase-diagram labels, not the activity reference.
+  context_id: shornikov-2025-lithium-silicate-melts::context::shornikov_2025_li2o_sio2_fig1_phase_diagram
+  work_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780
+  source_id: shornikov-2025-lithium-silicate-melts
+  species: Li2O
+- observation_id: shornikov_2025_li2o_sio2_fig4_series4
+  type: mixing_energy_curve
+  locator:
+    page: 5
+    published_page: 61
+    pdf_page_index: 4
+    figure: '4'
+    note: 'Caption series 4, this study, mixing energy in Li2O–SiO2 at 1673 K. 600 dpi render of PDF page 5: continuous stroke,
+      no marker centre. Series 1, 2 and 3 are Shornikov (2013), Shornikov (2014) and Charles (1967). The same PDF page then
+      starts the Li2O–P4O10 article, which is not part of this extract.'
+  units: kJ/mol as plotted, Delta G^m at 1673 K
+  values:
+    quantity: mixing energy
+    method_class: figure_only
+    admission_status: typed_refusal
+    series: 4
+    temperature_K: 1673
+    reason: Continuous calculated stroke. No numeric minimum is printed.
+  context_id: shornikov-2025-lithium-silicate-melts::context::shornikov_2025_li2o_sio2_fig4_series4
+  work_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780
+  source_id: shornikov-2025-lithium-silicate-melts
+  species: mixing
+- observation_id: shornikov_2025_li2o_sio2_model_scope
+  type: model_scope
+  locator:
+    page: 3
+    published_page: 59
+    pdf_page_index: 2
+    section: body
+  units: as reported
+  values:
+    quantity: model scope
+    method_class: model_derived
+    temperature_range_K:
+    - 1000
+    - 2000
+    model: Semi-empirical model (Shornikov, 2019).
+    model_inputs: Standard Gibbs energies of Li2O and SiO2 in the crystalline and liquid state, and of Li8SiO6, Li4SiO4, Li2SiO3,
+      Li6Si2O7 and Li2Si2O5.
+    gas_species_considered:
+    - Li
+    - Li2
+    - LiO
+    - Li2O
+    - Li2O2
+    - Si
+    - Si2
+    - Si3
+    - Si4
+    - SiO
+    - SiO2
+    - Si2O2
+    - Li2SiO3
+    - O
+    - O2
+    - O3
+    - O4
+    condensed_compounds_as_printed:
+    - formula: Li4SiO4
+      oxide_equivalent: 2Li2O · SiO2
+      congruent_melting_K: 1528
+    - formula: Li2SiO3
+      oxide_equivalent: Li2O · SiO2
+      congruent_melting_K: 1474
+    - formula: Li2Si2O5
+      oxide_equivalent: Li2O · 2SiO2
+      congruent_melting_K: 1307
+    - formula: Li8SiO6
+      oxide_equivalent: 4Li2O · SiO2
+      decomposes_K: 1104
+    - formula: Li6Si2O7
+      oxide_equivalent: 3Li2O · 2SiO2
+      exists_K: 1493–1503
+    - formula: Li2Si3O7
+      oxide_equivalent: Li2O · 3SiO2
+      dissociates_at_or_below_K: 600
+      source: Takahashi and Yoshio, 1970
+    - formula: Li4Si3O8
+      oxide_equivalent: 2Li2O · 3SiO2
+      dissociates_at_or_below_K: 600
+      source: Takahashi and Yoshio, 1970
+    sio2_activity_not_measured: 'Published page 60: the SiO2 activity in lithium-silicate melts has not been experimentally
+      determined.'
+    mixing_sentence_typo: Published page 60 prints "mixing energies in the Li2O–SiO3 melts". The title, the abstract and the
+      Fig. 4 caption print Li2O–SiO2. The typo is left as printed and is not a second system.
+    schultz_reference_not_this_model: Schultz et al. (1986) normalized experimental data to Li2SiO3. That is the cited EMF
+      reference, a compound. This paper's own calculated activities are not given that reference.
+  context_id: shornikov-2025-lithium-silicate-melts::context::shornikov_2025_li2o_sio2_model_scope
+  work_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780
+  source_id: shornikov-2025-lithium-silicate-melts
+  species: Li2O

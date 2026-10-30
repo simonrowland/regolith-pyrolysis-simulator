@@ -3618,6 +3618,14 @@ def test_registered_opaque_gate_suppliers_cannot_share_foreign_curve(
         'binding_revision': 'unproven-r1',
         'transport': 'unknown',
     }
+    assert notice['notices'][0]['governs'] == (
+        'cross-process cache replay and capture, plus '
+        'in-process gate-curve memo reuse'
+    )
+    message = notice['notices'][0]['message'].lower()
+    assert 'in-process gate-curve memo reuse' in message
+    assert 'gate curve is recomputed' in message
+    assert 'live computation and its value are unaffected' in message
 
 
 @pytest.mark.parametrize('memo_scope', ['local', 'shared'])
@@ -6024,17 +6032,27 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
                 'kind': 'engine_binding_not_admitted',
                 'identity': identity.as_dict(),
                 'reason': reason,
+                'governs': (
+                    'cross-process cache replay and capture, plus '
+                    'in-process gate-curve memo reuse'
+                ),
                 'message': (
-                    'binding not admitted on this host '
-                    f'({reason}); replay and capture disabled; '
-                    'run scripts/assess_engine_bindings.py'
+                    'Engine binding not admitted on this host '
+                    f'({reason}); this disables cross-process cache replay '
+                    'and capture, plus in-process gate-curve memo reuse. '
+                    'The gate curve is recomputed; live computation and its '
+                    'value are unaffected. To admit, run '
+                    'scripts/assess_engine_bindings.py'
                 ),
             }
         ]
     }
 
 
-@pytest.mark.parametrize('evidence_case', ['provenance-raises', 'null-digest'])
+@pytest.mark.parametrize(
+    'evidence_case',
+    ['provenance-raises', 'null-digest', 'null-digest-missing-receipt'],
+)
 def test_gate_memo_evidence_unavailable_is_a_miss(
     evidence_case,
     monkeypatch,
@@ -6081,6 +6099,12 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
             admission_module.admission_fingerprint(identity, provenance),
             raising=False,
         )
+    elif evidence_case == 'null-digest-missing-receipt':
+        monkeypatch.setattr(
+            admission_module,
+            'binding_receipt_path',
+            lambda *_args, **_kwargs: tmp_path / 'missing-binding-receipt.json',
+        )
     curve = {
         'source': 'gate_liquid_fraction:authoritative:test',
         'status': 'ok',
@@ -6115,13 +6139,107 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
     assert len(producer_calls) == 1
     assert len(provenance_calls) == 2
     notice = admission_module.binding_admission_run_notice(sim)
-    if evidence_case == 'provenance-raises':
+    if evidence_case != 'null-digest':
         assert notice is not None
         assert [item['reason'] for item in notice['notices']] == [
-            'install provenance unverifiable'
+            (
+                'install provenance unverifiable'
+                if evidence_case == 'provenance-raises'
+                else 'receipt missing'
+            )
         ]
+        assert notice['notices'][0]['governs'] == (
+            'cross-process cache replay and capture, plus '
+            'in-process gate-curve memo reuse'
+        )
+        message = notice['notices'][0]['message'].lower()
+        assert 'in-process gate-curve memo reuse' in message
+        assert 'gate curve is recomputed' in message
+        assert 'live computation and its value are unaffected' in message
+        if evidence_case == 'null-digest-missing-receipt':
+            assert producer_calls
     else:
         assert notice is None
+
+
+@pytest.mark.parametrize(
+    'producer_evidence',
+    [
+        'no-external-install',
+        'unproven',
+        'evidence-unavailable',
+        'a' * 64,
+    ],
+)
+@pytest.mark.parametrize('selected_binding', [False, True])
+def test_gate_memo_notice_scope_matches_reuse_predicate(
+    producer_evidence,
+    selected_binding,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.reduced_real_determinism import _gate_curve_provider_role
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:scope-test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    evidence = admission_module.GateCurveEvidence(producer_evidence, True)
+    provider_role = _gate_curve_provider_role(curve)
+    origin = engine_binding_admission.write_gate_curve_memo_origin(
+        sim,
+        curve,
+        evidence,
+    )
+    reusable = engine_binding_admission.gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        origin,
+        fresh_evidence=False,
+    )
+    identity = admission_module.BindingIdentity(
+        'scope-test',
+        'fixture-producer',
+        'scope-r1',
+        'native',
+    )
+
+    admission_module._record_live_cache_refusal(
+        sim,
+        identity,
+        'receipt missing',
+        scope=(
+            admission_module._BindingAdmissionRefusalScope.SELECTED_BINDING_ONLY
+            if selected_binding
+            else admission_module._BindingAdmissionRefusalScope.GATE_CURVE_MEMO
+        ),
+        producer_evidence=producer_evidence,
+        memo_provider_role=provider_role,
+    )
+
+    notice = admission_module.binding_admission_run_notice(sim)
+    assert notice is not None
+    expected_scope = (
+        'cross-process cache replay and capture only'
+        if reusable and not selected_binding
+        else (
+            'cross-process cache replay and capture for the selected '
+            'binding only'
+            if reusable
+            else 'cross-process cache replay and capture, plus '
+            'in-process gate-curve memo reuse'
+        )
+    )
+    assert notice['notices'][0]['governs'] == expected_scope
 
 
 def test_gate_memo_reuses_live_curve_without_metadata_receipt_digests(

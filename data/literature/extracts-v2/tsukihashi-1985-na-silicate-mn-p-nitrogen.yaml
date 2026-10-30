@@ -1,0 +1,664 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml
+observations:
+- observation_id: tsukihashi-1985-na-silicate-mn-p-nitrogen::tsukihashi_1985_table1_mn_distribution
+  experiment_id: 10.2355/tetsutohagane1955.71.7_823::tsukihashi-1985-na-silicate-mn-p-nitrogen
+  identity:
+    quantity:
+      tag: value
+      value: distribution_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.00734149854894026447277148995'
+        - - Fe2O3
+          - '0.00008579163211247333127602868629'
+        - - Na2O
+          - '0.6830171992938420040569209036'
+        - - V2O5
+          - '0.01393497039813357216113499529'
+        - - SiO2
+          - '0.2166139829783350100511198373'
+        - - P2O5
+          - '0.06297707481437143794093057745'
+        - - MnO
+          - '0.01602948233426523798584616811'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: value
+      value: metal
+  value:
+    kind: point
+    point: '7.62'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - distribution_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsukihashi-1985-na-silicate-mn-p-nitrogen::tsukihashi_1985_table1_mn_distribution
+  source_id: tsukihashi-1985-na-silicate-mn-p-nitrogen
+  locator:
+    page: 2
+    published_page: 824
+    pdf_page_index: 1
+    table: '1'
+    note: row=After equilibration; column=(%Mn)/[%Mn]
+  read_from: pdf:tsukihashi-1985-na-silicate-mn-p-nitrogen
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 2
+        published_page: 824
+        pdf_page_index: 1
+        table: '1'
+        note: row=After equilibration; column=(%Mn)/[%Mn]
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 2
+              published_page: 824
+              pdf_page_index: 1
+              table: '1'
+              note: row=After equilibration; column=(%Mn)/[%Mn]
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 824
+              pdf_page_index: 1
+              table: '1'
+              note: row=After equilibration; column=(%Mn)/[%Mn]
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.00734149854894026447277148995'
+          - - Fe2O3
+            - '0.00008579163211247333127602868629'
+          - - Na2O
+            - '0.6830171992938420040569209036'
+          - - V2O5
+            - '0.01393497039813357216113499529'
+          - - SiO2
+            - '0.2166139829783350100511198373'
+          - - P2O5
+            - '0.06297707481437143794093057745'
+          - - MnO
+            - '0.01602948233426523798584616811'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '1'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0.77'
+            locator:
+              page: 2
+              table: '1'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 2
+              table: '1'
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 2
+              table: '1'
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 2
+              table: '1'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '61.8'
+            locator:
+              page: 2
+              table: '1'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '1'
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '3.7'
+            locator:
+              page: 2
+              table: '1'
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 2
+              table: '1'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '19'
+            locator:
+              page: 2
+              table: '1'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '1'
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '13.05'
+            locator:
+              page: 2
+              table: '1'
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 2
+              table: '1'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '1.66'
+            locator:
+              page: 2
+              table: '1'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 2
+              table: '1'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.02'
+          FeO: '0.77'
+          MnO: '1.66'
+          Na2O: '61.8'
+          P2O5: '13.05'
+          SiO2: '19'
+          V2O5: '3.7'
+      locator:
+        page: 2
+        published_page: 824
+        pdf_page_index: 1
+        table: '1'
+        note: row=After equilibration; column=(%Mn)/[%Mn]
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 5
+        figure: '6'
+        note: Figure 6 caption identifies the Table 1 practical-slag result at 1200 °C.
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        section: '3.1'
+        note: The CO-at-1-atm graphite-crucible run is stated on this page.
+    atmosphere:
+      state:
+        tag: value
+        value: CO
+      locator:
+        page: 3
+        section: '3.1'
+        note: The CO-at-1-atm graphite-crucible run is stated on this page.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:tsukihashi-1985-na-silicate-mn-p-nitrogen
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: tsukihashi-1985-na-silicate-mn-p-nitrogen::tsukihashi_1985_table1_p_distribution
+  experiment_id: 10.2355/tetsutohagane1955.71.7_823::tsukihashi-1985-na-silicate-mn-p-nitrogen
+  identity:
+    quantity:
+      tag: value
+      value: distribution_ratio
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - FeO
+          - '0.00734149854894026447277148995'
+        - - Fe2O3
+          - '0.00008579163211247333127602868629'
+        - - Na2O
+          - '0.6830171992938420040569209036'
+        - - V2O5
+          - '0.01393497039813357216113499529'
+        - - SiO2
+          - '0.2166139829783350100511198373'
+        - - P2O5
+          - '0.06297707481437143794093057745'
+        - - MnO
+          - '0.01602948233426523798584616811'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: value
+      value: metal
+  value:
+    kind: point
+    point: '105'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - distribution_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsukihashi-1985-na-silicate-mn-p-nitrogen::tsukihashi_1985_table1_p_distribution
+  source_id: tsukihashi-1985-na-silicate-mn-p-nitrogen
+  locator:
+    page: 2
+    published_page: 824
+    pdf_page_index: 1
+    table: '1'
+    note: row=After equilibration; column=(%P)/[%P]
+  read_from: pdf:tsukihashi-1985-na-silicate-mn-p-nitrogen
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 2
+        published_page: 824
+        pdf_page_index: 1
+        table: '1'
+        note: row=After equilibration; column=(%P)/[%P]
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 2
+              published_page: 824
+              pdf_page_index: 1
+              table: '1'
+              note: row=After equilibration; column=(%P)/[%P]
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 824
+              pdf_page_index: 1
+              table: '1'
+              note: row=After equilibration; column=(%P)/[%P]
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - FeO
+            - '0.00734149854894026447277148995'
+          - - Fe2O3
+            - '0.00008579163211247333127602868629'
+          - - Na2O
+            - '0.6830171992938420040569209036'
+          - - V2O5
+            - '0.01393497039813357216113499529'
+          - - SiO2
+            - '0.2166139829783350100511198373'
+          - - P2O5
+            - '0.06297707481437143794093057745'
+          - - MnO
+            - '0.01602948233426523798584616811'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '1'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0.77'
+            locator:
+              page: 2
+              table: '1'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 2
+              table: '1'
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 2
+              table: '1'
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 2
+              table: '1'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '61.8'
+            locator:
+              page: 2
+              table: '1'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '1'
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '3.7'
+            locator:
+              page: 2
+              table: '1'
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 2
+              table: '1'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '19'
+            locator:
+              page: 2
+              table: '1'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '1'
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '13.05'
+            locator:
+              page: 2
+              table: '1'
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 2
+              table: '1'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '1.66'
+            locator:
+              page: 2
+              table: '1'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 2
+              table: '1'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.02'
+          FeO: '0.77'
+          MnO: '1.66'
+          Na2O: '61.8'
+          P2O5: '13.05'
+          SiO2: '19'
+          V2O5: '3.7'
+      locator:
+        page: 2
+        published_page: 824
+        pdf_page_index: 1
+        table: '1'
+        note: row=After equilibration; column=(%P)/[%P]
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 2
+        figure: '1'
+        note: Figure 1 caption identifies the Table 1 practical-slag result at 1200 °C.
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        section: '3.1'
+        note: The CO-at-1-atm graphite-crucible run is stated on this page.
+    atmosphere:
+      state:
+        tag: value
+        value: CO
+      locator:
+        page: 3
+        section: '3.1'
+        note: The CO-at-1-atm graphite-crucible run is stated on this page.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:tsukihashi-1985-na-silicate-mn-p-nitrogen
+    parameters: []
+    output_unit: Pa
+    references: []

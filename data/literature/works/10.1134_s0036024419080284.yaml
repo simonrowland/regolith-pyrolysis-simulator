@@ -1,0 +1,604 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0036024419080284
+  citation: Shornikov, S. I. (2019). High-temperature mass spectrometry study of the thermodynamic properties of CaTiO3 perovskite.
+    Russian Journal of Physical Chemistry A, 93(8), 1428–1434. doi:10.1134/S0036024419080284.
+  source_ids:
+  - shornikova-2019-perovskite-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikova-2019-perovskite-thermodynamics
+      role: pdf
+      path: raw/shornikova-2019-perovskite-thermodynamics/shornikova-2019-perovskite-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 758169b94738ce5bdd3a69940dfb5fd3392a14a8fb26325f298833c8c8922286
+    - asset_id: pdftotext:shornikova-2019-perovskite-thermodynamics
+      role: pdftotext
+      path: text/shornikova-2019-perovskite-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikova-2019-perovskite-thermodynamics
+      role: table_csv
+      path: tables/shornikova-2019-perovskite-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:shornikova-2019-perovskite-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0036024419080284
+experiments:
+- experiment_id: 10.1134/s0036024419080284::experiment::shornikova-2019-fig3a
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Activities of CaO in perovskite, Fig. 3a series 3, open circles. Lewis relation, equation (5), on published
+      page 1431.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0036024419080284
+  locator:
+    page: 5
+    published_page: 1432
+    pdf_page_index: 4
+    figure: '3'
+    note: panel=a
+- experiment_id: 10.1134/s0036024419080284::experiment::shornikova-2019-fig3b
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Activities of TiO2 in perovskite, Fig. 3b series 3, open circles. Lewis relation, equation (6), on published
+      page 1431.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0036024419080284
+  locator:
+    page: 5
+    published_page: 1432
+    pdf_page_index: 4
+    figure: '3'
+    note: panel=b
+- experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0036024419080284
+  locator:
+    page: 2
+    published_page: 1429
+    pdf_page_index: 1
+    table: '1'
+    note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work row. MinerU and
+      pdftotext agree on the remaining numeric cells. pdftotext prints the minus as U+2013; the stored hyphen is ASCII.; row_label=298;
+      column_header=$\Delta H_T$
+context:
+- observation_id: shornikova_2019_abstract_formation_numbers
+  type: abstract_table_discrepancy
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 1428
+    section: Abstract
+    note: The abstract and the conclusions print −39.88 ± 0.54 kJ/mol. Table 1 prints −39.98 ± 0.54 for the 1791–2241 K this-work
+      row. Both are kept as printed. The table cell is the scored observation.
+  units: kJ/mol and J/(mol K)
+  values:
+    delta_H_as_printed: −39.88 ± 0.54 kJ/mol
+    delta_S_as_printed: 3.15 ± 0.28 J/(mol K)
+    delta_H_melt_as_printed: 47.61 ± 1.84 kJ/mol at 2241 ± 10 K
+    not_scored_because: The abstract enthalpy is 0.10 kJ/mol from the Table 1 cell. It is not a second measurement.
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_abstract_formation_numbers
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_equipment_ref48
+  type: apparatus
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1431
+    section: Results and discussion
+  units: as printed
+  values:
+    sentence_as_printed: The experimental features of the used equipment were described in detail in [48].
+    ref_48: S. I. Shornikov, I. Yu. Archakov, and T. Yu. Chemekova, Russ. J. Phys. Chem. A 74, 677 (2000).
+    cell_material: This paper does not restate the cell material.
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_equipment_ref48
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_fig2_gibbs_curve_not_digitized
+  type: figure_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1430
+    figure: '2'
+  units: kJ/mol
+  values:
+    reason_not_extracted: Fig. 2 series 9 is this work. The admitted result of that curve is the least-squares Table 1 row,
+      so the line is not digitized.
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_fig2_gibbs_curve_not_digitized
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_fig3_series3_read
+  type: figure_read_note
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1432
+    figure: '3'
+    note: The stored series-3 activities are the activity_coefficient rows under CaO and TiO2.
+  units: dimensionless activity
+  values:
+    caption_as_printed: Fig. 3. Activities of (a) CaO and (b) TiO2 in perovskite, determined via (1–3) Knudsen effusion mass
+      spectrometry in [46, 47] and this work, respectively; and (4, 5) in studying the heterogeneous equilibria of multicomponent
+      melts in [44, 45], respectively.
+    equation_5_as_printed: a_CaO = p_CaO / p°_CaO = p_Ca p_O / (p°_Ca p°_O)
+    equation_6_as_printed: a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O)
+    stored_counts: Fig. 3a series 3, 22 open circles. Fig. 3b series 3, 19 open circles.
+    refused: 'Series 1 filled circles and series 2 half-filled circles carry the error bars and are [46] and [47]. Series
+      4 and 5 triangles are [44] and [45]. The legend open circle at page pixel (2213, 3127) is a complete ring, 36 of 36
+      rays at radius 32 px, and it is the series-3 key, not a datum. Stored this round: (1534.00, 2812.00), 250 degrees at
+      radius 31 px; (1198.00, 3048.00), 240 degrees at radius 31.5 px, 48 px from the stored circle at (1231, 3083); (1485.00,
+      1001.00) is the right circle; the left circle is stored at (1464.68, 981.54); (1887.00, 2604.00), 230 degrees at radius
+      31 px; (2001.00, 840.00) is the right ring; the left ring is stored at (1967.00, 846.00). Still refused: (1640, 911)
+      is the literature half-filled symbol, even though 160 degrees of a 36 px ring are visible at (1644, 913). (1637.00,
+      972.00) is stored: 65 of 72 rays at radius 39 px. (1060.84, 3174.06) is stored from the right-hand arc, radius 41.90
+      px, rms 0.36 px. The left-window fit of the same ink has rms 3.16 px and is not used.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_fig3_series3_read
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_fig4_pressures_from_ref2
+  type: figure_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1432
+    figure: '4'
+  units: atm
+  values:
+    reason_not_extracted: Fig. 4 caption says the partial pressures are from reference [2], the earlier evaporation paper,
+      not a new measurement in this article.
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_fig4_pressures_from_ref2
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_fig5_devries_diagram
+  type: figure_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1433
+    figure: '5'
+  units: as printed
+  values:
+    reason_not_extracted: Fig. 5 is the CaTiO3–SiO2 phase diagram from reference [39], not this study.
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_fig5_devries_diagram
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r02
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: '298'
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 1.05 ± 0.21
+    T_as_printed: '298'
+    means_of_study: HF/HCl solution calorimetry
+    ref_as_printed: '[10]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r02
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r03
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: '298'
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 1.86 ± 0.71
+    T_as_printed: '298'
+    means_of_study: HF/HCl solution calorimetry
+    ref_as_printed: '[5, 18]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r03
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r05
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: '298'
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 2.40 ± 0.35
+    T_as_printed: '298'
+    means_of_study: Adiabatic calorimetry
+    ref_as_printed: '[11]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r05
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r06
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: '298'
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 2.72 ± 0.23
+    T_as_printed: '298'
+    means_of_study: Adiabatic calorimetry
+    ref_as_printed: '[13]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r06
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r08
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: 888–972
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 4.62 ± 3.54
+    T_as_printed: 888–972
+    means_of_study: EMF
+    ref_as_printed: '[34]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r08
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r09
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: 900–1250
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 3.15 ± 0.05
+    T_as_printed: 900–1250
+    means_of_study: EMF
+    ref_as_printed: '[36]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r09
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r16
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: '1073'
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 4.37 ± 1.23
+    T_as_printed: '1073'
+    means_of_study: $Pb_2B_2O_5$  solution calorimetry
+    ref_as_printed: '[20]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r16
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r19
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: 1180–1290
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 11.07 ± 6.44
+    T_as_printed: 1180–1290
+    means_of_study: EMF
+    ref_as_printed: '[33]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r19
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r20
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: '1300'
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 2.82 ± 1.29
+    T_as_printed: '1300'
+    means_of_study: Raman spectroscopy
+    ref_as_printed: '[32]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r20
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r21
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: 1600–1800
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 5.85 ± 0.09
+    T_as_printed: 1600–1800
+    means_of_study: Thermochemical calculations
+    ref_as_printed: '[7]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r21
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r22
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: 1600–2100
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 5.00 ± 0.02
+    T_as_printed: 1600–2100
+    means_of_study: Thermochemical calculations
+    ref_as_printed: '[8]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r22
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r23
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: 1600–2100
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 5.60 ± 0.02
+    T_as_printed: 1600–2100
+    means_of_study: Thermochemical calculations
+    ref_as_printed: '[9]'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r23
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r25
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: 1791–2241
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 3.15 ± 0.28
+    T_as_printed: 1791–2241
+    means_of_study: Knudsen effusion mass spectrometry
+    ref_as_printed: '*'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r25
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3
+- observation_id: shornikova_2019_table1_delta_s_r26
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    row_label: 2241–2398
+    column_header: ΔS_T
+    published_page: 1429
+    note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S is absolute entropy, so
+      this printed ΔS_T is not scored.
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 24.39 ± 0.76
+    T_as_printed: 2241–2398
+    means_of_study: Knudsen effusion mass spectrometry
+    ref_as_printed: '*'
+    reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+    standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation from simple oxides,
+      calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO] + [TiO2] = [CaTiO3]. The paper does not
+      state whether each simple-oxide reference is the pure solid or the pure liquid.'
+  context_id: shornikova-2019-perovskite-thermodynamics::context::shornikova_2019_table1_delta_s_r26
+  work_id: 10.1134/s0036024419080284
+  source_id: shornikova-2019-perovskite-thermodynamics
+  species: CaTiO3

@@ -44,28 +44,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5007013870195268383956181486'
-        - - TiO2
-          - '0.0008994958075878343276266462051'
-        - - Al2O3
-          - '0.01734331494605916599199045912'
-        - - FeO
-          - '0.1012995597623313608485726174'
-        - - MgO
-          - '0.3424968417281735095249248857'
-        - - CaO
-          - '0.02207372022638176573997875929'
-        - - Na2O
-          - '0.0128390664863871466484340079'
-        - - K2O
-          - '0.002346614023552378522854475945'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -85,8 +66,9 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
+    kind: interval
+    interval_low: '0.00101325'
+    interval_high: '0.0101325'
     approximate: false
   uncertainty:
     kind: printed
@@ -104,15 +86,20 @@ observations:
       worker: codex
       date: '2026-10-04'
       evidence:
-        page: 116
+        page: 4
         published_page: 116
         pdf_page_index: 3
         paragraph: 1
         section: Results and Discussion
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: shornikov-2025-saratov-alkali-evaporation::shornikov_2025_k_pressure_range_1450_1500k
   source_id: shornikov-2025-saratov-alkali-evaporation
   locator:
-    page: 116
+    page: 4
     published_page: 116
     pdf_page_index: 3
     paragraph: 1
@@ -121,202 +108,22 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5007013870195268383956181486'
-          - - TiO2
-            - '0.0008994958075878343276266462051'
-          - - Al2O3
-            - '0.01734331494605916599199045912'
-          - - FeO
-            - '0.1012995597623313608485726174'
-          - - MgO
-            - '0.3424968417281735095249248857'
-          - - CaO
-            - '0.02207372022638176573997875929'
-          - - Na2O
-            - '0.0128390664863871466484340079'
-          - - K2O
-            - '0.002346614023552378522854475945'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
-        page: 116
+        page: 4
         published_page: 116
         pdf_page_index: 3
         paragraph: 1
         section: Results and Discussion
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - Printed Saratov chondrule oxide composition in mass percent, copied from the experiment sample record.
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '54.44'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '0.13'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '3.2'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '13.17'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '24.98'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '2.24'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '1.44'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.4'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        output_unit: mole_fraction
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2025-saratov-alkali-evaporation
+    parameters: []
+    output_unit: Pa
+    references: []
 - observation_id: shornikov-2025-saratov-alkali-evaporation::shornikov_2025_na_pressure_range_1450_1500k
   experiment_id: 10.1007/978-3-031-87558-8_23::experiment::saratov-chondrule-kems-series
   identity:
@@ -359,28 +166,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5007013870195268383956181486'
-        - - TiO2
-          - '0.0008994958075878343276266462051'
-        - - Al2O3
-          - '0.01734331494605916599199045912'
-        - - FeO
-          - '0.1012995597623313608485726174'
-        - - MgO
-          - '0.3424968417281735095249248857'
-        - - CaO
-          - '0.02207372022638176573997875929'
-        - - Na2O
-          - '0.0128390664863871466484340079'
-        - - K2O
-          - '0.002346614023552378522854475945'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -400,8 +188,9 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: pressure value is not numeric
+    kind: interval
+    interval_low: '0.00101325'
+    interval_high: '0.0101325'
     approximate: false
   uncertainty:
     kind: printed
@@ -419,15 +208,20 @@ observations:
       worker: codex
       date: '2026-10-04'
       evidence:
-        page: 116
+        page: 4
         published_page: 116
         pdf_page_index: 3
         paragraph: 1
         section: Results and Discussion
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: shornikov-2025-saratov-alkali-evaporation::shornikov_2025_na_pressure_range_1450_1500k
   source_id: shornikov-2025-saratov-alkali-evaporation
   locator:
-    page: 116
+    page: 4
     published_page: 116
     pdf_page_index: 3
     paragraph: 1
@@ -436,199 +230,19 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5007013870195268383956181486'
-          - - TiO2
-            - '0.0008994958075878343276266462051'
-          - - Al2O3
-            - '0.01734331494605916599199045912'
-          - - FeO
-            - '0.1012995597623313608485726174'
-          - - MgO
-            - '0.3424968417281735095249248857'
-          - - CaO
-            - '0.02207372022638176573997875929'
-          - - Na2O
-            - '0.0128390664863871466484340079'
-          - - K2O
-            - '0.002346614023552378522854475945'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
-        page: 116
+        page: 4
         published_page: 116
         pdf_page_index: 3
         paragraph: 1
         section: Results and Discussion
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - Printed Saratov chondrule oxide composition in mass percent, copied from the experiment sample record.
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '54.44'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '0.13'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '3.2'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '13.17'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '24.98'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '2.24'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '1.44'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.4'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 116
-              published_page: 116
-              pdf_page_index: 3
-              paragraph: 1
-              section: Results and Discussion
-        output_unit: mole_fraction
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2025-saratov-alkali-evaporation
+    parameters: []
+    output_unit: Pa
+    references: []

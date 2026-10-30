@@ -1,0 +1,1327 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s00410-013-0943-9
+  citation: 'Borisov A., Behrens H. and Holtz F. (2013). The effect of titanium and phosphorus on ferric/ferrous ratio in
+    silicate melts: an experimental study. Contributions to Mineralogy and Petrology 166(6):1577–1591. DOI 10.1007/s00410-013-0943-9.'
+  source_ids:
+  - borisov-behrens-holtz-2013-ti-p-fe-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:borisov-behrens-holtz-2013-ti-p-fe-redox
+      role: pdf
+      path: raw/borisov-behrens-holtz-2013-ti-p-fe-redox/borisov-behrens-holtz-2013-ti-p-fe-redox.pdf
+      sha256:
+        tag: value
+        value: 6d7cfbe521563e285822de7070d90dec54a41966366c725510363601a5bbabe9
+    - asset_id: pdftotext:borisov-behrens-holtz-2013-ti-p-fe-redox
+      role: pdftotext
+      path: text/borisov-behrens-holtz-2013-ti-p-fe-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:borisov-behrens-holtz-2013-ti-p-fe-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s00410-013-0943-9
+experiments:
+- experiment_id: 10.1007/s00410-013-0943-9::borisov-behrens-holtz-2013-ti-p-fe-redox
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-013-0943-9
+  locator:
+    page: 5
+    published_page: 1581
+    pdf_page_index: 4
+    table: '2'
+    note: row=1; column=Fe3+/Fe2+
+context:
+- observation_id: borisov_2013_empirical_fe_redox_fit_eq10
+  type: model_record
+  method_class: model_derived
+  locator:
+    page: 7
+    published_page: 1583
+    pdf_page_index: 6
+    section: Discussion
+    equation: '10'
+  units: log10 ratio; temperature in K; oxide mole fractions
+  values:
+    quantity_as_printed: log(XFeO1.5/XFeO) empirical regression
+    equation_as_printed: log(XFeO1.5/XFeO) = 5919/T − 0.674 XSiO2 − 0.673 XTiO2 − 4.377 XP2O5 − 2.734
+    temperature_slope: '5919'
+    temperature_slope_uncertainty: '223'
+    temperature_slope_statistic: 1σ
+    dSiO2: −0.674
+    dSiO2_uncertainty: '0.037'
+    dTiO2: −0.673
+    dTiO2_uncertainty: '0.044'
+    dP2O5: −4.377
+    dP2O5_uncertainty: '0.113'
+    component_coefficient_statistic: 1σ
+    intercept: −2.734
+    R_squared: '0.988'
+    derived_from:
+    - borisov_2013_table2_fe3_fe2_row_01_daf_5
+    - borisov_2013_table2_fe3_fe2_row_02_daft10_5
+    - borisov_2013_table2_fe3_fe2_row_03_daft20_5
+    - borisov_2013_table2_fe3_fe2_row_04_daft30_5
+    - borisov_2013_table2_fe3_fe2_row_05_dafs_5
+    - borisov_2013_table2_fe3_fe2_row_06_dafst15_5
+    - borisov_2013_table2_fe3_fe2_row_07_dafst25_5
+    - borisov_2013_table2_fe3_fe2_row_08_daf_6
+    - borisov_2013_table2_fe3_fe2_row_09_dafs_6
+    - borisov_2013_table2_fe3_fe2_row_10_daf_7
+    - borisov_2013_table2_fe3_fe2_row_11_dafs_7
+    - borisov_2013_table2_fe3_fe2_row_12_daf_9
+    - borisov_2013_table2_fe3_fe2_row_13_dafs_9
+    - borisov_2013_table2_fe3_fe2_row_14_daf_10
+    - borisov_2013_table2_fe3_fe2_row_15_daft10_10
+    - borisov_2013_table2_fe3_fe2_row_16_daft20_10
+    - borisov_2013_table2_fe3_fe2_row_17_daft30_10
+    - borisov_2013_table2_fe3_fe2_row_18_dafs_10a
+    - borisov_2013_table2_fe3_fe2_row_19_dafst15_10a
+    - borisov_2013_table2_fe3_fe2_row_20_dafst25_10a
+    - borisov_2013_table2_fe3_fe2_row_21_daf_13
+    - borisov_2013_table2_fe3_fe2_row_22_daft10_13
+    - borisov_2013_table2_fe3_fe2_row_23_daft20_13
+    - borisov_2013_table2_fe3_fe2_row_24_daft30_13
+    - borisov_2013_table2_fe3_fe2_row_25_daf_30
+    - borisov_2013_table2_fe3_fe2_row_26_dafp05_30
+    - borisov_2013_table2_fe3_fe2_row_27_dafp10_30
+    - borisov_2013_table2_fe3_fe2_row_28_dafp15_30
+    - borisov_2013_table2_fe3_fe2_row_29_dafp20_30
+    - borisov_2013_table2_fe3_fe2_row_30_daf_28
+    - borisov_2013_table2_fe3_fe2_row_31_dafp05_28
+    - borisov_2013_table2_fe3_fe2_row_32_dafp10_28
+    - borisov_2013_table2_fe3_fe2_row_33_dafp15_28
+    - borisov_2013_table2_fe3_fe2_row_34_dafp20_28
+    - borisov_2013_table2_fe3_fe2_row_35_dafsp08_39
+    - borisov_2013_table2_fe3_fe2_row_36_dafsp08_40
+    - borisov_2013_table2_fe3_fe2_row_37_dafsp08_42
+    - borisov_2013_table2_fe3_fe2_row_38_daf_33
+    - borisov_2013_table2_fe3_fe2_row_39_dafp05_33
+    - borisov_2013_table2_fe3_fe2_row_40_dafp10_33
+    - borisov_2013_table2_fe3_fe2_row_41_dafp15_33
+    - borisov_2013_table2_fe3_fe2_row_42_dafp20_33
+    - borisov_2013_table2_fe3_fe2_row_43_dafsp08_41
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_empirical_fe_redox_fit_eq10
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_10_deferred
+  type: figure_record
+  locator:
+    page: 12
+    published_page: 1588
+    pdf_page_index: 11
+    figure: '10'
+  panel: whole_figure
+  attribution: Model-derived values from Kilinc et al. (1983) and Kress and Carmichael (1991), using the Cottrell and Kelley
+    (2011) composition dataset.
+  units: log fO2 units
+  values:
+    quantity: fO2_log
+    identity:
+      species:
+      - Fe
+      phase: glass
+      temperature_as_printed: not stated
+    axes_as_printed:
+      x: ΣdiXi/(k·ln10), Kress and Carmichael (1991)
+      y: ΣdiXi/(k·ln10), Kilinc et al. (1983)
+    caption_as_printed: A comparison of ΣdiXi/(k·ln10) values calculated with two different models, Kilinc et al. (1983) and
+      Kress and Carmichael (1991), for 103 MORB glasses analyzed by Cottrell and Kelley (2011). Note that ΣdiXi/(k·ln10) values
+      are in logfO2 units. Two samples a and b are chosen arbitrarily to discuss the models’ difference (see text for details)
+    series:
+    - name: 103 Cottrell and Kelley (2011) MORB glasses; one paired model comparison marker per glass
+      marker: circle
+      marker_count: 103
+    digitisation: deferred to a figure pass
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_10_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_11_deferred
+  type: figure_record
+  locator:
+    page: 13
+    published_page: 1589
+    pdf_page_index: 12
+    figure: '11'
+  panel: a-b
+  attribution: Author model calculations.
+  units: log fO2 units
+  values:
+    quantity: fO2_log
+    identity:
+      species:
+      - Fe
+      phase: liquid/melt model
+      temperature_as_printed: panel a temperature not stated; panel b 1175–1250 °C
+    axes_as_printed:
+      panel a x: Oxide (wt %)
+      panel b x: T (°C)
+      y: Error in logfO2
+    caption_as_printed: Possible errors of fO2 determination, a if TiO2 or P2O5 is ignored, b if temperature slope differs
+      from QFM buffer
+    series:
+    - name: panel a, ignoring TiO2
+      evidence_class: model_derived
+      marker_count: 0
+    - name: panel a, ignoring P2O5
+      evidence_class: model_derived
+      marker_count: 0
+    - name: panel b, QFM slope +30%
+      evidence_class: model_derived
+      marker_count: 0
+    - name: panel b, QFM slope −30%
+      evidence_class: model_derived
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_11_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_1_deferred
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 1582
+    pdf_page_index: 5
+    figure: '1'
+  panel: whole_figure
+  attribution: Present study; DAP values attributed in Table 1 to Borisov, unpublished data.
+  units: P/Pinitial dimensionless; duration h
+  values:
+    quantity: residue_component_composition
+    identity:
+      species:
+      - P2O5
+      phase: glass
+      temperature_as_printed: 1400–1500 °C; two IW series at 1350 and 1450 °C
+    axes_as_printed:
+      x: Duration (h)
+      y: P/Pinitial
+    caption_as_printed: Effect of temperature and redox conditions on P loss from experimental melts
+    series:
+    - name: 1500 °C, air
+      sample_series: DAFP10
+      marker_count: 4
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator:
+            page: 6
+            published_page: 1582
+            pdf_page_index: 5
+            row: 1500 °C, air
+            column: redox condition
+            figure: '1'
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Air is the controlled atmosphere; no numerical log fO2 is printed.
+          locator:
+            page: 6
+            published_page: 1582
+            pdf_page_index: 5
+            row: 1500 °C, air
+            column: redox condition
+            figure: '1'
+    - name: 1450 °C, air
+      sample_series: DAFP10
+      marker_count: 5
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator:
+            page: 6
+            published_page: 1582
+            pdf_page_index: 5
+            row: 1450 °C, air
+            column: redox condition
+            figure: '1'
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Air is the controlled atmosphere; no numerical log fO2 is printed.
+          locator:
+            page: 6
+            published_page: 1582
+            pdf_page_index: 5
+            row: 1450 °C, air
+            column: redox condition
+            figure: '1'
+    - name: 1450 °C, IW
+      sample_series: DAP
+      marker_count: 4
+      point_conditions:
+        fO2_control:
+          state:
+            tag: value
+            value: IW
+          locator:
+            page: 6
+            published_page: 1582
+            pdf_page_index: 5
+            row: 1450 °C, IW
+            column: fO2 control
+            figure: '1'
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The IW buffer is named, but a numerical log fO2 is not printed.
+          locator:
+            page: 6
+            published_page: 1582
+            pdf_page_index: 5
+            row: 1450 °C, IW
+            column: fO2 control
+            figure: '1'
+    - name: 1350 °C, IW
+      sample_series: DAP
+      marker_count: 4
+      point_conditions:
+        fO2_control:
+          state:
+            tag: value
+            value: IW
+          locator:
+            page: 6
+            published_page: 1582
+            pdf_page_index: 5
+            row: 1350 °C, IW
+            column: fO2 control
+            figure: '1'
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The IW buffer is named, but a numerical log fO2 is not printed.
+          locator:
+            page: 6
+            published_page: 1582
+            pdf_page_index: 5
+            row: 1350 °C, IW
+            column: fO2 control
+            figure: '1'
+    digitisation: deferred to a figure pass
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_1_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_figure_2_deferred
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 1582
+    pdf_page_index: 5
+    figure: '2'
+  panel: a-b
+  attribution: Present study.
+  units: Fe3+/Fe2+ ratio; duration h
+  values:
+    quantity: valence_ratio
+    identity:
+      species:
+      - Fe
+      phase: liquid
+      temperature_as_printed: 1500 °C
+    axes_as_printed:
+      x: Duration (h)
+      y: Fe3+/Fe2+
+    caption_as_printed: 'Effect of equilibration time on ferric/ferrous ratio at 1,500 °C: a in basic (DAF) and more silicic
+      (DAFS) melts; b in melts of DAFSP08 composition'
+    series:
+    - name: panel a, DAF
+      marker_count: 4
+    - name: panel a, DAFS
+      marker_count: 4
+    - name: panel b, DAFSP08
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    point_conditions:
+      atmosphere:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 5
+          published_page: 1581
+          pdf_page_index: 4
+          table: '2'
+          row: all series
+          column: atmosphere
+          section: The Table 2 note states all series were made at air conditions.
+      fO2_log:
+        state:
+          tag: unknown
+          reason: Air is the controlled atmosphere; no numerical log fO2 is printed.
+        locator:
+          page: 5
+          published_page: 1581
+          pdf_page_index: 4
+          table: '2'
+          row: all series
+          column: atmosphere
+          section: The Table 2 note states all series were made at air conditions.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_2_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_3_deferred
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 1583
+    pdf_page_index: 6
+    figure: '3'
+  panel: three temperature panels
+  attribution: Present study.
+  units: Fe3+/Fe2+ ratio; TiO2 wt %
+  values:
+    quantity: valence_ratio
+    identity:
+      species:
+      - Fe
+      phase: liquid
+      temperature_as_printed: 1400, 1450 and 1500 °C
+    axes_as_printed:
+      x: TiO2 (wt %)
+      y: Fe3+/Fe2+
+    caption_as_printed: Effect of TiO2 on ferric/ferrous ratio in the experimental samples
+    series:
+    - name: DAFT, 1400 °C
+      marker_count: 4
+    - name: DAFT, 1450 °C
+      marker_count: 4
+    - name: DAFST, 1450 °C
+      marker_count: 3
+    - name: DAFT, 1500 °C
+      marker_count: 4
+    - name: DAFST, 1500 °C
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    point_conditions:
+      atmosphere:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 5
+          published_page: 1581
+          pdf_page_index: 4
+          table: '2'
+          row: all series
+          column: atmosphere
+          section: The Table 2 note states all series were made at air conditions.
+      fO2_log:
+        state:
+          tag: unknown
+          reason: Air is the controlled atmosphere; no numerical log fO2 is printed.
+        locator:
+          page: 5
+          published_page: 1581
+          pdf_page_index: 4
+          table: '2'
+          row: all series
+          column: atmosphere
+          section: The Table 2 note states all series were made at air conditions.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_3_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_4_deferred
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 1583
+    pdf_page_index: 6
+    figure: '4'
+  panel: three temperature series
+  attribution: Present study.
+  units: Fe3+/Fe2+ ratio; P2O5 wt %
+  values:
+    quantity: valence_ratio
+    identity:
+      species:
+      - Fe
+      phase: liquid
+      temperature_as_printed: 1450, 1500 and 1550 °C
+    axes_as_printed:
+      x: P2O5 (wt %)
+      y: Fe3+/Fe2+
+    caption_as_printed: Effect of P2O5 on ferric/ferrous ratio in the experimental samples of DAFP series
+    series:
+    - name: 1450 °C
+      marker_count: 5
+    - name: 1500 °C
+      marker_count: 5
+    - name: 1550 °C
+      marker_count: 5
+    digitisation: deferred to a figure pass
+    point_conditions:
+      atmosphere:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 5
+          published_page: 1581
+          pdf_page_index: 4
+          table: '2'
+          row: all series
+          column: atmosphere
+          section: The Table 2 note states all series were made at air conditions.
+      fO2_log:
+        state:
+          tag: unknown
+          reason: Air is the controlled atmosphere; no numerical log fO2 is printed.
+        locator:
+          page: 5
+          published_page: 1581
+          pdf_page_index: 4
+          table: '2'
+          row: all series
+          column: atmosphere
+          section: The Table 2 note states all series were made at air conditions.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_4_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_5_deferred
+  type: figure_record
+  locator:
+    page: 8
+    published_page: 1584
+    pdf_page_index: 7
+    figure: '5'
+  panel: three temperature trends
+  attribution: Present study.
+  units: Fe3+/Fe2+ ratio; oxide wt %
+  values:
+    quantity: valence_ratio
+    identity:
+      species:
+      - Fe
+      phase: liquid
+      temperature_as_printed: 1400, 1450 and 1500 °C
+    axes_as_printed:
+      x: SiO2 + TiO2 (wt %)
+      y: Fe3+/Fe2+
+    caption_as_printed: Effect of SiO2 + TiO2 contents on ferric/ferrous ratio in the experimental samples
+    series:
+    - name: DAFT, 1400 °C
+      marker_count: 4
+    - name: DAFT, 1450 °C
+      marker_count: 4
+    - name: DAFST, 1450 °C
+      marker_count: 3
+    - name: DAFT, 1500 °C
+      marker_count: 4
+    - name: DAFST, 1500 °C
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    point_conditions:
+      atmosphere:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 5
+          published_page: 1581
+          pdf_page_index: 4
+          table: '2'
+          row: all series
+          column: atmosphere
+          section: The Table 2 note states all series were made at air conditions.
+      fO2_log:
+        state:
+          tag: unknown
+          reason: Air is the controlled atmosphere; no numerical log fO2 is printed.
+        locator:
+          page: 5
+          published_page: 1581
+          pdf_page_index: 4
+          table: '2'
+          row: all series
+          column: atmosphere
+          section: The Table 2 note states all series were made at air conditions.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_5_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_6_deferred
+  type: figure_record
+  locator:
+    page: 8
+    published_page: 1584
+    pdf_page_index: 7
+    figure: '6'
+  panel: whole_figure
+  attribution: Matsuzaki and Ito (1997); Ban-ya et al. (1980); values recalculated in the present paper.
+  units: Fe3+/Fe2+ ratio; mole fraction sum
+  values:
+    quantity: valence_ratio
+    identity:
+      species:
+      - Fe
+      phase: liquid slag
+      temperature_as_printed: 1400 °C
+    axes_as_printed:
+      x: XSiO2 + XTiO2
+      y: Fe3+/Fe2+
+    caption_as_printed: Effect of SiO2 + TiO2 contents on ferric/ferrous ratio in simple slags in equilibrium with metallic
+      iron at 1,400 °C. Experimental data from Ban-ya et al. (1980) and Matsuzaki and Ito (1997) recalculated to a constant
+      fO2 = 10^-10 atm
+    series:
+    - name: Matsuzaki and Ito (1997), FeO-TiO2-SiO2
+      marker: circle
+      marker_count: 16
+    - name: Ban-ya et al. (1980), FeO-TiO2
+      marker: filled inverted triangle
+      marker_count: 13
+    - name: Ban-ya et al. (1980), FeO-SiO2
+      marker: open triangle
+      marker_count: 13
+    digitisation: deferred to a figure pass
+    point_conditions:
+      oxygen_partial_pressure:
+        state:
+          tag: value
+          value: 1e-10
+        value_as_printed: 10^-10
+        units: atm
+        locator:
+          page: 8
+          published_page: 1584
+          pdf_page_index: 7
+          column: fO2
+          figure: '6'
+          note: Caption prints fO2 = 10^-10 atm.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_6_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_7_deferred
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 1586
+    pdf_page_index: 9
+    figure: '7'
+  panel: whole_figure
+  attribution: Gwinn and Hess (1993); compiled by the present authors.
+  units: Fe3+/Fe2+ ratio
+  values:
+    quantity: valence_ratio
+    identity:
+      species:
+      - Fe
+      phase: glass
+      temperature_as_printed: 1400 °C, air
+    axes_as_printed:
+      x: K* = XK2O/(XK2O + XAl2O3)
+      y: Fe3+/Fe2+
+    caption_as_printed: Effects of K/Al ratio on Fe3+/Fe2+ in P-free, P-poor, and P-rich silicic melts at 1,400 °C in air.
+      Experimental data from Gwinn and Hess (1993). We present three series of experiments with zero, 0.5 mol % (1.6 wt %),
+      and 2.6 mol % (5.4 wt %) P2O5 (data from Tables 1, 3a, b in Gwinn and Hess 1993). All melts have approximately the same
+      SiO2 content (about 76 wt % ≈85 mol %) and total Fe2O3 (1 mol %) but with variable K/Al ratio
+    series:
+    - name: P-free glasses
+      marker: open circle
+      marker_count: 3
+    - name: 0.5 mol % P2O5
+      marker: gray circle
+      marker_count: 6
+    - name: 2.6 mol % P2O5
+      marker: black circle
+      marker_count: 5
+    digitisation: deferred to a figure pass
+    note: The caption says 2.6 mol % P2O5; the legend abbreviates it to 2.5 mol %.
+    point_conditions:
+      atmosphere:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 10
+          published_page: 1586
+          pdf_page_index: 9
+          column: atmosphere
+          figure: '7'
+      fO2_log:
+        state:
+          tag: unknown
+          reason: Air is the controlled atmosphere; no numerical log fO2 is printed.
+        locator:
+          page: 10
+          published_page: 1586
+          pdf_page_index: 9
+          column: atmosphere
+          figure: '7'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_7_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_8_deferred
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 1586
+    pdf_page_index: 9
+    figure: '8'
+  panel: a-b
+  attribution: Present experiments; model predictions from Moretti (2005), Kress and Carmichael (1991), Borisov and Shapkin
+    (1990), and Jayasuriya et al. (2004).
+  units: log ratio; oxide wt %
+  values:
+    quantity: valence_ratio
+    identity:
+      species:
+      - Fe
+      phase: liquid
+      temperature_as_printed: 1450 °C, air
+    axes_as_printed:
+      x: panel a TiO2 (wt %); panel b P2O5 (wt %)
+      y: log(Fe3+/Fe2+)
+    caption_as_printed: 'Effects of ‘minor’ components on Fe3+/Fe2+ in melts of 10Fe2O3·90DA composition modified either with
+      TiO2 (a) or P2O5 (b) at 1,450 °C in air. A comparison of experimental results and calculation according to the published
+      models: Moretti (2005), Kress and Carmichael (1991), Borisov and Shapkin (1990), Jayasuriya et al. (2004)'
+    series:
+    - name: panel a, experiments
+      evidence_class: measured_direct
+      marker_count: 4
+    - name: panel a, present Eq. (10)
+      evidence_class: model_derived
+      marker_count: 0
+    - name: panel a, other models
+      evidence_class: model_derived
+      marker_count: 0
+    - name: panel b, experiments
+      evidence_class: measured_direct
+      marker_count: 5
+    - name: panel b, present Eq. (10)
+      evidence_class: model_derived
+      marker_count: 0
+    - name: panel b, other models
+      evidence_class: model_derived
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    point_conditions:
+      atmosphere:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 10
+          published_page: 1586
+          pdf_page_index: 9
+          column: atmosphere
+          figure: '8'
+      fO2_log:
+        state:
+          tag: unknown
+          reason: Air is the controlled atmosphere; no numerical log fO2 is printed.
+        locator:
+          page: 10
+          published_page: 1586
+          pdf_page_index: 9
+          column: atmosphere
+          figure: '8'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_8_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_figure_9_deferred
+  type: figure_record
+  locator:
+    page: 11
+    published_page: 1587
+    pdf_page_index: 10
+    figure: '9'
+  panel: whole_figure
+  attribution: Sack et al. (1980); Kilinc et al. (1983); Kress and Carmichael (1988).
+  units: oxide wt %
+  values:
+    quantity: equilibrium_phase_composition
+    identity:
+      species:
+      - TiO2
+      - P2O5
+      phase: glass
+      temperature_as_printed: not stated in this caption
+    axes_as_printed:
+      x: P2O5 (wt %)
+      y: TiO2 (wt %)
+    caption_as_printed: 'TiO2 versus P2O5 content in three largest datasets from experiments with natural melts: Sack et al.
+      (1980), Kilinc et al. (1983) and Kress and Carmichael (1988)'
+    series:
+    - name: Sack et al. (1980)
+      marker: circle
+      marker_count: 70
+    - name: Kilinc et al. (1983)
+      marker: open triangle
+      marker_count: 43
+    - name: Kress and Carmichael (1988)
+      marker: inverted triangle
+      marker_count: 45
+    digitisation: deferred to a figure pass
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_figure_9_deferred
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_intro_morb_sample_counts_context
+  type: quoted_data_context
+  locator:
+    page: 2
+    published_page: 1578
+    pdf_page_index: 1
+    section: Introduction
+    note: Reported MORB Fe3+/Fet averages used to illustrate calibration differences.
+  units: number of glasses
+  values:
+    quantity_as_printed: MORB glass sample counts in cited redox studies
+    rows:
+    - study: Christie et al. (1986)
+      count: 78
+    - study: Cottrell and Kelley (2011)
+      count: 103
+    note: Sample counts are method context, not a composition, temperature, pressure, or redox observation.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_intro_morb_sample_counts_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_morb_fugacity_recalculation_eq12
+  type: model_record
+  method_class: model_derived
+  locator:
+    page: 12
+    published_page: 1588
+    pdf_page_index: 11
+    section: Role of compositional parameters and temperature
+    equation: '12'
+  units: log fO2 units
+  values:
+    quantity_as_printed: empirical-model log fO2 rearrangement
+    equation_as_printed: log fO2 = H/T + log(XFe2O3/XFeO)/k − ΣdiXi/(k·ln10) − c/(k·ln10)
+    example_dataset: 103 MORB glasses analyzed by Cottrell and Kelley (2011)
+    note: The equation's coefficients and calculated model outputs are not measured observations.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_morb_fugacity_recalculation_eq12
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_table1_dafp10_air_row_15p5_t_1450_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '15.5'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '13.1'
+    sample_as_printed: DAFP10 air (present study)
+    duration_h_as_printed: '15.5'
+    T_C_as_printed: '1450'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dafp10_air_row_15p5_t_1450_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dafp10_air_row_17p2_t_1500_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '17.2'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '13.9'
+    sample_as_printed: DAFP10 air (present study)
+    duration_h_as_printed: '17.2'
+    T_C_as_printed: '1500'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dafp10_air_row_17p2_t_1500_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dafp10_air_row_2_t_1450_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '2'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '12.2'
+    sample_as_printed: DAFP10 air (present study)
+    duration_h_as_printed: '2'
+    T_C_as_printed: '1450'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dafp10_air_row_2_t_1450_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dafp10_air_row_2_t_1500_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '2'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '10.8'
+    sample_as_printed: DAFP10 air (present study)
+    duration_h_as_printed: '2'
+    T_C_as_printed: '1500'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dafp10_air_row_2_t_1500_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dafp10_air_row_66_t_1450_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '66'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '15.0'
+    sample_as_printed: DAFP10 air (present study)
+    duration_h_as_printed: '66'
+    T_C_as_printed: '1450'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dafp10_air_row_66_t_1450_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dafp10_air_row_7_t_1450_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '7'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '13.6'
+    sample_as_printed: DAFP10 air (present study)
+    duration_h_as_printed: '7'
+    T_C_as_printed: '1450'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dafp10_air_row_7_t_1450_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dafp10_air_row_7_t_1500_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '7'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '15.2'
+    sample_as_printed: DAFP10 air (present study)
+    duration_h_as_printed: '7'
+    T_C_as_printed: '1500'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dafp10_air_row_7_t_1500_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dap_iw_row_15_t_1450_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '15'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '12.6'
+    sample_as_printed: DAP IW (Borisov, unpublished data)
+    duration_h_as_printed: '15'
+    T_C_as_printed: '1450'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dap_iw_row_15_t_1450_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dap_iw_row_24_t_1350_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '24'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '18.1'
+    sample_as_printed: DAP IW (Borisov, unpublished data)
+    duration_h_as_printed: '24'
+    T_C_as_printed: '1350'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dap_iw_row_24_t_1350_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dap_iw_row_3_t_1450_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '3'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '15.2'
+    sample_as_printed: DAP IW (Borisov, unpublished data)
+    duration_h_as_printed: '3'
+    T_C_as_printed: '1450'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dap_iw_row_3_t_1450_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dap_iw_row_53_t_1350_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '53'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '16.2'
+    sample_as_printed: DAP IW (Borisov, unpublished data)
+    duration_h_as_printed: '53'
+    T_C_as_printed: '1350'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dap_iw_row_53_t_1350_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dap_iw_row_71_t_1350_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '71'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '17.2'
+    sample_as_printed: DAP IW (Borisov, unpublished data)
+    duration_h_as_printed: '71'
+    T_C_as_printed: '1350'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dap_iw_row_71_t_1350_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_dap_iw_row_8_t_1450_sample_weight_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: '8'
+    column: Sample weight (mg)
+  units: mg
+  values:
+    quantity_as_printed: sample weight
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    - mass_loss_rate
+    schema_gap: No existing quantity token represents the measured sample weight; it is retained as method data, and no mass-loss
+      rate is derived.
+    sample_weight_mg_as_printed: '12.6'
+    sample_as_printed: DAP IW (Borisov, unpublished data)
+    duration_h_as_printed: '8'
+    T_C_as_printed: '1450'
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_dap_iw_row_8_t_1450_sample_weight_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_initial_p2o5_context
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 1580
+    pdf_page_index: 3
+    table: '1'
+    row: Initial
+    column: P2O5 and er.
+  units: wt% P2O5
+  values:
+    quantity_as_printed: initial starting-charge P2O5 composition
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    - liquidus_composition
+    - condensate_composition
+    - residue_component_composition
+    schema_gap: These are starting charges, not measured equilibrium phases, liquidus compositions, condensates, or post-run
+      residues; no existing quantity token types them.
+    rows:
+    - series_as_printed: DAFP10 air (present study)
+      P2O5_wt_pct_as_printed: '10.6'
+      standard_deviation_wt_pct_as_printed: '0.1'
+    - series_as_printed: DAP IW (Borisov, unpublished data)
+      P2O5_wt_pct_as_printed: '12.9'
+      standard_deviation_wt_pct_as_printed: '0.3'
+    DAP_initial_second_locator:
+      value_as_published: '12.93'
+      locator:
+        page: 5
+        published_page: 1581
+        pdf_page_index: 4
+        table: '2'
+        row: DAP initial
+        column: P2O5
+      note: The Table 2 DAP initial composition reports 12.93 wt% P2O5; it is the same starting DAP charge as Table 1's 12.9
+        ± 0.3 wt% value and is not duplicated as a second observation.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_initial_p2o5_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_table1_p_loss_model_eq6
+  type: model_record
+  method_class: model_derived
+  locator:
+    page: 6
+    published_page: 1582
+    pdf_page_index: 5
+    section: Results
+    equation: '6'
+  units: P/Pini fraction; duration in h
+  values:
+    quantity_as_printed: P2O5 loss fraction versus run duration
+    equation_as_printed: P/Pini = 1 − 0.00728 × s + 4.993 × 10^-5 × s^2
+    R_squared: '0.999'
+    duration_variable_as_printed: s (h)
+    derived_from:
+    - borisov_2013_table1_initial_p2o5_context
+    - borisov_2013_table1_dafp10_air_row_2_t_1500
+    - borisov_2013_table1_dafp10_air_row_7_t_1500
+    - borisov_2013_table1_dafp10_air_row_17p2_t_1500
+    - borisov_2013_table1_dafp10_air_row_2_t_1450
+    - borisov_2013_table1_dafp10_air_row_7_t_1450
+    - borisov_2013_table1_dafp10_air_row_15p5_t_1450
+    - borisov_2013_table1_dafp10_air_row_66_t_1450
+    note: The authors fit Eq. (6) to the DAFP10 air phosphorus-loss results; no curve points are extracted from Fig. 1.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table1_p_loss_model_eq6
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe
+- observation_id: borisov_2013_table2_dap_initial_composition_context
+  type: measured_table_context
+  locator:
+    page: 5
+    published_page: 1581
+    pdf_page_index: 4
+    table: '2'
+    row: DAP initial
+    column: oxide composition
+  units: wt% oxides
+  values:
+    quantity_as_printed: DAP starting-charge composition used only for phosphorus evaporation at IW
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    - liquidus_composition
+    - condensate_composition
+    - residue_component_composition
+    schema_gap: This is an initial charge rather than an equilibrium phase; TiO2 and Fe2O3 are printed as em dashes and are
+      not reconstructed.
+    composition_as_published:
+      SiO2: '38.43'
+      TiO2: –
+      Al2O3: '12.58'
+      Fe2O3: –
+      MgO: '7.59'
+      CaO: '28.74'
+      P2O5: '12.93'
+      Total: '100.26'
+    Fe3_over_Fe2: not reported
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_table2_dap_initial_composition_context
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: P2O5
+- observation_id: borisov_2013_turkdogan_bills_refit_eq11
+  type: model_record
+  method_class: model_derived
+  locator:
+    page: 9
+    published_page: 1585
+    pdf_page_index: 8
+    section: Comparison with published data
+    equation: '11'
+  units: log10 ratio; log fO2; oxide mole fractions
+  values:
+    quantity_as_printed: refit of Turkdogan and Bills (1957) FeOt–SiO2–P2O5 data
+    equation_as_printed: log(XFeO1.5/XFeO) = 0.20 log fO2 − 0.963 XSiO2 − 3.105 XP2O5 + 0.641
+    fO2_slope: '0.20'
+    fO2_slope_uncertainty: '0.01'
+    fO2_slope_statistic: 1σ
+    R_squared: '0.95'
+    number_of_experiments: 49
+    attribution_of_input_data: Turkdogan and Bills (1957)
+    input_data_note: The 49 cited experimental values are not transcribed as observations in this extract.
+  context_id: borisov-behrens-holtz-2013-ti-p-fe-redox::context::borisov_2013_turkdogan_bills_refit_eq11
+  work_id: 10.1007/s00410-013-0943-9
+  source_id: borisov-behrens-holtz-2013-ti-p-fe-redox
+  species: Fe

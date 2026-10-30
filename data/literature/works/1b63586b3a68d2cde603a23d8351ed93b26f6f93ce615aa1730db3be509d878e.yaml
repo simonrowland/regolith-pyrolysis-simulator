@@ -1,17 +1,17 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 1b63586b3a68d2cde603a23d8351ed93b26f6f93ce615aa1730db3be509d878e
-  citation: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage) — independent
-    of oxide-carrier path. Plant carriers (preferred promotion targets): (1) PO/PO2 — JANAF PO(g)/PO2(g) Chase 1998 free energies
-    (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto-class phosphate vaporization; Sossi & Fegley 2018 Table
-    5 speciation guidance. See docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md.'
+  citation: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage, 298–600 K),
+    independent of the oxide-carrier path. Plant-relevant phosphorus carriers (preferred promotion targets): (1) PO/PO2 gas
+    free energies from JANAF (Chase 1998, REF-020); (2) P4O10(s) sublimation (Muenow et al. / Hashimoto-class phosphate vaporization),
+    with Sossi & Fegley 2018 Table 5 speciation guidance.'
   source_ids:
   - nist-srd69-p4
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: unknown:nist-srd69-p4
       role: pdftotext

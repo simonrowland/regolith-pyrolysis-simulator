@@ -1,0 +1,1193 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/itoh-1985-beta-alumina-na2o-emf.yaml
+observations:
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_alpha_beta_ref22_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000000000152'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: (22)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=3
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=3
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=3
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_alpha_beta_ref23_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000000000323'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: (23)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=4
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=4
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=4
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_alpha_beta_ref24_25_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000000000158'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: (24)(25)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=5
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=5
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=5
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_alpha_beta_ref26_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000002'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: (26)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=6
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=6
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=6
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_alpha_beta_ref3_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000000000125'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: (3)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=1
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=1
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=1
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_alpha_beta_ref6_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000000162'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: (6)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=2
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=2
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=2
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_alpha_beta_this_work_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000000000282'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=7
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=7
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=7
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+  derivation:
+    relation: Equation (6) reduction from the galvanic-cell EMF and the standard Gibbs energy of Na2O
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 355
+        pdf_page_index: 2
+        figure: '3'
+    references: []
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_beta_beta_prime_ref25_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000001'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: (25)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=8
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=8
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=8
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+- observation_id: itoh-1985-beta-alumina-na2o-emf::itoh_1985_table1_beta_beta_prime_this_work_activity_1000k
+  experiment_id: 10.2320/matertrans1960.26.353::experiment::itoh_1985_beta_alumina_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000295'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=9
+  notices: []
+  source_id: itoh-1985-beta-alumina-na2o-emf
+  locator:
+    page: 6
+    published_page: 358
+    pdf_page_index: 5
+    table: '1'
+    note: row=9
+  read_from: pdf:itoh-1985-beta-alumina-na2o-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: row=9
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 358
+        pdf_page_index: 5
+        table: '1'
+        note: Phase assemblage is printed but its composition is not given.
+  derivation:
+    relation: Equation (6) reduction from the galvanic-cell EMF and the standard Gibbs energy of Na2O
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 355
+        pdf_page_index: 2
+        figure: '3'
+    references: []

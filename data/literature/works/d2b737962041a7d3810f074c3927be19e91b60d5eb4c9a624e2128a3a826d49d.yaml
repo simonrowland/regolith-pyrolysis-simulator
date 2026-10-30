@@ -1,0 +1,208 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: d2b737962041a7d3810f074c3927be19e91b60d5eb4c9a624e2128a3a826d49d
+  citation: Schreiber, H. D., Kozak, S. J., and McManus, K. K. (1986). Oxygen Diffusion and Redox Kinetics in a Geochemical
+    Melt System. Lunar and Planetary Science XVII, 773-774 (abstract 1394).
+  source_ids:
+  - schreiber-1986-oxygen-diffusion-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:schreiber-1986-oxygen-diffusion-redox
+      role: pdf
+      path: raw/schreiber-1986-oxygen-diffusion-redox/schreiber-1986-oxygen-diffusion-redox.pdf
+      sha256:
+        tag: value
+        value: 599b16683c32dd8f5be4fb02334b66206690227b4faf83f2eb53d97fa874a3d0
+    - asset_id: pdftotext:schreiber-1986-oxygen-diffusion-redox
+      role: pdftotext
+      path: text/schreiber-1986-oxygen-diffusion-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:schreiber-1986-oxygen-diffusion-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: d2b737962041a7d3810f074c3927be19e91b60d5eb4c9a624e2128a3a826d49d::experiment::schreiber_1986_cerium_oxidation_kinetics
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: d2b737962041a7d3810f074c3927be19e91b60d5eb4c9a624e2128a3a826d49d
+  locator:
+    page: 2
+    published_page: 774
+    pdf_page_index: 1
+    section: The experiment
+context:
+- observation_id: schreiber_1986_figure1_oxygen_diffusion_compensation
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 774
+    figure: '1'
+  phase: silicate melts as described; individual measurement phase not stated
+  units: activation energy in kcal/mole; log D0 in cm^2/sec
+  values:
+    quantity: oxygen diffusion coefficient compensation plot
+    schema_gap: No store quantity token represents an oxygen diffusion coefficient.
+    method_class: figure_only
+    species: O
+    temperature_as_published: not stated on the figure
+    axes_as_published: x E (kcal/mole); y log D0 (cm^2/sec)
+    caption_as_published: Compensation law plot of oxygen diffusion in silicate melts used to distinguish the difference in
+      the mechanism for network oxygen diffusion versus that for chemical oxygen diffusion in various compositions.
+    panel: single plot
+    series:
+    - label: chemical oxygen diffusion in melts
+      marker: open circle
+      marker_count: 24
+    - label: network oxygen diffusion in melts
+      marker: filled circle
+      marker_count: 15
+    - label: compensation-law guides
+      marker_count: 0
+    marker_count_note: Counts were tallied from the 600 dpi render. Several symbols cluster in the 40-60 kcal/mole region.
+    attribution: This work's compilation of previous oxygen-diffusion studies.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1986-oxygen-diffusion-redox::context::schreiber_1986_figure1_oxygen_diffusion_compensation
+  work_id: d2b737962041a7d3810f074c3927be19e91b60d5eb4c9a624e2128a3a826d49d
+  source_id: schreiber-1986-oxygen-diffusion-redox
+  species: O
+- observation_id: schreiber_1986_figure2_cerium_redox_kinetics
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 774
+    figure: '2'
+  phase: glass
+  units: Ce(III)/Ce(IV) concentration ratio as plotted
+  values:
+    quantity: valence_ratio
+    method_class: figure_only
+    species: Ce
+    valence_basis:
+      numerator: Ce3+
+      denominator: Ce4+
+      printed_form: ratio
+    T_C: 1400
+    oxygen_fugacity_as_published: 'Initial equilibration: about 10^-4 atm; oxidation stage: about 10^-0.7 atm. Figure caption
+      describes the initial carbon dioxide atmosphere and subsequent oxidation in air. Values are retained as printed; no
+      conversion was made.'
+    composition_as_published: 50 wt% diopside - 50 wt% albite melt. Prose says 1.5 wt% cerium; Figure 2 says total Ce = 1.48
+      wt%. Both printed values are retained.
+    quench_as_published: Samples were quenched; effect on the Ce ratio is not stated.
+    axes_as_published: x time of re-equilibration (sec), with top axis time (hours); y [Ce3+]/[Ce4+]
+    caption_as_published: Experimental redox kinetics compared to the oxygen diffusion model in a cerium-doped basaltic liquid.
+      Individual samples were equilibrated in a carbon dioxide atmosphere at 1400 °C for 1 day, then oxidized as a function
+      of time in air at 1400 °C.
+    panel: single plot
+    series:
+    - label: experimental Ce redox kinetics
+      marker: filled circle
+      marker_count: 9
+    - label: model curve D = 2 x 10^-5 cm^2/sec
+      marker_count: 0
+    - label: model curve D = 3 x 10^-6 cm^2/sec
+      marker_count: 0
+    - label: model curve D = 9 x 10^-6 cm^2/sec
+      marker_count: 0
+    attribution: This work; fitted diffusion curves are model-derived.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1986-oxygen-diffusion-redox::context::schreiber_1986_figure2_cerium_redox_kinetics
+  work_id: d2b737962041a7d3810f074c3927be19e91b60d5eb4c9a624e2128a3a826d49d
+  source_id: schreiber-1986-oxygen-diffusion-redox
+  species: Ce
+- observation_id: schreiber_1986_fitted_chemical_oxygen_diffusion_coefficient
+  type: assessment
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 774
+    paragraph: diffusion model and coefficient
+  units: cm^2/sec
+  values:
+    printed_quantity: chemical oxygen diffusion coefficient
+    method_class: model_derived
+    admission_status: typed_unavailable
+    approximate: true
+    value_as_prose: about 9 x 10^-6
+    value_as_figure2_label: 9 x 10^-6
+    second_locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 774
+      figure: '2'
+    duplicate_value_note: The prose calls the fitted coefficient about 9 x 10^-6; Figure 2 labels the corresponding model
+      curve 9 x 10^-6. These are one coefficient, with the prose approximation retained.
+    conditions_as_published:
+      temperature: 1400 °C
+      composition: 50 wt% diopside - 50 wt% albite base composition
+    fitting_basis: Calculated diffusion-model results were compared with the measured cerium redox kinetics in Figure 2 to
+      obtain this coefficient.
+    candidate_tokens:
+    - activity_coefficient_temperature_fit
+    - evaporation_coefficient_alpha
+    schema_gap: No store quantity token represents a chemical oxygen diffusion coefficient. The candidate coefficient tokens
+      describe activity coefficients or evaporation coefficients and do not fit this transport coefficient.
+  context_id: schreiber-1986-oxygen-diffusion-redox::context::schreiber_1986_fitted_chemical_oxygen_diffusion_coefficient
+  work_id: d2b737962041a7d3810f074c3927be19e91b60d5eb4c9a624e2128a3a826d49d
+  source_id: schreiber-1986-oxygen-diffusion-redox
+  species: O
+- observation_id: schreiber_1986_oxygen_diffusivity_literature_comparison
+  type: assessment
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 773
+    paragraph: Oxygen diffusion
+  units: orders of magnitude
+  values:
+    printed_quantity: relative network and chemical oxygen diffusivities
+    method_class: quoted_attributed
+    admission_status: typed_unavailable
+    attribution: Previous studies (references 2 and 3)
+    values_as_published: Network oxygen diffusivity is about four orders of magnitude below molecular oxygen diffusivity in
+      silica, and is expected to be one or two orders below chemical oxygen diffusivity in silicate melts.
+    candidate_tokens:
+    - activity_coefficient_temperature_fit
+    - evaporation_coefficient_alpha
+    schema_gap: No store quantity represents oxygen diffusivity or diffusivity ratios.
+    reason: These are comparisons to prior studies, not measurements in this abstract.
+  context_id: schreiber-1986-oxygen-diffusion-redox::context::schreiber_1986_oxygen_diffusivity_literature_comparison
+  work_id: d2b737962041a7d3810f074c3927be19e91b60d5eb4c9a624e2128a3a826d49d
+  source_id: schreiber-1986-oxygen-diffusion-redox
+  species: O

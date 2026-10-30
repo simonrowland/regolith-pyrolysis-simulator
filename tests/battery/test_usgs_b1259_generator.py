@@ -36,13 +36,13 @@ B1259_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1259_STORE_PATTERN = "compilations-robie-waldbaum-1968-usgs-b1259.yaml"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1259_RAW = 29809
-B1259_STORE_STORED = 14808
-B1259_STORED = 15118
-B1259_REFUSED = 2761
+B1259_STORE_STORED = 14820
+B1259_STORED = 15130
+B1259_REFUSED = 2749
 B1259_EXCLUDED = 11930
 B1259_RECORD_COUNT = 549
-B1259_RECORDS_STORING_NOTHING = 80
-B1259_EMPTY_FORMULA_UNRESOLVED_298K = 59
+B1259_RECORDS_STORING_NOTHING = 77
+B1259_EMPTY_FORMULA_UNRESOLVED_298K = 56
 B1259_EMPTY_FORMULA_UNRESOLVED_HT = 16
 B1259_EMPTY_METADATA_TABLES = 3
 B1259_EMPTY_ALL_CELLS_REFUSED_OR_EXCLUDED = 2
@@ -55,7 +55,7 @@ B1259_UNGUARDED_MERGED_STORED = 2
 B1259_IDENTITY_10X = 118
 B1259_IDENTITY_1X_10X = 27
 B1259_FORMULA_UNRESOLVED_HT = 16
-B1259_FORMULA_UNRESOLVED_298K_ROWS = 59
+B1259_FORMULA_UNRESOLVED_298K_ROWS = 56
 SILVER_298K = "b1259-298k-0001-silver"
 AG_ION_298K = "b1259-298k-0002-ag-aqueous-ion"
 AL_ION_298K = "b1259-298k-0004-al-aqueous-ion"
@@ -116,6 +116,34 @@ def test_tridymite_record_name_uses_the_closed_polymorph_alias() -> None:
         observation.identity.species.polymorph.is_unknown
         for observation in o_tridymite.observations
     )
+
+
+def test_hexagonal_anorthite_keeps_its_printed_unrecognised_polymorph() -> None:
+    record_id = "b1259-298k-0311-hexagonal-anorthite"
+    record = _load(record_id)
+    correction = next(
+        item for item in record["corrections"] if item["field"] == "polymorph"
+    )
+    assert correction["pdf_page"] == 30
+    assert correction["printed_token"] == "hexagonal"
+
+    generated = generator.generate_record(record)
+    assert generated.observations
+    assert all(
+        observation.identity.species.polymorph.is_unknown
+        and observation.identity.species.polymorph.rejection_kind.value == "unrecognised"
+        and "'hexagonal'" in observation.identity.species.polymorph.reason
+        for observation in generated.observations
+    )
+    from simulator.battery.compilation_tier import predict_thermo_attempt
+    from simulator.battery.enums import Engine
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        generated.observations[0],
+        invoke_pure_phase=False,
+    )
+    assert attempt.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
 
 
 def test_table1_states_calorie_r_and_joule_companion() -> None:

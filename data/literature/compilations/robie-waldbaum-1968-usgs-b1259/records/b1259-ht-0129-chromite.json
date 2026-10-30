@@ -14,8 +14,8 @@
   "pdf_page": 160,
   "page": 154,
   "name_as_published": "CHROMITE",
-  "formula_as_published": "FeCr.O,",
-  "formula": "FeCr.O,",
+  "formula_as_published": "FeCr2O4",
+  "formula": "FeCr2O4",
   "phase": "Crystals 298.15° to 1900°K. 2 4",
   "gram_formula_weight": {
     "as_published": "223.837",
@@ -1706,6 +1706,16 @@
   "ocr_suspect_token_count": 51,
   "identity_disagreements": [],
   "ambiguities": [],
+  "corrections": [
+    {
+      "correction_id": "b1259-p160-formula_as_published",
+      "pdf_page": 160,
+      "field": "formula_as_published",
+      "layout_as_extracted": "FeCr.O,",
+      "printed_token": "FeCr2O4",
+      "evidence": "PDF page 160 image visibly prints 'FeCr2O4'"
+    }
+  ],
   "record_id": "b1259-ht-0129-chromite",
   "source": {
     "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",

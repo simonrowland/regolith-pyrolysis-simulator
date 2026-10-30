@@ -66,7 +66,17 @@ def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
     assert (output_dir / "paired-decisions.csv").is_file()
     assert (output_dir / "reference-anchor-results.csv").is_file()
     assert (output_dir / "live-vaporock-check.csv").is_file()
-    assert result["metadata"]["reference_anchor"]["shared_magma_count"] == 288
+    anchor = result["metadata"]["reference_anchor"]
+    assert anchor["shared_magma_count"] == 288
+    assert anchor["alkali_in_domain_count"] == 72
+    assert "Na/K" in anchor["alkali_population_label"]
+    assert "in-domain" in anchor["alkali_population_label"]
+    assert anchor["alkali_in_domain_imcc_rmse_dex"] is not None
+    assert anchor["alkali_exclusion_delta_dex"] is not None
+    saved_metadata = json.loads(
+        (output_dir / "run-metadata.json").read_text(encoding="utf-8")
+    )
+    assert saved_metadata["reference_anchor"] == anchor
     assert "Literal SF04 basalt empirical points: **0**" in (
         output_dir / "report.md"
     ).read_text(encoding="utf-8")
@@ -580,6 +590,15 @@ def test_coverage_non_pressure_engine_omits_pressure_columns():
     assert all(
         not benchmark.coverage_cell_accepted(row, "alphamelts") for row in rows
     )
+    # This successful coverage result is a domain projection, not a
+    # prediction by the point-observable adapter.
+    assert benchmark.detect_run_self_contradiction(
+        [{"engine": "alphamelts", "status": "unavailable"}],
+        (),
+        rows,
+    ) == ("alphamelts",)
+    guard_contract = benchmark.engines_with_ok_and_adapter_unavailable.__doc__ or ""
+    assert "domain_gate" in guard_contract and "domain projection" in guard_contract
 
 
 def test_vaporock_evaluate_empty_speciation_is_not_typed_ok(monkeypatch):
@@ -672,6 +691,44 @@ def test_reference_anchor_reproduces_controller_join_and_kems_column():
     assert summary["controller_anchor_reproduced"] is True
     assert summary["empirical_kems_scored"] == 7
     assert summary["empirical_kems_total"] == 9
+
+
+def test_magma_report_discloses_alkali_exclusion_cost():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    reference_rows = benchmark.run_reference_anchors(fixture)
+    summary = benchmark.summarize_reference_anchors(fixture, reference_rows)
+    model_rows = [
+        row
+        for row in reference_rows
+        if row["evidence_class"] == "model_model_MAGMA"
+    ]
+    alkali_rows = [row for row in model_rows if row["species"] in {"Na", "K"}]
+    alkali_rmse = benchmark._rmse(
+        float(row["imcc_residual_dex"]) for row in alkali_rows
+    )
+    all_species_rmse = benchmark._rmse(
+        float(row["imcc_residual_dex"]) for row in model_rows
+    )
+
+    assert summary["alkali_in_domain_count"] == len(alkali_rows) == 72
+    assert summary["alkali_in_domain_imcc_rmse_dex"] == pytest.approx(alkali_rmse)
+    assert summary["alkali_exclusion_delta_dex"] == pytest.approx(
+        all_species_rmse - summary["controller_pool_imcc_rmse_dex"]
+    )
+
+    report = benchmark.generate_report(
+        fixture, [], [], [], reference_rows=reference_rows
+    )
+    pool_line = next(
+        line for line in report.splitlines()
+        if line.startswith("Controller regression pool")
+    )
+    assert (
+        f"alkali exclusion cost +{summary['alkali_exclusion_delta_dex']:.4f} dex; "
+        f"in-domain alkali RMSE {summary['alkali_in_domain_imcc_rmse_dex']:.4f} dex"
+        in pool_line
+    )
+    assert "imcc-sf04-v1.0.2.json" in pool_line
 
 
 def test_reference_anchor_refuses_tracked_snapshot_hash_mismatch():

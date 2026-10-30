@@ -278,5 +278,8 @@ def test_default_classification_values_preserve_pre_change_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
-    assert digest == 'dc85b0c8714c5f0a31d7e0508fab48122482f314317c2078ad76d9834b044b40'
+    # b-956: against green the hashed payload only gains keys: the 26
+    # zero-valued oxygen partition keys restored under oxygen.partition_kg
+    # and metals_plus_O2.O2_partition_kg, and an empty
+    # estimated_contributions list on 7 classes. No value changes.
+    assert digest == "a290d5b37eadd34e8c7e3963e045e895305ea459a35a774f19aff370a1dfc28b"

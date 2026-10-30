@@ -482,6 +482,7 @@ def test_write_artifacts_emits_study_summary_schema(
 
     summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
 
+    assert summary["save_schema_version"] == 2
     for key in (
         "save_schema_version",
         "member_schema_version",
@@ -531,6 +532,38 @@ def test_write_artifacts_emits_study_summary_schema(
     assert manifest["strategy"]["config"]["budget"] == 4
     assert manifest["strategy"]["config"]["sampler_name"] == "random"
     assert manifest["replayable"] is True
+
+
+def test_study_summary_distinguishes_unavailable_and_empty_stage_three_glass() -> None:
+    from simulator.three_product_report import classify_products
+
+    def summarize(stages: list[object]) -> Mapping[str, Any]:
+        products = classify_products(
+            SimpleNamespace(
+                product_ledger=lambda: {},
+                train=SimpleNamespace(stages=stages),
+                atom_ledger=None,
+            )
+        )
+        record = SimpleNamespace(
+            product_summary={"product_classes": products},
+            trace_summary={},
+        )
+        payload = study._summary_products_payload(record)
+        assert payload is not None
+        return payload
+
+    missing_stage = summarize([])
+    assert missing_stage["glass_kg"] is None
+    assert missing_stage["glass_status"] == "unavailable"
+    assert missing_stage["glass_status_reason"] == "stage_3_missing"
+
+    empty_stage = summarize(
+        [None, None, None, SimpleNamespace(collected_kg={})]
+    )
+    assert empty_stage["glass_kg"] == {}
+    assert empty_stage["glass_status"] == "available"
+    assert empty_stage["glass_status_reason"] == ""
 
 
 def test_export_study_bundle_round_trip_hash_index(
@@ -3656,8 +3689,48 @@ def test_parallel_composition_target_stub_study_completes(
         seed=0,
     )
 
-    assert result.winner is not None
-    assert (tmp_path / "study" / "pareto.json").exists()
+    pareto_path = tmp_path / "study" / "pareto.json"
+    assert pareto_path.exists()
+    payload = json.loads(pareto_path.read_text())
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
+    assert result.pareto == ()
+    assert payload["status"] == "completed-no-feasible-winner"
+    assert payload["winner_candidate_id"] is None
+    assert payload["pareto"] == []
+    assert result.records
+    assert all(record.feasible for record in result.records)
+
+    # t-1368 owns the missing SiO wall-pressure rail; until it lands, these
+    # candidates must remain unpriced and cannot restore a study winner.
+    for candidate in result.records:
+        summary = candidate.product_summary
+        assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+        refusal = summary["wall_deposit_refusal"]
+        authority = refusal["authority"]
+        assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
+        assert "SiO" in authority["wall_saturation_pressure_refused_species"]
+        sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
+            "SiO"
+        ]
+        assert sio_refusals
+        assert all(
+            record["status"] == "refused"
+            for record in sio_refusals.values()
+        )
+
+        wall_authority = summary["wall_deposit_sticking_authority"]
+        fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
+        assert any(
+            record.get("alpha_s", 0.0) == pytest.approx(0.02)
+            and record.get("alpha_s_extrapolation_notice", {}).get(
+                "authority_level"
+            ) == "extrapolated"
+            and record["alpha_s_extrapolation_notice"].get(
+                "temperature_used_K"
+            ) == pytest.approx(1523.15)
+            for record in fe_records
+        )
 
 
 def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path) -> None:
@@ -5466,7 +5539,7 @@ def test_feasible_earned_rump_ood_cache_rejection_warns_and_study_continues(
     assert "out_of_domain_provenance" in caplog.text
 
 
-@pytest.mark.timeout(150)
+@pytest.mark.cpu_budget(150)
 def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
     result = study.run(
         PROFILE,
@@ -5507,6 +5580,7 @@ def _all_slow_evaluator(
     return _evaluator()(patch, feedstock, fidelity, profile=profile, candidate_id=candidate_id, **kwargs)
 
 
+@pytest.mark.cpu_budget(25)
 @pytest.mark.timeout(25)
 def test_parallel_all_timeouts_is_a_designed_no_winner_outcome(tmp_path) -> None:
     """Every candidate timing out is a DESIGNED outcome, not a crash.
@@ -6755,7 +6829,7 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
+    assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

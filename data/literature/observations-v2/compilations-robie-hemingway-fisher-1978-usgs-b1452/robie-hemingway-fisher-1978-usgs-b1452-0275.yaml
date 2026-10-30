@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
 observations:
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=1000:col=entropy:v=12c358148b
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=1000:col=entropy:v=12c358148b:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -14,9 +14,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -78,8 +77,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='212.87'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -98,7 +108,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=298.15:col=entropy:v=ba316020b9
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=298.15:col=entropy:v=ba316020b9:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -110,9 +121,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -174,8 +184,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='87.99'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -194,7 +215,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=400:col=entropy:v=289300c705
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=400:col=entropy:v=289300c705:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -206,9 +228,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -270,8 +291,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='113.75'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -290,7 +322,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=500:col=entropy:v=a591093933
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=500:col=entropy:v=a591093933:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -302,9 +335,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -366,8 +398,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='135.23'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -386,7 +429,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=600:col=entropy:v=c86c452366
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=600:col=entropy:v=c86c452366:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -398,9 +442,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -462,8 +505,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='153.96'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -482,7 +536,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=700:col=entropy:v=6065bb35be
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=700:col=entropy:v=6065bb35be:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -494,9 +549,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -558,8 +612,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='170.68'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -578,7 +643,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=800:col=entropy:v=c2e17b9bdb
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=800:col=entropy:v=c2e17b9bdb:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -590,9 +656,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -654,8 +719,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='185.86'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -674,7 +750,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=900:col=entropy:v=e4dee74d4e
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:S:shared:T=900:col=entropy:v=e4dee74d4e:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -686,9 +763,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -750,8 +826,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='199.84'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -770,7 +857,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=1000:col=heat_capacity:v=d3e82be6cf
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=1000:col=heat_capacity:v=d3e82be6cf:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -782,9 +870,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -846,8 +933,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='126.07'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -866,7 +964,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=298.15:col=heat_capacity:v=94c6e88a31
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=298.15:col=heat_capacity:v=94c6e88a31:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -878,9 +977,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -942,8 +1040,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='82.32'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -962,7 +1071,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=400:col=heat_capacity:v=2b08efb6a3
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=400:col=heat_capacity:v=2b08efb6a3:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -974,9 +1084,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1038,8 +1147,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='92.67'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1058,7 +1178,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=500:col=heat_capacity:v=621d752bd3
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=500:col=heat_capacity:v=621d752bd3:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1070,9 +1191,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1134,8 +1254,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='99.81'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1154,7 +1285,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=600:col=heat_capacity:v=94cec72b77
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=600:col=heat_capacity:v=94cec72b77:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1166,9 +1298,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1230,8 +1361,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='105.77'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1250,7 +1392,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=700:col=heat_capacity:v=209a419e7c
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=700:col=heat_capacity:v=209a419e7c:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1262,9 +1405,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1326,8 +1468,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='111.18'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1346,7 +1499,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=800:col=heat_capacity:v=e85754c630
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=800:col=heat_capacity:v=e85754c630:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1358,9 +1512,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1422,8 +1575,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='116.29'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1442,7 +1606,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=900:col=heat_capacity:v=bcf8d421be
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:cp:shared:T=900:col=heat_capacity:v=bcf8d421be:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1454,9 +1619,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1518,8 +1682,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 301
+        pdf_page_index: 307
+        table: robie-hemingway-fisher-1978-usgs-b1452-0275
+        note: as_published='121.23'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0275
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1538,7 +1713,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=1000:col=formation_gibbs_energy:v=8020035904
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=1000:col=formation_gibbs_energy:v=8020035904:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1550,9 +1726,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1643,7 +1818,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=298.15:col=formation_gibbs_energy:v=1c609e30e3
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=298.15:col=formation_gibbs_energy:v=1c609e30e3:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1655,9 +1831,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1756,7 +1931,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=400:col=formation_gibbs_energy:v=b7f614a99c
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=400:col=formation_gibbs_energy:v=b7f614a99c:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1768,9 +1944,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1861,7 +2036,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=500:col=formation_gibbs_energy:v=67a2276385
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=500:col=formation_gibbs_energy:v=67a2276385:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1873,9 +2049,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -1966,7 +2141,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=600:col=formation_gibbs_energy:v=bb68917b12
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=600:col=formation_gibbs_energy:v=bb68917b12:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -1978,9 +2154,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2071,7 +2246,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=700:col=formation_gibbs_energy:v=96d91a4d10
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=700:col=formation_gibbs_energy:v=96d91a4d10:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2083,9 +2259,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2176,7 +2351,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=800:col=formation_gibbs_energy:v=b68fb3b92b
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=800:col=formation_gibbs_energy:v=b68fb3b92b:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2188,9 +2364,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2281,7 +2456,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=900:col=formation_gibbs_energy:v=7c3945eb8f
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fG:from_the_oxides:T=900:col=formation_gibbs_energy:v=7c3945eb8f:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2293,9 +2469,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2386,7 +2561,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=1000:col=formation_enthalpy:v=e98a378340
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=1000:col=formation_enthalpy:v=e98a378340:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2398,9 +2574,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2491,7 +2666,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=298.15:col=formation_enthalpy:v=f56d795a9d
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=298.15:col=formation_enthalpy:v=f56d795a9d:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2503,9 +2679,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2596,7 +2771,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=400:col=formation_enthalpy:v=df714fdfde
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=400:col=formation_enthalpy:v=df714fdfde:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2608,9 +2784,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2701,7 +2876,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=500:col=formation_enthalpy:v=9a1de8a82d
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=500:col=formation_enthalpy:v=9a1de8a82d:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2713,9 +2889,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2806,7 +2981,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=600:col=formation_enthalpy:v=a8f2b74ac6
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=600:col=formation_enthalpy:v=a8f2b74ac6:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2818,9 +2994,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -2911,7 +3086,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=700:col=formation_enthalpy:v=cea3b80bcd
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=700:col=formation_enthalpy:v=cea3b80bcd:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -2923,9 +3099,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3016,7 +3191,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=800:col=formation_enthalpy:v=75b8d71540
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=800:col=formation_enthalpy:v=75b8d71540:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3028,9 +3204,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3121,7 +3296,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=900:col=formation_enthalpy:v=40c8f2f339
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:delta_fH:from_the_oxides:T=900:col=formation_enthalpy:v=40c8f2f339:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3133,9 +3309,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3226,7 +3401,8 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=1000:col=log_kf:v=9a6a3f366c
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=1000:col=log_kf:v=9a6a3f366c:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3238,9 +3414,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3323,7 +3498,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=298.15:col=log_kf:v=746a9e91bd
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=298.15:col=log_kf:v=746a9e91bd:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3335,9 +3511,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3428,7 +3603,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=400:col=log_kf:v=266a3baea8
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=400:col=log_kf:v=266a3baea8:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3440,9 +3616,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3525,7 +3700,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=500:col=log_kf:v=42a16022c5
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=500:col=log_kf:v=42a16022c5:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3537,9 +3713,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3622,7 +3797,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=600:col=log_kf:v=369ebce7b9
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=600:col=log_kf:v=369ebce7b9:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3634,9 +3810,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3719,7 +3894,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=700:col=log_kf:v=2c41e59ad4
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=700:col=log_kf:v=2c41e59ad4:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3731,9 +3907,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3816,7 +3991,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=800:col=log_kf:v=24519f98f1
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=800:col=log_kf:v=24519f98f1:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3828,9 +4004,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -3913,7 +4088,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=900:col=log_kf:v=4b708c7a2c
+    references: []
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:log10_Kf:from_the_oxides:T=900:col=log_kf:v=4b708c7a2c:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0275:tabulation
   identity:
     quantity:
@@ -3925,9 +4101,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to 1000 K.' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -4010,3 +4185,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0275.json
     parameters: []
     output_unit: dimensionless
+    references: []

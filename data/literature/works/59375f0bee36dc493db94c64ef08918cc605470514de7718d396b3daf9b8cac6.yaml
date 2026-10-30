@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:kems-026-markova-1984
       role: pdf
@@ -36,45 +36,21 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
-  kind: literature
-  method:
-    tag: value
-    value: knudsen_effusion
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
-  locator:
-    published_page: 509
-    pdf_page_index: 1
-    paragraph: The experiments were carried out in the step-wise heating regime till the complete vaporization of the sample
-      under study
-- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984::V
+- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::experiment::V
   kind: literature
   method:
     tag: value
     value: knudsen_effusion
   sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+        note: The abstract names the samples but gives no charge mass.
     initial_composition:
       state:
         tag: value
@@ -205,26 +181,26 @@ experiments:
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
         value:
+          SiO2: '52.32'
           Al2O3: '19.13'
-          CaO: '12.93'
           FeO: '9.37'
           MgO: '6.25'
-          SiO2: '52.32'
+          CaO: '12.93'
       locator:
         published_page: 510
         pdf_page_index: 2
         table: '2'
-        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
-          of corpus PDF page 2; right panel = composition V (alumina basalt)
+        note: Table 2 printed starting charge for sample V (alumina basalt), wt%
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -243,17 +219,73 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
   locator:
-    published_page: 510
-    pdf_page_index: 2
-    table: '2'
-    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
-      of corpus PDF page 2; right panel = composition V (alumina basalt)
-- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984::VI
+    published_page: 509
+    pdf_page_index: 1
+    section: experimental method
+    note: Stepwise-heating run for sample V (alumina basalt), reported in Table 2.
+  apparatus:
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+  bench_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::bench::markova-1984-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+        note: A duration is printed for each temperature step, but the number of steps and total duration are not printed.
+- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::experiment::VI
   kind: literature
   method:
     tag: value
     value: knudsen_effusion
   sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+        note: The abstract names the samples but gives no charge mass.
     initial_composition:
       state:
         tag: value
@@ -384,21 +416,102 @@ experiments:
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
         value:
+          SiO2: '44.02'
           Al2O3: '4.56'
-          CaO: '6.95'
           FeO: '8.04'
           MgO: '36.44'
-          SiO2: '44.02'
+          CaO: '6.95'
       locator:
         published_page: 510
         pdf_page_index: 2
         table: '2'
-        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
-          of corpus PDF page 2; left panel = composition VI (lherzolite)
+        note: Table 2 printed starting charge for sample VI (lherzolite), wt%
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    section: experimental method
+    note: Stepwise-heating run for sample VI (lherzolite), reported in Table 2.
+  apparatus:
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+  bench_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::bench::markova-1984-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+        note: A duration is printed for each temperature step, but the number of steps and total duration are not printed.
+- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
   conditions:
     temperature_K:
       state:
@@ -424,9 +537,8 @@ experiments:
   locator:
     published_page: 510
     pdf_page_index: 2
-    table: '2'
-    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
-      of corpus PDF page 2; left panel = composition VI (lherzolite)
+    table: '1'
+    note: CHEMICAL COMPOSITIONS OF THE INITIAL SAMPLES TABLE 1; 400 dpi pdftoppm of corpus PDF page 2
 benches:
 - id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::bench::markova-1984-kems
   work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
@@ -450,3 +562,176 @@ benches:
       section: experimental method
       note: The abstract does not print the cell material; no material is inferred from Yakovlev 1983.
   other_facts: []
+context:
+- observation_id: markova_1984_dissipation_1500C_recent_moon_model
+  type: model_output_context
+  class_tag: model
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: Only for Na the level of dissipation reaches ~2%, for the others it is significantly less than ~1%
+  quote: The calculation shows that losses of petrogenic elements at temperature ~1500 C from the recent Moon is improbable.
+    Only for Na the level of dissipation reaches ~2%, for the others it is significantly less than ~1%.
+  T_range_K:
+  - '1773.15'
+  - '1773.15'
+  phase: model_dissipation_from_basalt_vaporization_experiment
+  standard_state: calculated dissipation from experimental vapor forms and masses, recent Moon
+  regime: kems_effusion
+  units: percent of petrogenic element as printed
+  values:
+    quantity_as_printed: thermal_dissipation_fraction
+    schema_gap: Model-calculated lunar escape dissipation has no scored quantity token.
+    method_class: model_derived
+    admission_status: model_output_not_measurement
+    T_C: '1500'
+    body: recent_Moon
+    Na_pct_about: '2'
+    other_elements_pct_less_than_about: '1'
+    as_printed: Only for Na the level of dissipation reaches ~2%, for the others it is significantly less than ~1%.
+    derivation_note: Calculated from experimental forms of components in vapor (and their masses) during vaporization of silicate
+      melts /2/, under ideal conditions. Not a directly tabulated ion-current series.
+  uncertainty:
+    note: Authors print ~2% and ~1%; no numeric uncertainty.
+  context_id: kems-026-markova-1984::context::markova_1984_dissipation_1500C_recent_moon_model
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  source_id: kems-026-markova-1984
+  species: Na
+- observation_id: markova_1984_dissipation_1500C_reduced_lunar_mass_model
+  type: model_output_context
+  class_tag: model
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    paragraph: dissipation for SiO-2%, K-3%, Na-14%
+  quote: It may be seen, that at temperatures 1500 C the level of dissipation for SiO-2%, K-3%, Na-14%.
+  T_range_K:
+  - '1773.15'
+  - '1773.15'
+  phase: model_dissipation_from_basalt_vaporization_experiment
+  standard_state: calculated dissipation for lunar mass 3.53e25 g (escape 1.88 km/s)
+  regime: kems_effusion
+  units: percent as printed
+  values:
+    quantity_as_printed: thermal_dissipation_fraction
+    schema_gap: Model-calculated lunar escape dissipation has no scored quantity token.
+    method_class: model_derived
+    admission_status: model_output_not_measurement
+    T_C: '1500'
+    lunar_mass_g: '35300000000000000000000000'
+    escape_velocity_km_s: '1.88'
+    radius_less_than_recent_km: '400'
+    radius_offset_note: 400 km is the assumed value of the magmatic ocean depth /3,4/
+    Na_pct: '14'
+    K_pct: '3'
+    SiO_pct: '2'
+    curve_onset_p_torr_ge: '0.0001'
+    curve_onset_note: Curves of Na, K, SiO and Fe begin from the temperatures at which pressures of their vapors >= 10^-4
+      tor (the pressures have been taken from the basalt vaporization experiment).
+  uncertainty:
+    note: Model percentages as printed; no numeric uncertainty. Fig. 2 is the curve form of the same calculation and was not
+      digitised.
+  context_id: kems-026-markova-1984::context::markova_1984_dissipation_1500C_reduced_lunar_mass_model
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  source_id: kems-026-markova-1984
+  species: Na
+- observation_id: markova_1984_fig2_dissipation_curves_figure_only
+  type: figure_model_context
+  locator:
+    figure: '2'
+    published_page: 510
+    pdf_page_index: 2
+    note: CURVES OF THE DISSIPATION LEVELS OF THE VOLATILE PETROGENIC COMPONENTS IN DEPENDENCE ON TEMPERATURE FOR THE LUNAR
+      MASS 3.53e25 g AND ESCAPE VELOCITY 1.88 km/sek
+  T_range_K:
+  - '773.15'
+  - '3173.15'
+  phase: model_dissipation_from_basalt_vaporization_experiment
+  standard_state: calculated dissipation percent vs T; not a measured P(T) series
+  regime: kems_effusion
+  units: percent vs C as plotted; not digitised
+  values:
+    quantity_as_printed: thermal_dissipation_fraction
+    schema_gap: Model-calculated lunar escape dissipation has no scored quantity token.
+    method_class: model_derived
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    axis: dissipation_percent vs T_C
+    labeled_species_as_printed:
+    - Na
+    - K
+    - SiO
+    - Fe
+    - O2
+    labeled_mass_numbers_as_printed:
+    - 23Na
+    - 39K
+    - 44SiO
+    - 56Fe
+    - 32O2
+    T_axis_ticks_C_as_printed:
+    - 500
+    - 900
+    - 1300
+    - 1700
+    - 2100
+    - 2500
+    - 2900
+  uncertainty:
+    note: Figure-only model curves; not digitised. 1500 C intercepts are printed in the text (Na 14%, K 3%, SiO 2%).
+  context_id: kems-026-markova-1984::context::markova_1984_fig2_dissipation_curves_figure_only
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  source_id: kems-026-markova-1984
+  species: Na
+- observation_id: markova_1984_kems_method_stepwise_heating
+  type: method_context
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: The experiments were carried out in the step-wise heating regime till the complete vaporization of the sample
+      under study
+  T_range_K:
+  - '1748.15'
+  - '2564.15'
+  phase: l
+  condensed_form:
+    state: liquid
+    metastable: false
+    basis: explicit_author
+    note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite, lunar basalt 68415,40,
+      gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+  standard_state: Knudsen effusion cell; technique described in Yakovlev et al. 14th LPS (1983) 869
+  regime: kems_effusion
+  units: as published
+  values:
+    quantity_as_printed: kems_method_geometry_reference
+    schema_gap: Method and apparatus description only; no scored measurement.
+    method_class: method_only
+    semantics: method_geometry_reference_not_measured_species_observation
+    cell: Knudsen effusion cell
+    technique_reference: Yakovlev O.I. et al. 14th LPS (1983) 869
+    heating_regime: step-wise to complete vaporization
+    temperature_step_C: '70'
+    step_duration_min: '15'
+    determined_as_printed:
+    - forms of the components in vapor
+    - partial pressures of the main components over the residuals (see /2/ for compositions I-IV)
+    - compositions of residual melts (see table 2 for compositions V and VI)
+    - compositions of complementary vapor
+    - partial pressure of oxygen
+    - total pressure of the components in vapor over the residual melts
+    - activities of components in these melts
+    missing_for_motzfeldt:
+    - orifice_area
+    - orifice_diameter
+    - clausing_factor
+    - sample_surface_area
+    - cell_material
+    missing_note: Orifice geometry and cell material are not printed in this two-page abstract; authors point to Yakovlev
+      et al. 14th LPS (1983) 869 for the technique.
+  uncertainty:
+    note: No numeric uncertainty printed for the temperature step or duration.
+  context_id: kems-026-markova-1984::context::markova_1984_kems_method_stepwise_heating
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  source_id: kems-026-markova-1984
+  species: SiO2

@@ -141,12 +141,14 @@ observations:
               note: The text gives the approximate Fe pressure and points to Figure 6, whose caption identifies the SC6 time
                 series.
         output_unit: K
+        references: []
   derivation:
     relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:dohmen-2003-coupled-kinetics
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: dohmen-2003-coupled-kinetics::dohmen_2003_text_psio_approximate
   experiment_id: 10.1029/2001jb000587::experiment::dohmen-2003-kems-1400c
   identity:
@@ -289,9 +291,11 @@ observations:
               note: The text states SiO becomes unambiguous after about 10 hours and gives its approximate pressure; the source
                 sentence does not name a specific run.
         output_unit: K
+        references: []
   derivation:
     relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:dohmen-2003-coupled-kinetics
     parameters: []
     output_unit: Pa
+    references: []

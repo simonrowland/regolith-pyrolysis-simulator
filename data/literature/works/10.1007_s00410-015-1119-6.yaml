@@ -1,0 +1,1149 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s00410-015-1119-6
+  citation: 'Borisov, A., Behrens, H. & Holtz, F. (2015). Effects of melt composition on Fe3+/Fe2+ in silicate melts: a step
+    to model ferric/ferrous ratio in multicomponent systems. Contributions to Mineralogy and Petrology 169:24. DOI 10.1007/s00410-015-1119-6.'
+  source_ids:
+  - borisov-behrens-holtz-2015-melt-composition-fe-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:borisov-behrens-holtz-2015-melt-composition-fe-redox
+      role: pdf
+      path: raw/borisov-behrens-holtz-2015-melt-composition-fe-redox/borisov-behrens-holtz-2015-melt-composition-fe-redox.pdf
+      sha256:
+        tag: value
+        value: 54123679f344548b617f197efa918482638d3c7cf5130b031cb59c24ce03b1aa
+    - asset_id: pdftotext:borisov-behrens-holtz-2015-melt-composition-fe-redox
+      role: pdftotext
+      path: text/borisov-behrens-holtz-2015-melt-composition-fe-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:borisov-behrens-holtz-2015-melt-composition-fe-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s00410-015-1119-6
+experiments:
+- experiment_id: 10.1007/s00410-015-1119-6::borisov-behrens-holtz-2015-melt-composition-fe-redox
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 3
+    pdf_page_index: 2
+    section: Experimental procedure
+    note: PU-3 session 1 ratio.
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_01
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=1
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_07
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=7
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_13
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=13
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_19
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=19
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_22
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=22
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_25
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=25
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_27
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=27
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_32
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=32
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_37
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=37
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_43
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: row=43
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_49
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: row=49
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_55
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: row=55
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_58
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: row=58
+- experiment_id: 10.1007/s00410-015-1119-6::experiment::borisov_2015_table1_run_from_row_63
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental procedure
+        note: The runs were made in a one-atmosphere vertical tube furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The Table 1 note says series used either air or pure CO2 but does not bind the atmosphere to each run group.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 states that all series were made either in air or in pure CO2 atmosphere.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The flow-regime class is not stated.
+  work_id: 10.1007/s00410-015-1119-6
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: row=63
+context:
+- observation_id: borisov_2015_equation4_model_context
+  type: model_fit_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    section: Results
+    note: Equation (4), fit to 21 DAF5, DAF and DAF20 samples.
+  attribution: Borisov, Behrens & Holtz (2015), present study
+  units: model coefficients and fitted quantities as printed
+  values:
+    method_class: model_derived
+    equation_as_printed: log(XFeO1.5/XFeO) = 4933/T + 0.27·log fO2 + 1.05·XFe2O3t − 2.38
+    fit_quality_as_printed: R2 = 0.996
+    coefficient_estimate_as_printed: k = 0.270 ± 0.005
+    iron_coefficient_as_printed: dFe2O3t = 1.05 ± 0.10
+    inputs_as_printed: 21 DAF5, DAF and DAF20 samples
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_equation4_model_context
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_figure_1_deferred
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '1'
+  panel: whole_figure
+  attribution: Present study
+  units: dimensionless Fe3+/Fe2+ ratio
+  values:
+    quantity: valence_ratio
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1450, 1500 and 1550 °C
+      valence_basis:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: oxidation_state
+        denominator_oxidation_state: 2
+        value_form: ratio
+    axes_as_printed:
+      x: Al2O3 (wt.%)
+      y: Fe3+/Fe2+ (logarithmic Y scale)
+    caption_as_printed: Effect of Al2O3 on ferric/ferrous ratio in basic DAFA and silicic DAFSA series. +Spl and +Sil mean
+      trace spinel or trace silica phase in appropriate sample. Note that Y scale is logarithmic
+    series:
+    - name: basic DAFA, 1450 °C
+      marker_count: 3
+    - name: basic DAFA, 1500 °C
+      marker_count: 3
+    - name: basic DAFA, 1550 °C
+      marker_count: 3
+    - name: silicic DAFSA, 1450 °C
+      marker_count: 3
+    - name: silicic DAFSA, 1500 °C
+      marker_count: 3
+    - name: silicic DAFSA, 1550 °C
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were transcribed from 600 dpi physical-page renders.
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_figure_1_deferred
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_figure_2_deferred
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '2'
+  panel: whole_figure
+  attribution: Present study
+  units: dimensionless Fe3+/Fe2+ ratio
+  values:
+    quantity: valence_ratio
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1500 and 1550 °C
+      valence_basis:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: oxidation_state
+        denominator_oxidation_state: 2
+        value_form: ratio
+    axes_as_printed:
+      x: MgO (wt.%)
+      y: Fe3+/Fe2+ (logarithmic Y scale)
+    caption_as_printed: Effect of MgO on ferric/ferrous ratio in basic DAFM and silicic DAFSM series. Note that Y scale is
+      logarithmic
+    series:
+    - name: basic DAFM, 1500 °C
+      marker_count: 3
+    - name: basic DAFM, 1550 °C
+      marker_count: 3
+    - name: silicic DAFSM, 1500 °C
+      marker_count: 3
+    - name: silicic DAFSM, 1550 °C
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were transcribed from 600 dpi physical-page renders.
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_figure_2_deferred
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_figure_3_deferred
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    figure: '3'
+  panel: whole_figure
+  attribution: Present study
+  units: dimensionless Fe3+/Fe2+ ratio
+  values:
+    quantity: valence_ratio
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1450, 1500 and 1550 °C
+      valence_basis:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: oxidation_state
+        denominator_oxidation_state: 2
+        value_form: ratio
+    axes_as_printed:
+      x: MgO (wt.%)
+      y: Fe3+/Fe2+ (logarithmic Y scale)
+    caption_as_printed: Effect of MgO on ferric/ferrous ratio in DAFOL series (diluting initial DAF with San Carlos Ol). Note
+      that Y scale is logarithmic
+    series:
+    - name: DAFOL, 1450 °C
+      marker_count: 3
+    - name: DAFOL, 1500 °C
+      marker_count: 3
+    - name: DAFOL, 1550 °C
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were transcribed from 600 dpi physical-page renders.
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_figure_3_deferred
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_figure_4_deferred
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    figure: '4'
+  panel: whole_figure
+  attribution: Present study
+  units: dimensionless Fe3+/Fe2+ ratio
+  values:
+    quantity: valence_ratio
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1400, 1450, 1500 and 1550 °C; 1400 °C air series only
+      valence_basis:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: oxidation_state
+        denominator_oxidation_state: 2
+        value_form: ratio
+    axes_as_printed:
+      x: FeO + FeO1.5 (mol.%)
+      y: log Fe3+/Fe2+
+    caption_as_printed: Effect of total iron on ferric/ferrous ratio in DA–Fe2O3 melts
+    series:
+    - name: air, 1400 °C
+      marker_count: 3
+    - name: air, 1450 °C
+      marker_count: 3
+    - name: air, 1500 °C
+      marker_count: 3
+    - name: air, 1550 °C
+      marker_count: 3
+    - name: CO2, 1450 °C
+      marker_count: 3
+    - name: CO2, 1500 °C
+      marker_count: 3
+    - name: CO2, 1550 °C
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were transcribed from 600 dpi physical-page renders.
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_figure_4_deferred
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_figure_5_deferred
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: '5'
+  panel: whole_figure
+  attribution: Present study
+  units: dimensionless Fe3+/Fe2+ ratio
+  values:
+    quantity: valence_ratio
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1400–1550 °C
+      valence_basis:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: oxidation_state
+        denominator_oxidation_state: 2
+        value_form: log10_ratio
+    axes_as_printed:
+      x: 10^4/T(K)
+      y: log Fe3+/Fe2+
+    caption_as_printed: Effect of reciprocal temperature on ferric/ferrous ratio in DAF and DAFS melt. The data were collected
+      during a 4-year period of time, the ferric/ferrous ratios were determined in six different analytical sessions. The
+      figure also demonstrates that the error on the slope h is very large when using data from different analytical sessions
+      and obtained over a small temperature range (ca. 50 °C) (see text for details)
+    series:
+    - name: analytical session 1; DAF and DAFS at four temperatures
+      marker_count: 8
+    - name: analytical session 2; DAF and DAFS at four temperatures
+      marker_count: 8
+    - name: analytical session 3; DAF and DAFS at four temperatures
+      marker_count: 8
+    - name: analytical session 4; DAF and DAFS at four temperatures
+      marker_count: 8
+    - name: analytical session 5; DAF and DAFS at four temperatures
+      marker_count: 8
+    - name: analytical session 6; DAF and DAFS at four temperatures
+      marker_count: 8
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were transcribed from 600 dpi physical-page renders.
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_figure_5_deferred
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_figure_6_deferred
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    figure: '6'
+  panel: whole_figure
+  attribution: Present study
+  units: dimensionless Fe3+/Fe2+ ratio
+  values:
+    quantity: valence_ratio
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: not stated
+      valence_basis:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: oxidation_state
+        denominator_oxidation_state: 2
+        value_form: log10_ratio
+    axes_as_printed:
+      x: Experimental log(XFeO1.5/XFeO)
+      y: Calculated log(XFeO1.5/XFeO)
+    caption_as_printed: 'log(XFeO1.5/XFeO) values according to present data for air conditions and data of Borisov et al.
+      (2013): a comparison of experimental results with calculated values using Eq. (31)'
+    series:
+    - name: DAF–DAF5–DAF20
+      marker_count: 7
+      count_note: visible marker centers; overprinted symbols may hide additional markers
+    - name: DAFS
+      marker_count: 4
+      count_note: visible marker centers; overprinted symbols may hide additional markers
+    - name: TiO2-modified
+      marker_count: 12
+      count_note: visible marker centers; overprinted symbols may hide additional markers
+    - name: P2O5-modified
+      marker_count: 10
+      count_note: visible marker centers; overprinted symbols may hide additional markers
+    - name: Al2O3-modified
+      marker_count: 8
+      count_note: visible marker centers; overprinted symbols may hide additional markers
+    - name: MgO- or Ol-modified
+      marker_count: 11
+      count_note: visible marker centers; overprinted symbols may hide additional markers
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were transcribed from 600 dpi physical-page renders; Figure 6 counts are visible centers and
+      are lower bounds where symbols overlap.
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_figure_6_deferred
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_figure_7_deferred
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    figure: '7'
+  panel: whole_figure
+  attribution: Present study
+  units: dimensionless Fe3+/Fe2+ ratio
+  values:
+    quantity: valence_ratio
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1500 °C
+      valence_basis:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: oxidation_state
+        denominator_oxidation_state: 2
+        value_form: log10_ratio
+    axes_as_printed:
+      x: oxide mole fraction as labeled in each panel
+      y: log(XFeO1.5/XFeO)
+    caption_as_printed: 'Effect of different components on ferric/ferrous ratio in silicate melts at 1500 °C in air: a comparison
+      of experimental data with calculated values according to Eq. (31)'
+    series:
+    - name: 'MgO panel: experiment'
+      panel: MgO
+      marker_count: 6
+    - name: 'MgO panel: calculated'
+      panel: MgO
+      marker_count: 6
+    - name: 'Al2O3 panel: experiment'
+      panel: Al2O3
+      marker_count: 6
+    - name: 'Al2O3 panel: calculated'
+      panel: Al2O3
+      marker_count: 6
+    - name: 'P2O5 panel: experiment'
+      panel: P2O5
+      marker_count: 5
+    - name: 'P2O5 panel: calculated'
+      panel: P2O5
+      marker_count: 5
+    - name: 'TiO2 panel: experiment'
+      panel: TiO2
+      marker_count: 7
+    - name: 'TiO2 panel: calculated'
+      panel: TiO2
+      marker_count: 7
+    - name: 'FeO1.5 total panel: experiment'
+      panel: FeO1.5 total
+      marker_count: 4
+    - name: 'FeO1.5 total panel: calculated'
+      panel: FeO1.5 total
+      marker_count: 4
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were transcribed from 600 dpi physical-page renders.
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_figure_7_deferred
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_table2_model_context
+  type: model_fit_context
+  locator:
+    page: 10
+    pdf_page_index: 9
+    table: '2'
+  attribution: Borisov, Behrens & Holtz (2015), present study
+  units: model coefficients and fitted quantities as printed
+  values:
+    method_class: model_derived
+    table_title_as_published: Temperature slopes from equations type of log(XFeO1.5/XFeO) = diXi + h/T + const., where Xi
+      is modifying oxide
+    equation_type_as_printed: log(XFeO1.5/XFeO) = diXi + h/T + const.
+    h_units_as_printed: K
+    rows:
+    - system: DAFM
+      prescription: MgO-modified, basic
+      h: '5187'
+      1sigma: '715'
+    - system: DAFSM
+      prescription: MgO-modified, silicic
+      h: '5186'
+      1sigma: '799'
+    - system: DAFA
+      prescription: Al2O3-modified, basic
+      h: '4413'
+      1sigma: '163'
+    - system: DAFSA
+      prescription: Al2O3-modified, silicic
+      h: '5130'
+      1sigma: '304'
+    - system: DAFT
+      prescription: TiO2-modified, basic
+      h: '6398'
+      1sigma: '324'
+    - system: DAFST
+      prescription: TiO2-modified, silicic
+      h: '7749'
+      1sigma: '247'
+    - system: DAFP
+      prescription: P2O5-modified, basic
+      h: '4818'
+      1sigma: '188'
+    - system: DAF5-DAF-DAF20
+      prescription: Fe2O3-modified, basic
+      h: '4827'
+      1sigma: '312'
+    - system: Average
+      prescription: not stated
+      h: '5464'
+      1sigma: not reported
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_table2_model_context
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe
+- observation_id: borisov_2015_table3_model_context
+  type: model_fit_context
+  locator:
+    page: 10
+    pdf_page_index: 9
+    table: '3'
+  attribution: Borisov, Behrens & Holtz (2015), present study
+  units: model coefficients and fitted quantities as printed
+  values:
+    method_class: model_derived
+    table_title_as_published: Empirical coefficients for Eq. (31), with variability of compositions (Xi min and max) included
+      in the regression
+    equation_as_printed: log(XFeO1.5/XFeO) = ΣdiXi + dSiAl·XSiO2·XAl2O3 + dSiMg·XSiO2·XMgO + h/T + c
+    rows:
+    - oxide: XSiO2
+      di: −0.400
+      1sigma: '0.084'
+      Xi_min: '0.341'
+      Xi_max: '0.685'
+    - oxide: XTiO2
+      di: −1.334
+      1sigma: '0.057'
+      Xi_min: '0.000'
+      Xi_max: '0.242'
+    - oxide: XAl2O3
+      di: '1.945'
+      1sigma: '0.357'
+      Xi_min: '0.035'
+      Xi_max: '0.194'
+    - oxide: XMgO
+      di: '1.766'
+      1sigma: '0.245'
+      Xi_min: '0.056'
+      Xi_max: '0.293'
+    - oxide: XP2O5
+      di: −5.256
+      1sigma: '0.109'
+      Xi_min: '0.000'
+      Xi_max: '0.099'
+    - oxide: XSiO2·XAl2O3
+      di: −7.835
+      1sigma: '0.690'
+      Xi_min: not reported
+      Xi_max: not reported
+    - oxide: XSiO2·XMgO
+      di: −5.187
+      1sigma: '0.516'
+      Xi_min: not reported
+      Xi_max: not reported
+    - oxide: h (at 1/T)
+      di: '5299.2'
+      1sigma: '127.9'
+      Xi_min: not applicable
+      Xi_max: not applicable
+    - oxide: c (constant)
+      di: −2.27
+      1sigma: '0.02'
+      Xi_min: not applicable
+      Xi_max: not applicable
+    excluded_regressors_as_printed: CaO and iron oxide
+    excluded_component_ranges_as_printed:
+      XCaO_min: '0.092'
+      XCaO_max: '0.246'
+      XFeO1.5 + XFeO_min: '0.034'
+      XFeO1.5 + XFeO_max: '0.160'
+    fit_quality_as_printed:
+      R2: '0.986'
+      sigma_log_ratio: '0.018'
+  context_id: borisov-behrens-holtz-2015-melt-composition-fe-redox::context::borisov_2015_table3_model_context
+  work_id: 10.1007/s00410-015-1119-6
+  source_id: borisov-behrens-holtz-2015-melt-composition-fe-redox
+  species: Fe

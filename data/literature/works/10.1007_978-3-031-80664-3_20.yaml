@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:shornikov-2025-calcium-oxide-evaporation
       role: pdf
@@ -71,6 +71,8 @@ experiments:
             kind: bound
             bound_operator: <=
             bound_value: '1.0'
+          note: 'p. 221 Experimental: "CaO (chemically pure), the content of the basic substance is not less than 97.5 wt%,
+            not more than 1.0 wt% CaCO3." Remaining composition unresolved.'
       locator:
         published_page: 221
         pdf_page_index: 7
@@ -136,6 +138,7 @@ experiments:
               section: Experimental
               note: Residual gas <=10^-10 atm converted using 101325 Pa/atm; chamber background, not sample pressure
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown

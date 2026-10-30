@@ -6,9 +6,23 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import Engine, EvidenceClass, Phase, Quantity
-from simulator.battery.records import Species, State
-from simulator.battery.score import _bench_for_score, compile_residual, load_score_context
+from simulator.battery.enums import (
+    BenchIdentityBasis,
+    CellMaterial,
+    Engine,
+    EvidenceClass,
+    Phase,
+    Quantity,
+)
+from simulator.battery.records import (
+    Bench, BenchIdentity, Located, Reaction, ReactionTerm, Species, State,
+)
+from simulator.battery.score import (
+    ScoreContext,
+    _bench_for_score,
+    compile_residual,
+    load_score_context,
+)
 from simulator.battery.source_oxygen import (
     SourceOxygenCondition,
     SourceOxygenFallback,
@@ -118,10 +132,64 @@ def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_contex
     assert residual.refusal.detail["derivation"]["inputs"]
 
 
+def test_typed_1996_source_oxygen_commands_the_reduced_condition(
+    tmp_path, monkeypatch
+):
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(
+        tmp_path,
+        "stolyarova-1996-cao-alumina-silica-kems.yaml",
+        use_repository_index_row=True,
+    )
+    source_context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=migrated.observations,
+        benches=migrated.benches,
+    )
+    row = _row(source_context, "stolyarova-1996-cao-alumina-silica-kems", "AlO")
+    condition = _resolve(source_context, row)
+    assert isinstance(condition, SourceOxygenCondition)
+    assert condition.observation.identity.species.formula == "O2"
+    assert condition.observation.derived_from
+    assert set(condition.observation.derived_from) <= condition.used_observations
+    oxygen_row = source_context.observations[condition.observation.derived_from[0]]
+    assert oxygen_row.identity.species.formula == "O"
+    assert oxygen_row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert oxygen_row.identity.reaction is not None
+    assert oxygen_row.identity.reaction.is_value
+    assert {
+        term.species.formula
+        for term in oxygen_row.identity.reaction.value.terms
+    } == {"MoO3", "MoO2", "O"}
+
+    requests, handles = _capture_engine(monkeypatch, row)
+    residual, candidate = compile_residual(
+        row,
+        Engine.OPENIMCC,
+        context=source_context,
+        handles=handles,
+        point_observations=tuple(source_context.observations.values()),
+    )
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+    assert requests[0].po2_bar == pytest.approx(
+        float(condition.observation.value.point) / 1.0e5
+    )
+    assert residual.numeric is not None
+    assert candidate is not None
+    assert (
+        candidate.provenance["source_oxygen_condition"]["observation_id"]
+        == condition.observation.observation_id
+    )
+
+
 def test_stolyarova_1996_alternative_oxygen_columns_use_mo_cell_condition(source_context, tmp_path):
     from simulator.battery.migrate import load_migrated_context
     from simulator.battery.validate import validate_corpus
     from tests.battery.test_migrate import _migrate_real_extract
+    from tests.battery.test_score import _series_stem
 
     source_id = "stolyarova-1996-cao-alumina-silica-kems"
     context = source_context
@@ -143,7 +211,13 @@ def test_stolyarova_1996_alternative_oxygen_columns_use_mo_cell_condition(source
             key: observation for key, observation in context.observations.items()
             if observation.source_id == source_id
         }
-        assert set(fresh.observations) == set(stored_source_rows)
+        # A stale committed sibling may have different :h= row hashes; the
+        # series stems must still match the fresh migration.
+        assert {
+            _series_stem(observation_id) for observation_id in fresh.observations
+        } == {
+            _series_stem(observation_id) for observation_id in stored_source_rows
+        }
         validation = validate_corpus(
             context.works,
             context.experiments,
@@ -430,6 +504,63 @@ def _pair_rows(o_uncertainty=None, o2_uncertainty=None):
     if o2_uncertainty is not None:
         molecular = replace(molecular, uncertainty=o2_uncertainty)
     return sample, (sample, atomic, molecular)
+
+
+def _mo_pair_atomic_oxygen(*, evidence, derived_from=()):
+    sample = _partial_pressure("mo-target", "SiO", Decimal("1"))
+    moo2 = _partial_pressure("mo-cell-moo2", "MoO2", Decimal("1"))
+    moo3 = _partial_pressure("mo-cell-moo3", "MoO3", Decimal("1"))
+    atomic = _partial_pressure("mo-cell-oxygen", "O", Decimal("1e-9"), evidence=evidence)
+    atomic = replace(
+        atomic,
+        identity=replace(
+            atomic.identity,
+            reaction=State.of(Reaction((
+                ReactionTerm(Species("MoO2", Phase.G), 1),
+                ReactionTerm(Species("MoO3", Phase.G), -1),
+                ReactionTerm(Species("O", Phase.G), 1),
+            ))),
+        ),
+        derived_from=derived_from,
+        derivation=None,
+    )
+    bench = Bench(
+        id="mo-cell-bench", work_id="synthetic-comeasured",
+        identity=BenchIdentity(
+            basis=BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+            reason="literal Mo-cell fixture",
+        ),
+        cell_materials=(Located(State.of(CellMaterial.MO), locator=atomic.locator),),
+    )
+    return sample, moo2, moo3, atomic, bench
+
+
+def test_mo_pair_model_derived_without_lineage_is_refused():
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.MODEL_DERIVED)
+    assert atomic.derived_from == ()
+    selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic), bench)
+    assert isinstance(selected, SourceOxygenFallback)
+    assert selected.reason is FallbackReason.UNTYPED_LINEAGE
+
+
+def test_mo_pair_quoted_attributed_atomic_oxygen_is_admitted():
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.QUOTED_ATTRIBUTED)
+    selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic), bench)
+    assert isinstance(selected, SourceOxygenCondition)
+    assert "mo-cell-oxygen" in selected.used_observations
+
+
+def test_mo_pair_atomic_oxygen_with_derived_from_is_admitted():
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.MODEL_DERIVED)
+    atomic = replace(
+        atomic,
+        derived_from=("mo-cell-moo2", "mo-cell-moo3"),
+    )
+    selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic), bench)
+    assert isinstance(selected, SourceOxygenCondition)
+    assert {
+        "mo-cell-oxygen", "mo-cell-moo2", "mo-cell-moo3",
+    } <= selected.used_observations
 
 
 def _selected_pair(o_uncertainty=None, o2_uncertainty=None):
@@ -873,8 +1004,12 @@ def test_migrated_printed_fo2_source_is_excluded_by_scorer(tmp_path, monkeypatch
             row, Engine.OPENIMCC, context=context, handles=handles,
             point_observations=point_rows,
         )
+        # 45cea9498 types Table 3 O2 measured_reduced, so the row is the
+        # selected source-oxygen condition. That exclusion lists derived_from
+        # and does not set the printed-name match key (9c40ad728).
+        assert residual.refusal is not None
         assert residual.refusal.detail["reason"] == "used_as_scoring_condition"
-        assert residual.refusal.detail["match"] == "printed_fo2_names_observation"
+        assert row.observation_id in residual.refusal.detail["derived_from"]
         assert residual.numeric is None and candidate is None
     assert requests == []
     row = sample_row

@@ -1,0 +1,564 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  citation: Jeon, Junmo, and Daniel Lindberg (2025). Interfacial reaction between different MgO-based refractories and the
+    CaO-FeOx-SiO2 slag system at 1400 °C. Journal of the European Ceramic Society 45(5), article 117099.
+  source_ids:
+  - jeon-lindberg-2025-mgo-refractory-slag-interface
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:jeon-lindberg-2025-mgo-refractory-slag-interface
+      role: pdf
+      path: raw/jeon-lindberg-2025-mgo-refractory-slag-interface/jeon-lindberg-2025-mgo-refractory-slag-interface.pdf
+      sha256:
+        tag: value
+        value: b7ff4fe8073271107fb4d1b307682e80d799f5e6ca27425ab8e7dd2db604d7d1
+    - asset_id: pdftotext:jeon-lindberg-2025-mgo-refractory-slag-interface
+      role: pdftotext
+      path: text/jeon-lindberg-2025-mgo-refractory-slag-interface
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:jeon-lindberg-2025-mgo-refractory-slag-interface
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.jeurceramsoc.2024.117099
+experiments:
+- experiment_id: 10.1016/j.jeurceramsoc.2024.117099::experiment::jeon25_immersion
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  locator:
+    page: 4
+    published_page: 3
+    pdf_page_index: 3
+    section: Experimental procedure
+- experiment_id: 10.1016/j.jeurceramsoc.2024.117099::experiment::jeon25_sessile_drop
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  locator:
+    page: 3
+    published_page: 2
+    pdf_page_index: 2
+    section: Experimental procedure
+context:
+- observation_id: jeon25_factsage_model_context
+  type: model_derived
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: '11'
+  values:
+    quantity: context
+    values_as_published: 'Calculated FeO activity of S2 slag: 0.77 at 1400 °C, p(O2)=10−6; 0.81 at 1350 °C, p(O2)<10−18. The
+      review paragraph does not print a pressure unit.'
+    reason: Thermodynamic model output is not measured equilibrium composition.
+    units: ''
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_factsage_model_context
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_10_deferred
+  type: figure
+  locator:
+    page: 8
+    pdf_page_index: 7
+    figure: '10'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: microstructure images
+    caption: SEM/EDS results of MgO-based refractories in contact with S2 liquid slag.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    - label_as_published: series 2
+      marker_count: null
+    - label_as_published: series 3
+      marker_count: null
+    - label_as_published: series 4
+      marker_count: null
+    - label_as_published: series 5
+      marker_count: null
+    - label_as_published: series 6
+      marker_count: null
+    - label_as_published: series 7
+      marker_count: null
+    - label_as_published: series 8
+      marker_count: null
+    - label_as_published: series 9
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: null
+      axes: null
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_10_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_11_deferred
+  type: figure
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: '11'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: model phase fields
+    caption: FactSage equilibrium phase calculations.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    - label_as_published: series 2
+      marker_count: null
+    - label_as_published: series 3
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: 1400
+      axes: as printed in figure
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_11_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_1_deferred
+  type: figure
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '1'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: XRD phase identification
+    caption: 'XRD patterns of sintered MgO-based refractories: MgO-Al2O3, MgO-Cr2O3, MgO-C.'
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: null
+      axes: null
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_1_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_2_deferred
+  type: figure
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: microstructure images
+    caption: 'SEM images of sintered MgO-based refractories: MgO-Al2O3, MgO-Cr2O3, MgO-C.'
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    - label_as_published: series 2
+      marker_count: null
+    - label_as_published: series 3
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: null
+      axes: null
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_2_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_3_deferred
+  type: figure
+  locator:
+    page: 4
+    pdf_page_index: 3
+    figure: '3'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: calculated phase diagram
+    caption: Compositions of liquid slag according to basicity on the ternary CaO-FeOx-SiO2 phase diagram at 1400 °C at P(O2)=10−7
+      to −5.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    - label_as_published: series 2
+      marker_count: null
+    - label_as_published: series 3
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: 1400
+      axes: as printed in figure
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_3_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_4_deferred
+  type: figure
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '4'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: apparatus
+    caption: Apparatus of sessile drop test with CCD camera.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: null
+      axes: null
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_4_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_5_deferred
+  type: figure
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '5'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: apparatus
+    caption: Apparatus of corrosion test.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: null
+      axes: null
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_5_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_6_deferred
+  type: figure
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '6'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: photographic comparison
+    caption: Slag behavior on MgO-based refractories according to slag basicity at 1400 °C.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    - label_as_published: series 2
+      marker_count: null
+    - label_as_published: series 3
+      marker_count: null
+    - label_as_published: series 4
+      marker_count: null
+    - label_as_published: series 5
+      marker_count: null
+    - label_as_published: series 6
+      marker_count: null
+    - label_as_published: series 7
+      marker_count: null
+    - label_as_published: series 8
+      marker_count: null
+    - label_as_published: series 9
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: 1400
+      axes: null
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_6_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_7_deferred
+  type: figure
+  locator:
+    page: 6
+    pdf_page_index: 5
+    figure: '7'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: contact angle vs time
+    caption: S2 slag behaviors on MgO-based refractories against time at 1400 °C; images and contact-angle graph.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    - label_as_published: series 2
+      marker_count: null
+    - label_as_published: series 3
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: 1400
+      axes: as printed in figure
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_7_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_8_deferred
+  type: figure
+  locator:
+    page: 6
+    pdf_page_index: 5
+    figure: '8'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: microstructure images
+    caption: SEM image of interface between S2 slag and MgO-based refractories.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    - label_as_published: series 2
+      marker_count: null
+    - label_as_published: series 3
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: null
+      axes: null
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_8_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_figure_9_deferred
+  type: figure
+  locator:
+    page: 7
+    pdf_page_index: 6
+    figure: '9'
+  panel_as_published: all panels as captioned
+  values:
+    quantity: refractory diameter
+    caption: Comparison of diameters of MgO-based refractories before and after immersion tests.
+    series:
+    - label_as_published: series 1
+      marker_count: null
+    - label_as_published: series 2
+      marker_count: null
+    - label_as_published: series 3
+      marker_count: null
+    identity:
+      system: MgO-based refractory and CaO-FeOx-SiO2 slag
+      temperature_C: null
+      axes: as printed in figure
+    attribution: Jeon and Lindberg (2025), present work
+    digitisation: deferred to a figure pass
+    units: as printed or not applicable
+  units: as printed or not applicable
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_figure_9_deferred
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_table1_initial_recipes_context
+  type: measured_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 3
+    table: '1'
+  values:
+    quantity: context
+    values_as_published: 'MgO-Al2O3 refractory: 28.3 MgO, 71.7 Al2O3; MgO-Cr2O3: 21.0 MgO, 79.0 Cr2O3; MgO-C: 70 MgO, 30 C.
+      S1: 10 CaO, 50 FeOx, 40 SiO2; S2: 25 CaO, 50 FeOx, 25 SiO2; S3: 30 CaO, 50 FeOx, 20 SiO2.'
+    reason: Initial charges and bulk multiphase refractory recipes have no matching measured-equilibrium quantity token; FeOx
+      breakdown is unspecified.
+    units: wt% as printed
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - liquidus_composition
+  units: wt% as printed
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_table1_initial_recipes_context
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_table1_sintered_eds_context
+  type: measured_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 3
+    table: '1'
+  values:
+    quantity: context
+    values_as_published: 'MgAl2O4: 50.4 mol% MgO and 49.6 mol% Al2O3; MgCr2O4: 48.2 mol% MgO and 51.8 mol% Cr2O3; MgO-C: 89.2
+      wt% MgO and 10.8 wt% C.'
+    reason: These are sintered starting refractory phase analyses at 1000 °C, before contact with slag; the equilibrium phase-composition
+      token would misstate them as slag-interface equilibria.
+    units: as printed
+    candidate_tokens:
+    - equilibrium_phase_composition
+  units: as printed
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_table1_sintered_eds_context
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_table2_composite_points_context
+  type: measured_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 6
+    table: '2'
+  values:
+    quantity: context
+    values_as_published: 'MgO-C points 5: 78 MgO, 2.1 C, 9.4 CaO, 2.7 FeO, 7.8 SiO2; 6: 91.3 MgO, 8.0 C, 0.4 FeO, 0.3 SiO2;
+      7: 89.2 MgO, 10.5 C, 0.3 SiO2.'
+    reason: Multiphase refractory bulk points are not single phase compositions.
+    units: wt% as printed
+  units: wt% as printed
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_table2_composite_points_context
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_table2_metal_point_context
+  type: measured_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 6
+    table: '2'
+    row: MgO-C, point 1
+  values:
+    quantity: context
+    values_as_published: 97.5 Fe, 2.0 C, 0.1 Si, 0.4 O.
+    reason: No existing token for this multicomponent metal composition.
+    units: wt% as printed
+  units: wt% as printed
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_table2_metal_point_context
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_table3_metal_point_context
+  type: measured_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 7
+    table: '3'
+    row: MgO-C, point 2
+  values:
+    quantity: context
+    values_as_published: 92.3 Fe, 6.3 C, 0.4 Ca, 0.9 Si, 0.1 O.
+    reason: No existing token for this multicomponent metal composition.
+    units: wt% as printed
+  units: wt% as printed
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_table3_metal_point_context
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2
+- observation_id: jeon25_table3_mgo_c_point3_context
+  type: measured_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 7
+    table: '3'
+    row: MgO-C, point 3
+  units: wt% as printed
+  values:
+    quantity: context
+    values_as_published: 88.3 MgO, 0.3 Al2O3, 0.0 Cr2O3, 11.4 C, 0.0 CaO, 0.0 FeO, 0.0 SiO2.
+    reason: Multiphase refractory bulk point; values retained as printed, not assigned to a single phase.
+    units: wt% as printed
+  context_id: jeon-lindberg-2025-mgo-refractory-slag-interface::context::jeon25_table3_mgo_c_point3_context
+  work_id: 10.1016/j.jeurceramsoc.2024.117099
+  source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+  species: SiO2

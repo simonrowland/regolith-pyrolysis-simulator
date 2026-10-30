@@ -283,7 +283,7 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
 
 
 @pytest.mark.nightly
-@pytest.mark.timeout(1800)
+@pytest.mark.cpu_budget(1800)
 def test_default_lunar_redox_runaway_acceptance() -> None:
     from simulator.runner import PyrolysisRun
     from simulator.session import DecisionPolicy, drive_session

@@ -1,0 +1,328 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  citation: Shornikov, S. I. (2014), “Thermodynamic properties of the Na2O–GeO2 melts,” Experimental Geochemistry 2(1).
+  source_ids:
+  - shornikov-2014-sodium-germanate-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2014-sodium-germanate-melts
+      role: pdf
+      path: raw/shornikov-2014-sodium-germanate-melts/shornikov-2014-sodium-germanate-melts.pdf
+      sha256:
+        tag: value
+        value: 205c8b86b592fb0c9215c6462f7a08e3a54e77360eb7dfa07e1655b4346cba21
+    - asset_id: pdftotext:shornikov-2014-sodium-germanate-melts
+      role: pdftotext
+      path: text/shornikov-2014-sodium-germanate-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2014-sodium-germanate-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7::experiment::shornikov-2014-ideal-associated-solution
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Ideal associated solution, Gibbs-energy minimization, 900–1600 K. Table 2 is the 1500 K formation set
+      used as input. The input numbers from the cited sources are not printed.' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  locator:
+    page: 2
+    published_page: 52
+    pdf_page_index: 1
+- experiment_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7::shornikov-2014-sodium-germanate-melts
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  locator:
+    page: 2
+    published_page: 52
+    pdf_page_index: 1
+    table: '1'
+    note: 600 dpi render of PDF page 2 confirms this cell. MinerU and the text layer agree. No digit was hand-corrected.;
+      row_label=Na4GeO4; column_header=ΔH_T, kJ/mole
+context:
+- observation_id: na_2014_activity_reference_unstated
+  type: activity_reference_unstated
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    paragraph: oxide activities
+  units: as reported
+  values:
+    standard_state: The text says the oxide activities a(i) were obtained by Gibbs-energy minimization and are plotted in
+      Fig. 2. It does not state whether a(Na2O) and a(GeO2) are referred to the pure solid or the pure liquid. Fig. 2 lines
+      are the present-study calculation. The markers are literature EMF and KEMS points. No present-study marker was read.
+    expected_migration_phase: unknown
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_activity_reference_unstated
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na2O
+- observation_id: na_2014_t1_Na2Ge4O9_1300_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na2Ge4O9
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 4.69±1.31
+    T_K: '1300'
+    attribution: Kozhina and Shultz (2000)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na2Ge4O9_1300_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na2Ge4O9
+- observation_id: na_2014_t1_Na2Ge4O9_1450_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na2Ge4O9
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 5.02±2.72
+    T_K: '1450'
+    attribution: Kozhina and Shultz (1995)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na2Ge4O9_1450_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na2Ge4O9
+- observation_id: na_2014_t1_Na2GeO3_1300_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na2GeO3
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: -7.00±1.31
+    T_K: '1300'
+    attribution: Kozhina and Shultz (2000)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na2GeO3_1300_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na2GeO3
+- observation_id: na_2014_t1_Na2GeO3_1450_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na2GeO3
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: -9.00±4.18
+    T_K: '1450'
+    attribution: Kohsaka et al. (1978)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na2GeO3_1450_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na2GeO3
+- observation_id: na_2014_t1_Na2GeO3_1450b_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na2GeO3
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: -6.69±2.72
+    T_K: '1450'
+    attribution: Kozhina and Shultz (1995)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na2GeO3_1450b_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na2GeO3
+- observation_id: na_2014_t1_Na4Ge9O20_1300_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na4Ge9O20
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 5.35±1.31
+    T_K: '1300'
+    attribution: Kozhina and Shultz (2000)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na4Ge9O20_1300_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na4Ge9O20
+- observation_id: na_2014_t1_Na4Ge9O20_1450_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na4Ge9O20
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 3.85±4.18
+    T_K: '1450'
+    attribution: Kohsaka et al. (1978)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na4Ge9O20_1450_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na4Ge9O20
+- observation_id: na_2014_t1_Na4Ge9O20_1450b_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na4Ge9O20
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: 4.14±2.72
+    T_K: '1450'
+    attribution: Kozhina and Shultz (1995)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na4Ge9O20_1450b_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na4Ge9O20
+- observation_id: na_2014_t1_Na6Ge2O7_1300_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na6Ge2O7
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: -7.31±1.31
+    T_K: '1300'
+    attribution: Kozhina and Shultz (2000)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na6Ge2O7_1300_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na6Ge2O7
+- observation_id: na_2014_t1_Na6Ge2O7_1450_dfS
+  type: formation_entropy_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 52
+    table: '1'
+    row_label: Na6Ge2O7
+    column_header: ΔS_T, J/(mole K)
+  units: J/(mol K)
+  values:
+    delta_S_T_as_printed: -6.24±2.72
+    T_K: '1450'
+    attribution: Kozhina and Shultz (1995)
+    standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates formation from the
+      simple oxides. The paper does not state whether each simple oxide is the pure solid or the pure liquid.'
+    reason_not_scored: No formation-entropy quantity. The value is not a melting entropy.
+  context_id: shornikov-2014-sodium-germanate-melts::context::na_2014_t1_Na6Ge2O7_1450_dfS
+  work_id: fce33daa28be7ef1a7f00f791edb48c11528df3422486c072e3d91e1200136a7
+  source_id: shornikov-2014-sodium-germanate-melts
+  species: Na6Ge2O7

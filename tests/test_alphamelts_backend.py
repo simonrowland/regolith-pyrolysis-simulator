@@ -4,6 +4,7 @@ import io
 import math
 import inspect
 import os
+import resource
 import signal
 import subprocess
 import sys
@@ -118,6 +119,11 @@ class _StringifiableModel:
 def _load_data(filename):
     with open(DATA_DIR / filename) as f:
         return yaml.safe_load(f) or {}
+
+
+def _process_and_reaped_child_cpu_seconds():
+    children = resource.getrusage(resource.RUSAGE_CHILDREN)
+    return time.process_time() + children.ru_utime + children.ru_stime
 
 
 def _select_python_api_for_test(backend: AlphaMELTSBackend) -> None:
@@ -9948,7 +9954,7 @@ def test_project_local_alphamelts_populates_full_table_suite_when_installed():
 
 
 @pytest.mark.live_engine
-def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
+def test_project_local_alphamelts_cold_c0_step_returns_when_installed(capsys):
     backend = AlphaMELTSBackend()
     try:
         available = backend.initialize({'mode': 'subprocess'})
@@ -9966,26 +9972,64 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C0)
 
-    started = time.monotonic()
+    cpu_started = _process_and_reaped_child_cpu_seconds()
+    wall_started = time.monotonic()
     try:
         snapshot = sim.step()
     except AlphaMELTSSubprocessContractError as exc:
         if getattr(exc, "backend_status_reason", None) == "timeout":
             pytest.skip("AlphaMELTS live subprocess timed out")
         raise
-    elapsed_s = time.monotonic() - started
+    wall_elapsed_s = time.monotonic() - wall_started
+    cpu_elapsed_s = (
+        _process_and_reaped_child_cpu_seconds() - cpu_started
+    )
+    wall_cpu_ratio = (
+        wall_elapsed_s / cpu_elapsed_s if cpu_elapsed_s > 0.0 else math.inf
+    )
+    with capsys.disabled():
+        print(
+            "cold C0 step timing (expected_parallelism=1 solver lane): "
+            f"cpu={cpu_elapsed_s:.2f}s wall={wall_elapsed_s:.2f}s "
+            f"wall/cpu={wall_cpu_ratio:.2f}x",
+            flush=True,
+        )
 
     assert snapshot.hour == 1
-    # Bound covers a true cold start: the A-CX-02 fix instance-scoped the
-    # ThermoEngine health cache (process-global reuse masked stale health), so
-    # a fresh backend legitimately re-probes engine health (~4 s) before the
-    # step. Warm-worker pools reuse instances and never pay this.
-    # 2026-07-23 B1 budget re-derivation: the composed vapor package adds
-    # per-species certified-range guards + suppression-fit evaluation to the
-    # cold C0 step's first equilibrium; measured quiesced 30.8 s (subset-3)
-    # and 32.6 s (gate-1 under load). Budget = measured ~32 s x 1.4 headroom
-    # ~= 45 s; still a COLD-path-only cost that warm pools never pay.
-    assert elapsed_s < 45.0
+    # This metric is this process plus children it has reaped. The test selects
+    # the AlphaMELTS subprocess path at
+    # simulator/melt_backend/alphamelts.py:1754-1769;
+    # _run_alphamelts_subprocess waits in communicate() before returning at
+    # simulator/melt_backend/alphamelts.py:563-578. The test therefore counts
+    # the authoritative AlphaMELTS executable. It does not use the
+    # ThermoEngine worker path.
+    #
+    # A separate optional diagnostic is excluded: core registers a MAGEMin
+    # shadow at simulator/core.py:2424-2463, and the kernel dispatches shadows
+    # before the authoritative provider at
+    # simulator/chemistry/kernel/planner.py:180-242.
+    # If MAGEMin is installed, that shadow can leave a warm worker alive
+    # (engines/magemin/provider.py:513-553;
+    # simulator/melt_backend/magemin.py:1403-1406), so RUSAGE_CHILDREN cannot
+    # yet include its process or its nested MAGEMin executable. The shadow is
+    # diagnostic-only and cannot change the authoritative AlphaMELTS result;
+    # this CPU gate targets doubled AlphaMELTS solver work. The printed wall/CPU
+    # ratio retains the full step's serialization diagnostic, including time
+    # spent waiting for that shadow and host scheduling.
+    #
+    # Measured premise: six xdist-off runs on Mac-Studio-256-2 produced CPU /
+    # wall seconds of 18.18/34.00, 18.23/34.99, 19.13/32.27, 19.23/32.12,
+    # 19.09/30.77, and 18.76/31.20 (wall/CPU 1.61-1.92x). CPU median=18.93 s;
+    # min=18.18 s, max=19.23 s, spread=max-min=1.05 s. Allow five observed
+    # spreads beyond the maximum: 19.23 + 5 x 1.05 = 24.48 s, rounded up to
+    # 25 s. This leaves five full observed run ranges of headroom. Unit check:
+    # seconds + five x seconds = seconds. Sanity case: two full AlphaMELTS
+    # passes at the largest measured cost 2 x 19.23 = 38.46 s, which exceeds
+    # the cap.
+    assert cpu_elapsed_s < 25.0, (
+        f"cold C0 CPU time {cpu_elapsed_s:.2f}s exceeded 25.0s; "
+        f"wall={wall_elapsed_s:.2f}s ({wall_cpu_ratio:.2f}x wall/CPU)"
+    )
 
 
 @pytest.mark.live_engine

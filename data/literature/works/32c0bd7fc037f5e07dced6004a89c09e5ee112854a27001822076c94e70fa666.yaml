@@ -1,0 +1,201 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666
+  citation: Shornikov, S. I., and A. A. Slobodov (2022), “Thermodynamic properties of the K2O–Al2O3 melts,” Experiment in
+    Geosciences 28(1), 72–75.
+  source_ids:
+  - shornikov-2022-k2o-al2o3-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2022-k2o-al2o3-melts
+      role: pdf
+      path: raw/shornikov-2022-k2o-al2o3-melts/shornikov-2022-k2o-al2o3-melts.pdf
+      sha256:
+        tag: value
+        value: de8c2e245928266c5749bbebdd148988d39ed0c3b5ee8f2f0c274c5f59b687a1
+    - asset_id: pdftotext:shornikov-2022-k2o-al2o3-melts
+      role: pdftotext
+      path: text/shornikov-2022-k2o-al2o3-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2022-k2o-al2o3-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666::experiment::shornikov-2022-k2o-al2o3-model
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Semi-empirical model cited to Shornikov (2019). Activities and mixing energies are calculated, not tabulated.'
+      is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666
+  locator:
+    page: 5
+    published_page: 74
+    pdf_page_index: 4
+    section: Discussion
+- experiment_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666::shornikov-2022-k2o-al2o3-melts
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666
+  locator:
+    page: 3
+    published_page: 72
+    pdf_page_index: 2
+    section: Introduction
+    note: The sentence accepts Glushko et al. (1982), 1986±10 K, against Roth (1980) and Moya et al. (1982).
+context:
+- observation_id: k2o_2022_activity_reference_unstated
+  type: activity_reference_unstated
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 74
+    section: Discussion
+  units: as reported
+  values:
+    standard_state: 'Published page 74 (PDF page 5): the oxide activities and mixing energies were calculated in the present
+      study. The initial data are the standard Gibbs energies of formation of the simple oxides (K2O and Al2O3) and the potassium
+      aluminates in the crystalline and liquid state. The paper does not state whether a(K2O) and a(Al2O3) are referred to
+      the pure solid oxide or the pure liquid oxide.'
+    expected_migration_phase: unknown
+    reason_not_scored: Fig. 4 activities are continuous curves. No discrete present-study marker was read.
+  context_id: shornikov-2022-k2o-al2o3-melts::context::k2o_2022_activity_reference_unstated
+  work_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666
+  source_id: shornikov-2022-k2o-al2o3-melts
+  species: K2O
+- observation_id: k2o_2022_kalo2_tm_above_2500
+  type: cited_melting_bound
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 72
+    section: Introduction
+  units: K
+  values:
+    bound_as_printed: above 2500 K
+    attribution: Roth (1980) and Moya et al. (1982).
+    paper_judgement: The paper calls this an overestimated value compared with 1986±10 K.
+    reason_not_scored: A lower bound the paper does not accept as the melting point. Not stored as a point temperature.
+  context_id: shornikov-2022-k2o-al2o3-melts::context::k2o_2022_kalo2_tm_above_2500
+  work_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666
+  source_id: shornikov-2022-k2o-al2o3-melts
+  species: KAlO2
+- observation_id: k2o_2022_mixing_minimum_1450
+  type: mixing_energy_minimum
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 74
+    section: Discussion
+  units: kJ/mol
+  values:
+    value_as_printed: -95 kJ/mol
+    T_K: '1450'
+    composition_as_printed: close to the KAlO2 composition
+    method_class: model_derived
+    standard_state: 'Published page 74 (PDF page 5): the oxide activities and mixing energies were calculated in the present
+      study. The initial data are the standard Gibbs energies of formation of the simple oxides (K2O and Al2O3) and the potassium
+      aluminates in the crystalline and liquid state. The paper does not state whether a(K2O) and a(Al2O3) are referred to
+      the pure solid oxide or the pure liquid oxide.'
+    reason_not_scored: No mixing-energy quantity. The composition is not a numeric mole fraction. Parent Gibbs energies are
+      cited, not printed.
+  context_id: shornikov-2022-k2o-al2o3-melts::context::k2o_2022_mixing_minimum_1450
+  work_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666
+  source_id: shornikov-2022-k2o-al2o3-melts
+  species: K2O
+- observation_id: k2o_2022_mixing_minimum_2300
+  type: mixing_energy_minimum
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 74
+    section: Discussion
+  units: kJ/mol
+  values:
+    value_as_printed: -65 kJ/mol
+    T_K: '2300'
+    composition_as_printed: in the KAlO2 melt
+    method_class: model_derived
+    standard_state: 'Published page 74 (PDF page 5): the oxide activities and mixing energies were calculated in the present
+      study. The initial data are the standard Gibbs energies of formation of the simple oxides (K2O and Al2O3) and the potassium
+      aluminates in the crystalline and liquid state. The paper does not state whether a(K2O) and a(Al2O3) are referred to
+      the pure solid oxide or the pure liquid oxide.'
+    reason_not_scored: No mixing-energy quantity. The composition is not a numeric mole fraction. Parent Gibbs energies are
+      cited, not printed.
+  context_id: shornikov-2022-k2o-al2o3-melts::context::k2o_2022_mixing_minimum_2300
+  work_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666
+  source_id: shornikov-2022-k2o-al2o3-melts
+  species: K2O
+- observation_id: k2o_2022_p_kalo_ceiling_2300
+  type: partial_pressure_ceiling
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 74
+    section: Discussion
+  units: atm
+  values:
+    ceiling_as_printed: 3.5×10^−9 atm
+    T_K: '2300'
+    composition_as_printed: over the K2O–Al2O3 melts
+    method_class: model_derived
+    reason_not_scored: The sentence is a ceiling, not a point pressure, and it does not name a melt composition.
+  context_id: shornikov-2022-k2o-al2o3-melts::context::k2o_2022_p_kalo_ceiling_2300
+  work_id: 32c0bd7fc037f5e07dced6004a89c09e5ee112854a27001822076c94e70fa666
+  source_id: shornikov-2022-k2o-al2o3-melts
+  species: KAlO

@@ -1,0 +1,28 @@
+source_id: shugurov-2026-ceo2-tio2-kems
+source:
+  citation: 'Shugurov et al. (2026), Vaporization and Thermodynamic Properties of the CeO2–TiO2 System by Knudsen Effusion Mass Spectrometry, Russian Journal of Inorganic Chemistry 71(1), 1–7.'
+  doi: 10.1134/S0036023625602727
+extraction:
+  method: mineru_table_draft emit; values then bound manually to printed composition and sample row
+  date: '2026-10-20'
+  worker: codex-fam33-1020
+review_status: draft
+tables:
+  - page: 4
+    table_index: 2
+    type: transition_point
+    quantity: transition_temperature
+    unit: °C
+    evidence_class: measured_direct
+    phase: unknown
+    values:
+      - {column: 3, species: unknown}
+  - page: 4
+    table_index: 2
+    type: transition_point
+    quantity: transition_temperature
+    unit: °C
+    evidence_class: measured_direct
+    phase: unknown
+    values:
+      - {column: 4, species: unknown}

@@ -1,0 +1,901 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.epsl.2026.120123
+  citation: Lu, X., Namur, O., Xu, Y., Charlier, B., and Lin, Y. (2026). Mantle melting and magma ocean dynamics on Mercury
+    impacted by sulfur in reduced mafic magmas. Earth and Planetary Science Letters, 690, 120123.
+  source_ids:
+  - lu-2026-mercury-sulfur-liquidus
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:lu-2026-mercury-sulfur-liquidus
+      role: pdf
+      path: raw/lu-2026-mercury-sulfur-liquidus/lu-2026-mercury-sulfur-liquidus.pdf
+      sha256:
+        tag: value
+        value: 953928ef23dd6f3897e53b0f2996e4ba4a61b73e0d6f9a6ea840220ff6fbbf53
+    - asset_id: pdftotext:lu-2026-mercury-sulfur-liquidus
+      role: pdftotext
+      path: text/lu-2026-mercury-sulfur-liquidus
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:lu-2026-mercury-sulfur-liquidus
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.epsl.2026.120123
+experiments:
+- experiment_id: 10.1016/j.epsl.2026.120123::lu-2026-mercury-sulfur-liquidus
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.epsl.2026.120123
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '2'
+    note: 'row=2: A22 at 1675 °C'
+context:
+- observation_id: lu26_figure1_panels_a-f
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 4
+    pdf_page_index: 3
+    figure: '1'
+  panel: panels a-f
+  attribution: Present-work back-scattered electron images.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: unavailable
+    quantity_as_published: qualitative back-scattered electron images of representative experimental products
+    schema_gap: The panels show qualitative phase assemblages and microstructure, not a numeric phase-composition quantity.
+    species:
+    - silicate glass (Gl)
+    - enstatite (Ens)
+    - forsterite (Fo)
+    - metallic melt (FeSi)
+    - sulfide melt (FeS)
+    - (Mg,Fe)S
+    phase: multiphase experimental run products
+    temperature_as_printed:
+      a: Mer10, S-free, 5 GPa, 1850 °C
+      b: Mer10, 1.8% S, 3 GPa, 1725 °C
+      c: Mer10, 3.6% S, 3 GPa, 1675 °C
+      d: Mer10, 7.3% S, 3 GPa, 1650 °C
+      e: Mer20, 3.6% S, 3 GPa, 1700 °C
+      f: Mer20, 7.3% S, 3 GPa, 1650 °C
+    axes_as_printed:
+      x: image space; no quantitative x-axis
+      y: image space; no quantitative y-axis
+      scale_bars: 100 μm in panels a-e; 10 μm in panel f
+    series:
+    - name: BSE image panel a
+      marker: none
+      marker_count: 0
+    - name: BSE image panel b
+      marker: none
+      marker_count: 0
+    - name: BSE image panel c
+      marker: none
+      marker_count: 0
+    - name: BSE image panel d
+      marker: none
+      marker_count: 0
+    - name: BSE image panel e
+      marker: none
+      marker_count: 0
+    - name: BSE image panel f
+      marker: none
+      marker_count: 0
+    caption: 'Back-scattered electron images of representative experimental products. The starting compositions and experimental
+      pressure-temperature conditions are listed on the top-right of each panel. Abbreviations: Gl = silicate glass; Ens =
+      enstatite; Fo = forsterite.'
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure1_panels_a-f
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure2_a-b
+  type: figure_record
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    figure: '2'
+  panel: a-b
+  attribution: Present-work duration-series measurements; numerical figure reads deferred.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: equilibrium_phase_composition
+    species:
+    - S
+    - Na2O
+    phase: silicate melt/glass
+    temperature_as_printed: 1700 °C
+    axes_as_printed:
+      x: Time (min)
+      y_a: S content (wt.%)
+      y_b: Na2O content (wt.%)
+    series:
+    - panel: a
+      name: S content
+      marker: circle
+      marker_count: 4
+    - panel: b
+      name: Na2O content
+      marker: circle
+      marker_count: 4
+    conditions_as_printed: 3 GPa; fO2 range IW-7.1 to IW-6.3; Mer20 + 0.10 FeS, as stated in the text.
+    caption: S and Na2O contents of silicate melts as a function of experimental duration. The experiments conducted at 3
+      GPa and 1700 °C, and the fO2 ranges from IW-7.1 to IW-6.3.
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure2_a-b
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure3_panels_a-d
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    figure: '3'
+  panel: panels a-d
+  attribution: Present-work mass-balance calculations and run phase relations; numerical figure reads deferred.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: unavailable
+    quantity_as_published: melt proportion and phase relations from mass balance
+    schema_gap: Melt proportion is a phase fraction; the store has no melt-fraction quantity token.
+    species:
+    - silicate melt
+    - forsterite
+    - enstatite
+    phase: silicate melt and coexisting silicate minerals
+    temperature_as_printed: panel temperature axes; experimental runs span the plotted temperatures
+    axes_as_printed:
+      x: Temperature (°C)
+      y: Melt proportion (wt.%)
+    series:
+    - panel: 0.0% S
+      name: Mer10, 3 GPa
+      marker: circle
+      marker_count: 2
+    - panel: 0.0% S
+      name: Mer20, 3 GPa
+      marker: circle
+      marker_count: 7
+    - panel: 0.0% S
+      name: Mer10, 5 GPa
+      marker: square
+      marker_count: 3
+    - panel: 0.0% S
+      name: Mer20, 5 GPa
+      marker: square
+      marker_count: 6
+    - panel: 1.8% S
+      name: Mer10, 3 GPa
+      marker: circle
+      marker_count: 3
+    - panel: 1.8% S
+      name: Mer20, 3 GPa
+      marker: circle
+      marker_count: 5
+    - panel: 1.8% S
+      name: Mer10, 5 GPa
+      marker: square
+      marker_count: 3
+    - panel: 1.8% S
+      name: Mer20, 5 GPa
+      marker: square
+      marker_count: 5
+    - panel: 3.6% S
+      name: Mer10, 3 GPa
+      marker: circle
+      marker_count: 3
+    - panel: 3.6% S
+      name: Mer20, 3 GPa
+      marker: circle
+      marker_count: 4
+    - panel: 3.6% S
+      name: Mer10, 5 GPa
+      marker: square
+      marker_count: 3
+    - panel: 3.6% S
+      name: Mer20, 5 GPa
+      marker: square
+      marker_count: 4
+    - panel: 7.3% S
+      name: Mer10, 3 GPa
+      marker: circle
+      marker_count: 3
+    - panel: 7.3% S
+      name: Mer20, 3 GPa
+      marker: circle
+      marker_count: 3
+    - panel: 7.3% S
+      name: Mer10, 5 GPa
+      marker: square
+      marker_count: 3
+    - panel: 7.3% S
+      name: Mer20, 5 GPa
+      marker: square
+      marker_count: 4
+    caption: Melt proportion and phase relations for compositions Mer10 and Mer20 as a function of temperature at 3 GPa and
+      5 GPa. Solid lines denote the Mer10 composition, while dashed lines the Mer20 composition. The corresponding S content
+      for each set of experiments is shown in the bottom right corner of each panel. Melt proportions are calculated based
+      on mass balance using EPMA data.
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure3_panels_a-d
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure4_panels_a-d
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    figure: '4'
+  panel: panels a-d
+  attribution: Present-work phase diagram; markers repeat Table 2 and liquidus curves repeat Fig. 5.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: transition_temperature
+    species:
+    - silicate liquid
+    - forsterite
+    - enstatite
+    phase: experimental phase assemblages and liquidus boundary
+    temperature_as_printed: panel-dependent temperature range
+    axes_as_printed:
+      x: Sulfur content in silicate melt (wt.%)
+      y: Temperature (°C)
+    series:
+    - panel: a
+      name: M, 0.2 FeS
+      marker: square
+      marker_count: 3
+    - panel: a
+      name: M, 0.1 FeS
+      marker: diamond
+      marker_count: 3
+    - panel: a
+      name: M, 0.05 FeS
+      marker: triangle
+      marker_count: 3
+    - panel: a
+      name: M, 0.14 Fe
+      marker: circle
+      marker_count: 2
+    - panel: b
+      name: M, 0.2 FeS
+      marker: square
+      marker_count: 3
+    - panel: b
+      name: M, 0.1 FeS
+      marker: diamond
+      marker_count: 3
+    - panel: b
+      name: M, 0.05 FeS
+      marker: triangle
+      marker_count: 3
+    - panel: b
+      name: M, 0.14 Fe
+      marker: circle
+      marker_count: 3
+    - panel: c
+      name: M, 0.2 FeS
+      marker: square
+      marker_count: 3
+    - panel: c
+      name: M, 0.1 FeS
+      marker: diamond
+      marker_count: 4
+    - panel: c
+      name: M, 0.05 FeS
+      marker: triangle
+      marker_count: 5
+    - panel: c
+      name: M, 0.14 Fe
+      marker: circle
+      marker_count: 7
+    - panel: d
+      name: M, 0.2 FeS
+      marker: square
+      marker_count: 4
+    - panel: d
+      name: M, 0.1 FeS
+      marker: diamond
+      marker_count: 4
+    - panel: d
+      name: M, 0.05 FeS
+      marker: triangle
+      marker_count: 5
+    - panel: d
+      name: M, 0.14 Fe
+      marker: circle
+      marker_count: 6
+    duplicate_note: Experimental markers repeat Table 2 run conditions and sulfur measurements; no second observations are
+      created. Liquidus curves are the same curves plotted in Fig. 5.
+    caption: Experimental phase diagrams of Mer10 and Mer20 compositions. Note that y-axis scales differ between panels. The
+      liquidus curves are identical to those presented in Fig. 5. (a) At 3 GPa, the liquidus for Mer10 is systematically depressed
+      with increasing S content, and the stable liquidus phase changes from forsterite to enstatite. (b) At 5 GPa, the liquidus
+      of Mer10 follows a similar depression trend, and the liquidus phase shifts from forsterite + enstatite to enstatite
+      alone. (c), (d) The liquidus depression for Mer20 at 3 GPa and 5 GPa shows similar trend, and forsterite remains the
+      sole liquidus phase throughout the sulfur range investigated.
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure4_panels_a-d
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure5_a-b
+  type: figure_record
+  locator:
+    page: 8
+    published_page: 8
+    pdf_page_index: 7
+    figure: '5'
+  panel: a-b
+  attribution: Present-work liquidus estimates; numerical values transcribed from section 3.3.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: transition_temperature
+    species:
+    - silicate liquid
+    phase: liquidus
+    temperature_as_printed: liquidus temperature (°C)
+    axes_as_printed:
+      x: Sulfur content in silicate melt (wt.%)
+      y: Liquidus (°C)
+    series:
+    - panel: a
+      name: Mer10 3 GPa
+      marker: circle
+      marker_count: 4
+    - panel: a
+      name: Mer20 3 GPa
+      marker: square
+      marker_count: 4
+    - panel: b
+      name: Mer10 5 GPa
+      marker: circle
+      marker_count: 4
+    - panel: b
+      name: Mer20 5 GPa
+      marker: square
+      marker_count: 4
+    duplicate_note: The 16 liquidus temperatures printed in section 3.3 are the same points plotted here; one observation
+      per printed value is retained.
+    caption: The liquidi of Mer10 and Mer20 as a function of sulfur contents in the silicate melts. The error bars for Y axis
+      and X axis are 25 °C and the one standard deviation of S content in silicate melt respectively (see detail in Supplementary
+      Dataset 1).
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure5_a-b
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure6_a
+  type: figure_record
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 8
+    figure: '6'
+  panel: a
+  attribution: Present-work S regressions and quoted literature comparison curves; data points deferred.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: unavailable
+    quantity_as_published: liquidus depression ΔT as a function of volatile content
+    schema_gap: ΔT is a temperature difference, and no quantity token represents liquidus depression.
+    species:
+    - silicate melt
+    - S
+    - H2O
+    - F
+    - Cl
+    phase: liquidus
+    temperature_as_printed: liquidus depression ΔT (°C)
+    axes_as_printed:
+      x: Volatile content in silicate melt (wt.%)
+      y: Liquidus depression (°C)
+    series:
+    - name: S, Mer10 3 GPa
+      marker: circle
+      marker_count: 4
+    - name: S, Mer10 5 GPa
+      marker: circle
+      marker_count: 4
+    - name: S, Mer20 3 GPa
+      marker: square
+      marker_count: 4
+    - name: S, Mer20 5 GPa
+      marker: square
+      marker_count: 4
+    - name: H2O, Almeev et al. (2007)
+      marker: none
+      marker_count: 0
+    - name: H2O, Almeev et al. (2012)
+      marker: none
+      marker_count: 0
+    - name: H2O, Médard and Grove (2008)
+      marker: none
+      marker_count: 0
+    - name: F/Cl, Filiberto et al. (2012)
+      marker: none
+      marker_count: 0
+    - name: H2O, Koch et al. (2025)
+      marker: none
+      marker_count: 0
+    caption: Liquidus depression as a function of the volatile content in silicate melts, constrained by (a) Empirical regressions
+      of ΔT based on our experimental data; the solid lines represent S in this study (see detailed regression formulas in
+      Fig. S4), and the dashed lines show the role of H2O, F and Cl from the literature (Almeev et al., 2007, 2012; Filiberto
+      and Treiman, 2009; Filiberto et al., 2012; Koch et al., 2025; Médard and Grove, 2008), and (b) Calculations of the liquidus
+      depression using a cryoscopic approach (Hirschmann et al., 2009); the dashed lines represent the calculation results
+      using the thermodynamic model of Eq. (5). The mineral label in each line represents the liquidus phase.
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure6_a
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure6_b
+  type: figure_record
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 8
+    figure: '6'
+  panel: b
+  attribution: Present-work cryoscopic model calculations; no numeric points.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: unavailable
+    quantity_as_published: liquidus depression calculated by cryoscopic approach
+    schema_gap: ΔT is a temperature difference, not a transition-temperature observation.
+    species:
+    - silicate melt
+    - S
+    phase: liquidus
+    temperature_as_printed: liquidus depression ΔT (°C)
+    axes_as_printed:
+      x: Sulfur content in silicate melt (wt.%)
+      y: Liquidus depression (°C)
+    series:
+    - name: Mer10 3 GPa, Eq. (5) model
+      marker: none
+      marker_count: 0
+    - name: Mer10 5 GPa, Eq. (5) model
+      marker: none
+      marker_count: 0
+    - name: Mer20 3 GPa, Eq. (5) model
+      marker: none
+      marker_count: 0
+    - name: Mer20 5 GPa, Eq. (5) model
+      marker: none
+      marker_count: 0
+    caption: Liquidus depression as a function of the volatile content in silicate melts, constrained by (a) Empirical regressions
+      of ΔT based on our experimental data; the solid lines represent S in this study (see detailed regression formulas in
+      Fig. S4), and the dashed lines show the role of H2O, F and Cl from the literature (Almeev et al., 2007, 2012; Filiberto
+      and Treiman, 2009; Filiberto et al., 2012; Koch et al., 2025; Médard and Grove, 2008), and (b) Calculations of the liquidus
+      depression using a cryoscopic approach (Hirschmann et al., 2009); the dashed lines represent the calculation results
+      using the thermodynamic model of Eq. (5). The mineral label in each line represents the liquidus phase.
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure6_b
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure7_panels_a-d
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 10
+    pdf_page_index: 9
+    figure: '7'
+  panel: panels a-d
+  attribution: Present-work parameterized melting calculations; no numeric points.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: unavailable
+    quantity_as_published: melt fraction F as a function of sulfur in silicate melt
+    schema_gap: Melt fraction is not a closed quantity token in the store.
+    species:
+    - silicate melt
+    - S
+    phase: partial melt
+    temperature_as_printed: 1600–1800 °C; panel-specific temperatures are labelled
+    axes_as_printed:
+      x: Sulfur content in silicate melt (wt.%)
+      y: Melt fraction, F
+    series:
+    - panel: a Mer10 3 GPa
+      name: 1650 °C
+      marker: none
+      marker_count: 0
+    - panel: a Mer10 3 GPa
+      name: 1625 °C
+      marker: none
+      marker_count: 0
+    - panel: a Mer10 3 GPa
+      name: 1600 °C
+      marker: none
+      marker_count: 0
+    - panel: b Mer10 5 GPa
+      name: 1800 °C
+      marker: none
+      marker_count: 0
+    - panel: b Mer10 5 GPa
+      name: 1775 °C
+      marker: none
+      marker_count: 0
+    - panel: b Mer10 5 GPa
+      name: 1750 °C
+      marker: none
+      marker_count: 0
+    - panel: c Mer20 3 GPa
+      name: 1650 °C
+      marker: none
+      marker_count: 0
+    - panel: c Mer20 3 GPa
+      name: 1625 °C
+      marker: none
+      marker_count: 0
+    - panel: c Mer20 3 GPa
+      name: 1600 °C
+      marker: none
+      marker_count: 0
+    - panel: d Mer20 5 GPa
+      name: 1800 °C
+      marker: none
+      marker_count: 0
+    - panel: d Mer20 5 GPa
+      name: 1775 °C
+      marker: none
+      marker_count: 0
+    - panel: d Mer20 5 GPa
+      name: 1750 °C
+      marker: none
+      marker_count: 0
+    caption: Melt fraction as a function of the sulfur contents in the silicate melt at the pressures of 3 and 5 GPa and 1600–1800
+      °C. The selected temperatures for 3 GPa and 5 GPa are set to match the modeled temperatures at which melting begins
+      at the two pressures on Mercury, following Namur et al. (2016b).
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure7_panels_a-d
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure8_a
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 10
+    pdf_page_index: 9
+    figure: '8'
+  panel: a
+  attribution: Present-work heat-balance model.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: unavailable
+    quantity_as_published: normalized heat flux q/qS-free
+    schema_gap: Normalized heat flux has no quantity token.
+    species:
+    - silicate magma ocean
+    phase: magma ocean
+    temperature_as_printed: temperature depression relative to sulfur-free case; no absolute T axis
+    axes_as_printed:
+      x: Liquidus depression (K)
+      y: Normalized Heat Flux (q/qS-free) (%)
+    series:
+    - name: Heat Flux Ratio
+      marker: circle
+      marker_count: 20
+    caption: Influence of sulfur-induce liquidus depression and graphite thickness on magma ocean cooling timescales. (a)
+      The normalized heat flux (q/qS-free) versus liquidus depression, illustrating the reduction in heat flux relative to
+      the sulfur-free end member due to lower crystallization temperatures. (b) The extended cooling duration Δτ as a function
+      of liquidus depression for various graphite crust thickness (ranging from 1 m to 10,000 m). Δτ is defined as the difference
+      in cooling time between the sulfur-bearing scenario (τC) and sulfur-free scenario (τ0).
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure8_a
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure8_b
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 10
+    pdf_page_index: 9
+    figure: '8'
+  panel: b
+  attribution: Present-work heat-balance model.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: unavailable
+    quantity_as_published: extended cooling duration Δτ
+    schema_gap: Cooling duration is a time quantity with no token in this store schema.
+    species:
+    - silicate magma ocean
+    phase: magma ocean
+    temperature_as_printed: temperature depression relative to sulfur-free case; no absolute T axis
+    axes_as_printed:
+      x: Liquidus Depression (K)
+      y: Δτ (years), log scale
+    series:
+    - name: graphite thickness = 1 m
+      marker: circle
+      marker_count: 20
+    - name: graphite thickness = 10 m
+      marker: circle
+      marker_count: 20
+    - name: graphite thickness = 100 m
+      marker: circle
+      marker_count: 20
+    - name: graphite thickness = 1000 m
+      marker: circle
+      marker_count: 20
+    - name: graphite thickness = 10000 m
+      marker: circle
+      marker_count: 20
+    caption: Influence of sulfur-induce liquidus depression and graphite thickness on magma ocean cooling timescales. (a)
+      The normalized heat flux (q/qS-free) versus liquidus depression, illustrating the reduction in heat flux relative to
+      the sulfur-free end member due to lower crystallization temperatures. (b) The extended cooling duration Δτ as a function
+      of liquidus depression for various graphite crust thickness (ranging from 1 m to 10,000 m). Δτ is defined as the difference
+      in cooling time between the sulfur-bearing scenario (τC) and sulfur-free scenario (τ0).
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure8_b
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure9_a
+  type: figure_record
+  locator:
+    page: 11
+    published_page: 11
+    pdf_page_index: 10
+    figure: '9'
+  panel: a
+  attribution: Present-work critical-size model; gray band attributed to Armienti and Tarquini (2002).
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: unavailable
+    quantity_as_published: critical crystal size dℓ
+    schema_gap: Critical crystal size has no quantity token.
+    species:
+    - silicate crystals in magma ocean
+    phase: crystals in silicate magma ocean
+    temperature_as_printed: viscosity calculated at average magma-ocean temperature; numeric T not stated
+    axes_as_printed:
+      x: Viscosity η1 (Pa·s)
+      y: Crystal size (mm)
+    series:
+    - name: bulk S = 0 wt.%
+      marker: none
+      marker_count: 0
+    - name: bulk S = 3 wt.%
+      marker: none
+      marker_count: 0
+    - name: bulk S = 5 wt.%
+      marker: none
+      marker_count: 0
+    caption: Controls of sulfur content and viscosity on critical size during magma ocean crystallization. (a) Evolution of
+      critical crystal size (dℓ) as a function of magma ocean viscosity. (b) Evolution of magma ocean viscosity as a function
+      of bulk S content. The shaded grey band denotes the plausible crystal size range of 0.5–10 mm inferred from terrestrial
+      mantle xenoliths (Armienti and Tarquini, 2002). The calculated viscosity ranges from 10−1 to 102 Pa·s.
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure9_a
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_figure9_b
+  type: figure_record
+  locator:
+    page: 11
+    published_page: 11
+    pdf_page_index: 10
+    figure: '9'
+  panel: b
+  attribution: Present-work viscosity model.
+  units: As printed on the axes; no numeric points are included.
+  values:
+    quantity: viscosity
+    species:
+    - silicate magma
+    phase: magma ocean
+    temperature_as_printed: average magma-ocean temperature; numeric T not stated
+    axes_as_printed:
+      x: Pressure (GPa)
+      y: Viscosity η1 (Pa·s)
+    series:
+    - name: bulk S = 0 wt.%
+      marker: none
+      marker_count: 0
+    - name: bulk S = 3 wt.%
+      marker: none
+      marker_count: 0
+    - name: bulk S = 5 wt.%
+      marker: none
+      marker_count: 0
+    caption: Controls of sulfur content and viscosity on critical size during magma ocean crystallization. (a) Evolution of
+      critical crystal size (dℓ) as a function of magma ocean viscosity. (b) Evolution of magma ocean viscosity as a function
+      of bulk S content. The shaded grey band denotes the plausible crystal size range of 0.5–10 mm inferred from terrestrial
+      mantle xenoliths (Armienti and Tarquini, 2002). The calculated viscosity ranges from 10−1 to 102 Pa·s.
+    digitisation: deferred to a figure pass
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_figure9_b
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_prose_metal_and_sulfide_composition_ranges
+  type: table_record
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    section: 3.2 Phase assemblages and chemical composition
+  units: wt.%
+  values:
+    quantity_as_printed: major and minor element composition ranges of metallic alloy and sulfide melt
+    quantity_token: equilibrium_phase_composition
+    candidate_tokens:
+    - equilibrium_phase_composition
+    method_class: measured_direct
+    reason_not_extracted: The text reports pooled ranges without sample-specific rows; the full per-run analyses are referred
+      to Supplementary Dataset 1. These values are retained here without assigning them to a run.
+    metal_alloy_ranges_wt_pct:
+      Fe: 68.42–90.85
+      Si: 4.42–21.81
+      Cr: 0.06–5.35
+      P: 0.03–4.34
+      S: 0–1.42
+      Mn_and_Ti: present in sulfide-undersaturated experiments; numerical ranges not stated
+    sulfide_melt_ranges_wt_pct:
+      Fe: 31.59–56.95
+      S: 35.05–37.03
+      Ti: 0.13–2.37
+      Cr: 3.63–23.63
+      Mn: 0.44–2.25
+      Mg: 0.01–0.26
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_prose_metal_and_sulfide_composition_ranges
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_supplementary_dataset1_phase_analyses_unavailable
+  type: table_record
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    section: 2.2 Experimental, analytical methods and oxygen fugacity
+    note: The article states that average compositions and standard deviations of all phases are reported in Supplementary
+      Dataset 1.
+  units: wt.% (as stated for EPMA compositions)
+  values:
+    quantity_as_printed: average compositions and standard deviations of all phases in Supplementary Dataset 1
+    quantity_token: equilibrium_phase_composition
+    candidate_tokens:
+    - equilibrium_phase_composition
+    method_class: measured_direct
+    reason_not_extracted: Supplementary Dataset 1 is referenced by the paper but is absent from the available corpus; the
+      PDF main article only prints sulfur values for silicate glass in Table 2 and prose ranges for metal/sulfide phases.
+    source_statement_as_published: Average compositions and standard deviations of all phases are reported in Supplementary
+      Dataset 1.
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_supplementary_dataset1_phase_analyses_unavailable
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2
+- observation_id: lu26_table1_starting_compositions
+  type: table_record
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: wt.% for oxide composition and source fractions; wt.% S for bulk sulfur
+  values:
+    quantity_as_printed: average composition of the silicate fraction of EH-EL meteorites and nominal starting compositions
+    quantity_token: unavailable
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - liquidus_composition
+    schema_gap: These are compiled or nominal starting compositions, not analyzed equilibrium phase compositions or a liquidus
+      composition.
+    rows:
+    - sample: EH-EL
+      cells_as_published:
+      - '61.21'
+      - '0.12'
+      - '3.23'
+      - '0.45'
+      - '0.25'
+      - '32.64'
+      - '1.48'
+      - '1.21'
+      - '0.11'
+      - '0.32'
+      - '101.02'
+    - sample: Mer10
+      cells_as_published:
+      - '54.82'
+      - '0.14'
+      - '3.7'
+      - '0.52'
+      - '0.28'
+      - '37.32'
+      - '1.62'
+      - '1.37'
+      - '0.13'
+      - '0.10'
+      - '100.00'
+    - sample: Mer20
+      cells_as_published:
+      - '47.91'
+      - '0.16'
+      - '4.26'
+      - '0.60'
+      - '0.33'
+      - '43.04'
+      - '1.87'
+      - '1.58'
+      - '0.15'
+      - '0.10'
+      - '100.00'
+    starting_mixtures:
+    - starting_blend: 0.2S
+      silicate_fraction: '0.80'
+      Fe_fraction: '0.00'
+      FeS_fraction: '0.20'
+      bulk_S_content_wt_pct: '7.30'
+    - starting_blend: 0.1S
+      silicate_fraction: '0.90'
+      Fe_fraction: '0.00'
+      FeS_fraction: '0.10'
+      bulk_S_content_wt_pct: '3.60'
+    - starting_blend: 0.05S
+      silicate_fraction: '0.95'
+      Fe_fraction: '0.00'
+      FeS_fraction: '0.05'
+      bulk_S_content_wt_pct: '1.80'
+    - starting_blend: 0S
+      silicate_fraction: '0.86'
+      Fe_fraction: '0.14'
+      FeS_fraction: '0.00'
+      bulk_S_content_wt_pct: '0.00'
+    attribution:
+      EH-EL: Berthet et al. (2009); Jarosewich (1990), as cited in section 2.1
+      Mer10 and Mer20: present-work nominal starting compositions; 10% and 20% of Mercury bulk Si partitioned to the core,
+        respectively, with footnote assumptions printed in Table 1
+    blank_cells: No Table 1 cells are filled from neighboring rows.
+  context_id: lu-2026-mercury-sulfur-liquidus::context::lu26_table1_starting_compositions
+  work_id: 10.1016/j.epsl.2026.120123
+  source_id: lu-2026-mercury-sulfur-liquidus
+  species: SiO2

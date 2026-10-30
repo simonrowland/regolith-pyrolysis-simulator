@@ -1,0 +1,1300 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/jackson-2005-ferrous-glass-multispectroscopy.yaml
+observations:
+- observation_id: jackson-2005-ferrous-glass-multispectroscopy::jackson_2005_mossbauer_li2_fe3_fraction::T=300:row=li2:h=ebf8d0054844
+  experiment_id: 10.1016/j.gca.2005.01.008::jackson-2005-ferrous-glass-multispectroscopy
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: elemental
+        components:
+        - - Li
+          - '2'
+        - - Fe
+          - '1'
+        - - Si
+          - '3'
+        - - O
+          - '8'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.07'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no row-specific uncertainty for % Fe(III).
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 4
+        published_page: 4318
+        pdf_page_index: 3
+        table: '1'
+        note: row=LI2; column=% Fe(III)
+  notices: []
+  source_id: jackson-2005-ferrous-glass-multispectroscopy
+  locator:
+    page: 4
+    published_page: 4318
+    pdf_page_index: 3
+    table: '1'
+    note: row=LI2; column=% Fe(III)
+  read_from: pdf:jackson-2005-ferrous-glass-multispectroscopy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Mössbauer Spectroscopy
+    sample_id:
+      state:
+        tag: value
+        value: LI2
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    composition:
+      state:
+        tag: value
+        value:
+          basis: elemental
+          components:
+          - - Li
+            - '2'
+          - - Fe
+            - '1'
+          - - Si
+            - '3'
+          - - O
+            - '8'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no numeric oxygen fugacity or partial pressure.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    fO2_control:
+      state:
+        tag: unknown
+        reason: A controlled Ar or N2 atmosphere and metallic iron crucible are reported, but no oxygen buffer or gas ratio
+          is printed.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Abstract
+        note: The abstract states 1 bar; represented in canonical Pa.
+    atmosphere:
+      state:
+        tag: value
+        value: controlled atmosphere (Ar or N2)
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+  derivation:
+    relation: Table 1 footnote b states that the Fe(III) fraction was derived from the 57Fe Mössbauer spectrum using the shape-independent
+      distribution (SID) model.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7'
+        locator:
+          page: 4
+          published_page: 4318
+          pdf_page_index: 3
+          table: '1'
+          note: row=LI2; column=% Fe(III)
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '7'
+              locator:
+                page: 4
+                published_page: 4318
+                pdf_page_index: 3
+                table: '1'
+                note: row=LI2; column=% Fe(III)
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 4
+                published_page: 4318
+                pdf_page_index: 3
+                table: '1'
+                note: row=LI2; column=% Fe(III)
+          output_unit: dimensionless
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 4
+          published_page: 4318
+          pdf_page_index: 3
+          table: '1'
+          note: row=LI2; column=% Fe(III)
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 4318
+        pdf_page_index: 3
+        figure: '1'
+        note: Figure 1 includes the LI2 Mössbauer spectrum; numerical spectrum-fit inputs are not tabulated.
+    references: []
+- observation_id: jackson-2005-ferrous-glass-multispectroscopy::jackson_2005_mossbauer_nc6_fe3_fraction::T=300:row=nc6:h=5ac2fee4b466
+  experiment_id: 10.1016/j.gca.2005.01.008::jackson-2005-ferrous-glass-multispectroscopy
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: elemental
+        components:
+        - - Na
+          - '1.46'
+        - - Ca
+          - '0.24'
+        - - Fe
+          - '1.08'
+        - - Si
+          - '2.97'
+        - - O
+          - '8'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no row-specific uncertainty for % Fe(III).
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 4
+        published_page: 4318
+        pdf_page_index: 3
+        table: '1'
+        note: row=NC6; column=% Fe(III)
+  notices: []
+  source_id: jackson-2005-ferrous-glass-multispectroscopy
+  locator:
+    page: 4
+    published_page: 4318
+    pdf_page_index: 3
+    table: '1'
+    note: row=NC6; column=% Fe(III)
+  read_from: pdf:jackson-2005-ferrous-glass-multispectroscopy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Mössbauer Spectroscopy
+    sample_id:
+      state:
+        tag: value
+        value: NC6
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    composition:
+      state:
+        tag: value
+        value:
+          basis: elemental
+          components:
+          - - Na
+            - '1.46'
+          - - Ca
+            - '0.24'
+          - - Fe
+            - '1.08'
+          - - Si
+            - '2.97'
+          - - O
+            - '8'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no numeric oxygen fugacity or partial pressure.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    fO2_control:
+      state:
+        tag: unknown
+        reason: A controlled Ar or N2 atmosphere and metallic iron crucible are reported, but no oxygen buffer or gas ratio
+          is printed.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Abstract
+        note: The abstract states 1 bar; represented in canonical Pa.
+    atmosphere:
+      state:
+        tag: value
+        value: controlled atmosphere (Ar or N2)
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+  derivation:
+    relation: Table 1 footnote b states that the Fe(III) fraction was derived from the 57Fe Mössbauer spectrum using the shape-independent
+      distribution (SID) model.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          page: 4
+          published_page: 4318
+          pdf_page_index: 3
+          table: '1'
+          note: row=NC6; column=% Fe(III)
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '10'
+              locator:
+                page: 4
+                published_page: 4318
+                pdf_page_index: 3
+                table: '1'
+                note: row=NC6; column=% Fe(III)
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 4
+                published_page: 4318
+                pdf_page_index: 3
+                table: '1'
+                note: row=NC6; column=% Fe(III)
+          output_unit: dimensionless
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 4
+          published_page: 4318
+          pdf_page_index: 3
+          table: '1'
+          note: row=NC6; column=% Fe(III)
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 4318
+        pdf_page_index: 3
+        figure: '1'
+        note: Figure 1 includes the NC6 Mössbauer spectrum; numerical spectrum-fit inputs are not tabulated.
+    references: []
+- observation_id: jackson-2005-ferrous-glass-multispectroscopy::jackson_2005_mossbauer_rb2_fe3_fraction::T=300:row=rb2:h=ea568c9a67c8
+  experiment_id: 10.1016/j.gca.2005.01.008::jackson-2005-ferrous-glass-multispectroscopy
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: elemental
+        components:
+        - - Rb
+          - '2'
+        - - Fe
+          - '1'
+        - - Si
+          - '3'
+        - - O
+          - '8'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.22'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no row-specific uncertainty for % Fe(III).
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 4
+        published_page: 4318
+        pdf_page_index: 3
+        table: '1'
+        note: row=RB2; column=% Fe(III)
+  notices: []
+  source_id: jackson-2005-ferrous-glass-multispectroscopy
+  locator:
+    page: 4
+    published_page: 4318
+    pdf_page_index: 3
+    table: '1'
+    note: row=RB2; column=% Fe(III)
+  read_from: pdf:jackson-2005-ferrous-glass-multispectroscopy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Mössbauer Spectroscopy
+    sample_id:
+      state:
+        tag: value
+        value: RB2
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    composition:
+      state:
+        tag: value
+        value:
+          basis: elemental
+          components:
+          - - Rb
+            - '2'
+          - - Fe
+            - '1'
+          - - Si
+            - '3'
+          - - O
+            - '8'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no numeric oxygen fugacity or partial pressure.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    fO2_control:
+      state:
+        tag: unknown
+        reason: A controlled Ar or N2 atmosphere and metallic iron crucible are reported, but no oxygen buffer or gas ratio
+          is printed.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Abstract
+        note: The abstract states 1 bar; represented in canonical Pa.
+    atmosphere:
+      state:
+        tag: value
+        value: controlled atmosphere (Ar or N2)
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+  derivation:
+    relation: Table 1 footnote b states that the Fe(III) fraction was derived from the 57Fe Mössbauer spectrum using the shape-independent
+      distribution (SID) model.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '22'
+        locator:
+          page: 4
+          published_page: 4318
+          pdf_page_index: 3
+          table: '1'
+          note: row=RB2; column=% Fe(III)
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '22'
+              locator:
+                page: 4
+                published_page: 4318
+                pdf_page_index: 3
+                table: '1'
+                note: row=RB2; column=% Fe(III)
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 4
+                published_page: 4318
+                pdf_page_index: 3
+                table: '1'
+                note: row=RB2; column=% Fe(III)
+          output_unit: dimensionless
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 4
+          published_page: 4318
+          pdf_page_index: 3
+          table: '1'
+          note: row=RB2; column=% Fe(III)
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 4318
+        pdf_page_index: 3
+        figure: '1'
+        note: Figure 1 includes the RB2 Mössbauer spectrum; numerical spectrum-fit inputs are not tabulated.
+    references: []
+- observation_id: jackson-2005-ferrous-glass-multispectroscopy::jackson_2005_nc1_cr2o3_found_composition
+  experiment_id: 10.1016/j.gca.2005.01.008::jackson-2005-ferrous-glass-multispectroscopy
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide wt.%
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '2'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: jackson-2005-ferrous-glass-multispectroscopy::jackson_2005_nc1_cr2o3_found_composition
+  source_id: jackson-2005-ferrous-glass-multispectroscopy
+  locator:
+    page: 2
+    published_page: 4316
+    pdf_page_index: 1
+    section: Sample Preparation
+    note: The authors report approximately 2.0 wt.% Cr2O3 found in sample NC1 after reaction with the iron crucible.
+  read_from: pdf:jackson-2005-ferrous-glass-multispectroscopy
+  point_conditions:
+    sample_id:
+      state:
+        tag: value
+        value: NC1
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No temperature for the composition analysis is printed.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    composition:
+      state:
+        tag: value
+        value:
+          basis: elemental
+          components:
+          - - Na
+            - '0.99'
+          - - Ca
+            - '0.92'
+          - - Fe
+            - '0.24'
+          - - Si
+            - '3.17'
+          - - O
+            - '8'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+- observation_id: jackson-2005-ferrous-glass-multispectroscopy::jackson_2005_nc2_cr2o3_found_composition
+  experiment_id: 10.1016/j.gca.2005.01.008::jackson-2005-ferrous-glass-multispectroscopy
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide wt.%
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '2'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: jackson-2005-ferrous-glass-multispectroscopy::jackson_2005_nc2_cr2o3_found_composition
+  source_id: jackson-2005-ferrous-glass-multispectroscopy
+  locator:
+    page: 2
+    published_page: 4316
+    pdf_page_index: 1
+    section: Sample Preparation
+    note: The authors report approximately 2.0 wt.% Cr2O3 found in sample NC2 after reaction with the iron crucible.
+  read_from: pdf:jackson-2005-ferrous-glass-multispectroscopy
+  point_conditions:
+    sample_id:
+      state:
+        tag: value
+        value: NC2
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No temperature for the composition analysis is printed.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    composition:
+      state:
+        tag: value
+        value:
+          basis: elemental
+          components:
+          - - Na
+            - '1.09'
+          - - Ca
+            - '0.51'
+          - - Fe
+            - '0.72'
+          - - Si
+            - '3.1'
+          - - O
+            - '8'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+- observation_id: jackson-2005-ferrous-glass-multispectroscopy::jackson_2005_xanes_rb2_fe3_fraction::T=298:h=4b0274a66f68
+  experiment_id: 10.1016/j.gca.2005.01.008::jackson-2005-ferrous-glass-multispectroscopy
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: elemental
+        components:
+        - - Rb
+          - '2'
+        - - Fe
+          - '1'
+        - - Si
+          - '3'
+        - - O
+          - '8'
+        amount_basis: mol_inventory
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '5'
+      units: '%'
+      as_printed: ±5 atom%
+      confidence_level: not_stated
+      notice: confidence level not stated
+      locator:
+        page: 7
+        published_page: 4321
+        pdf_page_index: 6
+        section: 3.2.1 Pre-edge features
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam15-1019
+      date: '2026-10-19'
+      evidence:
+        page: 7
+        published_page: 4321
+        pdf_page_index: 6
+        section: 3.2.1 Pre-edge features
+        note: The authors estimate 15(±5) atom% of total Fe as ferric iron from XANES pre-edge position; Table 2b contains
+          supporting spectral fits.
+  notices: []
+  source_id: jackson-2005-ferrous-glass-multispectroscopy
+  locator:
+    page: 7
+    published_page: 4321
+    pdf_page_index: 6
+    section: 3.2.1 Pre-edge features
+    note: This prose estimate is distinct from the Table 1 Mössbauer estimate for RB2.
+  read_from: pdf:jackson-2005-ferrous-glass-multispectroscopy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Abstract
+        note: The abstract gives 298 K for the multi-spectroscopic study; the XANES method does not state another temperature.
+    sample_id:
+      state:
+        tag: value
+        value: RB2
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    composition:
+      state:
+        tag: value
+        value:
+          basis: elemental
+          components:
+          - - Rb
+            - '2'
+          - - Fe
+            - '1'
+          - - Si
+            - '3'
+          - - O
+            - '8'
+          amount_basis: mol_inventory
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports no numeric oxygen fugacity or partial pressure.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    fO2_control:
+      state:
+        tag: unknown
+        reason: A controlled Ar or N2 atmosphere and metallic iron crucible are reported, but no oxygen buffer or gas ratio
+          is printed.
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Abstract
+        note: The abstract states 1 bar; represented in canonical Pa.
+    atmosphere:
+      state:
+        tag: value
+        value: controlled atmosphere (Ar or N2)
+      locator:
+        page: 2
+        published_page: 4316
+        pdf_page_index: 1
+        section: Sample Preparation
+  derivation:
+    relation: The RB2 ferric fraction was estimated by calibrating the XANES pre-edge position against iron oxidation state
+      using Wilke et al. (1999, 2001).
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '15'
+        locator:
+          page: 7
+          published_page: 4321
+          pdf_page_index: 6
+          section: 3.2.1 Pre-edge features
+          note: This prose estimate is distinct from the Table 1 Mössbauer estimate for RB2.
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '15'
+              locator:
+                page: 7
+                published_page: 4321
+                pdf_page_index: 6
+                section: 3.2.1 Pre-edge features
+                note: This prose estimate is distinct from the Table 1 Mössbauer estimate for RB2.
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 7
+                published_page: 4321
+                pdf_page_index: 6
+                section: 3.2.1 Pre-edge features
+                note: This prose estimate is distinct from the Table 1 Mössbauer estimate for RB2.
+          output_unit: dimensionless
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 7
+          published_page: 4321
+          pdf_page_index: 6
+          section: 3.2.1 Pre-edge features
+          note: This prose estimate is distinct from the Table 1 Mössbauer estimate for RB2.
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 4320
+        pdf_page_index: 5
+        figure: '3'
+        note: The RB2 XANES pre-edge spectrum is shown, but its numerical spectral inputs are not tabulated.
+    references: []

@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:zaitsev-2000-ms2000-045
       role: pdf
@@ -2621,6 +2621,30 @@ context:
   work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
   source_id: zaitsev-2000-ms2000-045
   species: AlF3
+- observation_id: zaitsev_2000_table1_measured_ion_signals
+  type: measured_ion_signals_context
+  experiment: mnosi2-table1-1773k
+  locator:
+    published_page: 5
+    section: Experimental realisation and assignment of mass spectra
+    pdf_page_index: 4
+  units: ion signals; individual intensities not tabulated
+  values:
+    method_class: measured_direct
+    ions_measured:
+    - Mn+
+    - SiO+
+    - NbO+
+    - NbO2+
+    - MoO+
+    - MoO2+
+    - MoO3+
+    note: Mn+ and SiO+ currents were measured over all samples; complete or partial reductant-oxide currents were used in
+      Eqn. (5). Numerical input currents are not reported.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_table1_measured_ion_signals
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: MnO
 - observation_id: zaitsev_2000_table2_calculated_intensities
   type: thermodynamic_example
   locator:

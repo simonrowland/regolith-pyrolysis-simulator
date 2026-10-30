@@ -1,0 +1,33 @@
+source_id: itoh-1985-beta-alumina-na2o-emf
+source:
+  citation: 'Itoh, M., Kimura, K. and Kozuka, Z. (1985), "Measurement of Na2O Activity in Beta-Alumina by EMF Method", Transactions of the Japan Institute of Metals 26(5), 353–361.'
+extraction:
+  method: MinerU table draft emit, with hand-added row attribution and unknown composition/reference states.
+  date: '2026-10-20'
+  worker: codex-fam28-1020
+review_status: draft
+tables:
+  - page: 6
+    table_index: 1
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: cr
+    rows: [8]
+    temperature: {as_printed: '1000', unit: K}
+    values:
+      - {column: 3, species: Na2O, phase: cr}
+    published_page: 358
+  - page: 6
+    table_index: 1
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: cr
+    rows: [10]
+    temperature: {as_printed: '1000', unit: K}
+    values:
+      - {column: 3, species: Na2O, phase: cr}
+    published_page: 358

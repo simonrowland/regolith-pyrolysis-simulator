@@ -936,6 +936,26 @@ def _numeric_evidence_paths(leaves):
     ]
 
 
+def _numeric_field_evidence_paths(leaves, field):
+    field_path = re.compile(r"(?:^|\.)" + re.escape(field) + r"(?:\.|\[|$)")
+    metadata = re.compile(
+        r"(?:^|\.)(?:locator|page|published_page|pdf_page_index|index)(?:\.|\[|$)"
+    )
+    numeric = []
+    for path, value in leaves:
+        if not field_path.search(path) or metadata.search(path):
+            continue
+        if isinstance(value, bool) or value in (None, ""):
+            continue
+        try:
+            amount = Decimal(str(value))
+        except (ArithmeticError, TypeError, ValueError):
+            continue
+        if amount.is_finite():
+            numeric.append(path)
+    return numeric
+
+
 def _store_kind(path: Path) -> str | None:
     parts = path.parts
     if "extracts-v2" in parts:
@@ -1047,9 +1067,21 @@ def absence_audit(paths=STORE_PATHS):
                         if found:
                             contradiction = found
                     elif match := re.search(r"source does not state (?:a numeric )?(\w+)", reason):
-                        found = [p for p, value in leaves if value not in (None, "") and
-                                 not p.endswith((".tag", ".reason")) and
-                                 re.search(r"(?:^|\.)" + re.escape(match[1]) + r"(?:\.|\[|$)", p)]
+                        if "numeric" in reason:
+                            found = _numeric_field_evidence_paths(leaves, match[1])
+                        else:
+                            found = [
+                                path
+                                for path, value in leaves
+                                if value not in (None, "")
+                                and not path.endswith((".tag", ".reason"))
+                                and re.search(
+                                    r"(?:^|\.)"
+                                    + re.escape(match[1])
+                                    + r"(?:\.|\[|$)",
+                                    path,
+                                )
+                            ]
                         if found:
                             contradiction = found[:3]
                     if contradiction:
@@ -1094,6 +1126,42 @@ def test_g1_whole_store_absence_claims_match_sources(path):
         if _source_observation_rows(path) != 0:
             assert judged, "no source families judged"
     assert not bad, f"{len(bad)} false absence claims; first witnesses: {bad[:12]}"
+
+
+def test_lu_2026_liquidus_points_keep_printed_total_pressure(tmp_path: Path) -> None:
+    from simulator.battery.identity import Identity
+
+    source_id = "lu-2026-mercury-sulfur-liquidus"
+    filename = f"{source_id}.yaml"
+    source = yaml.load((EXTRACTS_DIR / filename).read_text(), Loader=_YAML_LOADER)
+    expected: dict[str, Decimal] = {}
+    for body in (source.get("species") or {}).values():
+        for row in body.get("observations") or []:
+            values = row.get("values") or {}
+            if values.get("quantity") != "transition_temperature":
+                continue
+            for point in values.get("points") or []:
+                conditions = point.get("point_conditions") or {}
+                pressure = conditions.get("total_pressure_Pa") or {}
+                state = pressure.get("state") or {}
+                value = state.get("value") or {}
+                if state.get("tag") == "value" and value.get("kind") == "point":
+                    expected[row["observation_id"]] = Decimal(value["point"])
+
+    result = _migrate_real_extract(tmp_path, filename)
+    actual = {}
+    for observation in result.observations.values():
+        if (
+            observation.source_id != source_id
+            or not isinstance(observation.identity, Identity)
+            or quantity_token(observation.identity) is not Quantity.TRANSITION_TEMPERATURE
+            or not observation.identity.total_pressure_Pa.is_value
+        ):
+            continue
+        local_id = observation.observation_id.split("::", 2)[1].split("::T=", 1)[0]
+        actual[local_id] = observation.identity.total_pressure_Pa.value
+    assert len(expected) == 16
+    assert actual == expected
 
 
 def test_g1_sato_1976_phase_absences_match_isolated_source(tmp_path: Path) -> None:
@@ -1169,12 +1237,10 @@ def test_g1_current_stolyarova_source_migrates_without_context_observation(
     assert method_id not in result.observations
     assert len(
         [obs for obs in result.observations.values() if obs.source_id == "kems-016-stolyarova-1992"]
-    ) == 22
+    ) == 0
 
     generated = tmp_path / "tree/data/literature/extracts-v2" / filename
-    judged, bad = absence_audit([generated])
-    assert judged["kems-016-stolyarova-1992"] == 22
-    assert bad == []
+    assert not generated.exists()
 
 
 @pytest.mark.parametrize(

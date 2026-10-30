@@ -1,0 +1,100 @@
+source_id: willenborg-2006-alkali-removal-thermodynamics
+tables:
+  - table: '1'
+    page: 2
+    caption: Analysis of the Coal Ash Slag (mass %)
+    printed_body_rows: 1
+    layout_audit: 200-dpi render confirms the eight oxide columns and the single row.
+    machine_read_audit: MinerU and pdftotext agree on all 8 numeric cells.
+    row_role: starting boiler slag composition; additive compositions are not tabulated.
+    columns:
+      SiO2: '36.2'
+      Al2O3: '27.0'
+      Fe2O3: '14.4'
+      CaO: '9.1'
+      MgO: '2.5'
+      Na2O: '2.1'
+      K2O: '1.2'
+      P2O5: '0.4'
+  - table: '2'
+    page: 2
+    caption: Analysis of the Alkali Laden Model Sorbents (mass %)
+    printed_body_rows: 14
+    layout_audit: 200-dpi render confirms 14 named sorbent rows and six columns.
+    machine_read_audit: MinerU and pdftotext agree on all 49 numeric cells; blank cells remain unreported.
+    rows:
+      AlSiNa5: {SiO2: '34.57', Al2O3: '60.29', Na2O: '5.14'}
+      AlSi4Na5: {SiO2: '66.01', Al2O3: '28.96', Na2O: '5.03'}
+      AlSi8Na5: {SiO2: '77.16', Al2O3: '17.76', Na2O: '5.07'}
+      AlSi8Na05: {SiO2: '77.47', Al2O3: '22.04', Na2O: '0.49'}
+      AlSi8Na1: {SiO2: '81.12', Al2O3: '17.67', Na2O: '1.21'}
+      AlSi8Na4: {SiO2: '78.72', Al2O3: '17.15', Na2O: '4.13'}
+      AlSi8Na9: {SiO2: '73.23', Al2O3: '17.59', Na2O: '9.19'}
+      AlSi8K4: {SiO2: '78.31', Al2O3: '17.15', Na2O: '0.40', K2O: '4.14'}
+      AlSi8Na3K3: {SiO2: '74.03', Al2O3: '19.65', Na2O: '2.83', K2O: '3.48'}
+      AlSi8Mg4Na03: {SiO2: '78.53', Al2O3: '17.67', MgO: '3.47', Na2O: '0.31'}
+      AlSi8Mg4Na5: {SiO2: '75.87', Al2O3: '15.52', MgO: '3.82', Na2O: '4.73'}
+      AlSi8Mg8Na1: {SiO2: '74.06', Al2O3: '17.10', MgO: '7.43', Na2O: '1.02'}
+      AlSi8Mg8Na5: {SiO2: '71.02', Al2O3: '15.87', MgO: '8.30', Na2O: '4.45'}
+      AlSi8Mg8Na7: {SiO2: '68.64', Al2O3: '16.70', MgO: '7.25', Na2O: '7.37'}
+    blank_cells: remain unreported; they are not converted to zero.
+extract_mapping:
+  table_values:
+    - table: '1'
+      role: incomplete boiler-slag composition retained verbatim for the typed refusal; totals 92.9 mass percent.
+    - table: '2'
+      role: exact model-sorbent compositions bound to prose activity observations.
+      activity_observations:
+        - {species: Na2O, row: AlSi8Na1, activity_as_published: 'about 5 × 10^-14'}
+        - {species: Na2O, row: AlSi8Mg8Na1, activity_as_published: 'about 2 × 10^-13'}
+      printed_body_rows: 14
+  emit_tool: 'The seat version of mineru_table_draft.py supports convert and compare; it has no emit command. Composition mapping was transcribed from the generated table draft and manually assembled into the extract.'
+  compare_output: 'matched=0 no-match=0 mismatch=0 presence-only=0 locator-error=0 unverifiable=0 total=0'
+  compare_note: 'Neither table contains an activity value; the admitted numeric activities are printed in prose. Table composition cells are checked by the cell audit above.'
+full_cell_audit:
+  table_1:
+    - 'PDF p. 2 / Table 1 / header SiO2 through P2O5; all eight cells agree between MinerU and pdftotext, with row and column placement checked against the 200-dpi render.'
+    - 'PDF p. 2 / Table 1 / sole composition row: 36.2, 27.0, 14.4, 9.1, 2.5, 2.1, 1.2, 0.4; MinerU and pdftotext agree on all digits; render confirms order.'
+  table_2:
+    - 'PDF p. 2 / Table 2 / header and all 14 sorbent names; render confirms row order and six columns.'
+    - 'PDF p. 2 / Table 2 / all 49 nonblank numeric cells; MinerU and pdftotext agree on digits; render confirms cell assignments. Blank cells remain unreported.'
+  prose_values:
+    - 'PDF p. 2 / printed p. 2594 / experimental setup, apparatus vacuum, KEMS cross sections, and pure-silver calibration statement; pdftotext agrees with the 200-dpi render.'
+    - 'PDF p. 3 / printed p. 2595 / Eq. 2, Eq. 3 and assumptions; pdftotext agrees with the 200-dpi render.'
+    - 'PDF p. 3 / printed p. 2595 / untreated and additive-group Na2O/K2O activities at 1400 °C; values and grouping checked against render; grouped slag summaries are typed-refused.'
+    - 'PDF p. 4 / printed p. 2596 / about 0.6 Pa, 0.3 Pa and 50% reduction; text agrees with render; gas species is not printed, so values are typed-refused.'
+    - 'PDF p. 4 / printed p. 2596 / calculated Fig. 5 minimum about 1.8 × 10^-14; pdftotext agrees with the 200-dpi render; recorded as a figure candidate, not a measurement.'
+    - 'PDF p. 5 / printed p. 2597 / 5 × 10^-14 and 2 × 10^-13 at 1400 °C; text agrees with render; bound to Table 2 rows AlSi8Na1 and AlSi8Mg8Na1.'
+    - 'PDF p. 5 / printed p. 2597 / about 2-times Na2O activity comparison; text agrees with render; retained only as context because there is no absolute value or single-composition identity.'
+    - 'PDF p. 5 / printed p. 2597 / kinetic caveat: AlSi8Na1 partly molten and AlSi8Na05 almost unmolten; checked against render; the low-Na caveat is preserved in the audit, not promoted to an equilibrium measurement.'
+    - 'PDF p. 6 / printed p. 2598 / conclusion bounds below 10^-13 for Na2O and 10^-14 for K2O; pdftotext agrees with the 200-dpi render; retained as printed summary bounds, not point observations.'
+  render_pages: [2, 3, 4, 5, 6]
+  render_resolution_dpi: 200
+prose_numeric_candidates:
+  - page: 3
+    values: ['3e-10', '2e-10', '6e-11', '2.5e-12', '1.2e-12', '5e-13']
+    note: Approximate Na2O and K2O activities at 1400 C; some values combine 5% or 10% SiO2 or TiO2 treatments, whose individual compositions and values are not distinguished in the prose.
+  - page: 4
+    values: ['0.6 Pa', '0.3 Pa']
+    note: Described as alkali partial pressures over untreated slag and slag with 10% SiO2; gas species is not specified.
+  - page: 5
+    values: ['5e-14', '2e-13']
+    note: Approximate Na2O activities at 1400 C for model sorbents AlSi8Na1 and AlSi8Mg8Na1, respectively; the paper says 'about'.
+  - page: 5
+    values: ['2 times']
+    note: Relative Na2O activity of AlSi8Mg8Na5 versus AlSi8Mg4Na5; no absolute values printed.
+  - page: 4
+    values: ['about 1.8e-14']
+    note: Calculated Fig. 5 minimum from FactSage; listed as a figure-read candidate, not an experimental measurement.
+  - page: 5
+    values: ['about 3 orders of magnitude', '2.5 orders of magnitude']
+    note: Relative Na2O and K2O activities of model sorbents against slag additives; no absolute values printed.
+  - page: 5
+    values: ['nearly the same', 'same range']
+    note: Relative Na2O activity statements for AlSi8Na1 versus AlSi8Na3K3 and AlSi8Mg4Na03 versus AlSi8Na1; no pointwise values are printed.
+  - page: 6
+    values: ['<10^-13', '<10^-14']
+    note: Conclusion bounds for calculated and measured Na2O and K2O activities, respectively; not individual point observations.
+figure_read_candidates:
+  - 'Figures 3 and 4: boiler-slag Na2O and K2O activity curves.'
+  - 'Figures 5-9: calculated Fig. 5 excluded; measured model-sorbent activity curves in Figs. 6-9 are not digitized.'

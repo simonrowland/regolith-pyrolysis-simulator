@@ -1,0 +1,531 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2320/matertrans1960.25.187
+  citation: Yokokawa H., Fujishige M., Ujiie S., Kameyama T., Dokiya M. and Fukuda K. (1984). Volatilization of Aluminum Oxycarbides
+    and of Alumina with Carbon in Reduction of Alumina. Transactions of the Japan Institute of Metals 25(3):187–196.
+  source_ids:
+  - yokokawa-1984-alumina-carbon-volatilization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:yokokawa-1984-alumina-carbon-volatilization
+      role: pdf
+      path: raw/yokokawa-1984-alumina-carbon-volatilization/yokokawa-1984-alumina-carbon-volatilization.pdf
+      sha256:
+        tag: value
+        value: 34b8500bf3f8cced3ad6c43b571ea6a6bde4f118da624bc0ab805fd686bda1c0
+    - asset_id: pdftotext:yokokawa-1984-alumina-carbon-volatilization
+      role: pdftotext
+      path: text/yokokawa-1984-alumina-carbon-volatilization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yokokawa-1984-alumina-carbon-volatilization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2320/matertrans1960.25.187
+experiments:
+- experiment_id: 10.2320/matertrans1960.25.187::yokokawa-1984-alumina-carbon-volatilization
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans1960.25.187
+  locator:
+    page: 5
+    published_page: 191
+    pdf_page_index: 4
+    table: '1'
+    note: row_label=1-a; column_header=ratio $(W_1 - W_f)/W_1$  ratio $(W_1 - W_f)/W_1$
+context:
+- observation_id: yokokawa_1984_figure_1_deferred
+  type: figure_record
+  locator:
+    pdf_page_index: 1
+    page: 2
+    published_page: 188
+    figure: '1'
+  units: as printed on axes
+  values:
+    typed_quantity: thermodynamic phase relation diagram
+    species: Al-O-C gas over condensed phases
+    phase: mixed vapor/condensed sample system
+    temperature_as_printed: 1800 K; 134 Pa
+    x_axis_as_printed: T (K)
+    y_axis_as_printed: P (Pa); species partial pressures
+    caption_as_printed: Al-O-C solid-gas phase relations
+    method_class: model_derived
+  caption_as_printed: Al-O-C solid-gas phase relations
+  panel: whole_figure
+  series:
+  - name: CO vapor pressure
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: CO2 vapor pressure
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: O2 vapor pressure
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: Al vapor pressure
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: Al2O vapor pressure
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: SiO vapor pressure
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  attribution: Yokokawa et al. (1984)
+  digitisation: deferred to a figure pass
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_figure_1_deferred
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown
+- observation_id: yokokawa_1984_figure_2_deferred
+  type: figure_record
+  locator:
+    pdf_page_index: 2
+    page: 3
+    published_page: 189
+    figure: '2'
+  units: as printed on axes
+  values:
+    typed_quantity: Gibbs energy versus composition
+    species: Al2OC, Al4O4C, alumina, carbide
+    phase: mixed vapor/condensed sample system
+    temperature_as_printed: 1800 K
+    x_axis_as_printed: composition / stability case
+    y_axis_as_printed: assumed Gibbs energy
+    caption_as_printed: Assumed Gibbs energy of formation of Al2OC from oxide and carbide at 1800 K
+    method_class: model_derived
+  caption_as_printed: Assumed Gibbs energy of formation of Al2OC from oxide and carbide at 1800 K
+  panel: whole_figure
+  series:
+  - name: stability case (i)
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: stability case (iii)
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: stability case (v)
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  attribution: Yokokawa et al. (1984)
+  digitisation: deferred to a figure pass
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_figure_2_deferred
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown
+- observation_id: yokokawa_1984_figure_3_deferred
+  type: figure_record
+  locator:
+    pdf_page_index: 2
+    page: 3
+    published_page: 189
+    figure: '3'
+  units: as printed on axes
+  values:
+    typed_quantity: pressure-composition diagram
+    species: Al2O3-Al4C3 pseudobinary with Al2OC
+    phase: mixed vapor/condensed sample system
+    temperature_as_printed: 1800 K
+    x_axis_as_printed: m(Al2O3)/m(Al4C3)
+    y_axis_as_printed: pressure (Pa)
+    caption_as_printed: Pressure-composition diagram in the Al2O3-Al4C3 pseudobinary system at 1800 K
+    method_class: model_derived
+  caption_as_printed: Pressure-composition diagram in the Al2O3-Al4C3 pseudobinary system at 1800 K
+  panel: whole_figure
+  series:
+  - name: case (i), panel a
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: case (iii), panel b
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  - name: case (v), panel c
+    marker: continuous curve
+    marker_count: 0
+    method_class: model_derived
+  attribution: Yokokawa et al. (1984)
+  digitisation: deferred to a figure pass
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_figure_3_deferred
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown
+- observation_id: yokokawa_1984_figure_4_deferred
+  type: figure_record
+  locator:
+    pdf_page_index: 5
+    page: 6
+    published_page: 192
+    figure: '4'
+  units: as printed on axes
+  values:
+    typed_quantity: thermal analysis traces
+    species: Al4O4C and Al2OC samples
+    phase: mixed vapor/condensed sample system
+    temperature_as_printed: temperature-dependent
+    x_axis_as_printed: T (K)
+    y_axis_as_printed: TG, DTG, DTA, pressure
+    caption_as_printed: Results of thermal analysis on oxycarbides
+    method_class: measured_direct
+    axes_as_printed:
+      x: T / K
+      TG: 1 − ΔW/W0
+      DTG: −dW/dt (mg min−1)
+      DTA: EMF / mV
+      pressure: log(P / Pa)
+    candidate_tokens:
+    - mass_loss_fraction_vs_T
+    - mass_loss_rate
+    - partial_pressure
+    schema_gap: Differential thermal-analysis signal has no store quantity token; digitisation is deferred for all curves.
+  caption_as_printed: Results of thermal analysis on oxycarbides
+  panel: a-b
+  series:
+  - name: 'panel a: TG'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel a: DTG'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel a: DTA'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel a: pressure P'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: TG'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: DTG'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: DTA'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: pressure P'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  attribution: Yokokawa et al. (1984)
+  digitisation: deferred to a figure pass
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_figure_4_deferred
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown
+- observation_id: yokokawa_1984_figure_5_deferred
+  type: figure_record
+  locator:
+    pdf_page_index: 6
+    page: 7
+    published_page: 193
+    figure: '5'
+  units: as printed on axes
+  values:
+    typed_quantity: DTG and DTA traces
+    species: Al2O3 + 3C with SiC, Si3N4, Fe2O3 additions
+    phase: mixed vapor/condensed sample system
+    temperature_as_printed: temperature-dependent
+    x_axis_as_printed: T (K)
+    y_axis_as_printed: DTG; DTA
+    caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina with carbon
+    method_class: measured_direct
+    axes_as_printed:
+      x: T / K
+      y_left: differential weight loss (DTG)
+      y_right: DTA
+    candidate_tokens:
+    - mass_loss_rate
+    - heat_capacity
+    schema_gap: The plotted differential weight-loss and thermal signals are curves with no point data entered in this figure
+      pass.
+  caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina with carbon
+  panel: a-f
+  series:
+  - name: 'panel a: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel a: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel c: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel c: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel d: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel d: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel e: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel e: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel f: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel f: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  attribution: Yokokawa et al. (1984)
+  digitisation: deferred to a figure pass
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_figure_5_deferred
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown
+- observation_id: yokokawa_1984_figure_6_deferred
+  type: figure_record
+  locator:
+    pdf_page_index: 7
+    page: 8
+    published_page: 194
+    figure: '6'
+  units: as printed on axes
+  values:
+    typed_quantity: DTG and DTA traces
+    species: Al2O3 + Al4C3; Al2O3 + SiC
+    phase: mixed vapor/condensed sample system
+    temperature_as_printed: temperature-dependent
+    x_axis_as_printed: T (K)
+    y_axis_as_printed: DTG; DTA
+    caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina with carbides
+    method_class: measured_direct
+    axes_as_printed:
+      x: T / K
+      y_left: differential weight loss (DTG)
+      y_right: DTA
+    candidate_tokens:
+    - mass_loss_rate
+    - heat_capacity
+    schema_gap: The plotted differential weight-loss and thermal signals are curves with no point data entered in this figure
+      pass.
+  caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina with carbides
+  panel: a-c
+  series:
+  - name: 'panel a: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel a: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel c: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel c: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  attribution: Yokokawa et al. (1984)
+  digitisation: deferred to a figure pass
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_figure_6_deferred
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown
+- observation_id: yokokawa_1984_figure_7_deferred
+  type: figure_record
+  locator:
+    pdf_page_index: 8
+    page: 9
+    published_page: 195
+    figure: '7'
+  units: as printed on axes
+  values:
+    typed_quantity: DTG and DTA traces
+    species: Al2O3-SiO2-Fe2O3-C mixtures
+    phase: mixed vapor/condensed sample system
+    temperature_as_printed: temperature-dependent
+    x_axis_as_printed: T (K)
+    y_axis_as_printed: DTG; DTA
+    caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina, silica and iron
+      oxide with carbon
+    method_class: measured_direct
+    axes_as_printed:
+      x: T / K
+      y_left: differential weight loss (DTG)
+      y_right: DTA
+    candidate_tokens:
+    - mass_loss_rate
+    - heat_capacity
+    schema_gap: The plotted differential weight-loss and thermal signals are curves with no point data entered in this figure
+      pass.
+  caption_as_printed: Results of differential weight loss and differential thermal analysis on alumina, silica and iron oxide
+    with carbon
+  panel: a-f
+  series:
+  - name: 'panel a: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel a: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel b: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel c: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel c: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel d: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel d: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel e: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel e: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel f: DTG solid line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  - name: 'panel f: DTA broken line'
+    marker: continuous curve
+    marker_count: 0
+    method_class: measured_direct
+  attribution: Yokokawa et al. (1984)
+  digitisation: deferred to a figure pass
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_figure_7_deferred
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown
+- observation_id: yokokawa_1984_printed_al2oc_experimental_pressure_context
+  type: printed_condition_context
+  locator:
+    pdf_page_index: 5
+    page: 6
+    published_page: 192
+    section: Aluminum oxycarbides
+  units: Pa; K
+  values:
+    pressure_range_as_printed: 10−4 to 10−3 Pa
+    evaporation_temperature_range_as_printed: 1600 to 2000 K
+    candidate_tokens:
+    - total_pressure_Pa
+    - transition_temperature
+  note: Applies to the Al2OC discussion, not to all Table 1 rows.
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_printed_al2oc_experimental_pressure_context
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown
+- observation_id: yokokawa_1984_printed_remaining_mass_context
+  type: measured_value_without_matching_token
+  locator:
+    pdf_page_index: 5
+    page: 6
+    published_page: 192
+    section: Aluminum oxycarbides
+  units: mass %; K
+  values:
+    remaining_mass_as_printed: 29 mass %
+    temperature_as_printed: heated to 2000 K
+    candidate_tokens:
+    - mass_loss_fraction
+    - yield_fraction
+    schema_gap: This is printed as remaining-mass yield, not the mass-loss fraction; converting it by subtraction would create
+      an unprinted value.
+  note: For Al4O4C, significant evaporation is reported around 1570 K after beginning above 1300 K, and it ceases at 1800
+    K; the residual is α-alumina.
+  context_id: yokokawa-1984-alumina-carbon-volatilization::context::yokokawa_1984_printed_remaining_mass_context
+  work_id: 10.2320/matertrans1960.25.187
+  source_id: yokokawa-1984-alumina-carbon-volatilization
+  species: unknown

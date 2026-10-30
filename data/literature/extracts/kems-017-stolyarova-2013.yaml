@@ -7,12 +7,12 @@ source:
   url: https://benthamopen.com/contents/pdf/TOTHERJ/TOTHERJ-7-57.pdf
   year: 2013
 extraction:
-  method: OCR MinerU; Table 1 is a SPECIES MAP with NO numeric partial pressures or activities. Extracted
+  method: OCR MinerU; Table 1 is a SPECIES MAP with NO numeric partial pressures or activities. Extracted; validated in an internal review, 2026-08-04, ocr-artifacts
     as report-only structured map under rate_series with semantics bound_not_point_ordering. No fabricated
     YAML numeric rows from species names.
   date: '2026-08-04'
   worker: mine-multicarrier-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/
+  provenance_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
 review_status: draft
 species:
   SiO:
@@ -20,7 +20,7 @@ species:
     - observation_id: stolyarova_2013_ternary_silicate_vapour_species_map_table1
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
+        source_path: text/kems-017-stolyarova-2013/mineru/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
         table: '1'
         line_range: 104-126
         paragraph: Composition of Vapour Over the Ternary Silicate Systems Studied
@@ -90,7 +90,7 @@ species:
     - observation_id: stolyarova_2013_fig1_mgo_activity_figure_only
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '62'
         figure: '1'
       phase: MgO-B2O3-SiO2_melt
@@ -121,7 +121,7 @@ species:
     - observation_id: stolyarova_2013_fig2_bao_kems_contours_figure_only
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '62'
         figure: '2'
       phase: BaO-B2O3-SiO2_melt
@@ -149,7 +149,7 @@ species:
     - observation_id: stolyarova_2013_fig2_bao_gltas_contours_model
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '62'
         figure: '2'
       phase: BaO-B2O3-SiO2_GLTAS_model
@@ -180,7 +180,7 @@ species:
     - observation_id: stolyarova_2013_fig3_b2o3_kems_contours_figure_only
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '63'
         figure: '3'
         note: Dotted KEMS contours at 1650 K; printed log10 activity levels -5, -4, -3, -2
@@ -209,7 +209,7 @@ species:
     - observation_id: stolyarova_2013_fig3_b2o3_gltas_contours_model
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '63'
         figure: '3'
         note: Solid GLTAS model contours at 1650 K; printed log10 activity levels -8, -6, -4, -1
@@ -241,7 +241,7 @@ species:
     - observation_id: stolyarova_2013_fig4_sio2_kems_contours_figure_only
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '63'
         figure: '4'
       phase: BaO-B2O3-SiO2_melt
@@ -269,7 +269,7 @@ species:
     - observation_id: stolyarova_2013_fig4_sio2_gltas_contours_model
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '63'
         figure: '4'
       phase: BaO-B2O3-SiO2_GLTAS_model
@@ -298,7 +298,7 @@ species:
     - observation_id: stolyarova_2013_fig5_gibbs_kems_contours_figure_only
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-08.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '64'
         figure: '5'
       phase: BaO-B2O3-SiO2_melt
@@ -326,7 +326,7 @@ species:
     - observation_id: stolyarova_2013_fig5_gibbs_gltas_contours_model
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-08.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '64'
         figure: '5'
       phase: BaO-B2O3-SiO2_GLTAS_model
@@ -355,7 +355,7 @@ species:
     - observation_id: stolyarova_2013_fig6_gibbs_gltas_model_figure_only
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-09.png
+        source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
         published_page: '65'
         figure: '6'
       phase: CaO_SrO_BaO_borosilicate_GLTAS_models
@@ -383,7 +383,7 @@ species:
 metadata:
   - record_id: stolyarova_2013_table1_full_transcription_r2
     locator:
-      source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pdftotext-layout.txt
+      source_path: text/kems-017-stolyarova-2013/pdftotext-layout.txt
       published_page: '60'
       table: '1'
     phase: ternary_silicate_systems_as_compiled
@@ -468,7 +468,7 @@ metadata:
       note: Table 1 prints no uncertainties and no pressure or activity values.
   - record_id: stolyarova_2013_compiled_kems_pressure_window
     locator:
-      source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pdftotext-layout.txt
+      source_path: text/kems-017-stolyarova-2013/pdftotext-layout.txt
       published_page: '59'
       paragraph: vapour composition over binary phosphate borate and silicate systems
     phase: binary_oxide_systems_as_compiled
@@ -487,7 +487,7 @@ metadata:
       note: The review gives only a general range, not species-resolved points or uncertainty.
   - record_id: stolyarova_2013_fig7_9_bond_populations_gltas_model_figure_only
     locator:
-      source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-10.png
+      source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
       published_page: '66'
       figure: 7-9
     phase: CaO_SrO_BaO_borosilicate_GLTAS_models
@@ -520,7 +520,7 @@ metadata:
       note: Model output; no model uncertainty is printed.
   - record_id: stolyarova_2013_gltas_equations_and_structural_parameters
     locator:
-      source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pdftotext-layout.txt
+      source_path: text/kems-017-stolyarova-2013/pdftotext-layout.txt
       published_page: 64-65
       equation: 1-9
     phase: BaO-B2O3-SiO2_GLTAS_model
@@ -560,32 +560,32 @@ fidelity_samples:
   value: false
   note: Table 1 is species map only — confirmed no numeric P/activity in this extract
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
+    source_path: text/kems-017-stolyarova-2013/mineru/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
     table: '1'
 - path: species.SiO.observations[stolyarova_2013_ternary_silicate_vapour_species_map_table1].values.systems[0].system
   value: $Na_{2}O-B_{2}O_{3}-SiO_{2}$
   note: first Table 1 system row
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
+    source_path: text/kems-017-stolyarova-2013/mineru/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
     table: '1'
 - path: species.B2O3.observations[stolyarova_2013_fig3_b2o3_kems_contours_figure_only].values.contour_levels_as_printed
   value: ['-5', '-4', '-3', '-2']
   note: Figure 3 dotted experimental labels only, checked against the rendered publisher PDF
   locator:
-    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+    source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
     published_page: '63'
     figure: '3'
 - path: species.BaO.observations[stolyarova_2013_fig2_bao_kems_contours_figure_only].values.contour_levels_as_printed
   value: ['-4', '-5', '-8', '-11']
   note: Figure 2 unique BaO log-activity contour labels checked against the rendered publisher PDF
   locator:
-    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+    source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
     published_page: '62'
     figure: '2'
 - path: species.SiO2.observations[stolyarova_2013_fig5_gibbs_gltas_contours_model].values.refusal_reason
   value: model_output_not_measurement
   note: Figure 5 solid curves are explicitly GLTAS model output, not measured data
   locator:
-    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-08.png
+    source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
     published_page: '64'
     figure: '5'

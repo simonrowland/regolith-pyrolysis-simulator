@@ -117,7 +117,7 @@ def _choice_for(decisions: list[dict], decision_type: str) -> str | None:
     return None
 
 
-@pytest.mark.timeout(BRANCH_JOURNEY_TIMEOUT_S)
+@pytest.mark.cpu_budget(BRANCH_JOURNEY_TIMEOUT_S)
 def test_alternate_branch_journey(page, evidence, artifacts_dir):
     step_results: list[tuple[str, bool, str]] = []
 

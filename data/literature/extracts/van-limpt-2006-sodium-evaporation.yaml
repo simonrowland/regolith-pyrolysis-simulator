@@ -1,0 +1,243 @@
+schema_version: literature_extract.v1
+source_id: van-limpt-2006-sodium-evaporation
+source:
+  citation: >-
+    van Limpt, H., Beerkens, R., and Verheijen, O. (2006). "Models and Experiments for Sodium Evaporation From Sodium-Containing Silicate Melts," Journal of the American Ceramic Society 89(11), 3446–3455.
+  doi: 10.1111/j.1551-2916.2006.01233.x
+  year: 2006
+extraction:
+  method: >-
+    Born-digital pdftotext-layout reading with table and figure-page render checks. Table I contains calculated gas diffusion coefficients; Table II repeats the six transpiration mass-balance measurements also transcribed in the 2007 van Limpt thesis (kems-046-van-limpt-2007). The main Na evaporation, NaOH vapor-pressure, and Na2O activity measurements are plotted in Figures 3–8 and deferred to a figure pass; Figure 9 is an industrial CFD model output.
+  date: '2026-10-20'
+  worker: fam35-1021
+review_status: draft
+species:
+  Na:
+    observations: []
+    context:
+      - observation_id: van_limpt_2006_table_i_gas_diffusion_coefficients
+        type: table_context
+        locator:
+          source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf
+          page: 4
+          published_page: 3449
+          pdf_page_index: 3
+          table: 'I'
+          note: >-
+            Two rows, 1400 and 1500 °C, checked against the printed table. Candidate tokens checked: evaporation_rate and partial_pressure; this is calculated gas-phase diffusivity, which has no store quantity token. Calculated Chapman–Enskog values and comparisons from Beerkens and Conradt/Scholze are reproduced as printed.
+        units: m2/s
+        values:
+          quantity: calculated_diffusion_coefficients_of_gaseous_NaOH
+          method_class: model_derived
+          rows:
+            - {temperature_C: 1400, D_NaOH_air: 3.12e-4, D_NaOH_combustion_gases: 2.96e-4, D_NaOH_N2_H2O_50_50: 3.01e-4, D_NaOH_Conradt_Scholze: 3.3e-4, D_NaOH_combustion_atmosphere: 2.46e-4}
+            - {temperature_C: 1500, D_NaOH_air: 3.45e-4, D_NaOH_combustion_gases: 3.27e-4, D_NaOH_N2_H2O_50_50: 3.33e-4, D_NaOH_Conradt_Scholze: 3.7e-4, D_NaOH_combustion_atmosphere: 2.73e-4}
+          notes:
+            collision_diameter_angstrom: 3.804
+            combustion_gas_composition_vol_percent: {H2O: 13, O2: 4.4, CO2: 9.0, N2_plus_Ar: 3.6}
+            N2_H2O_mixture_H2O_volume_fraction: 0–0.5
+      - observation_id: van_limpt_2006_table_ii_mass_balance_context
+        type: table_context
+        locator:
+          source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf
+          page: 7
+          published_page: 3452
+          pdf_page_index: 6
+          table: 'II'
+          note: >-
+            All six rows checked against the printed table. The exact six temperature / extractive / gravimetric / ratio rows are also in van_limpt_2007_table44_sodium_mass_balance in kems-046-van-limpt-2007; retained here as source-specific context and not scored twice. Candidate tokens checked: mass_loss_fraction (requires a sample-relative fraction) and mass_loss_areal_density (requires an area basis); neither fits the printed absolute mass in mg. The author reports the fitted relation m_gravimetric=(1.02±0.04)×m_extractive.
+        units: mg; ratio dimensionless
+        values:
+          quantity: sodium_disilicate_transpiration_mass_balance
+          method_class: measured_direct
+          duplicate_source_observation_id: van_limpt_2007_table44_sodium_mass_balance
+          rows:
+            - {temperature_C: 1416, extractive_weight_loss_mg: 112, gravimetric_weight_loss_mg: 125, ratio_extractive_to_gravimetric: 0.90}
+            - {temperature_C: 1437, extractive_weight_loss_mg: 146, gravimetric_weight_loss_mg: 153, ratio_extractive_to_gravimetric: 0.96}
+            - {temperature_C: 1439, extractive_weight_loss_mg: 166, gravimetric_weight_loss_mg: 170, ratio_extractive_to_gravimetric: 0.98}
+            - {temperature_C: 1354, extractive_weight_loss_mg: 69, gravimetric_weight_loss_mg: 79, ratio_extractive_to_gravimetric: 0.87}
+            - {temperature_C: 1454, extractive_weight_loss_mg: 188, gravimetric_weight_loss_mg: 188, ratio_extractive_to_gravimetric: 1.00}
+            - {temperature_C: 1356, extractive_weight_loss_mg: 85, gravimetric_weight_loss_mg: 71, ratio_extractive_to_gravimetric: 1.21}
+          fitted_relation: '(1.02 ± 0.04) × extractive weight loss'
+      - observation_id: van_limpt_2006_printed_evaporation_fluxes_context
+        type: measured_quantity_context
+        locator:
+          source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf
+          page: 6
+          published_page: 3451
+          pdf_page_index: 5
+          note: >-
+            Text reports total sodium-species molar evaporation rates (Na, NaOH, etc.): approximately 1.2×10^-4 mol m^-2 s^-1 at 1450–1460 °C; at 1400 °C the compared rates are 6.7×10^-5 to 7.4×10^-5 mol m^-2 s^-1 with differences up to about 10%. Candidate token checked: EVAPORATION_RATE, but its canonical unit is kg/s total; the paper reports areal molar flux and provides no single vapor species or directly usable total conversion. Retained with the printed units.
+        units: mol m−2 s−1
+        values:
+          quantity: total_sodium_species_evaporation_flux
+          method_class: measured_direct
+          at_1450_to_1460_C: about 1.2e-4
+          at_1400_C_range: [6.7e-5, 7.4e-5]
+          relative_difference_at_1400_C: up to about 10%
+      - observation_id: van_limpt_2006_figure_3_naoh_pressure
+        type: figure_record
+        locator: {source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf, page: 6, published_page: 3451, pdf_page_index: 5, figure: '3'}
+        panel: whole_figure
+        attribution: present study measurements and Associated Species Model calculations
+        units: Pa; square root of water vapor pressure in bar
+        values:
+          quantity: partial_pressure
+          species: NaOH
+          phase: gas in equilibrium above sodium-disilicate melt
+          temperature_as_printed: average melt temperature 1416 °C
+          composition_as_printed: Na2O·2SiO2 melt
+          axes_as_printed: {x: 'square root of pH2O (bar)^0.5', y: 'saturation pressure p*NaOH (Pa)'}
+          caption: Saturation pressure of NaOH above a 2SiO2·Na2O melt as a function of the square root of water vapor pressure; measurements and modified thermodynamic Associated Species Model.
+          series:
+            - {name: measurements, marker: filled square, marker_count: 4, evidence_class: measured_reduced}
+            - {name: thermochemical modeling, marker: open triangle, marker_count: 4, evidence_class: model_derived}
+            - {name: linear model fit, marker: line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: van_limpt_2006_figure_4_elemental_sodium_pressure
+        type: figure_record
+        locator: {source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf, page: 6, published_page: 3451, pdf_page_index: 5, figure: '4'}
+        panel: whole_figure
+        attribution: present study measurements and thermochemical model calculations
+        units: Pa
+        values:
+          quantity: partial_pressure
+          species: Na
+          phase: gas in equilibrium above sodium-disilicate melt
+          temperature_as_printed: 1250–1500 °C axis; measurements at 1400–1460 °C
+          composition_as_printed: Na2O·2SiO2 melt
+          axes_as_printed: {x: 'temperature (°C)', y: 'saturation pressure p*Na (Pa)'}
+          caption: Calculated and measured saturation pressure of elemental sodium in equilibrium with a Na2O·2SiO2 melt as a function of temperature.
+          series:
+            - {name: 'measured values, pO2 < 1 Pa', marker: filled square, marker_count: 3, evidence_class: measured_reduced}
+            - {name: 'thermochemical model, pO2 < 1 Pa', marker: curve, marker_count: 0, evidence_class: model_derived}
+            - {name: 'measuring points, pO2 = 0.223 bar', marker: open triangle, marker_count: 2, evidence_class: measured_reduced}
+            - {name: 'thermochemical model, pO2 = 0.223 bar', marker: filled circle, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+  Na2O:
+    observations: []
+    context:
+      - observation_id: van_limpt_2006_figure_5_cumulative_release
+        type: figure_record
+        locator: {source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf, page: 8, published_page: 3453, pdf_page_index: 7, figure: '5'}
+        panel: whole_figure
+        attribution: present study
+        units: g cumulative Na2O release; time in minutes
+        values:
+          quantity: unavailable
+          schema_gap: The store has no cumulative Na2O mass-release token; mass_loss_fraction and mass_loss_areal_density do not fit the printed ordinate in grams.
+          candidate_tokens: [mass_loss_fraction, mass_loss_areal_density]
+          species: Na2O
+          phase: sodium-disilicate melt
+          temperature_as_printed: one fixed temperature per experiment; values A–H are in the table below the plot
+          composition_as_printed: sodium-disilicate melt
+          axes_as_printed: {x: 'time (minutes)', y: 'cumulative Na2O release'}
+          caption: Measured cumulative Na2O release from a sodium-disilicate melt during a transpiration experiment as a function of time, with eight experiments A–H.
+          series:
+            - {name: 'experiment A, 1451 °C, pH2O 0.51 bar', marker: filled diamond, marker_count: 5, evidence_class: measured_direct}
+            - {name: 'experiment B, 1306 °C, pH2O 0.52 bar', marker: filled square, marker_count: 6, evidence_class: measured_direct}
+            - {name: 'experiment C, 1312 °C, pH2O 0.46 bar', marker: filled triangle, marker_count: 3, evidence_class: measured_direct}
+            - {name: 'experiment D, 1295 °C, pH2O 0.29 bar', marker: filled circle, marker_count: 3, evidence_class: measured_direct}
+            - {name: 'experiment E, 1303 °C, pH2O 0.19 bar', marker: asterisk, marker_count: 5, evidence_class: measured_direct}
+            - {name: 'experiment F, 1308 °C, pH2O 0.00 bar', marker: open circle, marker_count: 4, evidence_class: measured_direct}
+            - {name: 'experiment G, 1401 °C, pH2O 0.49 bar', marker: plus, marker_count: 6, evidence_class: measured_direct}
+            - {name: 'experiment H, 1424 °C, pH2O 0.46 bar', marker: open triangle, marker_count: 3, evidence_class: measured_direct}
+          digitisation: deferred to a figure pass
+      - observation_id: van_limpt_2006_figure_6_sodium_disilicate_activity
+        type: figure_record
+        locator: {source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf, page: 8, published_page: 3453, pdf_page_index: 7, figure: '6'}
+        panel: whole_figure
+        attribution: present study measurements and thermodynamical Associated Species Model
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: Na2O
+          phase: sodium-disilicate melt
+          temperature_as_printed: 1250–1500 °C
+          standard_state: pure liquid Na2O at experiment temperature; inferred from JANAF Na-012 alpha-to-liquid transition at 1405.2 K, below the plotted temperatures
+          standard_state_inferred: true
+          composition_as_printed: molar Na2O fraction 0.3307 ± 0.005
+          axes_as_printed: {x: 'temperature (°C)', y: 'chemical activity of Na2O'}
+          caption: Chemical activity of Na2O in a sodium-disilicate (Na2O·2SiO2) melt as a function of temperature; model and results derived from transpiration evaporation measurements.
+          series:
+            - {name: measurements, marker: diamond with error bars, marker_count: 9, evidence_class: measured_reduced}
+            - {name: thermodynamical Associated Species Model, marker: bounded range, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: van_limpt_2006_figure_7_soda_lime_activity
+        type: figure_record
+        locator: {source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf, page: 8, published_page: 3453, pdf_page_index: 7, figure: '7'}
+        panel: whole_figure
+        attribution: present study measurements and thermodynamical Associated Species Model
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: Na2O
+          phase: soda–lime–silicate melt
+          temperature_as_printed: 1360–1465 °C; plot axis 1300–1550 °C
+          standard_state: pure liquid Na2O at experiment temperature; inferred from JANAF Na-012 alpha-to-liquid transition at 1405.2 K
+          standard_state_inferred: true
+          composition_as_printed: SiO2:Na2O:CaO = 74:16:10 mol%; molar Na2O fraction 0.1577 ± 0.003
+          axes_as_printed: {x: 'temperature (°C)', y: 'chemical activity of Na2O'}
+          caption: Chemical activity of Na2O measured for a soda–lime–silicate melt sample; model range and transpiration-measurement values are shown.
+          series:
+            - {name: measurements, marker: blue diamond with error bars, marker_count: 4, evidence_class: measured_reduced}
+            - {name: thermodynamical modeling, marker: bounded range, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: van_limpt_2006_figure_8_activity_model_comparison
+        type: figure_record
+        locator: {source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf, page: 8, published_page: 3453, pdf_page_index: 7, figure: '8'}
+        panel: whole_figure
+        attribution: present study activity measurements compared with Associated Species Model
+        units: dimensionless activity
+        values:
+          quantity: activity
+          species: Na2O
+          phase: sodium-disilicate and soda–lime–silicate melts
+          temperature_as_printed: points correspond to the temperature series in Figures 6–7
+          standard_state: pure liquid Na2O at the respective experiment temperature; inferred as above the 1405.2 K JANAF Na-012 transition
+          standard_state_inferred: true
+          composition_as_printed: sodium-disilicate and SiO2:Na2O:CaO = 74:16:10 mol% soda–lime–silicate melts
+          axes_as_printed: {x: 'measured chemical activity Na2O', y: 'modeled chemical activity Na2O'}
+          caption: Comparison between measured and modeled chemical activities (Associated Species Model) of Na2O in sodium-disilicate and soda–lime–silica melts.
+          series:
+            - {name: 'soda–lime–silicate, SiO2:Na2O:CaO 74:16:10 mol%', marker: open square, marker_count: 4, evidence_class: measured_reduced}
+            - {name: sodium-disilicate Na2O·2SiO2, marker: open triangle, marker_count: 11, evidence_class: measured_reduced}
+            - {name: linear relation y = 0.9823x, marker: fitted line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: van_limpt_2006_figure_9_industrial_naoh_distribution
+        type: figure_record
+        locator: {source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf, page: 9, published_page: 3454, pdf_page_index: 8, figure: '9'}
+        panel: whole_figure
+        attribution: computational fluid dynamics calculation
+        units: vpm NaOH
+        values:
+          quantity: unavailable
+          schema_gap: The store has no gas concentration-field token for this calculated industrial distribution.
+          candidate_tokens: [partial_pressure, equilibrium_phase_composition]
+          species: NaOH
+          phase: gas in a soda–lime–silicate oxy-fuel furnace combustion chamber
+          temperature_as_printed: not reported for the plotted field
+          composition_as_printed: industrial furnace model
+          axes_as_printed: spatial CFD field; concentration scale in vpm
+          caption: NaOH concentrations obtained from computational fluid dynamics calculations in the combustion chamber of a soda–lime–silicate oxy-fuel furnace; values range from 0 to 400 vpm.
+          series:
+            - {name: calculated concentration field, marker: CFD contours, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: van_limpt_2006_printed_activity_summary
+        type: measured_quantity_context
+        locator:
+          source_path: corpus/raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf
+          page: 8
+          published_page: 3453
+          pdf_page_index: 7
+          note: >-
+            Text states Na2O surface activity is about 10–15% lower than the original glass for both sodium-silicate and soda–lime–silicate melts; cumulative Na2O release during the experiments was about 0.5–3.5% of the original melt amount. Figure 8 reports the printed relation aNa2O(model)=(0.98±0.04)×aNa2O(measured), with fitted line y=0.9823x and R2=0.9283. These are author summaries/fit rather than individual measurements; point data remain deferred to Figures 5–8.
+        units: relative percent; dimensionless activity
+        values:
+          quantity: measured_activity_and_release_summaries
+          method_class: model_derived
+          activity_surface_to_bulk_difference_percent: [10, 15]
+          cumulative_na2o_loss_percent: [0.5, 3.5]
+          model_activity_from_measured_slope: {value: 0.98, sigma: 0.04}
+          plotted_regression_slope: 0.9823
+          plotted_R_squared: 0.9283

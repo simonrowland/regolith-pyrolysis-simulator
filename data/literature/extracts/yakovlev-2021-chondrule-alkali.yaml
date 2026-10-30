@@ -1,0 +1,794 @@
+schema_version: literature_extract.v1
+source_id: yakovlev-2021-chondrule-alkali
+source:
+  citation: Yakovlev, O. I., & Shornikov, S. I. (2021). Experimental Data of Alkali Component Evaporation from Chondrule
+    Melts. Experiment in Geosciences 27(1), 25–28.
+  year: 2021
+  corpus_asset: raw/yakovlev-2021-chondrule-alkali/yakovlev-2021-chondrule-alkali.pdf
+  corpus_sha256: d766a39acd8b6ace1dec780d40eee5d4489df41b393984b0f4aa223bc0e2d063
+extraction:
+  method: Figure 1 symbols digitised from 600 dpi PDF raster using calibrated axes; independently checked against
+    a blind second read. Figure 2 calculated curves retained as context only.
+  date: '2026-10-27'
+  worker: yako21-figextract
+review_status: draft
+experiments:
+- experiment_id: yakovlev-shornikov-2021-vacuum-evaporation
+  method: vacuum_evaporation
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    paragraph: Experimental conditions
+  conditions:
+    total_pressure_bar:
+      state:
+        tag: value
+        value: 10^-9 bar
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        paragraph: Experimental conditions
+    duration_min:
+      state:
+        tag: value
+        value: 30
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        paragraph: Experimental conditions
+fidelity_samples: []
+species:
+  residue_composition:
+    observations: []
+    context:
+    - observation_id: yakovlev_2021_fig1_g1_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: G1; 1 series, filled symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: granite
+        T_C: 1026.84
+        K2O_Na2O_mass_ratio: 1.3731
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3205.94
+          y: 5293.62
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_g2_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: G2; 1 series, filled symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: granite
+        T_C: 1300.17
+        K2O_Na2O_mass_ratio: 1.5283
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3699.6
+          y: 5222.67
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_g3_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: G3; 1 series, filled symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: granite
+        T_C: 1350.1
+        K2O_Na2O_mass_ratio: 1.5682
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3789.78
+          y: 5204.45
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_g4_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: G4; 1 series, filled symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: granite
+        T_C: 1400.26
+        K2O_Na2O_mass_ratio: 1.5026
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3880.36
+          y: 5234.43
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b1_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B1; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1026.04
+        K2O_Na2O_mass_ratio: 1.4871
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3204.5
+          y: 5241.5
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b2_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B2; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1199.62
+        K2O_Na2O_mass_ratio: 1.0992
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3518.0
+          y: 5418.75
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b3_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B3; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1189.38
+        K2O_Na2O_mass_ratio: 1.0073
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3499.5
+          y: 5460.75
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b4_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B4; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1299.56
+        K2O_Na2O_mass_ratio: 0.7212
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3698.5
+          y: 5591.5
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b5_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B5; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1305.93
+        K2O_Na2O_mass_ratio: 0.655
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3710.0
+          y: 5621.75
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b6_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B6; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1299.56
+        K2O_Na2O_mass_ratio: 0.4345
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3698.5
+          y: 5722.5
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b7_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B7; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1349.67
+        K2O_Na2O_mass_ratio: 0.5833
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3789.0
+          y: 5654.5
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b8_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B8; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1399.92
+        K2O_Na2O_mass_ratio: 0.5023
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3879.75
+          y: 5691.5
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b9_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B9; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1400.2
+        K2O_Na2O_mass_ratio: 0.3896
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3880.25
+          y: 5743.0
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b10_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B10; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1417.64
+        K2O_Na2O_mass_ratio: 0.4164
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3911.75
+          y: 5730.75
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b11_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B11; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1463.04
+        K2O_Na2O_mass_ratio: 0.0947
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 3993.75
+          y: 5877.75
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b12_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B12; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1500.27
+        K2O_Na2O_mass_ratio: 0.6293
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 4061.0
+          y: 5633.5
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed
+    - observation_id: yakovlev_2021_fig1_b13_context
+      type: figure_read_point
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        figure: '1'
+        note: B13; 2 series, open symbol
+      experiment: yakovlev-shornikov-2021-vacuum-evaporation
+      units: mass ratio as plotted; °C; raster pixels
+      values:
+        quantity: K2O/Na2O_mass_ratio
+        method_class: figure_only
+        evidence_class: figure_only
+        series: basalt
+        T_C: 1599.94
+        K2O_Na2O_mass_ratio: 0.5609
+        uncertainty:
+          ratio: 0.0292
+          temperature_C: 7.33
+          basis: absolute_digitisation_uncertainty
+        pixel_center:
+          x: 4241.0
+          y: 5664.75
+        conditions:
+          pressure:
+            state:
+              tag: value
+              value: 10^-9 bar
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+          duration:
+            state:
+              tag: value
+              value: 30 min
+            locator:
+              page: 3
+              published_page: 25
+              pdf_page_index: 2
+              paragraph: Experimental conditions
+        starting_composition: unknown; not printed

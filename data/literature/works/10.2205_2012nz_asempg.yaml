@@ -1,0 +1,70 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2205/2012nz_asempg
+  citation: Shornikov, S. I. (2012), “Thermodynamic study of regularities in vapor composition over oxide compounds (the CaO–MgO–Al2O3–FeO–SiO2
+    system),” Vestnik Otdelenia nauk o Zemle RAN 4, NZ9001, doi:10.2205/2012NZ_ASEMPG.
+  source_ids:
+  - shornikov-2012-vestnik-cmafs
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2012-vestnik-cmafs
+      role: pdf
+      path: raw/shornikov-2012-vestnik-cmafs/shornikov-2012-vestnik-cmafs.pdf
+      sha256:
+        tag: value
+        value: bd2d2bf8b0a77ffe5996bc4804bf4413a48659a8eda03388d4e682cccd175e46
+    - asset_id: pdftotext:shornikov-2012-vestnik-cmafs
+      role: pdftotext
+      path: text/shornikov-2012-vestnik-cmafs
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2012-vestnik-cmafs
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2205/2012nz_asempg
+experiments: []
+context:
+- observation_id: vestnik_2012_complex_oxide_ceiling
+  type: gas_fraction_ceiling
+  locator:
+    page: 1
+    pdf_page_index: 0
+    paragraph: complex gaseous oxides
+  units: percent of total gas concentration
+  values:
+    ceiling_as_printed: does not exceed 1 %
+    T_range_as_printed: 1500–2500 K
+    species_as_printed: (CaAlO), (CaSiO), (CaSiO3), (MgAlO), (AlSiO)
+    attribution: Shornikov (2003), as cited in the paragraph.
+    reason_not_scored: One ceiling for five species over an unstated set of melts. Cited to an earlier paper. Not a partial
+      pressure at one composition.
+  context_id: shornikov-2012-vestnik-cmafs::context::vestnik_2012_complex_oxide_ceiling
+  work_id: 10.2205/2012nz_asempg
+  source_id: shornikov-2012-vestnik-cmafs
+  species: AlSiO
+- observation_id: vestnik_2012_figures_not_read
+  type: figure_series_refused
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: as reported
+  values:
+    fig_1: Calculated p(i) and x(i) over Al2O3–SiO2 at 2200 K, based on Shornikov (2002). Curves.
+    fig_2: Experimental temperature curves for mullite and spinel, cited to Shornikov (2002) and Shornikov (2001). Those papers
+      are already extracted. Not re-digitised.
+    fig_3: Calculated mullite curves at 2200 K versus p(O2), based on Shornikov (2002).
+    reason_not_scored: No discrete marker was given a value. Reading the curves would repeat extracted 2001 and 2002 data
+      or digitise a model line.
+  context_id: shornikov-2012-vestnik-cmafs::context::vestnik_2012_figures_not_read
+  work_id: 10.2205/2012nz_asempg
+  source_id: shornikov-2012-vestnik-cmafs
+  species: AlSiO

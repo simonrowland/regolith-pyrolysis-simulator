@@ -1,0 +1,1684 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  citation: Hanson, B. & Jones, J. H. (1998), “The systematics of Cr3+ and Cr2+ partitioning between olivine and liquid in
+    the presence of spinel”, American Mineralogist 83, 669–684.
+  source_ids:
+  - hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:hanson-jones-1998-am-cr-partitioning-olivine-liquid
+      role: pdf
+      path: raw/hanson-jones-1998-am-cr-partitioning-olivine-liquid/hanson-jones-1998-am-cr-partitioning-olivine-liquid.pdf
+      sha256:
+        tag: value
+        value: 0678855fee35aa5feab888f37e4da4a9054bc0fa6c255463df15f2cb469c3734
+    - asset_id: pdftotext:hanson-jones-1998-am-cr-partitioning-olivine-liquid
+      role: pdftotext
+      path: text/hanson-jones-1998-am-cr-partitioning-olivine-liquid
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:hanson-jones-1998-am-cr-partitioning-olivine-liquid
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_fad1b_1320
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 4
+    published_page: 672
+    pdf_page_index: 3
+    table: '2'
+    note: row=FAD1b_1320; column=experimental conditions
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_fad2_1320
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 4
+    published_page: 672
+    pdf_page_index: 3
+    table: '2'
+    note: row=FAD2_1320; column=experimental conditions
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_fad3_1320
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 4
+    published_page: 672
+    pdf_page_index: 3
+    table: '2'
+    note: row=FAD3_1320; column=experimental conditions
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_fas1_1300
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 5
+    published_page: 673
+    pdf_page_index: 4
+    table: '2'
+    note: row=FAS1_1300; column=experimental conditions
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_fas1_1320
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 5
+    published_page: 673
+    pdf_page_index: 4
+    table: '2'
+    note: row=FAS1_1320; column=experimental conditions
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_table2_glass_cr_series
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 4
+    published_page: 672
+    pdf_page_index: 3
+    table: '2'
+    note: row=all Cr(l) rows; column=temperature and oxygen fugacity
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_table3_glass
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 6
+    published_page: 674
+    pdf_page_index: 5
+    table: '3'
+    note: row=all glass sample rows; column=temperature and oxygen buffer
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_table3_olivine
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 6
+    published_page: 674
+    pdf_page_index: 5
+    table: '3'
+    note: row=all olivine sample rows; column=temperature and oxygen buffer
+- experiment_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94::experiment::hj98_table4_morb_series
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  locator:
+    page: 8
+    published_page: 676
+    pdf_page_index: 7
+    table: '4'
+    note: row=all rows; column=temperature and oxygen fugacity
+context:
+- observation_id: hj98_figure_10_deferred
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 679
+    figure: '10'
+  units: axes and units as printed; no numeric points
+  phase: olivine/liquid
+  values:
+    quantity: null
+    species: Cr
+    phase_as_printed: olivine and silicate liquid
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: -log fO2
+      y: DCr (olivine/liquid)
+    panel: whole figure
+    series:
+    - name: FAD1 known-fO2 data; open circles
+      marker_count: 8
+      attribution: Hanson and Jones (1998)
+    - name: reversal experiment; square
+      marker_count: 1
+      attribution: Hanson and Jones (1998)
+    - name: unknown-fO2 graphite-bearing experiment; arrowed circle
+      marker_count: 1
+      attribution: Hanson and Jones (1998)
+    marker_count_per_series:
+    - 8
+    - 1
+    - 1
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: null
+    quantity_as_printed: DCr (olivine/liquid)
+    schema_gap: No distribution-coefficient quantity token exists.
+    temperature_as_printed: 1320 °C, FAD1
+    phase: olivine and silicate liquid
+    caption_as_printed: Plot of DCr as a function of fO2 for the FAD1 experiments shown in Figures 5 and 6. The arrow marks
+      the graphite-bearing experiment with unknown fO2, thought to be <10^-18 bar. The square is the reversal experiment.
+      Cr metal in the graphite-bearing run implies all Cr in the silicate is divalent.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_10_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_11_deferred
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 679
+    figure: '11'
+  units: axes and units as printed; no numeric points
+  phase: olivine/liquid
+  values:
+    quantity: null
+    species: Cr
+    phase_as_printed: olivine and silicate liquid
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: -log fO2
+      y: DCr (olivine/liquid)
+    panel: whole figure
+    series:
+    - name: FAD1, circles
+      marker_count: 10
+      attribution: Hanson and Jones (1998)
+    - name: FAD3, squares
+      marker_count: 6
+      attribution: Hanson and Jones (1998)
+    - name: FAS1, diamonds
+      marker_count: 7
+      attribution: Hanson and Jones (1998)
+    - name: approximate literature trend lines
+      marker_count: 0
+      attribution: Schreiber and Haskin (1976)
+    marker_count_per_series:
+    - 10
+    - 6
+    - 7
+    - 0
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: null
+    quantity_as_printed: DCr (olivine/liquid)
+    schema_gap: No distribution-coefficient quantity token exists.
+    temperature_as_printed: 1320 °C; FAS1 also includes 1300 °C point
+    phase: olivine and silicate liquid
+    caption_as_printed: Plot of DCr as a function of fO2 for FAD1 (circles), FAD3 (squares), and FAS1 (diamonds). Fe-loop
+      and sealed-tube experiments are not plotted. Lines approximate data trends interpolated to 1320 °C from Figure 1; FAD3
+      and FAS1 were synthesized to reproduce Schreiber and Haskin experiments at low temperatures.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_11_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_12_deferred
+  type: figure_record
+  locator:
+    page: 12
+    pdf_page_index: 11
+    published_page: 680
+    figure: '12'
+  units: axes and units as printed; no numeric points
+  phase: olivine/liquid
+  values:
+    quantity: null
+    species: Cr
+    phase_as_printed: olivine and silicate liquid
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: -log fO2
+      y: DCr (olivine/liquid)
+    panel: whole figure
+    series:
+    - name: FAS1, open circles
+      marker_count: 7
+      attribution: Hanson and Jones (1998)
+    - name: FAD1 and FAD2, diamonds
+      marker_count: 10
+      attribution: Hanson and Jones (1998)
+    - name: FAD3, squares
+      marker_count: 6
+      attribution: Hanson and Jones (1998)
+    - name: calculated DCr curves, dashed
+      marker_count: 0
+      attribution: model-derived Equation 3
+    marker_count_per_series:
+    - 7
+    - 10
+    - 6
+    - 0
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: null
+    quantity_as_printed: DCr (olivine/liquid)
+    schema_gap: No distribution-coefficient quantity token exists.
+    temperature_as_printed: mostly 1320 °C; FAS1 includes 1300 °C point
+    phase: olivine and silicate liquid
+    caption_as_printed: All data from Fe-free systems FAS1, FAD1, and FAD3 with calculated DCr values (dashed lines) superimposed.
+      Values were calculated using Equation 3, taking DCr2+ from the most reducing experiment and DCr3+ from experiments run
+      in pure CO2. Agreement at intermediate fO2 demonstrates internal consistency.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_12_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_13_deferred
+  type: figure_record
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: 681
+    figure: '13'
+  units: axes and units as printed; no numeric points
+  phase: olivine/liquid
+  values:
+    quantity: null
+    species: Cr
+    phase_as_printed: olivine and silicate liquid
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      a:
+        x: NBO/T
+        y: DCr3+ (olivine/liquid)
+      b:
+        x: NBO/T
+        y: DCr3+ (olivine/liquid)
+      c:
+        x: NBO/T
+        y: DCr3+ (olivine/liquid)
+    panel:
+    - a
+    - b
+    - c
+    series:
+    - name: 'a: FAS1, open circles'
+      marker_count: 8
+      attribution: Hanson and Jones (1998)
+    - name: 'a: FAD1 and FAD2, diamonds'
+      marker_count: 8
+      attribution: Hanson and Jones (1998)
+    - name: 'a: FAD3, squares'
+      marker_count: 4
+      attribution: Hanson and Jones (1998)
+    - name: 'b: Schreiber and Haskin, circles with crosses'
+      marker_count: 7
+      attribution: Schreiber and Haskin (1976)
+    - name: 'c: present-work Fe-bearing data, filled squares'
+      marker_count: 18
+      attribution: Hanson and Jones (1998)
+    - name: 'c: Longhi and Pan, half-filled squares'
+      marker_count: 6
+      attribution: Longhi and Pan (1989)
+    - name: 'c: Mikouchi et al., X'
+      marker_count: 3
+      attribution: Mikouchi et al. (1994)
+    - name: 'c: Gaetani and Grove, cross'
+      marker_count: 1
+      attribution: Gaetani and Grove (1997)
+    - name: 'c: multianvil, squares with crosses'
+      marker_count: 8
+      attribution: Herzberg and Zhang (1996)
+    marker_count_per_series:
+    - 8
+    - 8
+    - 4
+    - 7
+    - 18
+    - 6
+    - 3
+    - 1
+    - 8
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: null
+    quantity_as_printed: DCr3+ vs NBO/T
+    schema_gap: No distribution-coefficient quantity token exists.
+    temperature_as_printed: 1 bar experiments 1150–1450 °C; multianvil 1726–2050 °C
+    phase: olivine and silicate liquid
+    caption_as_printed: Plots of DCr3+ vs. NBO/T (Mysen 1983). Panel (a) distinguishes FAS1, FAD1/FAD2, and FAD3; the line
+      is a linear regression. Panel (b) superimposes Schreiber and Haskin (1976) data. Panel (c) shows Fe-bearing 1 atm results
+      from this study and literature and multianvil data from 5 to 15.5 GPa and 1726–2050 °C; the line is the Fe-free trend
+      and the equation is the regression through Fe-bearing data.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_13_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_14_deferred
+  type: figure_record
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 682
+    figure: '14'
+  units: axes and units as printed; no numeric points
+  phase: olivine/liquid
+  values:
+    quantity: null
+    species: Cr
+    phase_as_printed: olivine and silicate liquid
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      a:
+        x: 10,000/T (K)
+        y: ln DCr3+ (olivine/liquid)
+      b:
+        x: DMgO (olivine/liquid)
+        y: DCr2+ (olivine/liquid)
+      c:
+        x: NBO/T
+        y: DCr2+ (olivine/liquid)
+    panel:
+    - a
+    - b
+    - c
+    series:
+    - name: 'a: Fe-bearing, circles'
+      marker_count: 21
+      attribution: Hanson and Jones (1998) and cited literature
+    - name: 'a: Fe-free, crosses'
+      marker_count: 4
+      attribution: Hanson and Jones (1998) and cited literature
+    - name: 'b: Fe-bearing, circles'
+      marker_count: 21
+      attribution: Hanson and Jones (1998) and cited literature
+    - name: 'b: Fe-free, crosses'
+      marker_count: 4
+      attribution: Hanson and Jones (1998) and cited literature
+    - name: 'c: Fe-bearing data'
+      marker_count: 21
+      attribution: Hanson and Jones (1998) and cited literature
+    marker_count_per_series:
+    - 21
+    - 4
+    - 21
+    - 4
+    - 21
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: null
+    quantity_as_printed: DCr3+; DCr2+; DCr2+ vs NBO/T
+    schema_gap: No distribution-coefficient quantity token exists.
+    temperature_as_printed: experimental and literature data; range not stated in caption
+    phase: olivine and silicate liquid
+    caption_as_printed: Plot of (a) ln DCr3+ vs. 10,000/T(K), (b) DCr2+ vs. DMgO, and (c) NBO/T vs. DCr2+ for Fe-bearing (circles)
+      and Fe-free (crosses) experiments from this study and the literature. All Cr is assumed divalent under these redox conditions.
+      Regression equations are shown; DCr2+ covaries with both parameters in panels (a) and (b), but shows no systematic variation
+      with NBO/T in panel (c).
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_14_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_1_deferred
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 670
+    figure: '1'
+  units: axes and units as printed; no numeric points
+  phase: liquid + olivine
+  values:
+    quantity: null
+    species: Cr
+    phase_as_printed: olivine and silicate liquid
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      a:
+        x: -log fO2
+        y: DCr (olivine/liquid)
+      b:
+        x: -log fO2
+        y: DCr (olivine/liquid)
+    panel:
+    - a
+    - b
+    series:
+    - name: FAD literature data and temperature curves
+      marker_count: 18
+      attribution: Schreiber and Haskin (1976)
+    - name: FAS literature data and temperature curves
+      marker_count: 27
+      attribution: Schreiber and Haskin (1976)
+    marker_count_per_series:
+    - 18
+    - 27
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: null
+    quantity_as_printed: DCr (olivine/liquid)
+    schema_gap: No distribution-coefficient quantity token exists.
+    temperature_as_printed: 1350–1450 °C (FAD); 1300–1450 °C (FAS)
+    phase: olivine and silicate liquid
+    caption_as_printed: Plot of DCr (olivine/liquid) as a function of T and fO2 in the Fe-free systems FAD and FAS (modified
+      from Schreiber and Haskin 1976; Fig. 7, page 1243). DCr is the weight ratio of Cr in olivine to Cr in the glass. Note
+      the difference in functional form between the two compositional systems.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_1_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_2_deferred
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 670
+    figure: '2'
+  units: axes and units as printed; no numeric points
+  phase: liquid + olivine
+  values:
+    quantity: null
+    species: Cr
+    phase_as_printed: olivine and silicate liquid
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: -log fO2
+      y: DCr (olivine/liquid)
+    panel: whole figure
+    series:
+    - name: Mikouchi et al. (1994), filled circles
+      marker_count: 10
+      attribution: Mikouchi et al. (1994)
+    - name: Gaetani and Grove (1997), open squares
+      marker_count: 10
+      attribution: Gaetani and Grove (1997)
+    marker_count_per_series:
+    - 10
+    - 10
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: null
+    quantity_as_printed: DCr (olivine/liquid)
+    schema_gap: No distribution-coefficient quantity token exists.
+    temperature_as_printed: 1350 °C (komatiite); 1400 °C (angrite)
+    phase: olivine and silicate liquid
+    caption_as_printed: Plot of DCr (olivine/liquid) in Fe-bearing systems from two different data sets from the literature.
+      The Gaetani and Grove (1997) experiments were performed on a komatiite bulk composition at 1350 °C and the Mikouchi
+      et al. (1994) experiments were performed on an angrite bulk composition at 1400 °C. Note that, in contrast to the SH(1976)
+      data shown in Figure 1, DCr does not change with oxygen fugacity, temperature, or liquid composition.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_2_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_3_deferred
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 671
+    figure: '3'
+  units: axes and units as printed; no numeric points
+  phase: starting materials
+  values:
+    quantity: null
+    species: FAD and FAS oxide systems
+    phase_as_printed: starting materials and liquid compositions
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      a: 'FAD ternary composition axes: anorthite, diopside, forsterite'
+      b: 'FAS ternary composition axes: silica, forsterite, anorthite'
+    panel:
+    - a
+    - b
+    series:
+    - name: This study, open squares
+      marker_count: 5
+      attribution: Hanson and Jones (1998)
+    - name: Schreiber and Haskin (1976), open circles
+      marker_count: 11
+      attribution: Schreiber and Haskin (1976)
+    marker_count_per_series:
+    - 5
+    - 11
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: null
+    quantity_as_printed: bulk composition in ternary diagrams
+    schema_gap: No bulk-composition plotting token represents ternary composition markers.
+    temperature_as_printed: Schreiber and Haskin FAS liquid at 1350 °C; its starting-composition liquidus is printed as ~1500
+      °C
+    phase: starting materials and liquid compositions
+    caption_as_printed: Ternary diagrams showing the locations of the bulk compositions used in this study. The numbers in
+      the symbols in FAD correspond to FAD1, FAD2, and FAD3, from Table 1. The liquid compositions of the experiments from
+      SH(1976) are shown for comparison. The highest temperature Schreiber and Haskin points represent their two bulk compositions
+      [i.e., the SH(1976) FAS 1350 °C liquid was produced experimentally from a starting composition that had a liquidus of
+      ~1500 °C].
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_3_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_4_deferred
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 672
+    figure: '4'
+  units: axes and units as printed; no numeric points
+  phase: glass
+  values:
+    quantity: equilibrium_phase_composition
+    species: Cr
+    phase_as_printed: glass
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: number of experiments performed on the same Pt loop
+      y: Cr in glass (ppm)
+    panel: whole figure
+    series:
+    - name: no spinel present, open circles
+      marker_count: 2
+      attribution: Hanson and Jones (1998)
+    - name: spinel present, crossed circles
+      marker_count: 2
+      attribution: Hanson and Jones (1998)
+    marker_count_per_series:
+    - 2
+    - 2
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: equilibrium_phase_composition
+    quantity_as_printed: Cr concentration in glass
+    temperature_as_printed: 1320 °C, FAD1b
+    phase: glass
+    caption_as_printed: Plot of the results of four replicate experiments performed on the same Pt loop using composition
+      FAD1. Four identical experiments were performed and residual material was cleaned from the loops between experiments
+      by soaking in HF. After two experiments the Pt loop is saturated with Cr.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_4_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_5_deferred
+  type: figure_record
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 676
+    figure: '5'
+  units: axes and units as printed; no numeric points
+  phase: glass
+  values:
+    quantity: equilibrium_phase_composition
+    species: Cr
+    phase_as_printed: glass
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: -log fO2
+      y: Cr (ppm)
+    panel: whole figure
+    series:
+    - name: FAD1, open circles, 3000 ppm total Cr
+      marker_count: 10
+      attribution: Hanson and Jones (1998)
+    - name: FAD2, circles with crosses, 1500 ppm total Cr
+      marker_count: 6
+      attribution: Hanson and Jones (1998)
+    - name: Pt loop in air, filled circle
+      marker_count: 1
+      attribution: Hanson and Jones (1998)
+    - name: Pt95Au5 capsule in air, symbol above filled circle
+      marker_count: 1
+      attribution: Hanson and Jones (1998)
+    - name: IW to QFM reversal, square
+      marker_count: 1
+      attribution: Hanson and Jones (1998)
+    - name: Cr3+ solubility limit, dashed line
+      marker_count: 0
+      attribution: Hanson and Jones (1998)
+    marker_count_per_series:
+    - 10
+    - 6
+    - 1
+    - 1
+    - 1
+    - 0
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: equilibrium_phase_composition
+    quantity_as_printed: Cr concentration in glass by oxygen fugacity
+    temperature_as_printed: 1320 °C
+    phase: glass
+    caption_as_printed: Plot of the Cr content of the glasses as a function of fO2 from gas-mixing experiments on FAD1 (open
+      circles, 3000 ppm total Cr) and FAD2 (circles with crosses, 1500 ppm total Cr) at 1320 °C. The filled circle is the
+      Pt-loop air run with Cr loss by Cr6+ volatility and no spinel; the symbol above it is the matching Pt95Au5 pinhole-capsule
+      run. The square is the FAD1 reversal from IW to QFM after 24 h. The dashed line marks the Cr3+ solubility limit; Cr
+      above it is Cr2+ or Cr6+ in the liquid.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_5_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_6_deferred
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 677
+    figure: '6'
+  units: axes and units as printed; no numeric points
+  phase: liquid
+  values:
+    quantity: valence_ratio
+    species: Cr
+    phase_as_printed: spinel-saturated glass
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: -log fO2
+      y: log(Cr2+/Cr3+)
+    panel: whole figure
+    series:
+    - name: FAD1 data, open circles
+      marker_count: 5
+      attribution: Hanson and Jones (1998), calculated from Equation 1
+    - name: reversal experiment, open square
+      marker_count: 1
+      attribution: Hanson and Jones (1998), calculated from Equation 1
+    - name: linear fit, dotted line
+      marker_count: 0
+      attribution: model fit
+    marker_count_per_series:
+    - 5
+    - 1
+    - 0
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: valence_ratio
+    quantity_as_printed: log(Cr2+/Cr3+)
+    temperature_as_printed: 1320 °C, FAD1
+    phase: spinel-saturated glass
+    caption_as_printed: Plot of log[Cr2+/Cr3+] vs. -log fO2 for the FAD1 experiments shown in Figure 5. Cr2+/Cr3+ was calculated
+      using Equation 1 assuming that all Cr in excess of the Cr3+ solubility limit is Cr2+. The reversal experiment was not
+      used in the regression calculation.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_6_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_7_deferred
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 677
+    figure: '7'
+  units: axes and units as printed; no numeric points
+  phase: glass
+  values:
+    quantity: equilibrium_phase_composition
+    species: Cr
+    phase_as_printed: glass
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: -log fO2
+      y: Cr in liquid (ppm)
+    panel: whole figure
+    series:
+    - name: MORB3a, circles, 3000 ppm total Cr
+      marker_count: 6
+      attribution: Hanson and Jones (1998)
+    - name: MORB3b, squares, 1500 ppm total Cr
+      marker_count: 6
+      attribution: Hanson and Jones (1998)
+    - name: reversal experiments, crossed symbols (included in the two series above)
+      marker_count: 2
+      attribution: Hanson and Jones (1998)
+    marker_count_per_series:
+    - 6
+    - 6
+    - 2
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: equilibrium_phase_composition
+    quantity_as_printed: Cr content of spinel-saturated glasses
+    temperature_as_printed: 1200 °C, MORB3a and MORB3b
+    phase: glass
+    caption_as_printed: Plot of Cr content of spinel-saturated glasses from MORB3a (circles, 3000 ppm total Cr) and MORB3b
+      (squares, 1500 ppm total Cr) as a function of fO2. Crossed symbols are reversals changed from IW to QFM after 24 h.
+      The high-fO2 experiment was not used because the spinel composition differed from those at lower fO2.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_7_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_8_deferred
+  type: figure_record
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 678
+    figure: '8'
+  units: axes and units as printed; no numeric points
+  phase: liquid
+  values:
+    quantity: valence_ratio
+    species: Cr
+    phase_as_printed: spinel-saturated glass
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: -log fO2
+      y: log(Cr2+/Cr3+)
+    panel: whole figure
+    series:
+    - name: MORB3 data, same symbols as Figure 7
+      marker_count: 12
+      attribution: Hanson and Jones (1998), calculated from Equation 1
+    - name: reversal experiments
+      marker_count: 2
+      attribution: Hanson and Jones (1998), calculated from Equation 1
+    - name: linear fit, solid line
+      marker_count: 0
+      attribution: model fit
+    marker_count_per_series:
+    - 12
+    - 2
+    - 0
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: valence_ratio
+    quantity_as_printed: log(Cr2+/Cr3+)
+    temperature_as_printed: 1200 °C, MORB3
+    phase: spinel-saturated glass
+    caption_as_printed: Plot of log[Cr2+/Cr3+] vs. -log fO2 for MORB3 experiments shown in Figure 7, calculated using Equation
+      1. All Cr is assumed to be trivalent at NNO in Fe-bearing systems. The reversal experiments were not used in the regression
+      calculation.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_8_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_figure_9_deferred
+  type: figure_record
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 678
+    figure: '9'
+  units: axes and units as printed; no numeric points
+  phase: spinel
+  values:
+    quantity: equilibrium_phase_composition
+    species:
+    - Cr2O3
+    - Al2O3
+    - FeO
+    phase_as_printed: spinel
+    temperature: as printed in the caption/series; no numeric points extracted
+    axes_as_printed:
+      x: log fO2
+      y: oxide (wt%)
+    panel:
+    - Cr2O3
+    - Al2O3
+    - FeO
+    series:
+    - name: MORB1, circles
+      marker_count: 7
+      attribution: Hanson and Jones (1998)
+    - name: MORB2, diamonds
+      marker_count: 5
+      attribution: Hanson and Jones (1998)
+    - name: MORB3, squares (MORB3a and MORB3b)
+      marker_count: 12
+      attribution: Hanson and Jones (1998)
+    marker_count_per_series:
+    - 7
+    - 5
+    - 12
+    attribution: Hanson and Jones (1998); cited work attribution is recorded by series.
+    digitisation: deferred to a figure pass
+    typed_quantity: equilibrium_phase_composition
+    quantity_as_printed: spinel oxide composition
+    temperature_as_printed: MORB1 1175 °C; MORB2 and MORB3 1200 °C
+    phase: spinel
+    caption_as_printed: Plots of the compositions of spinels from experiments performed on MORB1 at 1175 °C, MORB2 at 1200
+      °C, and MORB3 at 1200 °C. Spinel compositions remain remarkably constant and only begin to change at oxygen fugacities
+      above NNO.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_figure_9_deferred
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_t1_starting_compositions
+  type: experimental_design
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 671
+    table: '1'
+    row: all compositions
+    column: oxide and trace-element rows
+  units: wt% oxides; ppm Cr and V, as printed
+  values:
+    quantity_as_printed: bulk starting material compositions
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - liquidus_composition
+    - residue_component_composition
+    reason_no_token: These are designed starting-charge compositions, not measured equilibrium phase compositions, liquidus
+      compositions, or analyzed residue components.
+    components:
+    - SiO2
+    - TiO2
+    - Al2O3
+    - MgO
+    - MnO
+    - FeO
+    - CaO
+    - Na2O
+    - K2O
+    - Cr_ppm
+    - V_ppm
+    samples:
+      FAD1a:
+        SiO2: '46.09'
+        TiO2: '0'
+        Al2O3: '12.03'
+        MgO: '27.91'
+        MnO: '0'
+        FeO: '0'
+        CaO: '13.58'
+        Na2O: '0'
+        K2O: '0'
+        Cr_ppm: '1500'
+        V_ppm: '0'
+      FAD1b:
+        SiO2: '46.09'
+        TiO2: '0'
+        Al2O3: '12.03'
+        MgO: '27.91'
+        MnO: '0'
+        FeO: '0'
+        CaO: '13.58'
+        Na2O: '0'
+        K2O: '0'
+        Cr_ppm: '3000'
+        V_ppm: '0'
+      FAD2:
+        SiO2: '49.96'
+        TiO2: '0'
+        Al2O3: '11.74'
+        MgO: '17.62'
+        MnO: '0'
+        FeO: '0'
+        CaO: '20.68'
+        Na2O: '0'
+        K2O: '0'
+        Cr_ppm: '3500'
+        V_ppm: '0'
+      FAD3:
+        SiO2: '49.63'
+        TiO2: '0'
+        Al2O3: '10.96'
+        MgO: '19.04'
+        MnO: '0'
+        FeO: '0'
+        CaO: '19.93'
+        Na2O: '0'
+        K2O: '0'
+        Cr_ppm: '3500'
+        V_ppm: '0'
+      FAS1:
+        SiO2: '54.20'
+        TiO2: '0'
+        Al2O3: '14.63'
+        MgO: '22.74'
+        MnO: '0'
+        FeO: '0'
+        CaO: '8.00'
+        Na2O: '0'
+        K2O: '0'
+        Cr_ppm: '3500'
+        V_ppm: '0'
+      MORB1:
+        SiO2: '48.81'
+        TiO2: '0.83'
+        Al2O3: '17.51'
+        MgO: '9.51'
+        MnO: '0'
+        FeO: '7.45'
+        CaO: '12.88'
+        Na2O: '2.13'
+        K2O: '0.02'
+        Cr_ppm: '3000'
+        V_ppm: '3000'
+      MORB2:
+        SiO2: '51.54'
+        TiO2: '2.16'
+        Al2O3: '13.26'
+        MgO: '6.14'
+        MnO: '0.22'
+        FeO: '13.48'
+        CaO: '10.79'
+        Na2O: '2.32'
+        K2O: '0.11'
+        Cr_ppm: '3000'
+        V_ppm: '3000'
+      MORB3a:
+        SiO2: '49.62'
+        TiO2: '3.71'
+        Al2O3: '11.06'
+        MgO: '4.27'
+        MnO: '0.27'
+        FeO: '18.85'
+        CaO: '9.24'
+        Na2O: '2.49'
+        K2O: '0.19'
+        Cr_ppm: '1500'
+        V_ppm: '3000'
+      MORB3b:
+        SiO2: '49.62'
+        TiO2: '3.71'
+        Al2O3: '11.06'
+        MgO: '4.27'
+        MnO: '0.27'
+        FeO: '18.85'
+        CaO: '9.24'
+        Na2O: '2.49'
+        K2O: '0.19'
+        Cr_ppm: '3000'
+        V_ppm: '3000'
+      YBG:
+        SiO2: '42.9'
+        TiO2: '3.48'
+        Al2O3: '8.30'
+        MgO: '13.5'
+        MnO: '0.27'
+        FeO: '22.1'
+        CaO: '8.50'
+        Na2O: '0.45'
+        K2O: '0'
+        Cr_ppm: '4037'
+        V_ppm: '3000'
+      BG:
+        SiO2: '34.0'
+        TiO2: '16.4'
+        Al2O3: '4.6'
+        MgO: '13.3'
+        MnO: '0.31'
+        FeO: '24.5'
+        CaO: '6.9'
+        Na2O: '0.23'
+        K2O: '0.16'
+        Cr_ppm: '6295'
+        V_ppm: '3000'
+      PPG:
+        SiO2: '49.0'
+        TiO2: '0.63'
+        Al2O3: '14.0'
+        MgO: '10.7'
+        MnO: '0.2'
+        FeO: '14.0'
+        CaO: '11.2'
+        Na2O: '0'
+        K2O: '0'
+        Cr_ppm: '2740'
+        V_ppm: '5000'
+    attribution:
+      YBG: Delano (1986)
+      BG: Delano (1986)
+      PPG: Jones and Delano (1989)
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_t1_starting_compositions
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_t2_partition_coefficients
+  type: printed_table_no_quantity_token
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 672
+    table: '2'
+    row: all composition groups
+    column: log fO2 / DCr (olivine/liquid)
+  units: dimensionless DCr; log fO2 as printed
+  values:
+    quantity_as_printed: DCr (olivine/liquid) by oxygen fugacity
+    candidate_tokens:
+    - activity_coefficient
+    - equilibrium_phase_composition
+    rows:
+    - sample: FAD1b 1320 C
+      log_fO2_and_DCr_as_printed:
+      - -0.68|0.5(1)
+      - -3.0|0.64(3)
+      - -5.9|0.68(5)
+      - -7.64|0.69(4)
+      - -7.20 R|0.67(6)
+      - -7.92|0.69(3)
+      - -8.64|0.70(2)
+      - -10.51|0.71(1)
+      - -14.3(3)|0.73(1)
+      - <=-18|0.76(9)
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 672
+        table: '2'
+        row: FAD1b 1320 C
+        column: log fO2 / DCr
+    - sample: FAD2 1320 C
+      log_fO2_and_DCr_as_printed:
+      - -3|0.54(7)
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 672
+        table: '2'
+        row: FAD2 1320 C
+        column: log fO2 / DCr
+    - sample: FAD3 1320 C
+      log_fO2_and_DCr_as_printed:
+      - -3.0|0.45(6)
+      - -7.2|0.50(4)
+      - -9.0|0.59(3)
+      - -10.5|0.63(1)
+      - -10.5 R|0.62(4)
+      - -15.3(3)|0.73(1)
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 672
+        table: '2'
+        row: FAD3 1320 C
+        column: log fO2 / DCr
+    - sample: FAS1 1320 C
+      log_fO2_and_DCr_as_printed:
+      - -3|0.87(5)
+      - -7.2|0.79(6)
+      - -7.2 R|0.81(5)
+      - -9.0|0.77(3)
+      - -10.5|0.73(2)
+      - -14.0(3)|0.701(7)
+      - <=-18.0|0.71(7)
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 673
+        table: '2'
+        row: FAS1 1320 C
+        column: log fO2 / DCr
+    - sample: FAS1 1300 C
+      log_fO2_and_DCr_as_printed:
+      - -3|0.87(8)
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 673
+        table: '2'
+        row: FAS1 1300 C
+        column: log fO2 / DCr
+    reason_no_token: A phase partition coefficient has no store quantity token; the task directs partition coefficients to
+      context. Blank table cells remain absent, not ditto.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_t2_partition_coefficients
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_t2_table_totals_and_structure
+  type: table_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 672
+    table: '2'
+    row: FAD1b, FAD2, FAD3; continuation FAS1
+    column: Total / phases / NBO/T
+  units: wt% total; phase codes; dimensionless NBO/T
+  values:
+    quantity_as_printed: Table 2 totals and silicate phases present
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    rows:
+    - sample: FAD1b 1320 C
+      total_wt_pct_by_phase:
+        glass: '98.9'
+        olivine: '100.1'
+        spinel: '100.2'
+      phase_codes_as_printed:
+        glass: fsl
+        olivine: —
+        spinel: —
+      NBO_T_as_printed: '1.0'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 672
+        table: '2'
+        row: FAD1b 1320 C
+        column: Total / phases / NBO/T
+    - sample: FAD2 1320 C
+      total_wt_pct_by_phase:
+        glass: '100.2'
+        olivine: '99.7'
+        spinel: '100.6'
+      phase_codes_as_printed:
+        glass: fsl
+        olivine: —
+        spinel: —
+      NBO_T_as_printed: '1.22'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 672
+        table: '2'
+        row: FAD2 1320 C
+        column: Total / phases / NBO/T
+    - sample: FAD3 1320 C
+      total_wt_pct_by_phase:
+        glass: '99.8'
+        olivine: '99.3'
+        spinel: '99.0'
+      phase_codes_as_printed:
+        glass: fds
+        olivine: —
+        spinel: —
+      NBO_T_as_printed: '1.27'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 672
+        table: '2'
+        row: FAD3 1320 C
+        column: Total / phases / NBO/T
+    - sample: FAS1 1320 C
+      total_wt_pct_by_phase:
+        glass: '100.4'
+        olivine: '99.8'
+        spinel: '99.1'
+      phase_codes_as_printed:
+        glass: fesl
+        olivine: —
+        spinel: —
+      NBO_T_as_printed: '0.70'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 673
+        table: '2'
+        row: FAS1 1320 C
+        column: Total / phases / NBO/T
+    - sample: FAS1 1300 C
+      total_wt_pct_by_phase:
+        glass: '99.8'
+        olivine: '99.4'
+        spinel: '100.4'
+      phase_codes_as_printed:
+        glass: fesl
+        olivine: —
+        spinel: —
+      NBO_T_as_printed: '0.64'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 673
+        table: '2'
+        row: FAS1 1300 C
+        column: Total / phases / NBO/T
+    reason_no_token: Totals, qualitative phase codes and NBO/T are table diagnostics or structural descriptors with no matching
+      observation token.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_t2_table_totals_and_structure
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_t3_derived_and_total_rows
+  type: table_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 674
+    table: '3'
+    row: all samples
+    column: Total / KD / NBO/T / DCr
+  units: wt% totals; KD and DCr dimensionless; dimensionless NBO/T
+  values:
+    quantity_as_printed: Table 3 totals and calculated descriptors
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    rows:
+    - sample: PPG-1
+      total_glass_wt_pct: '100.35'
+      total_olivine_wt_pct: '100.23'
+      KD: '0.31'
+      NBO_T: '0.93'
+      DCr: 1.05(7)
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 674
+        table: '3'
+        row: PPG-1
+        column: Total / KD / NBO/T / DCr
+    - sample: PPG-2
+      total_glass_wt_pct: '100.11'
+      total_olivine_wt_pct: '100.22'
+      KD: '0.31'
+      NBO_T: '0.92'
+      DCr: 0.95(8)
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 674
+        table: '3'
+        row: PPG-2
+        column: Total / KD / NBO/T / DCr
+    - sample: YG-54
+      total_glass_wt_pct: '99.86'
+      total_olivine_wt_pct: '99.10'
+      KD: '0.29'
+      NBO_T: '1.35'
+      DCr: 0.60(6)
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 674
+        table: '3'
+        row: YG-54
+        column: Total / KD / NBO/T / DCr
+    - sample: BG-54
+      total_glass_wt_pct: '99.50'
+      total_olivine_wt_pct: '99.05'
+      KD: '0.26'
+      NBO_T: '2.11'
+      DCr: 0.44(9)
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 674
+        table: '3'
+        row: BG-54
+        column: Total / KD / NBO/T / DCr
+    - sample: YG-56
+      total_glass_wt_pct: '99.40'
+      total_olivine_wt_pct: '99.00'
+      KD: '0.28'
+      NBO_T: '1.56'
+      DCr: 0.56(4)
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 674
+        table: '3'
+        row: YG-56
+        column: Total / KD / NBO/T / DCr
+    - sample: YBG-58
+      total_glass_wt_pct: '99.33'
+      total_olivine_wt_pct: '99.39'
+      KD: '0.29'
+      NBO_T: '1.58'
+      DCr: 0.59(5)
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 674
+        table: '3'
+        row: YBG-58
+        column: Total / KD / NBO/T / DCr
+    - sample: Morb1
+      total_glass_wt_pct: '99.74'
+      total_olivine_wt_pct: '100.03'
+      KD: '0.30'
+      NBO_T: '0.80'
+      DCr: 0.98(8)
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 674
+        table: '3'
+        row: Morb1
+        column: Total / KD / NBO/T / DCr
+    - sample: YG-51a
+      total_glass_wt_pct: '99.28'
+      total_olivine_wt_pct: '99.21'
+      KD: '0.29'
+      NBO_T: '1.41'
+      DCr: 0.75(9)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 675
+        table: '3'
+        row: YG-51a
+        column: Total / KD / NBO/T / DCr
+    - sample: YG-51b
+      total_glass_wt_pct: '99.78'
+      total_olivine_wt_pct: '99.37'
+      KD: '0.30'
+      NBO_T: '1.4'
+      DCr: 0.59(6)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 675
+        table: '3'
+        row: YG-51b
+        column: Total / KD / NBO/T / DCr
+    - sample: BG-49
+      total_glass_wt_pct: '99.27'
+      total_olivine_wt_pct: '99.06'
+      KD: '0.26'
+      NBO_T: '2.14'
+      DCr: 0.54(7)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 675
+        table: '3'
+        row: BG-49
+        column: Total / KD / NBO/T / DCr
+    - sample: PPG-3
+      total_glass_wt_pct: '100.28'
+      total_olivine_wt_pct: '99.25'
+      KD: '0.35'
+      NBO_T: —
+      DCr: 0.83(6)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 675
+        table: '3'
+        row: PPG-3
+        column: Total / KD / NBO/T / DCr
+    - sample: PPG-4
+      total_glass_wt_pct: '100.21'
+      total_olivine_wt_pct: '99.61'
+      KD: '0.37'
+      NBO_T: —
+      DCr: 0.94(8)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 675
+        table: '3'
+        row: PPG-4
+        column: Total / KD / NBO/T / DCr
+    - sample: PPG-5d
+      total_glass_wt_pct: '100.44'
+      total_olivine_wt_pct: '99.1'
+      KD: '0.33'
+      NBO_T: —
+      DCr: 1.04(6)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 675
+        table: '3'
+        row: PPG-5d
+        column: Total / KD / NBO/T / DCr
+    - sample: PPG-7a
+      total_glass_wt_pct: '100.35'
+      total_olivine_wt_pct: '99.16'
+      KD: '0.35'
+      NBO_T: —
+      DCr: 0.9(1)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 675
+        table: '3'
+        row: PPG-7a
+        column: Total / KD / NBO/T / DCr
+    reason_no_token: KD, NBO/T and DCr are derived descriptors; totals are compositional checks. No matching store token is
+      used for these table rows.
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_t3_derived_and_total_rows
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr
+- observation_id: hj98_t5_cr_valence_fit
+  type: model_derived
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 677
+    table: '5'
+    row: FAD1, FAD3, FAS1, MORB1, MORB2, MORB3, BASALT
+    column: log(Cr2+/Cr3+) regression
+  units: log10(Cr2+/Cr3+) vs -log fO2
+  values:
+    quantity: valence_ratio
+    method_class: model_derived
+    reason: These are fitted regression equations and model-derived values, not measured ratios.
+    candidate_tokens:
+    - valence_ratio
+    rows:
+    - composition: FAD1
+      T_C: '1320'
+      equation_as_printed: log(Cr2+/Cr3+) = 0.275 × (-log fO2) - 2.59
+    - composition: FAD3
+      T_C: '1320'
+      equation_as_printed: log(Cr2+/Cr3+) = 0.274 × (-log fO2) - 2.81
+    - composition: FAS1
+      T_C: '1320'
+      equation_as_printed: log(Cr2+/Cr3+) = 0.242 × (-log fO2) - 2.05
+    - composition: MORB1
+      T_C: '1250'
+      equation_as_printed: log(Cr2+/Cr3+) = 0.286 × (-log fO2) - 2.88
+    - composition: MORB2
+      T_C: '1200'
+      equation_as_printed: log(Cr2+/Cr3+) = 0.219 × (-log fO2) - 2.34
+    - composition: MORB3
+      T_C: '1200'
+      equation_as_printed: log(Cr2+/Cr3+) = 0.241 × (-log fO2) - 2.47
+    - composition: BASALT
+      T_C: '1260'
+      equation_as_printed: log(Cr2+/Cr3+) = 0.276 × (-log fO2) - 2.59
+      attribution: J. Delano, unpublished data
+  context_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid::context::hj98_t5_cr_valence_fit
+  work_id: 803439e113f054beea290f72dd0ef6ecae622b15f20aaffdc46a49cc8b8d4f94
+  source_id: hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  species: Cr

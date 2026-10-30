@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0232-aragonite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=aragonite:v=cb13e05cba
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=aragonite:v=cb13e05cba:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:tabulation
   identity:
     quantity:
@@ -14,9 +14,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Aragonite' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -42,9 +41,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Aragonite' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: aragonite
             charge:
               tag: value
               value: 0
@@ -161,8 +159,22 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 26
+        table: b1259-298k-0232-aragonite
+        note: as_published='-269678'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+          formation_basis=from_the_elements; elemental_reference_state_tables=C=B1259 reference-state table p.35/PDF p.41,
+          Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF p.65
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0232-aragonite.json
+        record: b1259-298k-0232-aragonite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -194,7 +206,8 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=aragonite:v=9b01b17149
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=aragonite:v=9b01b17149:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:tabulation
   identity:
     quantity:
@@ -206,9 +219,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Aragonite' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -234,9 +246,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Aragonite' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: aragonite
             charge:
               tag: value
               value: 0
@@ -353,8 +364,22 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 26
+        table: b1259-298k-0232-aragonite
+        note: as_published='-288651'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+          formation_basis=from_the_elements; elemental_reference_state_tables=C=B1259 reference-state table p.35/PDF p.41,
+          Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF p.65
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0232-aragonite.json
+        record: b1259-298k-0232-aragonite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -386,7 +411,8 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=aragonite:v=b39ce8fc9e
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=aragonite:v=b39ce8fc9e:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0232-aragonite:tabulation
   identity:
     quantity:
@@ -398,9 +424,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Aragonite' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -426,9 +451,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Aragonite' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: aragonite
             charge:
               tag: value
               value: 0
@@ -545,8 +569,22 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 26
+        table: b1259-298k-0232-aragonite
+        note: as_published='197.679'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+          formation_basis=from_the_elements; elemental_reference_state_tables=C=B1259 reference-state table p.35/PDF p.41,
+          Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF p.65
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0232-aragonite.json
+        record: b1259-298k-0232-aragonite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -570,3 +608,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0232-aragonite.json
     parameters: []
     output_unit: dimensionless
+    references: []

@@ -1,0 +1,168 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2473/shigentosozai.105.685
+  citation: Itoh, S. and Azakami, T. (1989), Thermodynamic Studies of ZnO in Solid Zinc Silicate, Shigen-to-Sozai 105(9):685-692.
+  source_ids:
+  - itoh-1989-zno-solid-zinc-silicate
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:itoh-1989-zno-solid-zinc-silicate
+      role: pdf
+      path: raw/itoh-1989-zno-solid-zinc-silicate/itoh-1989-zno-solid-zinc-silicate.pdf
+      sha256:
+        tag: value
+        value: 5c590ca3d8a19bb708be110e8d95659e5c9d9b3e4930ecabc3f219da3ab6a6b9
+    - asset_id: pdftotext:itoh-1989-zno-solid-zinc-silicate
+      role: pdftotext
+      path: text/itoh-1989-zno-solid-zinc-silicate
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:itoh-1989-zno-solid-zinc-silicate
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2473/shigentosozai.105.685
+experiments:
+- experiment_id: 10.2473/shigentosozai.105.685::itoh-1989-zno-solid-zinc-silicate
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2473/shigentosozai.105.685
+  locator:
+    page: 6
+    published_page: 690
+    pdf_page_index: 5
+    table: '6'
+    note: row_label=973; column_header=ZnO side  $a_{ZnO}$
+context:
+- observation_id: itoh_1989_eq10_zno_standard_formation_free_energy_fit
+  type: typed_context
+  locator:
+    page: 3
+    published_page: 687
+    pdf_page_index: 2
+    equation: '10'
+  units: J/mol
+  values:
+    method_class: model_derived
+    quantity_as_printed: standard formation free-energy fit for cell (V)
+    equation_as_printed: ΔG°ZnO/J mol-1 = -351540 + 105.00 T/K ± 120
+    temperature_range_as_printed: 840–1017 K
+  context_id: itoh-1989-zno-solid-zinc-silicate::context::itoh_1989_eq10_zno_standard_formation_free_energy_fit
+  work_id: 10.2473/shigentosozai.105.685
+  source_id: itoh-1989-zno-solid-zinc-silicate
+  species: ZnO
+- observation_id: itoh_1989_eq12_zno_standard_formation_free_energy_fit
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 688
+    pdf_page_index: 3
+    equation: '12'
+  units: J/mol
+  values:
+    method_class: model_derived
+    quantity_as_printed: standard formation free-energy fit
+    equation_as_printed: ΔG°ZnO/J mol-1 = -355940 + 108.53 T/K ± 190
+    temperature_range_as_printed: 823–1073 K
+  context_id: itoh-1989-zno-solid-zinc-silicate::context::itoh_1989_eq12_zno_standard_formation_free_energy_fit
+  work_id: 10.2473/shigentosozai.105.685
+  source_id: itoh-1989-zno-solid-zinc-silicate
+  species: ZnO
+- observation_id: itoh_1989_eq17_zinc_silicate_reaction_free_energy_fit
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 690
+    pdf_page_index: 5
+    section: Zn2SiO4 formation free energy
+    equation: '17'
+  units: J/mol reaction; J/(mol reaction K)
+  values:
+    method_class: model_derived
+    quantity_as_printed: linear standard reaction free-energy relation
+    reaction_as_printed: 2ZnO(s) + SiO2(s) = Zn2SiO4(s)
+    equation_as_printed: ΔG°r/J = -46590 + 16.79 T/K
+    intercept_as_printed: '-46590'
+    slope_as_printed: '16.79'
+    temperature_range_as_printed: 1073–1275 K
+  context_id: itoh-1989-zno-solid-zinc-silicate::context::itoh_1989_eq17_zinc_silicate_reaction_free_energy_fit
+  work_id: 10.2473/shigentosozai.105.685
+  source_id: itoh-1989-zno-solid-zinc-silicate
+  species: ZnO
+- observation_id: itoh_1989_eq8_cu2o_standard_formation_free_energy_fit
+  type: typed_context
+  locator:
+    page: 3
+    published_page: 687
+    pdf_page_index: 2
+    equation: '8'
+  units: J/mol
+  values:
+    method_class: model_derived
+    quantity_as_printed: standard formation free-energy fit
+    equation_as_printed: ΔG°Cu2O/J mol-1 = -166690 + 71.03 T/K ± 100
+    temperature_range_as_printed: 871–1317 K
+  context_id: itoh-1989-zno-solid-zinc-silicate::context::itoh_1989_eq8_cu2o_standard_formation_free_energy_fit
+  work_id: 10.2473/shigentosozai.105.685
+  source_id: itoh-1989-zno-solid-zinc-silicate
+  species: Cu2O
+- observation_id: itoh_1989_table7_oxide_reaction_free_energy
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 690
+    pdf_page_index: 5
+    table: '7'
+  units: kJ/mol reaction as printed
+  values:
+    method_class: measured_reduced
+    quantity_as_printed: standard free energy change of reaction (15), not standard formation free energy from elements
+    reaction_as_printed: 2ZnO(s) + SiO2(s) = Zn2SiO4(s)
+    temperature_K_and_deltaG_kJ_per_mol_as_printed:
+    - T_K: '973'
+      deltaG_r: '-30.3'
+      attribution: Present work
+    - T_K: '1073'
+      deltaG_r: '-28.6'
+      attribution: Present work
+    - T_K: '973'
+      deltaG_r: -28.9 ± 8.4
+      attribution: Kitchener et al. [36]
+    - T_K: '1073'
+      deltaG_r: -28.8 ± 8.4
+      attribution: Kitchener et al. [36]
+  context_id: itoh-1989-zno-solid-zinc-silicate::context::itoh_1989_table7_oxide_reaction_free_energy
+  work_id: 10.2473/shigentosozai.105.685
+  source_id: itoh-1989-zno-solid-zinc-silicate
+  species: ZnO

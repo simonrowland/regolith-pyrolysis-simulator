@@ -1,0 +1,1113 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  citation: Shornikov, S. I., and Archakov, I. Yu. (2000). Mass Spectrometric Study of Thermodynamic Properties and Vaporization
+    Processes in the Na2O–ZnO–P2O5 System. Glastech. Ber. Glass Sci. Technol., 73 C2, 58–65.
+  source_ids:
+  - shornikov-2000-na-zno-phosphate-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2000-na-zno-phosphate-vaporization
+      role: pdf
+      path: raw/shornikov-2000-na-zno-phosphate-vaporization/shornikov-2000-na-zno-phosphate-vaporization.pdf
+      sha256:
+        tag: value
+        value: 235e29ac33be76ba90c1188166f2cf97c4f7ef3770ea0e3dfb157bb84f3ec4bb
+    - asset_id: pdftotext:shornikov-2000-na-zno-phosphate-vaporization
+      role: pdftotext
+      path: text/shornikov-2000-na-zno-phosphate-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2000-na-zno-phosphate-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shilov-1998-fig1d
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Cited Knudsen effusion mass spectrometry at 1300 K on the Sn2P2O7-Zn2P2O7 join. Not a measurement of this
+      article.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: panel=d
+- experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Knudsen effusion mass spectrometry, this study, 1100 K, along the Na4P2O7-Zn2P2O7 join. Molybdenum cell,
+      MI 1201T, 25.0 ± 0.1 eV.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: panel=c
+context:
+- observation_id: shornikov_2000_apparatus
+  type: thermodynamic_example
+  units: as printed
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 58
+    section: Experimental
+  values:
+    cell: molybdenum effusion cell
+    evaporation_to_effusion_area_ratio: '>500'
+    spectrometer: MI 1201T
+    ionization_energy_eV: 25.0 ± 0.1
+    temperature_window_K: 950-1550
+    ions: Na+, NaPO2+, NaPO3+, Zn+, P2+, PO+, PO2+
+    samples_as_printed: Na2O·ZnO·P2O5 and 4Na2O·6ZnO·5P2O5
+    sentence_as_published: Evaporation from molybdenum effusion cells with the ratio of evaporation to effusion area more
+      than 500, using an MI 1201T mass spectrometer, at an ionization energy of 25.0 ± 0.1 eV.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_apparatus
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: ZnO
+- observation_id: shornikov_2000_eq14_integration_limits
+  type: thermodynamic_example
+  units: mol% ZnO
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 61
+    equation: '14'
+  values:
+    quantity: Gibbs-Duhem integration limit
+    ZnO_mol_percent_limits: 16.6 ± 0.2 or 56.0 ± 0.2
+    sentence_as_published: The lower integration limit in equation (14) corresponds to 16.6 ± 0.2 (or 56.0 ± 0.2) ZnO mole
+      % for different integrating paths. a* is the component activity in the corresponding phase of the binary system at x*.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_eq14_integration_limits
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: ZnO
+- observation_id: shornikov_2000_fig1_phase_diagrams
+  type: thermodynamic_example
+  units: not an activity
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 60
+    figure: '1'
+    panel: a
+  values:
+    admission_status: refused
+    reason: Panels (a) and (b) are phase diagrams according to references [1] and [19], not measurements of this article.
+      No activity markers were read from them.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig1_phase_diagrams
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: ZnO
+- observation_id: shornikov_2000_fig1c_2_zno_03_context
+  type: figure_read_point
+  locator:
+    figure: 1(c)
+    page: 60
+    pdf_page_index: 2
+  units: 'x: mole %; y: log a_i(i); raster pixels'
+  values:
+    quantity: log_activity
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 ZnO
+    x_value: '66.67'
+    x_unit: mole %
+    y_value: '-2.7'
+    y_unit: log a_i(i)
+    uncertainty:
+      x: '1.08'
+      y: '0.21'
+      basis: tick rms + class half-width; square/circle/triangle median outer half-extent 45.0 px (x), 45.0 px (y)
+    pixel_center:
+      x: '4941.3'
+      y: '6174.76'
+    temperature_K: 1100
+    standard_state_as_printed: pure oxides which form the ternary system
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig1c_2_zno_03_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig1c_3_p2o5_03_context
+  type: figure_read_point
+  locator:
+    figure: 1(c)
+    page: 60
+    pdf_page_index: 2
+  units: 'x: mole %; y: log a_i(i); raster pixels'
+  values:
+    quantity: log_activity
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 3 P2O5
+    x_value: '66.76'
+    x_unit: mole %
+    y_value: '-4.69'
+    y_unit: log a_i(i)
+    uncertainty:
+      x: '1.41'
+      y: '0.29'
+      basis: tick rms + class half-width; square/circle/triangle median outer half-extent 59.6 px (x), 63.0 px (y)
+    pixel_center:
+      x: '4945.23'
+      y: '6626.06'
+    temperature_K: 1100
+    standard_state_as_printed: pure oxides which form the ternary system
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig1c_3_p2o5_03_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_01_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '33.35'
+    x_unit: mole %
+    y_value: '33.29'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '4478'
+      y: '2740'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_01_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_02_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '34.62'
+    x_unit: mole %
+    y_value: '30.67'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '4724.63'
+      y: '2961.53'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_02_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_03_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '35.21'
+    x_unit: mole %
+    y_value: '29.47'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '4839.16'
+      y: '3062.92'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_03_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_04_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '36.32'
+    x_unit: mole %
+    y_value: '27.17'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '5054'
+      y: '3257'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_04_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_05_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '36.73'
+    x_unit: mole %
+    y_value: '26.34'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '5133.82'
+      y: '3326.53'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_05_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_06_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '37.26'
+    x_unit: mole %
+    y_value: '25.28'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '5238.5'
+      y: '3416.5'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_06_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_07_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '37.67'
+    x_unit: mole %
+    y_value: '24.36'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '5316.5'
+      y: '3494'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_07_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_08_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '39.21'
+    x_unit: mole %
+    y_value: '21.08'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '5617.34'
+      y: '3770.73'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_08_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_09_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '40.36'
+    x_unit: mole %
+    y_value: '18.37'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '5840.18'
+      y: '3999.18'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_09_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_10_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '41.82'
+    x_unit: mole %
+    y_value: '14.86'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '6123.29'
+      y: '4295.59'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_10_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_1_11_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 1 Na2O·ZnO·P2O5
+    x_value: '45.01'
+    x_unit: mole %
+    y_value: '7.58'
+    y_unit: mole %
+    uncertainty:
+      x: '0.33'
+      y: '0.75'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '6744.21'
+      y: '4910.26'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_1_11_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_2_01_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 4Na2O·6ZnO·5P2O5
+    x_value: '26.69'
+    x_unit: mole %
+    y_value: '39.97'
+    y_unit: mole %
+    uncertainty:
+      x: '0.34'
+      y: '0.77'
+      basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+    pixel_center:
+      x: '3182'
+      y: '2177'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_2_01_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_2_02_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 4Na2O·6ZnO·5P2O5
+    x_value: '27.08'
+    x_unit: mole %
+    y_value: '39.23'
+    y_unit: mole %
+    uncertainty:
+      x: '0.34'
+      y: '0.77'
+      basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+    pixel_center:
+      x: '3259'
+      y: '2239'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_2_02_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_2_03_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 4Na2O·6ZnO·5P2O5
+    x_value: '29.83'
+    x_unit: mole %
+    y_value: '34.57'
+    y_unit: mole %
+    uncertainty:
+      x: '0.34'
+      y: '0.77'
+      basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+    pixel_center:
+      x: '3794'
+      y: '2632'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_2_03_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_2_04_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 4Na2O·6ZnO·5P2O5
+    x_value: '31.66'
+    x_unit: mole %
+    y_value: '29.4'
+    y_unit: mole %
+    uncertainty:
+      x: '0.34'
+      y: '0.77'
+      basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+    pixel_center:
+      x: '4149'
+      y: '3069'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_2_04_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_2_05_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 4Na2O·6ZnO·5P2O5
+    x_value: '32.39'
+    x_unit: mole %
+    y_value: '26.69'
+    y_unit: mole %
+    uncertainty:
+      x: '0.34'
+      y: '0.77'
+      basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+    pixel_center:
+      x: '4290'
+      y: '3297'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_2_05_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_2_06_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 4Na2O·6ZnO·5P2O5
+    x_value: '35.46'
+    x_unit: mole %
+    y_value: '21.62'
+    y_unit: mole %
+    uncertainty:
+      x: '0.34'
+      y: '0.77'
+      basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+    pixel_center:
+      x: '4888'
+      y: '3725'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_2_06_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_2_07_context
+  type: figure_read_point
+  locator:
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: mole %; raster pixels'
+  values:
+    quantity: mole_fraction
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 4Na2O·6ZnO·5P2O5
+    x_value: '35.96'
+    x_unit: mole %
+    y_value: '20.19'
+    y_unit: mole %
+    uncertainty:
+      x: '0.34'
+      y: '0.77'
+      basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+    pixel_center:
+      x: '4984'
+      y: '3846'
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_2_07_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig2_evaporation_paths
+  type: thermodynamic_example
+  units: mol%
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 63
+    figure: '2'
+  values:
+    admission_status: refused
+    reason: Fig. 2 plots evaporation trajectories of two starting melts in the x(Na2O)-x(ZnO) plane. That quantity is not
+      an oxide activity, activity coefficient, partial pressure, vapour species, partial Gibbs energy, or evaporation coefficient.
+      Markers were not read. The MinerU scatter table was ignored.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig2_evaporation_paths
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: ZnO
+- observation_id: shornikov_2000_fig3_2_01_context
+  type: figure_read_point
+  locator:
+    figure: '3'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+  values:
+    quantity: dimensionless_gibbs_energy_of_formation
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+    x_value: '6.49'
+    x_unit: mole %
+    y_value: '-10.61'
+    y_unit: ΔG_T / RT
+    uncertainty:
+      x: '0.9'
+      y: '0.57'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '3392'
+      y: '8250'
+    temperature_K: 1300
+    standard_state_as_printed: pure oxide components (named as standard states in the text)
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_2_01_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig3_2_02_context
+  type: figure_read_point
+  locator:
+    figure: '3'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+  values:
+    quantity: dimensionless_gibbs_energy_of_formation
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+    x_value: '13.17'
+    x_unit: mole %
+    y_value: '-11.24'
+    y_unit: ΔG_T / RT
+    uncertainty:
+      x: '0.9'
+      y: '0.57'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '3877'
+      y: '8321'
+    temperature_K: 1300
+    standard_state_as_printed: pure oxide components (named as standard states in the text)
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_2_02_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig3_2_03_context
+  type: figure_read_point
+  locator:
+    figure: '3'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+  values:
+    quantity: dimensionless_gibbs_energy_of_formation
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+    x_value: '19.78'
+    x_unit: mole %
+    y_value: '-11.55'
+    y_unit: ΔG_T / RT
+    uncertainty:
+      x: '0.9'
+      y: '0.57'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '4357'
+      y: '8356'
+    temperature_K: 1300
+    standard_state_as_printed: pure oxide components (named as standard states in the text)
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_2_03_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig3_2_04_context
+  type: figure_read_point
+  locator:
+    figure: '3'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+  values:
+    quantity: dimensionless_gibbs_energy_of_formation
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+    x_value: '26.48'
+    x_unit: mole %
+    y_value: '-11.66'
+    y_unit: ΔG_T / RT
+    uncertainty:
+      x: '0.9'
+      y: '0.57'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '4844'
+      y: '8369'
+    temperature_K: 1300
+    standard_state_as_printed: pure oxide components (named as standard states in the text)
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_2_04_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig3_2_05_context
+  type: figure_read_point
+  locator:
+    figure: '3'
+    page: 63
+    pdf_page_index: 5
+  units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+  values:
+    quantity: dimensionless_gibbs_energy_of_formation
+    method_class: figure_only
+    evidence_class: figure_only
+    series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+    x_value: '66.57'
+    x_unit: mole %
+    y_value: '-6.04'
+    y_unit: ΔG_T / RT
+    uncertainty:
+      x: '0.9'
+      y: '0.57'
+      basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+    pixel_center:
+      x: '7755'
+      y: '7732'
+    temperature_K: 1300
+    standard_state_as_printed: pure oxide components (named as standard states in the text)
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_2_05_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_fig3_series1_x0
+  type: thermodynamic_example
+  units: dimensionless ΔG_f/RT
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 63
+    figure: '3'
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 6 (published p. 63), 9732 by 15250 px. Labelled ΔG_f/RT ticks are the tick line: -5 at y=7612,
+      -10 at y=8181, -15 at y=8746, -20 at y=9312, -25 at y=9878, -30 at y=10444, -35 at y=11012. ΔG_f/RT = -0.008828346*y
+      + 62.210823. Residuals +0.0095, -0.0139, -0.0019, +0.0013, +0.0044, +0.0076, -0.0069; RMS 0.0077. Unlabelled minor ticks
+      halfway between those labels were not used. Labelled x(ZnO) mol% ticks on the bottom axis: 0 at x=2921, 10 at 3643,
+      20 at 4374, 30 at 5100, 40 at 5824, 50 at 6550, 60 at 7281. mol% = 0.013763247*x - 40.178795. Residuals +0.024, -0.039,
+      +0.022, +0.014, -0.022, -0.030, +0.031 mol%; RMS 0.027. Read uncertainty is ±0.04 in ΔG_f/RT and ±0.15 mol% ZnO. Filled
+      circle on the y-axis. Circle fit rms 1.12 px, radius 63.5 px, 283 inliers. Page pixel (2918.00, 10667.50). Read ΔG_f/RT
+      = -31.966; x(ZnO) = -0.02 mol%.'
+  values:
+    quantity: melt formation Gibbs energy over RT
+    method_class: figure_only
+    admission_status: context_only
+    T_K: '1100'
+    delta_fG_over_RT: '-31.966'
+    ZnO_mol_percent: '-0.02'
+    page_pixel_x: '2918.00'
+    page_pixel_y: '10667.50'
+    dpi: 600
+    why_not_gibbs_table: The axis is ΔG_f/RT, dimensionless. gibbs_table migrates as delta_fG in kJ/mol. These reads stay
+      in context so that unit is not invented.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_series1_x0
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na4P2O7-Zn2P2O7
+- observation_id: shornikov_2000_fig3_series1_x33
+  type: thermodynamic_example
+  units: dimensionless ΔG_f/RT
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 63
+    figure: '3'
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 6 (published p. 63), 9732 by 15250 px. Labelled ΔG_f/RT ticks are the tick line: -5 at y=7612,
+      -10 at y=8181, -15 at y=8746, -20 at y=9312, -25 at y=9878, -30 at y=10444, -35 at y=11012. ΔG_f/RT = -0.008828346*y
+      + 62.210823. Residuals +0.0095, -0.0139, -0.0019, +0.0013, +0.0044, +0.0076, -0.0069; RMS 0.0077. Unlabelled minor ticks
+      halfway between those labels were not used. Labelled x(ZnO) mol% ticks on the bottom axis: 0 at x=2921, 10 at 3643,
+      20 at 4374, 30 at 5100, 40 at 5824, 50 at 6550, 60 at 7281. mol% = 0.013763247*x - 40.178795. Residuals +0.024, -0.039,
+      +0.022, +0.014, -0.022, -0.030, +0.031 mol%; RMS 0.027. Read uncertainty is ±0.04 in ΔG_f/RT and ±0.15 mol% ZnO. Filled
+      circle. Circle fit rms 1.25 px, radius 64.4 px, 206 inliers. Page pixel (5332.71, 9145.57). Read ΔG_f/RT = -18.529;
+      x(ZnO) = 33.22 mol%.'
+  values:
+    quantity: melt formation Gibbs energy over RT
+    method_class: figure_only
+    admission_status: context_only
+    T_K: '1100'
+    delta_fG_over_RT: '-18.529'
+    ZnO_mol_percent: '33.22'
+    page_pixel_x: '5332.71'
+    page_pixel_y: '9145.57'
+    dpi: 600
+    why_not_gibbs_table: The axis is ΔG_f/RT, dimensionless. gibbs_table migrates as delta_fG in kJ/mol. These reads stay
+      in context so that unit is not invented.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_series1_x33
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na4P2O7-Zn2P2O7
+- observation_id: shornikov_2000_fig3_series1_x40
+  type: thermodynamic_example
+  units: dimensionless ΔG_f/RT
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 63
+    figure: '3'
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 6 (published p. 63), 9732 by 15250 px. Labelled ΔG_f/RT ticks are the tick line: -5 at y=7612,
+      -10 at y=8181, -15 at y=8746, -20 at y=9312, -25 at y=9878, -30 at y=10444, -35 at y=11012. ΔG_f/RT = -0.008828346*y
+      + 62.210823. Residuals +0.0095, -0.0139, -0.0019, +0.0013, +0.0044, +0.0076, -0.0069; RMS 0.0077. Unlabelled minor ticks
+      halfway between those labels were not used. Labelled x(ZnO) mol% ticks on the bottom axis: 0 at x=2921, 10 at 3643,
+      20 at 4374, 30 at 5100, 40 at 5824, 50 at 6550, 60 at 7281. mol% = 0.013763247*x - 40.178795. Residuals +0.024, -0.039,
+      +0.022, +0.014, -0.022, -0.030, +0.031 mol%; RMS 0.027. Read uncertainty is ±0.04 in ΔG_f/RT and ±0.15 mol% ZnO. Filled
+      circle. Circle fit rms 1.18 px, radius 64.5 px, 317 inliers. Page pixel (5816.64, 8902.69). Read ΔG_f/RT = -16.385;
+      x(ZnO) = 39.88 mol%.'
+  values:
+    quantity: melt formation Gibbs energy over RT
+    method_class: figure_only
+    admission_status: context_only
+    T_K: '1100'
+    delta_fG_over_RT: '-16.385'
+    ZnO_mol_percent: '39.88'
+    page_pixel_x: '5816.64'
+    page_pixel_y: '8902.69'
+    dpi: 600
+    why_not_gibbs_table: The axis is ΔG_f/RT, dimensionless. gibbs_table migrates as delta_fG in kJ/mol. These reads stay
+      in context so that unit is not invented.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_series1_x40
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na4P2O7-Zn2P2O7
+- observation_id: shornikov_2000_fig3_series1_x67
+  type: thermodynamic_example
+  units: dimensionless ΔG_f/RT
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 63
+    figure: '3'
+    series: '1'
+    marker_symbol: filled circle
+    note: '600 dpi PDF page 6 (published p. 63), 9732 by 15250 px. Labelled ΔG_f/RT ticks are the tick line: -5 at y=7612,
+      -10 at y=8181, -15 at y=8746, -20 at y=9312, -25 at y=9878, -30 at y=10444, -35 at y=11012. ΔG_f/RT = -0.008828346*y
+      + 62.210823. Residuals +0.0095, -0.0139, -0.0019, +0.0013, +0.0044, +0.0076, -0.0069; RMS 0.0077. Unlabelled minor ticks
+      halfway between those labels were not used. Labelled x(ZnO) mol% ticks on the bottom axis: 0 at x=2921, 10 at 3643,
+      20 at 4374, 30 at 5100, 40 at 5824, 50 at 6550, 60 at 7281. mol% = 0.013763247*x - 40.178795. Residuals +0.024, -0.039,
+      +0.022, +0.014, -0.022, -0.030, +0.031 mol%; RMS 0.027. Read uncertainty is ±0.04 in ΔG_f/RT and ±0.15 mol% ZnO. Filled
+      circle at the Zn2P2O7 end of curve 1. Circle fit rms 1.10 px, radius 64.5 px, 256 inliers. Page pixel (7753.93, 8032.83).
+      Read ΔG_f/RT = -8.706; x(ZnO) = 66.54 mol%.'
+  values:
+    quantity: melt formation Gibbs energy over RT
+    method_class: figure_only
+    admission_status: context_only
+    T_K: '1100'
+    delta_fG_over_RT: '-8.706'
+    ZnO_mol_percent: '66.54'
+    page_pixel_x: '7753.93'
+    page_pixel_y: '8032.83'
+    dpi: 600
+    why_not_gibbs_table: The axis is ΔG_f/RT, dimensionless. gibbs_table migrates as delta_fG in kJ/mol. These reads stay
+      in context so that unit is not invented.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_series1_x67
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na4P2O7-Zn2P2O7
+- observation_id: shornikov_2000_fig3_series2_open_circles
+  type: thermodynamic_example
+  units: dimensionless ΔG_f/RT
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 63
+    figure: '3'
+    series: '2'
+    marker_symbol: open circle
+    note: Five open circles on curve 2. Four enclosed holes lie near x(ZnO) of about 7, 13, 20 and 27 mol%. One further open
+      circle sits at the right-hand end, above the filled circle of series 1. Hole centres were not stored.
+  values:
+    quantity: melt formation Gibbs energy over RT
+    method_class: figure_only
+    admission_status: refused
+    reason: Caption assigns curve 2 to the Sn2P2O7-Zn2P2O7 melts at 1300 K, reference [13]. Five open circles were censused
+      on the 600 dpi page and were not read.
+    marker_census: 5
+    attribution: reference [13], Shilov et al. (1998)
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_fig3_series2_open_circles
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na4P2O7-Zn2P2O7
+- observation_id: shornikov_2000_figures_1_to_3_context
+  type: figure_inventory
+  locator:
+    pdf_page_index: 2
+    page: 60
+    figure: '1'
+  units: as printed in figure captions
+  values:
+    method_class: figure_only
+    figures_reviewed:
+    - figure: '1'
+      page: 60
+      pdf_page_index: 2
+      caption_scope: phase diagrams and pure-oxide activities; panel c is the present study at 1100 K
+      series_as_printed: 1 Na2O; 2 ZnO; 3 P2O5; 4 SnO in the comparison panel
+      Na_g_pressure_or_flux: false
+    - figure: '2'
+      page: 63
+      pdf_page_index: 5
+      caption_scope: initial Na2O-ZnO-P2O5 melt compositions change during evaporation
+      series_as_printed: 1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5
+      Na_g_pressure_or_flux: false
+    - figure: '3'
+      page: 63
+      pdf_page_index: 5
+      caption_scope: Gibbs energies of formation of Na4P2O7-Zn2P2O7 and Sn2P2O7-Zn2P2O7 melts
+      series_as_printed: 1 present study at 1100 K; 2 prior data at 1300 K
+      Na_g_pressure_or_flux: false
+    figure_read_candidates:
+    - candidate_id: shornikov_2000_fig1c_na2o_activity
+      figure: 1(c)
+      page: 60
+      pdf_page_index: 2
+      rail: melt_activity
+      x_axis_as_printed: x(ZnO), mole %
+      y_axis_as_printed: log a_i (i)
+      units: dimensionless log activity; x composition in mole %
+      standard_state_as_printed: pure oxides forming the ternary system
+      series_as_printed: 1 Na2O; 2 ZnO; 3 P2O5
+      temperature_K: 1100
+      note: Na2O is series 1; 8 points read and verified.
+    - candidate_id: shornikov_2000_fig2_evaporation_composition
+      figure: '2'
+      page: 63
+      pdf_page_index: 5
+      rail: residue_composition
+      x_axis_as_printed: x(Na2O), mole %
+      y_axis_as_printed: x(ZnO), mole %
+      units: mole %
+      temperature_as_printed: not stated in the figure or caption
+      series_as_printed: 1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5
+      note: Initial melt compositions are shown changing during evaporation; 18 points read and verified.
+    - candidate_id: shornikov_2000_fig3_melt_formation_gibbs_energy
+      figure: '3'
+      page: 63
+      pdf_page_index: 5
+      rail: thermochemistry
+      x_axis_as_printed: x(ZnO), mole %
+      y_axis_as_printed: ΔG_T/RT
+      units: dimensionless ΔG_T/RT; x composition in mole %
+      reference_states_as_printed: pure oxide components; the text names these as standard states
+      series_as_printed: 1 Na4P2O7-Zn2P2O7, present study at 1100 K; 2 Sn2P2O7-Zn2P2O7, prior data at 1300 K
+      note: Gibbs energies of melt formation; 9 points read and verified.
+    note: Figures 1-3 do not plot Na(g) partial pressure or evaporation flux; the broader candidate inventory covers scorable
+      data on the melt_activity, residue_composition, and thermochemistry rails.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_figures_1_to_3_context
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: Na
+- observation_id: shornikov_2000_partial_pressures_not_tabulated
+  type: thermodynamic_example
+  units: not printed
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 59
+    section: Results
+  values:
+    quantity: partial pressure
+    method_class: quoted_attributed
+    admission_status: refused
+    cross_check_as_printed: Comparison method using ionization cross-sections and Ag and Zn partial-pressure standards.
+    reason: Partial pressures of PO, PO2, P2, Zn, Na and NaPO3 were obtained from the Hertz-Knudsen equation with partial
+      evaporation coefficients taken from references [14] and [15]. No numerical pressure or evaporation coefficient is printed.
+  context_id: shornikov-2000-na-zno-phosphate-vaporization::context::shornikov_2000_partial_pressures_not_tabulated
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  species: ZnO

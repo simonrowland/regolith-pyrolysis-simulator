@@ -1,0 +1,215 @@
+"""Migration pins for Mendybaev et al. (2013), Table 1 residue analyses."""
+
+from decimal import Decimal
+from pathlib import Path
+
+import yaml
+
+from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.migrate import Migrator
+
+
+ROOT = Path(__file__).resolve().parents[1]
+EXTRACT = ROOT / "data/literature/extracts/mendybaev-2013-fun-cai-evaporation.yaml"
+
+
+def test_table_1_fun1_3_residue_composition_and_conditions_migrate() -> None:
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    row = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.locator.note == "row=FUN1-3"
+    ]
+    assert len(row) == 4
+    assert all(o.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION for o in row)
+    assert {o.identity.species.formula: o.value.point for o in row} == {
+        "MgO": Decimal("50.01"),
+        "Al2O3": Decimal("4.04"),
+        "SiO2": Decimal("42.99"),
+        "CaO": Decimal("2.96"),
+    }
+    assert all(o.identity.temperature_K.value == Decimal("2173.15") for o in row)
+    assert all(
+        o.point_conditions["total_pressure_Pa"].state.value.bound_value
+        == Decimal("0.0001")
+        for o in row
+    )
+    assert all(o.point_conditions["time_min"].state.value == Decimal("0") for o in row)
+    assert not migrator.result.validation.hard_issues
+
+
+def test_bounded_identity_conditions_stay_on_mendybaev_points(tmp_path: Path) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    row = next(
+        observation
+        for observation in document["species"]["SiO2"]["observations"]
+        if observation["observation_id"]
+        == "mendybaev_2013_table1_fun1_residue_composition_series"
+    )
+    row["point_conditions"]["sample_mass_kg"] = {
+        "state": {
+            "tag": "value",
+            "value": {
+                "kind": "bound",
+                "bound_operator": "<=",
+                "bound_value": "0.0001",
+            },
+        },
+        "locator": {"table": "1", "row": "FUN1-3"},
+    }
+    extract = tmp_path / EXTRACT.name
+    extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    observations = tuple(migrator.result.observations.values())
+    row_points = [
+        observation
+        for observation in observations
+        if observation.locator.note == "row=FUN1-3"
+    ]
+    assert len(observations) == 96
+    assert len(row_points) == 4
+    for observation in row_points:
+        pressure = observation.point_conditions["total_pressure_Pa"]
+        mass = observation.point_conditions["sample_mass_kg"]
+        assert pressure.state.is_value
+        assert pressure.state.value.kind is ValueKind.BOUND
+        assert pressure.state.value.bound_operator == "<"
+        assert observation.identity.total_pressure_Pa.is_unknown
+        assert mass.state.is_value
+        assert mass.state.value.kind is ValueKind.BOUND
+        assert mass.state.value.bound_operator == "<="
+        assert observation.identity.sample_mass_kg.is_unknown
+
+
+def test_table_1_fun2_residues_migrate_to_the_fun2_experiment() -> None:
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    observations = tuple(migrator.result.observations.values())
+    fun1 = [o for o in observations if o.locator.note and o.locator.note.startswith("row=FUN1-")]
+    fun2 = [o for o in observations if o.locator.note and o.locator.note.startswith("row=FUN2-")]
+    assert len(fun1) == 56
+    assert len(fun2) == 40
+    assert all(o.experiment_id.endswith("mendybaev-fun1-vacuum-evaporation") for o in fun1)
+    assert all(o.experiment_id.endswith("mendybaev-fun2-vacuum-evaporation") for o in fun2)
+    fun2_10_mgo = [
+        o for o in fun2
+        if o.locator.note == "row=FUN2-10"
+        and o.identity.species.formula == "MgO"
+    ]
+    assert len(fun2_10_mgo) == 1
+    assert fun2_10_mgo[0].value.point == Decimal("1.55")
+    assert sum(o.experiment_id == fun2_10_mgo[0].experiment_id for o in observations) == 40
+    assert not migrator.result.validation.hard_issues
+
+
+def test_table_1_residue_uncertainties_migrate_from_each_printed_sigma(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    series = next(
+        observation["values"]["series"]
+        for observation in document["species"]["SiO2"]["observations"]
+        if observation["observation_id"]
+        == "mendybaev_2013_table1_fun1_residue_composition_series"
+    )
+    fun1_mgo = next(row for row in series if row["run_id"] == "FUN1-3")
+    fun2_series = next(
+        observation["values"]["series"]
+        for species in document["species"].values()
+        for observation in species["observations"]
+        if observation.get("observation_id")
+        == "mendybaev_2013_table1_fun2_residue_composition_series"
+    )
+    fun2_cao = next(
+        row
+        for row in fun2_series
+        if row["run_id"] == "FUN2-10" and "CaO_wt_pct" in row
+    )
+
+    def migrated(path: Path):
+        migrator = Migrator(root=ROOT, index={}, aliases={})
+        migrator._migrate_extract(path)
+        migrator.finalize()
+        assert len(migrator.result.observations) == 96
+        assert not migrator.result.validation.hard_issues
+        for observation in migrator.result.observations.values():
+            assert observation.identity.temperature_K.value == Decimal("2173.15")
+            elapsed = observation.point_conditions["time_min"]
+            assert elapsed.state.is_value
+            assert elapsed.locator is not None
+        return migrator
+
+    def residue_uncertainty(migrator: Migrator, row: str, formula: str) -> str:
+        observation = next(
+            item
+            for item in migrator.result.observations.values()
+            if item.locator.note == f"row={row}"
+            and item.identity.species.formula == formula
+        )
+        assert observation.uncertainty.kind.value == "printed"
+        return observation.uncertainty.verbatim["sigma"]
+
+    original = migrated(EXTRACT)
+    assert residue_uncertainty(original, "FUN1-3", "MgO") == "0.31"
+    assert residue_uncertainty(original, "FUN2-10", "CaO") == "0.10"
+
+    fun1_mgo["sigma"] = "0.99"
+    fun2_cao["sigma"] = "0.77"
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    mutated = migrated(mutated_extract)
+    assert residue_uncertainty(mutated, "FUN1-3", "MgO") == "0.99"
+    assert residue_uncertainty(mutated, "FUN2-10", "CaO") == "0.77"
+
+
+def test_all_deferred_figure_records_have_separate_captions() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    figures = [
+        row for row in extract["species"]["SiO2"]["context"]
+        if row.get("type") == "figure_only"
+    ]
+    assert len(figures) == 12
+    figure7 = next(row for row in figures if row["locator"]["figure"] == "7")
+    figure8 = next(row for row in figures if row["locator"]["figure"] == "8")
+    assert "Fig. 8." not in figure7["values"]["caption_as_printed"]
+    assert "as a function of the amount of 24Mg remaining" in figure7["values"]["caption_as_printed"]
+    assert "Fig. 7." not in figure8["values"]["caption_as_printed"]
+    assert "Same as Fig. 7 but for 29Si/28Si" in figure8["values"]["caption_as_printed"]
+    for number in (1, 3, 10, 11, 12):
+        figure = next(row for row in figures if row["locator"]["figure"] == str(number))
+        assert figure["values"]["caption_as_printed"].startswith(f"Fig. {number}.")
+    assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
+
+
+def test_unique_l4b_context_values_are_retained_with_source_locators() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    contexts = {
+        row["observation_id"]: row
+        for section in extract["species"].values()
+        for row in section.get("context", [])
+    }
+
+    factor = contexts["mendybaev_2013_abstract_unique_isotope_factor_context"]
+    assert factor["values"]["value"] == "0.98372 ± 0.00041"
+    assert factor["locator"]["page"] == 1
+    assert factor["locator"]["published_page"] == 368
+
+    rate_estimates = contexts["mendybaev_2013_printed_evaporation_rate_estimates_context"]
+    assert len(rate_estimates["values"]["estimates_as_printed"]) == 5
+    natural_estimates = contexts["mendybaev_2013_natural_cai_isotope_loss_estimates_context"]
+    assert len(natural_estimates["values"]["estimates_as_printed"]) == 2
+    for row in rate_estimates["values"]["estimates_as_printed"]:
+        assert row["locator"]["page"] == 15
+        assert row["locator"]["published_page"] == 382
+    for row in natural_estimates["values"]["estimates_as_printed"]:
+        assert "page" in row["locator"]
+        assert "published_page" in row["locator"]

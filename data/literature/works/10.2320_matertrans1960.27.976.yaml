@@ -1,0 +1,218 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2320/matertrans1960.27.976
+  citation: Oishi T, Kondo Y, Ono K (1986). A Thermodynamic Study of Cu2O-CaO Melts in Equilibrium with Liquid Copper. Transactions
+    of the Japan Institute of Metals 27(12):976-980.
+  source_ids:
+  - oishi-1986-cu2o-cao-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:oishi-1986-cu2o-cao-activities
+      role: pdf
+      path: raw/oishi-1986-cu2o-cao-activities/oishi-1986-cu2o-cao-activities.pdf
+      sha256:
+        tag: value
+        value: 5c1563e16d0304ce6a9a60edf57bd51a9b6ef7455d57125ef7560690790cf06e
+    - asset_id: pdftotext:oishi-1986-cu2o-cao-activities
+      role: pdftotext
+      path: text/oishi-1986-cu2o-cao-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:oishi-1986-cu2o-cao-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2320/matertrans1960.27.976
+experiments: []
+context:
+- observation_id: oishi_1986_figure2_oxygen_partial_pressure
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 978
+    pdf_page_index: 2
+    figure: '2'
+  units: as printed
+  phase_as_printed: Cu2O-CaO oxide melt in equilibrium with liquid copper
+  temperature_as_printed: 1573 K
+  axes_as_printed:
+    x: mass% CaO in oxide melt
+    y: (pO2/p°) × 10^4
+  caption: Relationship between oxygen partial pressure and mass% CaO in oxide melt at 1573 K.
+  panel: single
+  series:
+  - name: Table 1 experimental runs
+    marker: open circle
+    marker_count: 12
+    method_class: measured_direct
+  digitisation: deferred to a figure pass
+  numeric_points: none
+  values:
+    typed_quantity: partial_pressure
+    method_class: measured_direct
+    reference_as_printed: p° = 101325 Pa = 1 atm
+  context_id: oishi-1986-cu2o-cao-activities::context::oishi_1986_figure2_oxygen_partial_pressure
+  work_id: 10.2320/matertrans1960.27.976
+  source_id: oishi-1986-cu2o-cao-activities
+  species: O
+- observation_id: oishi_1986_figure3_oxygen_content_copper
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 978
+    pdf_page_index: 2
+    figure: '3'
+  units: as printed
+  phase_as_printed: liquid copper
+  temperature_as_printed: 1573 K
+  axes_as_printed:
+    x: mass% CaO in oxide melt
+    y: mass% O in liquid copper
+  caption: Variation of oxygen contents in liquid copper with CaO contents in oxide melt; calculated using data from ref.
+    (4).
+  panel: single
+  series:
+  - name: calculated oxygen contents
+    marker: open circle
+    marker_count: 12
+    method_class: model_derived
+    attribution: data from ref. (4)
+  digitisation: deferred to a figure pass
+  numeric_points: none
+  values:
+    typed_quantity: equilibrium_phase_composition
+    method_class: model_derived
+    component_as_printed: O
+  context_id: oishi-1986-cu2o-cao-activities::context::oishi_1986_figure3_oxygen_content_copper
+  work_id: 10.2320/matertrans1960.27.976
+  source_id: oishi-1986-cu2o-cao-activities
+  species: O
+- observation_id: oishi_1986_figure4_conjugation_lines
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 978
+    pdf_page_index: 2
+    figure: '4'
+  units: as printed
+  phase_as_printed: liquid copper and Cu2O-CaO oxide melt
+  temperature_as_printed: 1573 K
+  axes_as_printed:
+    x: mass% O
+    y: mass% CaO
+  caption: Conjugation lines of the two-phase region between liquid copper and Cu2O-CaO melt in the Cu-O-CaO system at 1573
+    K.
+  panel: single
+  series:
+  - name: conjugation endpoints A-D
+    marker: open circle
+    marker_count: 4
+    method_class: measured_direct
+  digitisation: deferred to a figure pass
+  numeric_points: none
+  values:
+    typed_quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    assemblage_as_printed: liquid copper + Cu2O-CaO oxide melt
+  context_id: oishi-1986-cu2o-cao-activities::context::oishi_1986_figure4_conjugation_lines
+  work_id: 10.2320/matertrans1960.27.976
+  source_id: oishi-1986-cu2o-cao-activities
+  species: O
+- observation_id: oishi_1986_figure5_oxide_activities
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 979
+    pdf_page_index: 3
+    figure: '5'
+  units: as printed
+  phase_as_printed: oxide melt along line AB
+  temperature_as_printed: 1573 K
+  axes_as_printed:
+    x: mass% CaO
+    y: activity
+  caption: Changes in activities of Cu, Cu2O and CaO in oxide melt with CaO concentration at 1573 K.
+  panel: single
+  series:
+  - name: aCu
+    marker: open circle
+    marker_count: 12
+    method_class: model_derived
+  - name: aCu2O
+    marker: open square
+    marker_count: 12
+    method_class: model_derived
+  - name: aCaO
+    marker: line
+    marker_count: 0
+    method_class: model_derived
+  digitisation: deferred to a figure pass
+  numeric_points: none
+  values:
+    typed_quantity: activity
+    method_class: model_derived
+    reference_as_printed: Cu2O is stoichiometric liquid Cu2O; references for Cu and CaO are not stated.
+  context_id: oishi-1986-cu2o-cao-activities::context::oishi_1986_figure5_oxide_activities
+  work_id: 10.2320/matertrans1960.27.976
+  source_id: oishi-1986-cu2o-cao-activities
+  species: O
+- observation_id: oishi_1986_table1_emf_column
+  type: context_record
+  locator:
+    page: 2
+    published_page: 977
+    pdf_page_index: 1
+    table: '1'
+    column: emf/mV
+  units: mV
+  candidate_quantities:
+  - electrode_potential
+  - electromotive_force
+  reason: The store has no token for cell emf; numeric emf readings are retained as printed in this record.
+  values:
+    method_class: measured_direct
+    emf_mV_by_run_as_printed:
+    - '-247.3'
+    - '-244.2'
+    - '-240.9'
+    - '-236.3'
+    - '-230.2'
+    - '-232.8'
+    - '-224.5'
+    - '-227.0'
+    - '-225.5'
+    - '-219.1'
+    - '-223.3'
+    - '-221.1'
+  context_id: oishi-1986-cu2o-cao-activities::context::oishi_1986_table1_emf_column
+  work_id: 10.2320/matertrans1960.27.976
+  source_id: oishi-1986-cu2o-cao-activities
+  species: Cu
+- observation_id: oishi_1986_table1_printed_oxygen_conditions
+  type: context_record
+  locator:
+    page: 2
+    published_page: 977
+    pdf_page_index: 1
+    table: '1'
+    column: log(pO2/p°)
+  units: log10(pO2/p°), dimensionless ratio
+  candidate_quantities:
+  - partial_pressure
+  reason: Printed log oxygen pressure is a condition, not a measured pressure point. The phase-composition profile does not
+    carry this reference-aware condition into identity; values.log_fO2 records each row verbatim without conversion.
+  values:
+    method_class: measured_direct
+    reference_as_printed: p° = 101325 Pa = 1 atm
+    field: values.log_fO2 on each typed composition row
+  context_id: oishi-1986-cu2o-cao-activities::context::oishi_1986_table1_printed_oxygen_conditions
+  work_id: 10.2320/matertrans1960.27.976
+  source_id: oishi-1986-cu2o-cao-activities
+  species: Cu

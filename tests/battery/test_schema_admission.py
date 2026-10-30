@@ -913,18 +913,10 @@ def test_geometry_context_keeps_original_source_record():
                    for row in result.context_by_work[experiment.work_id])
 
 
-_ITOH_KNACKE = (
-    "Knacke et al. thermochemical data and prior Mg, Ca and Al "
-    "deoxidation-equilibrium data cited by the authors"
-)
-_ITOH_PRESENT = (
-    "present 1873 K equilibrium observations plus prior Mg, Ca and Al "
-    "deoxidation-equilibrium parameters"
-)
 _BOULLIUNG_APPARATUS = "boulliung_2025_ssas_apparatus_and_run_conditions"
 _BOULLIUNG_STARTING = "boulliung_2025_starting_material_hg_and_trace_doping"
-# Unresolved printed parents kept on both derived_from and derivation.inputs.
-_BOULLIUNG_UNRESOLVED = {
+# Context parents are retained as qualified work-context references.
+_BOULLIUNG_CONTEXT_INPUTS = {
     "boulliung_2025_hg_equilibrium_partial_pressure": (_BOULLIUNG_APPARATUS,),
     "boulliung_2025_hg_equilibrium_partial_pressure_1400c": (
         _BOULLIUNG_STARTING, _BOULLIUNG_APPARATUS,
@@ -971,31 +963,59 @@ def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
         issue.reason is RefusalReason.REFERENTIAL_INTEGRITY for issue in hard
     )
     if source == "itoh-hino-banya-1998-spinel":
-        expected = {
-            _printed_lineage_issue(
-                source, "itoh_1998_spinel_equilibrium_constants",
-                "derivation.inputs", _ITOH_KNACKE,
-            ),
-            _printed_lineage_issue(
-                source, "itoh_1998_spinel_interaction_parameters",
-                "derivation.inputs", _ITOH_PRESENT,
-            ),
+        # These records are explicitly extract context, not observations.
+        # Preserve them in the owning work context instead of inventing
+        # Observation derivation pointers from the source's prose.
+        expected = set()
+        context_rows = [
+            row
+            for rows in migrator.result.context_by_work.values()
+            for row in rows
+            if row.get("context_id")
+            in {
+                f"{source}::context::itoh_1998_spinel_equilibrium_constants",
+                f"{source}::context::itoh_1998_spinel_interaction_parameters",
+            }
+        ]
+        assert {row["context_id"] for row in context_rows} == {
+            f"{source}::context::itoh_1998_spinel_equilibrium_constants",
+            f"{source}::context::itoh_1998_spinel_interaction_parameters",
         }
-        for local_id in (
-            "itoh_1998_spinel_equilibrium_constants",
-            "itoh_1998_spinel_interaction_parameters",
-        ):
-            observation = migrator.result.observations[f"{source}::{local_id}"]
-            assert observation.derivation is not None
-            assert _ITOH_KNACKE not in observation.derivation.inputs
-            assert _ITOH_PRESENT not in observation.derivation.inputs
+        assert all(row.get("type") == "context" for row in context_rows)
+        assert all(
+            "derived_from" not in row and "derivation" not in row
+            for row in context_rows
+        )
+        assert not any(
+            f"{source}::{local_id}" in migrator.result.observations
+            for local_id in (
+                "itoh_1998_spinel_equilibrium_constants",
+                "itoh_1998_spinel_interaction_parameters",
+            )
+        )
+        assert {row["values"]["quantity"] for row in context_rows} == {
+            "printed_equilibrium_constants_and_relations",
+            "cross_interaction_coefficients",
+        }
     elif source == "boulliung-2025-mercury-volatile-metals-magmatic":
-        expected = {
-            _printed_lineage_issue(source, local_id, field, text)
-            for local_id, texts in _BOULLIUNG_UNRESOLVED.items()
-            for text in texts
-            for field in ("derived_from", "derivation.inputs")
-        }
+        expected = set()
+        for local_id, context_inputs in _BOULLIUNG_CONTEXT_INPUTS.items():
+            observation = migrator.result.observations[f"{source}::{local_id}"]
+            expected_context_ids = {
+                f"{source}::context::{context_input}"
+                for context_input in context_inputs
+            }
+            assert expected_context_ids <= set(observation.derived_from or ())
+            assert observation.derivation is not None
+            assert expected_context_ids <= set(observation.derivation.inputs)
+            assert not any(
+                issue.path
+                in {
+                    f"observation[{observation.observation_id}].derived_from",
+                    f"observation[{observation.observation_id}].derivation.inputs",
+                }
+                for issue in hard
+            )
     else:
         expected = {
             _printed_lineage_issue(

@@ -1,0 +1,656 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1186/1752-153x-5-54
+  citation: Klemme, S., Hermes, W., Eul, M., Wijbrans, C. H., Rohrbach, A., and Pöttgen, R. (2011). New thermodynamic data
+    for CoTiO3, NiTiO3 and CoCO3 based on low-temperature calorimetric measurements. Chemistry Central Journal, 5, 54.
+  source_ids:
+  - klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+      role: pdf
+      path: raw/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.pdf
+      sha256:
+        tag: value
+        value: de63741dd94f4f557cfb66a5b3f8a7f323ce93dc25b0caec4f67063c3d8959de
+    - asset_id: pdftotext:klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+      role: pdftotext
+      path: text/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1186/1752-153x-5-54
+experiments:
+- experiment_id: 10.1186/1752-153x-5-54::klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1186/1752-153x-5-54
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table continues on physical page 4.
+context:
+- observation_id: klemme_2011_coco3_heat_capacity_anomaly_peak_text
+  type: thermochemical_values
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Abstract
+  units: K
+  values:
+    quantity_as_printed: low-temperature heat-capacity anomaly peak temperature
+    quantity_token: unavailable
+    candidate_store_tokens:
+    - transition_temperature
+    - cp
+    schema_gap: No quantity token represents a heat-capacity anomaly peak temperature without recasting the reported peak
+      as a phase-transition temperature.
+    method_class: measured_reduced
+    species: CoCO3
+    phase: crystalline solid
+    temperature_as_printed: about 31
+    temperature_K: 31
+    approximate: true
+    interpretation: For NiTiO3 and CoTiO3 the authors say the Cp anomaly coincides with antiferromagnetic ordering; for CoCO3
+      they say it may be caused by the transition.
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_coco3_heat_capacity_anomaly_peak_text
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: CoCO3
+- observation_id: klemme_2011_coco3_table6_calculated_cp_and_cp_over_t_context
+  type: table_record
+  locator:
+    page: 10
+    published_page: 10
+    pdf_page_index: 9
+    table: '6'
+  units: T in K; Cp in J/mol K; Cp/T in J mol-1 K-2
+  values:
+    quantity_as_printed: Cp, Cp/T and S(T) at selected temperatures
+    candidate_store_tokens:
+    - cp
+    - S
+    method_class: model_derived
+    disposition: The S(T) values are typed as measured_reduced in klemme_2011_coco3_table6_entropy_series (with S(298.15 K)
+      split out for its printed uncertainty). The selected-temperature Cp values are not stored as a second measured series
+      because the paper does not identify them as independent measurements; the Cp/T column has no quantity token. The printed
+      Cp and Cp/T cells are retained here.
+    rows:
+    - T_as_printed: '300'
+      Cp_as_printed: '85.2'
+      Cp_over_T_as_printed: '0.284'
+    - T_as_printed: '298.15'
+      Cp_as_printed: '84.8'
+      Cp_over_T_as_printed: '0.284'
+    - T_as_printed: '290'
+      Cp_as_printed: '83.5'
+      Cp_over_T_as_printed: '0.288'
+    - T_as_printed: '280'
+      Cp_as_printed: '82.2'
+      Cp_over_T_as_printed: '0.294'
+    - T_as_printed: '270'
+      Cp_as_printed: '80.6'
+      Cp_over_T_as_printed: '0.298'
+    - T_as_printed: '260'
+      Cp_as_printed: '78.7'
+      Cp_over_T_as_printed: '0.303'
+    - T_as_printed: '250'
+      Cp_as_printed: '77.0'
+      Cp_over_T_as_printed: '0.308'
+    - T_as_printed: '240'
+      Cp_as_printed: '75.0'
+      Cp_over_T_as_printed: '0.312'
+    - T_as_printed: '230'
+      Cp_as_printed: '72.9'
+      Cp_over_T_as_printed: '0.317'
+    - T_as_printed: '220'
+      Cp_as_printed: '71.1'
+      Cp_over_T_as_printed: '0.323'
+    - T_as_printed: '210'
+      Cp_as_printed: '69.0'
+      Cp_over_T_as_printed: '0.329'
+    - T_as_printed: '200'
+      Cp_as_printed: '66.8'
+      Cp_over_T_as_printed: '0.334'
+    - T_as_printed: '190'
+      Cp_as_printed: '64.6'
+      Cp_over_T_as_printed: '0.340'
+    - T_as_printed: '180'
+      Cp_as_printed: '62.2'
+      Cp_over_T_as_printed: '0.346'
+    - T_as_printed: '170'
+      Cp_as_printed: '59.7'
+      Cp_over_T_as_printed: '0.351'
+    - T_as_printed: '160'
+      Cp_as_printed: '57.1'
+      Cp_over_T_as_printed: '0.357'
+    - T_as_printed: '150'
+      Cp_as_printed: '54.1'
+      Cp_over_T_as_printed: '0.361'
+    - T_as_printed: '140'
+      Cp_as_printed: '51.0'
+      Cp_over_T_as_printed: '0.364'
+    - T_as_printed: '130'
+      Cp_as_printed: '47.7'
+      Cp_over_T_as_printed: '0.367'
+    - T_as_printed: '120'
+      Cp_as_printed: '44.2'
+      Cp_over_T_as_printed: '0.369'
+    - T_as_printed: '110'
+      Cp_as_printed: '40.7'
+      Cp_over_T_as_printed: '0.370'
+    - T_as_printed: '100'
+      Cp_as_printed: '36.9'
+      Cp_over_T_as_printed: '0.369'
+    - T_as_printed: '90'
+      Cp_as_printed: '32.2'
+      Cp_over_T_as_printed: '0.358'
+    - T_as_printed: '80'
+      Cp_as_printed: '27.0'
+      Cp_over_T_as_printed: '0.338'
+    - T_as_printed: '70'
+      Cp_as_printed: '21.4'
+      Cp_over_T_as_printed: '0.306'
+    - T_as_printed: '60'
+      Cp_as_printed: '16.4'
+      Cp_over_T_as_printed: '0.273'
+    - T_as_printed: '50'
+      Cp_as_printed: '11.4'
+      Cp_over_T_as_printed: '0.228'
+    - T_as_printed: '40'
+      Cp_as_printed: '7.14'
+      Cp_over_T_as_printed: '0.178'
+    - T_as_printed: '30'
+      Cp_as_printed: '4.17'
+      Cp_over_T_as_printed: '0.139'
+    - T_as_printed: '20'
+      Cp_as_printed: '2.72'
+      Cp_over_T_as_printed: '0.136'
+    - T_as_printed: '15'
+      Cp_as_printed: '3.18'
+      Cp_over_T_as_printed: '0.212'
+    - T_as_printed: '10'
+      Cp_as_printed: '1.31'
+      Cp_over_T_as_printed: '0.131'
+    - T_as_printed: '5'
+      Cp_as_printed: '0.18'
+      Cp_over_T_as_printed: '0.036'
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_coco3_table6_calculated_cp_and_cp_over_t_context
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: CoCO3
+- observation_id: klemme_2011_cotio3_heat_capacity_anomaly_peak_text
+  type: thermochemical_values
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Abstract
+  units: K
+  values:
+    quantity_as_printed: low-temperature heat-capacity anomaly peak temperature
+    quantity_token: unavailable
+    candidate_store_tokens:
+    - transition_temperature
+    - cp
+    schema_gap: No quantity token represents a heat-capacity anomaly peak temperature without recasting the reported peak
+      as a phase-transition temperature.
+    method_class: measured_reduced
+    species: CoTiO3
+    phase: crystalline solid
+    temperature_as_printed: '37'
+    temperature_K: 37
+    approximate: false
+    interpretation: For NiTiO3 and CoTiO3 the authors say the Cp anomaly coincides with antiferromagnetic ordering; for CoCO3
+      they say it may be caused by the transition.
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_cotio3_heat_capacity_anomaly_peak_text
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: CoTiO3
+- observation_id: klemme_2011_cotio3_table5_calculated_cp_and_cp_over_t_context
+  type: table_record
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 8
+    table: '5'
+    note: The table continues on physical page 10.
+  units: T in K; Cp in J/mol K; Cp/T in J mol-1 K-2
+  values:
+    quantity_as_printed: Cp, Cp/T and S(T) at selected temperatures
+    candidate_store_tokens:
+    - cp
+    - S
+    method_class: model_derived
+    disposition: The S(T) values are typed as measured_reduced in klemme_2011_cotio3_table5_entropy_series (with S(298.15
+      K) split out for its printed uncertainty). The selected-temperature Cp values are not stored as a second measured series
+      because the paper does not identify them as independent measurements; the Cp/T column has no quantity token. The printed
+      Cp and Cp/T cells are retained here.
+    rows:
+    - T_as_printed: '300'
+      Cp_as_printed: '87.6'
+      Cp_over_T_as_printed: '0.292'
+    - T_as_printed: '298.15'
+      Cp_as_printed: '86.8'
+      Cp_over_T_as_printed: '0.291'
+    - T_as_printed: '290'
+      Cp_as_printed: '86.3'
+      Cp_over_T_as_printed: '0.298'
+    - T_as_printed: '280'
+      Cp_as_printed: '85.9'
+      Cp_over_T_as_printed: '0.307'
+    - T_as_printed: '270'
+      Cp_as_printed: '85.1'
+      Cp_over_T_as_printed: '0.315'
+    - T_as_printed: '260'
+      Cp_as_printed: '84.1'
+      Cp_over_T_as_printed: '0.324'
+    - T_as_printed: '250'
+      Cp_as_printed: '83.1'
+      Cp_over_T_as_printed: '0.333'
+    - T_as_printed: '240'
+      Cp_as_printed: '81.9'
+      Cp_over_T_as_printed: '0.341'
+    - T_as_printed: '230'
+      Cp_as_printed: '80.3'
+      Cp_over_T_as_printed: '0.349'
+    - T_as_printed: '220'
+      Cp_as_printed: '78.6'
+      Cp_over_T_as_printed: '0.357'
+    - T_as_printed: '210'
+      Cp_as_printed: '76.3'
+      Cp_over_T_as_printed: '0.364'
+    - T_as_printed: '200'
+      Cp_as_printed: '74.1'
+      Cp_over_T_as_printed: '0.370'
+    - T_as_printed: '190'
+      Cp_as_printed: '71.6'
+      Cp_over_T_as_printed: '0.377'
+    - T_as_printed: '180'
+      Cp_as_printed: '68.9'
+      Cp_over_T_as_printed: '0.383'
+    - T_as_printed: '170'
+      Cp_as_printed: '65.9'
+      Cp_over_T_as_printed: '0.387'
+    - T_as_printed: '160'
+      Cp_as_printed: '62.7'
+      Cp_over_T_as_printed: '0.392'
+    - T_as_printed: '150'
+      Cp_as_printed: '59.1'
+      Cp_over_T_as_printed: '0.394'
+    - T_as_printed: '140'
+      Cp_as_printed: '55.1'
+      Cp_over_T_as_printed: '0.394'
+    - T_as_printed: '130'
+      Cp_as_printed: '51.0'
+      Cp_over_T_as_printed: '0.392'
+    - T_as_printed: '120'
+      Cp_as_printed: '46.5'
+      Cp_over_T_as_printed: '0.387'
+    - T_as_printed: '110'
+      Cp_as_printed: '42.1'
+      Cp_over_T_as_printed: '0.383'
+    - T_as_printed: '100'
+      Cp_as_printed: '37.4'
+      Cp_over_T_as_printed: '0.374'
+    - T_as_printed: '90'
+      Cp_as_printed: '32.1'
+      Cp_over_T_as_printed: '0.357'
+    - T_as_printed: '80'
+      Cp_as_printed: '26.4'
+      Cp_over_T_as_printed: '0.330'
+    - T_as_printed: '70'
+      Cp_as_printed: '20.5'
+      Cp_over_T_as_printed: '0.293'
+    - T_as_printed: '60'
+      Cp_as_printed: '15.4'
+      Cp_over_T_as_printed: '0.256'
+    - T_as_printed: '50'
+      Cp_as_printed: '10.8'
+      Cp_over_T_as_printed: '0.216'
+    - T_as_printed: '40'
+      Cp_as_printed: '10.2'
+      Cp_over_T_as_printed: '0.254'
+    - T_as_printed: '30'
+      Cp_as_printed: '7.65'
+      Cp_over_T_as_printed: '0.255'
+    - T_as_printed: '20'
+      Cp_as_printed: '2.39'
+      Cp_over_T_as_printed: '0.120'
+    - T_as_printed: '15'
+      Cp_as_printed: '0.96'
+      Cp_over_T_as_printed: '0.064'
+    - T_as_printed: '10'
+      Cp_as_printed: '0.22'
+      Cp_over_T_as_printed: '0.022'
+    - T_as_printed: '5'
+      Cp_as_printed: '0.02'
+      Cp_over_T_as_printed: '0.003'
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_cotio3_table5_calculated_cp_and_cp_over_t_context
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: CoTiO3
+- observation_id: klemme_2011_figure1_al2o3_calorimeter_check
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    figure: '1'
+  phase: cr
+  units: T in K; Cp in J/mol K
+  values:
+    quantity: cp
+    method_class: figure_only
+    species: Al2O3
+    temperature_as_published: main axis 0-350 K
+    axes_as_printed:
+      x: T / K
+      y: Cp / J mol-1 K-1
+    caption_as_published: Comparison of published heat capacities of NIST SRM-720 (Ditmars et al. 1982) with PPMS measurements
+      done at Münster University.
+    panel: single panel
+    series:
+    - label: Münster PPMS
+      marker: black diamond
+      marker_count: not separable; dense overlapping markers
+    - label: NIST-SRM 720
+      marker: red square
+      marker_count: 32
+    attribution: Münster PPMS measurements; NIST-SRM 720 values attributed to Ditmars et al. (1982) [35].
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    marker_count_note: The black PPMS symbols overlap into a continuous band at 600 dpi; count is not separately resolvable.
+      NIST red squares are countable in the render.
+    calibration_summary_as_published: SRM-720 Cp was reproduced within 0.8%; average Cp difference 0.4% above 90 K and around
+      4% below 90 K.
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_figure1_al2o3_calorimeter_check
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: Al2O3
+- observation_id: klemme_2011_figure2_nitio3_cp
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    figure: '2'
+  phase: cr
+  units: T in K; Cp in J/mol K
+  values:
+    quantity: cp
+    method_class: figure_only
+    species: NiTiO3
+    temperature_as_published: main axis 0-350 K; inset 0-60 K
+    axes_as_printed:
+      x: Temperature / K
+      y: Cp / J mol-1 K-1
+    caption_as_published: Low-temperature heat capacity data for NiTiO3. The insert shows results from two scans done at low
+      temperatures.
+    panel: main panel with low-temperature inset
+    series:
+    - label: first scan
+      marker: filled circle
+      marker_count: 180
+    - label: second scan
+      marker: open diamond
+      marker_count: 75
+    attribution: This work.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_figure2_nitio3_cp
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: NiTiO3
+- observation_id: klemme_2011_figure3_cotio3_cp
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    figure: '3'
+  phase: cr
+  units: T in K; Cp in J/mol K
+  values:
+    quantity: cp
+    method_class: figure_only
+    species: CoTiO3
+    temperature_as_published: main axis 0-300 K; inset 0-80 K
+    axes_as_printed:
+      x: Temperature / K
+      y: Cp / J mol-1 K-1
+    caption_as_published: Low-temperature heat capacity data for CoTiO3. The insert shows results from two scans done at low
+      temperatures.
+    panel: main panel with low-temperature inset
+    series:
+    - label: first scan
+      marker: open square
+      marker_count: 210
+    - label: second scan
+      marker: filled square
+      marker_count: 90
+    attribution: This work.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_figure3_cotio3_cp
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: CoTiO3
+- observation_id: klemme_2011_figure4_coco3_cp
+  type: figure_record
+  locator:
+    page: 8
+    published_page: 8
+    pdf_page_index: 7
+    figure: '4'
+  phase: cr
+  units: T in K; Cp in J/mol K
+  values:
+    quantity: cp
+    method_class: figure_only
+    species: CoCO3
+    temperature_as_published: main axis 0-300 K; inset 0-40 K
+    axes_as_printed:
+      x: Temperature / K
+      y: Cp / J mol-1 K-1
+    caption_as_published: Low-temperature heat capacity data for CoCO3.
+    panel: main panel with low-temperature inset
+    series:
+    - label: single scan
+      marker: filled triangle in the main panel; open diamond in the inset
+      marker_count: 170
+    attribution: This work.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_figure4_coco3_cp
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: CoCO3
+- observation_id: klemme_2011_nitio3_heat_capacity_anomaly_peak_text
+  type: thermochemical_values
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Abstract
+  units: K
+  values:
+    quantity_as_printed: low-temperature heat-capacity anomaly peak temperature
+    quantity_token: unavailable
+    candidate_store_tokens:
+    - transition_temperature
+    - cp
+    schema_gap: No quantity token represents a heat-capacity anomaly peak temperature without recasting the reported peak
+      as a phase-transition temperature.
+    method_class: measured_reduced
+    species: NiTiO3
+    phase: crystalline solid
+    temperature_as_printed: '26'
+    temperature_K: 26
+    approximate: false
+    interpretation: For NiTiO3 and CoTiO3 the authors say the Cp anomaly coincides with antiferromagnetic ordering; for CoCO3
+      they say it may be caused by the transition.
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_nitio3_heat_capacity_anomaly_peak_text
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: NiTiO3
+- observation_id: klemme_2011_nitio3_table4_calculated_cp_and_cp_over_t_context
+  type: table_record
+  locator:
+    page: 8
+    published_page: 8
+    pdf_page_index: 7
+    table: '4'
+    note: The table continues on physical page 9.
+  units: T in K; Cp in J/mol K; Cp/T in J mol-1 K-2
+  values:
+    quantity_as_printed: Cp, Cp/T and S(T) at selected temperatures
+    candidate_store_tokens:
+    - cp
+    - S
+    method_class: model_derived
+    disposition: The S(T) values are typed as measured_reduced in klemme_2011_nitio3_table4_entropy_series (with S(298.15
+      K) split out for its printed uncertainty). The selected-temperature Cp values are not stored as a second measured series
+      because the paper does not identify them as independent measurements; the Cp/T column has no quantity token. The printed
+      Cp and Cp/T cells are retained here.
+    rows:
+    - T_as_printed: '300'
+      Cp_as_printed: '92.4'
+      Cp_over_T_as_printed: '0.308'
+    - T_as_printed: '298.15'
+      Cp_as_printed: '92.3'
+      Cp_over_T_as_printed: '0.309'
+    - T_as_printed: '290'
+      Cp_as_printed: '91.2'
+      Cp_over_T_as_printed: '0.314'
+    - T_as_printed: '280'
+      Cp_as_printed: '89.7'
+      Cp_over_T_as_printed: '0.320'
+    - T_as_printed: '270'
+      Cp_as_printed: '87.9'
+      Cp_over_T_as_printed: '0.326'
+    - T_as_printed: '260'
+      Cp_as_printed: '86.2'
+      Cp_over_T_as_printed: '0.332'
+    - T_as_printed: '250'
+      Cp_as_printed: '84.3'
+      Cp_over_T_as_printed: '0.337'
+    - T_as_printed: '240'
+      Cp_as_printed: '82.2'
+      Cp_over_T_as_printed: '0.343'
+    - T_as_printed: '230'
+      Cp_as_printed: '79.9'
+      Cp_over_T_as_printed: '0.347'
+    - T_as_printed: '220'
+      Cp_as_printed: '77.4'
+      Cp_over_T_as_printed: '0.352'
+    - T_as_printed: '210'
+      Cp_as_printed: '74.5'
+      Cp_over_T_as_printed: '0.355'
+    - T_as_printed: '200'
+      Cp_as_printed: '71.7'
+      Cp_over_T_as_printed: '0.358'
+    - T_as_printed: '190'
+      Cp_as_printed: '68.5'
+      Cp_over_T_as_printed: '0.360'
+    - T_as_printed: '180'
+      Cp_as_printed: '65.1'
+      Cp_over_T_as_printed: '0.362'
+    - T_as_printed: '170'
+      Cp_as_printed: '61.6'
+      Cp_over_T_as_printed: '0.362'
+    - T_as_printed: '160'
+      Cp_as_printed: '57.9'
+      Cp_over_T_as_printed: '0.362'
+    - T_as_printed: '150'
+      Cp_as_printed: '53.8'
+      Cp_over_T_as_printed: '0.359'
+    - T_as_printed: '140'
+      Cp_as_printed: '49.5'
+      Cp_over_T_as_printed: '0.354'
+    - T_as_printed: '130'
+      Cp_as_printed: '45.0'
+      Cp_over_T_as_printed: '0.346'
+    - T_as_printed: '120'
+      Cp_as_printed: '40.3'
+      Cp_over_T_as_printed: '0.336'
+    - T_as_printed: '110'
+      Cp_as_printed: '35.8'
+      Cp_over_T_as_printed: '0.325'
+    - T_as_printed: '100'
+      Cp_as_printed: '31.0'
+      Cp_over_T_as_printed: '0.310'
+    - T_as_printed: '90'
+      Cp_as_printed: '25.9'
+      Cp_over_T_as_printed: '0.287'
+    - T_as_printed: '80'
+      Cp_as_printed: '20.5'
+      Cp_over_T_as_printed: '0.257'
+    - T_as_printed: '70'
+      Cp_as_printed: '15.4'
+      Cp_over_T_as_printed: '0.220'
+    - T_as_printed: '60'
+      Cp_as_printed: '11.0'
+      Cp_over_T_as_printed: '0.183'
+    - T_as_printed: '50'
+      Cp_as_printed: '7.11'
+      Cp_over_T_as_printed: '0.142'
+    - T_as_printed: '40'
+      Cp_as_printed: '4.05'
+      Cp_over_T_as_printed: '0.101'
+    - T_as_printed: '30'
+      Cp_as_printed: '2.48'
+      Cp_over_T_as_printed: '0.083'
+    - T_as_printed: '20'
+      Cp_as_printed: '13.4'
+      Cp_over_T_as_printed: '0.672'
+    - T_as_printed: '15'
+      Cp_as_printed: '7.53'
+      Cp_over_T_as_printed: '0.502'
+    - T_as_printed: '10'
+      Cp_as_printed: '3.20'
+      Cp_over_T_as_printed: '0.320'
+    - T_as_printed: '5'
+      Cp_as_printed: '4.15'
+      Cp_over_T_as_printed: '0.830'
+  context_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity::context::klemme_2011_nitio3_table4_calculated_cp_and_cp_over_t_context
+  work_id: 10.1186/1752-153x-5-54
+  source_id: klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
+  species: NiTiO3

@@ -1,0 +1,1100 @@
+schema_version: literature_extract.v1
+source_id: banya-2004-sulphide-capacity-cao-al2o3
+source:
+  citation: S. Ban-ya, M. Hobo, T. Kaji, T. Itoh, and M. Hino (2004), "Sulphide Capacity and Sulphur Solubility
+    in CaO–Al2O3 and CaO–Al2O3–CaF2 Slags", ISIJ International 44(11), 1810–1816.
+  doi: 10.2355/isijinternational.44.1810
+  year: 2004
+  corpus_asset: raw/banya-2004-sulphide-capacity-cao-al2o3/banya-2004-sulphide-capacity-cao-al2o3.pdf
+  corpus_sha256: 94dad0ed9229896b3b9252bb4bca64e4535ee3711b487c0a1df43c729ac4bcd2
+extraction:
+  method: Authoritative born-digital pdftotext-layout text was primary. No MinerU table source is present.
+    Table 1 is non-measured reference thermochemistry and Table A1 is conceptual; Table 1 was transcribed from
+    its 600-dpi render into context, with its blank cells retained. The printed CaS solubility summaries were
+    typed as composition interval/approximate point observations. Figures 1–13 have metadata only and no digitised
+    points.
+  date: '2026-10-20'
+  worker: fam20-1019
+fidelity_samples:
+- path: species.CaS.observations[banya_2004_cao_caf2_binary_cas_solubility_hawkins].values.value
+  value: '27'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1813
+    section: 4.2. Solubility of CaS in Slags
+    note: Printed about 27 mol% CaS; attribution to Hawkins et al. [14] is explicit in the surrounding paragraph
+      and Figure 7.
+review_status: draft
+species:
+  CaS:
+    observations:
+    - observation_id: banya_2004_cao_al2o3_cas_solubility_summary
+      type: equilibrium_phase_composition
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1813
+        section: 4.2. Solubility of CaS in Slags
+        note: Printed prose summary; numerical points and sample-specific compositions are in deferred Figures
+          4–5.
+      units: mol%
+      phase: l
+      regime: quench_equilibration
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        temperature_range_K_as_printed: 1823, 1873, and 1923 K
+        value_as_published: about 1.5 to 4 mol% CaS
+        admission_status: typed_unavailable
+        reason: The prose reports an aggregate interval across varying compositions and temperatures; the extract
+          migrator maps this quantity as scalar points and cannot preserve this interval as one observation.
+          No point was synthesized; sample-specific plotted values are deferred to Figures 4–5.
+        approximate: true
+        basis_as_published: mol% CaS dissolved in CaO–Al2O3 slag
+        method_as_printed: Equilibrium measurement of the gas–slag reaction; sulphur, calcium, alumina, and
+          fluoride were analysed after quenching.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1823'
+              interval_high: '1923'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1812
+            section: 4.2. Solubility of CaS in Slags
+            note: The source states that measurements were carried out at 1823, 1873, and 1923 K; no temperature-specific
+              range endpoint is given.
+        composition:
+          state:
+            tag: unknown
+            reason: The printed range summarizes multiple CaO–Al2O3 slag compositions; individual ratios are
+              only plotted in deferred Figures 4–5.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1813
+            section: 4.2. Solubility of CaS in Slags
+        total_pressure_Pa: &id001
+          state:
+            tag: unknown
+            reason: The source does not report total pressure for the gas–slag measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1811
+            section: 3. Experiments
+        atmosphere:
+          state:
+            tag: value
+            value: CO–CO2–SO2–Ar gas mixture; the individual flow proportions are adjusted for gas potential
+              and are not printed for this summary.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1811
+            section: 3. Experiments
+        fO2_control:
+          state:
+            tag: unknown
+            reason: No single oxygen potential or (PO2/PS2)^(1/2) gas-potential ratio is assigned to this prose
+              summary; the printed figure-series ratios are not recomputed.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1812
+            section: 4.2. Solubility of CaS in Slags
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1811
+            section: 3. Experiments
+            note: Samples were quickly removed to the lower quenching part; the paper does not state whether
+              quenching preserved or altered the measured composition.
+      assemblage_id: banya_2004_cao_al2o3_cas_solubility_summary
+      assemblage_as_printed: CaO–Al2O3 liquid slag at the CaS solubility limit; summary across reported compositions
+        and temperatures.
+      phase_as_printed: CaO–Al2O3 slag; CaS solubility limit
+    - observation_id: banya_2004_cao_caf2_binary_cas_solubility_hawkins
+      type: equilibrium_phase_composition
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1813
+        section: 4.2. Solubility of CaS in Slags
+        note: Printed prose summary; the CaO–CaF2 binary result is attributed to Hawkins et al. [14] and appears
+          at x=1.0 in deferred Figure 7.
+      units: mol%
+      phase: l
+      regime: quench_equilibration
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: quoted_attributed
+        attribution: Hawkins et al. [14]
+        T_K: '1873'
+        value: '27'
+        approximate: true
+        value_as_published: about 27 mol% CaS
+        basis_as_published: mol% CaS dissolved in CaO–CaF2 binary slag
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1813
+            figure: '7'
+            note: Figure 7 caption gives 1873 K for the solubility lines, including x=1.0 binary data attributed
+              to Hawkins et al. [14].
+        composition:
+          state:
+            tag: unknown
+            reason: The prose gives a binary-system solubility summary, not an individual CaO/CaF2 composition.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1813
+            section: 4.2. Solubility of CaS in Slags
+        total_pressure_Pa: *id001
+        atmosphere:
+          state:
+            tag: unknown
+            reason: The cited Hawkins et al. conditions are not reproduced in this paper.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1813
+            section: 4.2. Solubility of CaS in Slags
+        fO2_control:
+          state:
+            tag: unknown
+            reason: The cited Hawkins et al. gas potential is not stated for the prose summary.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1813
+            section: 4.2. Solubility of CaS in Slags
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1813
+            section: 4.2. Solubility of CaS in Slags
+            note: The cited Hawkins et al. quench procedure and preservation status are not reproduced in this
+              paper.
+      assemblage_id: banya_2004_cao_caf2_binary_cas_solubility_hawkins
+      assemblage_as_printed: CaO–CaF2 binary liquid slag with dissolved CaS; prose value attributed to Hawkins
+        et al. [14].
+      phase_as_printed: CaO–CaF2 binary slag; CaS solubility
+    context:
+    - observation_id: banya_2004_table1_reference_reaction_gibbs_data
+      type: table_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1811
+        table: '1'
+        note: Thermodynamic data table, verified against the 600-dpi physical page render.
+      units: J/mol
+      values:
+        quantity: standard reaction Gibbs-energy equations
+        method_class: quoted_attributed
+        attribution: Knacke, Kubaschewski, and Hesselmann (1991), cited as reference [15]
+        units: J/mol
+        temperature_as_printed: T in K
+        rows_as_printed:
+        - substance: C(g)
+          reaction_as_printed: 2CO(g) = CO2(g) + C(g)
+          delta_G0_expression_as_printed: 555800 + 11.26 T
+        - substance: C2(g)
+          reaction_as_printed: 4CO(g) = 2CO2(g) + C2(g)
+          delta_G0_expression_as_printed: 509400 + 146.21 T
+        - substance: C3(g)
+          reaction_as_printed: 6CO(g) = 3CO2(g) + C3(g)
+          delta_G0_expression_as_printed: 311100 + 305.22 T
+        - substance: CO(g)
+          reaction_as_printed: not printed
+          delta_G0_expression_as_printed: not printed
+        - substance: CO2(g)
+          reaction_as_printed: not printed
+          delta_G0_expression_as_printed: not printed
+        - substance: CS(g)
+          reaction_as_printed: 2CO(g) + 1/2S2(g) = CO2(g) + CS(g)
+          delta_G0_expression_as_printed: 48600 + 81.80 T
+        - substance: CS2(g)
+          reaction_as_printed: 2CO(g) + S2(g) = CO2(g) + CS2(g)
+          delta_G0_expression_as_printed: -172900 + 161.74 T
+        - substance: COS(g)
+          reaction_as_printed: CO(g) + 1/2S2(g) = COS(g)
+          delta_G0_expression_as_printed: -86200 + 75.20 T
+        - substance: O(g)
+          reaction_as_printed: CO2(g) = CO(g) + O(g)
+          delta_G0_expression_as_printed: 533700 - 150.25 T
+        - substance: O2(g)
+          reaction_as_printed: 2CO2(g) = 2CO(g) + O2(g)
+          delta_G0_expression_as_printed: 557600 - 167.10 T
+        - substance: O3(g)
+          reaction_as_printed: 3CO2(g) = 3CO(g) + O3(g)
+          delta_G0_expression_as_printed: 982000 - 184.60 T
+        - substance: S(g)
+          reaction_as_printed: 1/2S2(g) = S(g)
+          delta_G0_expression_as_printed: 217400 - 60.92 T
+        - substance: S2(g)
+          reaction_as_printed: not printed
+          delta_G0_expression_as_printed: not printed
+        - substance: S3(g)
+          reaction_as_printed: 3/2S2(g) = S3(g)
+          delta_G0_expression_as_printed: -52100 + 71.04 T
+        - substance: S4(g)
+          reaction_as_printed: 2S2(g) = S4(g)
+          delta_G0_expression_as_printed: -101400 + 134.30 T
+        - substance: S5(g)
+          reaction_as_printed: 5/2S2(g) = S5(g)
+          delta_G0_expression_as_printed: -194100 + 239.91 T
+        - substance: S2O(g)
+          reaction_as_printed: CO2(g) + S2(g) = CO(g) + S2O(g)
+          delta_G0_expression_as_printed: 109750 - 19.87 T
+        - substance: SO(g)
+          reaction_as_printed: CO2(g) + 1/2S2(g) = CO(g) + SO(g)
+          delta_G0_expression_as_printed: 219700 - 90.33 T
+        - substance: SO2(g)
+          reaction_as_printed: 2CO2(g) + 1/2S2(g) = 2CO(g) + SO2(g)
+          delta_G0_expression_as_printed: 196550 - 94.98 T
+        - substance: SO3(g)
+          reaction_as_printed: 3CO2(g) + 1/2S2(g) = 3CO(g) + SO3(g)
+          delta_G0_expression_as_printed: 381200 - 89.17 T
+        schema_gap: 'Candidate delta_fG does not fit: these are standard reaction Gibbs-energy equations, not
+          formation Gibbs energies. They are reference inputs to the authors'' gas-potential calculation, not
+          measured slag values.'
+        blank_cells: The reaction and expression cells are blank for CO(g), CO2(g), and S2(g); no ditto values
+          were inferred.
+    - observation_id: banya_2004_table_a1_henrian_hydrogen_example
+      type: table_context
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1816
+        table: A1
+        note: Conceptual comparison of two Henrian standard-state cases; checked against the 600-dpi physical
+          page render.
+      units: as printed; qualitative equations only
+      values:
+        quantity: conceptual equilibrium-constant and activity-coefficient example for hydrogen in Fe and Fe–Ni
+          liquids
+        method_class: model_derived
+        species:
+        - H
+        phase: liquid iron and iron–nickel alloys; not a slag system
+        caption: Relationship of the equilibrium constant and the activity coefficient in Henrian standard
+          of multi-component solutions.
+        content_as_printed: Table contrasts infinitely dilute hydrogen in each multicomponent solvent (Case
+          I) with infinitely dilute hydrogen in liquid iron (Case II); no numeric measured slag values are
+          printed.
+        candidate_tokens:
+        - activity_coefficient
+        disposition: context-model; conceptual standard-state comparison, outside the CaO–Al2O3–CaF2 slag measurement
+          system.
+    - observation_id: banya_2004_figure_1_deferred
+      type: figure_record
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1811
+        figure: '1'
+        note: Fig. 1 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: experimental_apparatus_schematic
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaO
+        - Al2O3
+        - CaF2
+        - CaS
+        phase: gas–slag equilibration apparatus
+        temperature_as_printed: experiments at 1823–1923 K; no single plotted temperature
+        axes_as_printed:
+          x: not applicable; apparatus schematic
+          y: not applicable; apparatus schematic
+        caption: Schematic diagram of experimental apparatus.
+        series: []
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+        apparatus_labels_as_printed:
+        - Mo wire
+        - Al2O3 reaction tube
+        - Al2O3 refractories
+        - Pt crucible
+        - MgO crucible
+        - Pt/6%Rh–Pt/30%Rh thermocouple
+        - brass cap
+        - heating element
+        - Al foil
+    - observation_id: banya_2004_figure_2_deferred
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1812
+        figure: '2'
+        note: Fig. 2 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaO
+        - Al2O3
+        - CaF2
+        - CaS
+        phase: unsaturated liquid CaO–Al2O3–CaF2 slag
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          x: Time, hour
+          y: mass %
+        caption: Time for attainment to equilibrium in CaO–Al2O3–CaF2 slag unsaturated with CaS at 1873 K.
+        series:
+        - name: NAl2O3:NCaF2=50:50; CaO
+          marker_as_printed: open squares
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3:NCaF2=50:50; Al2O3
+          marker_as_printed: open upward triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3:NCaF2=50:50; CaF2
+          marker_as_printed: open diamonds
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3:NCaF2=50:50; CaS
+          marker_as_printed: open circles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3:NCaF2=25:75; CaO
+          marker_as_printed: open squares
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3:NCaF2=25:75; Al2O3
+          marker_as_printed: open upward triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3:NCaF2=25:75; CaF2
+          marker_as_printed: open diamonds
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3:NCaF2=25:75; CaS
+          marker_as_printed: open circles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+    - observation_id: banya_2004_figure_3_deferred
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1812
+        figure: '3'
+        note: Fig. 3 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaO
+        - Al2O3
+        - CaF2
+        - CaS
+        phase: schematic pseudoternary composition and CaS-saturation construction
+        temperature_as_printed: no numeric temperature axis; method diagram
+        axes_as_printed:
+          ternary: CaO, CaS, and (Al2O3)1-x·(CaF2)x
+        caption: Method of determination of sulphur solubility limit.
+        series:
+        - name: initial slag compositions 1–5
+          marker_as_printed: five numbered points
+          marker_count: 5
+          evidence_class: figure_only
+          attribution: present work
+        - name: unsaturated gas–slag equilibrium compositions A, B, C
+          marker_as_printed: three labeled points
+          marker_count: 3
+          evidence_class: figure_only
+          attribution: present work
+        - name: CaS-saturated compositions Dsat and Esat
+          marker_as_printed: two labeled points
+          marker_count: 2
+          evidence_class: figure_only
+          attribution: present work
+        - name: iso-gas-potential and extrapolation lines
+          marker_as_printed: schematic lines
+          marker_count: 0
+          evidence_class: figure_only
+          attribution: present work
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+    - observation_id: banya_2004_figure_4_deferred
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1812
+        figure: '4'
+        note: Fig. 4 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaO
+        - Al2O3
+        - CaS
+        phase: CaO–Al2O3 liquid slag with CaS solubility limit
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          ternary: N_CaO, N_Al2O3, N_CaS
+        caption: Sulphur solubility line in CaO–Al2O3 slag at 1873 K.
+        series:
+        - name: printed (PO2/PS2)^(1/2)=8.80×10^-3
+          marker_as_printed: square with diagonal fill
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=6.10×10^-3
+          marker_as_printed: filled square
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=4.55×10^-3
+          marker_as_printed: filled square variant
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=3.40×10^-3
+          marker_as_printed: open diamond
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=2.75×10^-3
+          marker_as_printed: open downward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=1.76×10^-3
+          marker_as_printed: filled upward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=1.61×10^-3
+          marker_as_printed: filled downward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=1.00×10^-3
+          marker_as_printed: open square
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=8.90×10^-4
+          marker_as_printed: filled diamond
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=6.70×10^-4
+          marker_as_printed: open upward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=5.60×10^-4
+          marker_as_printed: filled circle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=3.40×10^-4
+          marker_as_printed: open circle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+        gas_potential_as_printed: (PO2/PS2)^(1/2); plotted ratios are retained as printed and were calculated
+          by the authors from thermodynamic data, not recomputed.
+    - observation_id: banya_2004_figure_5_deferred
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1812
+        figure: '5'
+        note: Fig. 5 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaO
+        - Al2O3
+        - CaS
+        phase: CaO–Al2O3 liquid slag with CaS solubility limit
+        temperature_as_printed: 1823, 1873, and 1923 K; see prose discrepancy noted for Fig. 9 separately
+        axes_as_printed:
+          ternary: N_CaO, N_Al2O3, N_CaS
+        caption: Comparison of sulphur solubility in CaO–Al2O3 slag.
+        series:
+        - name: present work (1873 K)
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: Sharma & Richardson (1773 K)
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Sharma and Richardson [4]
+        - name: Kor & Richardson (1773 K)
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Kor and Richardson [3]
+        - name: Fujisawa et al.
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Fujisawa et al. [11]
+        - name: Ozturk & Turkdogan
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Ozturk and Turkdogan [8]
+        - name: Cameron et al. (1823 K)
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Cameron et al. [6]
+        - name: Takenouchi & Suzuki
+          marker_as_printed: open triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Takenouchi and Suzuki [12]
+        points: []
+        attribution: Present work with literature comparison series attributed in the legend.
+        digitisation: deferred to a figure pass
+    - observation_id: banya_2004_figure_6_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1813
+        figure: '6'
+        note: Fig. 6 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaO
+        - Al2O3
+        - CaF2
+        - CaS
+        phase: CaO–Al2O3–CaF2 liquid slag with CaS solubility limit
+        temperature_as_printed: 1873 K; NAl2O3:NCaF2=54:46
+        axes_as_printed:
+          ternary: N_CaO, N_(Al2O3)0.54(CaF2)0.46, N_CaS
+        caption: Sulphur solubility line in CaO–Al2O3–CaF2 slag at 1873 K (NAl2O3:NCaF2=54:46).
+        series:
+        - name: printed (PO2/PS2)^(1/2)=2.0×10^-2
+          marker_as_printed: open square with grid fill
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=3.8×10^-3
+          marker_as_printed: open diamond
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=8.9×10^-4
+          marker_as_printed: filled diamond
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=4.0×10^-4
+          marker_as_printed: square
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=3.1×10^-4
+          marker_as_printed: filled downward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=2.9×10^-4
+          marker_as_printed: open upward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed (PO2/PS2)^(1/2)=2.8×10^-4
+          marker_as_printed: open circle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+        gas_potential_as_printed: (PO2/PS2)^(1/2); plotted ratios are retained as printed and were calculated
+          by the authors from thermodynamic data, not recomputed.
+    - observation_id: banya_2004_figure_7_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1813
+        figure: '7'
+        note: Fig. 7 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaO
+        - Al2O3
+        - CaF2
+        - CaS
+        phase: CaO–Al2O3–CaF2 liquid slag with CaS solubility limit
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          ternary: N_CaO, N_CaS, and N_(Al2O3)1-x(CaF2)x
+        caption: Sulphur solubility lines in CaO–Al2O3–CaF2 slag at 1873 K.
+        series:
+        - name: x=0.16
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: x=0.23
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: x=0.37
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: x=0.46
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: x=1.0 CaO–CaF2 binary; evaluated from Hawkins et al. [14] observations
+          marker_as_printed: line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Hawkins et al. [14]
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+        x_definition_as_printed: x in CaO–CaS–[(1-x)Al2O3 + xCaF2] pseudoternary system
+    - observation_id: banya_2004_figure_8_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1813
+        figure: '8'
+        note: Fig. 8 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: sulphide_capacity
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaS
+        phase: CaO–Al2O3 liquid slag
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          x: log N_CaS
+          y: log C′s
+        caption: Molar sulphide capacity in CaO–Al2O3 slag at 1873 K.
+        series:
+        - name: NCaO/NAl2O3=2.7
+          marker_as_printed: open upward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=2.2
+          marker_as_printed: filled upward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=1.9
+          marker_as_printed: open square
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=1.7
+          marker_as_printed: filled square
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=1.4
+          marker_as_printed: open circle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=1.1
+          marker_as_printed: filled circle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+        schema_gap: No store token represents sulphide capacity C′s. Candidate activity or activity_coefficient
+          tokens describe different quantities; the figure is retained without points.
+    - observation_id: banya_2004_figure_9_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1813
+        figure: '9'
+        note: Fig. 9 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: sulphide_capacity
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaS
+        phase: CaO–Al2O3 liquid slag
+        temperature_as_printed: 'caption: 1823, 1873, 1923 K; discussion prose says 1823, 1873, 1973 K'
+        axes_as_printed:
+          x: N_CaO
+          y: log C′s
+        caption: Comparison of molar sulphide capacity in CaO–Al2O3 slag at 1823, 1873 and 1923 K.
+        series:
+        - name: present work, 1823 K
+          marker_as_printed: filled upward triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: present work, 1873 K
+          marker_as_printed: filled circles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: present work, 1923 K
+          marker_as_printed: filled squares
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: Sharma & Richardson (1773 K)
+          marker_as_printed: open downward triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Sharma and Richardson [4]
+        - name: Carter & MacFarlane (1773 K)
+          marker_as_printed: open upward triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Carter and MacFarlane [5]
+        - name: Fincham & Richardson (1923 K)
+          marker_as_printed: open circles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Fincham and Richardson [2]
+        - name: Kor & Richardson (1773 K)
+          marker_as_printed: filled downward triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Kor and Richardson [3]
+        - name: Cameron et al. (1823 K)
+          marker_as_printed: open squares
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Cameron et al. [6]
+        - name: Mieck & Fenzke (1873 K)
+          marker_as_printed: circled dot
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Mieck and Fenzke [9]
+        - name: Ozturk & Turkdogan (1923 K)
+          marker_as_printed: crosses
+          marker_count: not enumerated; figure values deferred
+          evidence_class: quoted_attributed
+          attribution: Ozturk and Turkdogan [8]
+        points: []
+        attribution: Present work with literature comparison series attributed in the legend.
+        digitisation: deferred to a figure pass
+        temperature_discrepancy: The caption prints 1923 K; the discussion paragraph on physical page 4 prints
+          1973 K for the third temperature. The figure was not digitised.
+    - observation_id: banya_2004_figure_10_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1814
+        figure: '10'
+        note: Fig. 10 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: sulphide_capacity
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaS
+        phase: CaO–Al2O3–CaF2 liquid slag
+        temperature_as_printed: 1873 K; NAl2O3:NCaF2=54:46
+        axes_as_printed:
+          x: log N_CaS
+          y: log C′s
+        caption: Molar sulphide capacity in CaO–Al2O3–CaF2 slag at 1873 K (NAl2O3:NCaF2=54:46).
+        series:
+        - name: NCaO/NAl2O3=3.9
+          marker_as_printed: filled upward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=3.4
+          marker_as_printed: open upward triangle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=2.7
+          marker_as_printed: filled square
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=2.2
+          marker_as_printed: open square
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=1.8
+          marker_as_printed: filled circle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NCaO/NAl2O3=1.4
+          marker_as_printed: open circle
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+        schema_gap: No store token represents sulphide capacity C′s. Candidate activity or activity_coefficient
+          tokens describe different quantities; the figure is retained without points.
+    - observation_id: banya_2004_figure_11_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1814
+        figure: '11'
+        note: Fig. 11 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: sulphide_capacity
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaS
+        phase: dilute CaS in CaO–Al2O3–CaF2 liquid slag
+        temperature_as_printed: 1873 K; NCaS<0.024
+        axes_as_printed:
+          x: N_CaO
+          y: log C′s
+        caption: Sulphide capacity in the dilute solution of sulphur in CaO–Al2O3–CaF2 slag at 1873 K (NCaS<0.024).
+        series:
+        - name: NAl2O3/NCaF2=28/72
+          marker_as_printed: open squares
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3/NCaF2=54/46
+          marker_as_printed: open upward triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3/NCaF2=77/23
+          marker_as_printed: open circles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: NAl2O3/NCaF2=100/0
+          marker_as_printed: open downward triangles
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+        schema_gap: No store token represents sulphide capacity Cs. The printed dilute-solution condition is
+          retained; no plotted values are read.
+    - observation_id: banya_2004_figure_12_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1814
+        figure: '12'
+        note: Fig. 12 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: sulphide_capacity
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaS
+        phase: CaO–Al2O3–CaF2 liquid slag
+        temperature_as_printed: as plotted; figure caption gives no single temperature
+        axes_as_printed:
+          ternary: N_CaO, N_Al2O3, N_CaF2
+        caption: Iso-sulphide capacity lines in CaO–Al2O3–CaF2 slag.
+        series:
+        - name: printed contour -log Cs=1.5
+          marker_as_printed: iso-value line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed contour -log Cs=1.75
+          marker_as_printed: iso-value line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed contour -log Cs=2
+          marker_as_printed: iso-value line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed contour -log Cs=2.25
+          marker_as_printed: iso-value line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed contour -log Cs=2.5
+          marker_as_printed: iso-value line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed contour -log Cs=2.75
+          marker_as_printed: iso-value line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed contour -log Cs=3
+          marker_as_printed: iso-value line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        - name: printed contour -log Cs=3.25
+          marker_as_printed: iso-value line
+          marker_count: not enumerated; figure values deferred
+          evidence_class: figure_only
+          attribution: present work
+        points: []
+        attribution: Present work; compared with Kor and Richardson [13] as stated in the discussion.
+        digitisation: deferred to a figure pass
+        schema_gap: No store token represents sulphide capacity Cs. Contour labels are recorded as figure metadata;
+          no values are digitised.
+    - observation_id: banya_2004_figure_13_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1814
+        figure: '13'
+        note: Fig. 13 caption and 600-dpi render
+      panel: whole_figure
+      units: as printed on axes
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        admission_status: figure_only
+        species:
+        - CaS
+        phase: CaS-saturated CaO–Al2O3–CaF2 liquid slag
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          ternary: N_CaO, N_Al2O3, N_CaF2
+        caption: Iso-activity coefficient curves of CaS in CaO–Al2O3–CaF2 slag saturated with CaS at 1873 K.
+        series:
+        - name: printed gamma_CaS=11
+          marker_as_printed: iso-value line
+          marker_count: 0
+          evidence_class: model_derived
+          attribution: present work
+        - name: printed gamma_CaS=20
+          marker_as_printed: iso-value line
+          marker_count: 0
+          evidence_class: model_derived
+          attribution: present work
+        - name: printed gamma_CaS=30
+          marker_as_printed: iso-value line
+          marker_count: 0
+          evidence_class: model_derived
+          attribution: present work
+        - name: printed gamma_CaS=50
+          marker_as_printed: iso-value line
+          marker_count: 0
+          evidence_class: model_derived
+          attribution: present work
+        - name: printed gamma_CaS=80
+          marker_as_printed: iso-value line
+          marker_count: 0
+          evidence_class: model_derived
+          attribution: present work
+        points: []
+        attribution: present work
+        digitisation: deferred to a figure pass
+        standard_state_as_printed: Pure solid CaS; the paper states activity of CaS in slag saturated with
+          solid CaS is unity for this standard state.
+        model_basis_as_printed: The activity coefficient in CaS-saturated slag is the reciprocal of the CaS
+          mole fraction.

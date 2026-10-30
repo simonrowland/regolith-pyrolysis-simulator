@@ -1,0 +1,5156 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lee-bruckner-1984-cr-mn-glass-redox.yaml
+observations:
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr3_total::points:row=sodium-borate-70-b2o3,-30-na2o:h=6637574bd51d
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.6411'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '64.11'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr3_total::points:row=sodium-borate-80-b2o3,-20-na2o:h=ab6961842dac
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.778'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '77.8'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr3_total::points:row=sodium-borate-90-b2o3,-10-na2o:h=2ff6435ed294
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.8655'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '86.55'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr3_total::points:row=sodium-silicate-70-sio2,-30-na2o:h=a29775db50ae
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.682'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '68.2'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr3_total::points:row=sodium-silicate-73-sio2,-16-na2o,-11-cao:h=cd230ff29177
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '80'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr3_total::points:row=sodium-silicate-75-sio2,-25-na2o:h=7504cf569a94
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.794'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '79.4'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr3_total::points:row=sodium-silicate-80-sio2,-20-na2o:h=c0204e648667
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.846'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '84.6'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr6_total::points:row=sodium-borate-70-b2o3,-30-na2o:h=a2083628d66b
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.3589'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them to each glass row.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Base glass composition and dopant are printed on different amount bases; complete melt composition is not
+          reported.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '35.89'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr6_total::points:row=sodium-borate-80-b2o3,-20-na2o:h=606dbcf977ac
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.222'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them to each glass row.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Base glass composition and dopant are printed on different amount bases; complete melt composition is not
+          reported.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '22.2'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr6_total::points:row=sodium-borate-90-b2o3,-10-na2o:h=73d63ece1389
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.1345'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them to each glass row.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Base glass composition and dopant are printed on different amount bases; complete melt composition is not
+          reported.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '13.45'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr6_total::points:row=sodium-silicate-70-sio2,-30-na2o:h=949be6700330
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.318'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them to each glass row.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Base glass composition and dopant are printed on different amount bases; complete melt composition is not
+          reported.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr6_total::points:row=sodium-silicate-73-sio2,-16-na2o,-11-cao:h=e65ca3385e88
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them to each glass row.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Base glass composition and dopant are printed on different amount bases; complete melt composition is not
+          reported.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '20'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr6_total::points:row=sodium-silicate-75-sio2,-25-na2o:h=6e72796b0585
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.206'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them to each glass row.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Base glass composition and dopant are printed on different amount bases; complete melt composition is not
+          reported.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '20.6'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_cr6_total::points:row=sodium-silicate-80-sio2,-20-na2o:h=78a5ec5b1d32
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.154'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them to each glass row.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Base glass composition and dopant are printed on different amount bases; complete melt composition is not
+          reported.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '15.4'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_glass_density::points:row=70-b2o3,-30-na2o:h=d955bc3fa145
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2335'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.335'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_glass_density::points:row=70-sio2,-30-na2o:h=d6d8a089f9f9
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2470'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.47'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_glass_density::points:row=73-sio2,-16-na2o,-11-cao:h=0a3d73789d19
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2495'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.495'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_glass_density::points:row=75-sio2,-25-na2o:h=d74df6a6e3b8
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2416'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.416'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_glass_density::points:row=80-b2o3,-20-na2o:h=4d5e715b3c9e
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2184'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.184'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_glass_density::points:row=80-sio2,-20-na2o:h=43c860e5327b
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2388'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.388'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table1_glass_density::points:row=90-b2o3,-10-na2o:h=d42d12def553
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_chromium_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2046'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '1'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '1'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.046'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '1'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_glass_density::points:row=70-b2o3,-30-na2o:h=e2d495130710
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2299'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.299'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_glass_density::points:row=70-sio2,-30-na2o:h=b8ea690379c1
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2481'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.481'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_glass_density::points:row=73-sio2,-16-na2o,-11-cao:h=41fdcc5b8bb1
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2508'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.508'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_glass_density::points:row=75-sio2,-25-na2o:h=2770af0dcfa0
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2437'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.437'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_glass_density::points:row=80-b2o3,-20-na2o:h=254626a83484
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2189'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.189'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_glass_density::points:row=80-sio2,-20-na2o:h=664112594223
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2398'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.398'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_glass_density::points:row=90-b2o3,-10-na2o:h=090572d6fd37
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '2042'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Density measurement temperature is not reported.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: Complete melt composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  derivation:
+    relation: g_per_cm3_to_kg_per_m3
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.042'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: kg_per_m3
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_mn3_total::points:row=sodium-borate-70-b2o3,-30-na2o:h=9cdb0a825f5e
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '20'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_mn3_total::points:row=sodium-borate-80-b2o3,-20-na2o:h=0412f0820184
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.1325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '13.25'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_mn3_total::points:row=sodium-borate-90-b2o3,-10-na2o:h=59bec586be17
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.045'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '4.5'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_mn3_total::points:row=sodium-silicate-70-sio2,-30-na2o:h=f9830a0b877d
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.073'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.3'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_mn3_total::points:row=sodium-silicate-73-sio2,-16-na2o,-11-cao:h=7ad86b96ca80
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.0791'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.91'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_mn3_total::points:row=sodium-silicate-75-sio2,-25-na2o:h=148c8d7f25dd
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.0588'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '5.88'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: dimensionless
+    references: []
+- observation_id: lee-bruckner-1984-cr-mn-glass-redox::lee_bruckner_1984_table2_mn3_total::points:row=sodium-silicate-80-sio2,-20-na2o:h=68f1ffcc525a
+  experiment_id: f7b288af23358206dba8c31fcb7d44c97c25c4b0e9b4c56e0c8f248f8d5c3216::experiment::lee_bruckner_1984_manganese_glasses
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.0567'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam25-1020
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 8
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: lee-bruckner-1984-cr-mn-glass-redox
+  locator:
+    page: 2
+    published_page: 8
+    pdf_page_index: 1
+    table: '2'
+  read_from: pdf:lee-bruckner-1984-cr-mn-glass-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: Temperature assignment is not stated per composition.
+      locator:
+        page: 1
+        pdf_page_index: 0
+    composition:
+      state:
+        tag: unknown
+        reason: Complete composition is not reported on a single amount basis.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+    atmosphere_as_printed:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Herstellung der Gläser
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:lee-bruckner-1984-cr-mn-glass-redox
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '5.67'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 2
+          published_page: 8
+          pdf_page_index: 1
+          table: '2'
+    output_unit: dimensionless
+    references: []

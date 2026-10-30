@@ -186,20 +186,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -233,6 +222,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1586.4:h=d7dddfc9ba1e
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -246,87 +240,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -352,6 +271,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1598.0:h=2cd4bd7cfe96
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -408,20 +328,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -455,6 +364,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1598.0:h=2cd4bd7cfe96
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -468,87 +382,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -574,6 +413,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1608.6:h=b9dae2d4d4f2
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -630,20 +470,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -677,6 +506,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1608.6:h=b9dae2d4d4f2
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -690,87 +524,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -796,6 +555,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1619.2:h=d2f65843657e
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -852,20 +612,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -899,6 +648,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1619.2:h=d2f65843657e
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -912,87 +666,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1018,6 +697,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1630.8:h=32f9208ca45e
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -1074,20 +754,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1121,6 +790,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1630.8:h=32f9208ca45e
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1134,87 +808,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1240,6 +839,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1642.5:h=3d5e1b4780de
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -1296,20 +896,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1343,6 +932,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1642.5:h=3d5e1b4780de
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1356,87 +950,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1462,6 +981,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1653.0:h=917fb8de71ee
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -1518,20 +1038,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1565,6 +1074,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1653.0:h=917fb8de71ee
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1578,87 +1092,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1684,6 +1123,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1664.7:h=8dd7cd739c2c
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -1740,20 +1180,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1787,6 +1216,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1664.7:h=8dd7cd739c2c
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1800,87 +1234,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1906,6 +1265,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1674.2:h=937c91dd605a
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -1962,20 +1322,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2009,6 +1358,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1674.2:h=937c91dd605a
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2022,87 +1376,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -2128,6 +1407,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1684.8:h=56d20ce145ed
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -2184,20 +1464,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2231,6 +1500,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1684.8:h=56d20ce145ed
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2244,87 +1518,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -2350,6 +1549,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1695.4:h=eec90a0eba81
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -2406,20 +1606,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2453,6 +1642,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1695.4:h=eec90a0eba81
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2466,87 +1660,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -2572,6 +1691,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_preferred_1700k
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -2909,6 +2029,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -2923,6 +2044,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1598.0:h=a0f8bc743299
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -3143,6 +2265,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -3157,6 +2280,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1608.6:h=4d774e99b200
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -3377,6 +2501,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -3391,6 +2516,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1619.2:h=bb36d26c395d
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -3611,6 +2737,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -3625,6 +2752,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1630.8:h=0dd44bd3924f
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -3845,6 +2973,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -3859,6 +2988,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1642.5:h=a7d9e8f42c25
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -4079,6 +3209,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -4093,6 +3224,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1653.0:h=f91b11e0be3f
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -4313,6 +3445,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -4327,6 +3460,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1664.7:h=09f0d5798510
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -4547,6 +3681,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -4561,6 +3696,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1674.2:h=5cfeaa4b4b75
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -4781,6 +3917,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -4795,6 +3932,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1684.8:h=eaa0b8e35155
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -5015,6 +4153,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -5029,6 +4168,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::T=1695.4:h=e284791235d3
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -5249,6 +4389,7 @@ observations:
               table: S1
               note: supplement 1_low polytherm
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -5263,6 +4404,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1740.8:h=79f0fb5c476e
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -5483,6 +4625,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -5497,6 +4640,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1740.8:h=850c5d329a98
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -5717,6 +4861,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -5731,6 +4876,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1740.8:h=8ae9e5abd419
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -5951,6 +5097,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -5965,6 +5112,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1740.8:h=8f6b7e56a704
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -6185,6 +5333,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -6199,6 +5348,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1740.8:h=a71bea117d6b
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -6419,6 +5569,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -6433,6 +5584,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1740.8:h=aff0e81dbabe
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -6653,6 +5805,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -6667,6 +5820,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1740.8:h=b3f3fcfc5033
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -6887,6 +6041,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -6901,6 +6056,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1740.8:h=c81f72062c88
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -7121,6 +6277,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -7135,6 +6292,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1741.9:h=13fb31825ed6
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -7355,6 +6513,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -7369,6 +6528,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1741.9:h=2a63e51ea6db
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -7589,6 +6749,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -7603,6 +6764,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1741.9:h=2dcd79cbcdaa
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -7823,6 +6985,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -7837,6 +7000,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1741.9:h=57f1776d2d68
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -8057,6 +7221,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -8071,6 +7236,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1741.9:h=c92edf76be06
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -8291,6 +7457,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -8305,6 +7472,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1741.9:h=e10de91477fd
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -8525,6 +7693,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -8539,6 +7708,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1743.0:h=d17f6ee06f1b
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -8759,6 +7929,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -8773,6 +7944,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::T=1743.0:h=e054e46caaec
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -8993,6 +8165,7 @@ observations:
               table: S2
               note: supplement 1_low isotherm ~1742 K
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -9007,6 +8180,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1425.6:h=3962c72fc71c
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -9216,6 +8390,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -9229,6 +8404,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1437.2:h=8364fd6d382a
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -9438,6 +8614,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -9451,6 +8628,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1449.9:h=d01661a90e26
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -9660,6 +8838,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -9673,6 +8852,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1461.6:h=c9ebcf2f7257
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -9882,6 +9062,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -9895,6 +9076,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1474.2:h=f773287a64f2
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -10104,6 +9286,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -10117,6 +9300,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1486.9:h=bb9f1854a504
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -10326,6 +9510,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -10339,6 +9524,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1498.6:h=2b42738cccbc
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -10548,6 +9734,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -10561,6 +9748,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1511.3:h=8f69922e7597
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -10770,6 +9958,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -10783,6 +9972,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1522.9:h=7d95b0eb7aa9
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -10992,6 +10182,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -11005,6 +10196,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1535.6:h=5458194dfbeb
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -11214,6 +10406,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -11227,6 +10420,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1548.3:h=53c0295c2f6c
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -11436,6 +10630,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -11449,6 +10644,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1557.8:h=baba0dcd97f6
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -11658,6 +10854,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -11671,6 +10868,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1571.6:h=3a9fa86dcf25
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -11880,6 +11078,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -11893,6 +11092,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1588.5:h=e7618c9ae408
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -12102,6 +11302,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -12115,6 +11316,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1601.2:h=2e789879b181
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -12324,6 +11526,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -12337,6 +11540,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1613.9:h=f5bb363a843e
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -12546,6 +11750,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -12559,6 +11764,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1626.6:h=a8eacc1f2a81
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -12768,6 +11974,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -12781,6 +11988,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1638.2:h=177015cf0afd
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -12990,6 +12198,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -13003,6 +12212,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1650.9:h=1a2f4bde77cb
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -13212,6 +12422,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -13225,6 +12436,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1662.6:h=e01cceed0e17
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -13434,6 +12646,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -13447,6 +12660,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1674.2:h=970bfeb013a8
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -13656,6 +12870,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -13669,6 +12884,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1685.8:h=4f96c16e2297
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -13878,6 +13094,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -13891,6 +13108,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1699.6:h=f18c2c68f7ad
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -14100,6 +13318,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -14113,6 +13332,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1712.3:h=fb347e860a09
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -14322,6 +13542,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -14335,6 +13556,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1719.7:h=e3c47441badd
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -14544,6 +13766,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -14557,6 +13780,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::T=1733.4:h=7b3afde891ac
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -14766,6 +13990,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -14779,6 +14004,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1538.8:h=c12feb926380
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -14988,6 +14214,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -15001,6 +14228,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1547.2:h=f1749bf4ea99
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -15210,6 +14438,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -15223,6 +14452,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1555.7:h=91eafad3e47e
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -15432,6 +14662,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -15445,6 +14676,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1564.2:h=bcf94e7bc7f8
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -15654,6 +14886,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -15667,6 +14900,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1577.9:h=013bdd0379e9
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -15876,6 +15110,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -15889,6 +15124,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1587.4:h=749e9d0c464d
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -16098,6 +15334,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -16111,6 +15348,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1598.0:h=37dfd99a65cf
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -16320,6 +15558,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -16333,6 +15572,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1609.7:h=0ed9e09cd994
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -16542,6 +15782,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -16555,6 +15796,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1618.1:h=34190d9dcfb2
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -16764,6 +16006,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -16777,6 +16020,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::T=1631.9:h=02acab798ed5
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -16986,6 +16230,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -16999,6 +16244,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in2o3_henrian_log10_gamma_model
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -17183,20 +16429,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -17230,6 +16465,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1586.4:h=af73d739d4d6
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -17243,87 +16483,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -17349,6 +16514,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1598.0:h=973db73de518
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -17405,20 +16571,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -17452,6 +16607,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1598.0:h=973db73de518
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -17465,87 +16625,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -17571,6 +16656,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1608.6:h=a13ef9d20f4d
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -17627,20 +16713,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -17674,6 +16749,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1608.6:h=a13ef9d20f4d
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -17687,87 +16767,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -17793,6 +16798,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1619.2:h=b19156e2f0a1
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -17849,20 +16855,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -17896,6 +16891,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1619.2:h=b19156e2f0a1
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -17909,87 +16909,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -18015,6 +16940,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1630.8:h=b900a3f72e6d
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -18071,20 +16997,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -18118,6 +17033,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1630.8:h=b900a3f72e6d
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -18131,87 +17051,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -18237,6 +17082,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1642.5:h=ebb53af38d3f
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -18293,20 +17139,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -18340,6 +17175,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1642.5:h=ebb53af38d3f
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -18353,87 +17193,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -18459,6 +17224,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1653.0:h=1c63f096aa50
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -18515,20 +17281,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -18562,6 +17317,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1653.0:h=1c63f096aa50
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -18575,87 +17335,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -18681,6 +17366,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1664.7:h=0d70bcdab058
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -18737,20 +17423,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -18784,6 +17459,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1664.7:h=0d70bcdab058
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -18797,87 +17477,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -18903,6 +17508,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1674.2:h=445ad36b93b3
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -18959,20 +17565,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -19006,6 +17601,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1674.2:h=445ad36b93b3
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -19019,87 +17619,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -19125,6 +17650,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1684.8:h=56d20ce145ed
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -19181,20 +17707,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -19228,6 +17743,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1684.8:h=56d20ce145ed
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -19241,87 +17761,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -19347,6 +17792,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1695.4:h=b02665d3b144
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
@@ -19403,20 +17849,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5027655818937908435137918246'
-        - - Al2O3
-          - '0.09028384043023104368530294097'
-        - - MgO
-          - '0.1547402922065900795099231116'
-        - - CaO
-          - '0.252210285469388033290982123'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -19450,6 +17885,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1695.4:h=b02665d3b144
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -19463,87 +17903,12 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         pdf_page_index: 2
         table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -19569,6 +17934,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_preferred_1674k
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -19899,12 +18265,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1598.0:h=46be3b3479b1
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -20121,12 +18489,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1608.6:h=b81d8330fad3
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -20343,12 +18713,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1619.2:h=e6a7b0118302
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -20565,12 +18937,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1630.8:h=e9e656327840
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -20787,12 +19161,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1642.5:h=97c9ec00c5d6
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -21009,12 +19385,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1653.0:h=e8a8307751ab
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -21231,12 +19609,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1664.7:h=f33fc9588576
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -21453,12 +19833,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1674.2:h=2b5c5d2e7a84
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -21675,12 +20057,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1684.8:h=72fec352ba66
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -21897,12 +20281,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1695.4:h=21bbc9c6520f
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -22119,12 +20505,14 @@ observations:
               pdf_page_index: 2
               table: S1
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=43c9d588d217
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -22341,12 +20729,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=6b5ff10eb0c7
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -22563,12 +20953,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=89d335eff5de
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -22785,12 +21177,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=8fd1715f19f2
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -23007,12 +21401,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=97ca0eec4899
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -23229,12 +21625,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=9ab6424fa419
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -23451,12 +21849,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=ae5ab21a1005
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -23673,12 +22073,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=d8fc00a02994
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -23895,12 +22297,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=1a771e04dba2
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -24117,12 +22521,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=b4a746293070
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -24339,12 +22745,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=b54d269bd421
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -24561,12 +22969,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=b6e2974671a1
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -24783,12 +23193,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=c3b2ff2857d2
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -25005,12 +23417,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=f3b3cd700cbb
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -25227,12 +23641,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1743.0:h=34d4aa9bfea9
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -25449,12 +23865,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1743.0:h=98d76812e957
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -25671,12 +24089,14 @@ observations:
               pdf_page_index: 3
               table: S2
         output_unit: mole_fraction
+        references: []
   derivation:
     relation: as_published
     inputs:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1401.3:h=8c6581a6007e
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -25886,6 +24306,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -25899,6 +24320,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1413.9:h=be9bffca3aae
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -26108,6 +24530,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -26121,6 +24544,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1425.6:h=cd37a7a6fec1
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -26330,6 +24754,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -26343,6 +24768,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1437.2:h=9cf24bd07371
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -26552,6 +24978,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -26565,6 +24992,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1449.9:h=90b1a4da2b79
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -26774,6 +25202,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -26787,6 +25216,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1461.6:h=d78ca2c4d54a
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -26996,6 +25426,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -27009,6 +25440,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1474.2:h=ef45680dadce
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -27218,6 +25650,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -27231,6 +25664,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1486.9:h=7f9325ecd98d
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -27440,6 +25874,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -27453,6 +25888,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1498.6:h=91998d05f7e5
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -27662,6 +26098,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -27675,6 +26112,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1511.3:h=f6e39d8b0459
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -27884,6 +26322,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -27897,6 +26336,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1522.9:h=76d01fbf9549
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -28106,6 +26546,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -28119,6 +26560,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1535.6:h=d88a85f76538
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -28328,6 +26770,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -28341,6 +26784,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1548.3:h=75312f4e3363
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -28550,6 +26994,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -28563,6 +27008,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1557.8:h=0f1ff54c7054
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -28772,6 +27218,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -28785,6 +27232,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1571.6:h=3daae74e7b69
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -28994,6 +27442,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -29007,6 +27456,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1588.5:h=3cddf393f0e4
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -29216,6 +27666,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -29229,6 +27680,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1601.2:h=6a761ea8c073
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -29438,6 +27890,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -29451,6 +27904,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1613.9:h=5017c92f3010
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -29660,6 +28114,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -29673,6 +28128,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1626.6:h=d7bf5a9b015c
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -29882,6 +28338,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -29895,6 +28352,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1638.2:h=cca7cebe26b3
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -30104,6 +28562,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -30117,6 +28576,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1650.9:h=80882932e033
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -30326,6 +28786,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -30339,6 +28800,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1662.6:h=6952fe1a7cd1
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -30548,6 +29010,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -30561,6 +29024,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1674.2:h=dee692bc6093
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -30770,6 +29234,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -30783,6 +29248,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1685.8:h=3c68d548acc1
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -30992,6 +29458,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -31005,6 +29472,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1699.6:h=c0703ee3d3d4
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -31214,6 +29682,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -31227,6 +29696,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1712.3:h=20a148634671
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -31436,6 +29906,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -31449,6 +29920,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1719.7:h=0b2efbf2280c
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -31658,6 +30130,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -31671,6 +30144,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::T=1733.4:h=c0a6d16b17be
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-2-low
   identity:
@@ -31880,6 +30354,7 @@ observations:
               pdf_page_index: 5
               table: S3-cont
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -31893,6 +30368,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1538.8:h=3c4e8d2ee9fd
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -32102,6 +30578,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -32115,6 +30592,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1547.2:h=403303bbc4d3
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -32324,6 +30802,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -32337,6 +30816,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1555.7:h=f120aa850133
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -32546,6 +31026,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -32559,6 +31040,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1564.2:h=2f218028fe99
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -32768,6 +31250,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -32781,6 +31264,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1577.9:h=6b2e44f9e04e
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -32990,6 +31474,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -33003,6 +31488,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1587.4:h=9e2f7db544d1
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -33212,6 +31698,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -33225,6 +31712,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1598.0:h=e1f71ee62541
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -33434,6 +31922,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -33447,6 +31936,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1609.7:h=23bd5729dcbc
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -33656,6 +32146,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -33669,6 +32160,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1618.1:h=d8735ecd2df6
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -33878,6 +32370,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -33891,6 +32384,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::T=1631.9:h=4036c7226380
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-3-high
   identity:
@@ -34100,6 +32594,7 @@ observations:
               pdf_page_index: 6
               table: S4-gamma
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -34113,6 +32608,7 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+    references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_kems_geometry_and_calibration
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -34274,6 +32770,7 @@ observations:
               section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
               note: apparatus §2.2.1 AM pp. 4-5; Table 2 weights AM p. 6; calibration eqs. 2-3 AM p. 8
         output_unit: mole_fraction
+        references: []
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=6c804341a8cf
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:

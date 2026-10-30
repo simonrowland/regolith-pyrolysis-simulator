@@ -1,0 +1,270 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/matsumaru-1999-plasma-arc-silicate-evaporation.yaml
+observations:
+- observation_id: matsumaru-1999-plasma-arc-silicate-evaporation::matsumaru_1999_text_fe2_fraction_450s
+  experiment_id: 10.2320/jinstmet1952.63.1_21::matsumaru-1999-plasma-arc-silicate-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4047611991952702772385045482'
+        - - CaO
+          - '0.4336763224004390730413441654'
+        - - Al2O3
+          - '0.1192587718977959582519787072'
+        - - Fe2O3
+          - '0.04230370650649469146817257921'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.75'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - valence_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsumaru-1999-plasma-arc-silicate-evaporation::matsumaru_1999_text_fe2_fraction_450s
+  source_id: matsumaru-1999-plasma-arc-silicate-evaporation
+  locator:
+    page: 3
+    published_page: 23
+    pdf_page_index: 2
+    figure: '3'
+    section: Results
+    note: The prose gives 75 mol% at 450 s; no plotted figure values were digitized.
+  read_from: pdf:matsumaru-1999-plasma-arc-silicate-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The source gives a radial surface-temperature profile, not one temperature for the 450 s valence measurement.
+      locator:
+        page: 4
+        published_page: 24
+        pdf_page_index: 3
+        figure: '6'
+    oxygen_partial_pressure:
+      state:
+        tag: unknown
+        reason: The source plots a changing Fe-Glass oxygen partial pressure in Figure 4 but gives no numeric value at 450
+          s; figure reads are deferred.
+      locator:
+        page: 3
+        published_page: 23
+        pdf_page_index: 2
+        figure: '4'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4047611991952702772385045482'
+          - - CaO
+            - '0.4336763224004390730413441654'
+          - - Al2O3
+            - '0.1192587718977959582519787072'
+          - - Fe2O3
+            - '0.04230370650649469146817257921'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 22
+        pdf_page_index: 1
+        section: Experimental method
+        note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900 s.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '36'
+            locator:
+              page: 2
+              published_page: 22
+              pdf_page_index: 1
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900
+                s.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              published_page: 22
+              pdf_page_index: 1
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900
+                s.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '36'
+            locator:
+              page: 2
+              published_page: 22
+              pdf_page_index: 1
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900
+                s.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              published_page: 22
+              pdf_page_index: 1
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900
+                s.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '18'
+            locator:
+              page: 2
+              published_page: 22
+              pdf_page_index: 1
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900
+                s.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              published_page: 22
+              pdf_page_index: 1
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900
+                s.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 2
+              published_page: 22
+              pdf_page_index: 1
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900
+                s.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 2
+              published_page: 22
+              pdf_page_index: 1
+              section: Experimental method
+              note: The paper reports the Fe-Glass composition and says both melt compositions stayed constant through 900
+                s.
+        output_unit: mole_fraction
+        references: []
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 2
+        published_page: 22
+        pdf_page_index: 1
+        section: Experimental method
+        note: No quench or cooling procedure for the Mössbauer analysis is stated.
+    time_s:
+      state:
+        tag: value
+        value: '450'
+      locator:
+        page: 3
+        published_page: 23
+        pdf_page_index: 2
+        section: Results
+        note: The text states that 450 s had elapsed during plasma melting.

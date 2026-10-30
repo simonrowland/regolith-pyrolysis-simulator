@@ -1,0 +1,276 @@
+schema_version: literature_extract.v1
+source_id: dong-2009-cr-v-slag-activities
+source:
+  citation: >-
+    Dong, P., Seetharaman, S. and Wang, X. (2009), “Thermodynamic Activity of Chromium,
+    Vanadium Oxide in CaO-SiO2-MgO-Al2O3 Slags,” MOLTEN 2009, Santiago, Chile, pp. 328–337.
+  year: 2009
+  corpus_asset: raw/dong-2009-cr-v-slag-activities/dong-2009-cr-v-slag-activities.pdf
+extraction:
+  method: >-
+    Born-digital pdftotext-layout.txt was read as the primary source; the PDF title page and
+    figure captions were checked against the physical pages. There are no numbered data tables.
+    Measured activity results are plotted in Figures 5–7 and estimated/experimental slag
+    contents in Figure 8; all figure data are deferred without digitisation. Figure 3's measured
+    equilibration-time series and Figure 4's Pt cross-section analysis are likewise deferred.
+    The alloy activity-coefficient curves in Figures 5(b) and 6(b) use the cited Pretorius
+    relationships and are model-derived. No plotted values were estimated.
+  date: '2026-10-20'
+  worker: fam37-1021
+review_status: draft
+species:
+  Cr:
+    observations: []
+    context:
+      - observation_id: dong_2009_experimental_conditions
+        type: experiment_series
+        locator: {page: 1, pdf_page_index: 0, section: Abstract and Experimental Procedure}
+        units: as printed
+        values:
+          method_class: method_only
+          quantity: gas-slag equilibrium experimental conditions
+          measured_quantities: chromium-oxide and vanadium-oxide activities in multicomponent slag
+          temperature_K: [1803, 1823, 1873, 1923]
+          oxygen_partial_pressure_Pa: ['10^-3', '10^-4', '10^-5']
+          gas_mixture: CO, CO2, and Ar
+          equilibration_duration_h: 20
+          tested_equilibration_times_h: [6, 8, 12, 15, 20]
+          gas_flow_rate_ml_min: 200
+          temperature_stabilization_h: at least 1
+          initial_mixture_mass_g: approximately 1.5–2
+          slag_crucibles: four platinum crucibles
+          quench: rapid withdrawal to the cold end under argon
+          note: >-
+            Abstract and procedure values are experimental conditions, not independent
+            numeric observations. No measured data table is printed. The cited Figures 3 and 4
+            are referenced in the text but their plots are absent from the supplied PDF pages.
+      - observation_id: dong_2009_equations_5_6_standard_reaction_free_energies
+        type: thermodynamic_equations
+        locator: {page: 3, pdf_page_index: 2}
+        units: (J)
+        values:
+          method_class: quoted_attributed
+          quantity_as_printed: standard reaction free-energy expressions for reactions (1) and (2)
+          reactions:
+            - reaction_number: '1'
+              equation_number: '5'
+              reaction_as_printed: 'Cr(Pt)(s) + 1/2 O2(g) = CrO(l)'
+              delta_G0_as_printed: '−334218 + 63.81 T'
+            - reaction_number: '2'
+              equation_number: '6'
+              reaction_as_printed: 'V(Pt)(s) + 3/4 O2(g) = VO1.5(s)'
+              delta_G0_as_printed: '−600405 + 112.97 T'
+          note: >-
+            Expressions are retained as printed context; no value is evaluated at a
+            selected temperature and no species formation free energy is emitted.
+      - observation_id: dong_2009_fig3_equilibration_time
+        type: figure
+        locator: {page: 5, pdf_page_index: 4, figure: '3', section: Results — Equilibrium Time}
+        units: chromium content in Pt versus soaking time; as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: concentration_series
+          quantity_as_printed: chromium content in Pt crucible versus soaking time
+          species: Cr in Pt alloy
+          phase: solid alloy
+          temperature_as_printed: not stated for this equilibration-time series
+          x_axis_as_printed: soaking time (6, 8, 12, 15, 20 h)
+          y_axis_as_printed: chromium content in Pt crucible
+          caption_as_printed: >-
+            Figure 3 plots the relationship between chromium content in the Pt crucible and
+            soaking time; the text reports the tested times as 6, 8, 12, 15, and 20 h.
+          panel: single
+          series: [{name: measured chromium content, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: dong_2009_fig4_pt_cross_section
+        type: figure
+        locator: {page: 5, pdf_page_index: 4, figure: '4', section: Results — Equilibrium Time}
+        units: chromium concentration as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: concentration_series
+          quantity_as_printed: chromium concentration across a Pt crucible cross-section
+          species: Cr in Pt alloy
+          phase: solid alloy
+          temperature_as_printed: 1803–1923 K experimental range
+          x_axis_as_printed: position across crucible cross-section
+          y_axis_as_printed: chromium concentration
+          caption_as_printed: >-
+            Figure 4 reports the SEM-EDS line analysis across the cross-section of a platinum
+            crucible equilibrated with chromium- or vanadium-bearing slag for 20 h.
+          panel: single
+          series: [{name: SEM-EDS line analysis, marker: line, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: dong_2009_fig5a_cr_activity
+        type: figure
+        locator: {page: 6, pdf_page_index: 5, figure: '5', panel: a}
+        units: dimensionless activity, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: activity
+          quantity_as_printed: activity of chromium in Cr-Pt alloy
+          species: Cr
+          phase: solid alloy
+          temperature_as_printed: 1803, 1873, and 1923 K
+          oxygen_partial_pressure_as_printed: 10^-3, 10^-4, and 10^-5 Pa
+          standard_state: pure solid Cr
+          x_axis_as_printed: chromium content in Cr-Pt alloy
+          y_axis_as_printed: activity of chromium
+          caption_as_printed: >-
+            Figure 5(a), activity of chromium as a function of chromium content in Cr-Pt alloy;
+            oxygen partial pressures 10^-3, 10^-4, and 10^-5 Pa; temperatures 1803, 1873, and
+            1923 K; pure solid Cr standard state.
+          series: [{name: temperature and oxygen-pressure series, marker: curve, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: dong_2009_fig5b_cr_log_activity_coefficient
+        type: figure
+        locator: {page: 6, pdf_page_index: 5, figure: '5', panel: b}
+        units: log10 activity coefficient, as plotted
+        values:
+          method_class: model_derived
+          typed_quantity: activity_coefficient
+          quantity_as_printed: log10 activity coefficient of chromium in Cr-Pt alloy
+          species: Cr
+          phase: solid alloy
+          standard_state: pure solid Cr
+          x_axis_as_printed: chromium content in Cr-Pt alloy
+          y_axis_as_printed: log10 activity coefficient of chromium
+          caption_as_printed: >-
+            Figure 5(b), logarithm of the chromium activity coefficient as a function of
+            chromium content in Cr-Pt alloy. The activity coefficient relationship is attributed
+            in the text to Pretorius et al. [8].
+          attribution: Pretorius et al. [8], as cited by Dong et al.
+          printed_model_expression: 'log10 gamma_Cr = -4.42 + 11.39 X_Cr - 7.35 X_Cr^2'
+          printed_coefficients: [-4.42, 11.39, -7.35]
+          series: [{name: log10 activity coefficient, marker: curve, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: dong_2009_fig8a_slag_cr
+        type: figure
+        locator: {page: 8, pdf_page_index: 7, figure: '8', panel: a}
+        units: chromium mass percent in slag; as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: concentration_series
+          quantity_as_printed: estimated and experimental chromium content in slag
+          species: Cr in slag
+          phase: liquid slag at experimental temperature; quenched for chemical analysis
+          temperature_as_printed: experimental range 1803–1923 K
+          x_axis_as_printed: chromium content in slag, experimental versus estimated
+          y_axis_as_printed: chromium content in slag, experimental versus estimated
+          caption_as_printed: 'Figure 8(a): estimated and experimental content of chromium in slag.'
+          printed_model_expression: 'log10(%Cr)_slag = 1.31 + 12481/T + 0.84 log10(a_Cr) + 1.59 log10(PO2) - 6.77 log10(B)'
+          printed_coefficients: [1.31, 12481, 0.84, 1.59, -6.77]
+          series: [{name: estimated, marker: curve, marker_count: 0}, {name: experimental, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: dong_2009_fig8b_slag_v
+        type: figure
+        locator: {page: 8, pdf_page_index: 7, figure: '8', panel: b}
+        units: vanadium mass percent in slag; as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: concentration_series
+          quantity_as_printed: estimated and experimental vanadium content in slag
+          species: V in slag
+          phase: liquid slag at experimental temperature; quenched for chemical analysis
+          temperature_as_printed: experimental range 1803–1923 K
+          x_axis_as_printed: vanadium content in slag, experimental versus estimated
+          y_axis_as_printed: vanadium content in slag, experimental versus estimated
+          caption_as_printed: 'Figure 8(b): estimated and experimental content of vanadium in slag.'
+          printed_model_expression: 'log10(%V)_slag = -5.61 + 11825/T + 0.28 log10(a_V) + 0.46 log10(PO2) - 2.45 log10(B)'
+          printed_coefficients: [-5.61, 11825, 0.28, 0.46, -2.45]
+          series: [{name: estimated, marker: curve, marker_count: 0}, {name: experimental, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+  V:
+    observations: []
+    context:
+      - observation_id: dong_2009_fig6a_v_activity
+        type: figure
+        locator: {page: 6, pdf_page_index: 5, figure: '6', panel: a}
+        units: dimensionless activity, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: activity
+          quantity_as_printed: activity of vanadium in V-Pt alloy
+          species: V
+          phase: solid alloy
+          temperature_as_printed: 1823, 1873, and 1923 K
+          oxygen_partial_pressure_as_printed: 10^-3, 10^-4, and 10^-5 Pa
+          standard_state: pure solid V
+          x_axis_as_printed: vanadium content in V-Pt alloy
+          y_axis_as_printed: activity of vanadium
+          caption_as_printed: >-
+            Figure 6(a), activity of vanadium as a function of vanadium content in V-Pt alloy;
+            oxygen partial pressures 10^-3, 10^-4, and 10^-5 Pa; temperatures 1823, 1873, and
+            1923 K; pure solid V standard state.
+          series: [{name: temperature and oxygen-pressure series, marker: curve, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: dong_2009_fig6b_v_log_activity_coefficient
+        type: figure
+        locator: {page: 6, pdf_page_index: 5, figure: '6', panel: b}
+        units: log10 activity coefficient, as plotted
+        values:
+          method_class: model_derived
+          typed_quantity: activity_coefficient
+          quantity_as_printed: log10 activity coefficient of vanadium in V-Pt alloy
+          species: V
+          phase: solid alloy
+          standard_state: pure solid V
+          x_axis_as_printed: vanadium content in V-Pt alloy
+          y_axis_as_printed: log10 activity coefficient of vanadium
+          caption_as_printed: >-
+            Figure 6(b), logarithm of the vanadium activity coefficient as a function of
+            vanadium content in V-Pt alloy. The activity coefficient relationship is attributed
+            in the text to Pretorius et al. [8].
+          attribution: Pretorius et al. [8], as cited by Dong et al.
+          printed_model_expression: 'log10 gamma_V = -6.72 + 17.66 X_V - 13.33 X_V^2'
+          printed_coefficients: [-6.72, 17.66, -13.33]
+          series: [{name: log10 activity coefficient, marker: curve, marker_count: 0}]
+          digitisation: deferred to a figure pass
+  CrO:
+    observations: []
+    context:
+      - observation_id: dong_2009_fig7a_cro_activity
+        type: figure
+        locator: {page: 7, pdf_page_index: 6, figure: '7', panel: a}
+        units: dimensionless activity, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: activity
+          quantity_as_printed: thermodynamic activity of CrO in slag
+          species: CrO
+          phase: liquid slag at experimental temperature; quenched for chemical analysis
+          temperature_as_printed: 1803, 1873, and 1923 K
+          oxygen_partial_pressure_as_printed: 10^-4 Pa
+          x_axis_as_printed: mole fraction of CrO in slag
+          y_axis_as_printed: activity of CrO
+          caption_as_printed: >-
+            Figure 7(a), thermodynamic activity of chromium (CrO) as a function of mole
+            fraction of CrO in slag at PO2=10^-4 Pa and 1803, 1873, and 1923 K.
+          standard_state: not stated for the slag activity in this figure
+          quench_provenance: samples equilibrated at high temperature were rapidly withdrawn to the cold end under argon
+          series: [{name: 1803,  marker: curve, marker_count: 0}, {name: 1873, marker: curve, marker_count: 0}, {name: 1923, marker: curve, marker_count: 0}]
+          digitisation: deferred to a figure pass
+  VO1.5:
+    observations: []
+    context:
+      - observation_id: dong_2009_fig7b_vo15_activity
+        type: figure
+        locator: {page: 7, pdf_page_index: 6, figure: '7', panel: b}
+        units: dimensionless activity, as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: activity
+          quantity_as_printed: thermodynamic activity of VO1.5 in slag
+          species: VO1.5
+          phase: liquid slag at experimental temperature; quenched for chemical analysis
+          temperature_as_printed: 1823, 1873, and 1923 K
+          oxygen_partial_pressure_as_printed: 10^-4 Pa
+          x_axis_as_printed: mole fraction of VO1.5 in slag
+          y_axis_as_printed: activity of VO1.5
+          caption_as_printed: >-
+            Figure 7(b), thermodynamic activity of vanadium oxide (VO1.5) as a function of
+            mole fraction of VO1.5 in slag at PO2=10^-4 Pa and 1823, 1873, and 1923 K.
+          standard_state: not stated for the slag activity in this figure
+          quench_provenance: samples equilibrated at high temperature were rapidly withdrawn to the cold end under argon
+          series: [{name: 1823, marker: curve, marker_count: 0}, {name: 1873, marker: curve, marker_count: 0}, {name: 1923, marker: curve, marker_count: 0}]
+          digitisation: deferred to a figure pass

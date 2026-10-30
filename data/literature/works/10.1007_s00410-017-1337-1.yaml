@@ -1,0 +1,817 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s00410-017-1337-1
+  citation: 'Borisov, A., Behrens, H. & Holtz, F. (2017). Effects of strong network modifiers on Fe3+/Fe2+ in silicate melts:
+    an experimental study. Contributions to Mineralogy and Petrology 172:34. DOI 10.1007/s00410-017-1337-1.'
+  source_ids:
+  - borisov-2017-network-modifiers-fe-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:borisov-2017-network-modifiers-fe-redox
+      role: pdf
+      path: raw/borisov-2017-network-modifiers-fe-redox/borisov-2017-network-modifiers-fe-redox.pdf
+      sha256:
+        tag: value
+        value: d72880c22de03bc40b9b4132f669778fa754570b394b47b5bbcbd6cb71094e05
+    - asset_id: pdftotext:borisov-2017-network-modifiers-fe-redox
+      role: pdftotext
+      path: text/borisov-2017-network-modifiers-fe-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:borisov-2017-network-modifiers-fe-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s00410-017-1337-1
+experiments:
+- experiment_id: 10.1007/s00410-017-1337-1::borisov-2017-network-modifiers-fe-redox
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-017-1337-1
+  locator:
+    page: 3
+    pdf_page_index: 2
+    section: Experimental procedure
+    note: PU-3 in-house reference ratio for the Ca-series analytical session.
+- experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_13
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experimental procedure
+        note: Experiments were conducted at one-atmosphere total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The paper states that all runs were made in air but does not state gas flow or a gas mixture ratio.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime is not stated.
+  work_id: 10.1007/s00410-017-1337-1
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Run group identified by the printed sample suffix -13.; row=43
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+- experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_14
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experimental procedure
+        note: Experiments were conducted at one-atmosphere total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The paper states that all runs were made in air but does not state gas flow or a gas mixture ratio.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime is not stated.
+  work_id: 10.1007/s00410-017-1337-1
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Run group identified by the printed sample suffix -14.; row=37
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+- experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_15
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experimental procedure
+        note: Experiments were conducted at one-atmosphere total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The paper states that all runs were made in air but does not state gas flow or a gas mixture ratio.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime is not stated.
+  work_id: 10.1007/s00410-017-1337-1
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Run group identified by the printed sample suffix -15.; row=49
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+- experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experimental procedure
+        note: Experiments were conducted at one-atmosphere total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The paper states that all runs were made in air but does not state gas flow or a gas mixture ratio.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime is not stated.
+  work_id: 10.1007/s00410-017-1337-1
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Run group identified by the printed sample suffix -3.; row=3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+- experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_4
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experimental procedure
+        note: Experiments were conducted at one-atmosphere total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The paper states that all runs were made in air but does not state gas flow or a gas mixture ratio.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime is not stated.
+  work_id: 10.1007/s00410-017-1337-1
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Run group identified by the printed sample suffix -4.; row=11
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+- experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_6
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experimental procedure
+        note: Experiments were conducted at one-atmosphere total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The paper states that all runs were made in air but does not state gas flow or a gas mixture ratio.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime is not stated.
+  work_id: 10.1007/s00410-017-1337-1
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Run group identified by the printed sample suffix -6.; row=1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+- experiment_id: 10.1007/s00410-017-1337-1::experiment::borisov_2017_table1_run_93
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experimental procedure
+        note: Experiments were conducted at one-atmosphere total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The paper states that all runs were made in air but does not state gas flow or a gas mixture ratio.
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime is not stated.
+  work_id: 10.1007/s00410-017-1337-1
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Run group identified by the printed sample suffix -93.; row=19
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+context:
+- observation_id: borisov_2017_figure_1_deferred
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '1'
+  panel: whole_figure
+  attribution: Borisov, Behrens & Holtz (2017), present study
+  units: as printed on the axes
+  values:
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1450, 1500 and 1550 °C
+    axes_as_printed:
+      x: CaO (wt.%)
+      y: Fe3+/Fe2+ (logarithmic scale)
+    caption_as_printed: Effect of CaO content on ferric/ferrous ratio in basic HAFC series. Note that Y scale is logarithmic.
+    series:
+    - name: HAFC series at 1450 °C
+      marker_count: 4
+    - name: HAFC series at 1500 °C
+      marker_count: 4
+    - name: HAFC series at 1550 °C
+      marker_count: 4
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were visually counted from the 600 dpi physical-page render; no data points were digitised.
+    quantity: valence_ratio
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_figure_1_deferred
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_figure_2_deferred
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '2'
+  panel: two panels
+  attribution: Borisov, Behrens & Holtz (2017), present study
+  units: wt.%
+  values:
+    identity:
+      species:
+      - Na2O
+      - K2O
+      phase: l
+      temperature_as_printed: 1500 °C
+    axes_as_printed:
+      x: Duration (h)
+      y_top: Na2O (wt.%)
+      y_bottom: K2O (wt.%)
+    caption_as_printed: Alkali contents in samples with different experimental durations at 1500 °C. The calculated initial
+      Na or K sample contents are shown at zero time. Errors are below the symbol size.
+    series:
+    - name: Na2O panel, DAF
+      marker_count: 4
+    - name: Na2O panel, DAFN8
+      marker_count: 4
+    - name: Na2O panel, DAFN15
+      marker_count: 4
+    - name: Na2O panel, DAFS
+      marker_count: 4
+    - name: Na2O panel, DAFSN7
+      marker_count: 4
+    - name: Na2O panel, DAFSN15
+      marker_count: 4
+    - name: Na2O panel, DAFA
+      marker_count: 4
+    - name: Na2O panel, DAFAN8
+      marker_count: 4
+    - name: Na2O panel, DAFAN16
+      marker_count: 4
+    - name: K2O panel, DAFS
+      marker_count: 4
+    - name: K2O panel, DAFSK12
+      marker_count: 4
+    - name: K2O panel, DAFSK25
+      marker_count: 4
+    - name: K2O panel, HAFS
+      marker_count: 4
+    - name: K2O panel, HAFSK13
+      marker_count: 4
+    - name: K2O panel, HAFSK26
+      marker_count: 4
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were visually counted from the 600 dpi physical-page render; no data points were digitised.
+    quantity: unavailable
+    quantity_as_printed: Na2O and K2O mass composition
+    schema_gap: No matching store quantity token exists; this figure remains unscored in context.
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_figure_2_deferred
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_figure_3_deferred
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    figure: '3'
+  panel: two panels
+  attribution: Borisov, Behrens & Holtz (2017), present study
+  units: as printed on the axes
+  values:
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1500 °C
+    axes_as_printed:
+      x: Me2O (wt.%)
+      y: Fe3+/Fe2+ (logarithmic scale)
+      panels:
+      - Na2O
+      - K2O
+    caption_as_printed: Effect Na or K on ferric/ferrous ratio in DAFSN or DAFSK samples (see compositions in Table 1). Big
+      loss indicates alkali loss higher than 26% from correspondent initial content. Small means moderate alkali loss below
+      26% from correspondent initial content. Note that Y scale is logarithmic.
+    series:
+    - name: Na2O panel, 2 h
+      marker_count: 3
+    - name: Na2O panel, 6 h
+      marker_count: 3
+    - name: K2O panel, 2 h
+      marker_count: 3
+    - name: K2O panel, 4 h
+      marker_count: 3
+    - name: K2O panel, 6 h
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were visually counted from the 600 dpi physical-page render; no data points were digitised.
+    quantity: valence_ratio
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_figure_3_deferred
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_figure_4_deferred
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    figure: '4'
+  panel: whole_figure
+  attribution: Borisov, Behrens & Holtz (2017), present study
+  units: as printed on the axes
+  values:
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1500 °C
+    axes_as_printed:
+      x: XNa2O
+      y: log(Fe3+/Fe2+)
+    caption_as_printed: Effect of Na2O on ferric/ferrous ratio in DAFN, DAFSN, and DAFAN melts (see compositions in Table
+      1).
+    series:
+    - name: DAFN
+      marker_count: 6
+    - name: DAFSN
+      marker_count: 6
+    - name: DAFAN
+      marker_count: 6
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were visually counted from the 600 dpi physical-page render; no data points were digitised.
+    quantity: valence_ratio
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_figure_4_deferred
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_figure_5_deferred
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    figure: '5'
+  panel: whole_figure
+  attribution: Borisov, Behrens & Holtz (2017), present study
+  units: as printed on the axes
+  values:
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1500 °C
+    axes_as_printed:
+      x: XK2O
+      y: log(Fe3+/Fe2+)
+    caption_as_printed: Effect of K2O on ferric/ferrous ratio in DAFSK and HAFSK melts (see compositions in Table 1). Solid
+      lines mark the boundary between peraluminous and metaluminous/peralkaline melts (see text for details).
+    series:
+    - name: DAFSK
+      marker_count: 9
+    - name: HAFSK
+      marker_count: 9
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were visually counted from the 600 dpi physical-page render; no data points were digitised.
+    quantity: valence_ratio
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_figure_5_deferred
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_figure_6_deferred
+  type: figure_record
+  locator:
+    page: 8
+    pdf_page_index: 7
+    figure: '6'
+  panel: two panels
+  attribution: Borisov, Behrens & Holtz (2017), present study
+  units: dimensionless standard residuals
+  values:
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1450–1550 °C
+    axes_as_printed:
+      panel_a_x: CaO/SiO2 (mol.)
+      panel_a_y: Standard residuals
+      panel_b_x: CaO/Al2O3 (mol.)
+      panel_b_y: Standard residuals
+    caption_as_printed: 'Comparison of experimental data for Ca-bearing samples with those obtained with Eq. (6): a standard
+      residuals versus SiO2/Al2O3 (mol.); b standard residuals versus CaO/Al2O3 (mol.). Dash line marks the boundary between
+      percalcic and peraluminous melts (see text for details).'
+    series:
+    - name: panel a, Ca-bearing samples
+      marker_count: 18
+    - name: panel b, Ca-bearing samples
+      marker_count: 18
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were visually counted from the 600 dpi physical-page render; no data points were digitised.
+    quantity: unavailable
+    quantity_as_printed: standard residual of log(XFeO1.5/XFeO)
+    schema_gap: No matching store quantity token exists; this figure remains unscored in context.
+  note: The printed caption's panel-a ratio differs from the panel-a x-axis label; both are preserved as printed.
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_figure_6_deferred
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_figure_7_deferred
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: '7'
+  panel: two panels
+  attribution: Dickenson and Hess (1981), data re-plotted and recalculated by Borisov, Behrens & Holtz (2017)
+  units: as printed on the axes
+  values:
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1400 °C, air
+    axes_as_printed:
+      x: K2O* = K2O/(K2O + Al2O3) (mol.)
+      panel_a_y: Fe2+/ΣFe
+      panel_b_y: Fe3+/Fe2+
+    caption_as_printed: 'Redox ratio versus K* = K2O/(K2O + Al2O3) (mol.) according to Dickenson and Hess (1981) data: a diagram
+      similar to that presented by the authors; b results if Fe2+/ΣFe values are recalculated to Fe3+/Fe2+.'
+    series:
+    - name: panel a, Dickenson and Hess (1981) data
+      marker_count: 16
+    - name: panel b, recalculated Dickenson and Hess (1981) data
+      marker_count: 16
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were visually counted from the 600 dpi physical-page render; no data points were digitised.
+    quantity: valence_ratio
+  note: The panels plot the same cited dataset; point markers overlap in both panels.
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_figure_7_deferred
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_figure_8_deferred
+  type: figure_record
+  locator:
+    page: 12
+    pdf_page_index: 11
+    figure: '8'
+  panel: whole_figure
+  attribution: Borisov et al. (2013, 2015) and Borisov, Behrens & Holtz (2017), present study
+  units: as printed on the axes
+  values:
+    identity:
+      species: Fe
+      phase: l
+      temperature_as_printed: 1400–1550 °C
+    axes_as_printed:
+      x: Experimental log(XFeO1.5/XFeO)
+      y: Calculated log(XFeO1.5/XFeO)
+    caption_as_printed: 'log(XFeO1.5/XFeO) values: a comparison of experimental results with values calculated according to
+      Eq. (22).'
+    series:
+    - name: Borisov et al. (2013, 2015)
+      marker_count: 97
+    - name: Ca-series
+      marker_count: 18
+    - name: Na-series
+      marker_count: 18
+    - name: K-series
+      marker_count: 18
+    digitisation: deferred to a figure pass
+    series_note: Marker counts were visually counted from the 600 dpi physical-page render; no data points were digitised.
+    quantity: valence_ratio
+  note: The paper states the combined dataset contains 151 experimental charges; model-prediction markers are unscored.
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_figure_8_deferred
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_table2_tangeman_empirical_coefficients_context
+  type: model_fit_context
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '2'
+  attribution: Tangeman et al. (2001) experiments; coefficients calculated by Borisov, Behrens & Holtz (2017)
+  units: empirical coefficients and fit statistics as printed
+  values:
+    method_class: model_derived
+    table_title_as_published: Empirical coefficients for log(XFeO1.5/XFeO) = dK2O·XK2O + h/T(K) + c calculated from Tangeman
+      et al. (2001) experiments with different initial compositions
+    equation_as_printed: log(XFeO1.5/XFeO) = dK2O·XK2O + h/T(K) + c
+    rows:
+    - initial_composition: KFS-A
+      Si/Fe_at: '4.0'
+      K2O_wt_pct: '43.8'
+      dK2O: '0.70'
+      dK2O_1sigma: '0.54'
+      h: '5478'
+      h_1sigma: '590'
+      c: −2.37
+      c_1sigma: '0.05'
+      R2: '0.98'
+      n: '11'
+    - initial_composition: KFS-C
+      Si/Fe_at: '3.8'
+      K2O_wt_pct: '31.1'
+      dK2O: −2.12
+      dK2O_1sigma: '1.11'
+      h: '6780'
+      h_1sigma: '1010'
+      c: −2.76
+      c_1sigma: '0.06'
+      R2: '0.94'
+      n: '13'
+    - initial_composition: KFS-E
+      Si/Fe_at: '4.0'
+      K2O_wt_pct: '15.6'
+      dK2O: '15.1'
+      dK2O_1sigma: '15.4'
+      h: '9113'
+      h_1sigma: '1539'
+      c: −5.71
+      c_1sigma: '0.14'
+      R2: '0.95'
+      n: '9'
+    note_as_published: Si/Fet is recalculated from Tangeman et al. (2001), Table 1; n is the number of experimental samples
+      in each group.
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_table2_tangeman_empirical_coefficients_context
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe
+- observation_id: borisov_2017_table3_multicomponent_model_coefficients_context
+  type: model_fit_context
+  locator:
+    page: 12
+    pdf_page_index: 11
+    table: '3'
+  attribution: Borisov, Behrens & Holtz (2017), regression over this study and cited Borisov et al. (2013, 2015) data
+  units: empirical model coefficients and fit statistics as printed
+  values:
+    method_class: model_derived
+    equation_as_printed: log(XFeO1.5/XFeO) = ΣdiXi + dSiAl·XSiO2·XAl2O3 + dSiMg·XSiO2·XMgO + h/T + c
+    temperature_as_printed: T in K
+    input_components_as_printed:
+    - SiO2
+    - TiO2
+    - Al2O3
+    - MgO
+    - Na2O
+    - K2O
+    - P2O5
+    coefficient_rows:
+    - coefficient: XSiO2
+      di: −0.458
+      1sigma: '0.075'
+    - coefficient: XTiO2
+      di: −1.273
+      1sigma: '0.049'
+    - coefficient: XAl2O3
+      di: '2.000'
+      1sigma: '0.318'
+    - coefficient: XMgO
+      di: '1.338'
+      1sigma: '0.196'
+    - coefficient: XNa2O
+      di: '1.482'
+      1sigma: '0.095'
+    - coefficient: XK2O
+      di: '3.058'
+      1sigma: '0.079'
+    - coefficient: XP2O5
+      di: −5.150
+      1sigma: '0.103'
+    - coefficient: XSiO2·XAl2O3
+      di: −7.752
+      1sigma: '0.631'
+    - coefficient: XSiO2·XMgO
+      di: −4.197
+      1sigma: '0.349'
+    - coefficient: h (at 1/T)
+      di: '5300.7'
+      1sigma: '123.9'
+    - coefficient: c (constant)
+      di: −2.26
+      1sigma: '0.09'
+    fit_data_as_printed: 151 experimental charges
+    excluded_components_as_printed: CaO and total iron oxide
+    R2: '0.987'
+    adjusted_R2: '0.986'
+    standard_error: '0.019'
+  context_id: borisov-2017-network-modifiers-fe-redox::context::borisov_2017_table3_multicomponent_model_coefficients_context
+  work_id: 10.1007/s00410-017-1337-1
+  source_id: borisov-2017-network-modifiers-fe-redox
+  species: Fe

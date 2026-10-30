@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: fd8aa9b68a1894e44bc3cd035b9b6dcb4fd82236
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:oneill-2002-feo-activity-coefficients-cmas
       role: pdf
@@ -49,7 +49,7 @@ experiments:
         tag: value
         value: '1673.15'
       locator:
-        page: 163
+        page: 13
         published_page: 163
         pdf_page_index: 12
         table: '7'
@@ -61,6 +61,7 @@ experiments:
         - original_unit=C
         parameters: []
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -79,7 +80,7 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/s0009-2541(01)00414-4
   locator:
-    page: 155
+    page: 5
     published_page: 155
     pdf_page_index: 4
     section: Sample equilibration
@@ -95,7 +96,7 @@ experiments:
           point: '0.00000002454708915685030356082721741'
           approximate: false
       locator:
-        page: 161
+        page: 11
         published_page: 161
         pdf_page_index: 10
         table: '4'
@@ -113,7 +114,7 @@ experiments:
               tag: value
               value: '0.0000000000002454708915685030356082721740674509764216'
             locator:
-              page: 161
+              page: 11
               published_page: 161
               pdf_page_index: 10
               table: '4'
@@ -123,9 +124,10 @@ experiments:
               tag: value
               value: '100000'
             locator:
-              page: 161
+              page: 11
               published_page: 161
               pdf_page_index: 10
               table: '4'
               note: log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit.
         output_unit: Pa
+        references: []

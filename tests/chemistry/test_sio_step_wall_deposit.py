@@ -245,11 +245,16 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     p_local_pa = 1.0
     alpha_s = 0.04
 
-    sio_psat_pa = _antoine_psat_pa("SiO", wall_T_K)
     # SiO now carries the melt standard-reaction term, which must not be
     # consumed as a pure-vapor wall saturation pressure. The authorized
     # disproportionation-product backstop supplies the P_sat ~= 0 limit.
+    with pytest.raises(WallSaturationPressureRefusal):
+        _antoine_psat_pa("SiO", wall_T_K)
+    sio_psat_pa, refused = condensation_module._try_antoine_psat_pa(
+        "SiO", wall_T_K
+    )
     assert sio_psat_pa is None
+    assert refused is True
 
     expected_hkl = alpha_s * _hkl_impingement_flux_mol_m2_s(
         "SiO",

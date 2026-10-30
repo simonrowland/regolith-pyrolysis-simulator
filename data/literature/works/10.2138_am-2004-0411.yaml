@@ -1,0 +1,942 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2138/am-2004-0411
+  citation: Borisov, A.; Lahaye, Y.; Palme, H. (2004). The effect of TiO2 on Pd, Ni, and Fe solubilities in silicate melts.
+    American Mineralogist 89, 564–571.
+  source_ids:
+  - borisov-2004-tio2-pd-ni-fe-solubilities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:borisov-2004-tio2-pd-ni-fe-solubilities
+      role: pdf
+      path: raw/borisov-2004-tio2-pd-ni-fe-solubilities/borisov-2004-tio2-pd-ni-fe-solubilities.pdf
+      sha256:
+        tag: value
+        value: f8e121a14daf9bbb8f3cbb7a0ce4f95f82a9ff3d522d59365b93650b666c3de3
+    - asset_id: pdftotext:borisov-2004-tio2-pd-ni-fe-solubilities
+      role: pdftotext
+      path: text/borisov-2004-tio2-pd-ni-fe-solubilities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:borisov-2004-tio2-pd-ni-fe-solubilities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2138/am-2004-0411
+experiments:
+- experiment_id: 10.2138/am-2004-0411::borisov-2004-tio2-pd-ni-fe-solubilities
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 3
+    published_page: 566
+    pdf_page_index: 2
+    section: Accuracy and reproducibility
+    note: The Pd content of MP3 was found to be 2.15 ± 0.17 ppm
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_DAT10_4
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=17 DAT10-4
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_DAT10_7
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=15 DAT10-7
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_DAT17_1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.7'
+          CaO: '19.12'
+          MgO: '8.75'
+          SiO2: '41.68'
+          TiO2: '16.77'
+          total: '99.01'
+      locator:
+        page: 2
+        published_page: 565
+        pdf_page_index: 1
+        table: '1'
+        note: row=19 DAT17-1; column=Pd_ICP
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=19 DAT17-1
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_DAT17_6
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=13 DAT17-6
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_DAT32_11
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '10.66'
+          CaO: '17.35'
+          MgO: '7.72'
+          SiO2: '36.7'
+          TiO2: '27.46'
+          total: '99.88'
+      locator:
+        page: 2
+        published_page: 565
+        pdf_page_index: 1
+        table: '1'
+        note: row=21 DAT32-11; column=Pd_ICP
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=21 DAT32-11
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_DAT32_12
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '10.9'
+          CaO: '17.99'
+          MgO: '6.78'
+          SiO2: '37.85'
+          TiO2: '26.57'
+          total: '100.1'
+      locator:
+        page: 2
+        published_page: 565
+        pdf_page_index: 1
+        table: '1'
+        note: row=24 DAT32-12; column=Pd_ICP
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=24 DAT32-12
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_DAT32_17
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '10.93'
+          CaO: '16.98'
+          MgO: '7.58'
+          SiO2: '36.87'
+          TiO2: '26.69'
+          total: '99.05'
+      locator:
+        page: 2
+        published_page: 565
+        pdf_page_index: 1
+        table: '1'
+        note: row=20 DAT32-17; column=Pd_ICP
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=20 DAT32-17
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_DAT32_5
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=22 DAT32-5
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_air
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=1 DA-20
+- experiment_id: 10.2138/am-2004-0411::experiment::t1_co2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '1'
+    note: row=7 DA-21
+- experiment_id: 10.2138/am-2004-0411::experiment::t2_Fe_loop
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '2'
+    note: row=7
+- experiment_id: 10.2138/am-2004-0411::experiment::t2_Ni_loop
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am-2004-0411
+  locator:
+    page: 2
+    published_page: 565
+    pdf_page_index: 1
+    table: '2'
+    note: row=1
+context:
+- observation_id: borisov2004_apparent_pd_valence
+  type: thermodynamic_example
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 566
+    section: Results and Discussion
+    note: Interpretation of the fitted log-solubility slope.
+  units: as printed
+  values:
+    quantity: unavailable
+    value_as_published: apparent Pd valence about +1.33
+    approximate: true
+    method_class: model_derived
+    context_reason: Interpretation inferred from a fitted slope; not a measured valence ratio.
+    candidate_tokens:
+    - valence_ratio
+    - equilibrium_phase_composition
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_apparent_pd_valence
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_figure1_pd_tio2_oxidizing
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 566
+    note: Figure 1 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Pd equilibrium-phase composition
+    species:
+    - Pd
+    phase: liquid silicate melt
+    temperature_as_printed: 1300 °C
+    axes_as_published:
+      x: TiO2 (wt%)
+      y: log Pd (ppm)
+    caption: Dependence of Pd solubility on TiO2 contents in silicate melts at oxidizing conditions and 1300 °C. The solubility
+      in air is about a factor of 6 higher than in CO2, but the shapes of both curves are identical. Results of microprobe
+      analyses are indicated with full symbols.
+    panel: whole_figure
+    series:
+    - name: LA-ICPMS, CO2
+      marker: open square
+      marker_count: 6
+    - name: LA-ICPMS, air
+      marker: open circle
+      marker_count: 6
+    - name: microprobe, air
+      marker: filled circle
+      marker_count: 6
+    numeric_points: none
+    attribution: Present-work measurements; the fitted lines are model-derived.
+    digitisation: deferred to a figure pass
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_figure1_pd_tio2_oxidizing
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_figure2_pd_tio2_reducing
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 567
+    note: Figure 2 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Pd equilibrium-phase composition
+    species:
+    - Pd
+    phase: liquid silicate melt
+    temperature_as_printed: 1298–1301 °C across Table 1 rows 13–24
+    axes_as_published:
+      x: −log fO2
+      y: Pd (ppm)
+    caption: Dependence of Pd solubility on TiO2 contents in silicate melts at reducing conditions. Comparison with earlier
+      data (Borisov et al. 1994, dashed line) and isopleths of Pd solubility in melts with different TiO2 contents (solid
+      lines) are also shown (see text for details).
+    panel: whole_figure
+    series:
+    - name: DAT32
+      marker: downward triangle
+      marker_count: 7
+    - name: DAT17
+      marker: open circle
+      marker_count: 3
+    - name: DAT10
+      marker: upward triangle
+      marker_count: 2
+    - name: Borisov et al. (1994) An-Di
+      marker: dashed line
+      marker_count: 0
+    - name: calculated isopleths at 26.7, 17.0, 9.6, and 4.0 wt% TiO2
+      marker: solid line
+      marker_count: 0
+    numeric_points: none
+    attribution: Present-work data, quoted earlier comparison, and calculated model isopleths are distinguished in the caption.
+    digitisation: deferred to a figure pass
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_figure2_pd_tio2_reducing
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_figure3_nio_feo_activity_coefficients
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 568
+    note: Figure 3 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: activity_coefficient
+    species:
+    - NiO
+    - FeO
+    phase: liquid silicate melt
+    temperature_as_printed: 1301 °C (Table 2)
+    axes_as_published:
+      x: XTiO2
+      y: log γMeO
+    caption: Dependence of NiO and FeO activity coefficients on TiO2 contents in silicate melts. The behavior of NiO is similar
+      to that of Pd (Fig. 1), but at low TiO2 concentrations different from FeO.
+    panel: whole_figure
+    series:
+    - name: NiO
+      marker: open circle
+      marker_count: 6
+    - name: FeO
+      marker: open square
+      marker_count: 6
+    numeric_points: none
+    attribution: Present-work calculated activity coefficients using the stated liquid-oxide standards.
+    digitisation: deferred to a figure pass
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_figure3_nio_feo_activity_coefficients
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: NiO
+- observation_id: borisov2004_fit_feo_eq5
+  type: thermodynamic_example
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 568
+    section: Results and Discussion
+    note: Equation 5; fitted present-work relation.
+  units: as printed
+  values:
+    quantity: fitted_relation
+    method_class: model_derived
+    equation_as_published: log FeO (wt%) = 0.009 TiO2 (wt%) + 0.897
+    R_squared_as_published: '0.998'
+    fitted_data_as_published: Fe-loop Table 2 rows 7–12
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    context_reason: Regression coefficients and fitted relations are model-derived, not measured point values.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_fit_feo_eq5
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: FeO
+- observation_id: borisov2004_fit_gamma_feo_eq6
+  type: thermodynamic_example
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 568
+    section: Results and Discussion
+    note: Equation 6; fitted present-work relation.
+  units: as printed
+  values:
+    quantity: fitted_relation
+    method_class: model_derived
+    equation_as_published: log γFeO = −1.258 XTiO2 + 0.176
+    R_squared_as_published: '0.998'
+    fitted_data_as_published: Fe-loop Table 2
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    context_reason: Regression coefficients and fitted relations are model-derived, not measured point values.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_fit_gamma_feo_eq6
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: FeO
+- observation_id: borisov2004_fit_gamma_nio_eq4
+  type: thermodynamic_example
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 568
+    section: Results and Discussion
+    note: Equation 4; fitted present-work relation.
+  units: as printed
+  values:
+    quantity: fitted_relation
+    method_class: model_derived
+    equation_as_published: log γNiO = −1.427 XTiO2 + 0.538
+    R_squared_as_published: '1.000'
+    fitted_data_as_published: Ni-loop Table 2
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    context_reason: Regression coefficients and fitted relations are model-derived, not measured point values.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_fit_gamma_nio_eq4
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: NiO
+- observation_id: borisov2004_fit_nio_eq3
+  type: thermodynamic_example
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 568
+    section: Results and Discussion
+    note: Equation 3; fitted present-work relation.
+  units: as printed
+  values:
+    quantity: fitted_relation
+    method_class: model_derived
+    equation_as_published: log NiO (wt%) = 0.010 TiO2 (wt%) + 0.165
+    R_squared_as_published: '0.998'
+    fitted_data_as_published: Titanium-rich Ni-loop Table 2 rows 3–6
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    context_reason: Regression coefficients and fitted relations are model-derived, not measured point values.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_fit_nio_eq3
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: NiO
+- observation_id: borisov2004_fit_pd_eq1a
+  type: thermodynamic_example
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 566
+    section: Results and Discussion
+    note: Equation 1a; fitted present-work relation.
+  units: as printed
+  values:
+    quantity: fitted_relation
+    method_class: model_derived
+    equation_as_published: log Pd (ppm) = 0.34 log fO2 + 0.019 TiO2 (wt%) + 2.585
+    R_squared_as_published: '0.995'
+    fitted_data_as_published: DAT5 to DAT32; Table 1 Nos. 3–6 and 9–12
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    context_reason: Regression coefficients and fitted relations are model-derived, not measured point values.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_fit_pd_eq1a
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_fit_pd_eq1b
+  type: thermodynamic_example
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 566
+    section: Results and Discussion
+    note: Equation 1b; fitted present-work relation.
+  units: as printed
+  values:
+    quantity: fitted_relation
+    method_class: model_derived
+    equation_as_published: log Pd (ppm) = 0.34 log fO2 + 0.017 TiO2 (wt%) + 2.611
+    R_squared_as_published: '0.995'
+    fitted_data_as_published: All oxidizing Table 1 data, Nos. 1–12
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    context_reason: Regression coefficients and fitted relations are model-derived, not measured point values.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_fit_pd_eq1b
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_fit_pd_eq2
+  type: thermodynamic_example
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 567
+    section: Results and Discussion
+    note: Equation 2; fitted present-work relation.
+  units: as printed
+  values:
+    quantity: fitted_relation
+    method_class: model_derived
+    equation_as_published: log Pd (ppm) = 0.20 log fO2 + 0.016 TiO2 (wt%) + 1.954
+    R_squared_as_published: '0.912'
+    fitted_data_as_published: Reducing Table 1 data, Nos. 13–24
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    context_reason: Regression coefficients and fitted relations are model-derived, not measured point values.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_fit_pd_eq2
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_quoted_1994_pd_air
+  type: quoted_value
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 566
+    section: Results and Discussion
+    note: Quoted comparison; not a present-work equilibrium measurement.
+  units: as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: quoted_attributed
+    attribution_as_printed: Borisov et al. (1994)
+    value_as_published: 214 ppm Pd in air
+    context_reason: Quoted from the cited work, not newly measured in this paper.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_quoted_1994_pd_air
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_quoted_1994_pd_co2
+  type: quoted_value
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 566
+    section: Results and Discussion
+    note: Quoted comparison; not a present-work equilibrium measurement.
+  units: as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: quoted_attributed
+    attribution_as_printed: Borisov et al. (1994)
+    value_as_published: 32.9 ppm Pd in pure CO2
+    context_reason: Quoted from the cited work, not newly measured in this paper.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_quoted_1994_pd_co2
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_quoted_mp3_expected
+  type: quoted_value
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 566
+    section: Results and Discussion
+    note: Quoted comparison; not a present-work equilibrium measurement.
+  units: as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: quoted_attributed
+    attribution_as_printed: Borisov et al. (1994)
+    value_as_published: 2.2 ppm Pd expected in MP3
+    context_reason: Quoted from the cited work, not newly measured in this paper.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_quoted_mp3_expected
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_quoted_nist612_tabulated
+  type: quoted_value
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 566
+    section: Results and Discussion
+    note: Quoted comparison; not a present-work equilibrium measurement.
+  units: as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: quoted_attributed
+    attribution_as_printed: Sylvester and Eggins (1997)
+    value_as_published: 1.09 ± 0.09 ppm Pd tabulated for NIST SRM 612
+    context_reason: Quoted from the cited work, not newly measured in this paper.
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_quoted_nist612_tabulated
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd
+- observation_id: borisov2004_rutile_melt_pd_partition
+  type: partition_coefficient_report
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 569
+    section: Results and Discussion
+    note: Partition coefficient between rutile and silicate melt.
+  units: as printed
+  values:
+    quantity: unavailable
+    quantity_as_published: solid/liquid partition coefficient D(Pd)
+    value_as_published: D = 0.07 ± 0.02
+    uncertainty_as_published: ±0.02 (1σ)
+    conditions_as_published: DAT32-20, 1301 °C, air
+    method_as_published: EMP average of 3 analyses of 3 different isometric 30 × 30 μm rutile crystals
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    schema_gap: No quantity token represents a solid/liquid partition coefficient; it is not an activity coefficient or a
+      phase composition.
+    method_class: measured_reduced
+  context_id: borisov-2004-tio2-pd-ni-fe-solubilities::context::borisov2004_rutile_melt_pd_partition
+  work_id: 10.2138/am-2004-0411
+  source_id: borisov-2004-tio2-pd-ni-fe-solubilities
+  species: Pd

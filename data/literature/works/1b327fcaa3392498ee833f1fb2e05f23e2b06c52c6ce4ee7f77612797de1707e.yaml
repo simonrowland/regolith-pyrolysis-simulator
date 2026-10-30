@@ -1,0 +1,165 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e
+  citation: Shornikov, S. I., O. I. Yakovlev, and V. S. Minaev (2022), “Thermodynamic properties of the Na2O–Al2O3 melts,”
+    Experiment in Geosciences 28(1), 69–71.
+  source_ids:
+  - shornikov-2022-na2o-al2o3-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:shornikov-2022-na2o-al2o3-melts
+      role: pdf
+      path: raw/shornikov-2022-na2o-al2o3-melts/shornikov-2022-na2o-al2o3-melts.pdf
+      sha256:
+        tag: value
+        value: 873bc986f91fa54d9562471b4afac09b5f391f5de9e86499e767fb777baf2103
+    - asset_id: pdftotext:shornikov-2022-na2o-al2o3-melts
+      role: pdftotext
+      path: text/shornikov-2022-na2o-al2o3-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2022-na2o-al2o3-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e::experiment::shornikov-2022-na2o-al2o3-model
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Semi-empirical model cited to Shornikov (2019). Activities and mixing energies are calculated, not tabulated.'
+      is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e
+  locator:
+    page: 4
+    published_page: 70
+    pdf_page_index: 3
+    section: Discussion
+- experiment_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e::shornikov-2022-na2o-al2o3-melts
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: Introduction
+    note: 'Cited melting temperature of NaAlO2: Matignon (1923).'
+context:
+- observation_id: na2o_2022_activity_reference_unstated
+  type: activity_reference_unstated
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 70
+    section: Discussion
+  units: as reported
+  values:
+    standard_state: 'Published page 70: oxide activities and mixing energies in the Na2O–Al2O3 melts were calculated in the
+      present study from accepted standard Gibbs energies of formation of the simple oxides and the sodium aluminates in the
+      crystalline and liquid state. The paper does not state whether a(Na2O) and a(Al2O3) are referred to the pure solid oxide
+      or the pure liquid oxide.'
+    expected_migration_phase: unknown
+    pNa_ratio_as_printed: pNa over Na2O exceeds pNa over NaAlO2 by 10^3 (Fig. 4). A ratio of curves, not a partial pressure.
+    reason_not_scored: Fig. 2 and Fig. 3 activities are curves. No discrete present-study marker was read.
+  context_id: shornikov-2022-na2o-al2o3-melts::context::na2o_2022_activity_reference_unstated
+  work_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e
+  source_id: shornikov-2022-na2o-al2o3-melts
+  species: Na2O
+- observation_id: na2o_2022_mixing_minimum_1450
+  type: mixing_energy_minimum
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 70
+    section: Discussion
+  units: kJ/mol
+  values:
+    value_as_printed: -77 kJ/mol
+    T_K: '1450'
+    composition_as_printed: compositions close to the NaAlO2 compound
+    method_class: model_derived
+    standard_state: 'Published page 70: oxide activities and mixing energies in the Na2O–Al2O3 melts were calculated in the
+      present study from accepted standard Gibbs energies of formation of the simple oxides and the sodium aluminates in the
+      crystalline and liquid state. The paper does not state whether a(Na2O) and a(Al2O3) are referred to the pure solid oxide
+      or the pure liquid oxide.'
+    reason_not_scored: No mixing-energy quantity. The composition is not a numeric mole fraction. Parents are not printed.
+  context_id: shornikov-2022-na2o-al2o3-melts::context::na2o_2022_mixing_minimum_1450
+  work_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e
+  source_id: shornikov-2022-na2o-al2o3-melts
+  species: Na2O
+- observation_id: na2o_2022_mixing_minimum_2300
+  type: mixing_energy_minimum
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 70
+    section: Discussion
+  units: kJ/mol
+  values:
+    value_as_printed: -60 kJ/mol
+    T_K: '2300'
+    composition_as_printed: the melt
+    method_class: model_derived
+    standard_state: 'Published page 70: oxide activities and mixing energies in the Na2O–Al2O3 melts were calculated in the
+      present study from accepted standard Gibbs energies of formation of the simple oxides and the sodium aluminates in the
+      crystalline and liquid state. The paper does not state whether a(Na2O) and a(Al2O3) are referred to the pure solid oxide
+      or the pure liquid oxide.'
+    reason_not_scored: No mixing-energy quantity. Parents are not printed.
+  context_id: shornikov-2022-na2o-al2o3-melts::context::na2o_2022_mixing_minimum_2300
+  work_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e
+  source_id: shornikov-2022-na2o-al2o3-melts
+  species: Na2O
