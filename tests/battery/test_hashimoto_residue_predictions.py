@@ -690,7 +690,8 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     activity_compositions: list[tuple[tuple[str, float], ...]] = []
     original_evaluate = openimcc_bridge.evaluate
 
-    def track_activities(*, composition_mol, **kwargs):
+    def track_activities(*, composition_mol, engine_name, **kwargs):
+        assert engine_name == "openimcc"
         activity_compositions.append(tuple(sorted(composition_mol.items())))
         return original_evaluate(composition_mol=composition_mol, **kwargs)
 

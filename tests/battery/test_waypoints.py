@@ -7,7 +7,14 @@ import pytest
 
 from simulator.battery.migrate import wt_pct_to_mole_fraction
 
-from simulator.battery.enums import AmountBasis, BenchIdentityBasis, FO2Channel, MethodToken, ValueKind
+from simulator.battery.enums import (
+    IMCC_ENGINE_ORDER,
+    AmountBasis,
+    BenchIdentityBasis,
+    FO2Channel,
+    MethodToken,
+    ValueKind,
+)
 from simulator.battery.records import (
     ApparatusGeometry,
     Bench,
@@ -735,7 +742,7 @@ def test_multicomponent_engine_charge_is_not_structural_failure() -> None:
         "vaporock",
         "magemin",
         "cached-real",
-        "openimcc",
+        *(engine.value for engine in IMCC_ENGINE_ORDER),
     ]
     assert all(item.status is ReadinessStatus.READY for item in engines)
 

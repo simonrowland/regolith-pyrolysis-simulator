@@ -113,7 +113,8 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     original_melt_evaluate = openimcc_bridge.evaluate
     original_gas_evaluate = openimcc.evaluate_gas
 
-    def capture_melt_evaluate(**kwargs):
+    def capture_melt_evaluate(*, engine_name, **kwargs):
+        assert engine_name == "openimcc"
         evaluated_compositions.append(dict(kwargs["composition_mol"]))
         return original_melt_evaluate(**kwargs)
 
