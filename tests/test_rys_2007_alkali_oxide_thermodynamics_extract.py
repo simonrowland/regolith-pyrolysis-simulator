@@ -122,8 +122,9 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
                 collect_locators(item)
 
     collect_locators(document)
-    # Typing Tables 7 and 9 adds 158 locators and 73 observations.
-    assert len(locators) == 2226
+    # Typing Tables 7 and 9 adds 158 locators and 73 observations; the KEMS
+    # apparatus and experiment registry add three locators.
+    assert len(locators) == 2229
     assert all(
         locator["page"] == locator["pdf_page_index"] + 1
         and "published_page" in locator
