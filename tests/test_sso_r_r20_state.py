@@ -3256,8 +3256,11 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
     # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
     # finite-series-resistance escape fraction moved with D_AB.
+    # d-316 / b-1081: the native-Fe pond now uses its own pure-Fe alpha 0.9
+    # (McCabe via Pound 1972, flagged for liquid Fe) instead of the melt row's
+    # inadmissible 0.02; regenerated on studio-3, two passes identical.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        0.0024554127683492034,
         rel=0.0,
         abs=1.0e-15,
     )
