@@ -140,6 +140,7 @@ from simulator.battery.records import (
     State,
     Uncertainty,
     Value,
+    oxygen_efflux_derived_pressure_Pa,
     Work,
     _is_source_internally_inconsistent,
     as_decimal,
@@ -5896,25 +5897,6 @@ def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | Non
     return pressure
 
 
-def _efflux_derived_oxygen_pressure_for_score(
-    observation: Observation,
-) -> Decimal | None:
-    condition = (observation.point_conditions or {}).get("fO2_Pa")
-    if (
-        condition is None
-        or condition.inference is None
-        or condition.inference.relation != "vacuum_langmuir_oxygen_efflux_to_pO2"
-        or not condition.state.is_value
-        or not isinstance(condition.state.value, Value)
-        or condition.state.value.kind is not ValueKind.POINT
-    ):
-        return None
-    pressure = condition.state.value.point
-    if pressure is None or not pressure.is_finite() or pressure <= 0:
-        return None
-    return pressure
-
-
 def _areal_evaporation_flux_from_pressure(
     *,
     species_formula: str,
@@ -8536,7 +8518,9 @@ def predict_with_engine(
         )
     if (
         quantity is Quantity.EVAPORATION_FLUX_PER_AREA
-        and _efflux_derived_oxygen_pressure_for_score(observation) is None
+        and oxygen_efflux_derived_pressure_Pa(
+            (observation.point_conditions or {}).get("fO2_Pa")
+        ) is None
     ):
         return EnginePrediction(
             engine=engine,
@@ -9294,7 +9278,9 @@ def predict_with_engine(
     # d-216: a linked or printed source pressure is the row's fO2 before
     # the ladder runs, so every engine is commanded the measured condition.
     source_pressure = (
-        _efflux_derived_oxygen_pressure_for_score(observation)
+        oxygen_efflux_derived_pressure_Pa(
+            (observation.point_conditions or {}).get("fO2_Pa")
+        )
         if quantity is Quantity.EVAPORATION_FLUX_PER_AREA
         else _source_oxygen_pressure_for_score(observation)
     )

@@ -780,6 +780,26 @@ class Value:
         return cls(ValueKind.POINT, point=as_decimal(value))
 
 
+VACUUM_LANGMUIR_EFFLUX_PO2_RELATION = "vacuum_langmuir_oxygen_efflux_to_pO2"
+
+
+def oxygen_efflux_derived_pressure_Pa(condition: object) -> Decimal | None:
+    """Accept only a located, positive point derived from vacuum efflux."""
+    if not isinstance(condition, Located) or condition.inference is None:
+        return None
+    if condition.inference.relation != VACUUM_LANGMUIR_EFFLUX_PO2_RELATION:
+        return None
+    if not condition.state.is_value or not isinstance(condition.state.value, Value):
+        return None
+    value = condition.state.value
+    if value.kind is not ValueKind.POINT:
+        return None
+    pressure = value.point
+    if pressure is None or not pressure.is_finite() or pressure <= 0:
+        return None
+    return pressure
+
+
 def _value_has_numeric_value(value: Value) -> bool:
     return value.kind in _NUMERIC_VALUE_KINDS
 

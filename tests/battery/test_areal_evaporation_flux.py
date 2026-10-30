@@ -32,6 +32,10 @@ from simulator.battery.score import (
     rail_for_quantity,
     score_store,
 )
+from simulator.battery.records import (
+    VACUUM_LANGMUIR_EFFLUX_PO2_RELATION,
+    oxygen_efflux_derived_pressure_Pa,
+)
 from simulator.battery.validity import underdetermined_apparatus
 
 
@@ -120,7 +124,8 @@ def test_extract_flux_rows_keep_their_composition_basis_and_efflux_pressure(
         assert observation.identity.fO2_Pa.is_value
         condition = observation.point_conditions["fO2_Pa"]
         assert condition.inference is not None
-        assert condition.inference.relation == "vacuum_langmuir_oxygen_efflux_to_pO2"
+        assert condition.inference.relation == VACUUM_LANGMUIR_EFFLUX_PO2_RELATION
+        assert oxygen_efflux_derived_pressure_Pa(condition) == condition.state.value.point
         assert condition.state.value.point > Decimal("0.0001")  # above 1e-9 bar floor
 
     for observation in richter_2007:

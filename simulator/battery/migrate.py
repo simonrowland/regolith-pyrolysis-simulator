@@ -170,7 +170,9 @@ from simulator.battery.records import (
     ThermalSetpoint,
     Uncertainty,
     Value,
+    VACUUM_LANGMUIR_EFFLUX_PO2_RELATION,
     Work,
+    oxygen_efflux_derived_pressure_Pa,
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
@@ -16744,7 +16746,7 @@ class Migrator:
             },
             "locator": dict(locator),
             "inference": {
-                "relation": "vacuum_langmuir_oxygen_efflux_to_pO2",
+                "relation": VACUUM_LANGMUIR_EFFLUX_PO2_RELATION,
                 "inputs": (
                     "J_O2 = alpha_O2 * (J_Si + J_Mg) / 2; alpha_O2 = 1",
                     "pO2 = J_O2 * sqrt(2*pi*M_O2*R*T)",
@@ -16759,22 +16761,6 @@ class Migrator:
                 "output_unit": "Pa",
             },
         }
-
-    @staticmethod
-    def _oxygen_efflux_pressure_from_condition(
-        condition: object,
-    ) -> Decimal | None:
-        if not isinstance(condition, Located) or condition.inference is None:
-            return None
-        if condition.inference.relation != "vacuum_langmuir_oxygen_efflux_to_pO2":
-            return None
-        if not condition.state.is_value or not isinstance(condition.state.value, Value):
-            return None
-        value = condition.state.value
-        pressure = value.point if value.kind is ValueKind.POINT else None
-        if pressure is None or not pressure.is_finite() or pressure <= 0:
-            return None
-        return pressure
 
     @staticmethod
     def _printed_arm_flux(arm: object) -> Decimal | None:
@@ -19097,7 +19083,7 @@ class Migrator:
         ):
             ident_kwargs["fO2_Pa"] = oxygen_state
         if q_token is Quantity.EVAPORATION_FLUX_PER_AREA:
-            pressure = self._oxygen_efflux_pressure_from_condition(
+            pressure = oxygen_efflux_derived_pressure_Pa(
                 (point_conditions or {}).get("fO2_Pa")
             )
             ident_kwargs["fO2_Pa"] = (
@@ -21383,7 +21369,7 @@ class Migrator:
         ):
             identity = replace(identity, fO2_Pa=oxygen_state)
         if q_token_point is Quantity.EVAPORATION_FLUX_PER_AREA:
-            pressure = self._oxygen_efflux_pressure_from_condition(
+            pressure = oxygen_efflux_derived_pressure_Pa(
                 (point_conditions or {}).get("fO2_Pa")
             )
             identity = replace(
