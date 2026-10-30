@@ -32,8 +32,9 @@ from simulator.melt_regime import liquid_fraction_invalidity
 #   separate 15 s budget. This default remains only for explicit cold-worker
 #   diagnostics. Preserve margin over the measured 163 s cold search without
 #   retaining the former pre-pool 900 s ceiling: 163 s * 1.8 = 293.4 s,
-#   rounded to 300 s. Sanity: 300 s is still 1.84x the cold measurement and
-#   far below 101 * 60 s, so it bounds the spinel-hang class.
+#   rounded to 300 s. Sanity: 300 s is still 1.84x the cold measurement.
+#   The aggregate budget bounds a finder scan with repeated sample timeouts;
+#   it is not a solver-specific convergence limit.
 # Unit check: all terms in seconds; product is seconds.
 DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 300.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000

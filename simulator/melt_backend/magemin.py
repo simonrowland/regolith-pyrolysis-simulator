@@ -181,9 +181,10 @@ _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
 # 12.7 s, p90 = max = 14.8 s completing, with 3/15 scans exhausting the
 # 15.0 s budget at ~15.3 s -> 'not_converged' -> silent freeze-gate curve
 # source fallback. 60.0 s is ~4x the measured scan max while still far
-# below the cold/diagnostic DEFAULT_LIQUIDUS_FINDER_BUDGET_S (300 s) that
-# bounds the spinel-hang class; like the call wall it moves only when the
-# budget fires, never the physics of a completed scan.
+# below the cold/diagnostic DEFAULT_LIQUIDUS_FINDER_BUDGET_S (300 s),
+# which bounds a finder scan rather than a MAGEMin solver convergence loop;
+# like the call wall it moves only when the budget fires, never completed
+# scan physics.
 MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 60.0
 _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
     tempfile.gettempdir(),
