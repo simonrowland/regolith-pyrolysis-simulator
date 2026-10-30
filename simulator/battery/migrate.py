@@ -1462,7 +1462,12 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             source = _located_from_plain(payload, lambda value: value)
             locator = source.locator
         try:
-            composition = _composition_from_plain(body, closure_context=payload)
+            declared_component_map = _declared_printed_composition_map(payload)
+            composition = _composition_from_plain(
+                body,
+                closure_context=payload,
+                declared_component_map=declared_component_map,
+            )
         except (ArithmeticError, ValueError) as exc:
             return Located(
                 State.unknown(f"mass-percent composition is not usable: {exc}"),
@@ -1475,7 +1480,9 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             inference=wt_pct_to_mole_fraction_derivation(
                 accepted_wt,
                 locator,
-                source_note=_wt_percent_derivation_source_note(wt, payload),
+                source_note=_wt_percent_derivation_source_note(
+                    wt, payload, declared_component_map=declared_component_map
+                ),
             ),
         )
     if (
@@ -1700,7 +1707,10 @@ def migrate_species_payload(payload: Mapping[str, Any]) -> Species:
 
 
 def _composition_from_plain(
-    payload: object, *, closure_context: object = None
+    payload: object,
+    *,
+    closure_context: object = None,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
@@ -1732,6 +1742,7 @@ def _composition_from_plain(
             _wt_percent_conversion_or_raise(
                 wt,
                 closure_context=payload if closure_context is None else closure_context,
+                declared_component_map=declared_component_map,
             ),
             **metadata,
         )
@@ -3926,7 +3937,7 @@ def _printed_composition_source_map(payload: object) -> Mapping[str, Any] | None
     return source_map or None
 
 
-def _declared_printed_composition_map(payload: object) -> Mapping[str, Any] | None:
+def _named_printed_composition_map(payload: object) -> Mapping[str, Any] | None:
     if not isinstance(payload, Mapping):
         return None
     state = payload.get("state")
@@ -3938,6 +3949,20 @@ def _declared_printed_composition_map(payload: object) -> Mapping[str, Any] | No
         nested = payload.get(key)
         if isinstance(nested, Mapping):
             return _printed_composition_map(nested)
+    return None
+
+
+def _declared_printed_composition_map(payload: object) -> Mapping[str, Any] | None:
+    named = _named_printed_composition_map(payload)
+    if named is not None:
+        return named
+    if not isinstance(payload, Mapping):
+        return None
+    state = payload.get("state")
+    if isinstance(state, Mapping) and str(state.get("tag") or "value") == "value":
+        payload = state.get("value")
+    if not isinstance(payload, Mapping):
+        return None
     point_conditions = payload.get("point_conditions")
     if isinstance(point_conditions, Mapping):
         printed = _printed_composition_map(
@@ -3975,10 +4000,6 @@ def _unrecognized_printed_chemical_components(
     *,
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> dict[str, Decimal]:
-    if declared_component_map is None:
-        declared_component_map = _declared_printed_composition_map(closure_context)
-    if declared_component_map is None and closure_context is wt:
-        declared_component_map = wt
     declared_names = (
         {
             _canonical_printed_oxide_name(str(name).strip())
@@ -4014,19 +4035,29 @@ def _unrecognized_printed_chemical_components(
 
 
 def _omitted_trace_component_source_note(
-    wt: Mapping[str, Decimal], closure_context: object
+    wt: Mapping[str, Decimal],
+    closure_context: object,
+    *,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> str | None:
-    dropped = _unrecognized_printed_chemical_components(wt, closure_context)
+    dropped = _unrecognized_printed_chemical_components(
+        wt, closure_context, declared_component_map=declared_component_map
+    )
     if not dropped:
         return None
     return "omitted trace components: " + ", ".join(sorted(dropped))
 
 
 def _wt_percent_derivation_source_note(
-    wt: Mapping[str, Decimal], closure_context: object
+    wt: Mapping[str, Decimal],
+    closure_context: object,
+    *,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> str | None:
     notes = []
-    trace_note = _omitted_trace_component_source_note(wt, closure_context)
+    trace_note = _omitted_trace_component_source_note(
+        wt, closure_context, declared_component_map=declared_component_map
+    )
     if trace_note is not None:
         notes.append(trace_note)
     if any(
@@ -4125,10 +4156,13 @@ def _composition_projection_notice(
     closure_context: object,
     quantity: Quantity | None,
     origin: str,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> Notice | None:
     if wt is None or quantity is None:
         return None
-    dropped = _unrecognized_printed_chemical_components(wt, closure_context)
+    dropped = _unrecognized_printed_chemical_components(
+        wt, closure_context, declared_component_map=declared_component_map
+    )
     dropped_mass = sum(dropped.values(), Decimal("0"))
     if (
         not dropped
@@ -4393,7 +4427,9 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
 
     # This Composition-only API has no notice or derivation channel; migration
     # emits projection notices, and Located readers retain dropped names in their inference.
-    return _wt_percent_conversion_or_raise(wt, closure_context=wt)
+    return _wt_percent_conversion_or_raise(
+        wt, closure_context=wt, declared_component_map=wt
+    )
 
 
 def _wt_percent_conversion_or_refusal(
@@ -4441,10 +4477,15 @@ def _wt_percent_conversion_or_refusal(
 
 
 def _wt_percent_conversion_or_raise(
-    wt: Mapping[str, Decimal], *, closure_context: object = None
+    wt: Mapping[str, Decimal],
+    *,
+    closure_context: object = None,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> Composition:
     converted, refusal = _wt_percent_conversion_or_refusal(
-        wt, closure_context=closure_context
+        wt,
+        closure_context=closure_context,
+        declared_component_map=declared_component_map,
     )
     if converted is None:
         detail = (refusal or "mass-percent composition is not usable").removeprefix(
@@ -4455,10 +4496,15 @@ def _wt_percent_conversion_or_raise(
 
 
 def _wt_percent_conversion_state(
-    wt: Mapping[str, Decimal], *, closure_context: object = None
+    wt: Mapping[str, Decimal],
+    *,
+    closure_context: object = None,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> State[Composition]:
     converted, refusal = _wt_percent_conversion_or_refusal(
-        wt, closure_context=closure_context
+        wt,
+        closure_context=closure_context,
+        declared_component_map=declared_component_map,
     )
     if converted is None:
         return State.unknown(refusal or "mass-percent composition is not usable")
@@ -4466,12 +4512,18 @@ def _wt_percent_conversion_state(
 
 
 def _mass_percent_composition_state(
-    wt: Mapping[str, Decimal], *, basis: str, closure_context: object = None
+    wt: Mapping[str, Decimal],
+    *,
+    basis: str,
+    closure_context: object = None,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> State[Composition]:
     """Convert a printed wt% map after its kept mass meets the b-704 limits."""
 
     converted, refusal = _wt_percent_conversion_or_refusal(
-        wt, closure_context=closure_context
+        wt,
+        closure_context=closure_context,
+        declared_component_map=declared_component_map,
     )
     if converted is None:
         assert refusal is not None
@@ -4563,7 +4615,10 @@ def _oxide_map_from_mapping(
     obj: object,
     *,
     refusal_reason: list[str] | None = None,
+    # Enables parsing direct component columns; guard policy is carried
+    # separately by declared_component_map when a named field was selected.
     declared_map: bool = False,
+    declared_component_map: Mapping[str, Any] | None = None,
     closure_context: object = None,
     preserve_printed_map_on_refusal: bool = False,
 ) -> dict[str, Decimal] | None:
@@ -4577,12 +4632,16 @@ def _oxide_map_from_mapping(
 
     def checked(
         comps: dict[str, Decimal],
-        declared_component_map: Mapping[str, Any] | None = None,
+        component_map: Mapping[str, Any] | None = None,
     ) -> bool:
         _composition, refusal = _wt_percent_conversion_or_refusal(
             comps,
             closure_context=row_context,
-            declared_component_map=declared_component_map,
+            declared_component_map=(
+                component_map
+                if component_map is not None
+                else declared_component_map
+            ),
         )
         if refusal is None:
             return True
@@ -4634,6 +4693,7 @@ def _oxide_map_from_mapping(
                 nested_for_parse,
                 refusal_reason=refusal_reason,
                 declared_map=True,
+                declared_component_map=nested,
                 closure_context=row_context,
                 preserve_printed_map_on_refusal=preserve_refused_map,
             )
@@ -4689,15 +4749,7 @@ def _oxide_map_from_mapping(
             continue
         oxide, _factor = equivalent
         comps[oxide] = comps.get(oxide, Decimal("0")) + amount
-    if declared_map:
-        direct_component_map = (
-            _declared_printed_composition_map(row_context)
-            if closure_context is not None
-            else obj
-        )
-    else:
-        direct_component_map = None
-    accepted = checked(comps, direct_component_map)
+    accepted = checked(comps)
     if not accepted and not preserve_refused_map:
         return None
     return comps if len(comps) >= 2 else None
@@ -4751,7 +4803,9 @@ def _printed_initial_charge_row_map(
         if not got:
             return None
         _composition, refusal = _wt_percent_conversion_or_refusal(
-            got, closure_context=row
+            got,
+            closure_context=row,
+            declared_component_map=_named_printed_composition_map(row),
         )
         if refusal is not None:
             if refusal_reason is not None:
@@ -4776,6 +4830,7 @@ def _printed_initial_charge_row_map(
                     values.get("composition_wt_pct"),
                     refusal_reason=refusal_reason,
                     declared_map=declared_map,
+                    declared_component_map=values.get("composition_wt_pct"),
                     closure_context=values,
                 )
                 row_context = values
@@ -4811,9 +4866,13 @@ def _initial_oxide_map_from_values(
     *,
     refusal_reason: list[str] | None = None,
     declared_map: bool = False,
+    declared_component_map: Mapping[str, Any] | None = None,
+    closure_context: object = None,
 ) -> dict[str, Decimal] | None:
     if not isinstance(values, Mapping):
         return None
+    if declared_component_map is None:
+        declared_component_map = _named_printed_composition_map(values)
     quantity = str(values.get("quantity") or "").casefold()
     if not quantity and not declared_map:
         declared_map = any(
@@ -4848,7 +4907,8 @@ def _initial_oxide_map_from_values(
         values,
         refusal_reason=refusal_reason,
         declared_map=declared_map,
-        closure_context=values if "quantity" in values else None,
+        declared_component_map=declared_component_map,
+        closure_context=closure_context,
     )
     if got:
         if missing_reason:
@@ -4932,6 +4992,7 @@ def _catalogue_composition_located_from_values(
         values,
         declared_map=_declared_wt_composition_point_map(values, None),
     )
+    declared_component_map = _named_printed_composition_map(values)
     if not wt or len(wt) < 2:
         return None
     source_raw = values.get("composition_source") or values.get("composition_source_locator")
@@ -4951,7 +5012,11 @@ def _catalogue_composition_located_from_values(
         rule = rule.strip(" .")
     if not rule:
         rule = "source-declared catalogue analysis; no separate selection rule stated"
-    converted_state = _wt_percent_conversion_state(wt, closure_context=values)
+    converted_state = _wt_percent_conversion_state(
+        wt,
+        closure_context=values,
+        declared_component_map=declared_component_map,
+    )
     if not converted_state.is_value:
         return None
     composition = replace(
@@ -5194,7 +5259,10 @@ def _composition_located_from_values(
         role == "datum_state" and complement_note
     )
     derivation_notes = []
-    trace_note = _omitted_trace_component_source_note(wt, values)
+    declared_component_map = _named_printed_composition_map(values)
+    trace_note = _omitted_trace_component_source_note(
+        wt, values, declared_component_map=declared_component_map
+    )
     if trace_note is not None:
         derivation_notes.append(trace_note)
     if pass_note and isinstance(source_note, str) and source_note.strip():
@@ -5211,7 +5279,11 @@ def _composition_located_from_values(
             derivation,
             relation="SiO2_wt_pct=100-K2O_wt_pct;" + derivation.relation,
         )
-    composition_state = _wt_percent_conversion_state(wt, closure_context=values)
+    composition_state = _wt_percent_conversion_state(
+        wt,
+        closure_context=values,
+        declared_component_map=declared_component_map,
+    )
     if composition_state.is_unknown:
         return Located(composition_state, locator=locator, inference=derivation)
     composition = composition_state.value
@@ -5272,6 +5344,7 @@ def _located_printed_and_initial(
     locator: Locator | None,
     *,
     closure_context: object = None,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> tuple[Located[Mapping[str, Any]] | None, Located[Composition] | None]:
     if not isinstance(wt, Mapping) or not wt:
         return None, None
@@ -5281,7 +5354,9 @@ def _located_printed_and_initial(
         return None, None
     printed = located_value(_printed_map_payload(printed_map), locator)
     state = _wt_percent_conversion_state(
-        wt, closure_context=closure_context or wt
+        wt,
+        closure_context=closure_context or wt,
+        declared_component_map=declared_component_map,
     )
     if state.is_value:
         initial = Located(
@@ -5290,7 +5365,11 @@ def _located_printed_and_initial(
             inference=wt_pct_to_mole_fraction_derivation(
                 conversion_map,
                 locator,
-                source_note=_wt_percent_derivation_source_note(wt, closure_context),
+                source_note=_wt_percent_derivation_source_note(
+                    wt,
+                    closure_context,
+                    declared_component_map=declared_component_map,
+                ),
             ),
         )
     else:
@@ -5427,7 +5506,10 @@ def _owner_initial_from_printed(
             wt = dict(pairs)
     else:
         wt = _initial_oxide_map_from_values(
-            raw, refusal_reason=refusal_reason, declared_map=True
+            raw,
+            refusal_reason=refusal_reason,
+            declared_map=True,
+            declared_component_map=raw,
         )
     if wt:
         source_map = _source_printed_composition_values(wt, closure_context)
@@ -5447,6 +5529,7 @@ def _owner_initial_from_printed(
             wt,
             locator,
             closure_context=raw if closure_context is None else closure_context,
+            declared_component_map=raw,
         )
         if (
             initial is not None
@@ -13972,7 +14055,10 @@ def sample_from_equipment(
             declared_map=declared_map,
         )
         printed, _ = _located_printed_and_initial(
-            oxide_map, locator, closure_context=values
+            oxide_map,
+            locator,
+            closure_context=values,
+            declared_component_map=_named_printed_composition_map(values),
         )
         if oxide_map is None and refusal_reason:
             initial = Located(
@@ -17837,6 +17923,9 @@ class Migrator:
             closure_context=projected_closure_context,
             quantity=q_token if isinstance(q_token, Quantity) else None,
             origin=obs_id,
+            declared_component_map=_named_printed_composition_map(
+                projected_closure_context
+            ),
         )
         projection_notices = (
             () if projection_notice is None else (projection_notice,)
@@ -18443,11 +18532,17 @@ class Migrator:
             ident_kwargs["composition"] = composition_located.state
         elif initial_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
-                initial_oxide_map, closure_context=values
+                initial_oxide_map,
+                closure_context=values,
+                declared_component_map=_named_printed_composition_map(values),
             )
         elif isinstance(sample_composition, tuple):
             ident_kwargs["composition"] = _wt_percent_conversion_state(
-                sample_composition[0], closure_context=sample_composition[2]
+                sample_composition[0],
+                closure_context=sample_composition[2],
+                declared_component_map=_named_printed_composition_map(
+                    sample_composition[2]
+                ),
             )
         elif composition_refusal or q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(
@@ -18798,6 +18893,9 @@ class Migrator:
             projected_state = _wt_percent_conversion_state(
                 projected_oxide_map,
                 closure_context=projected_closure_context,
+                declared_component_map=_named_printed_composition_map(
+                    projected_closure_context
+                ),
             )
             point_conditions = {
                 **(point_conditions or {}),
@@ -18808,7 +18906,11 @@ class Migrator:
                         projected_oxide_map,
                         projected_oxide_locator or locator,
                         source_note=_wt_percent_derivation_source_note(
-                            projected_oxide_map, projected_closure_context
+                            projected_oxide_map,
+                            projected_closure_context,
+                            declared_component_map=_named_printed_composition_map(
+                                projected_closure_context
+                            ),
                         ),
                     ),
                 ),
@@ -18885,6 +18987,9 @@ class Migrator:
                         wt_for_conversion,
                         printed.locator or locator,
                         closure_context=values,
+                        declared_component_map=_named_printed_composition_map(
+                            values
+                        ),
                     )
             if declared_order and derived is not None:
                 point_conditions = {
@@ -19161,6 +19266,7 @@ class Migrator:
                         dict(components),
                         basis="printed_phase_composition",
                         closure_context=values,
+                        declared_component_map=printed.state.value,
                     )
                     located_composition = Located(
                         composition_state, locator=printed.locator
@@ -19682,7 +19788,11 @@ class Migrator:
                 # default condition on every sibling point.
                 if rowless_initial_map:
                     point_identity_kwargs["composition"] = _wt_percent_conversion_state(
-                        rowless_initial_map, closure_context=rowless_values
+                        rowless_initial_map,
+                        closure_context=rowless_values,
+                        declared_component_map=_named_printed_composition_map(
+                            rowless_values
+                        ),
                     )
                 else:
                     point_identity_kwargs.pop("composition", None)
@@ -19694,7 +19804,12 @@ class Migrator:
                     }
                 if rowless_initial_map:
                     _printed, parent_composition = _located_printed_and_initial(
-                        rowless_initial_map, locator, closure_context=rowless_values
+                        rowless_initial_map,
+                        locator,
+                        closure_context=rowless_values,
+                        declared_component_map=_named_printed_composition_map(
+                            rowless_values
+                        ),
                     )
                     if parent_composition is not None:
                         point_parent_conditions = {
@@ -20548,7 +20663,12 @@ class Migrator:
             ):
                 point_printed_composition, point_composition_located = (
                     _located_printed_and_initial(
-                        point_oxide_map, point_locator, closure_context=raw_item
+                        point_oxide_map,
+                        point_locator,
+                        closure_context=raw_item,
+                        declared_component_map=_named_printed_composition_map(
+                            raw_item
+                        ),
                     )
                 )
             point_catalogue = _catalogue_composition_located_from_values(
@@ -20740,7 +20860,9 @@ class Migrator:
             )
         elif q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
-                point_oxide_map, closure_context=raw_item
+                point_oxide_map,
+                closure_context=raw_item,
+                declared_component_map=_named_printed_composition_map(raw_item),
             )
         elif (
             point_oxide_map
@@ -20757,7 +20879,9 @@ class Migrator:
             # identity has no value; keep an already declared composition (for
             # example Guo Table 5's printed mole fractions) authoritative.
             ident_kwargs["composition"] = _wt_percent_conversion_state(
-                point_oxide_map, closure_context=raw_item
+                point_oxide_map,
+                closure_context=raw_item,
+                declared_component_map=_named_printed_composition_map(raw_item),
             )
         elif (
             point_oxide_map
@@ -20766,7 +20890,9 @@ class Migrator:
             and not getattr(ident_kwargs.get("composition"), "is_value", False)
         ):
             ident_kwargs["composition"] = _wt_percent_conversion_state(
-                point_oxide_map, closure_context=raw_item
+                point_oxide_map,
+                closure_context=raw_item,
+                declared_component_map=_named_printed_composition_map(raw_item),
             )
         elif ident_kwargs.get("composition") is None:
             composition_refusal: list[str] = []
@@ -20777,7 +20903,11 @@ class Migrator:
             )
             if initial_map:
                 ident_kwargs["composition"] = _wt_percent_conversion_state(
-                    initial_map, closure_context=parent_values
+                    initial_map,
+                    closure_context=parent_values,
+                    declared_component_map=_named_printed_composition_map(
+                        parent_values
+                    ),
                 )
             elif composition_refusal or q_token_point in _BULK_PROPERTY_QUANTITIES:
                 ident_kwargs["composition"] = State.unknown(
@@ -21032,7 +21162,12 @@ class Migrator:
         if point_oxide_map:
             if point_printed_composition is None:
                 printed, residual = _located_printed_and_initial(
-                    point_oxide_map, point_locator, closure_context=raw_item
+                    point_oxide_map,
+                    point_locator,
+                    closure_context=raw_item,
+                    declared_component_map=_named_printed_composition_map(
+                        raw_item
+                    ),
                 )
             else:
                 printed = _preserve_printed_composition_context(
@@ -21138,6 +21273,7 @@ class Migrator:
                                 components,
                                 basis="printed_oxides",
                                 closure_context=parent_values,
+                                declared_component_map=printed.state.value,
                             )
                     mass = run_experiment.sample.mass_kg
                     mass_value = (
@@ -21558,6 +21694,7 @@ class Migrator:
                 q_token_point if isinstance(q_token_point, Quantity) else None
             ),
             origin=point_id,
+            declared_component_map=_named_printed_composition_map(raw_item),
         )
         if projection_notice is not None and not any(
             notice.kind is NoticeKind.COMPOSITION_PROJECTED

@@ -1060,8 +1060,10 @@ def test_declared_unknown_label_counts_as_dropped_mass_and_stays_printed() -> No
         "unknown-component": "40",
     }
     refusal: list[str] = []
-    assert migrate_module._oxide_map_from_mapping(
-        {"composition_wt_pct": printed}, refusal_reason=refusal
+    assert _initial_oxide_map_from_values(
+        {"composition_wt_pct": printed},
+        refusal_reason=refusal,
+        declared_map=True,
     ) is None
     assert refusal == [
         "partial analysis contains unsupported component(s) above 0.5 wt%: "
@@ -1086,7 +1088,7 @@ def test_declared_unknown_label_counts_as_dropped_mass_and_stays_printed() -> No
     ) in sample.initial_composition.state.reason
 
 
-def test_declared_unknown_trace_projects_and_flat_row_conditions_do_not() -> None:
+def test_declared_unknown_trace_projects_with_notice() -> None:
     source = {
         "composition_wt_pct": {
             "SiO2": "59.7",
@@ -1094,10 +1096,9 @@ def test_declared_unknown_trace_projects_and_flat_row_conditions_do_not() -> Non
             "unknown-component": "0.3",
         }
     }
-    wt = migrate_module._oxide_map_from_mapping(
+    wt = _initial_oxide_map_from_values(
         source,
         declared_map=True,
-        closure_context=source,
     )
     assert wt == {"SiO2": Decimal("59.7"), "MgO": Decimal("40")}
     notice = migrate_module._composition_projection_notice(
@@ -1105,44 +1106,85 @@ def test_declared_unknown_trace_projects_and_flat_row_conditions_do_not() -> Non
         closure_context=source,
         quantity=migrate_module.Quantity.ACTIVITY,
         origin="fixture",
+        declared_component_map=source["composition_wt_pct"],
     )
     assert notice is not None
     assert notice.dropped == ("unknown-component",)
     assert "unknown-component=0.3 wt%" in notice.reason
 
-    flat_row = {
+
+@pytest.mark.parametrize("has_quantity", (False, True))
+@pytest.mark.parametrize("has_closure_context", (False, True))
+@pytest.mark.parametrize("has_unknown_oxide", (False, True))
+def test_initial_map_declaredness_comes_from_named_field_structure(
+    has_quantity: bool,
+    has_closure_context: bool,
+    has_unknown_oxide: bool,
+) -> None:
+    flat_row: dict[str, object] = {
         "SiO2": "60",
         "MgO": "40",
         "p_Pa": "101325",
         "invT_times_1e4_K_inv": "5.2",
         "residual": "0.03",
+    }
+    if has_quantity:
+        flat_row["quantity"] = "composition"
+    if has_unknown_oxide:
+        flat_row["XxO"] = "10"
+    refusal: list[str] = []
+    if has_closure_context:
+        parsed = _initial_oxide_map_from_values(
+            flat_row,
+            refusal_reason=refusal,
+            declared_map=True,
+            closure_context=flat_row,
+        )
+    else:
+        parsed = _initial_oxide_map_from_values(
+            flat_row, refusal_reason=refusal, declared_map=True
+        )
+
+    if has_unknown_oxide:
+        assert parsed is None
+        assert len(refusal) == 1 and "XxO=10 wt%" in refusal[0]
+    else:
+        assert parsed == {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+        assert refusal == []
+
+
+def test_named_initial_map_unknown_mass_is_refused_and_trace_is_noticed() -> None:
+    rejected = {
+        "composition_wt_pct": {
+            "SiO2": "60",
+            "MgO": "40",
+            "unknown-component": "40",
+        }
     }
     refusal: list[str] = []
-    parsed = migrate_module._oxide_map_from_mapping(
-        flat_row,
-        declared_map=True,
-        closure_context=flat_row,
-        refusal_reason=refusal,
-    )
-    assert parsed == {"SiO2": Decimal("60"), "MgO": Decimal("40")}
-    assert refusal == []
-
-    flat_unknown = {
-        "SiO2": "60",
-        "MgO": "40",
-        "XxO": "10",
-        "p_Pa": "101325",
-        "invT_times_1e4_K_inv": "5.2",
-        "residual": "0.03",
-    }
-    refusal = []
-    assert migrate_module._oxide_map_from_mapping(
-        flat_unknown,
-        declared_map=True,
-        closure_context=flat_unknown,
-        refusal_reason=refusal,
+    assert _initial_oxide_map_from_values(
+        rejected, refusal_reason=refusal, declared_map=True
     ) is None
-    assert len(refusal) == 1 and "XxO=10 wt%" in refusal[0]
+    assert len(refusal) == 1 and "unknown-component=40 wt%" in refusal[0]
+
+    trace = {
+        "composition_wt_pct": {
+            "SiO2": "59.7",
+            "MgO": "40",
+            "unknown-component": "0.3",
+        }
+    }
+    parsed = _initial_oxide_map_from_values(trace, declared_map=True)
+    assert parsed == {"SiO2": Decimal("59.7"), "MgO": Decimal("40")}
+    notice = migrate_module._composition_projection_notice(
+        parsed,
+        closure_context=trace,
+        quantity=migrate_module.Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=trace["composition_wt_pct"],
+    )
+    assert notice is not None and notice.dropped == ("unknown-component",)
+    assert "unknown-component=0.3 wt%" in notice.reason
 
 
 def test_merge_preserves_selected_initial_without_incoming_initial() -> None:
@@ -1871,6 +1913,7 @@ def test_b704_projection_fraction_uses_as_printed_alias_total() -> None:
         closure_context=source,
         quantity=migrate_module.Quantity.ACTIVITY,
         origin="fixture",
+        declared_component_map=source["composition_wt_pct"],
     )
 
     assert notice is not None
