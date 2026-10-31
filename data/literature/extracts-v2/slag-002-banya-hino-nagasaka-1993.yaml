@@ -40,9 +40,13 @@ observations:
     attribution: ΔG°_11 = − RT ln K_11 = 17 450 + 2.82 T (J)^{10,12} ...(14)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq14_dG11
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 3
@@ -85,9 +89,13 @@ observations:
     attribution: SiO2(β−cr) = SiO2(l) .............(15). ΔG°_15 = 9 851 − 4.81 T (J)^{32} .............(16)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq16_dG15
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 3
@@ -133,9 +141,13 @@ observations:
     attribution: α_H−Si = + 30 000 (J) (X_HO0.5 < 0.18) ......(17). Fig. 1 label α_H−Si = +30000 J
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq17_alpha_H_Si
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 3
@@ -193,9 +205,13 @@ observations:
       of the linear relation in X_SiO2 > 0.45, shown in Fig. 2. Fig. 2 label α_K−Si = −81030 J
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq20_alpha_K_Si
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 4
@@ -241,9 +257,13 @@ observations:
       < X_LiO0.5 < 0.6) .....(21)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq21_alpha_Li_Si
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 4
@@ -286,9 +306,13 @@ observations:
     attribution: α_H−Na = +9 750 (J) (0.25 < X_NaO0.5 < 0.66) ....(24). Fig. 3 label α_H−Na = +9750 J
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq24_alpha_H_Na
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 4
@@ -332,9 +356,13 @@ observations:
     attribution: α_H−Li = +1 500 (J) (0.35 < X_LiO0.5 < 0.60) ......(25)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq25_alpha_H_Li
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 4
@@ -377,9 +405,13 @@ observations:
     attribution: α_H−K = +13 520 (J) (0.26 < X_KO0.5 < 0.50) ......(26)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq26_alpha_H_K
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 4
@@ -425,9 +457,13 @@ observations:
     attribution: α_H−Ca = +15 100 (J) (0.37 < X_CaO < 0.57) .....(28). Fig. 4 label α_H−Ca = +15100 J
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq28_alpha_H_Ca
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 5
@@ -485,9 +521,13 @@ observations:
     attribution: ΔG°_7 = −19 800 + 26.32 T (1 430 K < T < 1 873 K)...(29). Fig. 5 box ΔG°_7 = −19800 + 26.32 T J
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq29_dG7
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 5
@@ -532,9 +572,13 @@ observations:
     attribution: α_H−Al = −24 400 (J) (X_AlO1.5 < 0.5) .........(31). Fig. 6 label α_H−Al = −24400 J
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq31_alpha_H_Al
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 5
@@ -578,9 +622,13 @@ observations:
     attribution: α_H−Mg = +15 800 (J) X_MgO < 0.35) .........(32)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq32_alpha_H_Mg
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 6
@@ -623,9 +671,13 @@ observations:
     attribution: α_H−Mn = −8 230 (J) (X_MnO < 0.20) .........(33)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq33_alpha_H_Mn
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 6
@@ -668,9 +720,13 @@ observations:
     attribution: α_H−P = +7 700 (J) (X_PO2.5 < 0.12) .........(34)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_eq34_alpha_H_P
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 6
@@ -776,9 +832,13 @@ observations:
       is about −22 kJ.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_fig1_YA_intercept
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 3
@@ -1399,9 +1459,13 @@ observations:
       −100 420  9); Mn2+–Ca2+ −92 050  12); P5+–Ca2+ −251 040  11).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_table2_alpha_ij
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 2
@@ -1447,9 +1511,13 @@ observations:
       H+–P5+ +7 700; H+–Si4+ +30 000.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-002-banya-hino-nagasaka-1993::banya_hino_nagasaka_1993_table3_alpha_H_i
   source_id: slag-002-banya-hino-nagasaka-1993
   locator:
     page: 6

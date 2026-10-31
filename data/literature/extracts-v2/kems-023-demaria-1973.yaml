@@ -1728,9 +1728,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-023-demaria-1973::demaria_1973_fe_psat_fig3_figure_only
   source_id: kems-023-demaria-1973
   locator:
     published_page: 177
@@ -5067,9 +5071,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_fig1_figure_only
   source_id: kems-023-demaria-1973
   locator:
     published_page: 177
@@ -8857,9 +8865,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-023-demaria-1973::demaria_1973_sio_psat_fig2_figure_only
   source_id: kems-023-demaria-1973
   locator:
     published_page: 177

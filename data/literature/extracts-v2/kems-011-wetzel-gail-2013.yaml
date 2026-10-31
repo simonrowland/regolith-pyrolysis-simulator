@@ -322,9 +322,13 @@ observations:
       our best fit to our experimental results on solid SiO obtained at 300 K.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model_gibbs
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 4
@@ -411,9 +415,13 @@ observations:
       annealing experiments of Wetzel et al. (2012a).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model_gibbs
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 4
@@ -556,9 +564,13 @@ observations:
       function.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model_gibbs
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 5
@@ -645,9 +657,13 @@ observations:
       corresponding key elements.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model_gibbs
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 7
@@ -732,9 +748,13 @@ observations:
     attribution: Data used for calculation of silicon monoxide growth.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model_gibbs
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 8
@@ -819,9 +839,13 @@ observations:
     attribution: Basic parameters of the dust-shell models
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model_gibbs
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 8

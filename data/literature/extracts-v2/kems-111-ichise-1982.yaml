@@ -96,9 +96,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-111-ichise-1982::ichise_1982_fig1_ion_intensity_A4_figure_only
   source_id: kems-111-ichise-1982
   locator:
     published_page: 553
@@ -140,9 +144,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-111-ichise-1982::ichise_1982_fig2_low_Mo_procedure_figure_only
   source_id: kems-111-ichise-1982
   locator:
     published_page: 554
@@ -193,9 +201,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-111-ichise-1982::ichise_1982_fig3_Ag_standard_procedure_figure_only
   source_id: kems-111-ichise-1982
   locator:
     published_page: 554
@@ -246,9 +258,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-111-ichise-1982::ichise_1982_fig4_activities_figure_only
   source_id: kems-111-ichise-1982
   locator:
     published_page: 556
@@ -303,9 +319,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-111-ichise-1982::ichise_1982_fig5_ln_gamma_Fe_figure_only
   source_id: kems-111-ichise-1982
   locator:
     published_page: 556
@@ -360,9 +380,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-111-ichise-1982::ichise_1982_fig6_error_estimate_figure_only
   source_id: kems-111-ichise-1982
   locator:
     published_page: 558

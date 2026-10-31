@@ -74,9 +74,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_cd_tl_author_partial_pressures
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 20
@@ -172,9 +176,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 13
@@ -266,9 +274,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure_1400c
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 20
@@ -443,9 +455,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hsc_gas_speciation
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 16

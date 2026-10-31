@@ -34,9 +34,8 @@ experiments:
 - experiment_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628::experiment::shornikov-2002-doklady-solid-kems
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'Knudsen effusion mass spectrometry, molybdenum cells, eight compositions, 1676–2327 K. The paper says
-      the conditions match the melt study cited as [3].' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:
@@ -64,6 +63,8 @@ experiments:
     page: 1
     published_page: 82
     pdf_page_index: 0
+    paragraph: main text, initial-data sentence (the paper has no abstract)
+    note: Eight compositions; the paper says the conditions match the melt study cited as [3].
 context:
 - observation_id: shornikov_2002_evaporation_coefficients_not_measured
   type: quoted_assumption

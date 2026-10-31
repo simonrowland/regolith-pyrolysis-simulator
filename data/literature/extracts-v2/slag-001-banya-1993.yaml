@@ -46,9 +46,13 @@ observations:
       −133 900 (1 − X_SiO2)^2 + 27 030 − 1.98 T (J).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq13_gamma_SiO2_quadratic
   source_id: slag-001-banya-1993
   locator:
     page: 4
@@ -105,9 +109,13 @@ observations:
     attribution: ΔG° = 128 100 − 57.99 T (J)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq16_oxygen_distribution_dG
   source_id: slag-001-banya-1993
   locator:
     page: 4
@@ -157,9 +165,13 @@ observations:
       · X_CaO (J).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq17_gamma_FeO_expansion
   source_id: slag-001-banya-1993
   locator:
     page: 4
@@ -202,9 +214,13 @@ observations:
       T). to confirm the validity of the model at the range of a_FetO < 0.7.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq23_24_ferrous_ferric
   source_id: slag-001-banya-1993
   locator:
     page: 5
@@ -251,9 +267,13 @@ observations:
       470 X_SiO2 · X_CaO + 70 290 X_MgO · X_CaO (J).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq27_28_manganese_distribution
   source_id: slag-001-banya-1993
   locator:
     page: 6
@@ -300,9 +320,13 @@ observations:
       · X_SiO2 − 164 440 X_FeO1.5 · X_SiO2 − 32 470 + 25.04 T (J)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq32_a_MnO_s
   source_id: slag-001-banya-1993
   locator:
     page: 6
@@ -352,9 +376,13 @@ observations:
       X_FeO1.5 · X_MnO + 40 590 X_SiO2 · X_MnO − 8 540 + 7.172 T (J)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq33_a_FetO_l
   source_id: slag-001-banya-1993
   locator:
     page: 7
@@ -413,9 +441,13 @@ observations:
       X_MnO · X_FeO1.5 + 9 456 X_FeO · X_FeO1.5 + 27 030 − 1.983 T (J)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq34_a_SiO2_crist
   source_id: slag-001-banya-1993
   locator:
     page: 7
@@ -466,9 +498,13 @@ observations:
       · X_MgO − 33 470 X_CaO · X_SiO2 + 112 960 X_MgO · X_SiO2 (J).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq37_38_phosphorus_distribution
   source_id: slag-001-banya-1993
   locator:
     page: 7
@@ -522,9 +558,13 @@ observations:
     attribution: ΔG°_P2 = 6 280 + 17.908 T (σ = 13 810) (J)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq40_P2_dG
   source_id: slag-001-banya-1993
   locator:
     page: 8
@@ -568,9 +608,13 @@ observations:
     attribution: ΔG°_41 = −705 420 + 556.472 T (J)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq42_turkdogan_pearson_P2O5
   source_id: slag-001-banya-1993
   locator:
     page: 8
@@ -616,9 +660,13 @@ observations:
     attribution: ΔG°_H2O = −19 800 + 26.32 T (J) (1 430 − 1 873 K)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq47_hydroxyl_dG
   source_id: slag-001-banya-1993
   locator:
     page: 9
@@ -662,9 +710,13 @@ observations:
       666 100 − 360.9 T (J). ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG::rows:h=291c785431d9
   source_id: slag-001-banya-1993
   locator:
     page: 4
@@ -708,9 +760,13 @@ observations:
       666 100 − 360.9 T (J). ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG::rows:h=4df20b9e5c56
   source_id: slag-001-banya-1993
   locator:
     page: 4
@@ -754,9 +810,13 @@ observations:
       666 100 − 360.9 T (J). ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG::rows:h=94bbe057f903
   source_id: slag-001-banya-1993
   locator:
     page: 4
@@ -800,9 +860,13 @@ observations:
       666 100 − 360.9 T (J). ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG::rows:h=dd498a43cda8
   source_id: slag-001-banya-1993
   locator:
     page: 4
@@ -974,9 +1038,13 @@ observations:
     attribution: log K_P1 = 17060 / T − 8.510 (σ = 0.4)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_fig11_printed_logK_P1_fit
   source_id: slag-001-banya-1993
   locator:
     page: 8
@@ -1075,9 +1143,13 @@ observations:
     attribution: log K_P2 = 328 / T − 0.936 (σ = 0.4)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_fig12_printed_logK_P2_fit
   source_id: slag-001-banya-1993
   locator:
     page: 8
@@ -1893,9 +1965,13 @@ observations:
     attribution: log K_Mn = 7386 / T − 3.462
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_fig7_printed_logK_Mn_fit
   source_id: slag-001-banya-1993
   locator:
     page: 6
@@ -2085,9 +2161,13 @@ observations:
     attribution: 'Al3+ row: −41 000  −161 080  −83 680  −154 810  −71 130  −127 610  −261 500  —'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table1_Al3_row
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2137,9 +2217,13 @@ observations:
       500  —.'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table1_alpha_ij_major
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2184,9 +2268,13 @@ observations:
       400; H+–Si4+ +30 000; H+–P5+ +7 700
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table2_H_pairs
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2230,9 +2318,13 @@ observations:
     attribution: K+ –Si4+  −81 030
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table2_K_Si_alpha
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2276,9 +2368,13 @@ observations:
     attribution: Li+ –Si4+  −142 130
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table2_Li_Si_alpha
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2322,9 +2418,13 @@ observations:
     attribution: Ti4+–Ca2+ −167 360; Ti4+–Mn2+ −66 940; Ti4+–Fe2+ −37 660; Ti4+–Fe3+ +1 260; Ti4+–Si4+ +104 600
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table2_Ti_pairs
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2371,9 +2471,13 @@ observations:
       H+–Mn2+ −8 230; H+–Al3+ −24 400; H+–Si4+ +30 000; H+–P5+ +7 700.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table2_alpha_ij_other
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2419,9 +2523,13 @@ observations:
     attribution: CaO(s)=CaO(R.S.) ΔG° = +18 160 − 23.309T; CaO(l)=CaO(R.S.) ΔG° = −40 880 − 4.703T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_CaO_conversions::rows:h=9659d53273ed
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2467,9 +2575,13 @@ observations:
     attribution: CaO(s)=CaO(R.S.) ΔG° = +18 160 − 23.309T; CaO(l)=CaO(R.S.) ΔG° = −40 880 − 4.703T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_CaO_conversions::rows:h=9d9d2d657dc3
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2515,9 +2627,13 @@ observations:
     attribution: MgO(s)=MgO(R.S.) ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.) ΔG° = −23 300 + 1.833T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_MgO_conversions::rows:h=25d3b282136c
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2563,9 +2679,13 @@ observations:
     attribution: MgO(s)=MgO(R.S.) ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.) ΔG° = −23 300 + 1.833T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_MgO_conversions::rows:h=f1e49e574633
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2611,9 +2731,13 @@ observations:
     attribution: MnO(s)=MnO(R.S.) ΔG° = −32 470 + 26.143T; MnO(l)=MnO(R.S.) ΔG° = −86 860 + 51.465T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_MnO_conversions::rows:h=2d871e3d107c
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2659,9 +2783,13 @@ observations:
     attribution: MnO(s)=MnO(R.S.) ΔG° = −32 470 + 26.143T; MnO(l)=MnO(R.S.) ΔG° = −86 860 + 51.465T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_MnO_conversions::rows:h=bb7b54310d50
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2707,9 +2835,13 @@ observations:
     attribution: Na2O(l)=2NaO0.5(R.S.) ΔG° = −185 060 + 22.866T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_Na2O_conversion::rows:h=bea34e0c3da8
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2755,9 +2887,13 @@ observations:
     attribution: P2O5(l)=2PO2.5(R.S.) ΔG° = +52 720 − 230.706T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_P2O5_conversion::rows:h=a7c82174f4ac
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2804,9 +2940,13 @@ observations:
       ΔG° = +17 450 + 2.820T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_SiO2_conversions::rows:h=217f7d73594b
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2853,9 +2993,13 @@ observations:
       ΔG° = +17 450 + 2.820T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_SiO2_conversions::rows:h=b507049dc5cc
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2902,9 +3046,13 @@ observations:
       ΔG° = +17 450 + 2.820T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_SiO2_conversions::rows:h=d0ddc733d884
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -2954,9 +3102,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=217f7d73594b
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3006,9 +3158,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=25d3b282136c
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3058,9 +3214,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=2d871e3d107c
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3110,9 +3270,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=9659d53273ed
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3162,9 +3326,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=9d9d2d657dc3
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3214,9 +3382,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=a7c82174f4ac
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3266,9 +3438,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=b507049dc5cc
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3318,9 +3494,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=bb7b54310d50
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3370,9 +3550,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=bea34e0c3da8
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3422,9 +3606,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=d0ddc733d884
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3474,9 +3662,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=ef0cdde1ca8e
   source_id: slag-001-banya-1993
   locator:
     page: 3
@@ -3526,9 +3718,13 @@ observations:
       = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=f1e49e574633
   source_id: slag-001-banya-1993
   locator:
     page: 3

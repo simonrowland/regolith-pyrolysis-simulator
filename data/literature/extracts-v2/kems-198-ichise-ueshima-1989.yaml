@@ -289,9 +289,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-198-ichise-ueshima-1989::ichise_1989_fig2_ionization_efficiency_figure_only
   source_id: kems-198-ichise-ueshima-1989
   locator:
     published_page: 297
@@ -337,9 +341,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-198-ichise-ueshima-1989::ichise_1989_fig3_ion_intensity_heating_figure_only
   source_id: kems-198-ichise-ueshima-1989
   locator:
     published_page: 298
@@ -385,9 +393,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-198-ichise-ueshima-1989::ichise_1989_fig4_ion_intensity_cooling_figure_only
   source_id: kems-198-ichise-ueshima-1989
   locator:
     published_page: 300
@@ -433,9 +445,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-198-ichise-ueshima-1989::ichise_1989_fig5_monovariant_figure_only
   source_id: kems-198-ichise-ueshima-1989
   locator:
     published_page: 301
@@ -478,9 +494,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-198-ichise-ueshima-1989::ichise_1989_fig6_lnIT_vs_1T_figure_only
   source_id: kems-198-ichise-ueshima-1989
   locator:
     published_page: 302
@@ -523,9 +543,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-198-ichise-ueshima-1989::ichise_1989_fig7_q_vs_xmn_figure_only
   source_id: kems-198-ichise-ueshima-1989
   locator:
     published_page: 304
@@ -620,9 +644,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-198-ichise-ueshima-1989::ichise_1989_table4_sensitivity_model
   source_id: kems-198-ichise-ueshima-1989
   locator:
     published_page: 305

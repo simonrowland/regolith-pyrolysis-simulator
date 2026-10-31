@@ -23312,9 +23312,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16_not_reported_1851
   source_id: shornikov-2017-spinel-evaporation
   locator:
     page: 4
@@ -23504,9 +23509,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: shornikov-2017-spinel-evaporation::shornikov_2017_table3_o_pressure_eq16_not_reported_1859
   source_id: shornikov-2017-spinel-evaporation
   locator:
     page: 4

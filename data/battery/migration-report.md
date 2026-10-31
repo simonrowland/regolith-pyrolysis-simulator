@@ -4,7 +4,7 @@ rows in: 86723
 records out (observations): 176254
 works: 717
 experiments: 6689
-queue size: 116516
+queue size: 116489
 identical-payload dedupe aliases: 342
 metadata files: 50
 index sources: 715
@@ -19107,7 +19107,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml` | 33 | 760 | 33 |
 | `data/literature/extracts/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml` | 198 | 198 | 311 |
 | `data/literature/extracts/cheng-2021-fe-ca-si-o-phase-equilibria.yaml` | 990 | 990 | 1983 |
-| `data/literature/extracts/cho-suito-1994-cas-slag-activities.yaml` | 48 | 48 | 80 |
+| `data/literature/extracts/cho-suito-1994-cas-slag-activities.yaml` | 48 | 48 | 53 |
 | `data/literature/extracts/colson-colson-1995-chromium-dimer-lpsc.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/colson-floden-1998-lpsc-co-nickel-activity.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/colson-keedy-1990-lpsc-redox-relationships.yaml` | 0 | 0 | 1 |
@@ -19814,8 +19814,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 293155
+advisory issues: 293128
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 293155 |
+| `identity_incomplete` | 293128 |

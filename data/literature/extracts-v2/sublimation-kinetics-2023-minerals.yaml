@@ -79,9 +79,14 @@ observations:
       g/h/g of regolith, respectively.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_fe_max_sublimation_rate_1200C
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 10
@@ -204,9 +209,14 @@ observations:
       al. [15] shown in blue, and the prediction by FactSage 8.2 software shown in orange, given the Apollo sample #12022
       feed shown in Table 1.'
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:figure_only
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_fig3_factsage_full_silicate_vs_demaria_figure_only
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 6
@@ -491,9 +501,14 @@ observations:
     attribution: The oxide systems determined to provide the most accurate prediction were FeO for Fe, Al2O3-CaO-Na2O for
       Na, and Al2O3-K2O for K.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:figure_only
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_fig4_proxy_oxide_vs_demaria_figure_only
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -578,9 +593,14 @@ observations:
     attribution: Figure 5. Predicted sublimation rate of elements Fe, Na, and K from lunar regolith, evaporation rate calculated
       using the HKL equation, surface area calculated from the sintering of LMS-1 simulant.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:figure_only
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_fig5_predicted_sublimation_rate_figure_only
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 8
@@ -666,9 +686,14 @@ observations:
       rates presented here equating to a ‘best case scenario’.
     model: model_derived_assumption
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_hkl_ae_unity_assumption
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 4
@@ -752,9 +777,14 @@ observations:
       g/h/g of regolith, respectively.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_k_max_sublimation_rate_1200C
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 10
@@ -1086,9 +1116,13 @@ observations:
     original_method_class: figure_only
     attribution: Figure 1. Calculated surface area changes due to sintering of LMS-1 simulant.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_lms1_fig1_ssa_curve_figure_only
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 5
@@ -1304,9 +1338,14 @@ observations:
       g/h/g of regolith, respectively.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_na_max_sublimation_rate_1200C
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 10
@@ -1691,9 +1730,14 @@ observations:
       predicted saturated pressures for each species.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1073.15:h=6f172ee26c63
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -1810,9 +1854,14 @@ observations:
       predicted saturated pressures for each species.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1173.15:h=5aad9b4640e6
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -1929,9 +1978,14 @@ observations:
       predicted saturated pressures for each species.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1273.15:h=07bf09ab080a
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -2048,9 +2102,14 @@ observations:
       predicted saturated pressures for each species.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1323.15:h=a551374296db
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -2167,9 +2226,14 @@ observations:
       predicted saturated pressures for each species.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1373.15:h=4371c318198b
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -2286,9 +2350,14 @@ observations:
       predicted saturated pressures for each species.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1423.15:h=3eaca3124688
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -2405,9 +2474,14 @@ observations:
       predicted saturated pressures for each species.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1473.15:h=ba0b4749d4e7
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -2524,9 +2598,14 @@ observations:
       Fe, Na, and K from an Apollo sample #12022 feedstock.'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1073.15:h=bd7ee815379f
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -2666,9 +2745,14 @@ observations:
       Fe, Na, and K from an Apollo sample #12022 feedstock.'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1173.15:h=86946c1f77fa
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -2808,9 +2892,14 @@ observations:
       Fe, Na, and K from an Apollo sample #12022 feedstock.'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1273.15:h=e5650257708a
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -2950,9 +3039,14 @@ observations:
       Fe, Na, and K from an Apollo sample #12022 feedstock.'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1323.15:h=df0af1224da2
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -3092,9 +3186,14 @@ observations:
       Fe, Na, and K from an Apollo sample #12022 feedstock.'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1373.15:h=b418da2a399b
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -3234,9 +3333,14 @@ observations:
       Fe, Na, and K from an Apollo sample #12022 feedstock.'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1423.15:h=47f7ebd71855
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -3376,9 +3480,14 @@ observations:
       Fe, Na, and K from an Apollo sample #12022 feedstock.'
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1473.15:h=f967591dd634
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -3516,9 +3625,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1073.15:h=d0ef1293e07a
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -3633,9 +3747,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1173.15:h=2b8fb66a2723
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -3750,9 +3869,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1273.15:h=4d0020499a44
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -3867,9 +3991,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1323.15:h=1c35e07225a9
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -3984,9 +4113,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1373.15:h=ab74ae0675ac
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -4101,9 +4235,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1423.15:h=827f924aea24
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -4218,9 +4357,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1473.15:h=8e857c4e90c2
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -4336,9 +4480,14 @@ observations:
     attribution: K from an Al2O3-K2O system
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1073.15:h=dcf0d6307219
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -4477,9 +4626,14 @@ observations:
     attribution: K from an Al2O3-K2O system
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1173.15:h=e3a5de31b946
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -4618,9 +4772,14 @@ observations:
     attribution: K from an Al2O3-K2O system
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1273.15:h=2cc7eeb0dd70
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -4759,9 +4918,14 @@ observations:
     attribution: K from an Al2O3-K2O system
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1323.15:h=ec4f25257dcd
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -4900,9 +5064,14 @@ observations:
     attribution: K from an Al2O3-K2O system
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1373.15:h=b43c7535536f
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -5041,9 +5210,14 @@ observations:
     attribution: K from an Al2O3-K2O system
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1423.15:h=c54b254e601a
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -5182,9 +5356,14 @@ observations:
     attribution: K from an Al2O3-K2O system
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1473.15:h=d35a4c18a57d
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -5322,9 +5501,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1073.15:h=ad79d074f703
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -5439,9 +5623,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1173.15:h=96515ec44f47
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -5556,9 +5745,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1273.15:h=7b08740af713
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -5673,9 +5867,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1323.15:h=f5b37a001820
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -5790,9 +5989,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1373.15:h=f3755c85a5e3
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -5907,9 +6111,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1423.15:h=ca3ebbfcb62a
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -6024,9 +6233,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - evaporation_rate
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1473.15:h=8695e90ddac2
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -6143,9 +6357,14 @@ observations:
       K from an Al2O3-K2O system.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1073.15:h=552956d8387d
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -6285,9 +6504,14 @@ observations:
       K from an Al2O3-K2O system.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1173.15:h=817d9aa54374
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -6427,9 +6651,14 @@ observations:
       K from an Al2O3-K2O system.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1273.15:h=66e356075e73
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -6569,9 +6798,14 @@ observations:
       K from an Al2O3-K2O system.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1323.15:h=51f35553922b
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -6711,9 +6945,14 @@ observations:
       K from an Al2O3-K2O system.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1373.15:h=ca44ac1539f0
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -6853,9 +7092,14 @@ observations:
       K from an Al2O3-K2O system.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1423.15:h=45b1734107ca
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
@@ -6995,9 +7239,14 @@ observations:
       K from an Al2O3-K2O system.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_sat
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1473.15:h=f59d54b81bd5
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 7
