@@ -222,3 +222,28 @@ def test_markdown_report_contains_summary_and_json_pointer_for_long_skips(
     )
     assert "more in JSON" in markdown
     assert "DS-010: fetch-dns-blocked" not in markdown
+
+
+def test_markdown_report_tables_have_consistent_column_counts(
+    validation_lake_reports,
+    validation_lake_catalog,
+) -> None:
+    # A GFM table renders only when its separator row has one cell per header
+    # cell; a short separator silently degrades the table to plain text.
+    markdown = render_markdown_report(
+        validation_lake_reports, catalog=validation_lake_catalog
+    )
+    lines = markdown.splitlines()
+    tables = 0
+    for index, line in enumerate(lines[:-1]):
+        separator = lines[index + 1]
+        if not (line.startswith("|") and separator.startswith("|---")):
+            continue
+        tables += 1
+        width = len(line.strip().strip("|").split("|"))
+        assert len(separator.strip().strip("|").split("|")) == width, line
+        for row in lines[index + 2 :]:
+            if not row.startswith("|"):
+                break
+            assert len(row.strip().strip("|").split("|")) == width, row
+    assert tables >= 2

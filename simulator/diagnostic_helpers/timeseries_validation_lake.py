@@ -273,7 +273,7 @@ def render_markdown_report(
         "## Dataset Summary",
         "",
         "| Dataset | status | rows evaluated | median abs dex (all) | median abs dex (measured only) | median abs dex (excluding SAME_INPUT) | max abs dex | endpoint rank disagreement | skipped / gap |",
-        "|---|---|---:|---:|---:|---:|---:|---|",
+        "|---|---|---:|---:|---:|---:|---:|---|---|",
     ]
     for report in reports:
         lines.append(
