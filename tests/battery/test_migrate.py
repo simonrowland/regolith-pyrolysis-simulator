@@ -1610,6 +1610,16 @@ def test_stolyarova_1992_untyped_bulk_thermodynamics_stays_in_context(
     assert table1[0]["minus_delta_G_exp_kcal_mol"] == 8.3
     assert table1[0]["minus_delta_G_kohler"] == 8.4
     assert table1[0]["minus_delta_G_wilson"] == 7.4
+    cms = next(point for point in table1 if point["system"] == "SiO2:CaO:MgO")
+    # Printed p. 186. Third field is 25, not 0.25. Do not repair it into x.
+    assert cms["x_as_printed"] == "0.50:0.25:25"
+    assert cms["x"] is None
+    assert cms["T_K"] == 1833.0
+    assert "0.50:0.25:0.25" not in cms["note"]
+    mg = contexts["stolyarova_1992_mg_bearing_melt_activity_context"]["values"]
+    assert mg["numeric_activity_published"] is False
+    assert "0.50:0.25:25" in mg["numeric_activity_note"]
+    assert "0.50:0.25:0.25" not in mg["numeric_activity_note"]
     assert table3[0]["minus_delta_G_exp_kcal_mol"] == 8.4
     assert table4[0]["mu_Na2O_exp_kcal_mol"] == 56.0
     assert result.validation is not None
