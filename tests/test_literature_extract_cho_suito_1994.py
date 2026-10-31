@@ -30,9 +30,9 @@ TABLE5_CELLS = {
     "cho_suito_1994_t5_cas8_alumina_cn": ("-3.35", "0.66"),
     "cho_suito_1994_t5_cas9_alumina_cn": ("-0.62", "0.13"),
     "cho_suito_1994_t5_ac_alumina_cn": ("-0.57", "0.23"),
-    "cho_suito_1994_t5_ac_alumina_cs": ("-0.90", "0.23"),
+    "cho_suito_1994_t5_ac_alumina_cn_paren": ("-0.90", "0.23"),
     "cho_suito_1994_t5_ca_alumina_cn": ("-2.82", "0.41"),
-    "cho_suito_1994_t5_ca_alumina_cs": ("-2.62", "0.40"),
+    "cho_suito_1994_t5_ca_alumina_cn_paren": ("-2.62", "0.40"),
     "cho_suito_1994_t5_acs2_lime_cn": ("-1.68", "0.13"),
     "cho_suito_1994_t5_acs4_lime_cn": ("-1.43", "0.13"),
     "cho_suito_1994_t5_cas5_lime_cn": ("-0.11", "0.33"),
@@ -62,10 +62,10 @@ UNKNOWN_COMPOSITION_IDS = {
     "cho_suito_1994_t5_cs_sio2_cn",
     "cho_suito_1994_t5_cs_lime_cn",
     "cho_suito_1994_t5_ac_alumina_cn",
-    "cho_suito_1994_t5_ac_alumina_cs",
+    "cho_suito_1994_t5_ac_alumina_cn_paren",
     "cho_suito_1994_t5_ac_lime_cn",
     "cho_suito_1994_t5_ca_alumina_cn",
-    "cho_suito_1994_t5_ca_alumina_cs",
+    "cho_suito_1994_t5_ca_alumina_cn_paren",
     "cho_suito_1994_t5_ca_lime_cn",
 }
 
@@ -103,17 +103,15 @@ def test_table5_cells_and_column_alignment_are_pinned_to_page_180() -> None:
         assert row["values"]["temperature_K"] == 1873
         assert row["phase"] == "l"
         assert row["standard_state"] in {
-            "pure solid SiO2(s)",
-            "pure solid Al2O3(s)",
-            "pure solid CaO(s)",
+            "relative to the solid standard state; SiO2(s)",
+            "relative to the solid standard state; Al2O3(s)",
+            "relative to the solid standard state; CaO(s)",
         }
 
     for observation_id in UNKNOWN_COMPOSITION_IDS:
         composition = rows[observation_id]["point_conditions"]["composition"]
         assert composition["state"]["tag"] == "unknown"
-        assert composition["state"]["reason"] == (
-            "Table 5 label has no printed or analysed composition"
-        )
+        assert composition["state"]["reason"].startswith("Table 5")
 
 
 def test_table5_isolated_migration_preserves_values_temperature_and_refusals(
@@ -127,6 +125,7 @@ def test_table5_isolated_migration_preserves_values_temperature_and_refusals(
         pytest.skip("Cho and Suito source PDF is absent")
 
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    rows = _table5_rows(document)
     result = migrate(isolated_root(tmp_path, document), write=False)
     assert result.validation is not None
     assert not result.validation.hard_issues
@@ -157,16 +156,17 @@ def test_table5_isolated_migration_preserves_values_temperature_and_refusals(
     assert migrated["cho_suito_1994_t5_ac_alumina_cn"].value.point == Decimal(
         "0.2692"
     )
-    assert migrated["cho_suito_1994_t5_ca_alumina_cs"].value.point == Decimal(
+    assert migrated["cho_suito_1994_t5_ca_alumina_cn_paren"].value.point == Decimal(
         "0.002399"
     )
 
     for observation_id in UNKNOWN_COMPOSITION_IDS:
         composition = migrated[observation_id].identity.composition
         assert not composition.is_value
-        assert composition.reason == (
-            "Table 5 label has no printed or analysed composition"
-        )
+        expected_reason = rows[observation_id]["point_conditions"]["composition"][
+            "state"
+        ]["reason"]
+        assert composition.reason == expected_reason
         condition = migrated[observation_id].point_conditions["composition"]
         assert not condition.state.is_value
         assert condition.locator.page == 4

@@ -90,7 +90,8 @@ def test_table5_printed_point_composition_is_none_after_inference(
     }
     assert set(rows) == set(TABLE5_DERIVED_COMPOSITION_IDS)
     for oid, row in rows.items():
-        assert _printed_point_composition(row) is None, oid
+        point_composition, _notice = _printed_point_composition(row)
+        assert point_composition is None, oid
         composition = row.identity.composition
         assert composition is not None and composition.is_value, oid
         assert composition.value.basis == (
