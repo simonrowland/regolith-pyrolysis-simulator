@@ -613,6 +613,11 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     if not engine_available:
         pytest.skip('shipped curve pins require the MAGEMin engine')
 
+    # Stage 4 now resolves Na and K through separate collectors. In the lunar
+    # staged run, that path records the C3_NA gate curve once; the prior
+    # single-stage capture contained a second identical C3_NA curve record.
+    # The production output therefore moves from two copies to one, while all
+    # six remaining curve tuples retain their pinned endpoints and paths.
     expected = {
         'lunar_mare_low_ti_C0_24h': [
             (
@@ -645,13 +650,6 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             ),
             (
                 'C2A_STAGED',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
-                1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
-            ),
-            (
-                'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
                 1040.625,
                 1375.0,
