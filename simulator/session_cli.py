@@ -103,7 +103,7 @@ class SessionScriptRunner:
         )
         self.session.start(config)
         self.started = True
-        return {
+        frame = {
             "frame_type": "start",
             "protocol_version": PROTOCOL_VERSION,
             "feedstock_id": parsed.feedstock,
@@ -115,6 +115,16 @@ class SessionScriptRunner:
             "backend_active": type(self.session.simulator.backend).__name__,
             "track": parsed.track,
         }
+        carrier_gas_overrides = {
+            campaign: fields["carrier_gas"]
+            for campaign, fields in config.runtime_campaign_overrides.items()
+            if "carrier_gas" in fields
+        }
+        if carrier_gas_overrides:
+            # Keep default NDJSON start frames byte-identical while making an
+            # explicit fixed carrier visible in the start acknowledgement.
+            frame["carrier_gas_overrides"] = carrier_gas_overrides
+        return frame
 
     def _advance(self, args: list[str]) -> dict[str, Any]:
         if len(args) > 1:
