@@ -14,6 +14,7 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import os
 import copy
 import sys
 from collections import Counter
@@ -60,8 +61,8 @@ from simulator.reference_data.fastchem import (  # noqa: E402
     write_overlap_tsv,
 )
 
-CORPUS = Path(
-    "/Users/simonrowland/Repos/regolith-corpus/raw/"
+# Seated corpus copy; pass --corpus, or set REGOLITH_CORPUS_RAW to the corpus raw/ directory.
+CORPUS = Path(os.environ.get("REGOLITH_CORPUS_RAW", "~/Repos/regolith-corpus/raw")).expanduser() / (
     "fastchem-v3-1-3-gas-condensate-coefficients"
 )
 SIDE_FILES = (

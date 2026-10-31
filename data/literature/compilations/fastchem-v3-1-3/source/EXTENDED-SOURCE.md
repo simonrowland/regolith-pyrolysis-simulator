@@ -12,4 +12,4 @@ Preserve the corrected operational association direction, natural logarithm, T i
 
 Repository GPL text already held; upstream data rights remain separate. No engine, software installer or solver was executed, and no model import, corpus seating or scientific promotion occurred.
 
-Acquisition/review: /Users/simonrowland/Repos/paper-download-tools/runs/2026-10-30-wave234-fastchem-extended/ . REVIEW.md/JSON, DATA-REVIEW.json, ROOT-COMPARISON.json and ROOT-ION-COUNTS.json preserve verification scope. Native attachment receipts and post-manifest audit reside there.
+Acquisition/review: paper-download-tools run 2026-10-30-wave234-fastchem-extended . REVIEW.md/JSON, DATA-REVIEW.json, ROOT-COMPARISON.json and ROOT-ION-COUNTS.json preserve verification scope. Native attachment receipts and post-manifest audit reside there.
