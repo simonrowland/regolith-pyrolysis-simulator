@@ -3651,6 +3651,68 @@ def test_magemin_live_shipped_phase_masses_close_to_input_mass(request):
         )
 
 
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_lunar_moved_capture_reservoir_independence(
+    monkeypatch, request
+):
+    """The moved lunar capture is stable within the liquidus search tolerance."""
+    import simulator.melt_backend.magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({
+        "binary_path": str(_LIVE_MAGEMIN_BINARY),
+        "warm_worker": False,
+    })
+
+    # Saved projected bulk for lunar C0_24h's moved freeze-gate row 4 capture.
+    # This is captured model input, not an expected solver output.
+    projected_oxide_wt_pct = {
+        "SiO2": 45.80710793463169,
+        "Al2O3": 13.896792617613746,
+        "CaO": 11.323312502705537,
+        "MgO": 9.264519568178713,
+        "FeOt": 16.982016133153035,
+        "K2O": 0.10281687896639194,
+        "Na2O": 0.4088016654038812,
+        "TiO2": 1.5440880432735837,
+        "O": 0.0014456996111300625,
+        "Cr2O3": 0.3602840740242704,
+    }
+    fO2_log = -7.602855641376113
+    search_tolerance_C = 2.0
+
+    def solve(reservoir_wt_pct):
+        monkeypatch.setattr(
+            magemin_module,
+            "_MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT",
+            reservoir_wt_pct,
+        )
+        return backend.find_liquidus_solidus(
+            projected_oxide_wt_pct=projected_oxide_wt_pct,
+            fO2_log=fO2_log,
+            redox_state=RedoxState.absolute(fO2_log),
+            pressure_bar=0.01,
+            min_T_C=400.0,
+            max_T_C=2200.0,
+            scan_step_C=50.0,
+            tolerance_C=search_tolerance_C,
+        )
+
+    small_reservoir = solve(2.0)
+    large_reservoir = solve(20.0)
+
+    assert small_reservoir.status == "ok", small_reservoir.warnings
+    assert large_reservoir.status == "ok", large_reservoir.warnings
+    assert small_reservoir.solidus_T_C == large_reservoir.solidus_T_C
+    assert abs(
+        small_reservoir.liquidus_T_C - large_reservoir.liquidus_T_C
+    ) <= search_tolerance_C
+
+
 # Pure-endmember melting references retained for any future calibrated engine
 # (not MAGEMin `ig` acceptance targets). Forsterite 2163 K (Akimoto et al.
 # 1981); diopside 1391.5 C and anorthite 1553 C (standard Di-An calibration).

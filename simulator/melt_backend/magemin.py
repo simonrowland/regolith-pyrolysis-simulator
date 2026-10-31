@@ -159,9 +159,18 @@ from simulator.feedstock_composition import (
 )
 
 
-# MAGEMin's QFM tutorial uses O=10 wt% to make the requested buffer active.
-# This is solver-only oxygen added to the CLI vector, never feedstock O.
-# Source: MAGEMinApp QFM tutorial, buffer offset section, v1.8.5.
+# Named-buffer MAGEMin calculations are open to oxygen: the fixed-fO2 buffer
+# needs an O source, and MAGEMin's QFM tutorial supplies O=10 wt% to activate
+# that boundary. This solver-only reservoir is added to the CLI vector, never
+# to feedstock mass or the material ledger. For lunar C0 row 1 and moved rows
+# 4-7, live runs at 2/5/10/20 wt units gave identical solidi; liquidus varied
+# by at most 1.5625 C, within the configured 2 C search tolerance, native
+# phase liquid fraction by at most 1.05e-4, and gate liquid fraction did not
+# change. This supports 10 wt units within solver resolution. The reported
+# solved log fO2 is QFM + buffer_n reconstructed by this adapter, not an
+# independent MAGEMin fO2 measurement and therefore not evidence of buffer
+# achievement. Source for the O requirement: MAGEMinApp QFM tutorial, buffer
+# offset section, v1.8.5.
 _MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT = 10.0
 
 
