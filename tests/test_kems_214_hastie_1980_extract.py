@@ -40,6 +40,19 @@ TABLE3_RENDER = (
     ("2167", "5.98e-5", "3.39e-5", "5.96e-6", "1.09e-7"),
 )
 
+K1_INITIAL_COMPOSITION_RENDER = {
+    "Al2O3": "12.06",
+    "CaO": "3.8",
+    "Cr2O3": "1.3",
+    "Fe2O3": "14.25",
+    "K2O": "19.54",
+    "MgO": "1.03",
+    "Na2O": "0.47",
+    "SO3": "0.21",
+    "SiO2": "46.82",
+    "TiO2": "0.52",
+}
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -99,6 +112,35 @@ def test_table3_transcription_and_both_cell_mutations_are_detected() -> None:
         _assert_table3_matches(TABLE3_RENDER, _table3_grid(changed_extract))
 
 
+def test_k1_initial_composition_and_mgo_reservoir_are_pinned_to_printed_source() -> None:
+    document = _document()
+    k_point = document["species"]["K"]["observations"][0]["values"]["points"][0]
+    conditions = k_point["point_conditions"]
+    starting = conditions["starting_composition"]
+    assert starting["state"]["tag"] == "value"
+    assert starting["state"]["value"] == {
+        "amount_basis": "mass_percent",
+        "components": K1_INITIAL_COMPOSITION_RENDER,
+    }
+    assert starting["locator"]["page"] == 97
+    assert starting["locator"]["published_page"] == 11
+
+    run_state = conditions["composition"]
+    assert run_state["state"]["tag"] == "unknown"
+    assert "run-state composition at 1466 K is not reported" in run_state["state"]["reason"]
+
+    mg_values = document["species"]["Mg"]["observations"][0]["values"]
+    assert len(mg_values["points"]) == 15
+    assert mg_values["reservoir_formula"] == "MgO"
+    assert mg_values["reservoir"] == {
+        "formula": "MgO",
+        "phase": {"tag": "value", "value": "cr"},
+        "polymorph": {"tag": "unknown", "reason": "polymorph_not_stated_in_paper"},
+    }
+    assert mg_values["reservoir_as_printed"] == "MgO(s) in the MgO + H2 system"
+    assert mg_values["reservoir"]["phase"]["value"] == "cr"
+
+
 def test_isolated_migration_pins_species_temperature_and_oxygen_conditions() -> None:
     migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -131,6 +173,20 @@ def test_isolated_migration_pins_species_temperature_and_oxygen_conditions() -> 
     k_point = next(row for row in observations if row.identity.species.formula == "K")
     assert k_point.identity.temperature_K.value == Decimal("1466")
     assert k_point.point_conditions["oxygen_partial_pressure"].state.value.approximate
+    assert k_point.point_conditions["composition"].state.is_unknown
+    starting = k_point.point_conditions["starting_composition"]
+    assert starting.state.is_value
+    assert starting.locator is not None
+    assert starting.locator.page == 97
+
+    mg_rows = [row for row in observations if row.identity.species.formula == "Mg"]
+    assert len(mg_rows) == 15
+    for row in mg_rows:
+        reservoir = row.identity.reservoir
+        assert reservoir.is_value
+        assert reservoir.value.formula == "MgO"
+        assert reservoir.value.phase.value is Phase.CR
+        assert reservoir.value.polymorph.is_unknown
 
 
 def test_deferred_figures_have_metadata_but_no_numeric_points() -> None:

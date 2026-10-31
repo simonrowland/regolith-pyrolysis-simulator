@@ -11,6 +11,14 @@ extraction:
   date: '2026-10-22'
   worker: fam42-1022
 review_status: draft
+source_caveats:
+- locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: '5-2'
+    section: 2.1 Sample Preparation
+  quote: 'One large, gem quality single crystal of green San Carlos olivine (Fo90)'
+  note: The initial olivine composition is printed; Fe metal powder was also in the cell and the olivine surface composition evolved during the run.
 experiments:
 - experiment_id: dohmen-2003-kems-1400c
   method: knudsen_effusion
@@ -103,6 +111,16 @@ species:
             pdf_page_index: 3
             published_page: '5-4'
             section: 3.2 Gas Phase Composition
+        starting_composition:
+          state:
+            tag: value
+            value: San Carlos olivine Fo90
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: '5-2'
+            section: 2.1 Sample Preparation
+            note: 'One large, gem quality single crystal of green San Carlos olivine (Fo90)'
       values:
         quantity: partial_pressure
         method_class: measured_tabulated
@@ -837,6 +855,16 @@ species:
             pdf_page_index: 4
             published_page: '5-5'
             section: 3.2 Gas Phase Composition
+        starting_composition:
+          state:
+            tag: value
+            value: San Carlos olivine Fo90
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: '5-2'
+            section: 2.1 Sample Preparation
+            note: 'One large, gem quality single crystal of green San Carlos olivine (Fo90)'
       values:
         quantity: partial_pressure
         method_class: measured_tabulated
