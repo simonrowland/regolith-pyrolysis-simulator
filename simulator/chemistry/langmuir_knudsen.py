@@ -369,7 +369,16 @@ def grounded_alpha(species: str, T_K: float) -> tuple[float, dict[str, Any]]:
     alpha_spec = alpha_by_species[species]
     context: dict[str, Any] = {"coefficient_spec": alpha_spec}
     value = alpha_s(species, T_K, context)
-    return value, dict(context.get("alpha_s_evaluation", {}))
+    evaluation = dict(context.get("alpha_s_evaluation", {}))
+    if isinstance(alpha_spec, Mapping):
+        lineage_sources = alpha_spec.get("lineage_sources")
+        if isinstance(lineage_sources, Sequence) and not isinstance(
+            lineage_sources, (str, bytes)
+        ):
+            evaluation["coefficient_sources"] = tuple(
+                str(source_id) for source_id in lineage_sources
+            )
+    return value, evaluation
 
 
 @dataclass(frozen=True)

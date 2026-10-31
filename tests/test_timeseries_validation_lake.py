@@ -44,6 +44,7 @@ def test_catalog_keeps_unavailable_datasets_as_explicit_gaps(
     assert "403" in by_id["DS-002"]["condition_gap"]
     assert by_id["DS-010"]["status"] == "validated-direct-flux"
     assert by_id["DS-010"]["file"] == "DS-010.csv"
+    assert by_id["DS-007"]["source_id"] == "kems-005-fedkin-2006"
     assert "SiO volatile proxy" in by_id["DS-010"]["condition_gap"]
     assert by_id["DS-012"]["status"] == "unavailable-automation"
     assert "session-gated" in by_id["DS-012"]["condition_gap"]
@@ -86,6 +87,16 @@ def test_validation_lake_reports_dimensionally_honest_comparisons(
     ]
     assert len(same_input_rows) == 4
     assert {item.species for item in same_input_rows} == {"Fe"}
+    assert {item.source_relation for item in reports["DS-007"].species} <= {
+        "SAME_INPUT",
+        "INDEPENDENT",
+        "UNKNOWN",
+    }
+    assert all(
+        item.source_relation == "UNKNOWN"
+        for item in reports["DS-007"].species
+        if item.source_relation != "SAME_INPUT"
+    )
     assert reports["DS-007"].as_dict()[
         "median_abs_dex_error_excluding_same_input"
     ] == pytest.approx(0.1406575917694785)

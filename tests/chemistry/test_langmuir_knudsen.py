@@ -300,6 +300,10 @@ def test_validate_against_baseline_reports_ratios_without_tuning():
     fe_alpha, alpha_evaluation = grounded_alpha("Fe", fe.T_K)
     assert fe.modeled_langmuir_to_effusion_ratio == pytest.approx(fe_alpha)
     assert alpha_evaluation["alpha_authority_status"] == "bridge"
+    assert alpha_evaluation["coefficient_sources"] == (
+        "kems-005-fedkin-2006",
+        "kems-015-hashimoto-1983",
+    )
     assert alpha_evaluation["alpha_s_extrapolated"] is True
     assert fe.modeled_langmuir_to_effusion_ratio > fe.measured_ratio_high
     assert abs(fe.relative_error_percent) > fe.allowed_error_percent

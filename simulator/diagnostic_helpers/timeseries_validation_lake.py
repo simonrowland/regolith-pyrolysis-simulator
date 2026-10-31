@@ -70,7 +70,7 @@ class SpeciesReproductionError:
     alpha: float | None
     observed_floor_applied: bool = False
     notes: str = ""
-    source_relation: str = "UNASSESSED"
+    source_relation: str = "UNKNOWN"
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -183,7 +183,13 @@ def validate_dataset(
     species_errors: list[SpeciesReproductionError] = []
     skipped_reasons: list[str] = []
     if alpha_rows:
-        alpha_errors, alpha_skips = _validate_alpha_rows(dataset_id, alpha_rows)
+        alpha_errors, alpha_skips = _validate_alpha_rows(
+            dataset_id,
+            alpha_rows,
+            reference_source_id=(
+                str((catalog_entry or {}).get("source_id") or "") or None
+            ),
+        )
         species_errors.extend(alpha_errors)
         skipped_reasons.extend(alpha_skips)
     if direct_flux_rows:
@@ -312,11 +318,14 @@ def render_markdown_report(
 def _validate_alpha_rows(
     dataset_id: str,
     rows: Sequence[Mapping[str, str]],
+    *,
+    reference_source_id: str | None = None,
 ) -> tuple[list[SpeciesReproductionError], list[str]]:
     errors: list[SpeciesReproductionError] = []
     skipped: list[str] = []
     grouped: dict[tuple[str, str, float], list[float]] = defaultdict(list)
     original_species: dict[tuple[str, str, float], str] = {}
+    score_contexts: dict[tuple[str, ...], Any] = {}
     for row in rows:
         species = str(row.get("species") or "")
         model_species = str(row.get("model_species") or species)
@@ -333,13 +342,55 @@ def _validate_alpha_rows(
             skipped.append(f"{dataset_id}:{species} has no model species")
             continue
         try:
-            modeled_alpha, _ = grounded_alpha(model_species, T_K)
+            modeled_alpha, alpha_context = grounded_alpha(model_species, T_K)
             p_eq = _maybe_p_eq(model_species, T_K)
         except Exception as exc:  # noqa: BLE001 - validation reports model gaps.
             skipped.append(f"{dataset_id}:{species} alpha model unavailable: {exc}")
             continue
         observed_alpha = median(values)
         dex_error = math.log10(_positive(modeled_alpha) / _positive(observed_alpha))
+        source_relation = "UNKNOWN"
+        coefficient_sources = tuple(alpha_context.get("coefficient_sources") or ())
+        if reference_source_id and coefficient_sources:
+            from simulator.battery.score import (
+                lineage_complete_for,
+                load_score_context,
+                resolve_source_relation,
+            )
+
+            context_sources = tuple(
+                sorted({reference_source_id, *(str(src) for src in coefficient_sources)})
+            )
+            score_context = score_contexts.get(context_sources)
+            if score_context is None:
+                score_context = load_score_context(
+                    root=REPO_ROOT,
+                    sources=context_sources,
+                )
+                score_contexts[context_sources] = score_context
+            reference = next(
+                (
+                    observation
+                    for observation in score_context.observations.values()
+                    if observation.source_id == reference_source_id
+                ),
+                None,
+            )
+            if reference is not None:
+                lineage_complete = lineage_complete_for(
+                    coefficient_sources,
+                    works=score_context.works,
+                    observations=score_context.observations,
+                    experiments=score_context.experiments,
+                )
+                source_relation = resolve_source_relation(
+                    reference,
+                    coefficient_sources,
+                    lineage_complete,
+                    works=score_context.works,
+                    observations=score_context.observations,
+                    experiments=score_context.experiments,
+                ).name
         errors.append(
             SpeciesReproductionError(
                 dataset_id=dataset_id,
@@ -356,11 +407,7 @@ def _validate_alpha_rows(
                 p_eq_pa=p_eq,
                 alpha=modeled_alpha,
                 notes="direct alpha comparison",
-                source_relation=(
-                    "SAME_INPUT"
-                    if dataset_id == "DS-007" and species == "Fe"
-                    else "UNASSESSED"
-                ),
+                source_relation=source_relation,
             )
         )
     return errors, skipped
