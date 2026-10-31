@@ -160,6 +160,8 @@ WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 DEFAULT_PIPE_DIAMETER_M = 0.12
+# Equal-width center samples retained from the production band integral.
+HKL_BAND_SAMPLES = 33
 # N2_COLLISION_DIAMETER_M and the Knudsen flow-regime thresholds
 # (VISCOUS_KNUDSEN_MAX / FREE_MOLECULAR_KNUDSEN_MIN) are single-sourced in
 # simulator/transport_constants.py (shared with simulator/transport_regime.py) so
@@ -4172,7 +4174,7 @@ class CondensationModel:
         antoine_extrapolation_warnings: list[str] | None = None,
         efficiency_outcomes: list[dict[str, Any]] | None = None,
     ) -> float:
-        """Equilibrium-capped kinetic capture at the stage midpoint."""
+        """Equilibrium-capped kinetic capture integrated over the stage band."""
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
                 efficiency_outcomes.append({
@@ -4196,7 +4198,14 @@ class CondensationModel:
                 'stage_capture', (residence_s, alpha_s_value),
                 'residence and sticking must be within physical bounds',
             )
-        if residence_s == 0.0 or alpha_s_value == 0.0:
+        alpha_spec = (
+            alpha_record.get('alpha_s_coefficient_spec')
+            if isinstance(alpha_record, Mapping)
+            else None
+        )
+        if residence_s == 0.0 or (
+            alpha_s_value == 0.0 and not isinstance(alpha_spec, Mapping)
+        ):
             return _mint_zero('zero_residence_or_alpha',
                               residence_s=residence_s, alpha_s_value=alpha_s_value)
         available_kg = _deposition_finite_scalar('available_kg', available_kg)
@@ -4229,36 +4238,15 @@ class CondensationModel:
         if area == 0.0:
             return _mint_zero('no_configured_capture_area')
 
-        T_surface_K = _stage_midpoint_temperature_K(stage)
-        T_surface_C = T_surface_K - CELSIUS_TO_KELVIN_OFFSET
-        if _reactive_product_backstop_authorized(species) and T_surface_C > T_cond_C:
-            return _mint_zero('above_reactive_product_condensation_temperature')
+        midpoint_T_K = _stage_midpoint_temperature_K(stage)
+        lo_C, hi_C = _stage_temp_band_C(stage)
+        width_C = hi_C - lo_C
+        sample_count = 1 if width_C == 0.0 else HKL_BAND_SAMPLES
+        reactive_backstop_authorized = _reactive_product_backstop_authorized(species)
+        stable_product_backstop_authorized = (
+            _stable_condensation_product_backstop_authorized(species)
+        )
         notices = antoine_extrapolations if antoine_extrapolations is not None else {}
-        diagnostic: dict[str, Any] = {}
-        pressure_options = dict(
-            vapor_pressure_data=self.vapor_pressure_data,
-            reactive_product_backstop=(
-                _reactive_product_backstop_authorized(species)
-                and T_surface_C <= T_cond_C
-            ),
-            stable_condensation_product_backstop=(
-                _stable_condensation_product_backstop_authorized(species)
-            ),
-            antoine_extrapolations=notices,
-            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-            diagnostic_out=diagnostic,
-        )
-        driving_pressure = _wall_deposition_driving_pressure_pa(
-            species, p_in, T_surface_K, **pressure_options,
-        )
-        if diagnostic.get('wall_saturation_pressure_refused'):
-            raise WallSaturationPressureRefusal(
-                species, T_surface_K,
-                diagnostic.get('wall_saturation_pressure_refusal_reason', 'saturation_pressure_unavailable'),
-            )
-        if driving_pressure <= 0.0:
-            return _mint_zero('no_supersaturation', P_local_pa=p_in)
-
         # Gas-side length: a configured stage hydraulic diameter, else the
         # throat diameter. Parallel plates of gap g have Dh = 4*A/P = 2*g.
         # The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.
@@ -4268,44 +4256,146 @@ class CondensationModel:
         # so throat Poiseuille flow stays on the ~0.12 m throat.
         gas_side_length_m = self._hydraulic_diameter_m_for_stage_number(
             stage.stage_number)
-        flux = _series_resistance_deposition_flux_mol_m2_s(
-            species, p_in, T_surface_K, alpha_s_value,
-            pipe_diameter_m=gas_side_length_m,
-            stir_factor=self.stir_factor,
-            radial_stir_factor=self.radial_stir_factor,
-            regime_factor=self.regime_factor,
-            T_gas_K=float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
-            overhead_pressure_pa=float(self.overhead_pressure_mbar) * 100.0,
-            carrier_gas=self.carrier_gas,
-            **pressure_options,
-        )
-        if not math.isfinite(flux) or flux < 0.0:
-            raise ValueError(
-                f'condensation efficiency for {species} in stage {stage.stage_number} is not finite'
+        T_gas_K = float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
+        band_flux_sum = 0.0
+        band_conductance_sum = 0.0
+        midpoint_driving_pressure: float | None = None
+        active_temperature_samples = 0
+        positive_driving_samples = 0
+        for sample in range(sample_count):
+            sample_T_C = (
+                lo_C if width_C == 0.0
+                else lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
             )
-        if flux == 0.0:
-            return _mint_zero('nonpositive_reference_flux', reference_flux=flux)
+            # SiO above its declared reactive-product cutoff has no supported
+            # wall product to capture. That sample is established pass-through;
+            # the inclusive boundary sample at T_cond_C still uses the product
+            # backstop. Other missing saturation data remains a typed refusal.
+            if reactive_backstop_authorized and sample_T_C > T_cond_C:
+                continue
+            active_temperature_samples += 1
+            sample_T_K = sample_T_C + CELSIUS_TO_KELVIN_OFFSET
+            if sample_T_K <= 0.0:
+                raise DepositionInputRefusal(
+                    'T_surface_K', sample_T_K, 'must be above absolute zero',
+                )
+            sample_alpha_s = alpha_s_value
+            if isinstance(alpha_spec, Mapping):
+                alpha_context: dict[str, Any] = {'coefficient_spec': alpha_spec}
+                sample_alpha_s = _condensation_alpha_s(
+                    species, sample_T_K, alpha_context,
+                )
+            if sample_alpha_s == 0.0:
+                if sample_T_C == (lo_C + hi_C) / 2.0:
+                    midpoint_driving_pressure = 0.0
+                continue
+
+            diagnostic: dict[str, Any] = {}
+            pressure_options = dict(
+                vapor_pressure_data=self.vapor_pressure_data,
+                reactive_product_backstop=(
+                    reactive_backstop_authorized and sample_T_C <= T_cond_C
+                ),
+                stable_condensation_product_backstop=(
+                    stable_product_backstop_authorized
+                ),
+                antoine_extrapolations=notices,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                diagnostic_out=diagnostic,
+            )
+            flux = _series_resistance_deposition_flux_mol_m2_s(
+                species, p_in, sample_T_K, sample_alpha_s,
+                pipe_diameter_m=gas_side_length_m,
+                stir_factor=self.stir_factor,
+                radial_stir_factor=self.radial_stir_factor,
+                regime_factor=self.regime_factor,
+                T_gas_K=T_gas_K,
+                overhead_pressure_pa=overhead_pressure_pa,
+                carrier_gas=self.carrier_gas,
+                **pressure_options,
+            )
+            if diagnostic.get('wall_saturation_pressure_refused'):
+                raise WallSaturationPressureRefusal(
+                    species, sample_T_K,
+                    diagnostic.get(
+                        'wall_saturation_pressure_refusal_reason',
+                        'saturation_pressure_unavailable',
+                    ),
+                )
+            if not math.isfinite(flux) or flux < 0.0:
+                raise ValueError(
+                    f'condensation efficiency for {species} in stage '
+                    f'{stage.stage_number} is not finite'
+                )
+            saturation_pressure = diagnostic.get('wall_saturation_pressure_pa')
+            if saturation_pressure is None or not math.isfinite(float(saturation_pressure)):
+                raise WallSaturationPressureRefusal(
+                    species, sample_T_K, 'saturation_pressure_unavailable',
+                )
+            sample_driving_pressure = max(0.0, p_in - float(saturation_pressure))
+            if (
+                sample_T_C == (lo_C + hi_C) / 2.0
+                or (width_C == 0.0 and sample == 0)
+            ):
+                midpoint_driving_pressure = sample_driving_pressure
+            band_flux_sum += flux
+            if sample_driving_pressure > 0.0:
+                positive_driving_samples += 1
+                band_conductance_sum += flux / sample_driving_pressure
+
+        if active_temperature_samples == 0 and reactive_backstop_authorized:
+            return _mint_zero(
+                'above_reactive_product_condensation_temperature',
+                stage_temperature_band_C=[lo_C, hi_C],
+            )
+        band_flux = band_flux_sum / sample_count
+        band_conductance = band_conductance_sum / sample_count
+        if band_flux <= 0.0 or band_conductance <= 0.0:
+            return _mint_zero(
+                'nonpositive_reference_flux'
+                if positive_driving_samples else 'no_supersaturation',
+                reference_flux=band_flux,
+            )
+        # For a declared isothermal collector, the sole sample is the midpoint;
+        # retain its exact driving pressure rather than round-tripping through
+        # flux/conductance. The band case uses the conductance-weighted drive.
+        driving_pressure = (
+            midpoint_driving_pressure
+            if width_C == 0.0 and midpoint_driving_pressure is not None
+            else band_flux / band_conductance
+        )
+        if (
+            driving_pressure is None
+            or not math.isfinite(driving_pressure)
+            or driving_pressure <= 0.0
+        ):
+            raise WallSaturationPressureRefusal(
+                species, midpoint_T_K, 'saturation_pressure_unavailable',
+            )
         molar_mass = (
             _molecular_mass_kg_per_molecule(species, vapor_pressure_data=self.vapor_pressure_data)
             * AVOGADRO_MOL
         )
-        # Premise: the series law is J=K_series*(p-P_sat), and at fixed gas
-        # volume/temperature p=N*R*T/V. Thus the balance is on excess inventory:
-        # d(N-N_sat)/dt=-(K_series*A*R*T/V)*(N-N_sat). Integrating from the
-        # inlet gives f=f_eq*(1-exp(-lambda*tau)), with
-        # lambda=K_series*A*R*T/V=J_in*A/(N_stage*f_eq). Since
-        # k_s=J_in*A/N_stage, this is f=f_eq*(1-exp(-k_s*tau/f_eq)).
-        # Units: J_in*A/N_stage is 1/s, so lambda*tau and k_s*tau/f_eq are
-        # dimensionless. N_stage=(available_kg/M)/3600*tau; at fixed flow,
-        # area and pressure, k_s*tau therefore cancels tau. Alpha->0 gives
-        # f->0; large k_s*tau gives f->f_eq, and 0<=f<=f_eq. Numerical ODE
-        # checks at P_sat/p_in=0.5 and 0.9 with unit excess transfer give
-        # 31.6060% and 6.3212%, respectively; no supersaturation returns 0.
+        # Premise: each band strip has J_i=K_i*(p-P_sat,i), with the same gas
+        # inventory feeding all strips. The existing equal-width center rule
+        # evaluates Jbar=(1/DeltaT)*integral(J dT) ~= sum(J_i)/N and
+        # Kbar=(1/DeltaT)*integral(K dT) ~= sum(J_i/(p-P_sat,i))/N; samples
+        # above the reactive cutoff contribute zero to both integrals. Then
+        # d_eff=Jbar/Kbar and f_eq=d_eff/p represent the integrated surface
+        # response. Apply the t-1217 excess-inventory balance once, after this
+        # integration: d(N-N_eq)/dt=-(Kbar*A*R*T/V)*(N-N_eq), hence
+        # eta=f_eq*(1-exp(-Jbar*A*tau/(N_stage*f_eq))). Applying the balance
+        # per strip would spend the same stage inventory N times. Units:
+        # Jbar*A/N_stage is 1/s and the exponent is dimensionless. At zero
+        # sticking eta is zero; long exposure tends to f_eq. An isothermal
+        # band uses its one midpoint sample and exactly reproduces that
+        # midpoint balance; no supersaturation gives zero.
         inventory_mol = available_kg / molar_mass / 3600.0 * residence_s
-        k_s = flux * area / inventory_mol
+        k_s = band_flux * area / inventory_mol
         f_eq = driving_pressure / p_in
         eta = f_eq * -math.expm1(-k_s * residence_s / f_eq)
-        notice = notices.get(f'{species}#wall:{T_surface_K}')
+        notice = notices.get(f'{species}#wall:{midpoint_T_K}')
         if isinstance(notice, Mapping) and efficiency_outcomes is not None:
             efficiency_outcomes.append({
                 **notice, 'status': 'extrapolated', 'authority_level': 'extrapolated',

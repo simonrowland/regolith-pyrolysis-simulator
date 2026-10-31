@@ -494,6 +494,9 @@ def test_b112_nonpositive_reference_flux_mints_typed_outcome(monkeypatch) -> Non
 
 def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
     import simulator.condensation as condensation_module
+    from tests.chemistry.test_equilibrium_capped_capture import (
+        _integrated_pressure_driven_capture,
+    )
 
     model = _efficiency_model()
     stage = next(s for s in model.train.stages if s.stage_number == 3)
@@ -507,10 +510,17 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
         "_hkl_impingement_flux_mol_m2_s",
         lambda *args, **kwargs: 1.0,
     )
+    def positive_flux(*args, **kwargs):
+        kwargs["diagnostic_out"].update(
+            wall_saturation_pressure_pa=1.0,
+            wall_saturation_pressure_refused=False,
+        )
+        return 2.0
+
     monkeypatch.setattr(
         condensation_module,
         "_series_resistance_deposition_flux_mol_m2_s",
-        lambda *args, **kwargs: 2.0,
+        positive_flux,
     )
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
@@ -528,8 +538,28 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
         alpha_s_value=1.0,
         efficiency_outcomes=outcomes,
     )
-    # t-1217: 1 Pa saturation leaves 99% equilibrium headroom at the 100 Pa inlet.
-    assert eta == pytest.approx(0.181092363070676)
+    # Independent ODE: 17 of the 33 band samples use the inclusive reactive
+    # backstop, with the stub flux supplying the same pressure coefficient in
+    # each active strip. The equilibrium headroom stays 99 Pa at 100 Pa inlet.
+    active_fraction = 17 / condensation_module.HKL_BAND_SAMPLES
+    inventory_mol = (
+        available_kg
+        / (
+            condensation_module._molecular_mass_kg_per_molecule("SiO")
+            * condensation_module.AVOGADRO_MOL
+        )
+        / 3600.0
+    )
+    expected = _integrated_pressure_driven_capture(
+        pressure=100.0,
+        psat=1.0,
+        temperature=model.gas_temperature_C + 273.15,
+        coefficient=active_fraction * (2.0 / 99.0),
+        area=1.0,
+        inventory=inventory_mol,
+        residence=1.0,
+    )
+    assert eta == pytest.approx(expected, rel=1e-8)
     assert outcomes == []
 
 

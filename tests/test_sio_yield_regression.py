@@ -16,7 +16,6 @@ from engines.builtin.vapor_pressure import (
 )
 from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
-from simulator.config import resolve_collector_bands_C
 from simulator.overhead import OverheadGasModel
 from simulator.runner import (
     SIO_ALPHA_PROVENANCE,
@@ -420,9 +419,16 @@ BASELINE_STAGE4_SIO2_KG = {
 # inlet pressures are lower and vary with its other molar flows, so the same
 # pressure-driven route has no feedstock-independent capture direction.
 # Values below are from simulator.runner.sio_yield's fixture-writing CLI.
+# 2026-10-31 d-137fix4 integrates the existing 33 center samples across the
+# Stage-3 band before applying the t-1217 excess-inventory balance. Production
+# CLI Stage-3 SiO2 product values (green -> midpoint -> integrated) are lunar
+# 2.73729872021e-06 -> 6.95443158853e-06 -> 6.95337203734e-06 kg and Mars
+# 2.75786146523e-06 -> 1.88317547314e-06 -> 1.10774716572e-06 kg. Evolved SiO
+# remains unchanged; the feedstock-dependent capture shifts follow the
+# integrated pressure-limited wall response.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 6.95443158853e-06,
-    "mars_basalt": 1.88317547314e-06,
+    "lunar_mare_low_ti": 6.95337203734e-06,
+    "mars_basalt": 1.10774716572e-06,
 }
 
 
@@ -599,19 +605,21 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # at 5e-12 percent.
     # t-1217 restores source-preserving causal capture and changes the bulk-
     # inventory subtraction's roundoff path; b-850 parent-oxide alkali-dimer
-    # activities shift the SiO route, yielding merged 24-hour closure residuals
-    # of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7% (Mars).
+    # activities shift the SiO route, yielding midpoint-era 24-hour closure
+    # residuals of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7%
+    # (Mars). d-137fix4 integrates the Stage-3 band before applying the same
+    # excess-inventory balance; the production resolver now reports the pins
+    # below without relaxing the independent atom-ledger closure bound.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333700073318e-7,
+        "lunar_mare_low_ti": 6.164333470503708e-7,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
-        # d-137's upstream Fe capture changes the Stage-3/terminal Si partition,
-        # which is the production resolver's closure input. The recomputed
-        # residual is 2.271604686598938e-7 -> 2.2716049134323923e-7 percent;
-        # retain the production value while the independent atom-ledger
-        # balance remains within 5e-12 percent.
-        "mars_basalt": 2.2716049134323923e-7,
+        # d-137's upstream Fe capture and d-137fix4's integrated Stage-3 band
+        # change the terminal Si partition. This is the measured
+        # production-resolver residual; atom-ledger balance remains within
+        # 5e-12 percent.
+        "mars_basalt": 2.2716048000156648e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -672,9 +680,10 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
     # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
     # Wetzel/Gail evaporation-Arrhenius validity floor.
-    # t-1217: inlet-driven equilibrium-capped kinetics leave 0.634790 kg after stage capture.
+    # Integrated band flux with the t-1217 shared-inventory balance leaves the
+    # production route's measured remainder.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.6347900475084334
+        0.6847703181648169
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
@@ -748,23 +757,28 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     )
 
     extrapolation = route.antoine_extrapolations["Ca"]
-    # d-137 splits the former Stage 4 into a 250 C Na collector and a 40 C K
-    # trap. Resolve the Na collector band through the production config owner;
-    # Ca's recorded extrapolation follows that current surface.
-    na_collector_low_C = resolve_collector_bands_C()[4][0]
-    na_collector_temperature_K = (
-        na_collector_low_C + condensation_module.CELSIUS_TO_KELVIN_OFFSET
-    )
-    assert extrapolation["temperature_K"] == pytest.approx(
-        na_collector_temperature_K
+    # A band collector records the encountered Antoine extrapolation at one of
+    # its production center samples, not at the isothermal midpoint. Ca first
+    # reaches the Stage-3 [900,1200] C band in this route.
+    stage_low_C, stage_high_C = model.train.stages[3].temp_range_C
+    sample_temperatures_K = [
+        stage_low_C
+        + (stage_high_C - stage_low_C) * (sample + 0.5)
+        / condensation_module.HKL_BAND_SAMPLES
+        + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+        for sample in range(condensation_module.HKL_BAND_SAMPLES)
+    ]
+    assert any(
+        extrapolation["temperature_K"] == pytest.approx(temperature_K)
+        for temperature_K in sample_temperatures_K
     )
     coefficients, coefficient_block = wall_condensation_antoine_coefficients(
-        ca_data, temperature_K=na_collector_temperature_K
+        ca_data, temperature_K=extrapolation["temperature_K"]
     )
     expected_range = vapor_pressure_source_equation_range_K(
-        ca_data, coefficient_block, na_collector_temperature_K
+        ca_data, coefficient_block, extrapolation["temperature_K"]
     ) or vapor_pressure_valid_range_K(
-        ca_data, coefficient_block, na_collector_temperature_K
+        ca_data, coefficient_block, extrapolation["temperature_K"]
     )
     assert coefficients
     assert tuple(extrapolation["valid_range_K"]) == tuple(expected_range)

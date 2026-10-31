@@ -188,6 +188,84 @@ def test_sio_missing_saturation_without_reactive_backstop_refuses(monkeypatch):
         )
 
 
+def test_band_capture_integrates_33_centers_with_inclusive_reactive_cutoff(monkeypatch):
+    model = _configured_model()
+    stage = model.train.stages[3]
+    stage.temp_range_C = (900.0, 1200.0)
+    evaluated_C = []
+
+    def constant_flux(_species, _pressure, temperature_K, _alpha, **kwargs):
+        evaluated_C.append(temperature_K - 273.15)
+        kwargs["diagnostic_out"]["wall_saturation_pressure_pa"] = 0.0
+        kwargs["diagnostic_out"]["wall_saturation_pressure_refused"] = False
+        return 0.02
+
+    monkeypatch.setattr(
+        condensation, "_series_resistance_deposition_flux_mol_m2_s", constant_flux,
+    )
+    eta = model._condensation_efficiency(
+        stage=stage, species="SiO", T_cond_C=1050.0, residence_s=4.0,
+        available_kg=1.0, alpha_s_value=0.5,
+        inlet_partial_pressure_pa=100.0,
+    )
+
+    assert len(evaluated_C) == 17
+    assert max(evaluated_C) == pytest.approx(1050.0)
+    assert min(evaluated_C) > 900.0
+    band_flux = 0.02 * 17 / condensation.HKL_BAND_SAMPLES
+    molar_mass = (
+        condensation._molecular_mass_kg_per_molecule("SiO")
+        * condensation.AVOGADRO_MOL
+    )
+    inventory = 1.0 / molar_mass / 3600.0 * 4.0
+    expected = _integrated_pressure_driven_capture(
+        pressure=100.0, psat=0.0,
+        temperature=model.gas_temperature_C + 273.15,
+        coefficient=band_flux / 100.0,
+        area=model._stage_area_m2_for_stage(stage),
+        inventory=inventory, residence=4.0,
+    )
+    assert eta == pytest.approx(expected, rel=1e-8)
+
+
+def test_isothermal_band_matches_midpoint_excess_inventory_capture(monkeypatch):
+    model = _configured_model()
+    stage = model.train.stages[3]
+    stage.temp_range_C = (1000.0, 1000.0)
+    evaluated_K = []
+
+    def constant_flux(_species, _pressure, temperature_K, _alpha, **kwargs):
+        evaluated_K.append(temperature_K)
+        kwargs["diagnostic_out"]["wall_saturation_pressure_pa"] = 25.0
+        kwargs["diagnostic_out"]["wall_saturation_pressure_refused"] = False
+        return 0.02
+
+    monkeypatch.setattr(
+        condensation, "_series_resistance_deposition_flux_mol_m2_s", constant_flux,
+    )
+    eta = model._condensation_efficiency(
+        stage=stage, species="Fe", T_cond_C=1050.0, residence_s=4.0,
+        available_kg=1.0, alpha_s_value=0.5,
+        inlet_partial_pressure_pa=100.0,
+    )
+
+    assert len(evaluated_K) == 1
+    assert evaluated_K[0] == pytest.approx(1273.15)
+    molar_mass = (
+        condensation._molecular_mass_kg_per_molecule("Fe")
+        * condensation.AVOGADRO_MOL
+    )
+    inventory = 1.0 / molar_mass / 3600.0 * 4.0
+    expected = _integrated_pressure_driven_capture(
+        pressure=100.0, psat=25.0,
+        temperature=model.gas_temperature_C + 273.15,
+        coefficient=0.02 / 75.0,
+        area=model._stage_area_m2_for_stage(stage),
+        inventory=inventory, residence=4.0,
+    )
+    assert eta == pytest.approx(expected, rel=1e-8)
+
+
 @pytest.mark.parametrize("band", [(math.nan, 600.0), (500.0, math.inf), (600.0, 500.0)])
 def test_invalid_stage_temperature_band_remains_a_typed_refusal(band):
     model = _configured_model()
