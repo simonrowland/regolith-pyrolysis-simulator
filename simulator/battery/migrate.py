@@ -19605,6 +19605,17 @@ class Migrator:
                     and point_items
                 ):
                     row_point_containers.append((container_name, point_items))
+
+        def queue_parent_value_issue(reason: str) -> None:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["value"],
+                reason,
+                source=source_key,
+                observation_id=obs_id,
+            )
+
         if (
             exploded
             and (
@@ -19702,14 +19713,12 @@ class Migrator:
             ):
                 return
             if not all_children_emitted:
-                self.result.add_queue(
-                    work.work_id,
-                    locator,
-                    ["value"],
+                queue_parent_value_issue(
                     value_sel.reason
-                    or "printed series had no numeric coordinate/value pairs; parent retained",
-                    source=source_key,
-                    observation_id=obs_id,
+                    or (
+                        "printed series had no numeric coordinate/value pairs; "
+                        "parent retained"
+                    )
                 )
         elif row_point_containers and (
             not _parent_bound_categorical(value_sel)
@@ -19897,14 +19906,16 @@ class Migrator:
                 )
             if self._count(source_key).observations_out > before:
                 return
+            if not value_sel.available:
+                # Suppressed children have their own queue ids; the retained
+                # unavailable parent needs its value issue under its own id.
+                queue_parent_value_issue(
+                    value_sel.reason
+                    or "source values have no printed scalar/series point"
+                )
         elif not value_sel.available:
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["value"],
-                value_sel.reason or "source values have no printed scalar/series point",
-                source=source_key,
-                observation_id=obs_id,
+            queue_parent_value_issue(
+                value_sel.reason or "source values have no printed scalar/series point"
             )
 
         uncertainty = _uncertainty_as_log10_dex(
