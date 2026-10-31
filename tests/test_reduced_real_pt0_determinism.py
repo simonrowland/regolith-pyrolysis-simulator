@@ -885,27 +885,33 @@ def test_equilibrium_key_ignores_absent_species_formula_changes() -> None:
 
 
 def test_equilibrium_key_uses_submitted_amount_when_inert_amount_changes() -> None:
+    from simulator.accounting.ledger import AtomLedger
+
     store = PT0DeterminismStore("capture")
     first, _first_result = _pt0_equilibrium_capture_context(store)
     second, _second_result = _pt0_equilibrium_capture_context(store)
     cleaned_account = "process.cleaned_melt"
 
-    first.inventory.inert_melt_components_kg.clear()
-    second.inventory.inert_melt_components_kg.clear()
+    for sim, na2o_mol in ((first, 1.0), (second, 2.0)):
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            cleaned_account,
+            {"SiO2": 1.0, "FeO": 2.0, "Na2O": na2o_mol},
+            source="b-929 inert amount identity",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        sim.inventory.inert_melt_components_kg.clear()
+        sim.inventory.inert_melt_components_kg["Na2O"] = (
+            ledger.project_account_kg(cleaned_account)["Na2O"]
+        )
+
     first_na2o_kg = first.atom_ledger.project_account_kg(
         cleaned_account
     )["Na2O"]
-    first.inventory.inert_melt_components_kg["Na2O"] = first_na2o_kg
-    second.atom_ledger.load_external_mol(
-        cleaned_account,
-        {"Na2O": 10.0},
-        source="b-929 inert amount identity",
-        material_origin="feedstock",
-    )
     second_na2o_kg = second.atom_ledger.project_account_kg(
         cleaned_account
     )["Na2O"]
-    second.inventory.inert_melt_components_kg["Na2O"] = second_na2o_kg
 
     first_mol = first.atom_ledger.project_account_mol(cleaned_account)
     second_mol = second.atom_ledger.project_account_mol(cleaned_account)
@@ -1247,11 +1253,18 @@ def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sim = _build_pt0_sim(PT0DeterminismStore("capture"))
+    from simulator.accounting.ledger import AtomLedger
+
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"SiO2": 1.0, "FeO": 2.0, "Na2O": 4.0},
+        source="b-929 dispatch identity pin",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger = ledger
     sim.inventory.inert_melt_components_kg.clear()
     sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
-    expected_payload = sim._silicate_provider_melt_inputs(
-        ChemistryIntent.SILICATE_EQUILIBRIUM
-    )
     observed: dict[str, Any] = {}
 
     class CapturingKernel:
@@ -1267,10 +1280,13 @@ def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
     )
 
     submitted_mol = observed["account_mol_overrides"]["process.cleaned_melt"]
-    assert expected_payload is not None
-    assert submitted_mol == expected_payload.composition_mol
+    # Literal values captured from the base 952e7730f dispatch path: PT-0
+    # canonicalizes the whole ledger before excluding inert Na2O.
+    assert submitted_mol == {
+        "FeO": 1.9999700000000002,
+        "SiO2": 1.00002,
+    }
     assert "Na2O" not in submitted_mol
-    assert "SiO2" in submitted_mol
 
 
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:

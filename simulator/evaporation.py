@@ -2825,12 +2825,10 @@ class EvaporationMixin:
                 'PT-0 live-control quantization requires composition '
                 'canonicalization support'
             )
-        if (
-            quantize_composition
-            and intent is ChemistryIntent.GATE_LIQUID_FRACTION
-        ):
-            # Gate inputs retain the full-ledger quantization their dispatch
-            # already uses; equilibrium inputs quantize after inert filtering.
+        if quantize_composition:
+            # PT-0 dispatch canonicalizes the full ledger before removing
+            # explicit inerts. Keep replay identity on those exact submitted
+            # values, including any rounding interaction with inert species.
             composition_mol = canonicalizer(
                 self,
                 {_FREEZE_GATE_ACCOUNT: composition_mol},
@@ -2849,14 +2847,6 @@ class EvaporationMixin:
             for species, mol in composition_mol.items()
             if species not in inert_species and float(mol) > 0.0
         }
-        if (
-            quantize_composition
-            and intent is not ChemistryIntent.GATE_LIQUID_FRACTION
-        ):
-            submitted_mol = canonicalizer(
-                self,
-                {_FREEZE_GATE_ACCOUNT: submitted_mol},
-            ).get(_FREEZE_GATE_ACCOUNT, {})
         formula_registry = getattr(self, 'species_formula_registry', {}) or {}
         formula_identity = tuple(
             (
