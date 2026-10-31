@@ -825,9 +825,21 @@ const common = {
     'data-default-pressure-band-warning-message': config.default_pressure_band_mbar.warning_message,
 };
 function render(extra) {
+    const classes = new Set();
+    const classList = {
+        add: name => classes.add(name),
+        remove: name => classes.delete(name),
+        contains: name => classes.has(name),
+        toggle(name, force) {
+            const shouldAdd = force === undefined ? !classes.has(name) : Boolean(force);
+            if (shouldAdd) classes.add(name);
+            else classes.delete(name);
+            return shouldAdd;
+        },
+    };
     const indicator = {
         getAttribute: name => ({...common, ...extra})[name] ?? null,
-        classList: {remove() {}},
+        classList,
         textContent: '',
     };
     const pressure = {value: '10'};
@@ -840,7 +852,10 @@ function render(extra) {
         },
     };
     vm.runInNewContext(functions + '\nupdateKnudsenIndicator();', context);
-    return indicator.textContent;
+    return {
+        text: indicator.textContent,
+        configWarning: classList.contains('config-warning'),
+    };
 }
 console.log(JSON.stringify({
     legacyN2: render({}),
@@ -865,10 +880,17 @@ console.log(JSON.stringify({
     )
     assert completed.returncode == 0, completed.stderr
     display = json.loads(completed.stdout)
-    legacy_kn = float(display["legacyN2"].split()[1])
-    carrier_kr_kn = float(display["carrierKr"].split()[1])
+    legacy_kn = float(display["legacyN2"]["text"].split()[1])
+    carrier_kr_kn = float(display["carrierKr"]["text"].split()[1])
     assert legacy_kn == pytest.approx(n2_kn, rel=0.005)
     assert carrier_kr_kn == pytest.approx(kr_kn, rel=0.005)
+    continuum_buffer_kn = config["continuum_buffer_kn"]
+    assert display["legacyN2"]["configWarning"] is (
+        n2_kn >= continuum_buffer_kn
+    )
+    assert display["carrierKr"]["configWarning"] is (
+        kr_kn >= continuum_buffer_kn
+    )
 
 
 def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:
