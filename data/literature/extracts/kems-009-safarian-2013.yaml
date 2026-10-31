@@ -38,6 +38,7 @@ species:
         - 0.92
         - 0.82
         - 0.85
+        - 0.8 to 0.85
         missing_for_motzfeldt:
         - orifice_area
         - clausing_factor
@@ -47,9 +48,11 @@ species:
           vs surface size; no Knudsen-cell Motzfeldt geometry package.
         S_cr_provenance: 'line 229: S_cr=0.913 gives effective sonic condition with η=1'
         p_eff_over_p_sat_at_eta_1_provenance: 'line 229: η=1 → p_eff=0.193 p°'
-        literature_flux_ratios_vs_max_provenance: Fig.4 / literature free-evaporation flux ratios vs max
-          for pure metals (Zn/Fe/Ag/Si context); values 0.92, 0.82, 0.85 as tabulated in extract from
-          theory-comparison discussion around lines 241-245
+        literature_flux_ratios_vs_max_provenance: 'Safarian and Engh p. 747 state: "evaporation flux ratios
+          0.92, [17] 0.82, [9,18] 0.85, [19] and 0.8 to 0.85 [16] have been reported." The sentence
+          does not assign these values to species, phase, or temperature. The later Figure 4 discussion
+          names Zn, Fe, Ag, and Si but does not map these four cited ratios to those metals. Keep all
+          four values unassigned; do not identify any as Fe alpha.'
         weak_evaporation_eta_provenance: Safarian and Engh p. 747, printed value 1.66; repaired source-pixel table.
       uncertainty:
         note: theoretical coefficients; pure-metal literature scatter on flux ratios
